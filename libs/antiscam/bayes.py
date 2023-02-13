@@ -175,15 +175,10 @@ class RandomForest:
                 result[i] += x/len(self.trees)
         return [round(x) for x in result]
 
-    def predict2(self) -> float:
-        "Get the model accuracy based on test dataset"
-        accuracy = 0.0
-        for i, tree in enumerate(self.trees):
-            tests = self.tests[i]
-            pred = tree.predict(tests)
-            tree_acc = sum(1 for i in range(len(pred)) if pred[i] == tests[i].category) / float(len(pred))
-            accuracy += tree_acc
-        return accuracy / len(self.trees)
+    def get_external_accuracy(self, data: list[Message]) -> float:
+        "Get the model accuracy based on a given dataset"
+        pred = self.predict(data)
+        return sum(1 for i in range(len(pred)) if pred[i] == data[i].category) / float(len(pred))
 
     def get_classes(self, record: Message) -> dict[str, float]:
         "Get the probability of each class for a given message"

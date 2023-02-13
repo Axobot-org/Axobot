@@ -1,4 +1,4 @@
-from libs.bot_classes import Zbot, MyContext
+from libs.bot_classes import Axobot, MyContext
 import discord
 import importlib
 import aiohttp
@@ -14,7 +14,7 @@ importlib.reload(checks)
 class Backups(commands.Cog):
     """This cog is used to make and apply backups of a Discord server"""
 
-    def __init__(self, bot: Zbot):
+    def __init__(self, bot: Axobot):
         self.bot = bot
         self.file = "s_backups"
 

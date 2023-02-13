@@ -10,7 +10,7 @@ from discord.ext import commands, tasks
 from fcts.args import serverlog
 from fcts.tickets import TicketCreationEvent
 from libs.antiscam.classes import PredictionResult
-from libs.bot_classes import MyContext, Zbot
+from libs.bot_classes import MyContext, Axobot
 from libs.enums import ServerWarningType
 from libs.formatutils import FormatUtils
 
@@ -37,7 +37,7 @@ class ServerLogs(commands.Cog):
         return {log for category in cls.logs_categories.values() for log in category}
 
 
-    def __init__(self, bot: Zbot):
+    def __init__(self, bot: Axobot):
         self.bot = bot
         self.file = "serverlogs"
         self.cache: LRUCache[int, dict[int, list[str]]] = LRUCache(max_size=10000, timeout=3600*4)
@@ -308,6 +308,8 @@ class ServerLogs(commands.Cog):
             if msg.cached_message:
                 if msg.cached_message.author.bot:
                     return
+                if "pinned" in msg.data and msg.cached_message.pinned != msg.data['pinned']:
+                    return
                 old_content = msg.cached_message.content
                 author = msg.cached_message.author
                 guild = msg.cached_message.guild
@@ -354,8 +356,9 @@ class ServerLogs(commands.Cog):
             )
             if msg is not None:
                 emb.set_author(name=str(msg.author), icon_url=msg.author.display_avatar)
-                emb.add_field(name="Created at", value=f"<t:{msg.created_at.timestamp():.0f}>")
                 emb.add_field(name="Message Author", value=f"{msg.author} ({msg.author.id})")
+            created_at = discord.utils.snowflake_time(payload.message_id)
+            emb.add_field(name="Created at", value=f"<t:{created_at.timestamp():.0f}>")
             await self.validate_logs(guild, channel_ids, emb, "message_delete")
         # ghost_ping
         if payload.cached_message is not None and (channel_ids := await self.is_log_enabled(payload.guild_id, "ghost_ping")):

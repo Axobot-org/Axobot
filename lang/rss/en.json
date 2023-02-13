@@ -74,6 +74,7 @@
     "tw-default-flow": "{logo}  | New tweet of {author}! ({date})\n\n{title}\n\nLink: {link}\n\n{mentions}",
     "tw-form-last": "{logo}  |  Here is the last tweet of {author}:\nWritten on {date}\n\n{title}\n\nLink: {url}",
     "tw-help": "To search for a twitter channel, you must enter the identifier of that channel. You will find it at the end of the string url, it usually corresponds to the user's name.\nFor example, for %https://twitter.com/Mc_AsiliS*, you must enter `Mc_AsiliS`.",
+    "tw-no-tweet": "It looks like this user has never tweeted :confused:",
     "twitch": "Twitch",
     "twitch-default-flow": "{logo}  | New live by {author}! ({date})\n\n{title}\n\nLink: {link}\n\n{mentions}",
     "twitch-form-last": "{logo}  | Here is the last video of {author}:\n{title}\nPublished on {date}\nLink: {url}\n",

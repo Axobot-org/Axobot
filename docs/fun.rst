@@ -1,10 +1,12 @@
+:tocdepth: 2
+
 ===
 Fun
 ===
 
 This section of the bot contains lots of fun commands, which will be less useful than the other sections, but will add a good atmosphere in your server. Because a server's life is not just about moderation or utilities, ZBot couldn't be without a few moments of fun. 
 
-However, if too much fun bothers you, this option can be disabled at any time with the `config command <server.html>`_ (`enable_fun` parameter). The choice is yours!
+However, if too much fun bothers you, this option can be disabled at any time with the `config command <server.html>`__ (`enable_fun` parameter). The choice is yours!
 
 
 ---------------------
@@ -28,9 +30,9 @@ Bigtext
 
 Here is a handy command for people who have trouble seeing small text of Discord. Or just for those who want to have some fun. In fact the bot will use your text to converts each letter into Discord Emojis, so that you have bigger text.
 
-You want some good news? If you have permission to use the `say <server.html#list-of-every-option>`_ command, the bot will delete your message after posting it !
+You want some good news? If you have permission to use the `say <server.html#list-of-every-option>`__ command, the bot will delete your message after posting it !
 
-.. warning:: The only permission required is "`Manage messages <perms.html#manage-messages>`_" to possibly delete your own message.
+.. warning:: The only permission required is "`Manage messages <perms.html#manage-messages>`__" to possibly delete your own message.
 
 
 Birthdays
@@ -52,7 +54,7 @@ You can access even more names by being on some secret servers! Enter the :code:
 
 .. note:: Currently only a bunch of images exist, but if you have others to propose (that respect the theme), come see us!
 
-.. warning:: ZBot needs "`Attach files <perms.html#attach-files>`_" permission to send its message. You're not gonna ask him to be angry without giving him permission to do it?
+.. warning:: ZBot needs "`Attach files <perms.html#attach-files>`__" permission to send its message. You're not gonna ask him to be angry without giving him permission to do it?
 
 
 Bubble-wrap
@@ -80,9 +82,9 @@ Count messages
 
 A nice little order that counts the number of messages in the history of this channel posted by someone. The limit corresponds to the number of messages to study in the chat, 1000 by default. And since some very old chats can have a very many many many MANY many messages (yes, 5 times *many*), we have a set limit on the number of messages you wish to search.
 
-If no user is given as parameter, Zbot will count your own messages. Same for the channel, if you don't provide any, Zbot uses the current one.
+If no user is given as parameter, Axobot will count your own messages. Same for the channel, if you don't provide any, Axobot uses the current one.
 
-.. warning:: It seems obvious, but the bot needs "`Read message history <perms.html#read-message-history>`_" permission to read the messages history...
+.. warning:: It seems obvious, but the bot needs "`Read message history <perms.html#read-message-history>`__" permission to read the messages history...
 
 
 Congrats
@@ -92,7 +94,7 @@ Congrats
 
 This is a nice little gif to use when you want to congratulate your friend. And remember to thank Gilderoy Lockhart for his charming smile!
 
-.. warning:: ZBot needs "`Attach files <perms.html#attach-files>`_" permission to send this nice message.
+.. warning:: ZBot needs "`Attach files <perms.html#attach-files>`__" permission to send this nice message.
 
 
 Kill
@@ -110,7 +112,7 @@ Lmgtfy
 
 Yes, that name is unpronounceable. On the other hand, commands are executed on written channels, not voice, so that's good. And, for use, refer to the website: "For all those people who find it more convenient to bother you with their question rather than search it for themselves."
 
-.. warning:: ZBot needs "`Manage messages <perms.html#manage-messages>`_" permission to delete the invocative message.
+.. warning:: ZBot needs "`Manage messages <perms.html#manage-messages>`__" permission to delete the invocative message.
 
 
 Loading
@@ -120,7 +122,7 @@ Loading
 
 Do you think that the time is long? Or do you just need to express a veeery looooong loading time? Use this command, designed especially for this bot!
 
-.. warning:: ZBot needs "`Attach files <perms.html#attach-files>`_" permission to send this message.
+.. warning:: ZBot needs "`Attach files <perms.html#attach-files>`__" permission to send this message.
 
 
 Me
@@ -128,7 +130,7 @@ Me
 
 **Syntax:** :code:`me <text>`
 
-When you need the bot to talk about you, like *"Z_runner runs away very fast"*, use this command. The "me" will be replaced by your nickname, and if you are allowed to use the `say <server.html#list-of-every-option>`_ command, your original message will be deleted.
+When you need the bot to talk about you, like *"Z_runner runs away very fast"*, use this command. The "me" will be replaced by your nickname, and if you are allowed to use the `say <server.html#list-of-every-option>`__ command, your original message will be deleted.
 
 Money
 -----
@@ -137,7 +139,7 @@ Money
 
 This command is perfect if you want to give the impression of literally swimming in piles of money. Can be placed in any discussion that is more or less related to this theme. Fortunately, the use of this command is not overtaxed.
 
-.. warning:: ZBot needs "`Attach files <perms.html#attach-files>`_" permission to send this gif.
+.. warning:: ZBot needs "`Attach files <perms.html#attach-files>`__" permission to send this gif.
 
 
 NASA
@@ -147,7 +149,7 @@ NASA
 
 If you want to see beautiful images from space, this command will suit you perfectly. It uses the official NASA API to get the Astronomy Picture of the Day, as well as a description of this image. Great for putting your head in the stars.
 
-.. warning:: The only permission needed to grant the bot is "`Embed Links <perms.html#embed-links>`_".
+.. warning:: The only permission needed to grant the bot is "`Embed Links <perms.html#embed-links>`__".
 
 
 Nope
@@ -155,9 +157,9 @@ Nope
 
 **Syntax:** :code:`nope`
 
-A small command to use when you do not agree with your interlocutor. Small, but it has the merit to be clear and to quickly cut short the discussion. And even better, if you have permission to use the `say <server.html#list-of-every-option>`_ command, your invocation message will be deleted ! *Camouflage activated!*
+A small command to use when you do not agree with your interlocutor. Small, but it has the merit to be clear and to quickly cut short the discussion. And even better, if you have permission to use the `say <server.html#list-of-every-option>`__ command, your invocation message will be deleted ! *Camouflage activated!*
 
-.. warning:: ZBot needs "`Attach files <perms.html#attach-files>`_" permission to send its message, and "`Manage messages <perms.html#manage-messages>`_" to delete yours.
+.. warning:: ZBot needs "`Attach files <perms.html#attach-files>`__" permission to send its message, and "`Manage messages <perms.html#manage-messages>`__" to delete yours.
 
 
 Nuke
@@ -167,7 +169,7 @@ Nuke
 
 The conversation's getting hot, do you want to blow it up? Let off some steam with a nice little gif, just to get the point out and calm down negotiations!
 
-.. warning:: ZBot needs "`Attach files <perms.html#attach-files>`_" permission to send this gif.
+.. warning:: ZBot needs "`Attach files <perms.html#attach-files>`__" permission to send this gif.
 
 
 HEEELP
@@ -184,7 +186,7 @@ Party
 
 Do you party often at home? If so, you have enough power to prove it with this command. And if not, she'll just put some good humor in the chat!
 
-.. warning:: Two permissions are required for this command: "`Attach files <perms.html#attach-files>`_" and "`Use external emojis <perms.html#use-external-emojis>`_".
+.. warning:: Two permissions are required for this command: "`Attach files <perms.html#attach-files>`__" and "`Use external emojis <perms.html#use-external-emojis>`__".
 
 
 Pibkac
@@ -192,9 +194,9 @@ Pibkac
 
 **Syntax:** :code:`pibkac`
 
-This is a quite well-known case in IT. To quote the definition of the `Urban Dictionary <https://www.urbandictionary.com/define.php?term=pibkac>`_, *"Problem Is Between Keyboard And Chair. Another term used to refer to an id10t or other person who probably should not own a computer"*.
+This is a quite well-known case in IT. To quote the definition of the `Urban Dictionary <https://www.urbandictionary.com/define.php?term=pibkac>`__, *"Problem Is Between Keyboard And Chair. Another term used to refer to an id10t or other person who probably should not own a computer"*.
 
-.. warning:: ZBot needs "`Attach files <perms.html#attach-files>`_" permission to send this gif.
+.. warning:: ZBot needs "`Attach files <perms.html#attach-files>`__" permission to send this gif.
 
 Piece
 -----
@@ -211,7 +213,7 @@ Pikachu
 
 Who doesn't know the world-famous Pokemon, Pikachu, who was for a long time the mascot of the Nintendo-owned company? Thanks to this command you can use gifs from this rabbit-eared Pokemon, randomly drawn from our ever-growing image bank!
 
-.. warning:: ZBot needs "`Attach files <perms.html#attach-files>`_" permission to send any gif.
+.. warning:: ZBot needs "`Attach files <perms.html#attach-files>`__" permission to send any gif.
 
 
 Pizza
@@ -221,7 +223,7 @@ Pizza
 
 Any of you like pizza here? Those beautiful dripping pieces of melted cheese and tomato sauce, delicately placed on a crispy, light dough? If that's your case, why don't you take a look at this beautiful and mouth-watering gif?!
 
-.. warning:: Yup. Here too, the bot needs "`Attach files <perms.html#attach-files>`_" permission to send this gif.
+.. warning:: Yup. Here too, the bot needs "`Attach files <perms.html#attach-files>`__" permission to send this gif.
 
 
 Pong
@@ -240,7 +242,7 @@ Ragequit
 Basically this command was designed for the sole use of the Creator. But since everyone has the right to get mad at something (and not just Python code), he decided to leave it open access. It's up to you to make good use of it!
 
 .. warning:: 
-    * The bot needs "`Attach files <perms.html#attach-files>`_" permission to send these images.
+    * The bot needs "`Attach files <perms.html#attach-files>`__" permission to send these images.
     * We do not own the copyright of each of the images used in this command. If you want to design an image specially for ZBot, and are ready to give us all rights, thank you to contact us as soon as possible!
 
 
@@ -253,9 +255,9 @@ This command allows you to force the bot to add reactions to a message, which is
 
 All reactions work, whether they are Discord or server reactions. All you have to do is separate them with a space. Just like magic!
 
-.. note:: To find out how to find the ID of a message, follow `this link <https://support.discord.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID->`_!
+.. note:: To find out how to find the ID of a message, follow `this link <https://support.discord.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID->`__!
 
-.. warning:: To find the message, ZBot must have "`Read Message History <perms.html#read-message-history>`_" permission, and "`Add Reactions <perms.html#add-reactions>`_" permission to add reactions.
+.. warning:: To find the message, ZBot must have "`Read Message History <perms.html#read-message-history>`__" permission, and "`Add Reactions <perms.html#add-reactions>`__" permission to add reactions.
 
 
 Reverse
@@ -294,7 +296,7 @@ Shrug
 
 Don't know the answer to a question? This is the opportunity to express it with a pretty gif straight out of our image bank! A simple command, but one which can be fun.
 
-.. warning:: ZBot needs "`Attach files <perms.html#attach-files>`_" permission to send any gif.
+.. warning:: ZBot needs "`Attach files <perms.html#attach-files>`__" permission to send any gif.
 
 
 Thanos
@@ -304,7 +306,7 @@ Thanos
 
 I assume you know Thanos from the Avengers series. If not, to make it short, he's a bad guy who decided to kill half the universe with a single snap of his finger.
 
-Well, if you want to know if you will be spared by this guy or not, check out the great oracle Zbot!
+Well, if you want to know if you will be spared by this guy or not, check out the great oracle Axobot!
 
 
 Tip
@@ -319,7 +321,7 @@ If you want to get some advice on how to use the bot, or just a funny fact, you 
 Bot events
 ----------
 
-From time to time, for special events of the year, Zbot has fun organizing an event where some small changes are made to the code. There is for example the tic-tac-toe whose symbols change, or many other small easter eggs of this kind... as well as the possibility to win event points!
+From time to time, for special events of the year, Axobot has fun organizing an event where some small changes are made to the code. There is for example the tic-tac-toe whose symbols change, or many other small easter eggs of this kind... as well as the possibility to win event points!
 
 To get event points, it is usually enough to use the bot: win games of tic-tac-toe, increase in xp level, or other actions of this kind.
 

@@ -13,7 +13,7 @@ from libs.errors import NotDuringEventError
 from libs.halloween import ColorVariation, TargetConverterType, VariationFlagType, check_image, convert_image
 
 importlib.reload(halloween)
-from libs.bot_classes import PRIVATE_GUILD_ID, SUPPORT_GUILD_ID, MyContext, Zbot
+from libs.bot_classes import PRIVATE_GUILD_ID, SUPPORT_GUILD_ID, MyContext, Axobot
 
 
 async def is_halloween(ctx: MyContext):
@@ -40,7 +40,7 @@ async def get_url_from_ctx(ctx: MyContext, who: typing.Optional[TargetConverterT
 
 class Halloween(Cog):
     "Class used for halloween events, mainly to hallowin-ify images"
-    def __init__(self, bot: Zbot):
+    def __init__(self, bot: Axobot):
         self.bot = bot
         self.file = "halloween"
         self.hourly_reward = [4, 17]
@@ -135,7 +135,7 @@ A BIG thanks to the Project Blurple and their original code for the colorization
 
         ..Example halloween check
 
-        ..Example halloween check Zbot"""
+        ..Example halloween check Axobot"""
 
         url = await get_url_from_ctx(ctx, who)
 

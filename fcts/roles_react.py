@@ -3,14 +3,14 @@ import discord
 import importlib
 import re
 from discord.ext import commands
-from libs.bot_classes import Zbot, MyContext
+from libs.bot_classes import Axobot, MyContext
 from . import checks, args
 importlib.reload(checks)
 importlib.reload(args)
 
 
 class RolesReact(commands.Cog):
-    def __init__(self, bot: Zbot):
+    def __init__(self, bot: Axobot):
         self.bot = bot
         self.file = 'roles_react'
         self.table = 'roles_react_beta' if bot.beta else 'roles_react'
@@ -114,7 +114,7 @@ class RolesReact(commands.Cog):
 
     @commands.group(name="roles_react", aliases=['role_react'])
     @commands.guild_only()
-    async def rr_main(self, ctx):
+    async def rr_main(self, ctx: MyContext):
         """Manage your roles reactions
         
         ..Doc roles-reactions.html"""
@@ -140,7 +140,7 @@ class RolesReact(commands.Cog):
             l = await self.rr_list_role(ctx.guild.id, emoji)
             if len(l) > 0:
                 return await ctx.send(await self.bot._(ctx.guild.id, "roles_react.already-1-rr"))
-            max_rr = await self.bot.get_config(ctx.guild.id, 'roles_react_max_number')
+            max_rr: int = await self.bot.get_config(ctx.guild.id, 'roles_react_max_number')
             if len(l) >= max_rr:
                 return await ctx.send(await self.bot._(ctx.guild.id, "roles_react.too-many-rr", l=max_rr))
             await self.rr_add_role(ctx.guild.id, role.id, emoji, description[:150])
@@ -153,7 +153,7 @@ class RolesReact(commands.Cog):
     @rr_main.command(name="remove")
     @commands.check(checks.database_connected)
     @commands.check(checks.has_manage_guild)
-    async def rr_remove(self, ctx, emoji):
+    async def rr_remove(self, ctx: MyContext, emoji):
         """Remove a role react
 
         ..Example roles_react remove :uwu:
@@ -171,17 +171,17 @@ class RolesReact(commands.Cog):
             await self.rr_remove_role(l[0]['ID'])
         except Exception as err:
             self.bot.dispatch("command_error", ctx, err)
+            return
+        role = ctx.guild.get_role(l[0]['role'])
+        if role is None:
+            await ctx.send(await self.bot._(ctx.guild.id, "roles_react.rr-removed-2", e=old_emoji))
         else:
-            role = ctx.guild.get_role(l[0]['role'])
-            if role is None:
-                await ctx.send(await self.bot._(ctx.guild.id, "roles_react.rr-removed-2", e=old_emoji))
-            else:
-                await ctx.send(await self.bot._(ctx.guild.id, "roles_react.rr-removed", r=role, e=old_emoji))
-            if len(l) < 2:
-                try:
-                    self.guilds_which_have_roles.remove(ctx.guild.id)
-                except KeyError:
-                    pass
+            await ctx.send(await self.bot._(ctx.guild.id, "roles_react.rr-removed", r=role, e=old_emoji))
+        if len(l) < 2:
+            try:
+                self.guilds_which_have_roles.remove(ctx.guild.id)
+            except KeyError:
+                pass
 
     async def create_list_embed(self, liste: list[dict], guild: discord.Guild):
         """Create a text with the roles list"""
@@ -219,7 +219,7 @@ class RolesReact(commands.Cog):
             self.bot.dispatch("command_error", ctx, err)
         else:
             des, _ = await self.create_list_embed(roles_list, ctx.guild)
-            max_rr = await self.bot.get_config(ctx.guild.id, 'roles_react_max_number')
+            max_rr: int = await self.bot.get_config(ctx.guild.id, 'roles_react_max_number')
             title = await self.bot._(ctx.guild.id, "roles_react.rr-list", n=len(roles_list), m=max_rr)
             emb = discord.Embed(title=title, description=des, color=self.embed_color, timestamp=ctx.message.created_at)
             emb.set_footer(text=ctx.author, icon_url=ctx.author.display_avatar)
@@ -237,17 +237,22 @@ It will only display the whole message with reactions. Still very cool tho
             roles_list = await self.rr_list_role(ctx.guild.id)
         except Exception as err:
             self.bot.dispatch("command_error", ctx, err)
-        else:
-            des, emojis = await self.create_list_embed(roles_list, ctx.guild)
-            title = await self.bot._(ctx.guild.id, "roles_react.rr-embed")
-            emb = discord.Embed(title=title, description=des, color=self.embed_color, timestamp=ctx.message.created_at)
-            emb.set_footer(text=self.footer_txt)
-            msg = await ctx.send(embed=emb)
-            for err in emojis:
-                try:
-                    await msg.add_reaction(err)
-                except (discord.Forbidden, discord.NotFound):
-                    pass
+            return
+        des, emojis = await self.create_list_embed(roles_list, ctx.guild)
+        title = await self.bot._(ctx.guild.id, "roles_react.rr-embed")
+        emb = discord.Embed(title=title, description=des, color=self.embed_color, timestamp=ctx.message.created_at)
+        emb.set_footer(text=self.footer_txt)
+        msg = await ctx.send(embed=emb)
+        for emoji in emojis:
+            try:
+                await msg.add_reaction(emoji)
+            except (discord.Forbidden, discord.NotFound):
+                pass
+            except discord.HTTPException as err:
+                if err.status == 400:
+                    continue
+                self.bot.dispatch("command_error", ctx, err)
+                break
 
     @rr_main.command(name="join")
     @commands.check(checks.database_connected)
@@ -310,7 +315,7 @@ Opposite is the subcommand 'join'
     @rr_main.command(name='update')
     @commands.check(checks.database_connected)
     async def rr_update(self, ctx: MyContext, embed: discord.Message, change_description: Optional[bool] = True, emojis: commands.Greedy[args.AnyEmoji] = None):
-        """Update a Zbot message to refresh roles/reactions
+        """Update an Axobot message to refresh roles/reactions
         If you don't want to update the embed content (for example if it's a custom embed) then you can use 'False' as a second argument, and I will only check the reactions
         Specifying a list of emojis will update the embed only for those emojis, and ignore other roles reactions
 
