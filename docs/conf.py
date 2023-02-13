@@ -31,7 +31,6 @@ release = '4.5.2'
 
 _documentation_name = "Axobot Documentation"
 
-
 # -- General configuration ---------------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.
