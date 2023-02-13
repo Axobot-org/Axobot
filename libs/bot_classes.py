@@ -226,7 +226,7 @@ class Axobot(commands.bot.AutoShardedBot):
         return super().get_cog(name)
 
     @property
-    def cnx_frm(self) -> MySQLConnection:
+    def cnx_axobot(self) -> MySQLConnection:
         """Connection to the default database
         Used for almost everything"""
         if self._cnx[0][1] + 1260 < round(time.time()):  # 21min
@@ -256,7 +256,7 @@ class Axobot(commands.bot.AutoShardedBot):
     def close_database_cnx(self):
         "Close any opened database connection"
         try:
-            self.cnx_frm.close()
+            self.cnx_axobot.close()
         except ProgrammingError:
             pass
         try:
@@ -292,7 +292,7 @@ class Axobot(commands.bot.AutoShardedBot):
 
     @property
     def db_query(self):
-        return create_database_query(self.cnx_frm)
+        return create_database_query(self.cnx_axobot)
 
     class SafeDict(dict):
         def __missing__(self, key):

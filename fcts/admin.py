@@ -415,11 +415,11 @@ class Admin(commands.Cog):
     async def db_reload(self, ctx: MyContext):
         "Reconnecte le bot à la base de donnée"
         await ctx.defer()
-        self.bot.cnx_frm.close()
+        self.bot.cnx_axobot.close()
         self.bot.connect_database_frm()
         self.bot.cnx_xp.close()
         self.bot.connect_database_xp()
-        if self.bot.cnx_frm is not None and self.bot.cnx_xp is not None:
+        if self.bot.cnx_axobot is not None and self.bot.cnx_xp is not None:
             if ctx.interaction:
                 await ctx.reply("Done!")
             else:

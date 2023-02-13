@@ -355,7 +355,7 @@ class Xp(commands.Cog):
             if points < 0:
                 return True
             if guild is None:
-                cnx = self.bot.cnx_frm
+                cnx = self.bot.cnx_axobot
             else:
                 cnx = self.bot.cnx_xp
             table = await self.get_table(guild)
@@ -378,7 +378,7 @@ class Xp(commands.Cog):
                 await self.bot.unload_extension("fcts.xp")
                 return None
             if guild is None:
-                cnx = self.bot.cnx_frm
+                cnx = self.bot.cnx_axobot
             else:
                 cnx = self.bot.cnx_xp
             table = await self.get_table(guild, False)
@@ -410,7 +410,7 @@ class Xp(commands.Cog):
                 await self.bot.unload_extension("fcts.xp")
                 return None
             if guild is None:
-                cnx = self.bot.cnx_frm
+                cnx = self.bot.cnx_axobot
             else:
                 cnx = self.bot.cnx_xp
             table = await self.get_table(guild, False)
@@ -437,7 +437,7 @@ class Xp(commands.Cog):
             target_global = (guild == -1)
             if target_global:
                 self.bot.log.info("[xp] Loading XP cache (global)")
-                cnx = self.bot.cnx_frm
+                cnx = self.bot.cnx_axobot
                 query = ("SELECT `userID`,`xp` FROM `{}` WHERE `banned`=0".format(self.table))
             else:
                 self.bot.log.info("[xp] Loading XP cache (guild {})".format(guild))
@@ -476,7 +476,7 @@ class Xp(commands.Cog):
                 cnx = self.bot.cnx_xp
                 query = ("SELECT * FROM `{}` order by `xp` desc".format(await self.get_table(guild.id,False)))
             else:
-                cnx = self.bot.cnx_frm
+                cnx = self.bot.cnx_axobot
                 query = ("SELECT * FROM `{}` order by `xp` desc".format(self.table))
             cursor = cnx.cursor(dictionary = True)
             try:
@@ -515,7 +515,7 @@ class Xp(commands.Cog):
                 cnx = self.bot.cnx_xp
                 query = ("SELECT `userID`,`xp`, @curRank := @curRank + 1 AS rank FROM `{}` p, (SELECT @curRank := 0) r WHERE `banned`='0' ORDER BY xp desc;".format(await self.get_table(guild.id, False)))
             else:
-                cnx = self.bot.cnx_frm
+                cnx = self.bot.cnx_axobot
                 query = ("SELECT `userID`,`xp`, @curRank := @curRank + 1 AS rank FROM `{}` p, (SELECT @curRank := 0) r WHERE `banned`='0' ORDER BY xp desc;".format(self.table))
             cursor = cnx.cursor(dictionary = True)
             try:

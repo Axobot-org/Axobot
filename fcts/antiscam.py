@@ -126,7 +126,7 @@ class AntiScam(commands.Cog):
             messages: list[dict[str, typing.Any]] = query_result
 
         counter = 0
-        cursor = self.bot.cnx_frm.cursor()
+        cursor = self.bot.cnx_axobot.cursor()
         for msg in messages:
             mentions_count = msg['mentions_count'] if msg['mentions_count'] > 0 else get_mentions_count(msg['message'])
             normd_msg = normalize(msg['message'])
@@ -148,7 +148,7 @@ class AntiScam(commands.Cog):
             params = list(edits.values()) + [msg['id']]
             # print(cur.mogrify(query, params))
             cursor.execute(query, params)
-        self.bot.cnx_frm.commit()
+        self.bot.cnx_axobot.commit()
         cursor.close()
         return counter
 

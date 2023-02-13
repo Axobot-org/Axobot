@@ -45,7 +45,7 @@ async def can_say(ctx: MyContext):
 
 async def can_use_cookie(ctx: MyContext) -> bool:
     "Check if a user can use the 'cookie' cmd"
-    async with ctx.bot.db_query("SELECT userID FROM frm.users WHERE user_flags & 32 = 32", astuple=True) as query_results:
+    async with ctx.bot.db_query("SELECT userID FROM `axobot`.`users` WHERE user_flags & 32 = 32", astuple=True) as query_results:
         allowed_users = flatten_list(query_results)
     return ctx.author.id in allowed_users
 
