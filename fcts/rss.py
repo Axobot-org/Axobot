@@ -64,15 +64,13 @@ class Rss(commands.Cog):
             'web': 120
         }
         self.cache = {}
-        if bot.user is not None:
-            self.table = 'rss_flow_beta' if bot.beta else 'rss_flow'
         # launch rss loop
         self.loop_child.change_interval(minutes=self.time_loop) # pylint: disable=no-member
 
 
-    @commands.Cog.listener()
-    async def on_ready(self):
-        self.table = 'rss_flow_beta' if self.bot.beta else 'rss_flow'
+    @property
+    def table(self):
+        return 'rss_flow_beta' if self.bot.beta else 'rss_flow'
 
     async def cog_load(self):
         self.loop_child.start() # pylint: disable=no-member
