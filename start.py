@@ -67,7 +67,7 @@ async def main():
 
     load_sql_connection(client)
     if client.database_online:
-        client.connect_database_frm()
+        client.connect_database_axobot()
         client.connect_database_xp()
 
     if args.token == 'zbot':

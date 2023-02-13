@@ -230,12 +230,12 @@ class Axobot(commands.bot.AutoShardedBot):
         """Connection to the default database
         Used for almost everything"""
         if self._cnx[0][1] + 1260 < round(time.time()):  # 21min
-            self.connect_database_frm()
+            self.connect_database_axobot()
             self._cnx[0][1] = round(time.time())
             return self._cnx[0][0]
         return self._cnx[0][0]
 
-    def connect_database_frm(self):
+    def connect_database_axobot(self):
         "Create a connection to the default database"
         if len(self.database_keys) > 0:
             if self._cnx[0][0] is not None:
