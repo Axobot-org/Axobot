@@ -263,7 +263,7 @@ class Admin(commands.Cog):
                 count += 1
             if guild.id == 356067272730607628:
                 fr_chan = guild.get_channel(494870602146906113)
-                if fr_chan not in channel:
+                if fr_chan != channel:
                     await fr_chan.send(self.update['fr']+"\n\n"+mentions, allowed_mentions=allowed_mentions)
                     count += 1
 
