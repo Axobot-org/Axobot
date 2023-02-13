@@ -165,7 +165,7 @@ class BotStats(commands.Cog):
         if message.channel.id != 625319946271850537 or len(message.embeds) != 1:
             return
         embed = message.embeds[0]
-        if match := re.search(r"Database backup done! \((\d+(?:\.\d+)?)([GM])\)", embed.description):
+        if match := re.search(r"Database backup done! \((\d+(?:\.\d+)?)([GMK])\)", embed.description):
             unit = match.group(2)
             self.last_backup_size = float(match.group(1)) / (1024 if unit == "M" else 1)
             self.bot.log.info(f"Last backup size detected: {self.last_backup_size}G")
