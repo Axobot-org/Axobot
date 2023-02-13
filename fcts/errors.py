@@ -6,7 +6,7 @@ import typing
 
 import discord
 from discord.ext import commands, tasks
-from libs.bot_classes import MyContext, Zbot
+from libs.bot_classes import MyContext, Axobot
 from libs.errors import NotDuringEventError, VerboseCommandError
 
 from . import checks
@@ -16,7 +16,7 @@ AllowedCtx = typing.Union[MyContext, discord.Message, discord.Interaction, str]
 class Errors(commands.Cog):
     """General cog for error management."""
 
-    def __init__(self, bot: Zbot):
+    def __init__(self, bot: Axobot):
         self.bot = bot
         self.file = "errors"
         # map of user ID and number of cooldowns recently hit
@@ -284,7 +284,7 @@ class Errors(commands.Cog):
                 recipient = await self.bot.get_recipient(ctx.channel)
                 context = f"DM | {recipient}"
             elif isinstance(ctx, discord.Interaction):
-                context = f"Slash command `{ctx.command.name if ctx.command else None}` | {ctx.guild.name} | {ctx.channel.name}"
+                context = f"Slash command `{ctx.command.qualified_name if ctx.command else None}` | {ctx.guild.name} | {ctx.channel.name}"
             else:
                 context = f"{ctx.guild.name} | {ctx.channel.name}"
             # if channel is the private beta channel, send it there
@@ -299,15 +299,15 @@ class Errors(commands.Cog):
 
     async def senf_err_msg(self, msg: str):
         """Envoie un message dans le salon d'erreur"""
-        salon = self.bot.get_channel(626039503714254858)
-        if salon is None:
+        errors_channel = self.bot.get_channel(626039503714254858)
+        if errors_channel is None:
             return False
         if len(msg) > 2000:
             if msg.endswith("```"):
                 msg = msg[:1997]+"```"
             else:
                 msg = msg[:2000]
-        await salon.send(msg)
+        await errors_channel.send(msg)
         return True
 
 

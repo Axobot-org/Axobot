@@ -25,7 +25,7 @@ Mute/Unmute
 -----------
 
 .. warning::
-    This section describes the use of the mute system when coupled with a "muted" role. As of Zbot 4.0.3, having a special role is no longer mandatory, and Zbot will use Discord's "time out" feature when no role has been configured to mute.  
+    This section describes the use of the mute system when coupled with a "muted" role. As of Axobot 4.0.3, having a special role is no longer mandatory, and Axobot will use Discord's "time out" feature when no role has been configured to mute.  
 
     If you have a role set to mute but wish to switch to the time out system, you can use the :code:`config reset muted_role` command.
 
@@ -39,7 +39,7 @@ The duration of the tempmute is quite flexible: use :code:`XXd` for days, :code:
 
 .. warning:: The muted role must be placed below the bot role, and the bot must have "`Manage roles <perms.html#manage-roles>`__" (to give the role) permission.
 
-.. note:: Zbot remembers when a member is muted in your server, and only delete this information when someone uses the !unmute command. So, if a member tries to lose his "muted" role by leaving and joining the server, Zbot will give them back his role, even if you removed it manually (without the command)!
+.. note:: Axobot remembers when a member is muted in your server, and only delete this information when someone uses the !unmute command. So, if a member tries to lose his "muted" role by leaving and joining the server, Axobot will give them back his role, even if you removed it manually (without the command)!
 
 **Syntax:** :code:`unmute <user>`
 
@@ -47,7 +47,7 @@ This command unmutes a member, when they already have the muted role. Not necess
 
 **Syntax:** :code:`mute-config`
 
-With this command, Zbot will try to configure automatically the muted role (and create it if needed) with the correct permissions, both in your server and in your channels/categories. Basically, in Discord, the rule is "if a member has any role allowing them to do X, then they will be able to do X, no matter what other roles they have". So Zbot will at first make the muted role disallowing members to send messages in the channels (with the red cross permission), then check every other roles and make sure they don't allow muted members to send messages (so any green check will become a gray tick in the channels permissions).
+With this command, Axobot will try to configure automatically the muted role (and create it if needed) with the correct permissions, both in your server and in your channels/categories. Basically, in Discord, the rule is "if a member has any role allowing them to do X, then they will be able to do X, no matter what other roles they have". So Axobot will at first make the muted role disallowing members to send messages in the channels (with the red cross permission), then check every other roles and make sure they don't allow muted members to send messages (so any green check will become a gray tick in the channels permissions).
 
 --------
 Slowmode
@@ -205,9 +205,9 @@ Anti-scam
 
 **How does it work?**
 
-Zbot has an advanced scam message detection system, involving a `highly trained AI <scam-detector.html>`__ that has been conscientiously built over several months. This allows you to automatically filter and remove any messages that are dangerous to your members, such as Nitro scams or other suspicious links.
+Axobot has an advanced scam message detection system, involving a `highly trained AI <scam-detector.html>`__ that has been conscientiously built over several months. This allows you to automatically filter and remove any messages that are dangerous to your members, such as Nitro scams or other suspicious links.
 
-When Zbot is certain that a message is dangerous, it will delete the message immediately and send a log to the logs channel if you have configured it. If Zbot detects a "probably dangerous" message, it will not take any action but will send you an alert in this same logs channel. So make sure you have configured an antiscam logs channel if you enable this feature.
+When Axobot is certain that a message is dangerous, it will delete the message immediately and send a log to the logs channel if you have configured it. If Axobot detects a "probably dangerous" message, it will not take any action but will send you an alert in this same logs channel. So make sure you have configured an antiscam logs channel if you enable this feature.
 
 .. note:: Messages that are too short, or sent by moderators (members with "manage messages" or "manage server" permissions) or bots will not be monitored by this system.
 
@@ -218,13 +218,13 @@ When Zbot is certain that a message is dangerous, it will delete the message imm
 :code:`antiscam test` followed by any text to test how dangerous this text may be
 :code:`antiscam report` followed by any text or message link to report a malicious message to the bot team
 
-.. warning:: By enabling this feature, you allow Zbot to read and analyze all messages on your server, and messages considered suspicious may be anonymized and stored in our database for better detection. You are solely responsible for notifying your community of this.
+.. warning:: By enabling this feature, you allow Axobot to read and analyze all messages on your server, and messages considered suspicious may be anonymized and stored in our database for better detection. You are solely responsible for notifying your community of this.
 
 -----------
 Server logs
 -----------
 
-To help you moderate your server and keep track of what's going on, Zbot has a logging system somewhat similar to the Discord one. You can decide to track one or more types of "events" in a channel, and Zbot will send a message there whenever something new happens. For example, it is possible to have a log at every ban or unban, or when a member changes role, etc.
+To help you moderate your server and keep track of what's going on, Axobot has a logging system somewhat similar to the Discord one. You can decide to track one or more types of "events" in a channel, and Axobot will send a message there whenever something new happens. For example, it is possible to have a log at every ban or unban, or when a member changes role, etc.
 
 .. note:: The bot has very few different types of logs at the moment, but there are plans to add many more in the next updates!
 
@@ -240,7 +240,7 @@ Types of logs
 
 * **antiraid:** A new member is kicked or banned by the raid detection system
 * **antiscan:** A message is flagged as a potential scam by the antiscam AI
-* **bot_warnings:** Zbot couldn't do its job due to an external factor (like a missing permission)
+* **bot_warnings:** Axobot couldn't do its job due to an external factor (like a missing permission)
 * **discord_invite:** A member just sent a message containing one or more Discord server invite link
 * **ghost_ping:** A member deleted a message containing a user mention right after sending it
 * **member_avatar:** A member changes its guild avatar
@@ -289,7 +289,7 @@ Nice command that allows you to do different things with the server roles (other
 
 * :code:`role color <role> <colour>` (alias `role colour`): Changes the color of the given role. The color must be in hexadecimal form, although some common names are accepted (red, blue, gold...). To remove the color, use the name `default`. Please check notes 1. and 2.
 
-* :code:`role give <role> <user(s) | role(s)>`: Give a role to a list of people. You can target as many users or roles as you want, so for example to target your friends Joe and Jack, plus the Admin role, use :code:`role give superRole Joe Jack Admin`. Please check note 2. To avoid spamming the Discord API, Zbot also limit how many users you can affect by this command, and will tell you if this limit is reached.
+* :code:`role give <role> <user(s) | role(s)>`: Give a role to a list of people. You can target as many users or roles as you want, so for example to target your friends Joe and Jack, plus the Admin role, use :code:`role give superRole Joe Jack Admin`. Please check note 2. To avoid spamming the Discord API, Axobot also limit how many users you can affect by this command, and will tell you if this limit is reached.
 
 * :code:`role remove <role> <user(s) | role(s)>`: Same as above, but instead of giving them, it takes them away. Please check note 2.
 
@@ -298,7 +298,7 @@ Nice command that allows you to do different things with the server roles (other
 * :code:`role server-list`: Liste every role of your server, with the members count. The bot must have "`Embed Links <perms.html#embed-links>`__" permission to display the result. Please check note 2.
 
 .. warning:: (1) The bot need the "`Manage roles <perms.html#manage-roles>`__" permission, also his highest role need to be higher than the role he's trying to edit.
-    (2) You need to have the "`Manage roles <perms.html#manage-roles>`__" permission (or be an administrator) to use this command. Else, Zbot won't react.
+    (2) You need to have the "`Manage roles <perms.html#manage-roles>`__" permission (or be an administrator) to use this command. Else, Axobot won't react.
 
 
 Unhoist members

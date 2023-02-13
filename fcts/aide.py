@@ -5,7 +5,7 @@ from typing import List, Optional, TypedDict
 
 import discord
 from discord.ext import commands
-from libs.bot_classes import MyContext, Zbot
+from libs.bot_classes import MyContext, Axobot
 
 class CommandsCategoryData(TypedDict):
     emoji: str
@@ -13,7 +13,7 @@ class CommandsCategoryData(TypedDict):
 
 class Help(commands.Cog):
 
-    def __init__(self, bot: Zbot):
+    def __init__(self, bot: Axobot):
         self.bot = bot
         self.file = "aide"
         self.old_cmd = bot.remove_command("help")
@@ -94,7 +94,7 @@ If the bot can't send the new command format, it will try to send the old one.""
         async with ctx.channel.typing():
             destination: discord.abc.Messageable = None
             if ctx.guild is not None:
-                send_in_dm = False if not self.bot.database_online else await self.bot.get_config(ctx.guild, 'help_in_dm')
+                send_in_dm = False if not self.bot.database_online else await self.bot.get_config(ctx.guild.id, 'help_in_dm')
                 if send_in_dm is not None and send_in_dm == 1:
                     destination = ctx.message.author.dm_channel
                     await ctx.message.delete(delay=0)
@@ -129,7 +129,7 @@ If the bot can't send the new command format, it will try to send the old one.""
                 if len(pages) == 0 and ctx.guild is None:
                     pages = [await self.bot._(ctx.channel, "help.cog-empty-dm")]
             elif not commands:  # no command
-                compress = await self.bot.get_config(ctx.guild, 'compress_help')
+                compress = await self.bot.get_config(ctx.guild.id, 'compress_help')
                 pages = await self.all_commands(ctx, sorted([c for c in self.bot.commands], key=self.sort_by_name), compress=compress)
                 if ctx.guild is None:
                     title = await self.bot._(ctx.channel, "help.embed_title_dm")

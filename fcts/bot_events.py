@@ -6,7 +6,7 @@ from typing import Optional
 
 import discord
 from discord.ext import commands
-from libs.bot_classes import MyContext, Zbot
+from libs.bot_classes import MyContext, Axobot
 from libs.bot_events import EventData, EventType
 from libs.formatutils import FormatUtils
 
@@ -74,7 +74,7 @@ translations_data = {
 class BotEvents(commands.Cog):
     "Cog related to special bot events (like Halloween and Christmas)"
 
-    def __init__(self, bot: Zbot):
+    def __init__(self, bot: Axobot):
         self.bot = bot
         self.file = "bot_events"
         self.hourly_reward = [-10, 60]
@@ -141,7 +141,7 @@ class BotEvents(commands.Cog):
             # If axobot is already there, don't do anything
             return
         if self.current_event and (data := self.current_event_data.get("emojis")):
-            if not await is_fun_enabled(msg, self.bot.get_cog("Fun")):
+            if not await is_fun_enabled(msg):
                 # don't react if fun is disabled for this guild
                 return
             if random.random() < data["probability"] and any(trigger in msg.content for trigger in data["triggers"]):

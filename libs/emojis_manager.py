@@ -5,7 +5,7 @@ import discord
 import requests
 
 if TYPE_CHECKING:
-    from libs.bot_classes import Zbot
+    from libs.bot_classes import Axobot
 
 # https://github.com/ttacon/emoji/blob/master/emoji.go
 
@@ -934,7 +934,7 @@ characteres = {':': 582223307944886292,
 class EmojisManager:
     """Class for managing emojis. No more, no less."""
 
-    def __init__(self, bot: "Zbot"):
+    def __init__(self, bot: "Axobot"):
         self.bot = bot
         self.emoji_map = emojiMap
         self.numbers = numbers

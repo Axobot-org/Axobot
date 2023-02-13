@@ -6,7 +6,7 @@ from discord import app_commands
 from discord.ext import commands
 from mysql.connector.errors import IntegrityError
 
-from libs.bot_classes import MyContext, Zbot
+from libs.bot_classes import MyContext, Axobot
 from libs.tickets.converters import EmojiConverterType
 from libs.tickets.views import (AskTitleModal, AskTopicSelect, SelectView,
                                 SendHintText, TicketCreationEvent)
@@ -22,7 +22,7 @@ def is_named_other(name: str, other_translated: str):
 class Tickets(commands.Cog):
     "Handle the bot tickets system"
 
-    def __init__(self, bot: Zbot):
+    def __init__(self, bot: Axobot):
         self.bot = bot
         self.file = "tickets"
         self.cooldowns: dict[discord.User, float] = {}

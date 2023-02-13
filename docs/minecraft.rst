@@ -23,7 +23,7 @@ To search in the database, the command is disconcertingly simple: you just have 
 
 To see the list of available types, enter the help mc command in the chat. If you don't find what you're looking for, don't worry: this type is probably planned for later!
 
-Mods info come from the `CurseForge API <https://twitchappapi.docs.apiary.io/>`__ (currently managed by Twitch), so Zbot may not be able to find some mods. Please also note that their search engine is very weird, and may not have the best results. Players search use the official Mojang API, and other data come from the french `fr-minecraft.net <https://fr-minecraft.net>`__ website.
+Mods info come from the `CurseForge API <https://twitchappapi.docs.apiary.io/>`__ (currently managed by Twitch), so Axobot may not be able to find some mods. Please also note that their search engine is very weird, and may not have the best results. Players search use the official Mojang API, and other data come from the french `fr-minecraft.net <https://fr-minecraft.net>`__ website.
 
 .. warning:: 
     * The bot needs the "`Embed links <perms.html#embed-links>`__" permission to send its search query, as well as "`Read message history <perms.html#read-message-history>`__" and to display the status of a server (enabled with `add` subcommand)

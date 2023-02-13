@@ -10,7 +10,7 @@ import discord
 import twitter
 from aiohttp import ClientSession, client_exceptions
 from discord.ext import commands, tasks
-from libs.bot_classes import MyContext, Zbot
+from libs.bot_classes import MyContext, Axobot
 from libs.enums import ServerWarningType
 from libs.formatutils import FormatUtils
 from libs.paginator import PaginatedSelectView
@@ -45,7 +45,7 @@ async def can_use_rss(ctx: MyContext):
 class Rss(commands.Cog):
     """Cog which deals with everything related to rss feeds. Whether it is to add automatic tracking to a stream, or just to see the latest video released by Discord, it is this cog that will be used."""
 
-    def __init__(self, bot: Zbot):
+    def __init__(self, bot: Axobot):
         self.bot = bot
         self.time_loop = 20 # min minutes between two rss loops
         self.time_between_feeds_check = 0.15 # seconds between two rss checks within a loop
@@ -64,15 +64,13 @@ class Rss(commands.Cog):
             'web': 120
         }
         self.cache = {}
-        if bot.user is not None:
-            self.table = 'rss_flow_beta' if bot.beta else 'rss_flow'
         # launch rss loop
         self.loop_child.change_interval(minutes=self.time_loop) # pylint: disable=no-member
 
 
-    @commands.Cog.listener()
-    async def on_ready(self):
-        self.table = 'rss_flow_beta' if self.bot.beta else 'rss_flow'
+    @property
+    def table(self):
+        return 'rss_flow_beta' if self.bot.beta else 'rss_flow'
 
     async def cog_load(self):
         self.loop_child.start() # pylint: disable=no-member
@@ -157,11 +155,13 @@ class Rss(commands.Cog):
         if re.match(r'https://(?:www\.)?twitter\.com/', name):
             name = await self.twitter_rss.get_userid_from_url(name)
         try:
-            text = await self.twitter_rss.get_feed(ctx.channel,name)
+            text = await self.twitter_rss.get_feed(ctx.channel, name)
         except Exception as err:
             return self.bot.dispatch("error", err, ctx)
         if isinstance(text, str):
             await ctx.send(text)
+        elif len(text) == 0:
+            await ctx.send(await self.bot._(ctx.channel, "rss.tw-no-tweet"))
         else:
             form = await self.bot._(ctx.channel, "rss.tw-form-last")
             for single in text[:5]:
@@ -218,7 +218,7 @@ class Rss(commands.Cog):
     async def is_overflow(self, guild: discord.Guild) -> tuple[bool, int]:
         """Check if a guild still has at least a slot
         True if max number reached, followed by the feed limit"""
-        feed_limit = await self.bot.get_config(guild.id,'rss_max_number')
+        feed_limit: int = await self.bot.get_config(guild.id, "rss_max_number")
         return len(await self.db_get_guild_feeds(guild.id)) >= feed_limit, feed_limit
 
     @rss_main.command(name="add")
@@ -971,7 +971,7 @@ class Rss(commands.Cog):
                 img_url = r.group(1)
             obj = RssMessage(
                 bot=self.bot,
-                feed=FeedObject.unrecorded("twitch", channel.guild.id, channel.id),
+                feed=FeedObject.unrecorded("twitch", channel.guild.id if channel.guild else None, channel.id),
                 url=feed['link'],
                 title=feed['title'],
                 date=feed['published_parsed'],
@@ -993,7 +993,7 @@ class Rss(commands.Cog):
                     img_url = r.group(1)
                 obj = RssMessage(
                     bot=self.bot,
-                    feed=FeedObject.unrecorded("twitch", channel.guild.id, channel.id),
+                    feed=FeedObject.unrecorded("twitch", channel.guild.id if channel.guild else None, channel.id),
                     url=feed['link'],
                     title=feed['title'],
                     date=feed['published_parsed'],
@@ -1056,7 +1056,7 @@ class Rss(commands.Cog):
                 img = r.group(0)
             obj = RssMessage(
                 bot=self.bot,
-                feed=FeedObject.unrecorded("web", channel.guild.id, channel.id),
+                feed=FeedObject.unrecorded("web", channel.guild.id if channel.guild else None, channel.id),
                 url=l,
                 title=title,
                 date=datz,
@@ -1099,7 +1099,7 @@ class Rss(commands.Cog):
                         img = r.group(0)
                     obj = RssMessage(
                         bot=self.bot,
-                        feed=FeedObject.unrecorded("web", channel.guild.id, channel.id),
+                        feed=FeedObject.unrecorded("web", channel.guild.id if channel.guild else None, channel.id),
                         url=l,
                         title=title,
                         date=datz,
@@ -1126,7 +1126,7 @@ class Rss(commands.Cog):
             title = re.search(r"DeviantArt: ([^ ]+)'s gallery",feeds.feed['title']).group(1)
             obj = RssMessage(
                 bot=self.bot,
-                feed=FeedObject.unrecorded("deviant", guild.id),
+                feed=FeedObject.unrecorded("deviant", guild.id if guild else None),
                 url=feed['link'],
                 title=feed['title'],
                 date=feed['published_parsed'],
@@ -1143,7 +1143,7 @@ class Rss(commands.Cog):
                 title = re.search(r"DeviantArt: ([^ ]+)'s gallery",feeds.feed['title']).group(1)
                 obj = RssMessage(
                     bot=self.bot,
-                    feed=FeedObject.unrecorded("deviant", guild.id),
+                    feed=FeedObject.unrecorded("deviant", guild.id if guild else None),
                     url=feed['link'],
                     title=feed['title'],
                     date=feed['published_parsed'],
@@ -1435,7 +1435,7 @@ class Rss(commands.Cog):
             await asyncio.sleep(self.time_between_feeds_check)
         await session.close()
         self.bot.get_cog('Minecraft').feeds.clear()
-        desc = [f"**RSS loop done** in {time.time()-start:.3f}s ({len(success_ids)}/{checked_count} feeds)"]
+        desc = [f"**RSS loop done** in {time.time()-start:.0f}s ({len(success_ids)}/{checked_count} feeds)"]
         if guild_id is None:
             if statscog := self.bot.get_cog("BotStats"):
                 statscog.rss_stats["checked"] = checked_count
@@ -1451,7 +1451,7 @@ class Rss(commands.Cog):
         emb = discord.Embed(description='\n'.join(desc), color=1655066, timestamp=self.bot.utcnow())
         emb.set_author(name=self.bot.user, icon_url=self.bot.user.display_avatar)
         await self.bot.send_embed(emb, url="loop")
-        self.bot.log.debug(desc[0])
+        self.bot.log.info(desc[0])
         if len(errors_ids) > 0:
             self.bot.log.warning("[rss] "+desc[1])
         if guild_id is None:
@@ -1473,8 +1473,6 @@ class Rss(commands.Cog):
             await self.main_loop()
         except Exception as err:
             self.bot.dispatch("error", err, "RSS main loop")
-        else:
-            self.bot.log.info(f" Boucle rss terminée en {time.time() - start_time:.2f}s!")
 
     @loop_child.before_loop
     async def before_printer(self):

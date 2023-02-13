@@ -10,7 +10,7 @@ from mysql.connector.cursor import _bytestr_format_dict, _ParamSubstitutor, RE_P
 from mysql.connector import errors
 
 
-def create_database_query(cnx_frm: Union[MySQLConnection, 'CMySQLConnection']):
+def create_database_query(cnx_axobot: Union[MySQLConnection, 'CMySQLConnection']):
     """Create a database query object using a specific database connector"""
 
     class DatabaseQuery:
@@ -92,7 +92,7 @@ def create_database_query(cnx_frm: Union[MySQLConnection, 'CMySQLConnection']):
 
 
         async def __aenter__(self) -> Union[int, list[dict], dict]:
-            self.cursor: MySQLCursor = cnx_frm.cursor(
+            self.cursor: MySQLCursor = cnx_axobot.cursor(
                 dictionary=(not self.astuple)
             )
 
@@ -118,7 +118,7 @@ def create_database_query(cnx_frm: Union[MySQLConnection, 'CMySQLConnection']):
                     # make sure to execute every query
                     for _ in execute_result:
                         execute_result.send(None)
-                cnx_frm.commit()
+                cnx_axobot.commit()
                 if self.returnrowcount:
                     result = self.cursor.rowcount
                 else:

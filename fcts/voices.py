@@ -1,19 +1,20 @@
 import json
 import random
+from typing import Optional
 import discord
 import aiohttp
 from discord.ext import commands
 
 from . import checks
-from libs.bot_classes import Zbot, MyContext
+from libs.bot_classes import Axobot, MyContext
 
 RANDOM_NAMES_URL = 'https://randommer.io/api/Name?nameType=surname&quantity=20'
-MINECRAFT_ENTITIES_URL = 'https://raw.githubusercontent.com/PixiGeko/Minecraft-generated-data/master/1.19/releases/1.19/data/custom/universal_tags/all_entity_type.json'
+MINECRAFT_ENTITIES_URL = 'https://raw.githubusercontent.com/PixiGeko/Minecraft-generated-data/master/1.19/releases/1.19.3/data/tags/universal_tags/all_entity_type.json'
 
 class VoiceChannels(commands.Cog):
     "Create automated voice channels and give roles to voice members"
 
-    def __init__(self, bot: Zbot):
+    def __init__(self, bot: Axobot):
         self.bot = bot
         self.file = "voices"
         self.names: dict[str, list[str]] = {'random': [], 'minecraft': []}
@@ -65,11 +66,9 @@ class VoiceChannels(commands.Cog):
         if not member.guild.me.guild_permissions.manage_roles:
             self.bot.log.info(f"[Voice] Missing \"manage_roles\" permission on guild \"{member.guild.name}\"")
             return
-        roles_ids = await self.bot.get_config(member.guild.id, 'voice_roles')
-        if not roles_ids:
+        roles: Optional[list[discord.Role]] = await self.bot.get_config(member.guild.id, 'voice_roles')
+        if not roles:
             return
-        roles_ids = list(map(int, roles_ids.split(';')))
-        roles = [member.guild.get_role(x) for x in roles_ids]
         pos = member.guild.me.top_role.position
         roles = filter(lambda x: (x is not None) and (x.position < pos), roles)
         if remove:
@@ -95,13 +94,10 @@ class VoiceChannels(commands.Cog):
             # If axobot is already there, let it handle it
             if await self.bot.check_axobot_presence(guild=member.guild):
                 return
-            config = await self.bot.get_config(member.guild.id, 'voice_channel')
-            if config is None:  # if nothing was setup
+            voice_channel: Optional[discord.VoiceChannel] = await self.bot.get_config(member.guild.id, "voice_channel")
+            if voice_channel is None:  # if nothing was setup
                 return
-            config = [int(x) for x in config.split(';') if x.isnumeric() and len(x)>5]
-            if len(config) == 0:
-                return
-            if after.channel is not None and after.channel.id in config:
+            if after.channel == voice_channel:
                 if before.channel is not None and len(before.channel.members) == 0: # move from another channel which is now empty
                     if (member.guild.id in self.channels) and (before.channel.id in self.channels[member.guild.id]):
                         # if they come from an automated channel, we move them back if the channel is now empty
@@ -120,16 +116,10 @@ class VoiceChannels(commands.Cog):
     async def create_channel(self, member: discord.Member):
         """Create a new voice channel
         The member will get "Manage channel" permissions automatically"""
-        category = await self.bot.get_config(member.guild.id, 'voice_category')
+        category: Optional[discord.CategoryChannel] = await self.bot.get_config(member.guild.id, 'voice_category')
         if category is None:  # if nothing was setup
             return
-        category = [int(x) for x in category.split(';') if x.isnumeric() and len(x)>5]
-        if len(category) == 0:
-            return
-        voice_category: discord.CategoryChannel = member.guild.get_channel(category[0])
-        if not isinstance(voice_category, discord.CategoryChannel):
-            return
-        perms = voice_category.permissions_for(member.guild.me)
+        perms = category.permissions_for(member.guild.me)
         # if bot is missing perms: abort
         if not (perms.manage_channels and perms.move_members):
             self.bot.log.info(f"[Voice] Missing \"manage_channels, move_members\" permission on guild \"{member.guild.id}\"")
@@ -137,7 +127,7 @@ class VoiceChannels(commands.Cog):
         if not (member.voice.channel.permissions_for(member.guild.me)).move_members:
             self.bot.log.info(f"[Voice] Missing \"move_members\" permission on channel \"{member.voice.channel}\"")
             return
-        p = len(voice_category.channels)
+        p = len(category.channels)
         # try to calculate the correct permissions
         d = member.guild.me.guild_permissions
         d = {k: v for k, v in dict(d).items() if v}
@@ -148,7 +138,7 @@ class VoiceChannels(commands.Cog):
         over[member].manage_roles = None
         over[member.guild.me].manage_roles = None
         # build channel name from config and random
-        chan_name = await self.bot.get_config(member.guild.id, 'voice_channel_format')
+        chan_name: str = await self.bot.get_config(member.guild.id, "voice_channel_format")
         args = {
             'user': str(member),
             'number': random.randint(0, 1000)
@@ -159,7 +149,7 @@ class VoiceChannels(commands.Cog):
             args['minecraft'] = await self.get_mc_name()
         chan_name = chan_name.format_map(self.bot.SafeDict(args))
         # actually create the channel
-        new_channel = await voice_category.create_voice_channel(name=chan_name, position=p, overwrites=over)
+        new_channel = await category.create_voice_channel(name=chan_name, position=p, overwrites=over)
         # move user
         await member.move_to(new_channel)
         # add to database
@@ -227,6 +217,6 @@ class VoiceChannels(commands.Cog):
         await ctx.send(await self.bot._(ctx.guild.id, "voices.deleted", count=i))
 
 
-async def setup(bot: Zbot):
+async def setup(bot: Axobot):
     if bot.database_online:
         await bot.add_cog(VoiceChannels(bot))
