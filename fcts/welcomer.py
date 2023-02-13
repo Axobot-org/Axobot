@@ -71,7 +71,7 @@ class Welcomer(commands.Cog):
             return
         if self.bot.get_cog('Utilities').sync_check_any_link(member.name) is not None:
             return
-        if msg not in {'', None}:
+        if msg:
             channel: Optional[discord.TextChannel] = await self.bot.get_config(member.guild.id, 'welcome_channel')
             if channel is None:
                 return
@@ -251,7 +251,9 @@ class Welcomer(commands.Cog):
     async def give_roles(self, member: discord.Member):
         """Give new roles to new users"""
         try:
-            roles: list[discord.Role] = await self.bot.get_config(member.guild.id, "welcome_roles")
+            roles: Optional[list[discord.Role]] = await self.bot.get_config(member.guild.id, "welcome_roles")
+            if roles is None:
+                return
             for role in roles:
                 try:
                     await member.add_roles(role,reason=await self.bot._(member.guild.id,"logs.reason.welcome_roles"))
