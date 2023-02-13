@@ -11,13 +11,13 @@ import discord
 from libs.formatutils import FormatUtils
 
 if TYPE_CHECKING:
-    from libs.bot_classes import Zbot
+    from libs.bot_classes import Axobot
 
 
 class TaskHandler:
     "Handler for timed tasks (like reminders or planned unban)"
 
-    def __init__(self, bot: Zbot):
+    def __init__(self, bot: Axobot):
         self.bot = bot
 
     async def get_events_from_db(self, get_all: bool = False, id_only: bool = False):

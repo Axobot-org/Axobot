@@ -1,15 +1,13 @@
-import copy
 import datetime
 import importlib
 import random
-import re
 from math import ceil
-from typing import Dict, List, Literal, Optional, Tuple, Union
+from typing import Dict, List, Literal, Optional, Union
 
 import discord
 from discord import app_commands
 from discord.ext import commands
-from libs.bot_classes import MyContext, Zbot
+from libs.bot_classes import MyContext, Axobot
 from libs.formatutils import FormatUtils
 from libs.paginator import Paginator
 from libs.views import ConfirmView
@@ -24,7 +22,7 @@ class Moderation(commands.Cog):
     """Here you will find everything you need to moderate your server.
     Please note that most of the commands are reserved for certain members only."""
 
-    def __init__(self, bot: Zbot):
+    def __init__(self, bot: Axobot):
         self.bot = bot
         self.file = "moderation"
         # maximum of roles granted/revoked by query
@@ -179,7 +177,7 @@ Slowmode works up to one message every 6h (21600s)
 
             async def user_can_kick(user):
                 try:
-                    return await self.bot.get_cog("Servers").staff_finder(user, "kick_allowed_roles")
+                    return await self.bot.get_cog("ServerConfig").check_member_config_permission(user, "kick_allowed_roles")
                 except commands.errors.CommandError:
                     pass
                 return False
@@ -238,7 +236,7 @@ Slowmode works up to one message every 6h (21600s)
         try:
             async def user_can_warn(user):
                 try:
-                    return await self.bot.get_cog("Servers").staff_finder(user, "warn_allowed_roles")
+                    return await self.bot.get_cog("ServerConfig").check_member_config_permission(user, "warn_allowed_roles")
                 except commands.errors.CommandError:
                     pass
                 return False
@@ -278,13 +276,10 @@ Slowmode works up to one message every 6h (21600s)
             await ctx.send(await self.bot._(ctx.guild.id, "moderation.error"))
             self.bot.dispatch("command_error", ctx, err)
 
-    async def get_muted_role(self, guild: discord.Guild):
+    async def get_muted_role(self, guild: discord.Guild) -> Optional[discord.Role]:
         "Find the muted role from the guild config option"
-        opt = await self.bot.get_config(guild.id, 'muted_role')
-        if opt is None or (isinstance(opt, str) and not opt.isdigit()):
-            return None
-            # return discord.utils.find(lambda x: x.name.lower() == "muted", guild.roles)
-        return guild.get_role(int(opt))
+        return await self.bot.get_config(guild.id, "muted_role")
+        # return discord.utils.find(lambda x: x.name.lower() == "muted", guild.roles)
 
     async def mute_event(self, member:discord.Member, author:discord.Member, reason:str, case_id:int, f_duration:str=None, duration: datetime.timedelta=None):
         """Call when someone should be muted in a guild"""
@@ -359,7 +354,7 @@ You can also mute this member for a defined duration, then use the following for
 
         async def user_can_mute(user):
             try:
-                return await self.bot.get_cog("Servers").staff_finder(user, "mute_allowed_roles")
+                return await self.bot.get_cog("ServerConfig").check_member_config_permission(user, "mute_allowed_roles")
             except commands.errors.CommandError:
                 pass
             return False
@@ -578,7 +573,7 @@ The 'days_to_delete' option represents the number of days worth of messages to d
                 member = ctx.guild.get_member(user.id)
                 async def user_can_ban(user):
                     try:
-                        return await self.bot.get_cog("Servers").staff_finder(user, "ban_allowed_roles")
+                        return await self.bot.get_cog("ServerConfig").check_member_config_permission(user, "ban_allowed_roles")
                     except commands.errors.CommandError:
                         pass
                     return False
@@ -716,7 +711,7 @@ Permissions for using this command are the same as for the kick
                 return
             async def user_can_kick(user):
                 try:
-                    return await self.bot.get_cog("Servers").staff_finder(user, "kick_allowed_roles")
+                    return await self.bot.get_cog("ServerConfig").check_member_config_permission(user, "kick_allowed_roles")
                 except commands.errors.CommandError:
                     pass
                 return False
@@ -940,7 +935,7 @@ The 'show_reasons' parameter is used to display the mute reasons.
             async def get_page_content(self, interaction, page):
                 "Create one page"
                 title = await self.client._(ctx.guild.id, "moderation.mute.list-title-0", guild=ctx.guild.name)
-                emb = discord.Embed(title=title, color=self.client.get_cog("Servers").embed_color)
+                emb = discord.Embed(title=title, color=self.client.get_cog("ServerConfig").embed_color)
                 if len(muted_list) == 0:
                     emb.description = await self.client._(ctx.guild.id, "moderation.mute.no-mutes")
                 else:
@@ -966,41 +961,6 @@ The 'show_reasons' parameter is used to display the mute reasons.
         _quit = await self.bot._(ctx.guild, "misc.quit")
         view = MutesPaginator(self.bot, ctx.author, stop_label=_quit.capitalize())
         await view.send_init(ctx)
-
-        # desc = list()
-        
-        # if len(muted_list) == 0:
-        #     desc.append(await self.bot._(ctx.guild.id, "moderation.mute.no-mutes"))
-        # elif show_reasons:
-        #     _unknown = (await self.bot._(ctx.guild, "misc.unknown")).capitalize()
-        #     for userid, reason in muted_list.items():
-        #         user: Optional[discord.User] = self.bot.get_user(userid)
-        #         if user is None:
-        #             continue
-        #         if len(desc) >= 45:
-        #             break
-        #         _reason = reason if (
-        #             reason is not None and reason != "Unspecified") else _unknown
-        #         desc.append("{}  *({})*".format(user, _reason))
-        #     if len(muted_list) > 45: # overwrite title with limit
-        #         title = await self.bot._(ctx.guild.id, "moderation.mute.list-title-1", guild=ctx.guild.name)
-        # else:
-        #     for userid in muted_list[:45]:
-        #         user: Optional[discord.User] = self.bot.get_user(userid)
-        #         if user is None:
-        #             continue
-        #         if len(desc) >= 60:
-        #             break
-        #         desc.append(str(user))
-        #     if len(muted_list) > 60: # overwrite title with limit
-        #         title = await self.bot._(ctx.guild.id, "moderation.mute.list-title-2", guild=ctx.guild.name)
-        # embed = discord.Embed(title=title, color=self.bot.get_cog("Servers").embed_color,
-        #                       description="\n".join(desc), timestamp=ctx.message.created_at)
-        # try:
-        #     await ctx.send(embed=embed)
-        # except discord.errors.HTTPException as err:
-        #     if err.code == 400:
-        #         await ctx.send(await self.bot._(ctx.guild.id, "moderation.ban.list-error"))
 
 
     @commands.hybrid_group(name="emoji",aliases=['emojis', 'emote'])
@@ -1121,7 +1081,7 @@ The 'show_reasons' parameter is used to display the mute reasons.
                 "Create one page"
                 first_index = (page - 1) * 50
                 last_index = min(first_index + 50, len(emotes))
-                embed = discord.Embed(title=title, color=ctx.bot.get_cog('Servers').embed_color)
+                embed = discord.Embed(title=title, color=ctx.bot.get_cog('ServerConfig').embed_color)
                 for i in range(first_index, last_index, 10):
                     emotes_list = list()
                     for emote in emotes[i:i+10]:
@@ -1405,7 +1365,7 @@ The 'show_reasons' parameter is used to display the mute reasons.
         except Exception as err:
             self.bot.dispatch("error", err)
             count = len(guild.channels)
-        await self.bot.get_cog('Servers').modify_server(guild.id, values=[('muted_role',role.id)])
+        await self.bot.get_cog("ServerConfig").set_option(guild.id, "muted_role", role)
         return role, count
 
 

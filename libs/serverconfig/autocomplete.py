@@ -1,11 +1,11 @@
 from discord import Interaction
 from discord.app_commands import Choice
 
-from libs.bot_classes import Zbot
+from libs.bot_classes import Axobot
 
 from . import options_list
 
-async def autocomplete_main(bot: Zbot, interaction: Interaction, option: str, current: str) -> list[Choice]:
+async def autocomplete_main(bot: Axobot, interaction: Interaction, option: str, current: str) -> list[Choice]:
     """Main autocompletion function, calling other sub-functions as needed"""
     if option in options_list.roles_options:
         return await autocomplete_roles(interaction, current)
@@ -51,9 +51,9 @@ async def autocomplete_bool(_interaction: Interaction, _current: str):
         Choice(name="False", value="0"),
     ]
 
-async def autocomplete_language(bot: Zbot, _interaction: Interaction, current: str):
+async def autocomplete_language(bot: Axobot, _interaction: Interaction, current: str):
     "Autocomplete a language"
-    languages: list[str] = bot.get_cog("Languages").languages
+    languages: tuple[str] = options_list.options["language"]["values"]
     if current:
         return [
             Choice(name=language, value=language) for language in languages
@@ -63,9 +63,9 @@ async def autocomplete_language(bot: Zbot, _interaction: Interaction, current: s
         Choice(name=language, value=language) for language in languages
     ]
 
-async def autocomplete_raid(bot: Zbot, _interaction: Interaction, current: str):
+async def autocomplete_raid(bot: Axobot, _interaction: Interaction, current: str):
     "Autocomplete a raid protection level"
-    levels = bot.get_cog("Servers").raids_levels
+    levels: tuple[str] = options_list.options["anti_raid"]["values"]
     if current:
         return [
             Choice(name=level, value=level) for level in levels
@@ -75,9 +75,9 @@ async def autocomplete_raid(bot: Zbot, _interaction: Interaction, current: str):
         Choice(name=level, value=level) for level in levels
     ]
 
-async def autocomplete_xp_type(bot: Zbot, _interaction: Interaction, current: str):
+async def autocomplete_xp_type(bot: Axobot, _interaction: Interaction, current: str):
     "Autocomplete a xp type"
-    types = bot.get_cog('Xp').types
+    types: tuple[str] = options_list.options["xp_type"]["values"]
     if current:
         return [
             Choice(name=type_name, value=type_name) for type_name in types
@@ -87,9 +87,9 @@ async def autocomplete_xp_type(bot: Zbot, _interaction: Interaction, current: st
         Choice(name=type_name, value=type_name) for type_name in types
     ]
 
-async def autocomplete_ttt_mode(bot: Zbot, _interaction: Interaction, current: str):
+async def autocomplete_ttt_mode(bot: Axobot, _interaction: Interaction, current: str):
     "Autocomplete a tic-tac-toe display mode"
-    types: list[str] = bot.get_cog("Morpions").types
+    types: tuple[str] = options_list.options["ttt_display"]["values"]
     if current:
         return [
             Choice(name=type_name, value=type_name) for type_name in types

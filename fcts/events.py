@@ -12,18 +12,17 @@ import discord
 import mysql
 from discord.ext import commands, tasks
 
-from libs.bot_classes import MyContext, Zbot
+from libs.bot_classes import MyContext, Axobot
 from libs.enums import UsernameChangeRecord
 
 
 class Events(commands.Cog):
     """Cog for the management of major events that do not belong elsewhere. Like when a new server invites the bot."""
 
-    def __init__(self, bot: Zbot):
+    def __init__(self, bot: Axobot):
         self.bot = bot
         self.file = "events"
         self.dbl_last_sending = datetime.datetime.utcfromtimestamp(0)
-        self.partner_last_check = datetime.datetime.utcfromtimestamp(0)
         self.last_eventDay_check = datetime.datetime.utcfromtimestamp(0)
         self.statslogs_last_push = datetime.datetime.utcfromtimestamp(0)
         self.loop_errors = [0,datetime.datetime.utcfromtimestamp(0)]
@@ -126,7 +125,8 @@ class Events(commands.Cog):
             self.bot.dispatch("username_change_record", UsernameChangeRecord(
                 before or None,
                 after or None,
-                after
+                is_in_guild=guild_id != 0,
+                user=self.bot.get_user(user_id)
             ))
 
 
@@ -191,7 +191,7 @@ class Events(commands.Cog):
         if not msg.author.bot:
             cond = False
             if self.bot.database_online:
-                cond = str(await self.bot.get_config(msg.guild,"anti_caps_lock")) in ['1','True']
+                cond: bool = await self.bot.get_config(msg.guild, "anti_caps_lock")
             if cond:
                 clean_content = msg.content
                 for rgx_match in (r'\|', r'\*', r'_', r'<a?:\w+:\d+>', r'<(#|@&?!?)\d+>', r'https?://\w+\.\S+'):
@@ -262,10 +262,7 @@ class Events(commands.Cog):
             return
         color = self.embed_colors[log_type.lower()]
         try:
-            config = str(await self.bot.get_config(guild.id,"modlogs_channel")).split(';', maxsplit=1)[0]
-            if config == "" or not config.isnumeric():
-                return
-            channel = guild.get_channel_or_thread(int(config))
+            channel: Optional[discord.TextChannel] = await self.bot.get_config(guild.id, "modlogs_channel")
         except Exception as err:
             self.bot.dispatch("error", err)
             return
@@ -329,9 +326,6 @@ class Events(commands.Cog):
             # Clear old rank cards - every 20min
             elif now.minute%20 == 0 and self.bot.database_online:
                 await self.bot.get_cog('Xp').clear_cards()
-            # Partners reload - every 8h UTC (start from 0am)
-            elif utcnow.hour%8 == 0 and now.hour != self.partner_last_check.hour and self.bot.database_online:
-                await self.partners_loop()
             # Bots lists updates - every day
             elif now.hour == 0 and now.day != self.dbl_last_sending.day:
                 await self.dbl_send_data()
@@ -343,7 +337,7 @@ class Events(commands.Cog):
                 await self.send_sql_statslogs()
             # Refresh needed membercounter channels - every 1min
             elif abs((self.last_membercounter - now).total_seconds()) > 60 and self.bot.database_online:
-                await self.bot.get_cog('Servers').update_everyMembercounter()
+                await self.bot.get_cog('ServerConfig').update_everyMembercounter()
                 self.last_membercounter = now
         except Exception as err:
             self.bot.dispatch("error", err)
@@ -394,34 +388,35 @@ class Events(commands.Cog):
         except Exception as err:
             answers[0] = "0"
             self.bot.dispatch("error", err, "Sending server count to top.gg")
-        try: # https://bots.ondiscord.xyz/bots/486896267788812288
-            payload = json.dumps({
-                'guildCount': guild_count
-            })
-            headers = {
-                'Authorization': self.bot.others['botsondiscord'],
-                'Content-Type': 'application/json'
-            }
-            async with session.post(f'https://bots.ondiscord.xyz/bot-api/bots/{self.bot.user.id}/guilds', data=payload, headers=headers) as resp:
-                self.bot.log.debug(f'BotsOnDiscord returned {resp.status} for {payload}')
-                answers[1] = resp.status
-        except Exception as err:
-            answers[1] = "0"
-            self.bot.dispatch("error", err, "Sending server count to BotsOnDiscord")
-        try: # https://api.discordextremelist.xyz/v2/bot/486896267788812288/stats
-            payload = json.dumps({
-                'guildCount': guild_count
-            })
-            headers = {
-                'Authorization': self.bot.others['discordextremelist'],
-                'Content-Type': 'application/json'
-            }
-            async with session.post(f'https://api.discordextremelist.xyz/v2/bot/{self.bot.user.id}/stats', data=payload, headers=headers) as resp:
-                self.bot.log.debug(f'DiscordExtremeList returned {resp.status} for {payload}')
-                answers[2] = resp.status
-        except Exception as err:
-            answers[2] = "0"
-            self.bot.dispatch("error", err, "Sending server count to DiscordExtremeList")
+        if self.bot.entity_id == 0:
+            try: # https://bots.ondiscord.xyz/bots/486896267788812288
+                payload = json.dumps({
+                    'guildCount': guild_count
+                })
+                headers = {
+                    'Authorization': self.bot.others['botsondiscord'],
+                    'Content-Type': 'application/json'
+                }
+                async with session.post(f'https://bots.ondiscord.xyz/bot-api/bots/{self.bot.user.id}/guilds', data=payload, headers=headers) as resp:
+                    self.bot.log.debug(f'BotsOnDiscord returned {resp.status} for {payload}')
+                    answers[1] = resp.status
+            except Exception as err:
+                answers[1] = "0"
+                self.bot.dispatch("error", err, "Sending server count to BotsOnDiscord")
+            try: # https://api.discordextremelist.xyz/v2/bot/486896267788812288/stats
+                payload = json.dumps({
+                    'guildCount': guild_count
+                })
+                headers = {
+                    'Authorization': self.bot.others['discordextremelist'],
+                    'Content-Type': 'application/json'
+                }
+                async with session.post(f'https://api.discordextremelist.xyz/v2/bot/{self.bot.user.id}/stats', data=payload, headers=headers) as resp:
+                    self.bot.log.debug(f'DiscordExtremeList returned {resp.status} for {payload}')
+                    answers[2] = resp.status
+            except Exception as err:
+                answers[2] = "0"
+                self.bot.dispatch("error", err, "Sending server count to DiscordExtremeList")
         await session.close()
         answers = '-'.join(str(x) for x in answers)
         delta_time = round(time.time()-t, 3)
@@ -429,33 +424,6 @@ class Events(commands.Cog):
         emb.set_author(name=self.bot.user, icon_url=self.bot.user.display_avatar)
         await self.bot.send_embed(emb, url="loop")
         self.dbl_last_sending = datetime.datetime.now()
-
-    async def partners_loop(self):
-        """Update partners channels (every 7 hours)"""
-        t = time.time()
-        self.partner_last_check = datetime.datetime.now()
-        channels_list = await self.bot.get_cog('Servers').get_server(criters=["`partner_channel`<>''"],columns=['ID','partner_channel','partner_color'])
-        self.bot.log.info(f"[Partners] Rafraîchissement des salons ({len(channels_list)} serveurs prévus)...")
-        count = [0,0]
-        for guild in channels_list:
-            try:
-                chan = guild['partner_channel'].split(';')[0]
-                if not chan.isnumeric():
-                    continue
-                chan = self.bot.get_channel(int(chan))
-                if chan is None:
-                    continue
-                count[0] += 1
-                count[1] += await self.bot.get_cog('Partners').update_partners(chan,guild['partner_color'])
-            except Exception as err:
-                self.bot.dispatch("error", err)
-        delta_time = round(time.time()-t,3)
-        emb = discord.Embed(
-            description=f'**Partners channels updated** in {delta_time}s ({count[0]} channels - {count[1]} partners)',
-            color=10949630,
-            timestamp=self.bot.utcnow())
-        emb.set_author(name=self.bot.user, icon_url=self.bot.user.display_avatar)
-        await self.bot.send_embed(emb, url="loop")
 
     async def send_sql_statslogs(self):
         "Send some stats about the current bot stats"
@@ -469,9 +437,9 @@ class Events(commands.Cog):
         else:
             member_count = len(self.bot.users)
             bot_count = len([1 for x in self.bot.users if x.bot])
-        lang_stats = await self.bot.get_cog('Servers').get_languages([], return_dict=True)
+        lang_stats = await self.bot.get_cog('ServerConfig').get_languages([])
         rankcards_stats = await self.bot.get_cog('Users').get_rankcards_stats()
-        xptypes_stats = await self.bot.get_cog('Servers').get_xp_types([], return_dict=True)
+        xptypes_stats = await self.bot.get_cog('ServerConfig').get_xp_types([])
         supportserver_members = self.bot.get_guild(356067272730607628).member_count
         query = "INSERT INTO `log_stats` (`servers_count`, `members_count`, `bots_count`, `dapi_heartbeat`, `codelines_count`, `earned_xp_total`, `rss_feeds`, `active_rss_feeds`, `supportserver_members`, `languages`, `used_rankcards`, `xp_types`, `entity_id`) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
         data = (
@@ -516,7 +484,7 @@ class Events(commands.Cog):
 
 During the migration period, Zbot will continue to work, but will **receive updates later** than Axobot and may not work as well.
 Luckily for you, **the migration is very quick**, just invite Axobot and give it the same roles as Zbot to avoid any service interruption!"""
-            emb = discord.Embed(title="Zbot is becoming Axobot !", description=txt, color=0x00ff00)
+            emb = discord.Embed(title="Zbot is becoming Axobot!", description=txt, color=0x00ff00)
             emb.set_thumbnail(url="https://zrunner.me/axolotl.png")
             await ctx.send(embed=emb, view=MigrationView())
 

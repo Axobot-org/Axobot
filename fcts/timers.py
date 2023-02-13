@@ -4,7 +4,7 @@ from typing import Optional
 
 import discord
 from discord.ext import commands
-from libs.bot_classes import MyContext, Zbot
+from libs.bot_classes import MyContext, Axobot
 from libs.formatutils import FormatUtils
 from libs.paginator import PaginatedSelectView
 from libs.views import ConfirmView
@@ -12,7 +12,7 @@ from libs.views import ConfirmView
 from . import args, checks
 
 class Timers(commands.Cog):
-    def __init__(self, bot: Zbot):
+    def __init__(self, bot: Axobot):
         self.bot = bot
         self.file = "timers"
 
@@ -72,7 +72,7 @@ class Timers(commands.Cog):
         ..Doc miscellaneous.html#create-a-new-reminder"""
         ctx.message.content = ctx.prefix + ("reminder " if args.startswith('create') else "reminder create ") + args
         new_ctx = await self.bot.get_context(ctx.message)
-        await self.bot.invoke(new_ctx)
+        await self.remind_main.invoke(new_ctx)
 
 
     @commands.group(name="reminder", aliases=["remind", "reminds", "reminders"])

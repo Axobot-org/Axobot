@@ -3,7 +3,7 @@ from typing import Any, Optional, Union
 
 from discord import ButtonStyle, Interaction, Message, SelectOption, User, ui
 
-from libs.bot_classes import MyContext, Zbot
+from libs.bot_classes import MyContext, Axobot
 
 
 def cut_text(lines: list[str], max_length: int = 1024, max_size=100) -> list[str]:
@@ -24,7 +24,7 @@ def cut_text(lines: list[str], max_length: int = 1024, max_size=100) -> list[str
 class Paginator(ui.View):
     "Base class to paginate something"
 
-    def __init__(self, client: Zbot, user: User, stop_label: str="Quit", timeout: int=180):
+    def __init__(self, client: Axobot, user: User, stop_label: str="Quit", timeout: int=180):
         super().__init__(timeout=timeout)
         self.client = client
         self.user = user
@@ -120,7 +120,7 @@ class Paginator(ui.View):
 class PaginatedSelectView(ui.View):
     "View used to represent a discord Select with potentially more than 25 options"
 
-    def __init__(self, client: Zbot, message: Optional[str], options: list[SelectOption], user: User, placeholder: str,
+    def __init__(self, client: Axobot, message: Optional[str], options: list[SelectOption], user: User, placeholder: str,
                  stop_label: str = "Quit", min_values: int = 1, max_values: int = 25, timeout: int = 180):
         super().__init__(timeout=timeout)
         if any(not isinstance(opt.value, str) for opt in options):

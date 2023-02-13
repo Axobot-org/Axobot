@@ -12,7 +12,7 @@ Admins
 
 **Syntax:** :code:`admins`
 
-If you want to quickly know who are the Zbot administrators. Easy to use, quick to read, always up-to-date.
+If you want to quickly know who are the Axobot administrators. Easy to use, quick to read, always up-to-date.
 
 ----------
 Bitly urls
@@ -61,7 +61,7 @@ This command is particularly useful if the 'say' command is no longer enough for
 
 Each argument is presented in the form :code:`name="value"`. If you want a line break, you can use the character :code:`\\n`, and if you want to use quotation marks without closing the argument, you will have to escape them (with a \ in front). To better understand how it works, here is an example of how to use it: :code:`embed title="Here is my title!" content="Blah blah \\nBlah ?" footer="Do you mean \\"Text\\"? "`
 
-.. warning:: Hey, this may sound weird, but Zbot needs "`Embed Links <perms.html#embed-links>`__" permission to send embeds...
+.. warning:: Hey, this may sound weird, but Axobot needs "`Embed Links <perms.html#embed-links>`__" permission to send embeds...
 
 
 --------------
@@ -94,14 +94,14 @@ Python formatting (pep8)
 
 **Syntax:** :code:`pep8 <code>`
 
-Python's formatting conventions can sometimes be difficult to remember. Summaries exist on the internet, but there are several hundred rules, all more or less specific to their use cases. That's why Zbot offers you to automatically format your Python code following the "PEP 8" (PEP for Python Extension Proposal) rules with a simple command.
+Python's formatting conventions can sometimes be difficult to remember. Summaries exist on the internet, but there are several hundred rules, all more or less specific to their use cases. That's why Axobot offers you to automatically format your Python code following the "PEP 8" (PEP for Python Extension Proposal) rules with a simple command.
 
 
 ---------
 Reminders
 ---------
 
-If you have some issues with your memory like me, I think you should start using this command. With it, you can ask Zbot to remind you things to do later, between a minute and a few years. Like a `!d bump`, or anything else, up to you. And it also works in DM.
+If you have some issues with your memory like me, I think you should start using this command. With it, you can ask Axobot to remind you things to do later, between a minute and a few years. Like a `!d bump`, or anything else, up to you. And it also works in DM.
 
 Create a new reminder
 ---------------------
@@ -110,7 +110,7 @@ Create a new reminder
 
 The duration argument is exactly the same as for tempmute/tempban: use :code:`XXw` for weeks, :code:`XXd` for days, :code:`XXh` for hours and :code:`XXm` for minutes (replacing **XX** by the corresponding number, of course!)
 
-.. warning:: Zbot needs "`Embed Links <perms.html#embed-links>`__" permission to send the reminder.
+.. warning:: Axobot needs "`Embed Links <perms.html#embed-links>`__" permission to send the reminder.
 
 List your reminders
 -------------------
@@ -126,7 +126,7 @@ Delete one or more reminders
 
 **Syntax:** :code:`reminder delete [ID]`
 
-Used when you want to stop a reminder, so Zbot will completely forget it. If you don't provide any ID, Zbot will ask you to directly select which reminders you want to delete.
+Used when you want to stop a reminder, so Axobot will completely forget it. If you don't provide any ID, Axobot will ask you to directly select which reminders you want to delete.
 
 Clear every reminders
 ---------------------
@@ -168,7 +168,7 @@ Vote
 
 **Syntax:** :code:`vote [number] <text>`
 
-This command will add a little interactivity in your server by allowing the creation of votes or polls. Zbot will send a message containing your text and then add reactions to it, before deleting your original message.
+This command will add a little interactivity in your server by allowing the creation of votes or polls. Axobot will send a message containing your text and then add reactions to it, before deleting your original message.
 
 If no number of choices is given, or if this number is 0, the vote will be a yes/no type. Otherwise, it will be a question of choosing between the choices using numbers. Note that it is not possible at this time to put more than 10 choices.
 

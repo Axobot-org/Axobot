@@ -1,7 +1,10 @@
 from typing import Union
+
 import discord
 import i18n
-from libs.bot_classes import MyContext, Zbot
+
+from libs.bot_classes import Axobot, MyContext
+from libs.serverconfig.options_list import options
 
 SourceType = Union[None, int, discord.Guild, discord.TextChannel, discord.Thread,
                    discord.Member, discord.User, discord.DMChannel, discord.Interaction,
@@ -11,11 +14,10 @@ SourceType = Union[None, int, discord.Guild, discord.TextChannel, discord.Thread
 class Languages(discord.ext.commands.Cog):
     "Translations module"
 
-    def __init__(self, bot: Zbot):
+    def __init__(self, bot: Axobot):
         self.bot = bot
         self.file = "languages"
-        self.languages = ('fr', 'en', 'lolcat', 'fi', 'de', 'fr2')
-        self.serv_opts: dict[int, str] = {}
+        self.languages: tuple[str] = options["language"]["values"]
         i18n.set('filename_format', '{locale}.{format}')
         i18n.set('file_format', 'json')
         i18n.set('fallback', None)
@@ -26,8 +28,8 @@ class Languages(discord.ext.commands.Cog):
         i18n.load_path.append('./lang')
 
     @property
-    def default_language(self):
-        return self.bot.get_cog('Servers').default_language
+    def default_language(self) -> str:
+        return options["language"]["default"]
 
     async def tr(self, source: SourceType, string_id: str, **args):
         """Renvoie le texte en fonction de la langue"""
@@ -56,9 +58,6 @@ class Languages(discord.ext.commands.Cog):
             # get lang from user
             used_langs = await self.bot.get_cog('Utilities').get_languages(source, limit=1)
             lang_opt = used_langs[0][0] if len(used_langs) > 0 else self.default_language
-        elif source in self.serv_opts:
-            # get lang from cache
-            lang_opt = self.serv_opts[source]
         elif not self.bot.database_online or source is None:
             # get default lang
             lang_opt = self.default_language
@@ -72,12 +71,9 @@ class Languages(discord.ext.commands.Cog):
                 lang_opt = used_langs[0][0] if len(used_langs) > 0 else self.default_language
         elif isinstance(source, int):
             # get lang from server ID
-            lang_id = await self.bot.get_config(source, "language")
-            if lang_id is None:
+            lang_opt: str = await self.bot.get_config(source, "language")
+            if lang_opt is None:
                 lang_opt = self.default_language
-            else:
-                lang_opt = self.languages[lang_id]
-                self.serv_opts[source] = lang_opt
         else:
             raise TypeError(f"Unknown type for translation source: {type(source)}")
         if lang_opt not in self.languages:
@@ -104,12 +100,6 @@ class Languages(discord.ext.commands.Cog):
             await self.bot.get_cog('Errors').senf_err_msg(err)
         except Exception: # pylint: disable=broad-except
             self.bot.log.error("Something went wrong while reporting a translation as missing", exc_info=True)
-
-    async def change_cache(self, server_id: int, new_lang: str):
-        #print("change_cache:",new_lang)
-        if new_lang in self.languages:
-            #print("changement effectué")
-            self.serv_opts[server_id] = new_lang
 
 
 async def setup(bot):

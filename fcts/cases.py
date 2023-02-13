@@ -7,7 +7,7 @@ import discord
 from discord.ext import commands
 
 from fcts.checks import is_support_staff
-from libs.bot_classes import MyContext, Zbot
+from libs.bot_classes import MyContext, Axobot
 from libs.formatutils import FormatUtils
 from libs.paginator import Paginator
 
@@ -20,11 +20,11 @@ async def can_edit_case(ctx: MyContext):
     if await ctx.bot.get_cog('Admin').check_if_admin(ctx.author):
         return True
     if ctx.bot.database_online:
-        return await ctx.bot.get_cog("Servers").staff_finder(ctx.author, "warn_allowed_roles")
+        return await ctx.bot.get_cog("ServerConfig").check_member_config_permission(ctx.author, "warn_allowed_roles")
     return False
 
 class Case:
-    def __init__(self, bot: Zbot, guild_id: int, member_id: int, case_type: str, mod_id: int, reason: str, date: datetime, duration: Optional[int]=None, case_id: Optional[int]=None):
+    def __init__(self, bot: Axobot, guild_id: int, member_id: int, case_type: str, mod_id: int, reason: str, date: datetime, duration: Optional[int]=None, case_id: Optional[int]=None):
         self.bot = bot
         self.guild = guild_id
         self.id = case_id
@@ -72,7 +72,7 @@ class Case:
 class Cases(commands.Cog):
     """This part of the bot allows you to manage all your members' cases, to delete or edit them"""
 
-    def __init__(self, bot: Zbot):
+    def __init__(self, bot: Axobot):
         self.bot = bot
         self.file = "cases"
         if bot.user is not None:
@@ -236,7 +236,8 @@ class Cases(commands.Cog):
 
                     async def get_page_content(self, interaction, page):
                         "Create one page"
-                        embed = discord.Embed(title=title, colour=self.client.get_cog('Servers').embed_color, timestamp=ctx.message.created_at)
+                        embed_color = self.client.get_cog("ServerConfig").embed_color
+                        embed = discord.Embed(title=title, colour=embed_color, timestamp=ctx.message.created_at)
                         embed.set_author(name=author_text, icon_url=str(user.display_avatar.with_format("png")))
                         page_start, page_end = (page-1)*21, page*21
                         for case in cases[page_start:page_end]:
@@ -355,7 +356,8 @@ class Cases(commands.Cog):
             # finish message
             _msg = _msg.format(G=guild,U=u,T=case.type,M=str(mod),R=case.reason,D=_date)
 
-            emb = discord.Embed(title=title, description=_msg, color=self.bot.get_cog('Servers').embed_color, timestamp=ctx.message.created_at)
+            embed_color = self.bot.get_cog('ServerConfig').embed_color
+            emb = discord.Embed(title=title, description=_msg, color=embed_color, timestamp=ctx.message.created_at)
             emb.set_author(name=user, icon_url=user.display_avatar)
             await ctx.send(embed=emb)
         except Exception as err:
