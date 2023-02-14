@@ -14,7 +14,7 @@ The list of options continues to grow as development progresses, that's why a we
 
 .. note:: For the curious, know that all the configuration of each server is entirely saved in a MySQL database file, which makes its use easier than a simple txt or csv file.
 
-.. warning:: Recently, it has become possible to do without the names of the subcommands. Thus :code:`config 2` is equivalent to :code:`config see 2`, and :code:`config xp_rate 1.4` to :code:`config change xp_rate 1.4`.
+.. warning:: Recently, it has become possible to do without the names of the subcommands. Thus :code:`config 2` is equivalent to :code:`config see 2`, and :code:`config xp_rate 1.4` to :code:`config set xp_rate 1.4`.
 
 Watch
 -----
@@ -38,11 +38,11 @@ This command will give you a list of all the bot configuration options, in case 
 Modify
 ------
 
-**Syntax:** :code:`config change <option> <value>`
+**Syntax:** :code:`config set <option> <value>`
 
 This subcommand allows you to modify the value of an option. Just enter the exact name of the option and its value. A validation message will then be sent if the request has been correctly executed. 
 
-If the value contains several objects, such as a list of roles or channels, they must be separated by commas, like this: :code:`config change clear Admin, Moderators, Special role for Special people`. Please note that not all configurations support multiple values (for example, it is not possible to have multiple prefixes).
+If the value contains several objects, such as a list of roles or channels, they must be separated by commas, like this: :code:`config set clear_allowed_roles Admin, Moderators, Special role for Special people`. Please note that not all configurations support multiple values (for example, it is not possible to have multiple prefixes).
 
 .. note:: When the value takes the form of roles, for more comfort you are not obliged to mention them: the exact name or the identifier of the role is enough. The same goes for chanels.
 
@@ -124,7 +124,7 @@ There are several ways to customize your xp system. In particular, you have 4 `c
 
 - **Prevent xp in some channels:** although Axobot prevents people from earning xp with its commands, it cannot detect commands from other bots. So you can prevent your members from earning xp in certain channels via the :code:`noxp_channels` option, which contains a list of all channels where your users can't have any experience points.
 
-- **Select a channel where to send levelup messages:** sometimes levelup messages can be a bit spammy. So you have an option to select a single channel where to send level up messages. It is also possible to disable these messages via the same option. Enter the command :code:`config change levelup_channel` followed by the name of your channel, or "none" to disable the message.
+- **Select a channel where to send levelup messages:** sometimes levelup messages can be a bit spammy. So you have an option to select a single channel where to send level up messages. It is also possible to disable these messages via the same option. Enter the command :code:`config set levelup_channel` followed by the name of your channel, or "none" to disable the message.
 
 
 
@@ -247,7 +247,7 @@ Voice channels managment
 Give a role to voice users
 --------------------------
 
-**Syntax** :code:`config change voice_roles <your roles>`
+**Syntax** :code:`config set voice_roles <your roles>`
 
 You can easily give a role to any member joining a voice channel, and revoke it when the member leave the channel. This allows you to create a specific text channel for people talking together, for example.
 
@@ -256,11 +256,11 @@ Create automated voice channels
 
 Managing a server isn't easy. You often have too many or not enough channels, especially voice channels. This is why the bot has an automated voice channels management system, which will create new voice channels when needed, and delete them when they aren't used anymore.
 
-To do that, you only need to configure a special voice channel where every member joining it will trigger a new channel creation. This can be achieved with the :code:`config change voice_channel <your channel>` command.
+To do that, you only need to configure a special voice channel where every member joining it will trigger a new channel creation. This can be achieved with the :code:`config set voice_channel <your channel>` command.
 
-Then, the bot needs to know where it should create these new channels. A simple :code:`config change voice_category <your category>` will ask the bot to create its new channels at the bottom of a specific category.
+Then, the bot needs to know where it should create these new channels. A simple :code:`config set voice_category <your category>` will ask the bot to create its new channels at the bottom of a specific category.
 
-Axobot will take a random name for each new channel, from a random names API, but you can change the name format with the :code:`config change voice_channel_format <new format>` command. Several special keywords exists so you can get some unique names, feel free to use them in your format:
+Axobot will take a random name for each new channel, from a random names API, but you can change the name format with the :code:`config set voice_channel_format <new format>` command. Several special keywords exists so you can get some unique names, feel free to use them in your format:
 
 * :code:`{random}` inserts a random surname from randommer.io
 * :code:`{minecraft}` inserts a random minecraft entity name

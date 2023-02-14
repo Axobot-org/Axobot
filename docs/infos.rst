@@ -91,7 +91,7 @@ A nice shortcut to know the prefixes to which the bot responds. This is usually 
 
 Note that this result may differ from the :code:`config see prefix` command when the database is out of sync.
 
-..note:: The subcommand :code:`prefix change` is an alias of :code:`config change prefix`
+..note:: The subcommand :code:`prefix change` is an alias of :code:`config set prefix`
 
 
 ----------

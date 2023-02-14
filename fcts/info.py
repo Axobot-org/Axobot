@@ -1166,7 +1166,7 @@ Available types: member, role, user, emoji, channel, server, invite, category
         msg: discord.Message = copy.copy(ctx.message)
         if new_prefix.startswith('"') and new_prefix.endswith('"'):
             new_prefix = new_prefix[1:-1]
-        msg.content =  f'{ctx.prefix}config change prefix "{new_prefix}"'
+        msg.content =  f'{ctx.prefix}config set prefix "{new_prefix}"'
         new_ctx = await self.bot.get_context(msg)
         await self.bot.invoke(new_ctx)
 
