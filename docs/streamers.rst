@@ -17,15 +17,15 @@ The role you choose to give to streamers will only be given to members who have 
 Configure your server
 ---------------------
 
-**Syntax:** :code:`config change streaming_channel <channel>`
+**Syntax:** :code:`config set streaming_channel <channel>`
 
 This command will set the channel where Axobot will send notifications when a streamer goes live. You can enter both the channel mention, its name, and its ID. Make sure Axobot can send messages and embeds there!
 
-**Syntax:** :code:`config change streaming_role <role>`
+**Syntax:** :code:`config set streaming_role <role>`
 
 This command will set the role that will be given to streamers when they go live. You can enter both the role mention, its name, and its ID. Make sure Axobot role is higher than this role and has the "Manage roles" permission!
 
-**Syntax:** :code:`config change stream_mention <message>`
+**Syntax:** :code:`config set stream_mention <message>`
 
 This command will set the role that will be mentioned when a streamer goes live. You can enter both the role mention, its name, and its ID. Make sure Axobot can mention it!
 

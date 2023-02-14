@@ -499,7 +499,7 @@ class Partners(commands.Cog):
     @commands.check(checks.has_manage_guild)
     async def partner_color(self, ctx: MyContext, color: str):
         """Change the color of the partners embed
-    It has the same result as `config change partner_color`
+    It has the same result as `config set partner_color`
 
     ..Example partners color yellow
 

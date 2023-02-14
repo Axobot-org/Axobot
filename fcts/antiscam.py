@@ -247,7 +247,7 @@ class AntiScam(commands.Cog):
 
         ..Doc moderator.html#anti-scam"""
         msg: discord.Message = copy.copy(ctx.message)
-        msg.content =  f'{ctx.prefix}config change anti_scam true'
+        msg.content =  f'{ctx.prefix}config set anti_scam true'
         new_ctx = await self.bot.get_context(msg)
         await self.bot.invoke(new_ctx)
 
@@ -259,7 +259,7 @@ class AntiScam(commands.Cog):
 
         ..Doc moderator.html#anti-scam"""
         msg: discord.Message = copy.copy(ctx.message)
-        msg.content =  f'{ctx.prefix}config change anti_scam false'
+        msg.content =  f'{ctx.prefix}config set anti_scam false'
         new_ctx = await self.bot.get_context(msg)
         await self.bot.invoke(new_ctx)
 

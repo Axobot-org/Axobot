@@ -40,7 +40,7 @@ class Help(commands.Cog):
         """Help on setting up welcome / leave messages
 
 ..Doc infos.html#welcome-message"""
-        config_cmd = await self.bot.get_command_mention("config change")
+        config_cmd = await self.bot.get_command_mention("config set")
         await ctx.send(await self.bot._(ctx.guild, "welcome.help", config_cmd=config_cmd))
 
     @commands.command(name="about", aliases=["botinfos", "botinfo"])
