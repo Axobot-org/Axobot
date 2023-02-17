@@ -85,13 +85,11 @@ If you give an ip address in the command, the bot will send a certain number of 
 Prefix
 ------
 
-**Syntax:** :code:`prefix` or :code:`prefix change <new prefix>`
+**Syntax:** :code:`prefix`
 
 A nice shortcut to know the prefixes to which the bot responds. This is usually the prefix defined in the `configuration <server.html>`_, plus the mention of the bot.
 
-Note that this result may differ from the :code:`config see prefix` command when the database is out of sync.
-
-..note:: The subcommand :code:`prefix change` is an alias of :code:`config set prefix`
+..note:: You can change the bot prefix on your server with the :code:`config set prefix <new prefix>` command.
 
 
 ----------

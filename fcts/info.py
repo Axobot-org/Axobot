@@ -1143,32 +1143,15 @@ Available types: member, role, user, emoji, channel, server, invite, category
         """Show the usable prefix(s) for this server
 
         ..Doc infos.html#prefix"""
-        if ctx.invoked_subcommand is not None:
-            return
         txt = await self.bot._(ctx.channel,"info.prefix")
         prefix = "\n".join((await ctx.bot.get_prefix(ctx.message))[1:])
-        if ctx.guild is None or ctx.channel.permissions_for(ctx.guild.me):
+        if ctx.can_send_embed:
             emb = discord.Embed(title=txt, description=prefix, timestamp=ctx.message.created_at,
                 color=ctx.bot.get_cog('Help').help_color)
             emb.set_footer(text=ctx.author, icon_url=ctx.author.display_avatar)
             await ctx.send(embed=emb)
         else:
             await ctx.send(txt+"\n"+prefix)
-
-    @get_prefix.command(name="change")
-    @commands.guild_only()
-    async def prefix_change(self, ctx: MyContext, *, new_prefix: str):
-        """Change the used prefix
-
-        ..Example prefix change "Hey Zbot, "
-
-        ..Doc infos.html#prefix"""
-        msg: discord.Message = copy.copy(ctx.message)
-        if new_prefix.startswith('"') and new_prefix.endswith('"'):
-            new_prefix = new_prefix[1:-1]
-        msg.content =  f'{ctx.prefix}config set prefix "{new_prefix}"'
-        new_ctx = await self.bot.get_context(msg)
-        await self.bot.invoke(new_ctx)
 
     @commands.command(name="discordlinks",aliases=['discord','discordurls'])
     async def discord_status(self, ctx: MyContext):
