@@ -74,7 +74,6 @@ Enable "Embed Links" permission for better rendering
 
 ..Doc infos.html#help"""
         try:
-            # args = [x.replace('@everyone','@​everyone').replace('@here','@​here') for x in args]
             if len(args) == 0:
                 await self.help_command(ctx)
             else:
@@ -87,6 +86,12 @@ Enable "Embed Links" permission for better rendering
                 await self._default_help_command(ctx)
             else:
                 await self._default_help_command(ctx, args)
+    
+    async def should_dm(self, context: MyContext) -> bool:
+        "Check if the answer should be sent in DM or in current channel"
+        if context.guild is None or not self.bot.database_online:
+            return False
+        return await self.bot.get_config(context.guild.id, 'help_in_dm')
 
     async def help_command(self, ctx: MyContext, commands: Optional[list[str]] = None):
         """Main command for the creation of the help message
@@ -94,10 +99,10 @@ If the bot can't send the new command format, it will try to send the old one.""
         async with ctx.channel.typing():
             destination: discord.abc.Messageable = None
             if ctx.guild is not None:
-                send_in_dm = False if not self.bot.database_online else await self.bot.get_config(ctx.guild.id, 'help_in_dm')
-                if send_in_dm is not None and send_in_dm == 1:
+                if await self.should_dm(ctx):
                     destination = ctx.message.author.dm_channel
-                    await ctx.message.delete(delay=0)
+                    if ctx.guild:
+                        await ctx.message.delete(delay=0)
                 else:
                     destination = ctx.message.channel
             if destination is None:
@@ -129,7 +134,7 @@ If the bot can't send the new command format, it will try to send the old one.""
                 if len(pages) == 0 and ctx.guild is None:
                     pages = [await self.bot._(ctx.channel, "help.cog-empty-dm")]
             elif not commands:  # no command
-                compress = await self.bot.get_config(ctx.guild.id, 'compress_help')
+                compress: bool = await self.bot.get_config(ctx.guild.id, 'compress_help') if ctx.guild else False
                 pages = await self.all_commands(ctx, sorted([c for c in self.bot.commands], key=self.sort_by_name), compress=compress)
                 if ctx.guild is None:
                     title = await self.bot._(ctx.channel, "help.embed_title_dm")
