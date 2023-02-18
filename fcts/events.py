@@ -218,10 +218,11 @@ class Events(commands.Cog):
         emb = msg.embeds[0] if len(msg.embeds) > 0 else None
         arrow = ":inbox_tray:" if msg.author == recipient else ":outbox_tray:"
         date_ = f"<t:{msg.created_at.timestamp():.0f}>"
-        text = "{} **{}** ({} - {})\n{}".format(arrow, recipient, recipient.id, date_, msg.content)
+        msg_content = msg.content if len(msg.content) < 1900 else msg.content[:1900] + "…"
+        text = "{} **{}** ({} - {})\n{}".format(arrow, recipient, recipient.id, date_, msg_content)
         if len(msg.attachments) > 0:
             text += "".join(["\n{}".format(x.url) for x in msg.attachments])
-        await channel.send(text,embed=emb)
+        await channel.send(text, embed=emb)
 
     async def check_mp_adv(self, msg: discord.Message):
         """Teste s'il s'agit d'une pub MP"""
