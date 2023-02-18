@@ -62,7 +62,16 @@ Enable "Embed Links" permission for better rendering
             pass
         except Exception as err:
             self.bot.dispatch("error", err, ctx)
-            await ctx.send_super_help(args or None)
+            if len(args) == 0:
+                await self._default_help_command(ctx)
+            else:
+                await self._default_help_command(ctx, args)
+    
+    async def should_dm(self, context: MyContext) -> bool:
+        "Check if the answer should be sent in DM or in current channel"
+        if context.guild is None or not self.bot.database_online:
+            return False
+        return await self.bot.get_config(context.guild.id, 'help_in_dm')
 
     async def help_command(self, ctx: MyContext, command_arg: list[str]):
         """Main command for the creation of the help message
