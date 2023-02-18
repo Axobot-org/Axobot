@@ -25,8 +25,8 @@
     "hint-useless": "Ouvre un ticket",
     "missing-category-config": "Oups, je n'ai pas pu créer votre ticket parce que personne ne m'a dit où les créer. Vous devriez demander à un modérateur du serveur d'utiliser la commande %{set_category}.",
     "missing-perms-creation": {
-        "channel": "Oups, je n'ai pas pu créer de salon pour votre ticket. Assurez-vous que j'ai les permissions nécessaires et réessayez.",
-        "thread": "Oups, je n'ai pas pu créer de fil pour votre. Assurez-vous que j'ai les permissions nécessaires et réessayez."
+        "channel": "Oups, je n'ai pas pu créer de salon pour votre ticket. Assurez-vous que j'ai les permissions nécessaires dans la catégorie \"%{category}\" et réessayez.",
+        "thread": "Oups, je n'ai pas pu créer de fil pour votre. Assurez-vous que j'ai les permissions nécessaires dans %{channel} et réessayez."
     },
     "missing-perms-setup": {
         "to-member": "Oups, je n'ai pas pu configurer correctement le salon de votre ticket. Veuillez demander à un modérateur de serveur de corriger mes permissions, sinon toute personne ayant accès à la catégorie des tickets pourrait être en mesure de lire votre ticket.",

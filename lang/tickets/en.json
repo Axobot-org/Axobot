@@ -25,8 +25,8 @@
     "hint-useless": "Create a ticket",
     "missing-category-config": "Oops, I couldn't create your ticket because no one told me where to create them. Please ask a server moderator to use the %{set_category} command.",
     "missing-perms-creation": {
-        "channel": "Oops, I couldn't create a new ticket channel. Please make sure I have the required permissions and try again.",
-        "thread": "Oops, I couldn't create a new ticket thread. Please make sure I have the required permissions and try again."
+        "channel": "Oops, I couldn't create a new ticket channel. Please make sure I have the required permissions in the \"%{category}\" category and try again.",
+        "thread": "Oops, I couldn't create a new ticket thread. Please make sure I have the required permissions in %{channel} and try again."
     },
     "missing-perms-setup": {
         "to-member": "Oops, I couldn't properly set up your ticket channel. Please ask a server moderator to fix my permissions, otherwise anyone having access to the tickets category may be able to read your ticket.",

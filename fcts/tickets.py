@@ -275,7 +275,7 @@ class Tickets(commands.Cog):
             try:
                 channel = await category.create_text_channel(channel_name)
             except discord.Forbidden:
-                await interaction.edit_original_response(content=await self.bot._(interaction.guild_id, "tickets.missing-perms-creation.channel"))
+                await interaction.edit_original_response(content=await self.bot._(interaction.guild_id, "tickets.missing-perms-creation.channel", category=category.name))
                 return
             try:
                 await self.setup_ticket_channel(channel, topic, interaction.user)
@@ -290,7 +290,7 @@ class Tickets(commands.Cog):
                     channel_type = discord.ChannelType.public_thread
                 channel = await category.create_thread(name=channel_name, type=channel_type)
             except discord.Forbidden:
-                await interaction.edit_original_response(content=await self.bot._(interaction.guild_id, "tickets.missing-perms-creation.thread"))
+                await interaction.edit_original_response(content=await self.bot._(interaction.guild_id, "tickets.missing-perms-creation.thread", channel=category.mention))
                 return
             await self.setup_ticket_thread(channel, topic, interaction.user)
         else:
