@@ -34,6 +34,27 @@
     },
     "nothing-to-edit": "Nothing to edit!",
     "other": "other",
+    "review": {
+        "category": "Category",
+        "channel": "Channel",
+        "default": "Default configuration",
+        "deleted-category": "Deleted category or channel %{id}",
+        "deleted-role": "Deleted role %{id}",
+        "embed": {
+            "desc-global": "Here is a review of the global configuration of the ticket system for this server",
+            "desc-topic": "Here is a review of the configuration of the ticket system for the topic \"%{topic}\" specifically",
+            "title-global": "Global configuration review",
+            "title-topic": "Configuration review for topic \"%{topic}\""
+        },
+        "emoji": "Emoji",
+        "format": "Name format",
+        "hint": "Hint message",
+        "no-config": "This server does not use the ticket system",
+        "prompt": "Selection prompt",
+        "role": "Allowed role",
+        "topic-no-config": "No specific configuration for this topic",
+        "topic-not-found": "No topic with this ID was found"
+    },
     "role-edited": {
         "default": "The default role allowed to see tickets has been edited!",
         "default-reset": "The default role allowed to see tickets has been reset to no role!",

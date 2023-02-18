@@ -34,6 +34,27 @@
     },
     "nothing-to-edit": "Rien à modifier !",
     "other": "autre",
+    "review": {
+        "category": "Categorie",
+        "channel": "Salon",
+        "default": "Configuration par défaut",
+        "deleted-category": "Catégorie ou salon supprimé %{id}",
+        "deleted-role": "Rôle supprimé %{id}",
+        "embed": {
+            "desc-global": "Voici un aperçu de la configuration du système de tickets pour ce serveur",
+            "desc-topic": "Voici un aperçu de la configuration du système de tickets pour le sujet \"%{topic}\" spécifiquement",
+            "title-global": "Aperçu de la configuration générale",
+            "title-topic": "Aperçu de la configuration du topic \"%{topic}\""
+        },
+        "emoji": "Émoji",
+        "format": "Format du nom",
+        "hint": "Message d'aide",
+        "no-config": "Ce serveur n'utilise pas le système de tickets",
+        "prompt": "Invite de sélection",
+        "role": "Rôle autorisé",
+        "topic-no-config": "Pas de configuration spécifique pour ce topic",
+        "topic-not-found": "Aucun topic avec cet ID n'a été trouvé"
+    },
     "role-edited": {
         "default": "Le rôle autorisé à accéder aux tickets par défaut a été modifié !",
         "default-reset": "Le rôle autorisé à accéder aux tickets par défaut a bien été réinitialisé à 'aucun rôle' !",
