@@ -1138,7 +1138,7 @@ Available types: member, role, user, emoji, channel, server, invite, category
                 text += f"- {i[0]} : {i[1]}\n"
             await ctx.send(text)
 
-    @commands.group(name="prefix")
+    @commands.command(name="prefix")
     async def get_prefix(self, ctx: MyContext):
         """Show the usable prefix(s) for this server
 
