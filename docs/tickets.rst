@@ -117,6 +117,16 @@ Delete a topic
 To delete a topic in a simple way, use the command above. Axobot will ask you which topic to delete, you just have to select the right one from the list and the bot will take care of everything!
 
 
+Review your config
+------------------
+
+**Syntax:** :code:`tickets review-config`
+
+Once you're done configuring Axobot, you can use this command to review your configuration and make sure everything is correct. Axobot will send you a message containing all the information you need to know about your configuration.
+
+When using slash commands, you can also select a specific topic to review its configuration in more depth.
+
+
 -------------------
 Customize per topic
 -------------------

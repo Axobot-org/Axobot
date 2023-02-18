@@ -1,13 +1,14 @@
 import time
-from typing import Any, Optional, Union
+from typing import Optional, Union
 
 import discord
 from discord import app_commands
 from discord.ext import commands
 from mysql.connector.errors import IntegrityError
 
-from libs.bot_classes import MyContext, Axobot
+from libs.bot_classes import Axobot, MyContext
 from libs.tickets.converters import EmojiConverterType
+from libs.tickets.types import DBTopicRow
 from libs.tickets.views import (AskTitleModal, AskTopicSelect, SelectView,
                                 SendHintText, TicketCreationEvent)
 
@@ -84,19 +85,19 @@ class Tickets(commands.Cog):
         except Exception as err: # pylint: disable=broad-except
             self.bot.dispatch('error', err, f"when creating a ticket in guild {interaction.guild_id}")
 
-    async def db_get_topics(self, guild_id: int) -> list[dict[str, Any]]:
+    async def db_get_topics(self, guild_id: int) -> list[DBTopicRow]:
         "Fetch the topics associated to a guild"
         query = "SELECT * FROM `tickets` WHERE `guild_id` = %s AND `topic` IS NOT NULL AND `beta` = %s"
         async with self.bot.db_query(query, (guild_id, self.bot.beta)) as db_query:
             return db_query
 
-    async def db_get_defaults(self, guild_id: int) -> Optional[dict[str, Any]]:
+    async def db_get_defaults(self, guild_id: int) -> Optional[DBTopicRow]:
         "Get the default values for a guild"
         query = "SELECT * FROM `tickets` WHERE `guild_id` = %s AND `topic` IS NULL AND `beta` = %s"
         async with self.bot.db_query(query, (guild_id, self.bot.beta), fetchone=True) as db_query:
             return db_query or None
 
-    async def db_get_topic_with_defaults(self, guild_id: int, topic_id: int) -> dict[str, Any]:
+    async def db_get_topic_with_defaults(self, guild_id: int, topic_id: int) -> DBTopicRow:
         "Fetch a topicfrom its guild and ID"
         if topic_id == -1:
             query = "SELECT * FROM `tickets` WHERE `guild_id` = %s AND `topic` IS NULL AND `beta` = %s"
@@ -492,7 +493,6 @@ class Tickets(commands.Cog):
         await self.db_edit_topic_format(ctx.guild.id, row_id, name_format)
         await ctx.send(await self.bot._(ctx.guild.id, "tickets.format.edited.default"))
 
-
     @tickets_main.group(name="topic", aliases=["topics"])
     @commands.guild_only()
     @commands.check(checks.has_manage_channels)
@@ -689,7 +689,6 @@ If that still doesn't work, please create your ticket
     async def topic_set_format_autocomplete(self, interaction: discord.Interaction, current: str):
         return await self.topic_id_autocompletion(interaction, current)
 
-
     @tickets_topics.command(name="list")
     @commands.cooldown(3, 20, commands.BucketType.guild)
     @commands.guild_only()
@@ -718,6 +717,149 @@ If that still doesn't work, please create your ticket
             await ctx.send(embed=embed)
         else:
             await ctx.send(f"**{title}**\n\n" + "\n".join(topics_repr))
+
+
+    @tickets_main.command(name="review-config")
+    @app_commands.describe(topic_id="The topic to review - set none to review them all")
+    @commands.cooldown(3, 40, commands.BucketType.guild)
+    @commands.guild_only()
+    @commands.check(checks.has_manage_channels)
+    async def portal_review_config(self, ctx: MyContext, *, topic_id: Optional[int]=None):
+        """Review the configuration of a topic or all topics
+
+        ..Example tickets review-config
+
+        ..Example tickets review-config Economy issues
+
+        ..Doc tickets.html#review-the-configuration"""
+        if topic_id is None:
+            await self.review_all(ctx)
+        else:
+            await self.review_topic(ctx, topic_id)
+
+
+    @portal_review_config.autocomplete("topic_id")
+    async def portal_review_autocomplete(self, interaction: discord.Interaction, current: str):
+        return await self.topic_id_autocompletion(interaction, current, allow_other=False)
+    
+    async def review_all(self, ctx: MyContext):
+        "Send a global recap of a guild settings"
+        topics = await self.db_get_topics(ctx.guild.id)
+        if defaults := await self.db_get_defaults(ctx.guild.id):
+            topics.append(defaults)
+        emb = discord.Embed(
+            title=await self.bot._(ctx.guild.id, "tickets.review.embed.title-global"),
+            description=await self.bot._(ctx.guild.id, "tickets.review.embed.desc-global"),
+            color=discord.Color.blue(),
+        )
+        inline = len(topics) <= 6
+
+        language = await self.bot._(ctx.guild.id, "_used_locale")
+        async def field_value(key: str, value: str):
+            key_tr = await self.bot._(ctx.guild.id, f"tickets.review.{key}")
+            if "fr" in language:
+                return f"**{key_tr}** : {value}"
+            return f"**{key_tr}**: {value}"
+
+        for topic in topics:
+            text: list[str] = []
+            name = topic["topic"] if topic["topic"] else await self.bot._(ctx.guild.id, "tickets.review.default")
+            if topic["topic_emoji"]:
+                name = str(discord.PartialEmoji.from_str(topic['topic_emoji'])) + " " + name
+            if topic["role"]:
+                if role := ctx.guild.get_role(topic["role"]):
+                    text.append(await field_value("role", role.mention))
+                else:
+                    text.append(await field_value("role", await self.bot._(ctx.guild.id, "tickets.review.deleted-role", id=topic["role"])))
+            if topic["category"]:
+                if channel := ctx.guild.get_channel(topic["category"]):
+                    if isinstance(channel, discord.CategoryChannel):
+                        text.append(await field_value("category", channel.name))
+                    else:
+                        text.append(await field_value("channel", channel.mention))
+                else:
+                    text.append(await field_value("category", await self.bot._(ctx.guild.id, "tickets.review.deleted-category", id=topic["category"])))
+            if topic["name_format"]:
+                name_format = topic["name_format"] if len(topic["name_format"]) < 100 else topic["name_format"][:100] + "…"
+                text.append(await field_value("format", name_format))
+            if topic["hint"]:
+                hint = topic["hint"] if len(topic["hint"]) < 100 else topic["hint"][:100] + "…"
+                text.append(await field_value("hint", hint))
+            if topic["prompt"]:
+                prompt = topic["prompt"] if len(topic["prompt"]) < 200 else topic["prompt"][:200] + "…"
+                text.append(await field_value("prompt", prompt))
+            if len(text) == 0:
+                text.append(await self.bot._(ctx.guild.id, "tickets.review.topic-no-config"))
+            emb.add_field(
+                name=name,
+                value="\n".join(text),
+                inline=inline
+            )
+        if len(emb.fields) == 0:
+            emb.description += "\n\n**" + await self.bot._(ctx.guild.id, "tickets.review.no-config") + "**"
+        await ctx.send(embed=emb)
+    
+    async def review_topic(self, ctx: MyContext, topic_id: int):
+        "Send a global recap of a guild settings"
+        topics = await self.db_get_topics(ctx.guild.id)
+        topics_filtered = [t for t in topics if t["id"] == topic_id]
+        if len(topics_filtered) == 0:
+            await ctx.send(await self.bot._(ctx.guild.id, "tickets.review.topic-not-found"), ephemeral=True)
+            return
+        topic = topics_filtered[0]
+        emb = discord.Embed(
+            title=await self.bot._(ctx.guild.id, "tickets.review.embed.title-topic", topic=topic["topic"]),
+            description=await self.bot._(ctx.guild.id, "tickets.review.embed.desc-topic", topic=topic["topic"]),
+            color=discord.Color.blue(),
+        )
+        if topic["topic_emoji"]:
+            emb.add_field(
+                name=await self.bot._(ctx.guild.id, "tickets.review.emoji"),
+                value=discord.PartialEmoji.from_str(topic['topic_emoji']),
+            )
+        if topic["role"]:
+            if role := ctx.guild.get_role(topic["role"]):
+                emb.add_field(
+                    name=await self.bot._(ctx.guild.id, "tickets.review.role"),
+                    value=role.mention,
+                )
+            else:
+                emb.add_field(
+                    name=await self.bot._(ctx.guild.id, "tickets.review.role"),
+                    value=await self.bot._(ctx.guild.id, "tickets.review.deleted-role", id=topic["role"]),
+                )
+        if topic["category"]:
+            if channel := ctx.guild.get_channel(topic["category"]):
+                if isinstance(channel, discord.CategoryChannel):
+                    emb.add_field(
+                        name=await self.bot._(ctx.guild.id, "tickets.review.category"),
+                        value=channel.name,
+                    )
+                else:
+                    emb.add_field(
+                        name=await self.bot._(ctx.guild.id, "tickets.review.category"),
+                        value=channel.mention,
+                    )
+            else:
+                emb.add_field(
+                    name=await self.bot._(ctx.guild.id, "tickets.review.category"),
+                    value=await self.bot._(ctx.guild.id, "tickets.review.deleted-category", id=topic["category"]),
+                )
+        if topic["name_format"]:
+            emb.add_field(
+                name=await self.bot._(ctx.guild.id, "tickets.review.format"),
+                value=topic["name_format"],
+                inline=len(topic["name_format"]) < 60
+            )
+        if topic["hint"]:
+            emb.add_field(
+                name=await self.bot._(ctx.guild.id, "tickets.review.hint"),
+                value=topic["hint"] if len(topic["hint"]) < 1000 else topic["hint"][:1000] + "…",
+                inline=len(topic["hint"]) < 60
+            )
+        if len(emb.fields) == 0:
+            emb.description += "\n\n**" + await self.bot._(ctx.guild.id, "tickets.review.topic-no-config") + "**"
+        await ctx.send(embed=emb)
 
 async def setup(bot):
     await bot.add_cog(Tickets(bot))
