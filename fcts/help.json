@@ -98,7 +98,8 @@
             "hour",
             "say",
             "unafk",
-            "vote"
+            "vote",
+            "weather"
         ]
     },
     "translators": {
