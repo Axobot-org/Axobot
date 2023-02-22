@@ -68,11 +68,7 @@ class Xp(commands.Cog):
             return None
         if value == "any":
             return msg.channel
-        try:
-            chan = msg.guild.get_channel_or_thread(int(value))
-            return chan
-        except discord.errors.NotFound:
-            return None
+        return value
 
     @commands.Cog.listener(name="on_message")
     async def add_xp(self, msg: discord.Message):
