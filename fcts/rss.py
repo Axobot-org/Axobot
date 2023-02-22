@@ -567,7 +567,6 @@ class Rss(commands.Cog):
                 if length == 0:
                     return 1
                 return ceil(length / feeds_per_page)
-
             async def get_page_content(self, interaction, page):
                 "Create one page"
                 embed = discord.Embed(title=title, color=rss_cog.embed_color, timestamp=ctx.message.created_at)
