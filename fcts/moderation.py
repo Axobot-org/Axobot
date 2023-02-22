@@ -850,7 +850,7 @@ You must be an administrator of this server to use this command.
             saved_bans: list[discord.guild.BanEntry] = []
             users: set[int] = set()
 
-            async def get_page_count(self, interaction) -> int:
+            async def get_page_count(self) -> int:
                 length = len(self.saved_bans)
                 if length == 0:
                     return 1
@@ -883,7 +883,7 @@ You must be an administrator of this server to use this command.
                         else:
                             values = [str(entry.user) for entry in self.saved_bans[i:i+10]]
                         emb.add_field(name=f"{column_start}-{column_end}", value="\n".join(values))
-                footer = f"{ctx.author}  |  {page}/{await self.get_page_count(interaction)}"
+                footer = f"{ctx.author}  |  {page}/{await self.get_page_count()}"
                 emb.set_footer(text=footer, icon_url=ctx.author.display_avatar)
                 return {
                     "embed": emb
@@ -915,7 +915,7 @@ The 'show_reasons' parameter is used to display the mute reasons.
             "Paginator used to display muted users"
             users_map: dict[int, Optional[discord.User]] = {}
 
-            async def get_page_count(self, interaction) -> int:
+            async def get_page_count(self) -> int:
                 length = len(muted_list)
                 if length == 0:
                     return 1
@@ -952,7 +952,7 @@ The 'show_reasons' parameter is used to display the mute reasons.
                                 user = await self._resolve_user(user_id)
                                 values.append(str(user))
                         emb.add_field(name=f"{column_start}-{column_end}", value="\n".join(values))
-                footer = f"{ctx.author}  |  {page}/{await self.get_page_count(interaction)}"
+                footer = f"{ctx.author}  |  {page}/{await self.get_page_count()}"
                 emb.set_footer(text=footer, icon_url=ctx.author.display_avatar)
                 return {
                     "embed": emb
@@ -1071,7 +1071,7 @@ The 'show_reasons' parameter is used to display the mute reasons.
         ]
 
         class EmojisPaginator(Paginator):
-            async def get_page_count(self, _: discord.Interaction) -> int:
+            async def get_page_count(self) -> int:
                 length = len(emotes)
                 if length == 0:
                     return 1

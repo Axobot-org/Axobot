@@ -918,13 +918,9 @@ You can specify a verification limit by adding a number in argument (up to 1.000
             _title = await self.bot._(ctx.channel, "fun.discordjobs-title")
             class JobsPaginator(Paginator):
                 "Paginator used to display jobs offers"
-                async def send_init(self, ctx: MyContext):
-                    "Create and send 1st page"
-                    contents = await self.get_page_content(None, 1)
-                    await self._update_buttons(None)
-                    await ctx.send(**contents, view=self)
-                async def get_page_count(self, _: discord.Interaction) -> int:
+                async def get_page_count(self) -> int:
                     return ceil(len(f_jobs)/30)
+
                 async def get_page_content(self, interaction: discord.Interaction, page: int):
                     "Create one page"
                     # to_display = f_jobs[(page-1)*30:page*30]
@@ -934,7 +930,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
                     for i in range(page_start, page_end, 10):
                         column_start, column_end = i+1, min(i+10, len(f_jobs))
                         emb.add_field(name=f"{column_start}-{column_end}", value="\n".join(f_jobs[i:i+10]))
-                    footer = f"Page {page}/{await self.get_page_count(interaction)}"
+                    footer = f"Page {page}/{await self.get_page_count()}"
                     emb.set_footer(text=footer)
                     return {
                         "embed": emb
