@@ -451,8 +451,9 @@ class Rss(commands.Cog):
         view = FeedsPaginator(self.bot, ctx.author, stop_label=_quit.capitalize())
         msg = await view.send_init(ctx)
         if msg:
-            await view.wait()
-            await view.disable(msg)
+            if await view.wait():
+                # only manually disable if it was a timeout (ie. not a user stop)
+                await view.disable(msg)
 
 
     async def transform_feeds_to_options(self, feeds: list[FeedObject], guild: discord.Guild) -> list[discord.SelectOption]:

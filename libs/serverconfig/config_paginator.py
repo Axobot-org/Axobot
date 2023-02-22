@@ -31,7 +31,7 @@ class ServerConfigPaginator(Paginator):
                 self.server_config[option] = value
         contents = await self.get_page_content(ctx, 1)
         await self._update_buttons()
-        await ctx.send(**contents, view=self)
+        return await ctx.send(**contents, view=self)
 
     async def get_page_count(self) -> int:
         length = len(self.server_config)

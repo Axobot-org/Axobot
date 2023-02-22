@@ -395,7 +395,11 @@ class ServerConfig(commands.Cog):
             return
         _quit = await self.bot._(ctx.guild, "misc.quit")
         view = ServerConfigPaginator(self.bot, ctx.author, stop_label=_quit.capitalize(), guild=guild, cog=self)
-        await view.send_init(ctx)
+        msg = await view.send_init(ctx)
+        if msg:
+            if await view.wait():
+                # only manually disable if it was a timeout (ie. not a user stop)
+                await view.disable(msg)
 
     async def send_specific_config(self, guild: discord.Guild, ctx: MyContext, option: str):
         "Send the specific config value for guild into a channel"
