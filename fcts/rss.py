@@ -377,12 +377,13 @@ class Rss(commands.Cog):
         rss_cog = self
         title = await self.bot._(ctx.guild.id, "rss.list-title", server=ctx.guild.name)
         translation = await self.bot._(ctx.guild.id, "rss.list-result")
+        feeds_per_page = 10
 
         class FeedsPaginator(Paginator):
             "Paginator used to display the RSS feeds list"
             async def _get_feeds_for_page(self, page: int):
                 feeds_to_display: list[str] = []
-                for i in range((page - 1) * 20, min(page * 20, len(feeds))):
+                for i in range((page - 1) * feeds_per_page, min(page * feeds_per_page, len(feeds))):
                     feed = feeds[i]
                     channel = self.client.get_channel(feed.channel_id)
                     if channel is not None:
@@ -433,7 +434,7 @@ class Rss(commands.Cog):
                 length = len(feeds)
                 if length == 0:
                     return 1
-                return ceil(length / 20)
+                return ceil(length / feeds_per_page)
             
             async def get_page_content(self, interaction, page):
                 "Create one page"
@@ -449,8 +450,8 @@ class Rss(commands.Cog):
         _quit = await self.bot._(ctx.guild, "misc.quit")
         view = FeedsPaginator(self.bot, ctx.author, stop_label=_quit.capitalize())
         msg = await view.send_init(ctx)
-        await view.wait()
         if msg:
+            await view.wait()
             await view.disable(msg)
 
 
