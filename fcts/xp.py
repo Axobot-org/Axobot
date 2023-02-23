@@ -93,7 +93,7 @@ class Xp(commands.Cog):
                 self.sus = set()
         if self.bot.zombie_mode:
             return
-        if used_xp_type == "globam":
+        if used_xp_type == "global":
             await self.add_xp_0(msg, rate)
         elif used_xp_type == "mee6-like":
             await self.add_xp_1(msg, rate)
@@ -124,11 +124,12 @@ class Xp(commands.Cog):
         if msg.author.id in self.sus:
             await self.send_sus_msg(msg, giv_points)
         self.cache['global'][msg.author.id] = [round(time.time()), prev_points+giv_points]
-        new_lvl = await self.calc_level(self.cache['global'][msg.author.id][1],0)
-        if 0 < (await self.calc_level(prev_points,0))[0] < new_lvl[0]:
+        new_lvl, _, _ = await self.calc_level(self.cache['global'][msg.author.id][1], "global")
+        ex_lvl, _, _ = await self.calc_level(prev_points, "global")
+        if 0 < ex_lvl < new_lvl:
             await self.send_levelup(msg, new_lvl)
-            await self.give_rr(msg.author,new_lvl[0],await self.rr_list_role(msg.guild.id))
-            await self.bot.get_cog("Utilities").add_user_eventPoint(msg.author.id, round(new_lvl[0]/5))
+            await self.give_rr(msg.author, new_lvl, await self.rr_list_role(msg.guild.id))
+            await self.bot.get_cog("Utilities").add_user_eventPoint(msg.author.id, round(new_lvl/5))
     
     async def add_xp_1(self, msg:discord.Message, rate: float):
         """MEE6-like xp type"""
@@ -139,7 +140,7 @@ class Xp(commands.Cog):
                 return
         if await self.bot.potential_command(msg):
             return
-        giv_points = random.randint(15,25) * rate
+        giv_points = round(random.randint(15,25) * rate)
         if msg.author.id in self.cache[msg.guild.id].keys():
             prev_points = self.cache[msg.guild.id][msg.author.id][1]
         else:
@@ -153,10 +154,11 @@ class Xp(commands.Cog):
         if msg.author.id in self.sus:
             await self.send_sus_msg(msg, giv_points)
         self.cache[msg.guild.id][msg.author.id] = [round(time.time()), prev_points+giv_points]
-        new_lvl = await self.calc_level(self.cache[msg.guild.id][msg.author.id][1],1)
-        if 0 < (await self.calc_level(prev_points,1))[0] < new_lvl[0]:
-            await self.send_levelup(msg,new_lvl)
-            await self.give_rr(msg.author,new_lvl[0],await self.rr_list_role(msg.guild.id))
+        new_lvl, _, _ = await self.calc_level(self.cache[msg.guild.id][msg.author.id][1], "mee6-like")
+        ex_lvl, _, _ = await self.calc_level(prev_points, "mee6-like")
+        if 0 < ex_lvl < new_lvl:
+            await self.send_levelup(msg, new_lvl)
+            await self.give_rr(msg.author, new_lvl, await self.rr_list_role(msg.guild.id))
 
     async def add_xp_2(self, msg:discord.Message, rate: float):
         """Local xp type"""
@@ -168,7 +170,7 @@ class Xp(commands.Cog):
         content = msg.clean_content
         if len(content)<self.minimal_size or await self.check_spam(content) or await self.bot.potential_command(msg):
             return
-        giv_points = await self.calc_xp(msg) * rate
+        giv_points = round(await self.calc_xp(msg) * rate)
         if msg.author.id in self.cache[msg.guild.id].keys():
             prev_points = self.cache[msg.guild.id][msg.author.id][1]
         else:
@@ -182,10 +184,11 @@ class Xp(commands.Cog):
         if msg.author.id in self.sus:
             await self.send_sus_msg(msg, giv_points)
         self.cache[msg.guild.id][msg.author.id] = [round(time.time()), prev_points+giv_points]
-        new_lvl = await self.calc_level(self.cache[msg.guild.id][msg.author.id][1],2)
-        if 0 < (await self.calc_level(prev_points,2))[0] < new_lvl[0]:
-            await self.send_levelup(msg,new_lvl)
-            await self.give_rr(msg.author,new_lvl[0],await self.rr_list_role(msg.guild.id))
+        new_lvl, _, _ = await self.calc_level(self.cache[msg.guild.id][msg.author.id][1], "local")
+        ex_lvl, _, _ = await self.calc_level(prev_points, "local")
+        if 0 < ex_lvl < new_lvl:
+            await self.send_levelup(msg, new_lvl)
+            await self.give_rr(msg.author, new_lvl, await self.rr_list_role(msg.guild.id))
 
 
     async def check_noxp(self, msg: discord.Message) -> bool:
@@ -216,7 +219,7 @@ class Xp(commands.Cog):
             item = ''
         await destination.send(text.format_map(self.bot.SafeDict(
             user=msg.author.mention,
-            level=lvl[0],
+            level=lvl,
             random=item,
             username=msg.author.display_name
         )))
@@ -248,31 +251,33 @@ class Xp(commands.Cog):
         return min(round(len(content)*self.xp_per_char), self.max_xp_per_msg)
 
     async def calc_level(self, xp: int, system: typing.Literal["global", "mee6-like", "local"]):
-        """Calcule le niveau correspondant à un nombre d'xp"""
+        """Calculate the level corresponding to a given xp amount
+        Returns the current level, the xp needed for the next level and the xp needed for the current level"""
         if system != "mee6-like":
             if xp == 0:
-                return [0,ceil((1*125/7)**(20/13)),0]
-            lvl = ceil(0.056*xp**0.65)
+                xp_for_level_1: int = ceil((1*125/7)**(20/13))
+                return (0, xp_for_level_1, 0)
+            lvl: int = ceil(0.056*xp**0.65)
             next_step = xp
             while ceil(0.056*next_step**0.65)==lvl:
                 next_step += 1
-            return [lvl,next_step,ceil(((lvl-1)*125/7)**(20/13))]
-        # Niveau actuel - XP total pour le prochain niveau - XP total pour le niveau actuel
+            xp_for_current_lvl: int = ceil(((lvl-1)*125/7)**(20/13))
+            return (lvl, next_step, xp_for_current_lvl)
         else:
-            def recursive(lvl):
+            def recursive(lvl: int):
                 t = 0
                 for i in range(lvl):
                     t += 5*pow(i,2) + 50*i + 100
                 return t
 
             if xp == 0:
-                return [0,100,0]
+                return (0, 100, 0)
             lvl = 0
             total_xp = 0
             while xp >= total_xp:
                 total_xp += 5*pow(lvl,2) + 50*lvl + 100
                 lvl += 1
-            return [lvl-1,recursive(lvl),recursive(lvl-1)]
+            return (lvl-1, recursive(lvl), recursive(lvl-1))
 
     async def give_rr(self, member: discord.Member, level: int, rr_list: list, remove: bool=False):
         """Give (and remove?) roles rewards to a member"""

@@ -128,13 +128,17 @@ class Welcomer(commands.Cog):
         """Give roles rewards/muted role to new users"""
         if not self.bot.database_online:
             return
-        used_xp_type = await self.bot.get_config(member.guild.id, "xp_type")
+        used_xp_type: str = await self.bot.get_config(member.guild.id, "xp_type")
         if used_xp_type == "global":
             xp = await self.bot.get_cog('Xp').bdd_get_xp(member.id, None)
         else:
             xp = await self.bot.get_cog('Xp').bdd_get_xp(member.id, member.guild.id)
         if xp is not None and len(xp) == 1:
-            await self.bot.get_cog('Xp').give_rr(member,(await self.bot.get_cog('Xp').calc_level(xp[0]['xp'],used_xp_type))[0],await self.bot.get_cog('Xp').rr_list_role(member.guild.id))
+            await self.bot.get_cog('Xp').give_rr(
+                member,
+                (await self.bot.get_cog('Xp').calc_level(xp[0]['xp'],used_xp_type))[0],
+                await self.bot.get_cog('Xp').rr_list_role(member.guild.id)
+            )
 
     async def check_muted(self, member: discord.Member):
         """Give the muted role to that user if needed"""
