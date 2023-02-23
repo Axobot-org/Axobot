@@ -68,11 +68,7 @@ class Xp(commands.Cog):
             return None
         if value == "any":
             return msg.channel
-        try:
-            chan = msg.guild.get_channel_or_thread(int(value))
-            return chan
-        except discord.errors.NotFound:
-            return None
+        return value
 
     @commands.Cog.listener(name="on_message")
     async def add_xp(self, msg: discord.Message):
@@ -80,10 +76,10 @@ class Xp(commands.Cog):
         if msg.author.bot or msg.guild is None or not self.bot.xp_enabled:
             return
         # If axobot is already there, let it handle it
-        if await self.bot.check_axobot_presence(guild=msg.guild):
+        if await self.bot.check_axobot_presence(guild=msg.guild, channel_id=msg.channel.id):
             return
         used_xp_type: str = await self.bot.get_config(msg.guild.id, "xp_type")
-        if not ( await self.check_noxp(msg) and await self.bot.get_config(msg.guild.id, "enable_xp") ):
+        if await self.check_noxp(msg) or not await self.bot.get_config(msg.guild.id, "enable_xp"):
             return
         rate: float = await self.bot.get_config(msg.guild.id, "xp_rate")
         if self.sus is None:
