@@ -7,6 +7,7 @@ from discord.ext import commands
 from mysql.connector.errors import IntegrityError
 
 from libs.bot_classes import Axobot, MyContext
+from libs.enums import ServerWarningType
 from libs.tickets.converters import EmojiConverterType
 from libs.tickets.types import DBTopicRow
 from libs.tickets.views import (AskTitleModal, AskTopicSelect, SelectView,
@@ -269,6 +270,11 @@ class Tickets(commands.Cog):
         self.cooldowns[interaction.user] = time.time()
         category = interaction.guild.get_channel(topic['category'])
         if category is None:
+            self.bot.dispatch("server_warning", ServerWarningType.TICKET_CREATION_UNKNOWN_TARGET,
+                interaction.guild,
+                channel_id=topic['category'],
+                topic_name=topic['topic']
+            )
             raise Exception(f"No category configured for guild {interaction.guild_id} and topic {topic['topic']}")
         sent_error = False
         channel_name = await self.get_channel_name(topic["name_format"], interaction, topic, ticket_name)
@@ -277,11 +283,21 @@ class Tickets(commands.Cog):
                 channel = await category.create_text_channel(channel_name)
             except discord.Forbidden:
                 await interaction.edit_original_response(content=await self.bot._(interaction.guild_id, "tickets.missing-perms-creation.channel", category=category.name))
+                self.bot.dispatch("server_warning", ServerWarningType.TICKET_CREATION_FAILED,
+                    interaction.guild,
+                    channel=category,
+                    topic_name=topic['topic']
+                )
                 return
             try:
                 await self.setup_ticket_channel(channel, topic, interaction.user)
             except discord.Forbidden:
                 await self.send_missing_permissions_err(interaction, category.name)
+                self.bot.dispatch("server_warning", ServerWarningType.TICKET_INIT_FAILED,
+                    interaction.guild,
+                    channel=category,
+                    topic_name=topic['topic']
+                )
                 sent_error = True
         elif isinstance(category, discord.TextChannel):
             try:
@@ -292,6 +308,11 @@ class Tickets(commands.Cog):
                 channel = await category.create_thread(name=channel_name, type=channel_type)
             except discord.Forbidden:
                 await interaction.edit_original_response(content=await self.bot._(interaction.guild_id, "tickets.missing-perms-creation.thread", channel=category.mention))
+                self.bot.dispatch("server_warning", ServerWarningType.TICKET_CREATION_FAILED,
+                    interaction.guild,
+                    channel=category,
+                    topic_name=topic['topic']
+                )
                 return
             await self.setup_ticket_thread(channel, topic, interaction.user)
         else:
