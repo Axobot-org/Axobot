@@ -26,6 +26,7 @@
         "manage_guild": "Manage server",
         "manage_messages": "Manage messages",
         "manage_nicknames": "Manage nickames",
+        "manage_permissions": "Manage permissions",
         "manage_roles": "Manage roles",
         "manage_threads": "Manage threads",
         "manage_webhooks": "Manage webhooks",

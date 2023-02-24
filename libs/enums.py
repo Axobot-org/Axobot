@@ -69,6 +69,12 @@ class ServerWarningType(Enum):
     RSS_UNKNOWN_CHANNEL = 4
     # channel_id, feed_id
     RSS_DISABLED_FEED = 5
+    # channel_id, topic_name
+    TICKET_CREATION_UNKNOWN_TARGET = 6
+    # channel, topic_name
+    TICKET_CREATION_FAILED = 7
+    # channel, topic_name
+    TICKET_INIT_FAILED = 8
 
 class UsernameChangeRecord:
     "Record of a username change, mainly used for logs"

@@ -856,6 +856,32 @@ Minimum age required by anti-raid: {min_age}"
                 emb.description = f"**Feed has been disabled** in channel <#{kwargs.get('channel_id')}>"
                 emb.add_field(name="Feed ID", value=kwargs.get('feed_id'))
                 emb.add_field(name="Reason", value="Too many recent errors")
+            elif warning_type == ServerWarningType.TICKET_CREATION_UNKNOWN_TARGET:
+                emb.description = f"**Could not create ticket** in channel or category {kwargs.get('channel_id')}"
+                emb.add_field(name="Selected topic", value=kwargs.get('topic_name'))
+                emb.add_field(name="Reason", value="Unknown or deleted channel or category")
+            elif warning_type == ServerWarningType.TICKET_CREATION_FAILED:
+                channel = kwargs.get('channel')
+                if isinstance(channel, discord.CategoryChannel):
+                    emb.description = f"**Could not create ticket** in category {channel.name}"
+                else:
+                    emb.description = f"**Could not create ticket** in channel {channel.mention}"
+                emb.add_field(name="Selected topic", value=kwargs.get('topic_name'))
+                emb.add_field(
+                    name="Missing permission",
+                    value=await self.bot._(guild.id, "permissions.list.manage_channels")
+                )
+            elif warning_type == ServerWarningType.TICKET_INIT_FAILED:
+                channel = kwargs.get('channel')
+                if isinstance(channel, discord.CategoryChannel):
+                    emb.description = f"**Could not setup ticket permissions** in category {channel.name}"
+                else:
+                    emb.description = f"**Could not setup ticket permissions** in channel {channel.mention}"
+                emb.add_field(name="Selected topic", value=kwargs.get('topic_name'))
+                emb.add_field(
+                    name="Missing permission",
+                    value=await self.bot._(guild.id, "permissions.list.manage_permissions")
+                )
             else:
                 return
             await self.validate_logs(guild, channel_ids, emb, "bot_warnings")
