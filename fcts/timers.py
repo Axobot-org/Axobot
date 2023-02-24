@@ -96,8 +96,11 @@ class Timers(commands.Cog):
         `XXh` : XX hours
         `XXd` : XX days
         `XXw` : XX weeks
+        `XXm` : XX months
 
         ..Example reminder create 49d Think about doing my homework
+
+        ..Example reminder create 3h 5min It's pizza time!
 
         ..Doc miscellaneous.html#create-a-new-reminder
         """
