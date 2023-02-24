@@ -1,8 +1,8 @@
 :og:description: Axobot has a nice fresh tickets system, allowing your members to contact the staff in an easy and private way, without having to resort to DMs or role mentions.
 
-==============
-Tickets system
-==============
+=================
+❓ Tickets system
+=================
 
 A popular feature for very active servers is the ability for their members to quickly contact their staff when needed, without disturbing the moderators at any time of the day or night.
 

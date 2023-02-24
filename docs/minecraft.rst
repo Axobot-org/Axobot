@@ -1,6 +1,6 @@
-=========
-Minecraft
-=========
+============
+🟩 Minecraft
+============
 
 At the very beginning, ZBot was a single server bot, and focused on the world-famous Minecraft game. 
 

@@ -1,6 +1,6 @@
-==================
-User configuration
-==================
+=====================
+👤 User configuration
+=====================
 
 Users have a very important place in the bot code. Well, after all, without users, no bot, right? That's why we're currently working to give you as much as possible with ZBot, so you can fully enjoy your experience. 
 

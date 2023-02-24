@@ -1,6 +1,6 @@
-==========
-Moderation
-==========
+=============
+🔨 Moderation
+=============
 
 Like many Discord bots, ZBot allows you to moderate your server in different ways. You will find the classic commands to delete messages, mute, kick out or ban a member, as well as being able to slow down or freeze a chat completely. 
 

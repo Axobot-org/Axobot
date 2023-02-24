@@ -1,8 +1,8 @@
 :tocdepth: 2
 
-===
-Fun
-===
+======
+🎳 Fun
+======
 
 This section of the bot contains lots of fun commands, which will be less useful than the other sections, but will add a good atmosphere in your server. Because a server's life is not just about moderation or utilities, ZBot couldn't be without a few moments of fun. 
 

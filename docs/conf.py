@@ -40,6 +40,7 @@ release = '4.3.1'
 # ones.
 extensions = [
     "sphinxext.opengraph", # opengraph metadata
+    "sphinx_design", # enhanced design elements
 ]
 
 # Add any paths that contain templates here, relative to this directory.

@@ -1,6 +1,6 @@
-===========
-Information
-===========
+==============
+ℹ️ Information
+==============
 
 ZBot also allows you to retrieve information about the virtual world surrounding you. There you will find a single command that summarizes all the information about a channel/member/role/server/invitation/emoji, as well as a few other commands allowing you to study further.
 

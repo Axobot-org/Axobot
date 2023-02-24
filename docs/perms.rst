@@ -1,8 +1,8 @@
 :tocdepth: 2
 
-===========
-Permissions
-===========
+==============
+🔓 Permissions
+==============
 
 The permissions given to members is an important part in the configuration of a server. The same is also true for bots. This page is intended to show you each of the permissions necessary for the bot, as well as explain why they are necessary. All this in order to avoid putting unnecessary permissions on the bot, which it turn will keep your server clean and safe.
 
