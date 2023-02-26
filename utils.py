@@ -152,9 +152,9 @@ async def load_cogs(bot: "Axobot"):
         'fcts.welcomer',
         'fcts.xp'
     ]
-    progress_bar = progress.Bar(max=len(initial_extensions), width=60, prefix="Loading extensions", eta=False, duration=False)
+    progress_bar = progress.Bar(max=len(initial_extensions), width=60, prefix="Loading extensions", eta=False, show_duration=False)
 
-    # Here we load our extensions(cogs) listed above in [initial_extensions]
+    # Here we load our extensions (cogs) listed above in [initial_extensions]
     count = 0
     for i, extension in enumerate(initial_extensions):
         progress_bar(i)
