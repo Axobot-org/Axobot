@@ -73,7 +73,8 @@ class Errors(commands.Cog):
         # Anything in ignored will return and prevent anything happening.
         if isinstance(error, ignored) and not isinstance(error, actually_not_ignored):
             if isinstance(error, commands.CheckFailure) and ctx.interaction:
-                await ctx.send(await self.bot._(ctx.channel, "errors.checkfailure", help_cmd="`!help`"), ephemeral=True)
+                help_cmd = await self.bot.get_command_mention("help")
+                await ctx.send(await self.bot._(ctx.channel, "errors.checkfailure", help_cmd=help_cmd), ephemeral=True)
             if self.bot.beta and ctx.guild:
                 await ctx.send(f"`Ignored error:` [{error.__class__.__module__}.{error.__class__.__name__}] {error}")
             return
@@ -234,8 +235,9 @@ class Errors(commands.Cog):
     async def on_interaction_error(self, interaction: discord.Interaction, error: discord.app_commands.AppCommandError):
         "Called when an error is raised during an interaction"
         if isinstance(error, discord.app_commands.CheckFailure):
+            help_cmd = await self.bot.get_command_mention("help")
             await interaction.response.send_message(
-                await self.bot._(interaction, "errors.checkfailure", help_cmd="`!help`"),
+                await self.bot._(interaction, "errors.checkfailure", help_cmd=help_cmd),
                 ephemeral=True)
             return
         if interaction.guild:
