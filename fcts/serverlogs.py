@@ -28,7 +28,7 @@ class ServerLogs(commands.Cog):
         "members": {"member_roles", "member_nick", "member_avatar", "member_join", "member_leave", "member_verification"},
         "moderation": {"member_ban", "member_unban", "member_timeout", "member_kick"},
         "messages": {"message_update", "message_delete", "discord_invite", "ghost_ping"},
-        "roles": {"role_creation", "role_deletion"},
+        "roles": {"role_creation", "role_update", "role_deletion"},
         "tickets": {"ticket_creation"},
     }
 
@@ -735,6 +735,70 @@ class ServerLogs(commands.Cog):
                             emb.add_field(name="With reason", value=entry.reason)
                         break
             await self.validate_logs(role.guild, channel_ids, emb, "role_creation")
+
+    @commands.Cog.listener()
+    async def on_guild_role_update(self, before: discord.Role, after: discord.Role):
+        """Triggered when a role is edited in a guild
+        Corresponding log: role_update"""
+        if channel_ids := await self.is_log_enabled(after.guild.id, "role_update"):
+            emb = discord.Embed(
+                description=f"**Role '{before.name}' updated**",
+                colour=discord.Color.blurple()
+            )
+            emb.set_footer(text=f"Role ID: {after.id}")
+            # role name
+            if before.name != after.name:
+                emb.add_field(name="Name", value=f"{before.name} -> {after.name}", inline=False)
+            # role color
+            if before.color != after.color:
+                emb.add_field(name="Color", value=f"{before.color} -> {after.color}", inline=False)
+            # mentionnable
+            if before.mentionable != after.mentionable:
+                emb.add_field(name="Mentionnable", value="Enabled" if after.mentionable else "Disabled")
+            # hoisted
+            if before.hoist != after.hoist:
+                emb.add_field(name="Hoisted", value="Enabled" if after.hoist else "Disabled")
+            # icon
+            if before.icon != after.icon:
+                if after.icon:
+                    emb.add_field(name="Icon", value=f"Set to {after.icon.url}")
+                else:
+                    emb.add_field(name="Icon", value=f"Removed (previously {before.icon.url})")
+            if before.unicode_emoji != after.unicode_emoji:
+                if before.unicode_emoji is None:
+                    emb.add_field(name="Emoji", value=f"Set to {after.unicode_emoji}")
+                elif after.unicode_emoji is None:
+                    emb.add_field(name="Emoji", value=f"Removed (previously {after.unicode_emoji})")
+                else:
+                    emb.add_field(name="Emoji", value=f"{before.unicode_emoji} -> {after.unicode_emoji}")
+            if before.permissions != after.permissions:
+                revoked_perms = []
+                granted_perms = []
+                for perm in before.permissions:
+                    perm_id, perm_enabled = perm
+                    if perm not in after.permissions:
+                        if perm_enabled:
+                            granted_perms.append(
+                           await self.bot._(after.guild.id, "permissions.list."+perm_id)
+                        )
+                        else:
+                            revoked_perms.append(
+                            await self.bot._(after.guild.id, "permissions.list."+perm_id)
+                            )
+                if revoked_perms:
+                    emb.add_field(name="Revoked permissions", value=", ".join(revoked_perms), inline=False)
+                if granted_perms:
+                    emb.add_field(name="Granted permissions", value=", ".join(granted_perms), inline=False)
+            if after.guild.me.guild_permissions.view_audit_log:
+                now = self.bot.utcnow()
+                await asyncio.sleep(self.auditlogs_timeout)
+                async for entry in after.guild.audit_logs(limit=5, action=discord.AuditLogAction.role_update, oldest_first=False):
+                    if entry.target.id == after.id and (now - entry.created_at).total_seconds() < 5:
+                        emb.add_field(name="Edited by", value=f"**{entry.user.mention}** ({entry.user.id})", inline=False)
+                        if entry.reason:
+                            emb.add_field(name="With reason", value=entry.reason)
+                        break
+            await self.validate_logs(after.guild, channel_ids, emb, "role_update")
 
     @commands.Cog.listener()
     async def on_guild_role_delete(self, role: discord.Role):
