@@ -28,7 +28,7 @@ class ServerLogs(commands.Cog):
         "members": {"member_roles", "member_nick", "member_avatar", "member_join", "member_leave", "member_verification"},
         "moderation": {"member_ban", "member_unban", "member_timeout", "member_kick"},
         "messages": {"message_update", "message_delete", "discord_invite", "ghost_ping"},
-        "roles": {"role_creation"},
+        "roles": {"role_creation", "role_deletion"},
         "tickets": {"ticket_creation"},
     }
 
@@ -696,6 +696,21 @@ class ServerLogs(commands.Cog):
             await self.validate_logs(guild, channel_ids, emb, "member_unban")
 
 
+    async def get_role_specs(self, role: discord.Role) -> list[str]:
+        "Get specific things to note for a role"
+        specs = []
+        if role.permissions.administrator:
+            specs.append("Administrator permission")
+        if role.is_bot_managed():
+            specs.append("Managed by a bot")
+        if role.is_integration():
+            specs.append("Integrated by an app")
+        if role.is_premium_subscriber():
+            specs.append("Nitro boosts role")
+        if role.hoist:
+            specs.append("Hoisted")
+        return specs
+
     @commands.Cog.listener()
     async def on_guild_role_create(self, role: discord.Role):
         """Triggered when a role is created in a guild
@@ -707,20 +722,45 @@ class ServerLogs(commands.Cog):
             )
             emb.add_field(name="Name", value=role.name, inline=False)
             emb.add_field(name="Color", value=str(role.color))
-            specs = []
-            if role.permissions.administrator:
-                specs.append("Administrator permission")
-            if role.is_bot_managed():
-                specs.append("Managed by a bot")
-            if role.is_integration():
-                specs.append("Integrated by an app")
-            if role.is_premium_subscriber():
-                specs.append("Nitro boosts role")
-            if role.hoist:
-                specs.append("Hoisted")
-            if specs:
+            if specs := await self.get_role_specs(role):
                 emb.add_field(name="Specificities", value=", ".join(specs), inline=False)
+            # if we have access to audit logs, just wait a bit to make sure the unban is logged
+            if role.guild.me.guild_permissions.view_audit_log:
+                now = self.bot.utcnow()
+                await asyncio.sleep(self.auditlogs_timeout)
+                async for entry in role.guild.audit_logs(limit=5, action=discord.AuditLogAction.role_create, oldest_first=False):
+                    if entry.target.id == role.id and (now - entry.created_at).total_seconds() < 5:
+                        emb.add_field(name="Created by", value=f"**{entry.user.mention}** ({entry.user.id})")
+                        if entry.reason:
+                            emb.add_field(name="With reason", value=entry.reason)
+                        break
             await self.validate_logs(role.guild, channel_ids, emb, "role_creation")
+
+    @commands.Cog.listener()
+    async def on_guild_role_delete(self, role: discord.Role):
+        """Triggered when a role is deleted in a guild
+        Corresponding log: role_deletion"""
+        if channel_ids := await self.is_log_enabled(role.guild.id, "role_deletion"):
+            emb = discord.Embed(
+                description="**Role deleted**",
+                colour=discord.Color.red()
+            )
+            emb.add_field(name="Name", value=role.name, inline=False)
+            emb.add_field(name="Color", value=str(role.color))
+            if specs := await self.get_role_specs(role):
+                emb.add_field(name="Specificities", value=", ".join(specs), inline=False)
+            # if we have access to audit logs, just wait a bit to make sure the unban is logged
+            if role.guild.me.guild_permissions.view_audit_log:
+                now = self.bot.utcnow()
+                await asyncio.sleep(self.auditlogs_timeout)
+                async for entry in role.guild.audit_logs(limit=5, action=discord.AuditLogAction.role_delete, oldest_first=False):
+                    if entry.target.id == role.id and (now - entry.created_at).total_seconds() < 5:
+                        emb.add_field(name="Deleted by", value=f"**{entry.user.mention}** ({entry.user.id})")
+                        if entry.reason:
+                            emb.add_field(name="With reason", value=entry.reason)
+                        break
+            await self.validate_logs(role.guild, channel_ids, emb, "role_deletion")
+            
 
     @commands.Cog.listener()
     async def on_antiscam_warn(self, message: discord.Message, prediction: PredictionResult):
