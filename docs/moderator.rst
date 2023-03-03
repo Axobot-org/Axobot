@@ -257,6 +257,7 @@ Types of logs
 * **message_delete:** A message is deleted
 * **role_creation:** A role is created
 * **role_deletion:** A role is deleted
+* **role_update:** A role has been edited
 * **ticket_creation:** A `ticket <tickets.html>`__ has been opened
 
 
