@@ -42,17 +42,15 @@ class Xp(commands.Cog):
         self.file = 'xp'
         self.sus = None
         self.types = ['global','mee6-like','local']
-        try:
-            verdana_name = 'Verdana.ttf'
-        except OSError:
-            verdana_name = 'Veranda.ttf'
+        verdana_font = "./assets/fonts/Verdana.ttf"
+        roboto_font = "./assets/fonts/Roboto-Medium.ttf"
         self.fonts = {
-            'xp_fnt': ImageFont.truetype(verdana_name, 24),
-            'NIVEAU_fnt': ImageFont.truetype(verdana_name, 42),
-            'levels_fnt': ImageFont.truetype(verdana_name, 65),
-            'rank_fnt': ImageFont.truetype(verdana_name, 29),
-            'RANK_fnt': ImageFont.truetype(verdana_name, 23),
-            'name_fnt': ImageFont.truetype('Roboto-Medium.ttf', 40),
+            'xp_fnt': ImageFont.truetype(verdana_font, 24),
+            'NIVEAU_fnt': ImageFont.truetype(verdana_font, 42),
+            'levels_fnt': ImageFont.truetype(verdana_font, 65),
+            'rank_fnt': ImageFont.truetype(verdana_font, 29),
+            'RANK_fnt': ImageFont.truetype(verdana_font, 23),
+            'name_fnt': ImageFont.truetype(roboto_font, 40),
         }
     
     @commands.Cog.listener()
