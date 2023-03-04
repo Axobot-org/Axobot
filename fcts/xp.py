@@ -701,7 +701,7 @@ class Xp(commands.Cog):
             return
         return xp[0]['xp']
 
-    @commands.command(name='rank')
+    @commands.command(name="rank")
     @commands.bot_has_permissions(send_messages=True)
     @commands.cooldown(1,20,commands.BucketType.user)
     async def rank(self, ctx: MyContext, *, user: args.user=None):
@@ -745,8 +745,10 @@ class Xp(commands.Cog):
                     rank = "?"
             if isinstance(rank, float):
                 rank = int(rank)
+            send_in_private = ctx.guild is None or await self.bot.get_config(ctx.guild.id, "rank_in_dm")
+            use_author_dm = send_in_private and ctx.interaction is None
             # If we can send the rank card
-            if ctx.guild is None or ctx.channel.permissions_for(ctx.guild.me).attach_files:
+            if ctx.guild is None or use_author_dm or ctx.channel.permissions_for(ctx.guild.me).attach_files:
                 try:
                     await self.send_card(ctx, user, xp, rank, ranks_nb, xp_used_type, levels_info)
                     return
@@ -783,8 +785,14 @@ class Xp(commands.Cog):
                     self.bot.dispatch("error", err, ctx)
             if statsCog := self.bot.get_cog("BotStats"):
                 statsCog.xp_cards["generated"] += 1
+        send_in_private = ctx.guild is None or await self.bot.get_config(ctx.guild.id, "rank_in_dm")
         try:
-            await ctx.send(file=myfile)
+            if ctx.interaction:
+                await ctx.send(file=myfile, ephemeral=send_in_private)
+            elif send_in_private:
+                await ctx.author.send(file=myfile)
+            else:
+                await ctx.send(file=myfile)
         except discord.errors.HTTPException:
             await ctx.send(await self.bot._(ctx.channel, "xp.card-too-large"))
         if statsCog := self.bot.get_cog("BotStats"):
@@ -799,7 +807,13 @@ class Xp(commands.Cog):
         emb.add_field(name='XP', value="{}/{}".format(xp, levels_info[1]))
         emb.add_field(name=txts[0].title(), value=levels_info[0])
         emb.add_field(name=txts[1].title(), value="{}/{}".format(rank, ranks_nb))
-        await ctx.send(embed=emb)
+        send_in_private = await self.bot.get_config(ctx.guild.id, "rank_in_dm")
+        if ctx.interaction:
+            await ctx.send(embed=emb, ephemeral=send_in_private)
+        elif send_in_private:
+            await ctx.author.send(embed=emb)
+        else:
+            await ctx.send(embed=emb)
 
     async def send_txt(self, ctx: MyContext, user: discord.User, xp, rank, ranks_nb, levels_info, used_system: str):
         txts = [await self.bot._(ctx.channel, "xp.card-level"), await self.bot._(ctx.channel, "xp.card-rank")]
@@ -809,7 +823,13 @@ class Xp(commands.Cog):
 **XP** {}/{}
 **{}** {}
 **{}** {}/{}""".format(user.name, xp, levels_info[1], txts[0].title(), levels_info[0], txts[1].title(), rank, ranks_nb)
-        await ctx.send(msg)
+        send_in_private = await self.bot.get_config(ctx.guild.id, "rank_in_dm")
+        if ctx.interaction:
+            await ctx.send(msg, ephemeral=send_in_private)
+        elif send_in_private:
+            await ctx.author.send(msg)
+        else:
+            await ctx.send(msg)
 
     def convert_average(self, nbr: int) -> str:
         res = str(nbr)
