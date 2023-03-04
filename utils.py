@@ -6,6 +6,7 @@ import sys
 from logging.handlers import RotatingFileHandler
 from typing import TYPE_CHECKING
 from LRFutils import progress
+from mysql.connector import errors as mysql_errors
 
 import discord
 import mysql
@@ -101,12 +102,13 @@ def load_sql_connection(bot: "Axobot"):
                                           password=bot.database_keys['password'],
                                           host="127.0.0.1",
                                           database=bot.database_keys['database1'])
-        except (mysql.connector.InterfaceError, mysql.connector.ProgrammingError):
+        except (mysql_errors.InterfaceError, mysql_errors.ProgrammingError, mysql_errors.DatabaseError):
             bot.log.warning("Unable to access local dabatase - attempt via IP")
             cnx = mysql.connector.connect(user=bot.database_keys['user'],
                                           password=bot.database_keys['password'],
                                           host=bot.database_keys['host'],
                                           database=bot.database_keys['database1'])
+            bot.log.info("Database connected remotely")
         else:
             bot.log.info("Database connected locally")
             bot.database_keys['host'] = '127.0.0.1'
