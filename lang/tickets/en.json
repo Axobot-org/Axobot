@@ -65,7 +65,7 @@
     "text-edited": "The message displayed with the selection of a ticket has been edited",
     "ticket-created": "Ticket opened in %{channel} with the topic \"%{topic}\"!",
     "ticket-introduction": {
-        "description": "Welcome %{user} in your ticket about '%{ticket_name}'! Someone should quickly answer your concerns right here.\nAs a reminder, you selected the topic **'%{topic_name}'**",
+        "description": "Welcome %{user} in your ticket about '%{ticket_name}'! Someone should quickly answer your concerns right here.\n\nAs a reminder, you selected the topic **'%{topic_name}'**",
         "title": "New ticket created!"
     },
     "title-modal": {
