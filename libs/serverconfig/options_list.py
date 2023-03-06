@@ -198,6 +198,11 @@ options: dict[str, "AllRepresentation"] = {
         "default": "!",
         "is_listed": True,
     },
+    "rank_in_dm": {
+        "type": "boolean",
+        "default": False,
+        "is_listed": True,
+    },
     "roles_react_max_number": {
         "type": "int",
         "min": 0,
