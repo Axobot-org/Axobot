@@ -148,8 +148,8 @@ options: dict[str, "AllRepresentation"] = {
     },
     "nicknames_history": {
         "type": "boolean",
-        "default": None,
-        "is_listed": True,
+        "default": False,
+        "is_listed": False,
     },
     "noxp_channels": {
         "type": "text_channels_list",
