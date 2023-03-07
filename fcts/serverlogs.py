@@ -299,12 +299,17 @@ class ServerLogs(commands.Cog):
         if not guild.me.guild_permissions.view_audit_log:
             return None
         now = self.bot.utcnow()
+        stats_cog = self.bot.get_cog("BotStats")
         await asyncio.sleep(self.auditlogs_timeout)
         async for entry in guild.audit_logs(action=action, limit=5, oldest_first=False):
             if (now - entry.created_at).total_seconds() > 5:
                 continue
             if check is None or check(entry):
+                if stats_cog:
+                    await stats_cog.on_serverlogs_audit_search(True)
                 return entry
+        if stats_cog:
+            await stats_cog.on_serverlogs_audit_search(False)
 
 
     @commands.Cog.listener()
