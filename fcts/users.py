@@ -199,11 +199,10 @@ class Users(commands.Cog):
         Here you can (dis)allow one of the users option that Axobot has, which are:
         - animated_card: Display an animated rank card if your pfp is a gif (way slower rendering)
         - auto_unafk: Automatically remove your AFK mode
-        - usernames_log: Record when you change your username/nickname
 
         Value can only be a boolean (true/false)
         Providing empty value will show you the current value and more details"""
-        options = {"animated_card":"animated_card", "auto_unafk":"auto_unafk", "usernames_log":"allow_usernames_logs"}
+        options = {"animated_card":"animated_card", "auto_unafk":"auto_unafk", }
         if option not in options:
             await ctx.send(await self.bot._(ctx.channel, "users.config_list", options=" - ".join(options.keys())))
             return

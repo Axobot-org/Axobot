@@ -74,9 +74,3 @@ Option 'auto_unafk'
 ===================
 
 This option has been designed for people who don't want to manually type the `unafk` command as soon as they are back. So by activating this system, Axobot will automatically remove the AFK tag from you as soon as you send a message. As simple as that!
-
-
-Option 'usernames_log'
-======================
-
-By default Axobot records when you change your nickname, whether it is your main name or the nickname in a server. This data is then used for the results of the `usernames <infos.html#usernames-history>`__ command, and nowhere else. But for confidentiality reasons you can prevent your future changes from being saved at any time, via this option.
