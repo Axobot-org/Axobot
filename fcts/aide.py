@@ -5,7 +5,9 @@ from typing import List, Optional, TypedDict
 
 import discord
 from discord.ext import commands
-from libs.bot_classes import MyContext, Axobot
+
+from libs.bot_classes import Axobot, MyContext
+
 
 class CommandsCategoryData(TypedDict):
     emoji: str
@@ -43,16 +45,16 @@ class Help(commands.Cog):
         config_cmd = await self.bot.get_command_mention("config set")
         await ctx.send(await self.bot._(ctx.guild, "welcome.help", config_cmd=config_cmd))
 
-    @commands.command(name="about", aliases=["botinfos", "botinfo"])
+    @commands.hybrid_command(name="about", aliases=["botinfos", "botinfo"])
     @commands.cooldown(7, 30, commands.BucketType.user)
-    async def infos(self, ctx: MyContext):
+    async def about_cmd(self, ctx: MyContext):
         """Information about the bot
 
 ..Doc infos.html#about"""
         urls = ""
         bot_invite = "https://zrunner.me/" + ("invitezbot" if self.bot.entity_id == 0 else "invite-axobot")
-        for e, url in enumerate(['http://discord.gg/N55zY88', bot_invite, 'https://zbot.rtfd.io/', 'https://twitter.com/z_runnerr', 'https://zrunner.me/zbot-faq', 'https://zrunner.me/zbot-privacy.pdf']):
-            urls += "\n:arrow_forward: " + await self.bot._(ctx.channel, f"info.about-{e}") + " <" + url + ">"
+        for i, url in enumerate(['http://discord.gg/N55zY88', bot_invite, 'https://zbot.rtfd.io/', 'https://twitter.com/z_runnerr', 'https://zrunner.me/zbot-faq', 'https://zrunner.me/zbot-privacy.pdf']):
+            urls += "\n:arrow_forward: " + await self.bot._(ctx.channel, f"info.about-{i}") + " <" + url + ">"
         msg = await self.bot._(ctx.channel, "info.about-main", mention=ctx.bot.user.mention, links=urls)
         if ctx.can_send_embed:
             await ctx.send(embed=discord.Embed(description=msg, color=16298524))
