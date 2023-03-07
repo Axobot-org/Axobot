@@ -3,6 +3,7 @@ import datetime
 from typing import Optional
 
 import discord
+from discord import app_commands
 from discord.ext import commands
 from libs.bot_classes import MyContext, Axobot
 from libs.formatutils import FormatUtils
@@ -58,10 +59,11 @@ class Timers(commands.Cog):
         async with self.bot.db_query(query, (user, self.bot.beta)) as _:
             pass
 
-    @commands.command(name="remindme", aliases=['rmd'])
-    @commands.cooldown(5,30,commands.BucketType.channel)
-    @commands.cooldown(5,60,commands.BucketType.user)
-    async def remindme(self, ctx: MyContext, *, args):
+    @commands.hybrid_command(name="remindme", aliases=['rmd'])
+    @app_commands.describe(duration="The duration to wait, eg. '2d 4h'", message="The message to remind you of")
+    @commands.cooldown(5, 30, commands.BucketType.channel)
+    @commands.cooldown(5, 60, commands.BucketType.user)
+    async def remindme(self, ctx: MyContext, duration: commands.Greedy[args.tempdelta], *, message: str):
         """Create a new reminder
         This is actually an alias of `reminder create`
 
@@ -70,9 +72,7 @@ class Timers(commands.Cog):
         ..Example remindme 3months Christmas is coming!
 
         ..Doc miscellaneous.html#create-a-new-reminder"""
-        ctx.message.content = ctx.prefix + ("reminder " if args.startswith('create') else "reminder create ") + args
-        new_ctx = await self.bot.get_context(ctx.message)
-        await self.remind_main.invoke(new_ctx)
+        await self.remind_create(ctx, duration, message=message)
 
 
     @commands.group(name="reminder", aliases=["remind", "reminds", "reminders"])
@@ -88,7 +88,7 @@ class Timers(commands.Cog):
     @commands.cooldown(5,30,commands.BucketType.channel)
     @commands.cooldown(5,60,commands.BucketType.user)
     @commands.check(checks.database_connected)
-    async def remind_create(self, ctx: MyContext, duration: commands.Greedy[args.tempdelta], *, message):
+    async def remind_create(self, ctx: MyContext, duration: commands.Greedy[args.tempdelta], *, message: str):
         """Create a new reminder
 
         Please use the following format:
