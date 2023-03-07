@@ -270,6 +270,7 @@ class ServerConfig(commands.Cog):
     @discord.app_commands.default_permissions(manage_guild=True)
     @commands.guild_only()
     async def config_main(self, ctx: MyContext):
+        "Configure the bot for your server"
         if ctx.invoked_subcommand is None:
             subcommand_passed = ctx.message.content.replace(ctx.prefix+"config", "").strip()
             if subcommand_passed in options_list:
@@ -278,7 +279,7 @@ class ServerConfig(commands.Cog):
                 await ctx.send_help("config")
                 return
 
-    @config_main.command(name='set')
+    @config_main.command(name="set")
     @app_commands.describe(
         option="The option to modify",
         value="The new option value"
@@ -301,7 +302,7 @@ class ServerConfig(commands.Cog):
         return await self.option_name_autocomplete(option)
 
 
-    @config_main.command(name='reset')
+    @config_main.command(name="reset")
     @app_commands.describe(option="The option to reset")
     @commands.cooldown(3, 30, commands.BucketType.guild)
     @commands.guild_only()
@@ -408,9 +409,10 @@ class ServerConfig(commands.Cog):
         if not ctx.channel.permissions_for(ctx.guild.me).embed_links:
             await ctx.send(await self.bot._(ctx.channel, "minecraft.cant-embed"))
             return
-        if option not in options_list:
-            await ctx.send(await self.bot._(ctx.channel, "server.option-notfound"))
-            return
+        if (opt_data := options_list.get(option)) is None:
+            return await ctx.send(await self.bot._(ctx.guild.id, "server.option-notfound"))
+        if not opt_data["is_listed"]:
+            return await ctx.send(await self.bot._(ctx.guild.id, "server.option-notfound"))
         value = await self.get_option(guild.id, option)
         if (display := to_display(option, value)) is None:
             display = "Ø"
