@@ -1,6 +1,3 @@
-commit_message: "Update translations %original_path% (%language%)"
-append_commit_message: false
-
 files:
   - source: /lang/*/en.json
     translation: /%original_path%/%two_letters_code%.json
