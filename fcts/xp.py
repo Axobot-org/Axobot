@@ -18,6 +18,8 @@ import numpy as np
 from discord.ext import commands
 from PIL import Image, ImageDraw, ImageEnhance, ImageFont, ImageSequence
 
+from libs.tips import UserTip
+
 from . import args, checks
 
 importlib.reload(args)
@@ -504,7 +506,7 @@ class Xp(commands.Cog):
         except Exception as err:
             self.bot.dispatch("error", err)
 
-    async def bdd_get_rank(self, userID: int, guild: discord.Guild=None):
+    async def bdd_get_rank(self, user_id: int, guild: discord.Guild=None):
         """Get the rank of a user"""
         try:
             if not self.bot.database_online:
@@ -531,7 +533,7 @@ class Xp(commands.Cog):
             for x in cursor:
                 if (guild is not None and x['userID'] in users) or guild is None:
                     i += 1
-                if x['userID']== userID:
+                if x['userID']== user_id:
                     # x['rank'] = i
                     userdata = x
                     userdata["rank"] = round(userdata["rank"])
@@ -793,8 +795,15 @@ class Xp(commands.Cog):
                 await ctx.send(file=myfile)
         except discord.errors.HTTPException:
             await ctx.send(await self.bot._(ctx.channel, "xp.card-too-large"))
+        else:
+            await self.send_rankcard_tip(ctx)
         if statsCog := self.bot.get_cog("BotStats"):
             statsCog.xp_cards["sent"] += 1
+
+    async def send_rankcard_tip(self, ctx: MyContext):
+        if random.random() < 0.3 and await self.bot.tips_manager.should_show_user_tip(ctx.author.id, UserTip.RANK_CARD_PERSONALISATION):
+            profile_cmd = await self.bot.get_command_mention("profile card")
+            await self.bot.tips_manager.send_tip(ctx, UserTip.RANK_CARD_PERSONALISATION, profile_cmd=profile_cmd)
 
     async def send_embed(self, ctx: MyContext, user: discord.User, xp, rank, ranks_nb, levels_info, used_system: str):
         txts = [await self.bot._(ctx.channel, "xp.card-level"), await self.bot._(ctx.channel, "xp.card-rank")]
@@ -1081,7 +1090,7 @@ class Xp(commands.Cog):
     @commands.cooldown(1,300,commands.BucketType.guild)
     async def rr_reload(self, ctx: MyContext):
         """Refresh roles rewards for the whole server
-        
+
         ..Doc server.html#roles-rewards"""
         try:
             if not ctx.guild.me.guild_permissions.manage_roles:
