@@ -1,0 +1,19 @@
+{
+    "christmas": {
+        "already-collected": "Olet jo lunastanut joululahjasi! Nauti lahjoistasi ja pidä hauskaa!",
+        "collected": "Olet kerännyt vuoden 2022 joulukorttisi!\nKokeile %{cmd} komentoa (tyyli \"christmas22\") aloittaaksesi sen käytön!"
+    },
+    "events-price-title": "Palkinnot voittajille",
+    "nothing-desc": "Tällä hetkellä ei ole tapahtumia. Seuraa bottiuutisia tietääksesi, milloin seuraava tapahtuma on!",
+    "nothing-prices": "Tässä tapahtumassa ei ole mitään saavutettavaa :confused:",
+    "no-objectives": "Tämä tapahtuma ei edellytä sinua keräämään pisteitä voittaaksesi.\nLisätietoja saat komennosta %{cmd}",
+    "objectives": "Tavoitteet",
+    "points": "pistettä",
+    "position-global": "Globaali sija",
+    "leaderboard-global": "Globaali tulostaulukko (top %{count})",
+    "rank-title": "Tapahtuma pisteet",
+    "rank-total": "Pisteet yhteensä",
+    "soon": "Tapahtuma on tulossa pian! Pidä silmät auki, koska se alkaa %{date}",
+    "unclassed": "luokittelematon",
+    "xp-howto": "Voit ansaita tapahtumapisteitä voittamalla ristinolla -pelejä, käyttämällä tapahtumakomentoja, tai suorittamalla useita muita salaisia tehtäviä. Älä epäröi tulla tukipalvelimelle kysymään lisätietoja!"
+}
