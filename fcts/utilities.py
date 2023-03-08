@@ -2,9 +2,10 @@ import asyncio
 import importlib
 import operator
 import re
-from typing import Any, List, Optional
+from typing import Any, List
 
 import aiohttp
+from cachingutils import acached
 import discord
 from discord.ext import commands
 from libs.bot_classes import MyContext, Axobot
@@ -203,6 +204,7 @@ class Utilities(commands.Cog):
             return 'dark'
         return parameters['xp_style']
 
+    @acached(timeout=60)
     async def allowed_card_styles(self, user: discord.User):
         """Retourne la liste des styles autorisées pour la carte d'xp de cet utilisateur"""
         liste = ['blue', 'dark', 'green', 'grey', 'orange',
