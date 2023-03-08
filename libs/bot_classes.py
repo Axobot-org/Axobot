@@ -21,6 +21,7 @@ from libs.emojis_manager import EmojisManager
 from libs.prefix_manager import PrefixManager
 from libs.serverconfig.options_list import options as options_list
 from libs.tasks_handler import TaskHandler
+from libs.tips import TipsManager
 from utils import get_prefix
 
 if TYPE_CHECKING:
@@ -84,7 +85,7 @@ class MyContext(commands.Context):
             else:
                 kwargs["file"] = file
         return await super().send(*args, **kwargs)
-    
+
     async def send_help(self, command: Union[str, commands.Command]):
         """Send the help message of the given command"""
         cmd_arg = command.split(' ') if isinstance(command, str) else command.qualified_name.split(' ')
@@ -95,7 +96,7 @@ class Axobot(commands.bot.AutoShardedBot):
     """Bot class, with everything needed to run it"""
 
     def __init__(self, case_insensitive: bool = None, status: discord.Status = None, database_online: bool = True, \
-            beta: bool = False, dbl_token: str = "", zombie_mode: bool = False):
+            beta: bool = False, zombie_mode: bool = False):
         # pylint: disable=assigning-non-slot
         # defining allowed default mentions
         allowed_mentions = discord.AllowedMentions(everyone=False, roles=False)
@@ -123,10 +124,11 @@ class Axobot(commands.bot.AutoShardedBot):
         self.prefix_manager = PrefixManager(self)
         self.task_handler = TaskHandler(self)
         self.emojis_manager = EmojisManager(self)
+        self.tips_manager = TipsManager(self)
         # app commands
         self.tree.on_error = self.on_app_cmd_error
         self.app_commands_list: Optional[list[discord.app_commands.AppCommand]] = None
-    
+
     @property
     def dbl_token(self):
         return self.others["dbl_zbot"] if self.entity_id == 0 else self.others["dbl_axobot"]
@@ -397,7 +399,7 @@ class Axobot(commands.bot.AutoShardedBot):
         if channel_id is not None:
             channel = self.get_channel(channel_id)
         return await self._check_axobot_in_guild(guild, channel)
-    
+
     @acached(timeout=60)
     async def _check_axobot_in_guild(self, guild: Optional[discord.Guild], channel: Optional[discord.abc.GuildChannel] = None):
         if guild is None:
