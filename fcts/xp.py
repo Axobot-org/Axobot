@@ -801,7 +801,7 @@ class Xp(commands.Cog):
             statsCog.xp_cards["sent"] += 1
 
     async def send_rankcard_tip(self, ctx: MyContext):
-        if random.random() < 0.3 and await self.bot.tips_manager.should_show_user_tip(ctx.author.id, UserTip.RANK_CARD_PERSONALISATION):
+        if random.random() < 0.2 and await self.bot.tips_manager.should_show_user_tip(ctx.author.id, UserTip.RANK_CARD_PERSONALISATION):
             profile_cmd = await self.bot.get_command_mention("profile card")
             await self.bot.tips_manager.send_tip(ctx, UserTip.RANK_CARD_PERSONALISATION, profile_cmd=profile_cmd)
 
