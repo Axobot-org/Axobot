@@ -1,20 +1,20 @@
 import datetime
-from enum import Enum
 import random
+from enum import Enum
 from typing import TYPE_CHECKING, Optional, TypedDict, Union
 
 import discord
-
+from cachingutils import LRUCache
 
 if TYPE_CHECKING:
     from bot_classes import Axobot, MyContext
 
 
-class UserTip(Enum):
+class UserTip(str, Enum):
     RANK_CARD_PERSONALISATION = "rank_card_personalisation"
 
 
-class GuildTip(Enum):
+class GuildTip(str, Enum):
     ...
 
 
@@ -28,6 +28,9 @@ class TipsManager:
 
     def __init__(self, bot: "Axobot"):
         self.bot = bot
+        _cache_init: dict[int, list[self.UserTipsFetchResult]] = {}
+        self.user_cache = LRUCache(max_size=10_000, timeout=3_600 * 2, values=_cache_init)
+        self.guild_cache = LRUCache(max_size=10_000, timeout=3_600 * 2, values=dict(_cache_init))
 
     class UserTipsFetchResult(TypedDict):
         tip_id: UserTip
@@ -35,8 +38,11 @@ class TipsManager:
 
     async def db_get_user_tips(self, user_id: int) -> list[UserTipsFetchResult]:
         "Get list of tips shown to a user"
+        if value := self.user_cache.get(user_id):
+            return value
         query = "SELECT tip_id, shown_at FROM tips WHERE user_id = %s"
         async with self.bot.db_query(query, (user_id,)) as query_result:
+            self.user_cache[user_id] = query_result
             return query_result
 
     class GuildTipsFetchResult(TypedDict):
@@ -53,7 +59,11 @@ class TipsManager:
         "Register a tip as shown to a user"
         query = "INSERT INTO tips (user_id, tip_id) VALUES (%s, %s)"
         async with self.bot.db_query(query, (user_id, tip.value)):
-            pass
+            new_record = {"tip_id": tip, "shown_at": self.bot.utcnow()}
+            if tips_list := self.user_cache.get(user_id):
+                tips_list.append(new_record)
+            else:
+                self.user_cache[user_id] = [new_record]
 
     async def db_register_guild_tip(self, guild_id: int, tip: GuildTip):
         "Register a tip as shown to a guild"
@@ -63,6 +73,11 @@ class TipsManager:
 
     async def db_get_last_user_tip_shown(self, user_id: int, tip: UserTip) -> Optional[datetime.datetime]:
         "Get the last time a tip has been shown to a user"
+        if user_tips := self.user_cache.get(user_id):
+            sorted_tips = sorted(user_tips, key=lambda x: x["shown_at"], reverse=True)
+            for tip_dict in sorted_tips:
+                if tip_dict["tip_id"] == tip:
+                    return tip_dict["shown_at"]
         query = "SELECT MAX(shown_at) FROM tips WHERE user_id = %s AND tip_id = %s"
         async with self.bot.db_query(query, (user_id, tip.value), astuple=True) as query_result:
             if query_result[0][0]:
