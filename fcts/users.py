@@ -1,7 +1,8 @@
 import importlib
 import json
 import time
-from typing import Optional, Union
+from typing import Any, Optional, Union
+from cachingutils import acached
 
 import discord
 from discord import app_commands
@@ -15,11 +16,11 @@ from . import args, checks
 importlib.reload(args)
 importlib.reload(checks)
 
-user_options_map = [
-    "animated_card",
-    "auto_unafk",
-    "show_tips",
-]
+user_options_list = {
+    "animated_card": False,
+    "auto_unafk": False,
+    "show_tips": True,
+}
 
 class Users(commands.Cog):
     "Commands and tools related to users specifically"
@@ -28,22 +29,76 @@ class Users(commands.Cog):
         self.bot = bot
         self.file = 'users'
 
+    async def db_get_userinfo(self, user_id: int) -> Optional[dict[str, Any]]:
+        """Get the user info from the database"""
+        if not self.bot.database_online:
+            return None
+        query = "SELECT * FROM `users` WHERE userID=%s"
+        async with self.bot.db_query(query, (user_id,), fetchone=True) as query_result:
+            return query_result or None
+
+    @acached(timeout=3600)
+    async def db_get_user_config(self, user_id: int, config: str):
+        "Get a user config value from the database"
+        if config not in user_options_list:
+            raise ValueError(f"Unknown user config: {config}")
+        if not self.bot.database_online:
+            return user_options_list[config]
+        query = f"SELECT `{config}` FROM `users` WHERE userID=%s"
+        async with self.bot.db_query(query, (user_id,), astuple=True, fetchone=True) as query_result:
+            if len(query_result) == 0:
+                return user_options_list[config]
+            return bool(query_result[0])
+
+    async def db_edit_user_flags(self, user_id: int, flags: int):
+        "Change the user flags in the database"
+        if not self.bot.database_online:
+            return
+        query = "UPDATE `users` SET `user_flags`=%s WHERE `userID`=%s"
+        async with self.bot.db_query(query, (flags, user_id)):
+            pass
+
+    async def db_edit_user_rankcards(self, user_id: int, rankcards: int):
+        "Change the unlocked rank cards for a user in the database"
+        if not self.bot.database_online:
+            return
+        query = "UPDATE `users` SET `rankcards_unlocked`=%s WHERE `userID`=%s"
+        async with self.bot.db_query(query, (rankcards, user_id)):
+            pass
+
+    async def db_edit_user_xp_card(self, user_id: int, card_style: str):
+        "Change the user xp card in the database"
+        if not self.bot.database_online:
+            return
+        query = "UPDATE `users` SET `xp_style`=%s WHERE `userID`=%s"
+        async with self.bot.db_query(query, (card_style, user_id)):
+            pass
+
+    async def db_edit_user_config(self, user_id: int, config: str, value: bool):
+        "Change a user config in the database"
+        if config not in user_options_list:
+            raise ValueError(f"Unknown user config: {config}")
+        if not self.bot.database_online:
+            return
+        query = f"UPDATE `users` SET `{config}`=%s WHERE `userID`=%s"
+        async with self.bot.db_query(query, (value, user_id)):
+            pass
+
+    async def db_used_rank(self, user_id: int):
+        """Write in the database that a user used its rank card"""
+        if not self.bot.database_online:
+            return
+        query = "UPDATE `users` SET `used_rank`=1 WHERE `userID`=%s"
+        async with self.bot.db_query(query, (user_id,)):
+            pass
+
     async def get_userflags(self, user: discord.User) -> list[str]:
         """Check what user flags has a user"""
         if not self.bot.database_online:
             return []
-        parameters = None
-        try:
-            if cog := self.bot.get_cog("Utilities"):
-                get_data = cog.get_db_userinfo
-            else:
-                return False
-            parameters = await get_data(criters=["userID="+str(user.id)], columns=['user_flags'])
-        except Exception as err:
-            self.bot.dispatch("error", err)
-        if parameters is None:
-            return []
-        return UserFlag().int_to_flags(parameters['user_flags'])
+        if userinfo := await self.db_get_userinfo(user.id):
+            return UserFlag().int_to_flags(userinfo['user_flags'])
+        return []
 
     async def has_userflag(self, user: discord.User, flag: str) -> bool:
         """Check if a user has a specific user flag"""
@@ -55,18 +110,9 @@ class Users(commands.Cog):
         """Check what rank cards got unlocked by a user"""
         if not self.bot.database_online:
             return []
-        parameters = None
-        try:
-            if cog := self.bot.get_cog("Utilities"):
-                get_data = cog.get_db_userinfo
-            else:
-                return []
-            parameters = await get_data(criters=["userID="+str(user.id)], columns=['rankcards_unlocked'])
-        except Exception as err:
-            self.bot.dispatch("error", err)
-        if parameters is None:
-            return []
-        return RankCardsFlag().int_to_flags(parameters['rankcards_unlocked'])
+        if userinfo := await self.db_get_userinfo(user.id):
+            return RankCardsFlag().int_to_flags(userinfo['rankcards_unlocked'])
+        return []
 
     async def has_rankcard(self, user: discord.User, rankcard: str) -> bool:
         """Check if a user has unlocked a specific rank card"""
@@ -87,11 +133,7 @@ class Users(commands.Cog):
             rankcards.append(style)
         else:
             rankcards.remove(style)
-        await self.bot.get_cog('Utilities').change_db_userinfo(
-            user.id,
-            'rankcards_unlocked',
-            RankCardsFlag().flags_to_int(rankcards)
-        )
+        await self.db_edit_user_rankcards(user.id, RankCardsFlag().flags_to_int(rankcards))
 
     async def get_rankcards_stats(self) -> dict:
         """Get how many users use any rank card"""
@@ -107,13 +149,6 @@ class Users(commands.Cog):
         if '' in result:
             result['default'] = result.pop('')
         return result
-
-    async def used_rank(self, user_id: int):
-        """Write in the database that a user used its rank card"""
-        if not self.bot.database_online:
-            return
-        if cog := self.bot.get_cog("Utilities"):
-            await cog.change_db_userinfo(user_id, "used_rank", True)
 
     async def reload_event_rankcard(self, user: Union[discord.User, int], cards: list = None, points: int = None):
         """Grant the current event rank card to the provided user, if they have enough points
@@ -203,17 +238,14 @@ class Users(commands.Cog):
                 await ctx.send(await self.bot._(ctx.channel, 'users.invalid-card', cards=available_cards))
             return
         await ctx.defer()
-        if await ctx.bot.get_cog('Utilities').change_db_userinfo(ctx.author.id, 'xp_style', style):
-            # card changed
-            await ctx.send(await self.bot._(ctx.channel, 'users.changed-card', style=style))
-            last_update = self.get_last_rankcard_update(ctx.author.id)
-            if last_update is None:
-                await self.bot.get_cog("Utilities").add_user_eventPoint(ctx.author.id, 15)
-            elif last_update < time.time()-86400:
-                await self.bot.get_cog("Utilities").add_user_eventPoint(ctx.author.id, 2)
-            self.set_last_rankcard_update(ctx.author.id)
-        else:
-            await ctx.send(await self.bot._(ctx.channel, 'users.changed-error'))
+        await self.db_edit_user_xp_card(ctx.author.id, style)
+        await ctx.send(await self.bot._(ctx.channel, 'users.changed-card', style=style))
+        last_update = self.get_last_rankcard_update(ctx.author.id)
+        if last_update is None:
+            await self.bot.get_cog("Utilities").add_user_eventPoint(ctx.author.id, 15)
+        elif last_update < time.time()-86400:
+            await self.bot.get_cog("Utilities").add_user_eventPoint(ctx.author.id, 2)
+        self.set_last_rankcard_update(ctx.author.id)
 
     @profile_card.autocomplete("style")
     async def card_autocomplete_style(self, inter: discord.Interaction, current: str):
@@ -223,7 +255,7 @@ class Users(commands.Cog):
     @commands.check(checks.database_connected)
     @app_commands.choices(option=[
         discord.app_commands.Choice(name=option, value=option)
-        for option in user_options_map
+        for option in user_options_list
     ])
     async def user_config(self, ctx: MyContext, option: str, enable: Optional[bool]=None):
         """Modify any config option
@@ -234,15 +266,11 @@ class Users(commands.Cog):
 
         Value can only be a boolean (true/false)
         Providing empty value will show you the current value and more details"""
-        if option not in user_options_map:
-            await ctx.send(await self.bot._(ctx.channel, "users.config_list", options=" - ".join(user_options_map)))
+        if option not in user_options_list:
+            await ctx.send(await self.bot._(ctx.channel, "users.config_list", options=" - ".join(user_options_list)))
             return
         if enable is None:
-            value = await self.bot.get_cog('Utilities').get_db_userinfo([option], [f'`userID`={ctx.author.id}'])
-            if value is None:
-                value = False
-            else:
-                value = value[option]
+            value = await self.db_get_user_config(ctx.author.id, option)
             if ctx.guild is None or ctx.channel.permissions_for(ctx.guild.me).external_emojis:
                 emojis = self.bot.emojis_manager.customs['green_check'], self.bot.emojis_manager.customs['red_cross']
             else:
@@ -252,10 +280,8 @@ class Users(commands.Cog):
             else:
                 await ctx.send(emojis[1]+" "+await self.bot._(ctx.channel, f'users.set_config.{option}.false'))
         else:
-            if await self.bot.get_cog('Utilities').change_db_userinfo(ctx.author.id, option, enable):
-                await ctx.send(await self.bot._(ctx.channel, 'users.config_success', opt=option))
-            else:
-                await ctx.send(await self.bot._(ctx.channel, 'users.changed-error'))
+            await self.db_edit_user_config(ctx.author.id, option, enable)
+            await ctx.send(await self.bot._(ctx.channel, 'users.config_success', opt=option))
 
     def get_last_rankcard_update(self, user_id: int):
         "Get the timestamp of the last rank card change for a user"

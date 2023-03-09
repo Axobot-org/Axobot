@@ -85,8 +85,8 @@ class Events(commands.Cog):
         # If axobot is already there, let it handle it
         if guild_id and await self.bot.check_axobot_presence(guild_id=guild_id):
             return
-        config_option = await self.bot.get_cog('Utilities').get_db_userinfo(['allow_usernames_logs'],["userID=" + str(user_id)])
-        if config_option is not None and config_option['allow_usernames_logs'] is False:
+        config_option = await self.bot.get_cog("Users").db_get_user_config(user_id, "allow_usernames_logs")
+        if config_option is False:
             return False
         if guild_id:
             return await self.bot.get_config(guild_id, "nicknames_history")

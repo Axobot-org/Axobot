@@ -737,12 +737,14 @@ You can specify a verification limit by adding a number in argument (up to 1.000
                 if member.id not in self.afk_guys or len(self.afk_guys[member.id]) == 0:
                     await msg.channel.send(await self.bot._(msg.guild.id,"fun.afk.afk-user-noreason"))
                 else:
-                    reason = await self.utilities.clear_msg(await self.bot._(msg.guild.id,"fun.afk.afk-user-reason",reason=self.afk_guys[member.id]),ctx=ctx)
+                    tr = await self.bot._(msg.guild.id,"fun.afk.afk-user-reason",reason=self.afk_guys[member.id])
+                    reason = await self.utilities.clear_msg(tr, ctx=ctx)
                     await msg.channel.send(reason)
+        # auto unafk if the author was afk and has enabled it
         if isinstance(ctx.author, discord.Member) and not await checks.is_a_cmd(msg, self.bot):
-            if (ctx.author.nick and ctx.author.nick.endswith(' [AFK]')) or ctx.author.id in self.afk_guys.keys():
-                user_config = await self.utilities.get_db_userinfo(["auto_unafk"],[f'`userID`={ctx.author.id}'])
-                if user_config is None or (not user_config['auto_unafk']):
+            if (ctx.author.nick and ctx.author.nick.endswith(' [AFK]')) or ctx.author.id in self.afk_guys:
+                user_config = await self.bot.get_cog("Users").db_get_user_config(ctx.author, "auto_unafk")
+                if user_config is False:
                     return
                 await self.unafk(ctx)
 
