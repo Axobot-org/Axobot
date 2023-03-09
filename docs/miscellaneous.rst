@@ -2,7 +2,7 @@
 👀 Miscellaneous
 ================
 
-Some commands are difficult to classify in the categories of the site. They are not used for moderation, nor to get information, they can be fun but they are not listed in this category, they don't have much to do with configuration or rss... 
+Some commands are difficult to classify in the categories of the site. They are not used for moderation, nor to get information, they can be fun but they are not listed in this category, they don't have much to do with configuration or rss...
 
 Here is the list of these particular commands.
 

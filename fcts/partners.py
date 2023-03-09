@@ -26,13 +26,13 @@ class Partners(commands.Cog):
     @commands.Cog.listener()
     async def on_ready(self):
         self.table = 'partners_beta' if self.bot.beta else 'partners'
-    
+
     async def cog_load(self):
         self.refresh_loop.start()
-    
+
     async def cog_unload(self):
         self.refresh_loop.cancel()
-    
+
     @tasks.loop(time=[
         datetime.time(hour=7, tzinfo=utc),
         datetime.time(hour=14, tzinfo=utc),
@@ -57,7 +57,7 @@ class Partners(commands.Cog):
             timestamp=self.bot.utcnow())
         emb.set_author(name=self.bot.user, icon_url=self.bot.user.display_avatar)
         await self.bot.send_embed(emb, url="loop")
-    
+
     @refresh_loop.error
     async def on_refresh_loop_error(self, error):
         self.bot.dispatch("error", error, "When refreshing partners channels")
@@ -108,7 +108,7 @@ class Partners(commands.Cog):
         except Exception as err:
             self.bot.dispatch("error", err)
             return False
-    
+
     async def db_edit_partner(self,partnerID:int,target:str=None,desc:str=None,msg:int=None):
         """Modify a partner"""
         try:
@@ -136,7 +136,7 @@ class Partners(commands.Cog):
         except Exception as e:
             self.bot.dispatch("error", e)
             return False
-    
+
     async def db_get_bot_guilds(self, bot_id: int) -> Optional[int]:
         "Try to fetch the bot guilds count from the internal database"
         if bot_id == 159985870458322944:
@@ -175,7 +175,7 @@ class Partners(commands.Cog):
                 except discord.NotFound:
                     owners.append(o)
         return owners
-    
+
     async def get_partners_channels(self):
         channels: list[discord.abc.GuildChannel] = []
         for guild in self.bot.guilds:
@@ -364,7 +364,7 @@ class Partners(commands.Cog):
         """Add or modify a description for a partner
 
         ..Example partner desc 779713982 Very cool bot with tons of features, costs a lot
-        
+
         ..Doc server.html#add-a-partner"""
         l = await self.db_get_partner(ID,ctx.guild.id)
         if len(l) == 0:
@@ -378,11 +378,11 @@ class Partners(commands.Cog):
 
     @partner_main.command(name='invite')
     async def partner_invite(self, ctx: MyContext, ID:int, new_invite:discord.Invite=None):
-        """Get the invite of a guild partner. 
+        """Get the invite of a guild partner.
         If you specify an invite, the partner will be updated with this new invite
-        
+
         ..Example partner invite 795897339 discord.gg/ruyvNYQ
-        
+
         ..Doc server.html#change-a-server-invite"""
         l = await self.db_get_partner(ID,ctx.guild.id)
         if len(l) == 0 or l[0]['type']!='guild':
@@ -403,7 +403,7 @@ class Partners(commands.Cog):
         """Remove a partner from the partners list
 
         ..Example partner remove 800697342
-        
+
         ..Doc server.html#remove-a-partner"""
         if not ctx.channel.permissions_for(ctx.guild.me).add_reactions:
             return await ctx.send(await self.bot._(ctx.guild.id, "partners.missing-reactions"))
@@ -445,7 +445,7 @@ class Partners(commands.Cog):
     @commands.check(checks.has_manage_guild)
     async def partner_list(self, ctx: MyContext):
         """Get the list of every partners
-        
+
         ..Doc server.html#list-every-partners"""
         f = ['','']
         tr_bot = await self.bot._(ctx.guild.id, "misc.bot")
@@ -504,7 +504,7 @@ class Partners(commands.Cog):
     ..Example partners color yellow
 
     ..Example partners color #FF00FF
-    
+
     ..Doc server.html#change-the-embed-color"""
         await self.bot.get_cog('ServerConfig').config_set_cmd(ctx, "partner_color", color)
 
@@ -513,7 +513,7 @@ class Partners(commands.Cog):
     @commands.cooldown(1,60,commands.BucketType.guild)
     async def partner_reload(self, ctx: MyContext):
         """Reload your partners channel
-        
+
         ..Doc server.html#reload-your-list"""
         msg = await ctx.send(await self.bot._(ctx.guild, "rss.guild-loading", emoji=self.bot.emojis_manager.customs['loading']))
         channel: Optional[discord.abc.GuildChannel] = await self.bot.get_config(ctx.guild.id, "partner_channel")

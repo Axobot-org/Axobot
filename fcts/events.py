@@ -77,7 +77,7 @@ class Events(commands.Cog):
         """Called when a user change something (avatar, username, discrim)"""
         if before.name != after.name and await self.can_register_memberlog(before.id):
             await self.register_userlog_name(before, after)
-    
+
     async def can_register_memberlog(self, user_id: int, guild_id: Optional[int]=None):
         "Check if we are allowed to register a memberlog (if database is online, if the user has allowed it, if the server hasn't disabled it)"
         if not self.bot.database_online:
@@ -479,7 +479,7 @@ class Events(commands.Cog):
                 self.add_item(discord.ui.Button(label='Invite Axobot', url="https://zrunner.me/invite-axobot", style=discord.ButtonStyle.blurple))
                 self.add_item(discord.ui.Button(label='About the migration', url="https://zbot.readthedocs.io/en/release-candidate/v4.html#new-identity"))
                 self.add_item(discord.ui.Button(label='Support server', url="https://discord.gg/N55zY88"))
-        
+
         if self.bot.entity_id == 0 and random.random() < 0.1:
             txt = """Hey, Zbot is currently changing its identity to **Axobot**!
 

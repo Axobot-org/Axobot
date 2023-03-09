@@ -116,7 +116,7 @@ class RolesReact(commands.Cog):
     @commands.guild_only()
     async def rr_main(self, ctx: MyContext):
         """Manage your roles reactions
-        
+
         ..Doc roles-reactions.html"""
         if ctx.subcommand_passed is None:
             await ctx.send_help(ctx.command)
@@ -128,11 +128,11 @@ class RolesReact(commands.Cog):
         """Add a role reaction
         This role will be given when a membre click on a specific reaction
         Your description can only be a maximum of 150 characters
-        
+
         ..Example roles_react add :upside_down: "weird users" role for weird members
-        
+
         ..Example roles_react add :uwu: lolcats
-        
+
         ..Doc roles-reactions.html#add-and-remove-a-reaction"""
         try:
             if role.name == '@everyone':

@@ -23,7 +23,7 @@ class Help(commands.Cog):
         self.help_color_DM = 14090153
         with open('fcts/help.json', 'r', encoding="utf-8") as file:
             self.commands_data: dict[str, CommandsCategoryData] = json.load(file)
-    
+
     @property
     def doc_url(self):
         return (
@@ -88,7 +88,7 @@ Enable "Embed Links" permission for better rendering
                 await self._default_help_command(ctx)
             else:
                 await self._default_help_command(ctx, args)
-    
+
     async def should_dm(self, context: MyContext) -> bool:
         "Check if the answer should be sent in DM or in current channel"
         if context.guild is None or not self.bot.database_online:

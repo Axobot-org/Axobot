@@ -107,7 +107,7 @@ Online editor: https://projectblurple.com/paint
 For that, you have here some commands to blurplefy you. Notably the `blurplefy` command, which allows you to modify an image (by default your avatar or that of a friend) by changing its colors. Or why not `darkfy`, for a darker version. As well as `check`, to check that your image is up to Blurple:tm: standards.
 
 The modification commands (blurplefy/darkfy/lightfy) take into account several methods and variations.
-__3 methods:__ 
+__3 methods:__
 `--blurplefy` applies a basic blurplefy to your image
 `--edge-detect` applies an algorithm to detect the edges of your image to make it easier to see
 `--filter` applies a Blurple filter to your image (very good for images with many colors)
@@ -125,7 +125,7 @@ __29 variations: __
 `++less-gradient` removes some smoothness of colors from your image
 `++more-gradient` adds smoothness of colors to your image
 `++invert` swaps the darkest color and lightest color
-`++shift` shifts the colors over by one 
+`++shift` shifts the colors over by one
 `++white-bg` replaces the transparency of your image with a white background
 `++blurple-bg` replaces the transparency of your image with a Blurple background
 `++dark-blurple-bg` replaces the transparency of your image with a Dark Blurple background""")
@@ -215,7 +215,7 @@ __29 variations: __
                       variations: commands.Greedy[FlagConverter2] = [None], *,
                       who: typing.Union[discord.Member, discord.PartialEmoji, LinkConverter] = None):
         await self.color_command("dark", ctx, method, variations, who)
-    
+
     @commands.cooldown(6, 120, commands.BucketType.member)
     @commands.cooldown(20, 60, commands.BucketType.guild)
     @blurple_main.command("blurplefy", help="Blurplefy an image")
@@ -246,7 +246,7 @@ __29 variations: __
         else:
             await ctx.send(txt)
 
-    
+
 
 async def setup(bot):
     await bot.add_cog(Blurplefy(bot))

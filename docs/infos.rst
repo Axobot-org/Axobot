@@ -41,13 +41,13 @@ Info
 
 **Syntax:** :code:`info [type] <object>`
 
-This command is probably the most powerful in the information module. It allows you to find information on any item on your server: members, roles, text and voice channels, categories, emojis, invitations, as well as the server itself. Oh and also raw snowflakes (Discord IDs). Some information is even available about users who are not on your server! 
+This command is probably the most powerful in the information module. It allows you to find information on any item on your server: members, roles, text and voice channels, categories, emojis, invitations, as well as the server itself. Oh and also raw snowflakes (Discord IDs). Some information is even available about users who are not on your server!
 
-You can enter the name, the mention, or the `identifier <https://support.discord.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID->`_ of the object to be searched, and if the type of object (member, user, role...) is not specified, the bot will search itself to identify it. Note however that you are obliged to inform the type if your search includes spaces. 
+You can enter the name, the mention, or the `identifier <https://support.discord.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID->`_ of the object to be searched, and if the type of object (member, user, role...) is not specified, the bot will search itself to identify it. Note however that you are obliged to inform the type if your search includes spaces.
 
 .. note:: Some fields may not appear under certain conditions. No need to worry, it's just that Discord didn't send the requested information to the bot. And there's nothing we can do about it ¯\\_(ツ)_/¯
 
-.. warning:: The necessary permissions for the bot depend on the desired result: for example "Manage webhook" is required to get the list of webhooks of a channel. 
+.. warning:: The necessary permissions for the bot depend on the desired result: for example "Manage webhook" is required to get the list of webhooks of a channel.
 
 -----------
 Membercount
@@ -55,7 +55,7 @@ Membercount
 
 **Syntax:** :code:`membercount`
 
-With this command, you can get the number of members on your server, but also the number of bots, of humans, people connected, and probably other numbers that will be added later. This is a small basic command without much functionality, but it allows you to quickly keep up with these statistics. 
+With this command, you can get the number of members on your server, but also the number of bots, of humans, people connected, and probably other numbers that will be added later. This is a small basic command without much functionality, but it allows you to quickly keep up with these statistics.
 
 .. note:: Good news! The bot does not need any specific permissions for this command! Just keep in mind that the rendering is much prettier with "`Embed Links <perms.html#embed-links>`__" permission enabled.
 

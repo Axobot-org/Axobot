@@ -21,7 +21,7 @@ Grant every possible permission in the server. Someone with this permission will
 View Audit Log
 --------------
 
-Allows the bot to read server logs (adding roles, changing names, editing channels...). Not necessary for the moment 
+Allows the bot to read server logs (adding roles, changing names, editing channels...). Used by the modlogs system.
 
 Manage Server
 -------------

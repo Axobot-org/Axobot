@@ -325,7 +325,7 @@ options: dict[str, "AllRepresentation"] = {
         "max_count": 2,
         "default": ['👍', '👎'],
         "is_listed": True,
-    },    
+    },
     "warn_allowed_roles": {
         "type": "roles_list",
         "min_count": 1,

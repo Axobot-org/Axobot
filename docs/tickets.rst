@@ -6,7 +6,7 @@
 
 A popular feature for very active servers is the ability for their members to quickly contact their staff when needed, without disturbing the moderators at any time of the day or night.
 
-Axobot offers this very intuitive system, letting users open a "ticket" when they need it, and creating a private channel for them that only staff roles can read. This allows both your members to be sure to keep their information private, your teams to not be bothered by unsolicited mentions or DMs, and you to see at a glance which tickets are currently active and quickly respond. 
+Axobot offers this very intuitive system, letting users open a "ticket" when they need it, and creating a private channel for them that only staff roles can read. This allows both your members to be sure to keep their information private, your teams to not be bothered by unsolicited mentions or DMs, and you to see at a glance which tickets are currently active and quickly respond.
 
 .. note:: Like most of the features of this bot, this tickets system is constantly being developed. Feel free to help us by offering suggestions, voting for the best ideas or reporting bugs at our `Discord server <https://discord.gg/N55zY88>`__!
 

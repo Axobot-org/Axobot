@@ -170,7 +170,7 @@ class FeedObject:
         self.last_refresh: Optional[datetime.datetime] = from_dict['last_refresh'].replace(tzinfo=datetime.timezone.utc) if from_dict['last_refresh'] else from_dict['last_refresh']
         self.recent_errors: int = from_dict['recent_errors']
         self.enabled: bool = bool(from_dict['enabled'])
-    
+
     def has_recently_been_refreshed(self):
         if self.last_refresh is None:
             return False

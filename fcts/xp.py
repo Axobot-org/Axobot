@@ -54,7 +54,7 @@ class Xp(commands.Cog):
             'RANK_fnt': ImageFont.truetype(verdana_font, 23),
             'name_fnt': ImageFont.truetype(roboto_font, 40),
         }
-    
+
     @commands.Cog.listener()
     async def on_ready(self):
         self.table = 'xp_beta' if self.bot.beta else 'xp'
@@ -95,7 +95,7 @@ class Xp(commands.Cog):
             await self.add_xp_1(msg, rate)
         elif used_xp_type == "local":
             await self.add_xp_2(msg, rate)
-    
+
     async def add_xp_0(self, msg: discord.Message, rate: float):
         """Global xp type"""
         if msg.author.id in self.cache['global'].keys():
@@ -126,7 +126,7 @@ class Xp(commands.Cog):
             await self.send_levelup(msg, new_lvl)
             await self.give_rr(msg.author, new_lvl, await self.rr_list_role(msg.guild.id))
             await self.bot.get_cog("Utilities").add_user_eventPoint(msg.author.id, round(new_lvl/5))
-    
+
     async def add_xp_1(self, msg:discord.Message, rate: float):
         """MEE6-like xp type"""
         if msg.guild.id not in self.cache.keys():
@@ -304,7 +304,7 @@ class Xp(commands.Cog):
                 if self.bot.beta:
                     self.bot.dispatch("error", err)
         return c
-    
+
     async def reload_sus(self):
         """Check who should be observed for potential xp cheating"""
         cog = self.bot.get_cog("Utilities")
@@ -317,7 +317,7 @@ class Xp(commands.Cog):
             result = [item['userID'] for item in result]
         self.sus = set(result)
         self.bot.log.info("[xp] Reloaded xp suspects (%d suspects)", len(self.sus))
-    
+
     async def send_sus_msg(self, msg: discord.Message, xp: int):
         """Send a message into the sus channel"""
         chan = self.bot.get_channel(785877971944472597)
@@ -372,7 +372,7 @@ class Xp(commands.Cog):
         except Exception as err:
             self.bot.dispatch("error", err)
             return False
-    
+
     async def bdd_get_xp(self, userID: int, guild: int):
         try:
             if not self.bot.database_online:
@@ -403,7 +403,7 @@ class Xp(commands.Cog):
             return liste
         except Exception as err:
             self.bot.dispatch("error", err)
-    
+
     async def bdd_get_nber(self, guild: int=None):
         """Get the number of ranked users"""
         try:
@@ -445,7 +445,7 @@ class Xp(commands.Cog):
                 table = await self.get_table(guild,False)
                 if table is None:
                     self.cache[guild] = dict()
-                    return 
+                    return
                 cnx = self.bot.cnx_xp
                 query = ("SELECT `userID`,`xp` FROM `{}` WHERE `banned`=0".format(table))
             cursor = cnx.cursor(dictionary = True)
@@ -694,7 +694,7 @@ class Xp(commands.Cog):
 
     async def get_xp_bar_color(self, userID:int):
         return (45,180,105)
-    
+
     async def get_xp(self, user: discord.User, guild_id: int):
         xp = await self.bdd_get_xp(user.id, guild_id)
         if xp is None or (isinstance(xp,list) and len(xp) == 0):
@@ -1019,7 +1019,7 @@ class Xp(commands.Cog):
     @commands.guild_only()
     async def rr_main(self, ctx: MyContext):
         """Manage your roles rewards like a boss
-        
+
         ..Doc server.html#roles-rewards"""
         if ctx.subcommand_passed is None:
             await ctx.send_help(ctx.command)
@@ -1029,9 +1029,9 @@ class Xp(commands.Cog):
     async def rr_add(self, ctx: MyContext, level:int, *, role:discord.Role):
         """Add a role reward
         This role will be given to every member who reaches the level
-        
+
         ..Example rr add 10 Slowly farming
-        
+
         ..Doc server.html#roles-rewards"""
         try:
             if role.name == '@everyone':

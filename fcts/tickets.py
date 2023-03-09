@@ -168,7 +168,7 @@ class Tickets(commands.Cog):
         query = "UPDATE `tickets` SET `category` = %s WHERE `guild_id` = %s AND `id` = %s AND `beta` = %s"
         async with self.bot.db_query(query, (category, guild_id, topic_id, self.bot.beta), returnrowcount=True) as db_query:
             return db_query > 0
-    
+
     async def db_edit_topic_format(self, guild_id: int, topic_id: int, format: Optional[str]) -> bool:
         "Edit a topic channel/thread name format"
         query = "UPDATE `tickets` SET `name_format` = %s WHERE `guild_id` = %s AND `id` = %s AND `beta` = %s"
@@ -611,7 +611,7 @@ class Tickets(commands.Cog):
             await ctx.send(await self.bot._(ctx.guild.id, "tickets.emote-edited", topic=topic["topic"]))
         else:
             await ctx.send(await self.bot._(ctx.guild.id, "tickets.nothing-to-edit"))
-    
+
     @topic_set_emote.autocomplete("topic_id")
     async def topic_set_emote_autocomplete(self, interaction: discord.Interaction, current: str):
         return await self.topic_id_autocompletion(interaction, current, allow_other=False)
@@ -640,7 +640,7 @@ If that still doesn't work, please create your ticket
         await self.db_edit_topic_hint(ctx.guild.id, topic_id, message)
         topic = await self.db_get_topic_with_defaults(ctx.guild.id, topic_id)
         await ctx.send(await self.bot._(ctx.guild.id, "tickets.hint-edited.topic", topic=topic["topic"]))
-    
+
     @topic_set_hint.autocomplete("topic_id")
     async def topic_set_hint_autocomplete(self, interaction: discord.Interaction, current: str):
         return await self.topic_id_autocompletion(interaction, current)
@@ -671,7 +671,7 @@ If that still doesn't work, please create your ticket
             await ctx.send(await self.bot._(ctx.guild.id, key, topic=topic["topic"]))
         else:
             await ctx.send(await self.bot._(ctx.guild.id, "tickets.nothing-to-edit"))
-    
+
     @topic_set_role.autocomplete("topic_id")
     async def topic_set_role_autocomplete(self, interaction: discord.Interaction, current: str):
         return await self.topic_id_autocompletion(interaction, current)
@@ -705,7 +705,7 @@ If that still doesn't work, please create your ticket
             await ctx.send(await self.bot._(ctx.guild.id, "tickets.format.edited.topic", topic=topic["topic"]))
         else:
             await ctx.send(await self.bot._(ctx.guild.id, "tickets.nothing-to-edit"))
-    
+
     @topic_set_format.autocomplete("topic_id")
     async def topic_set_format_autocomplete(self, interaction: discord.Interaction, current: str):
         return await self.topic_id_autocompletion(interaction, current)
@@ -762,7 +762,7 @@ If that still doesn't work, please create your ticket
     @portal_review_config.autocomplete("topic_id")
     async def portal_review_autocomplete(self, interaction: discord.Interaction, current: str):
         return await self.topic_id_autocompletion(interaction, current, allow_other=False)
-    
+
     async def review_all(self, ctx: MyContext):
         "Send a global recap of a guild settings"
         topics = await self.db_get_topics(ctx.guild.id)
@@ -819,7 +819,7 @@ If that still doesn't work, please create your ticket
         if len(emb.fields) == 0:
             emb.description += "\n\n**" + await self.bot._(ctx.guild.id, "tickets.review.no-config") + "**"
         await ctx.send(embed=emb)
-    
+
     async def review_topic(self, ctx: MyContext, topic_id: int):
         "Send a global recap of a guild settings"
         topics = await self.db_get_topics(ctx.guild.id)

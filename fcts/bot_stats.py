@@ -213,7 +213,7 @@ class BotStats(commands.Cog):
                 FROM `axobot`.`dailies`
                 ORDER BY points
             ) AS subq
-            WHERE subq.row_index 
+            WHERE subq.row_index
             IN (FLOOR(@row_index / 2) , CEIL(@row_index / 2))"""
         async with self.bot.db_query(query, (now, "dailies.median", *args), multi=True) as _:
             pass
@@ -248,7 +248,7 @@ class BotStats(commands.Cog):
                 WHERE `events_points` != 0
                 ORDER BY events_points
             ) AS subq
-            WHERE subq.row_index 
+            WHERE subq.row_index
             IN (FLOOR(@row_index / 2) , CEIL(@row_index / 2))"""
         async with self.bot.db_query(query, (now, "eventpoints.median", *args), multi=True) as _:
             pass
@@ -270,7 +270,7 @@ class BotStats(commands.Cog):
         return ((query, (now, f"logs.{kind}.enabled", count, self.bot.entity_id))
             for kind, count in enabled_kinds.items()
         )
-            
+
 
     async def db_get_antiscam_enabled_count(self):
         "Get the number of active guilds where antiscam is enabled"
