@@ -17,19 +17,19 @@ The Basics
 
 Scams in Discord are a very specific category of scams, fortunately easy to isolate. They are mainly fake links that look like the official websites of Discord, Steam or Epic Games, as well as offers for free PayPal accounts or Nitro subscriptions. There are also scams offering “ friends ” to download malicious software, but this version exists almost only in DM; thus Axobot is not able to detect it, even less to prevent it.
 
-Here are some examples of particularly blatant scams for context: 
+Here are some examples of particularly blatant scams for context:
 
-    | +100 FEEDBACK  
+    | +100 FEEDBACK
     | +500 ORDERS
-    | 
-    | NETFLIX ACCOUNTS  
-    | RANDOM STEAM KEYS X10 OR MORE!  
+    |
+    | NETFLIX ACCOUNTS
+    | RANDOM STEAM KEYS X10 OR MORE!
     | AMAZON GIFT CARDS
     | [...]
     | ALL PAYMENT METHODS SUPPORTED, ALSO ACCEPTING XBOX AND NINTENDO DIGITAL CODES
-    | 
+    |
     | CHECK US OUT: **[CENSORED LINK]**
-    | 
+    |
     | TO PAY WITH PAYPAL OR SKRILL DM ME!
     | **[CENSORED LINK]**
 
@@ -40,7 +40,7 @@ Here are some examples of particularly blatant scams for context:
 --------
 
     | looking to sell my account It has over 240 skins with black knight 1,000 v bucks + Mako glider and a lot of more Shii lemme know if you if want it
-    | 
+    |
     | Serious Buyers Only‼️
 
 
@@ -72,7 +72,7 @@ Once the raw message is recorded, our agent needs to analyze and clean it in ord
         \**LF EARLY SUPPORTER DM ASAP GOT CRAZY OFFERS** <a:Early:909664561093828659>  \|\| @everyone||
 
     Our lemmatization algorithm will convert it to this raw message:
-    
+
         lf early support dm asap got crazy offer discordemoji everyon
 
 This system is far from perfect, it will inevitably remove some important information, but it is still an essential step in the cleaning process.

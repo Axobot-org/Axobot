@@ -1,0 +1,12 @@
+{
+    "embed": {
+        "title": [
+            "Astuce de pro",
+            "Le savais-tu ?",
+            "Saviez-vous que... ?",
+            "Conseil pratique",
+            "Le saviez-vous ?"
+        ]
+    },
+    "rank_card_personalisation": "Vous pouvez modifier l'arrière-plan de votre carte à l'aide de la commande %{profile_cmd} !"
+}

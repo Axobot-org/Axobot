@@ -1,6 +1,6 @@
-===========
-Information
-===========
+==============
+ℹ️ Information
+==============
 
 ZBot also allows you to retrieve information about the virtual world surrounding you. There you will find a single command that summarizes all the information about a channel/member/role/server/invitation/emoji, as well as a few other commands allowing you to study further.
 
@@ -41,13 +41,13 @@ Info
 
 **Syntax:** :code:`info [type] <object>`
 
-This command is probably the most powerful in the information module. It allows you to find information on any item on your server: members, roles, text and voice channels, categories, emojis, invitations, as well as the server itself. Oh and also raw snowflakes (Discord IDs). Some information is even available about users who are not on your server! 
+This command is probably the most powerful in the information module. It allows you to find information on any item on your server: members, roles, text and voice channels, categories, emojis, invitations, as well as the server itself. Oh and also raw snowflakes (Discord IDs). Some information is even available about users who are not on your server!
 
-You can enter the name, the mention, or the `identifier <https://support.discord.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID->`_ of the object to be searched, and if the type of object (member, user, role...) is not specified, the bot will search itself to identify it. Note however that you are obliged to inform the type if your search includes spaces. 
+You can enter the name, the mention, or the `identifier <https://support.discord.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID->`_ of the object to be searched, and if the type of object (member, user, role...) is not specified, the bot will search itself to identify it. Note however that you are obliged to inform the type if your search includes spaces.
 
 .. note:: Some fields may not appear under certain conditions. No need to worry, it's just that Discord didn't send the requested information to the bot. And there's nothing we can do about it ¯\\_(ツ)_/¯
 
-.. warning:: The necessary permissions for the bot depend on the desired result: for example "Manage webhook" is required to get the list of webhooks of a channel. 
+.. warning:: The necessary permissions for the bot depend on the desired result: for example "Manage webhook" is required to get the list of webhooks of a channel.
 
 -----------
 Membercount
@@ -55,7 +55,7 @@ Membercount
 
 **Syntax:** :code:`membercount`
 
-With this command, you can get the number of members on your server, but also the number of bots, of humans, people connected, and probably other numbers that will be added later. This is a small basic command without much functionality, but it allows you to quickly keep up with these statistics. 
+With this command, you can get the number of members on your server, but also the number of bots, of humans, people connected, and probably other numbers that will be added later. This is a small basic command without much functionality, but it allows you to quickly keep up with these statistics.
 
 .. note:: Good news! The bot does not need any specific permissions for this command! Just keep in mind that the rendering is much prettier with "`Embed Links <perms.html#embed-links>`__" permission enabled.
 
@@ -85,13 +85,11 @@ If you give an ip address in the command, the bot will send a certain number of 
 Prefix
 ------
 
-**Syntax:** :code:`prefix` or :code:`prefix change <new prefix>`
+**Syntax:** :code:`prefix`
 
 A nice shortcut to know the prefixes to which the bot responds. This is usually the prefix defined in the `configuration <server.html>`_, plus the mention of the bot.
 
-Note that this result may differ from the :code:`config see prefix` command when the database is out of sync.
-
-..note:: The subcommand :code:`prefix change` is an alias of :code:`config change prefix`
+..note:: You can change the bot prefix on your server with the :code:`config set prefix <new prefix>` command.
 
 
 ----------
@@ -106,15 +104,6 @@ An easy command to get some stats about the bot. Total XP collected by every use
 
 A list of the most used bot commands, sorted in descending order, both over the last 24 hours and since the beginning of the statistics recording!
 
------------------
-Usernames history
------------------
-
-**Syntax:** :code:`usernames <user>` (aliases: :code:`username` or :code:`usrnm`)
-
-This command displays the history of all nickname changes of a member. The Discord API does not give this information, so Axobot records each change, therefore it is possible that some nicknames may not be displayed in the list.
-
-If you don't want your names changes to be recorded, you can opt-out by using the `profile config usernames_log <user.html#allow-or-disallow-an-option>`_ command.
 
 ---------------
 Welcome message

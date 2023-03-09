@@ -1,10 +1,10 @@
 :tocdepth: 2
 
-===
-Fun
-===
+======
+🎳 Fun
+======
 
-This section of the bot contains lots of fun commands, which will be less useful than the other sections, but will add a good atmosphere in your server. Because a server's life is not just about moderation or utilities, ZBot couldn't be without a few moments of fun. 
+This section of the bot contains lots of fun commands, which will be less useful than the other sections, but will add a good atmosphere in your server. Because a server's life is not just about moderation or utilities, ZBot couldn't be without a few moments of fun.
 
 However, if too much fun bothers you, this option can be disabled at any time with the `config command <server.html>`__ (`enable_fun` parameter). The choice is yours!
 
@@ -48,7 +48,7 @@ Blame
 
 **Syntax:** :code:`blame <name|list>`
 
-You've probably already gotten a chance to get mad at someone. It doesn't matter why. And since it's always better to do it together, you may like to protest collectively against a common evil. This command therefore allows you to blame someone without getting tired of spamming. You just have to enter a name and hope that its custom message exists in our database, and we'll be happy to irritate ourselves for you. 
+You've probably already gotten a chance to get mad at someone. It doesn't matter why. And since it's always better to do it together, you may like to protest collectively against a common evil. This command therefore allows you to blame someone without getting tired of spamming. You just have to enter a name and hope that its custom message exists in our database, and we'll be happy to irritate ourselves for you.
 
 You can access even more names by being on some secret servers! Enter the :code:`list` argument to see which ones you have unlocked.
 
@@ -241,7 +241,7 @@ Ragequit
 
 Basically this command was designed for the sole use of the Creator. But since everyone has the right to get mad at something (and not just Python code), he decided to leave it open access. It's up to you to make good use of it!
 
-.. warning:: 
+.. warning::
     * The bot needs "`Attach files <perms.html#attach-files>`__" permission to send these images.
     * We do not own the copyright of each of the images used in this command. If you want to design an image specially for ZBot, and are ready to give us all rights, thank you to contact us as soon as possible!
 
@@ -272,7 +272,7 @@ Roll
 
 **Syntax:** :code:`roll <options>`
 
-If you can't agree with your friends, or if you want to leave the decision of a difficult choice to chance, this command will surely delight you. It allows you to select an option randomly from a list of options you provide, separated by commas (`,`). And you can put as many choices as you need! 
+If you can't agree with your friends, or if you want to leave the decision of a difficult choice to chance, this command will surely delight you. It allows you to select an option randomly from a list of options you provide, separated by commas (`,`). And you can put as many choices as you need!
 
 Example: :code:`roll a little, a lot;, passionately, madly, not at all!`
 
@@ -330,7 +330,7 @@ Get info about the current event
 
 **Syntax:** :code:`events info`
 
-You can have details about an event via this command. If an event is in progress, you will then have the explanatory summary, start and end dates, as well as any prizes to be won. 
+You can have details about an event via this command. If an event is in progress, you will then have the explanatory summary, start and end dates, as well as any prizes to be won.
 
 Get your current progress
 -------------------------

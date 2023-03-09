@@ -22,7 +22,9 @@
         "Lista palvelimista jossa sinä olet yhteistyökumppani"
     ],
     "reloaded": {
-        "many": "%{count} yhteistyökumppanit päivitetty"
+        "many": "%{count} yhteistyökumppanit päivitetty",
+        "one": "1 yhteistyökumppani päivitetty",
+        "zero": "Sinulla ei ole yhteistyökumppaneita"
     },
     "unknown-error": "Tuntematon virhe tapahtui. Lisätietoja saat ottamalla yhteyttä tukeen",
     "unknown-server": "Palvelin yhteistyökumppani ei löytynyt"

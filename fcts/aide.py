@@ -5,7 +5,9 @@ from typing import List, Optional, TypedDict
 
 import discord
 from discord.ext import commands
-from libs.bot_classes import MyContext, Axobot
+
+from libs.bot_classes import Axobot, MyContext
+
 
 class CommandsCategoryData(TypedDict):
     emoji: str
@@ -21,7 +23,7 @@ class Help(commands.Cog):
         self.help_color_DM = 14090153
         with open('fcts/help.json', 'r', encoding="utf-8") as file:
             self.commands_data: dict[str, CommandsCategoryData] = json.load(file)
-    
+
     @property
     def doc_url(self):
         return (
@@ -40,19 +42,19 @@ class Help(commands.Cog):
         """Help on setting up welcome / leave messages
 
 ..Doc infos.html#welcome-message"""
-        config_cmd = await self.bot.get_command_mention("config change")
+        config_cmd = await self.bot.get_command_mention("config set")
         await ctx.send(await self.bot._(ctx.guild, "welcome.help", config_cmd=config_cmd))
 
-    @commands.command(name="about", aliases=["botinfos", "botinfo"])
+    @commands.hybrid_command(name="about", aliases=["botinfos", "botinfo"])
     @commands.cooldown(7, 30, commands.BucketType.user)
-    async def infos(self, ctx: MyContext):
+    async def about_cmd(self, ctx: MyContext):
         """Information about the bot
 
 ..Doc infos.html#about"""
         urls = ""
         bot_invite = "https://zrunner.me/" + ("invitezbot" if self.bot.entity_id == 0 else "invite-axobot")
-        for e, url in enumerate(['http://discord.gg/N55zY88', bot_invite, 'https://zbot.rtfd.io/', 'https://twitter.com/z_runnerr', 'https://zrunner.me/zbot-faq', 'https://zrunner.me/zbot-privacy.pdf']):
-            urls += "\n:arrow_forward: " + await self.bot._(ctx.channel, f"info.about-{e}") + " <" + url + ">"
+        for i, url in enumerate(['http://discord.gg/N55zY88', bot_invite, 'https://zbot.rtfd.io/', 'https://twitter.com/z_runnerr', 'https://zrunner.me/zbot-faq', 'https://zrunner.me/zbot-privacy.pdf']):
+            urls += "\n:arrow_forward: " + await self.bot._(ctx.channel, f"info.about-{i}") + " <" + url + ">"
         msg = await self.bot._(ctx.channel, "info.about-main", mention=ctx.bot.user.mention, links=urls)
         if ctx.can_send_embed:
             await ctx.send(embed=discord.Embed(description=msg, color=16298524))
@@ -74,7 +76,6 @@ Enable "Embed Links" permission for better rendering
 
 ..Doc infos.html#help"""
         try:
-            # args = [x.replace('@everyone','@​everyone').replace('@here','@​here') for x in args]
             if len(args) == 0:
                 await self.help_command(ctx)
             else:
@@ -88,16 +89,22 @@ Enable "Embed Links" permission for better rendering
             else:
                 await self._default_help_command(ctx, args)
 
+    async def should_dm(self, context: MyContext) -> bool:
+        "Check if the answer should be sent in DM or in current channel"
+        if context.guild is None or not self.bot.database_online:
+            return False
+        return await self.bot.get_config(context.guild.id, 'help_in_dm')
+
     async def help_command(self, ctx: MyContext, commands: Optional[list[str]] = None):
         """Main command for the creation of the help message
 If the bot can't send the new command format, it will try to send the old one."""
         async with ctx.channel.typing():
             destination: discord.abc.Messageable = None
             if ctx.guild is not None:
-                send_in_dm = False if not self.bot.database_online else await self.bot.get_config(ctx.guild.id, 'help_in_dm')
-                if send_in_dm is not None and send_in_dm == 1:
+                if await self.should_dm(ctx):
                     destination = ctx.message.author.dm_channel
-                    await ctx.message.delete(delay=0)
+                    if ctx.guild:
+                        await ctx.message.delete(delay=0)
                 else:
                     destination = ctx.message.channel
             if destination is None:
@@ -129,7 +136,7 @@ If the bot can't send the new command format, it will try to send the old one.""
                 if len(pages) == 0 and ctx.guild is None:
                     pages = [await self.bot._(ctx.channel, "help.cog-empty-dm")]
             elif not commands:  # no command
-                compress = await self.bot.get_config(ctx.guild.id, 'compress_help')
+                compress: bool = await self.bot.get_config(ctx.guild.id, 'compress_help') if ctx.guild else False
                 pages = await self.all_commands(ctx, sorted([c for c in self.bot.commands], key=self.sort_by_name), compress=compress)
                 if ctx.guild is None:
                     title = await self.bot._(ctx.channel, "help.embed_title_dm")

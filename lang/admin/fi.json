@@ -1,3 +1,3 @@
 {
-    "emergency": "Hätätilanne on havaittu tälle botille. Tämä saattaa olla koska joku yrittää päästä sisään minun koodiini.\nJotta voidaan välttää sattumia, Minut oli pakotettu lähtemään kaikilta servuilta heti, missä olin toivoen että ei ole liian myöhäistä.\nLisätietoja tästä hätätilaanteesta mene minun servulleni: https://discord.me/z_bot (Katso linkki dokumenttiin jos linkki ei toimi enää: https://zbot.rtfd.io)"
+    "emergency": "Hätätilanne on havaittu botille. Tämä saattaa olla, koska joku yrittää päästä sisään minun koodiini.\nJotta voidaan välttää sattumia, minut on pakotettu lähtemään kaikilta palvelimilta heti, missä olin toivoen että ei ole liian myöhäistä.\nLisätietoja tästä hätätilaanteesta löytyy palvelimeltamme: https://discord.me/z_bot (Katso linkki dokumentista, jos linkki ei toimi enää: https://zbot.rtfd.io)"
 }

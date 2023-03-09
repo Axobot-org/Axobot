@@ -23,7 +23,7 @@ class TwitchApiAgent:
         if self._token is None or self.token_expires_at is None:
             return False
         return self.token_expires_at > datetime.now(timezone.utc)
-    
+
     @property
     def is_connected(self):
         "Check if the HTTP session is still open"
@@ -59,7 +59,7 @@ class TwitchApiAgent:
         return {
             "Client-ID": self.client_id,
             "Authorization": f"Bearer {self._token}"
-        }            
+        }
 
     @acached(timeout=1 * 60 * 60) # 1h
     async def get_user_by_name(self, username: str) -> Optional[StreamerObject]:

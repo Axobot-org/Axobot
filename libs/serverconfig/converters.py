@@ -130,11 +130,11 @@ class OptionConverter:
     @staticmethod
     def from_raw(raw: str, repr: TypedDict, guild: discord.Guild):
         raise NotImplementedError
-    
+
     @staticmethod
     def to_raw(value) -> str:
         raise NotImplementedError
-    
+
     @staticmethod
     def to_display(value) -> str:
         raise NotImplementedError
@@ -282,7 +282,7 @@ class BooleanOption(OptionConverter):
     @staticmethod
     def to_display(value: bool):
         return "Yes" if value else "No"
-    
+
     @staticmethod
     async def from_input(raw: str, repr: BooleanOptionRepresentation, guild: discord.Guild, ctx: MyContext):
         true_ish = {"1", "true", "yes", "on"}
@@ -324,7 +324,7 @@ class TextOption(OptionConverter):
     @staticmethod
     def to_display(value: str):
         return value
-    
+
     @staticmethod
     async def from_input(raw: str, repr: TextOptionRepresentation, guild: discord.Guild, ctx: MyContext):
         if len(raw) < repr["min_length"]:
@@ -354,7 +354,7 @@ class RoleOption(OptionConverter):
     @staticmethod
     def to_display(value: discord.Role):
         return value.mention
-    
+
     @staticmethod
     async def from_input(raw: str, repr: RoleOptionRepresentation, guild: discord.Guild, ctx: MyContext):
         try:
@@ -390,7 +390,7 @@ class RolesListOption(OptionConverter):
     @staticmethod
     def to_display(value: list[discord.Role]):
         return ", ".join(role.mention for role in value)
-    
+
     @staticmethod
     async def from_input(raw: str, repr: RolesListOptionRepresentation, guild: discord.Guild, ctx: MyContext):
         roles: list[discord.Role] = []
@@ -413,7 +413,7 @@ class RolesListOption(OptionConverter):
             raise ValueError("Too few roles", "ROLES_TOO_FEW", repr)
         elif len(roles) > repr["max_count"]:
             raise ValueError("Too many roles", "ROLES_TOO_MANY", repr)
-        return roles          
+        return roles
 
 class TextChannelOption(OptionConverter):
     @staticmethod
@@ -436,7 +436,7 @@ class TextChannelOption(OptionConverter):
     @staticmethod
     def to_display(value: Union[discord.TextChannel, discord.Thread]):
         return value.mention
-    
+
     @staticmethod
     async def from_input(raw: str, repr: TextChannelOptionRepresentation, guild: discord.Guild, ctx: MyContext):
         try:
@@ -473,7 +473,7 @@ class TextChannelsListOption(OptionConverter):
     @staticmethod
     def to_display(value: list[Union[discord.TextChannel, discord.Thread]]):
         return ", ".join(channel.mention for channel in value)
-    
+
     @staticmethod
     async def from_input(raw: str, repr: TextChannelsListOptionRepresentation, guild: discord.Guild, ctx: MyContext):
         channels: list[Union[discord.TextChannel, discord.Thread]] = []
@@ -520,7 +520,7 @@ class VoiceChannelOption(OptionConverter):
     @staticmethod
     def to_display(value: discord.channel.VocalGuildChannel):
         return value.mention
-    
+
     @staticmethod
     async def from_input(raw: str, repr: VoiceChannelOptionRepresentation, guild: discord.Guild, ctx: MyContext):
         try:
@@ -556,7 +556,7 @@ class CategoryOption(OptionConverter):
     @staticmethod
     def to_display(value: discord.CategoryChannel):
         return value.name
-    
+
     @staticmethod
     async def from_input(raw: str, repr: CategoryOptionRepresentation, guild: discord.Guild, ctx: MyContext):
         try:
@@ -594,7 +594,7 @@ class EmojisListOption(OptionConverter):
     @staticmethod
     def to_display(value: list[Union[UnicodeEmoji, discord.Emoji]]):
         return " ".join(str(emoji) for emoji in value)
-    
+
     @staticmethod
     async def from_input(raw: str, repr: EmojisListOptionRepresentation, guild: discord.Guild, ctx: MyContext):
         emojis: list[Union[UnicodeEmoji, discord.Emoji]] = []
@@ -637,7 +637,7 @@ class ColorOption(OptionConverter):
     @staticmethod
     def to_display(value: int):
         return f"#{value:06X}"
-    
+
     @staticmethod
     async def from_input(raw: str, repr: ColorOptionRepresentation, guild: discord.Guild, ctx: MyContext):
         try:
@@ -657,19 +657,19 @@ class LevelupChannelOption(OptionConverter):
             "allow_non_nsfw_channels": True,
         }
         return TextChannelOption.from_raw(raw, channel_repr, guild)
-    
+
     @staticmethod
     def to_raw(value: Union[str, discord.TextChannel]):
         if isinstance(value, str):
             return value
         return TextChannelOption.to_raw(value)
-    
+
     @staticmethod
     def to_display(value: Union[str, discord.TextChannel]):
         if isinstance(value, str):
             return value
         return TextChannelOption.to_display(value)
-    
+
     @staticmethod
     async def from_input(raw: str, repr: LevelupChannelRepresentation, guild: discord.Guild, ctx: MyContext):
         if raw.lower() in {"any", "none"}:

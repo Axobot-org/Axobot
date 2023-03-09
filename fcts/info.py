@@ -1138,37 +1138,20 @@ Available types: member, role, user, emoji, channel, server, invite, category
                 text += f"- {i[0]} : {i[1]}\n"
             await ctx.send(text)
 
-    @commands.group(name="prefix")
+    @commands.command(name="prefix")
     async def get_prefix(self, ctx: MyContext):
         """Show the usable prefix(s) for this server
 
         ..Doc infos.html#prefix"""
-        if ctx.invoked_subcommand is not None:
-            return
         txt = await self.bot._(ctx.channel,"info.prefix")
         prefix = "\n".join((await ctx.bot.get_prefix(ctx.message))[1:])
-        if ctx.guild is None or ctx.channel.permissions_for(ctx.guild.me):
+        if ctx.can_send_embed:
             emb = discord.Embed(title=txt, description=prefix, timestamp=ctx.message.created_at,
                 color=ctx.bot.get_cog('Help').help_color)
             emb.set_footer(text=ctx.author, icon_url=ctx.author.display_avatar)
             await ctx.send(embed=emb)
         else:
             await ctx.send(txt+"\n"+prefix)
-
-    @get_prefix.command(name="change")
-    @commands.guild_only()
-    async def prefix_change(self, ctx: MyContext, *, new_prefix: str):
-        """Change the used prefix
-
-        ..Example prefix change "Hey Zbot, "
-
-        ..Doc infos.html#prefix"""
-        msg: discord.Message = copy.copy(ctx.message)
-        if new_prefix.startswith('"') and new_prefix.endswith('"'):
-            new_prefix = new_prefix[1:-1]
-        msg.content =  f'{ctx.prefix}config change prefix "{new_prefix}"'
-        new_ctx = await self.bot.get_context(msg)
-        await self.bot.invoke(new_ctx)
 
     @commands.command(name="discordlinks",aliases=['discord','discordurls'])
     async def discord_status(self, ctx: MyContext):
@@ -1308,99 +1291,98 @@ Available types: member, role, user, emoji, channel, server, invite, category
         else:
             await ctx.send(desc)
 
-    @commands.command(name="usernames", aliases=["username","usrnm"])
-    @commands.check(checks.database_connected)
-    async def username(self, ctx: MyContext, *, user: discord.User=None):
-        """Get the names history of an user
-        Default user is you
+    # @commands.command(name="usernames", aliases=["username","usrnm"])
+    # @commands.check(checks.database_connected)
+    # async def username(self, ctx: MyContext, *, user: discord.User=None):
+    #     """Get the names history of an user
+    #     Default user is you
 
-        ..Doc infos.html#usernames-history"""
-        if user is None:
-            user = ctx.author
-        query = f"SELECT `old`, `new`, `guild`, CONVERT_TZ(`date`, @@session.time_zone, '+00:00') AS `utc_date` FROM `usernames_logs` WHERE user = %s AND beta = %s ORDER BY date DESC"
-        async with self.bot.db_query(query, (user.id, self.bot.beta)) as results:
-            # List creation
-            this_guild = list()
-            global_list = [x for x in results if x['guild'] in (None,0)]
-            if ctx.guild is not None:
-                this_guild = [x for x in results if x['guild']==ctx.guild.id]
-        # title
-        t = await self.bot._(ctx.channel,'info.usernames.title',u=user.name)
-        # Embed creation
-        if ctx.can_send_embed:
-            MAX = 28
-            date = ""
-            desc = None
-            fields = list()
-            if len(global_list) > 0:
-            # Usernames part
-                temp = [x['new'] for x in global_list if x['new']!='']
-                if len(temp) > 0:
-                    if len(temp) > MAX:
-                        temp = temp[:MAX] + [await self.bot._(ctx.channel, 'info.usernames.more', nbr=len(temp)-MAX)]
-                    fields.append({'name':await self.bot._(ctx.channel,'info.usernames.global'), 'value':"\n".join(temp)})
-                    _general = await self.bot._(ctx.channel,'info.usernames.general')
-                    date += f"{_general} <t:{global_list[0]['utc_date'].timestamp():.0f}>"
-            if len(this_guild) > 0:
-            # Nicknames part
-                temp = [x['new'] for x in this_guild if x['new']!='']
-                if len(temp) > 0:
-                    if len(temp) > MAX:
-                        temp = temp[:MAX] + [await self.bot._(ctx.channel, 'info.usernames.more', nbr=len(temp)-MAX)]
-                    fields.append({'name':await self.bot._(ctx.channel,'info.usernames.local'), 'value':"\n".join(temp)})
-                    _server = await self.bot._(ctx.channel,'info.usernames.server')
-                    date += f"\n{_server} <t:{this_guild[0]['utc_date'].timestamp():.0f}>"
-            # Date field
-            if len(date) > 0:
-                fields.append({'name':await self.bot._(ctx.channel,'info.usernames.last-date'), 'value': date})
-            else:
-                desc = await self.bot._(ctx.channel,'info.usernames.empty')
-            if ctx.guild is not None and ctx.guild.get_member(user.id) is not None and ctx.guild.get_member(user.id).color!=discord.Color(0):
-                c = ctx.guild.get_member(user.id).color
-            else:
-                c = 1350390
-            # "How to enable/disable" footer
-            allowing_logs = await self.bot.get_cog("Utilities").get_db_userinfo(["allow_usernames_logs"],["userID="+str(user.id)])
-            if allowing_logs is None or allowing_logs["allow_usernames_logs"]:
-                footer = await self.bot._(ctx.channel,'info.usernames.disallow')
-            else:
-                footer = await self.bot._(ctx.channel,'info.usernames.allow')
-            # Warning in description if disabled in the guild
-            if ctx.guild is not None and not await self.bot.get_config(ctx.guild.id, "nicknames_history"):
-                if len(ctx.guild.members) >= self.bot.get_cog("ServerConfig").max_members_for_nicknames:
-                    warning_disabled = await self.bot._(ctx.guild.id, "info.nicknames-disabled.guild-too-big")
-                else:
-                    warning_disabled = await self.bot._(ctx.guild.id, "info.nicknames-disabled.disabled")
-                desc = warning_disabled if desc is None else warning_disabled + "\n\n" + desc
-            # send the thing
-            emb = discord.Embed(title=t, description=desc, color=c)
-            emb.set_footer(text=footer)
-            for field in fields:
-                emb.add_field(**field)
-            await ctx.send(embed=emb)
-        # Raw text creation
-        else:
-            MAX = 25
-            text = ""
-            if len(global_list) > 0:
-                temp = [x['new'] for x in global_list if x['new']!='']
-                if len(temp) > MAX:
-                    temp = temp[:MAX] + [await self.bot._(ctx.channel, 'info.usernames.more', nbr=len(temp)-MAX)]
-                text += "**" + await self.bot._(ctx.channel,'info.usernames.global') + "**\n" + "\n".join(temp)
-            if len(this_guild) > 0:
-                if len(text) > 0:
-                    text += "\n\n"
-                temp = [x['new'] for x in this_guild if x['new']!='']
-                if len(temp) > MAX:
-                    temp = temp[:MAX] + [await self.bot._(ctx.channel, 'info.usernames.more', nbr=len(temp)-MAX)]
-                text += "**" + await self.bot._(ctx.channel,'info.usernames.local') + "**\n" + "\n".join(temp)
-            if len(text) == 0:
-                # no change known
-                text = await self.bot._(ctx.channel, 'info.usernames.empty')
-            await ctx.send(text)
+    #     ..Doc infos.html#usernames-history"""
+    #     if user is None:
+    #         user = ctx.author
+    #     query = f"SELECT `old`, `new`, `guild`, CONVERT_TZ(`date`, @@session.time_zone, '+00:00') AS `utc_date` FROM `usernames_logs` WHERE user = %s AND beta = %s ORDER BY date DESC"
+    #     async with self.bot.db_query(query, (user.id, self.bot.beta)) as results:
+    #         # List creation
+    #         this_guild = list()
+    #         global_list = [x for x in results if x['guild'] in (None,0)]
+    #         if ctx.guild is not None:
+    #             this_guild = [x for x in results if x['guild']==ctx.guild.id]
+    #     # title
+    #     t = await self.bot._(ctx.channel,'info.usernames.title',u=user.name)
+    #     # Embed creation
+    #     if ctx.can_send_embed:
+    #         MAX = 28
+    #         date = ""
+    #         desc = None
+    #         fields = list()
+    #         if len(global_list) > 0:
+    #         # Usernames part
+    #             temp = [x['new'] for x in global_list if x['new']!='']
+    #             if len(temp) > 0:
+    #                 if len(temp) > MAX:
+    #                     temp = temp[:MAX] + [await self.bot._(ctx.channel, 'info.usernames.more', nbr=len(temp)-MAX)]
+    #                 fields.append({'name':await self.bot._(ctx.channel,'info.usernames.global'), 'value':"\n".join(temp)})
+    #                 _general = await self.bot._(ctx.channel,'info.usernames.general')
+    #                 date += f"{_general} <t:{global_list[0]['utc_date'].timestamp():.0f}>"
+    #         if len(this_guild) > 0:
+    #         # Nicknames part
+    #             temp = [x['new'] for x in this_guild if x['new']!='']
+    #             if len(temp) > 0:
+    #                 if len(temp) > MAX:
+    #                     temp = temp[:MAX] + [await self.bot._(ctx.channel, 'info.usernames.more', nbr=len(temp)-MAX)]
+    #                 fields.append({'name':await self.bot._(ctx.channel,'info.usernames.local'), 'value':"\n".join(temp)})
+    #                 _server = await self.bot._(ctx.channel,'info.usernames.server')
+    #                 date += f"\n{_server} <t:{this_guild[0]['utc_date'].timestamp():.0f}>"
+    #         # Date field
+    #         if len(date) > 0:
+    #             fields.append({'name':await self.bot._(ctx.channel,'info.usernames.last-date'), 'value': date})
+    #         else:
+    #             desc = await self.bot._(ctx.channel,'info.usernames.empty')
+    #         if ctx.guild is not None and ctx.guild.get_member(user.id) is not None and ctx.guild.get_member(user.id).color!=discord.Color(0):
+    #             c = ctx.guild.get_member(user.id).color
+    #         else:
+    #             c = 1350390
+    #         # "How to enable/disable" footer
+    #         allowing_logs = await self.bot.get_cog("Utilities").get_db_userinfo(["allow_usernames_logs"],["userID="+str(user.id)])
+    #         if allowing_logs is None or allowing_logs["allow_usernames_logs"]:
+    #             footer = await self.bot._(ctx.channel,'info.usernames.disallow')
+    #         else:
+    #             footer = await self.bot._(ctx.channel,'info.usernames.allow')
+    #         # Warning in description if disabled in the guild
+    #         if ctx.guild is not None and not await self.bot.get_config(ctx.guild.id, "nicknames_history"):
+    #             if len(ctx.guild.members) >= self.bot.get_cog("ServerConfig").max_members_for_nicknames:
+    #                 warning_disabled = await self.bot._(ctx.guild.id, "info.nicknames-disabled.guild-too-big")
+    #             else:
+    #                 warning_disabled = await self.bot._(ctx.guild.id, "info.nicknames-disabled.disabled")
+    #             desc = warning_disabled if desc is None else warning_disabled + "\n\n" + desc
+    #         # send the thing
+    #         emb = discord.Embed(title=t, description=desc, color=c)
+    #         emb.set_footer(text=footer)
+    #         for field in fields:
+    #             emb.add_field(**field)
+    #         await ctx.send(embed=emb)
+    #     # Raw text creation
+    #     else:
+    #         MAX = 25
+    #         text = ""
+    #         if len(global_list) > 0:
+    #             temp = [x['new'] for x in global_list if x['new']!='']
+    #             if len(temp) > MAX:
+    #                 temp = temp[:MAX] + [await self.bot._(ctx.channel, 'info.usernames.more', nbr=len(temp)-MAX)]
+    #             text += "**" + await self.bot._(ctx.channel,'info.usernames.global') + "**\n" + "\n".join(temp)
+    #         if len(this_guild) > 0:
+    #             if len(text) > 0:
+    #                 text += "\n\n"
+    #             temp = [x['new'] for x in this_guild if x['new']!='']
+    #             if len(temp) > MAX:
+    #                 temp = temp[:MAX] + [await self.bot._(ctx.channel, 'info.usernames.more', nbr=len(temp)-MAX)]
+    #             text += "**" + await self.bot._(ctx.channel,'info.usernames.local') + "**\n" + "\n".join(temp)
+    #         if len(text) == 0:
+    #             # no change known
+    #             text = await self.bot._(ctx.channel, 'info.usernames.empty')
+    #         await ctx.send(text)
 
 
 async def setup(bot):
     locale.setlocale(locale.LC_ALL, '')
     await bot.add_cog(Info(bot))
-    

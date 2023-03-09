@@ -148,8 +148,8 @@ options: dict[str, "AllRepresentation"] = {
     },
     "nicknames_history": {
         "type": "boolean",
-        "default": None,
-        "is_listed": True,
+        "default": False,
+        "is_listed": False,
     },
     "noxp_channels": {
         "type": "text_channels_list",
@@ -196,6 +196,11 @@ options: dict[str, "AllRepresentation"] = {
         "min_length": 1,
         "max_length": 10,
         "default": "!",
+        "is_listed": True,
+    },
+    "rank_in_dm": {
+        "type": "boolean",
+        "default": False,
         "is_listed": True,
     },
     "roles_react_max_number": {
@@ -320,7 +325,7 @@ options: dict[str, "AllRepresentation"] = {
         "max_count": 2,
         "default": ['👍', '👎'],
         "is_listed": True,
-    },    
+    },
     "warn_allowed_roles": {
         "type": "roles_list",
         "min_count": 1,

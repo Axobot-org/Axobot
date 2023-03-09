@@ -17,6 +17,7 @@
         "Kestävyys",
         "Työkalu joka pystyy rikkoa sen",
         "Mobit jotka voivat ryöstää sen",
+        "Lisätty versiossa",
         "Lisätty versiossa"
     ],
     "block-help": "Tämä komento antaa sinun saamaan tietoa mistä tahansa Minecraft palikasta. Voit antaa sen nimen, Ranskaksi tai Englanniksi. Lähetä `%{p}mc block <nimi>`",
@@ -51,16 +52,16 @@
         "Lisätty versiossa"
     ],
     "item-help": "Tämä komento antaa sinulle mahdollisuuden saada tietoa mistä tahansa Minecraft esineestä. Voit antaa sen täyden tai osittaisen nimen, Ranskaksi tai Englanniksi, tai jopa sen tunnisteen. Lähetä `%{p}mc item <nimi>`",
-    "mod-fields": [
-        "Nimi",
-        "Tekijät",
-        "Lyhenne",
-        "Normaali kieli",
-        "Viimeisin päivitys",
-        "Peli versiot",
-        "Lataukset",
-        "ID"
-    ],
+    "mod-fields": {
+        "authors": "Tekijät",
+        "categories": "Kategoriat",
+        "downloads": "Latausten määrä",
+        "id": "CurseForge ID",
+        "name": "Nimi",
+        "release": "Viimeisin päivitys",
+        "summary": "Yhteenveto",
+        "versions": "Pelin versiot"
+    },
     "mod-help": "Tämö komento kertoo tietoa suuresta osasta Minecraftin modeista. Voit joko antaa sen täyden tai osan nimestä, kirjoita vain `%{p}mc mod <nimi>`. Modin täytyy olla CurseFrogissa",
     "mojang_desc": {
         "account.mojang.com": "Mojang käyttäjä johtajien sivu",
@@ -89,6 +90,7 @@
     "no-item": "Mahdotonta löytää tämä esine",
     "no-mod": "En löytänyt tuota modia",
     "no-ping": "Virhe: Mahdotonta mainits tätä palvelinta",
+    "no-player-list": "Ei saatavilla",
     "player-not-found": "En voinut löytää Minecraft Java pelaajaa tuolla nimellä",
     "player-skin-download": "Paina tästä lataaksesi",
     "player-skin-title": "Käyttäjän %{player} skini",

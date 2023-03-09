@@ -1,0 +1,7 @@
+{
+    "probabilities": "Todennäköisyydet:",
+    "report-empty": "Viestillä ei ole sisältöä raportoitavaksi!",
+    "report-successful": "Olemme vastaanottaneet ilmoituksesi, kiitos panoksestanne!",
+    "result": "Antiscam tunnistustulos:",
+    "url-score": "URLin riski-todennäköisyys: %{score}"
+}

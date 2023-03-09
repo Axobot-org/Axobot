@@ -148,7 +148,7 @@ class Admin(commands.Cog):
     @commands.guild_only()
     async def enable_god_mode(self, ctx: MyContext, enable:bool=True):
         """Get full powaaaaaa
-        
+
         Donne les pleins-pouvoirs aux admins du bot sur ce serveur (accès à toutes les commandes de modération)"""
         if enable:
             if ctx.guild.id not in self.god_mode:
@@ -639,7 +639,7 @@ Cette option affecte tous les serveurs"""
             await ctx.send(f"L'utilisateur {user} a déjà ce flag !")
             return
         userflags.append(flag)
-        await self.bot.get_cog('Utilities').change_db_userinfo(user.id, 'user_flags', UserFlag().flags_to_int(userflags))
+        await self.bot.get_cog("Users").db_edit_user_flags(user.id, UserFlag().flags_to_int(userflags))
         await ctx.send(f"L'utilisateur {user} a maintenant les flags {', '.join(userflags)}")
 
     @admin_flag.command(name="remove")
@@ -657,7 +657,7 @@ Cette option affecte tous les serveurs"""
             await ctx.send(f"L'utilisateur {user} n'a déjà pas ce flag")
             return
         userflags.remove(flag)
-        await self.bot.get_cog('Utilities').change_db_userinfo(user.id, 'user_flags', UserFlag().flags_to_int(userflags))
+        await self.bot.get_cog("Users").db_edit_user_flags(user.id, UserFlag().flags_to_int(userflags))
         if userflags:
             await ctx.send(f"L'utilisateur {user} a maintenant les flags {', '.join(userflags)}")
         else:

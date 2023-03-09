@@ -81,7 +81,7 @@ All Data Collected:
 
 * are obtained and processed fairly and lawfully;
 * are recorded for specified and legitimate purposes;
-* are used in accordance with those purposes;	
+* are used in accordance with those purposes;
 * are adequate, relevant and not excessive in relation to those purposes;
 * are subject to precautions to ensure the security and confidentiality of the Data in order to prevent them from being damaged, altered, destroyed or communicated to unauthorised third parties.
 
@@ -101,7 +101,7 @@ ZBot may disclose your Personal Data if it believes in good faith that it is nec
 
 * Fulfill a legal obligation
 * Protect and defend the rights or property of ZBot
-* Preventing or investigating possible wrongdoing within the Service 
+* Preventing or investigating possible wrongdoing within the Service
 * Ensure the personal safety of users of the Service or the public
 * To protect against civil liability.
 

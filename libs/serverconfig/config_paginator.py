@@ -30,10 +30,10 @@ class ServerConfigPaginator(Paginator):
             if opt_list.options[option]["is_listed"]:
                 self.server_config[option] = value
         contents = await self.get_page_content(ctx, 1)
-        await self._update_buttons(None)
-        await ctx.send(**contents, view=self)
+        await self._update_buttons()
+        return await ctx.send(**contents, view=self)
 
-    async def get_page_count(self, _: discord.Interaction) -> int:
+    async def get_page_count(self) -> int:
         length = len(self.server_config)
         if length == 0:
             return 1
@@ -44,7 +44,7 @@ class ServerConfigPaginator(Paginator):
         page_config_map: dict[str, Any] = {}
         for option in self.options_list[(page - 1) * self.items_per_page : page * self.items_per_page]:
             page_config_map[option] = self.server_config[option]
-        max_pages = await self.get_page_count(interaction)
+        max_pages = await self.get_page_count()
         title = await self.client._(interaction, "server.see-title", guild=self.guild.name) + f" ({page}/{max_pages})"
         embed = discord.Embed(
             title=title,

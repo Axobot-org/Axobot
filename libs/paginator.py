@@ -34,14 +34,14 @@ class Paginator(ui.View):
     async def send_init(self, ctx: MyContext):
         "Build the first page, before anyone actually click"
         contents = await self.get_page_content(None, 1)
-        await self._update_buttons(None)
-        await ctx.send(**contents, view=self)
+        await self._update_buttons()
+        return await ctx.send(**contents, view=self)
 
     async def get_page_content(self, interaction: Interaction, page: int) -> dict[str, Any]:
         "Build the page content given the page number and source interaction"
         raise NotImplementedError("get_page_content must be implemented!")
 
-    async def get_page_count(self, interaction: Interaction) -> int:
+    async def get_page_count(self) -> int:
         "Get total number of available pages"
         raise NotImplementedError("get_page_count must be implemented!")
 
@@ -56,35 +56,48 @@ class Paginator(ui.View):
             await interaction.response.send_message(err, ephemeral=True)
         return result
 
+    async def on_error(self, interaction, error, item):
+        await self.client.dispatch("error", error, interaction)
+
+    async def disable(self, interaction: Union[Message, Interaction]):
+        "Called when the timeout has expired"
+        await self._update_contents(interaction, stopped=True)
+        self.stop()
+
     async def _set_page(self, interaction: Interaction, page: int):
         "Set the page number starting from 1"
-        count = await self.get_page_count(interaction)
+        count = await self.get_page_count()
         self.page = min(max(page, 1), count)
 
-    async def _update_contents(self, interaction: Interaction):
+    async def _update_contents(self, interaction: Union[Message, Interaction], stopped: bool=None):
         "Update the page content"
-        await interaction.response.defer()
-        contents = await self.get_page_content(interaction, self.page)
-        await self._update_buttons(interaction)
-        await interaction.followup.edit_message(
-            interaction.message.id,
-            view=self,
-            **contents
-        )
+        if isinstance(interaction, Interaction):
+            await interaction.response.defer()
+        await self._update_buttons()
+        if isinstance(interaction, Interaction):
+            contents = await self.get_page_content(interaction, self.page)
+            await interaction.followup.edit_message(
+                interaction.message.id,
+                view=self,
+                **contents
+            )
+        else:
+            await interaction.edit(view=self)
 
-    async def _update_buttons(self, interaction: Interaction):
+    async def _update_buttons(self, stopped: bool=None):
         "Mark buttons as enabled/disabled according to current page and view status"
-        count = await self.get_page_count(interaction)
+        stopped = self.is_finished() if stopped is None else stopped
+        count = await self.get_page_count()
         # remove buttons if not required
         if count == 1:
             for child in self.children:
                 self.remove_item(child)
             return
-        self.children[0].disabled = (self.page == 1) or self.is_finished()
-        self.children[1].disabled = (self.page == 1) or self.is_finished()
-        self.children[2].disabled = self.is_finished()
-        self.children[3].disabled = (self.page == count) or self.is_finished()
-        self.children[4].disabled = (self.page == count) or self.is_finished()
+        self.children[0].disabled = (self.page == 1) or stopped
+        self.children[1].disabled = (self.page == 1) or stopped
+        self.children[2].disabled = stopped
+        self.children[3].disabled = (self.page == count) or stopped
+        self.children[4].disabled = (self.page == count) or stopped
 
     @ui.button(label='\U000025c0 \U000025c0', style=ButtonStyle.secondary)
     async def _first_element(self, interaction: Interaction, _: ui.Button):
@@ -113,7 +126,7 @@ class Paginator(ui.View):
     @ui.button(label='\U000025b6 \U000025b6', style=ButtonStyle.secondary)
     async def _last_element(self, interaction: Interaction, _: ui.Button):
         "Jump to the last page"
-        await self._set_page(interaction, await self.get_page_count(interaction))
+        await self._set_page(interaction, await self.get_page_count())
         await self._update_contents(interaction)
 
 
