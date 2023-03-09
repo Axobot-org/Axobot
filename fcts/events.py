@@ -66,31 +66,31 @@ class Events(commands.Cog):
             await self.send_sql_statslogs()
 
 
-    @commands.Cog.listener()
-    async def on_member_update(self, before: discord.Member, after: discord.Member):
-        """Called when a member change something (status, activity, nickame, roles)"""
-        if before.nick != after.nick and await self.can_register_memberlog(before.id, before.guild.id):
-            await self.register_memberlog_name(before, after)
+    # @commands.Cog.listener()
+    # async def on_member_update(self, before: discord.Member, after: discord.Member):
+    #     """Called when a member change something (status, activity, nickame, roles)"""
+    #     if before.nick != after.nick and await self.can_register_memberlog(before.id, before.guild.id):
+    #         await self.register_memberlog_name(before, after)
 
-    @commands.Cog.listener()
-    async def on_user_update(self, before: discord.User, after: discord.User):
-        """Called when a user change something (avatar, username, discrim)"""
-        if before.name != after.name and await self.can_register_memberlog(before.id):
-            await self.register_userlog_name(before, after)
+    # @commands.Cog.listener()
+    # async def on_user_update(self, before: discord.User, after: discord.User):
+    #     """Called when a user change something (avatar, username, discrim)"""
+    #     if before.name != after.name and await self.can_register_memberlog(before.id):
+    #         await self.register_userlog_name(before, after)
 
-    async def can_register_memberlog(self, user_id: int, guild_id: Optional[int]=None):
-        "Check if we are allowed to register a memberlog (if database is online, if the user has allowed it, if the server hasn't disabled it)"
-        if not self.bot.database_online:
-            return False
-        # If axobot is already there, let it handle it
-        if guild_id and await self.bot.check_axobot_presence(guild_id=guild_id):
-            return
-        config_option = await self.bot.get_cog("Users").db_get_user_config(user_id, "allow_usernames_logs")
-        if config_option is False:
-            return False
-        if guild_id:
-            return await self.bot.get_config(guild_id, "nicknames_history")
-        return True
+    # async def can_register_memberlog(self, user_id: int, guild_id: Optional[int]=None):
+    #     "Check if we are allowed to register a memberlog (if database is online, if the user has allowed it, if the server hasn't disabled it)"
+    #     if not self.bot.database_online:
+    #         return False
+    #     # If axobot is already there, let it handle it
+    #     if guild_id and await self.bot.check_axobot_presence(guild_id=guild_id):
+    #         return
+    #     config_option = await self.bot.get_cog("Users").db_get_user_config(user_id, "allow_usernames_logs")
+    #     if config_option is False:
+    #         return False
+    #     if guild_id:
+    #         return await self.bot.get_config(guild_id, "nicknames_history")
+    #     return True
 
     async def register_memberlog_name(self, before: discord.Member, after: discord.Member, tries:int=0):
         "Save in our database when a user change its nickname"
