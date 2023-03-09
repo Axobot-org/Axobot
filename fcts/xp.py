@@ -43,6 +43,7 @@ class Xp(commands.Cog):
         self.max_xp_per_msg = 70
         self.file = 'xp'
         self.sus = None
+        self.default_xp_style = "dark"
         self.types = ['global','mee6-like','local']
         verdana_font = "./assets/fonts/Verdana.ttf"
         roboto_font = "./assets/fonts/Roboto-Medium.ttf"
@@ -789,7 +790,8 @@ class Xp(commands.Cog):
         except discord.errors.HTTPException:
             await ctx.send(await self.bot._(ctx.channel, "xp.card-too-large"))
         else:
-            await self.send_rankcard_tip(ctx)
+            if style == self.default_xp_style:
+                await self.send_rankcard_tip(ctx)
         if statsCog := self.bot.get_cog("BotStats"):
             statsCog.xp_cards["sent"] += 1
 

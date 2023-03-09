@@ -153,10 +153,11 @@ class Utilities(commands.Cog):
         return text
 
     async def get_xp_style(self, user: discord.User) -> str:
+        "Return the chosen rank card style for a user"
         if config := await self.bot.get_cog("Users").db_get_userinfo(user.id):
             if config["xp_style"]:
                 return config['xp_style']
-        return 'dark'
+        return self.bot.get_cog("Xp").default_xp_style
 
     @acached(timeout=60)
     async def allowed_card_styles(self, user: discord.User):
