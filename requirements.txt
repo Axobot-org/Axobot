@@ -24,7 +24,6 @@ python-dateutil
 LRFutils==0.1.2
 GitPython
 
-# # Antiscam training
+# Antiscam training
 pandas
 scikit-learn
-# lightgbm
