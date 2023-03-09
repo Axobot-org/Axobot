@@ -312,10 +312,10 @@ ORDER BY usages DESC LIMIT %(limit)s"""
         """Get the documentation url"""
         text = self.bot.emojis_manager.customs['readthedocs'] + await self.bot._(ctx.channel,"info.docs") + \
             " https://zbot.rtfd.io"
-        if self.bot.entity_id == 1:
+        if self.bot.entity_id == 0:
+            text += '/en/main'
+        elif self.bot.entity_id == 1:
             text += '/en/develop'
-        elif self.bot.entity_id == 2:
-            text += '/en/release-candidate'
         await ctx.send(text)
 
     async def display_critical(self, ctx: MyContext):
