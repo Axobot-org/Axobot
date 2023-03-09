@@ -307,15 +307,13 @@ class Xp(commands.Cog):
 
     async def reload_sus(self):
         """Check who should be observed for potential xp cheating"""
-        cog = self.bot.get_cog("Utilities")
-        if cog is None:
+        if not self.bot.database_online:
             return
-        result = await cog.get_db_userinfo(['userID'], ['xp_suspect=1'])
-        if result is None or len(result) == 0:
-            return
-        if len(result) > 1:
-            result = [item['userID'] for item in result]
-        self.sus = set(result)
+        query = "SELECT userID FROM `users` WHERE `xp_suspect` = 1"
+        async with self.bot.db_query(query) as query_result:
+            if not query_result:
+                return
+            self.sus = {item['userID'] for item in query_result}
         self.bot.log.info("[xp] Reloaded xp suspects (%d suspects)", len(self.sus))
 
     async def send_sus_msg(self, msg: discord.Message, xp: int):
@@ -770,17 +768,12 @@ class Xp(commands.Cog):
         except FileNotFoundError:
             style = await self.bot.get_cog('Utilities').get_xp_style(user)
             txts = [await self.bot._(ctx.channel, "xp.card-level"), await self.bot._(ctx.channel, "xp.card-rank")]
-            static = await self.bot.get_cog('Utilities').get_db_userinfo(['animated_card'],[f'`userID`={user.id}'])
-            if user.display_avatar.is_animated():
-                if static is not None:
-                    static = not static['animated_card']
-                else:
-                    static = True
-            self.bot.log.debug("XP card for user {} ({}xp - style {})".format(user.id,xp,style))
+            static = not (user.display_avatar.is_animated() and await self.bot.get_cog("Users").db_get_user_config(user.id, "animated_card"))
+            self.bot.log.debug(f"XP card for user {user.id} ({xp=} - {style=} - {static=})")
             myfile = await self.create_card(user,style,xp,used_system,[rank,ranks_nb],txts,force_static=static,levels_info=levels_info)
             if UsersCog := self.bot.get_cog("Users"):
                 try:
-                    await UsersCog.used_rank(user.id)
+                    await UsersCog.db_used_rank(user.id)
                 except Exception as err:
                     self.bot.dispatch("error", err, ctx)
             if statsCog := self.bot.get_cog("BotStats"):
@@ -801,7 +794,13 @@ class Xp(commands.Cog):
             statsCog.xp_cards["sent"] += 1
 
     async def send_rankcard_tip(self, ctx: MyContext):
-        if random.random() < 0.2 and await self.bot.tips_manager.should_show_user_tip(ctx.author.id, UserTip.RANK_CARD_PERSONALISATION):
+        if random.random() > 0.2:
+            return
+        if not await self.bot.get_cog("Users").db_get_user_config(ctx.author.id, "show_tips"):
+            # tips are disabled
+            return
+        if await self.bot.tips_manager.should_show_user_tip(ctx.author.id, UserTip.RANK_CARD_PERSONALISATION):
+            # user has not seen this tip yet
             profile_cmd = await self.bot.get_command_mention("profile card")
             await self.bot.tips_manager.send_tip(ctx, UserTip.RANK_CARD_PERSONALISATION, profile_cmd=profile_cmd)
 

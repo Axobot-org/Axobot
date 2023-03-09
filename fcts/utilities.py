@@ -152,57 +152,11 @@ class Utilities(commands.Cog):
                         'a' if em.animated else '', em.name, em.id))
         return text
 
-    async def get_db_userinfo(self, columns=None, criters=["userID > 1"], relation: str="AND"):
-        """Get every info about a user with the database"""
-        await self.bot.wait_until_ready()
-        if not (isinstance(columns, (list, tuple)) and isinstance(criters, (list, tuple))):
-            raise ValueError
-        if not self.bot.database_online:
-            return None
-        if columns is None or len(columns) == 0:
-            select_part = "*"
-        else:
-            select_part = "`"+"`,`".join(columns)+"`"
-        relation = " "+relation+" "
-        query = f"SELECT {select_part} FROM `{self.table}` WHERE {relation.join(criters)}"
-        async with self.bot.db_query(query) as query_results:
-            liste = list(query_results)
-        if len(liste) == 1:
-            return liste[0]
-        if len(liste) > 1:
-            return liste
-        return None
-
-    async def change_db_userinfo(self, user_id: int, key: str, value):
-        """Change something about a user in the database"""
-        try:
-            if not self.bot.database_online:
-                return None
-            query = f"INSERT INTO `{self.table}` (`userID`,`{key}`) VALUES (%(u)s,%(v)s) ON DUPLICATE KEY UPDATE {key} = %(v)s;"
-            async with self.bot.db_query(query, {'u': user_id, 'v': value}):
-                pass
-            return True
-        except Exception as err:
-            self.bot.dispatch("error", err)
-            return False
-
-    async def get_number_premium(self):
-        """Return the number of premium users"""
-        try:
-            params = await self.get_db_userinfo(criters=['Premium=1'])
-            return len(params)
-        except Exception as err:
-            self.bot.dispatch("error", err)
-
     async def get_xp_style(self, user: discord.User) -> str:
-        parameters = None
-        try:
-            parameters = await self.get_db_userinfo(criters=["userID="+str(user.id)], columns=['xp_style'])
-        except Exception as err:
-            self.bot.dispatch("error", err)
-        if parameters is None or parameters['xp_style'] == '':
-            return 'dark'
-        return parameters['xp_style']
+        if config := await self.bot.get_cog("Users").db_get_userinfo(user.id):
+            if config["xp_style"]:
+                return config['xp_style']
+        return 'dark'
 
     @acached(timeout=60)
     async def allowed_card_styles(self, user: discord.User):
