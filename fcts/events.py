@@ -77,7 +77,7 @@ class Events(commands.Cog):
         """Called when a user change something (avatar, username, discrim)"""
         if before.name != after.name and await self.can_register_memberlog(before.id):
             await self.register_userlog_name(before, after)
-    
+
     async def can_register_memberlog(self, user_id: int, guild_id: Optional[int]=None):
         "Check if we are allowed to register a memberlog (if database is online, if the user has allowed it, if the server hasn't disabled it)"
         if not self.bot.database_online:
@@ -85,8 +85,8 @@ class Events(commands.Cog):
         # If axobot is already there, let it handle it
         if guild_id and await self.bot.check_axobot_presence(guild_id=guild_id):
             return
-        config_option = await self.bot.get_cog('Utilities').get_db_userinfo(['allow_usernames_logs'],["userID=" + str(user_id)])
-        if config_option is not None and config_option['allow_usernames_logs'] is False:
+        config_option = await self.bot.get_cog("Users").db_get_user_config(user_id, "allow_usernames_logs")
+        if config_option is False:
             return False
         if guild_id:
             return await self.bot.get_config(guild_id, "nicknames_history")
@@ -218,10 +218,11 @@ class Events(commands.Cog):
         emb = msg.embeds[0] if len(msg.embeds) > 0 else None
         arrow = ":inbox_tray:" if msg.author == recipient else ":outbox_tray:"
         date_ = f"<t:{msg.created_at.timestamp():.0f}>"
-        text = "{} **{}** ({} - {})\n{}".format(arrow, recipient, recipient.id, date_, msg.content)
+        msg_content = msg.content if len(msg.content) < 1900 else msg.content[:1900] + "…"
+        text = "{} **{}** ({} - {})\n{}".format(arrow, recipient, recipient.id, date_, msg_content)
         if len(msg.attachments) > 0:
             text += "".join(["\n{}".format(x.url) for x in msg.attachments])
-        await channel.send(text,embed=emb)
+        await channel.send(text, embed=emb)
 
     async def check_mp_adv(self, msg: discord.Message):
         """Teste s'il s'agit d'une pub MP"""
@@ -478,7 +479,7 @@ class Events(commands.Cog):
                 self.add_item(discord.ui.Button(label='Invite Axobot', url="https://zrunner.me/invite-axobot", style=discord.ButtonStyle.blurple))
                 self.add_item(discord.ui.Button(label='About the migration', url="https://zbot.readthedocs.io/en/release-candidate/v4.html#new-identity"))
                 self.add_item(discord.ui.Button(label='Support server', url="https://discord.gg/N55zY88"))
-        
+
         if self.bot.entity_id == 0 and random.random() < 0.1:
             txt = """Hey, Zbot is currently changing its identity to **Axobot**!
 

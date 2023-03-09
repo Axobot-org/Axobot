@@ -31,7 +31,7 @@ The service(s) offered by ZBot (hereinafter the "**Service**") consist in the ad
 
 The use of the Service is made only through the DISCORD platform, and must therefore respect its Terms of Service. In addition to these, the User undertakes, each time they use the Service, to behave in a normal and reasonable manner and not to hinder, in any way whatsoever, its proper functioning.
 
-In particular, the user agrees not to:  
+In particular, the user agrees not to:
    * Disrupt, slow down, block or alter the normal operation of the Service;
 
    * Fraudulently access, maintain, hinder or disrupt the access systems to the Service's features;
@@ -42,7 +42,7 @@ Some features of the Service are available only within "servers", as defined in 
 
 The User shall inform us without delay if they notice a security breach, including any possibility of misuse of the Service's features for dishonest purposes, so that we can take appropriate action without delay to remedy the security breach. The contact email address is listed on the last page of these Terms of Service.
 
-In the event of a security breach identified by our team, which could compromise the security of the Service or its use, we reserve the right to proceed, without prior notice, to a temporary or prolonged interruption of the Service in order to remedy the security breach as soon as possible. 
+In the event of a security breach identified by our team, which could compromise the security of the Service or its use, we reserve the right to proceed, without prior notice, to a temporary or prolonged interruption of the Service in order to remedy the security breach as soon as possible.
 
 
 1. Guarantee of service operation and liability
@@ -56,7 +56,7 @@ In this respect, the User acknowledges that use of the Service is at their own r
 
 Consequently and within the limits authorized by law, we cannot be held responsible for any type of foreseeable or unforeseeable damage, material or suffered by the User and arising from the use or total or partial impossibility of using the Service.
 
-The User is also encouraged to contact our support team if they encounter any difficulties in using our Service. 
+The User is also encouraged to contact our support team if they encounter any difficulties in using our Service.
 
 
 4. Intelectual property
@@ -92,7 +92,7 @@ You should review these Terms of Service periodically for any changes. Changes t
 
 The interpretation and execution of the present General Terms of Service, as well as all acts that would be the result or consequence, will be subject to French law, regardless of the place of use of the Service, the nationality of the User and his address.
 
-Any dispute resulting from the present and/or from any use of the Service which will be addressed to us will be subjected to the exclusive competence of the competent Court of Paris even in the event of appeal in guarantee or of plurality of defendants or of incidental demand. 
+Any dispute resulting from the present and/or from any use of the Service which will be addressed to us will be subjected to the exclusive competence of the competent Court of Paris even in the event of appeal in guarantee or of plurality of defendants or of incidental demand.
 
 
 Contact Us

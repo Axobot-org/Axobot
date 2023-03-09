@@ -1,12 +1,12 @@
 :og:description: Axobot has a nice fresh tickets system, allowing your members to contact the staff in an easy and private way, without having to resort to DMs or role mentions.
 
-==============
-Tickets system
-==============
+=================
+❓ Tickets system
+=================
 
 A popular feature for very active servers is the ability for their members to quickly contact their staff when needed, without disturbing the moderators at any time of the day or night.
 
-Axobot offers this very intuitive system, letting users open a "ticket" when they need it, and creating a private channel for them that only staff roles can read. This allows both your members to be sure to keep their information private, your teams to not be bothered by unsolicited mentions or DMs, and you to see at a glance which tickets are currently active and quickly respond. 
+Axobot offers this very intuitive system, letting users open a "ticket" when they need it, and creating a private channel for them that only staff roles can read. This allows both your members to be sure to keep their information private, your teams to not be bothered by unsolicited mentions or DMs, and you to see at a glance which tickets are currently active and quickly respond.
 
 .. note:: Like most of the features of this bot, this tickets system is constantly being developed. Feel free to help us by offering suggestions, voting for the best ideas or reporting bugs at our `Discord server <https://discord.gg/N55zY88>`__!
 
@@ -115,6 +115,16 @@ Delete a topic
 **Syntax:** :code:`tickets topic remove`
 
 To delete a topic in a simple way, use the command above. Axobot will ask you which topic to delete, you just have to select the right one from the list and the bot will take care of everything!
+
+
+Review your config
+------------------
+
+**Syntax:** :code:`tickets review-config`
+
+Once you're done configuring Axobot, you can use this command to review your configuration and make sure everything is correct. Axobot will send you a message containing all the information you need to know about your configuration.
+
+When using slash commands, you can also select a specific topic to review its configuration in more depth.
 
 
 -------------------

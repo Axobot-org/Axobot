@@ -1,6 +1,7 @@
 {
     "daily": {
         "got-points": "Onneksi olkoon! Sait juuri **%{pts} tapahtuma pistettä**!",
+        "lost-points": "Voi ei! Menetit **%{pts} tapahtumapistettä**",
         "too-quick": "Olet hieman liian ajoissa! Voit vaan saada tapahtuma pisteitä kerran tunnissa."
     }
 }

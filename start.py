@@ -35,7 +35,7 @@ async def main():
     parser = setup_start_parser()
     args = parser.parse_args()
 
-    client = Axobot(case_insensitive=True,status=discord.Status('online'))
+    client = Axobot(case_insensitive=True, status=discord.Status('online'))
 
     setup_database_logger()
     log = setup_bot_logger()

@@ -1,6 +1,7 @@
 import asyncio
 import datetime
 import importlib
+from math import ceil
 import random
 import re
 import time
@@ -10,10 +11,11 @@ import discord
 import twitter
 from aiohttp import ClientSession, client_exceptions
 from discord.ext import commands, tasks
-from libs.bot_classes import MyContext, Axobot
+
+from libs.bot_classes import Axobot, MyContext
 from libs.enums import ServerWarningType
 from libs.formatutils import FormatUtils
-from libs.paginator import PaginatedSelectView
+from libs.paginator import PaginatedSelectView, Paginator
 from libs.rss import RssMessage, TwitterRSS, YoutubeRSS, feed_parse
 from libs.rss.rss_general import FeedObject, FeedType
 
@@ -367,69 +369,92 @@ class Rss(commands.Cog):
             # no rss feed
             await ctx.send(await self.bot._(ctx.guild.id, "rss.no-feed2"))
             return
+        feeds_list.sort(key=lambda feed: feed.enabled, reverse=True)
+        await self.send_rss_list(ctx, feeds_list)
+
+    async def send_rss_list(self, ctx: MyContext, feeds: list[FeedObject]):
+        "Send the list paginator"
+        rss_cog = self
         title = await self.bot._(ctx.guild.id, "rss.list-title", server=ctx.guild.name)
         translation = await self.bot._(ctx.guild.id, "rss.list-result")
-        feeds_to_display: list[str] = []
-        feeds_list.sort(key=lambda feed: feed.enabled, reverse=True)
-        for feed in feeds_list:
-            channel = self.bot.get_channel(feed.channel_id)
-            if channel is not None:
-                channel = channel.mention
-            else:
-                channel = str(feed.channel_id)
-            # feed mentions
-            if len(feed.role_ids) == 0:
-                roles = await self.bot._(ctx.guild.id, "misc.none")
-            else:
-                roles = []
-                for item in feed.role_ids:
-                    role = discord.utils.get(ctx.guild.roles,id=int(item))
-                    if role is not None:
-                        roles.append(role.mention)
+        feeds_per_page = 10
+
+        class FeedsPaginator(Paginator):
+            "Paginator used to display the RSS feeds list"
+            async def _get_feeds_for_page(self, page: int):
+                feeds_to_display: list[str] = []
+                for i in range((page - 1) * feeds_per_page, min(page * feeds_per_page, len(feeds))):
+                    feed = feeds[i]
+                    channel = self.client.get_channel(feed.channel_id)
+                    if channel is not None:
+                        channel = channel.mention
                     else:
-                        roles.append(item)
-                roles = ", ".join(roles)
-            # feed name
-            feed_name: str = feed.link
-            if feed.type == 'tw' and feed.link.isnumeric():
-                if tw_user := await self.twitter_rss.get_user_from_id(int(feed.link)):
-                    feed_name = tw_user.screen_name
-            elif feed.type == 'yt' and (channel_name := self.youtube_rss.get_channel_name_by_id(feed.link)):
-                feed_name = channel_name
-            if feed.enabled and not feed_name.startswith("http"):
-                feed_name = f"**{feed_name}**"
-            elif not feed.enabled:
-                feed_name += " " + await self.bot._(ctx.guild.id, "rss.list-disabled")
-            # send embed
-            if len(feeds_to_display) > 20:
-                embed = discord.Embed(title=title, color=self.embed_color, timestamp=ctx.message.created_at)
-                embed.set_footer(text=ctx.author, icon_url=ctx.author.display_avatar)
-                for text in feeds_to_display:
-                    embed.add_field(name=self.bot.zws, value=text, inline=False)
-                await ctx.send(embed=embed)
-                feeds_to_display.clear()
-            # last post date
-            if isinstance(feed.date, datetime.datetime):
-                last_date = f"<t:{feed.date.timestamp():.0f}>"
-            elif isinstance(feed.date, str):
-                last_date = feed.date
-            else:
-                last_date = await self.bot._(ctx.guild.id, "misc.none")
-            # append data
-            feeds_to_display.append(translation.format(
-                emoji=feed.get_emoji(self.bot.emojis_manager),
-                channel=channel,
-                link=feed_name,
-                roles=roles,
-                id=feed.feed_id,
-                last_post=last_date
-            ))
-        if len(feeds_to_display) > 0:
-            embed = discord.Embed(title=title, color=self.embed_color, timestamp=ctx.message.created_at)
-            embed.set_footer(text=ctx.author, icon_url=ctx.author.display_avatar)
-            for feed in feeds_to_display:
-                embed.add_field(name=self.bot.zws, value=feed, inline=False)
-            await ctx.send(embed=embed)
+                        channel = str(feed.channel_id)
+                    # feed mentions
+                    if len(feed.role_ids) == 0:
+                        roles = await self.client._(ctx.guild.id, "misc.none")
+                    else:
+                        roles = []
+                        for item in feed.role_ids:
+                            role = discord.utils.get(ctx.guild.roles,id=int(item))
+                            if role is not None:
+                                roles.append(role.mention)
+                            else:
+                                roles.append(item)
+                        roles = ", ".join(roles)
+                    # feed name
+                    feed_name: str = feed.link
+                    if feed.type == 'tw' and feed.link.isnumeric():
+                        if tw_user := await rss_cog.twitter_rss.get_user_from_id(int(feed.link)):
+                            feed_name = tw_user.screen_name
+                    elif feed.type == 'yt' and (channel_name := rss_cog.youtube_rss.get_channel_name_by_id(feed.link)):
+                        feed_name = channel_name
+                    if feed.enabled and not feed_name.startswith("http"):
+                        feed_name = f"**{feed_name}**"
+                    elif not feed.enabled:
+                        feed_name += " " + await self.client._(ctx.guild.id, "rss.list-disabled")
+                    # last post date
+                    if isinstance(feed.date, datetime.datetime):
+                        last_date = f"<t:{feed.date.timestamp():.0f}>"
+                    elif isinstance(feed.date, str):
+                        last_date = feed.date
+                    else:
+                        last_date = await self.client._(ctx.guild.id, "misc.none")
+                    feeds_to_display.append(translation.format(
+                        emoji=feed.get_emoji(self.client.emojis_manager),
+                        channel=channel,
+                        link=feed_name,
+                        roles=roles,
+                        id=feed.feed_id,
+                        last_post=last_date
+                    ))
+                return feeds_to_display
+
+            async def get_page_count(self) -> int:
+                length = len(feeds)
+                if length == 0:
+                    return 1
+                return ceil(length / feeds_per_page)
+
+            async def get_page_content(self, interaction, page):
+                "Create one page"
+                embed = discord.Embed(title=title, color=rss_cog.embed_color, timestamp=ctx.message.created_at)
+                for feed in await self._get_feeds_for_page(page):
+                    embed.add_field(name=self.client.zws, value=feed, inline=False)
+                footer = f"{ctx.author}  |  {page}/{await self.get_page_count()}"
+                embed.set_footer(text=footer, icon_url=ctx.author.display_avatar)
+                return {
+                    "embed": embed
+                }
+
+        _quit = await self.bot._(ctx.guild, "misc.quit")
+        view = FeedsPaginator(self.bot, ctx.author, stop_label=_quit.capitalize())
+        msg = await view.send_init(ctx)
+        if msg:
+            if await view.wait():
+                # only manually disable if it was a timeout (ie. not a user stop)
+                await view.disable(msg)
+
 
     async def transform_feeds_to_options(self, feeds: list[FeedObject], guild: discord.Guild) -> list[discord.SelectOption]:
         "Transform a list of FeedObject into a list usable by a discord Select"
@@ -530,7 +555,7 @@ class Rss(commands.Cog):
     async def roles_feeds(self, ctx: MyContext, ID:int=None, *, mentions: Optional[str]):
         """Configures a role to be notified when a news is posted
         If you want to use the @everyone role, please put the server ID instead of the role name.
-        
+
         ..Example rss mentions
 
         ..Example rss mentions 6678466620137
@@ -682,7 +707,7 @@ class Rss(commands.Cog):
         ..Example rss move #cool-channels
 
         ..Example rss move 3078731683662 #cool-channels
-        
+
         ..Doc rss.html#move-a-feed"""
         try:
             if channel is None:

@@ -107,7 +107,7 @@ class Library(commands.Cog):
     @commands.group(name="book", aliases=['bookstore'])
     async def book_main(self, ctx: MyContext):
         """Search for a book and manage your library
-        
+
         ..Doc miscellaneous.html#book"""
         if ctx.subcommand_passed is None:
             await ctx.send_help(ctx.command)
@@ -116,7 +116,7 @@ class Library(commands.Cog):
     @commands.cooldown(5, 60, commands.BucketType.guild)
     async def book_search(self, ctx: MyContext, isbn: typing.Optional[ISBN], *, keywords: str = ''):
         """Search from a book from its ISBN or search terms
-        
+
         ..Example book search Percy Jackson
 
         ..Example book search 9781119688037

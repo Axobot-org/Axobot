@@ -1,6 +1,6 @@
-===
-Rss
-===
+======
+🗞️ Rss
+======
 
 More and more bots offer the feature to follow news feeds, sometimes `rss atom feeds <https://en.wikipedia.org/wiki/RSS>`__,but most often Twitter or YouTube profiles. ZBot allows you to track any rss/atom feed, as well as any Twitter/YouTube/Twitch/DeviantArt channel. For Reddit feeds, you can search for the url of the rss feed, but a command will be created to make your life easier!
 
@@ -51,7 +51,7 @@ Mention a role
 
 **Syntax:** :code:`rss roles [feed ID] [roles]`
 
-This rss feed tracking option allows you to notify a role when a new post arrives. The roles mentioned are different between rss feeds, which allows you a greater handling. 
+This rss feed tracking option allows you to notify a role when a new post arrives. The roles mentioned are different between rss feeds, which allows you a greater handling.
 
 The "feed ID" argument is the identifier of the feed (found with the command `rss list <#see-every-feed>`__). If you do not enter this argument, or if the feed can't be found, the bot will open a menu where you can choose which feed to modify. Then another menu will allow you to choose which roles you want to mention.
 
@@ -78,8 +78,7 @@ If the rss feed ID is not given, the bot will open a menu to select it. And for 
     - :code:`{link}` or :code:`{url}`: a link to the post
     - :code:`{logo}`: an emoji representing the type of post (web, Twitter, YouTube...)
     - :code:`{mentions}`: the list of mentioned roles
-    
-    - {title}: the title of the post
+    - :code:`{title}`: the title of the post
 
 .. warning:: Hey guess what? For this command, the bot needs "`Embed Links <perms.html#embed-links>`__" permission!
 
