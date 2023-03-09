@@ -785,6 +785,10 @@ class Xp(commands.Cog):
                 await ctx.send(file=myfile, ephemeral=send_in_private)
             elif send_in_private:
                 await ctx.author.send(file=myfile)
+                try:
+                    await ctx.message.delete()
+                except discord.HTTPException:
+                    pass
             else:
                 await ctx.send(file=myfile)
         except discord.errors.HTTPException:
