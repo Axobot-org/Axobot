@@ -100,7 +100,8 @@ Slowmode works up to one message every 6h (21600s)
             return
         await ctx.defer()
         if users is None and contains_file is None and contains_url is None and contains_invite is None and is_pinned is None:
-            return await self.clear_simple(ctx,number)
+            return await self.clear_simple(ctx, number)
+        user_ids = None if users is None else {u.id for u in users}
 
         def check(msg: discord.Message):
             # do not delete invocation message
@@ -112,14 +113,14 @@ Slowmode works up to one message every 6h (21600s)
                 return False
             if contains_file is not None and bool(msg.attachments) != contains_file:
                 return False
-            r = self.bot.get_cog("Utilities").sync_check_any_link(msg.content)
-            if contains_url is not None and (r is not None) != contains_url:
+            url_match = self.bot.get_cog("Utilities").sync_check_any_link(msg.content)
+            if contains_url is not None and (url_match is not None) != contains_url:
                 return False
-            i = self.bot.get_cog("Utilities").sync_check_discord_invite(msg.content)
-            if contains_invite is not None and (i is not None) != contains_invite:
+            invite_match = self.bot.get_cog("Utilities").sync_check_discord_invite(msg.content)
+            if contains_invite is not None and (invite_match is not None) != contains_invite:
                 return False
             if users and msg.author is not None:
-                return str(msg.author.id) in users
+                return msg.author.id in user_ids
             return True
 
         if ctx.interaction:
