@@ -148,7 +148,7 @@ class Admin(commands.Cog):
     @commands.guild_only()
     async def enable_god_mode(self, ctx: MyContext, enable:bool=True):
         """Get full powaaaaaa
-        
+
         Donne les pleins-pouvoirs aux admins du bot sur ce serveur (accès à toutes les commandes de modération)"""
         if enable:
             if ctx.guild.id not in self.god_mode:

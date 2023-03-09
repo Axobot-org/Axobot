@@ -267,7 +267,7 @@ class Twitch(commands.Cog):
                     continue
                 if activity.twitch_name and activity.twitch_name.lower() == streamer_name:
                     return member
-    
+
     async def find_streamer_offline_in_guild(self, guild: discord.Guild, role: discord.Role):
         "Find any member in the guild who has the streamer role but is not currently streaming"
         for member in guild.members:

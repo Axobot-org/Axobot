@@ -97,7 +97,7 @@ Arguments are:
         You will find there the configuration of your server, every general settings, the list of members with their roles, the list of categories and channels (with their permissions), emotes, and webhooks.
         Please note that audit logs, messages and invites are not used
 
-..Example backup create        
+..Example backup create
 
 ..Doc server.html#server-backup"""
         try:

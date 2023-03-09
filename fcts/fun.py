@@ -227,7 +227,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
                     await ctx.message.delete(delay=0)
             except commands.CommandError: # user can't use 'say'
                 pass
-    
+
     @commands.command(name="shuffle", hidden=True)
     @commands.check(is_fun_enabled)
     async def shuffle(self, ctx: MyContext, *, name: typing.Union[discord.Member, str]):
@@ -284,9 +284,9 @@ You can specify a verification limit by adding a number in argument (up to 1.000
     @commands.check(is_fun_enabled)
     async def kill(self, ctx: MyContext, * , name: str=None):
         """Just try to kill someone with a fun message
-        
+
         ..Example kill herobrine
-        
+
         ..Doc fun.html#kill"""
         if name is None:
             victime = ctx.author.display_name
@@ -711,18 +711,18 @@ You can specify a verification limit by adding a number in argument (up to 1.000
             await ctx.send(await self.bot._(ctx.guild.id,"fun.afk.unafk-done"))
             if ctx.author.nick and ctx.author.nick.endswith(" [AFK]"):
                 try:
-                    await ctx.author.edit(nick=ctx.author.display_name.replace(" [AFK]",''))                
+                    await ctx.author.edit(nick=ctx.author.display_name.replace(" [AFK]",''))
                 except discord.errors.Forbidden:
                     pass
         else:
             await ctx.send(await self.bot._(ctx.guild.id,"fun.afk.unafk-cant"))
-    
+
     @commands.Cog.listener()
     async def on_message(self, msg: discord.Message):
         if msg.guild and not await self.bot.check_axobot_presence(guild=msg.guild):
             await self.check_afk(msg)
             await self.check_suggestion(msg)
-    
+
     async def check_afk(self, msg: discord.Message):
         """Check if someone pinged is afk"""
         if msg.author.bot:

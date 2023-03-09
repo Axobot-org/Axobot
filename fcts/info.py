@@ -1386,4 +1386,3 @@ Available types: member, role, user, emoji, channel, server, invite, category
 async def setup(bot):
     locale.setlocale(locale.LC_ALL, '')
     await bot.add_cog(Info(bot))
-    

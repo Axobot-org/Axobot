@@ -40,7 +40,7 @@ class ServerConfig(commands.Cog):
         if (value := await self.db_get_value(guild_id, option_name)) is None:
             value = to_raw(option_name, options_list[option_name]["default"])
         return value
-    
+
     async def get_option(self, guild_id: int, option_name: str):
         "Return the formated value of a server config option"
         if (cached := self.cache.get((guild_id, option_name))) is not None:
@@ -54,7 +54,7 @@ class ServerConfig(commands.Cog):
             value = len(guild.members) < self.max_members_for_nicknames
         self.cache[(guild_id, option_name)] = value
         return value
-    
+
     async def set_option(self, guild_id: int, option_name: str, value: Any):
         "Set the value of a server config option"
         if option_name not in options_list:
@@ -160,7 +160,7 @@ class ServerConfig(commands.Cog):
         roles_ids: list[int] = json.loads(raw_roles)
         member_role_ids = {role.id for role in member.roles}
         return any(role in member_role_ids for role in roles_ids)
-    
+
     async def update_everyMembercounter(self):
         "Update all pending membercounter channels"
         if not self.bot.database_online:
@@ -214,7 +214,7 @@ class ServerConfig(commands.Cog):
             if len(query_results) == 0:
                 return None
             return query_results['value']
-    
+
     async def db_get_guild(self, guild_id: int) -> Optional[dict[str, str]]:
         "Get a guild from the database"
         if not self.bot.database_online:
@@ -224,7 +224,7 @@ class ServerConfig(commands.Cog):
             if len(query_results) == 0:
                 return None
             return {row['option_name']: row['value'] for row in query_results}
-    
+
     async def db_set_value(self, guild_id: int, option_name: str, new_value: str) -> bool:
         "Edit a value in the database"
         if option_name not in options_list:
@@ -234,7 +234,7 @@ class ServerConfig(commands.Cog):
         query = "INSERT INTO `serverconfig` (`guild_id`, `option_name`, `value`, `beta`) VALUES (%s, %s, %s, %s) ON DUPLICATE KEY UPDATE `value` = %s"
         async with self.bot.db_query(query, (guild_id, option_name, new_value, self.bot.beta, new_value), returnrowcount=True) as query_results:
             return query_results > 0
-    
+
     async def db_delete_option(self, guild_id: int, option_name: str) -> bool:
         "Delete a value from the database"
         if option_name not in options_list:
@@ -244,7 +244,7 @@ class ServerConfig(commands.Cog):
         query = "DELETE FROM `serverconfig` WHERE `guild_id` = %s AND `option_name` = %s AND `beta` = %s"
         async with self.bot.db_query(query, (guild_id, option_name, self.bot.beta), returnrowcount=True) as query_results:
             return query_results > 0
-    
+
     async def db_delete_guild(self, guild_id: int) -> bool:
         "Delete a guild from the database"
         if not self.bot.database_online:
@@ -252,7 +252,7 @@ class ServerConfig(commands.Cog):
         query = "DELETE FROM `serverconfig` WHERE `guild_id` = %s AND `beta` = %s"
         async with self.bot.db_query(query, (guild_id, self.bot.beta), returnrowcount=True) as query_results:
             return query_results > 0
-    
+
     # ---- COMMANDS ----
 
     async def option_name_autocomplete(self, current: str):
@@ -416,7 +416,7 @@ class ServerConfig(commands.Cog):
         value = await self.get_option(guild.id, option)
         if (display := to_display(option, value)) is None:
             display = "Ø"
-        elif len(display) > 1024: 
+        elif len(display) > 1024:
             display = display[:1023] + "…"
         title = await self.bot._(ctx.channel, "server.opt_title", opt=option, guild=guild.name)
         description = await self.bot._(ctx.channel, f"server.server_desc.{option}", value=display)
@@ -440,7 +440,7 @@ class ServerConfig(commands.Cog):
                 return await self.bot._(ctx.guild.id, f"server.set_success.levelup_channel.channel", opt=option_name, val=value.mention)
         str_value = to_display(option_name, value)
         return await self.bot._(ctx.guild.id, f"server.set_success.{option_type}", opt=option_name, val=str_value)
-    
+
     async def _get_set_error_message(self, ctx: MyContext, option_name: str, error: ValueError, value: Any):
         "Generate a proper error message for an invalid value"
         repr: AllRepresentation = error.args[2]

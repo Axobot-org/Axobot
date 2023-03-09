@@ -303,7 +303,7 @@ class AntiScam(commands.Cog):
             txt += f"\n❌ This model is not better than the current one ({current_acc:.3f})"
         await msg.edit(content=txt)
         self.bot.log.info(txt)
-    
+
     async def report_context_menu(self, interaction: discord.Interaction, message: discord.Message):
         "Report a suspicious message to the bot team"
         if not message.content:
@@ -347,7 +347,7 @@ class AntiScam(commands.Cog):
             await self.bot._(ctx.channel, "antiscam.report-successful"),
             allowed_mentions=discord.AllowedMentions.none()
         )
-    
+
     async def _report_message(self, message_author: discord.User, content: str, mentions_count: int, guild_id: typing.Optional[int]):
         msg = Message.from_raw(content, mentions_count, self.agent.websites_list)
         if guild_id:

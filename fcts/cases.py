@@ -110,7 +110,7 @@ class Cases(commands.Cog):
                         case_type=elem['type'],
                         mod_id=elem['mod'],
                         date=elem['created_at'],
-                        reason=elem['reason'], 
+                        reason=elem['reason'],
                         duration=elem['duration']
                     )
                     liste.append(case)
@@ -207,7 +207,7 @@ class Cases(commands.Cog):
     async def see_case_main(self, ctx: MyContext, guild: discord.Guild, user: discord.User):
         if guild is not None:
             criters = ["`user`='{}'".format(user.id),"guild='{}'".format(guild)]
-            syntax: str = await self.bot._(ctx.guild,'cases.list-0')  
+            syntax: str = await self.bot._(ctx.guild,'cases.list-0')
         else:
             syntax: str = await self.bot._(ctx.guild,'cases.list-1')
             criters = ["`user`='{}'".format(user.id)]
@@ -261,7 +261,7 @@ class Cases(commands.Cog):
                         return {
                             "embed": embed
                         }
-                
+
                 _quit = await self.bot._(ctx.guild, "misc.quit")
                 view = RecordsPaginator(self.bot, ctx.author, stop_label=_quit.capitalize())
                 await view.send_init(ctx)

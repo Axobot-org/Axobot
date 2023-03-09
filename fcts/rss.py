@@ -435,7 +435,7 @@ class Rss(commands.Cog):
                 if length == 0:
                     return 1
                 return ceil(length / feeds_per_page)
-            
+
             async def get_page_content(self, interaction, page):
                 "Create one page"
                 embed = discord.Embed(title=title, color=rss_cog.embed_color, timestamp=ctx.message.created_at)
@@ -446,7 +446,7 @@ class Rss(commands.Cog):
                 return {
                     "embed": embed
                 }
-        
+
         _quit = await self.bot._(ctx.guild, "misc.quit")
         view = FeedsPaginator(self.bot, ctx.author, stop_label=_quit.capitalize())
         msg = await view.send_init(ctx)
@@ -555,7 +555,7 @@ class Rss(commands.Cog):
     async def roles_feeds(self, ctx: MyContext, ID:int=None, *, mentions: Optional[str]):
         """Configures a role to be notified when a news is posted
         If you want to use the @everyone role, please put the server ID instead of the role name.
-        
+
         ..Example rss mentions
 
         ..Example rss mentions 6678466620137
@@ -707,7 +707,7 @@ class Rss(commands.Cog):
         ..Example rss move #cool-channels
 
         ..Example rss move 3078731683662 #cool-channels
-        
+
         ..Doc rss.html#move-a-feed"""
         try:
             if channel is None:

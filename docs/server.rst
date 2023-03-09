@@ -8,7 +8,7 @@ Config options
 --------------
 
 
-Recently, ZBot has features that can be modified per server, to make each server unique. You will find the language of the bot, the activation of certain options (such as the xp system), the list of roles authorized to use certain commands (ban, clear...), the welcome messages, and many other options. 
+Recently, ZBot has features that can be modified per server, to make each server unique. You will find the language of the bot, the activation of certain options (such as the xp system), the list of roles authorized to use certain commands (ban, clear...), the welcome messages, and many other options.
 
 The list of options continues to grow as development progresses, that's why a website is planned to make server configuration easier.
 
@@ -40,7 +40,7 @@ Modify
 
 **Syntax:** :code:`config set <option> <value>`
 
-This subcommand allows you to modify the value of an option. Just enter the exact name of the option and its value. A validation message will then be sent if the request has been correctly executed. 
+This subcommand allows you to modify the value of an option. Just enter the exact name of the option and its value. A validation message will then be sent if the request has been correctly executed.
 
 If the value contains several objects, such as a list of roles or channels, they must be separated by commas, like this: :code:`config set clear_allowed_roles Admin, Moderators, Special role for Special people`. Please note that not all configurations support multiple values (for example, it is not possible to have multiple prefixes).
 
@@ -132,7 +132,7 @@ There are several ways to customize your xp system. In particular, you have 4 `c
 Roles rewards
 -------------
 
-Roles rewards are roles given to your members when they reach a certain level of xp. These levels are defined by you (or by anyone with "Manage Server" permission), and you can add up to 7 rewards per server. 
+Roles rewards are roles given to your members when they reach a certain level of xp. These levels are defined by you (or by anyone with "Manage Server" permission), and you can add up to 7 rewards per server.
 
 The main command to manage these roles is :code:`roles_rewards` (or its alias :code:`rr`). Here is the list of commands currently available :
 
@@ -185,7 +185,7 @@ Change a server invite
 
 **Syntax:** :code:`partner invite <ID> [new invite]`
 
-It often happens that for X reason an invitation becomes invalid. Problem: Axobot uses the partner invitation to synchronize partners with the channel. There is therefore a command to quickly change the invitation of a server. 
+It often happens that for X reason an invitation becomes invalid. Problem: Axobot uses the partner invitation to synchronize partners with the channel. There is therefore a command to quickly change the invitation of a server.
 
 .. note:: If no new invitation is given in the command, the bot will send you the one currently in use.
 

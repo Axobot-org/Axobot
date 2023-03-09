@@ -520,7 +520,7 @@ This will remove the role 'muted' for the targeted member
         confirm_txt = await self.bot._(ctx.guild.id, "moderation.mute-config.confirm")
         confirm_txt += "\n\n" + await self.bot._(ctx.guild.id, "moderation.mute-config.tip", mute=await self.bot.get_command_mention("mute"))
         confirm_msg = await ctx.send(confirm_txt, view=confirm_view)
-        
+
         await confirm_view.wait()
         await confirm_view.disable(confirm_msg)
         if not confirm_view.value:
