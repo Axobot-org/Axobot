@@ -71,6 +71,7 @@
         "bot_news": "List of channels where to send bot news: %{value}",
         "clear_allowed_roles": "List of roles that can use the \"clear\" command: %{value}",
         "compress_help": "Should the display of the `help` command be compressed? %{value}",
+        "delete_welcome_on_quick_leave": "Should I delete the welcome message when a member leaves right after joining? %{value}",
         "description": "Server description:\n %{value}",
         "enable_fun": "Are the commands listed in the `fun` command enabled? %{value}",
         "enable_xp": "Should the xp system be enabled? %{value}",

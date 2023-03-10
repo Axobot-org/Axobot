@@ -72,6 +72,7 @@ List of every option
 * welcome_channel: List of channels where messages when a member joins/leaves the server will be sent. By default, none.
 * welcome: Message sent when a member joins your server. Some variables are usable, enter the `welcome <infos.html#welcome>`__ command to see them.
 * leave: Message sent when a member leave your server. Some variables are usable, the same as for the welcome message.
+* delete_welcome_on_quick_leave: Boolean indicating whether the welcome message should be deleted if the member leaves the server quickly. Default is :code:`False`.
 * welcome_roles: List of roles automatically given to members when they join the server. It is necessary that the bot is above the roles in question, and that it has the permission "Manage roles".
 * bot_news: List of channels to which new bot products will be sent. These are the new bugs found as well as the new features added. None by default.
 * modlogs_channel: Channel where all moderation logs (ban, warn, clear...) will be sent.
