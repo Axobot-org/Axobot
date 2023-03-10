@@ -26,7 +26,7 @@ class ServerLogs(commands.Cog):
     logs_categories = {
         "automod": {"antiraid", "antiscam"},
         "bot": {"bot_warnings"},
-        "members": {"member_roles", "member_nick", "member_avatar", "member_join", "member_leave", "member_verification"},
+        "members": {"member_roles", "member_nick", "member_avatar", "member_join", "member_leave", "member_verification", "user_update"},
         "moderation": {"member_ban", "member_unban", "member_timeout", "member_kick"},
         "messages": {"message_update", "message_delete", "discord_invite", "ghost_ping"},
         "roles": {"role_creation", "role_update", "role_deletion"},
@@ -460,6 +460,9 @@ class ServerLogs(commands.Cog):
         # member verification
         if (before.pending and not after.pending) and (channel_ids := await self.is_log_enabled(before.guild.id, "member_verification")):
             await self.handle_member_verification(before, after, channel_ids)
+        # public flags
+        if before.public_flags != after.public_flags and (channel_ids := await self.is_log_enabled(before.guild.id, "user_update")):
+            await self.handle_member_flags(before, after, channel_ids)
 
     async def handle_member_roles(self, before: discord.Member, after: discord.Member, channel_ids: list[int]):
         "Handle member_roles log"
@@ -585,6 +588,31 @@ class ServerLogs(commands.Cog):
                 value=f"<t:{after.joined_at.timestamp():.0f}> ({delta})",
                 inline=False)
         await self.validate_logs(after.guild, channel_ids, emb, "member_verification")
+
+    async def handle_member_flags(self, before: discord.Member, after: discord.Member, channel_ids: list[int]):
+        "Handle user public flags change ('user_update')"
+        before_flags = before.public_flags
+        after_flags = after.public_flags
+        if not before_flags.verified_bot and after_flags.verified_bot:
+            description = f"**Bot {before.mention} has been verified**"
+        elif not before_flags.active_developer and after_flags.active_developer:
+            description = f"User {before.mention} **got the active developer badge**"
+        elif before_flags.active_developer and not after_flags.active_developer:
+            description = f"User {before.mention} **lost their active developer badge**"
+        elif not before_flags.discord_certified_moderator and after_flags.active_developer:
+            description = f"User {before.mention} is now a **Discord certified moderator**"
+        elif before_flags.discord_certified_moderator and not after_flags.discord_certified_moderator:
+            description = f"User {before.mention} is **no longer a Discord certified moderator**"
+        else:
+            self.bot.dispatch("error", ValueError(f"Unknown flag change between {before_flags} and {after_flags}"))
+            return
+        emb = discord.Embed(
+            description=description,
+            color=discord.Color.blurple(),
+        )
+        emb.add_field(name="User ID", value=str(after.id))
+        emb.set_author(name=str(after), icon_url=after.avatar or after.default_avatar)
+        await self.validate_logs(after.guild, channel_ids, emb, "member_avatar")
 
     async def get_member_specs(self, member: discord.Member) -> list[str]:
         "Get specific things to note for a member"
