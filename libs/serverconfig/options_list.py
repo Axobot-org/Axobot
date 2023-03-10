@@ -52,6 +52,11 @@ options: dict[str, "AllRepresentation"] = {
         "default": False,
         "is_listed": True,
     },
+    "delete_welcome_on_quick_leave": {
+        "type": "boolean",
+        "default": False,
+        "is_listed": True,
+    },
     "description": {
         "type": "text",
         "min_length": 0,

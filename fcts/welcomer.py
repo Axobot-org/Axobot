@@ -1,7 +1,8 @@
-from typing import Optional
+from typing import Literal, Optional
 
 import discord
 from discord.ext import commands
+from cachingutils import Cache
 
 from libs.bot_classes import Axobot
 from libs.enums import ServerWarningType
@@ -14,7 +15,10 @@ class Welcomer(commands.Cog):
     def __init__(self, bot: Axobot):
         self.bot = bot
         self.file = "welcomer"
-        self.no_message = [392766377078816789,504269440872087564,552273019020771358]
+        # List of users who won't receive welcome/leave messages :
+        #   someone, Awhikax's alt, Z_Jumper
+        self.no_message = {392766377078816789, 504269440872087564, 552273019020771358}
+        self.join_cache = Cache[tuple[int, int], int](timeout=60)
 
 
     @commands.Cog.listener()
@@ -26,7 +30,7 @@ class Welcomer(commands.Cog):
                 return
             await self.bot.get_cog("ServerConfig").update_memberChannel(member.guild)
             if "MEMBER_VERIFICATION_GATE_ENABLED" not in member.guild.features:
-                await self.send_msg(member,"welcome")
+                await self.send_msg(member, "welcome")
                 self.bot.loop.create_task(self.give_roles(member))
                 await self.give_roles_back(member)
                 await self.check_muted(member)
@@ -43,7 +47,7 @@ class Welcomer(commands.Cog):
             return
         if before.pending and not after.pending:
             if "MEMBER_VERIFICATION_GATE_ENABLED" in after.guild.features:
-                await self.send_msg(after,"welcome")
+                await self.send_msg(after, "welcome")
                 self.bot.loop.create_task(self.give_roles(after))
                 await self.give_roles_back(after)
                 await self.check_muted(after)
@@ -58,34 +62,40 @@ class Welcomer(commands.Cog):
                 return
             await self.bot.get_cog("ServerConfig").update_memberChannel(member.guild)
             if "MEMBER_VERIFICATION_GATE_ENABLED" not in member.guild.features or not member.pending:
-                await self.send_msg(member,"leave")
+                await self.send_msg(member, "leave")
             await self.bot.get_cog('Events').check_user_left(member)
 
-
-    async def send_msg(self, member:discord.Member, event_type:str):
+    async def send_msg(self, member: discord.Member, event_type: Literal["welcome", "leave"]):
         """Envoie un message de bienvenue/départ dans le serveur"""
         if self.bot.zombie_mode:
             return
-        msg: Optional[str] = await self.bot.get_config(member.guild.id, event_type)
+        text: Optional[str] = await self.bot.get_config(member.guild.id, event_type)
         if member.id in self.no_message or (event_type == "welcome" and await self.raid_check(member)):
             return
         if self.bot.get_cog('Utilities').sync_check_any_link(member.name) is not None:
             return
-        if msg:
+        if text:
             channel: Optional[discord.TextChannel] = await self.bot.get_config(member.guild.id, 'welcome_channel')
             if channel is None:
                 return
-            msg = await self.bot.get_cog('Utilities').clear_msg(msg, ctx=None)
-            botormember = await self.bot._(member.guild,"misc.bot" if member.bot else "misc.member")
+            if event_type == "leave" and (msg_id := self.join_cache.get((member.guild.id, member.id))):
+                # if the user just joined, delete the welcome message and abort
+                if await self.delete_cached_welcome_message(channel, msg_id):
+                    # if the welcome message was deleted, don't send the leave message
+                    return
+            text = await self.bot.get_cog('Utilities').clear_msg(text, ctx=None)
+            botormember = await self.bot._(member.guild, "misc.bot" if member.bot else "misc.member")
             try:
-                msg = msg.format_map(self.bot.SafeDict(
+                text = text.format_map(self.bot.SafeDict(
                     user=member.mention if event_type=='welcome' else member.name,
                     server=member.guild.name,
                     owner=member.guild.owner.name,
                     member_count=member.guild.member_count,
                     type=botormember))
-                msg = await self.bot.get_cog("Utilities").clear_msg(msg, everyone=False)
-                await channel.send(msg)
+                text = await self.bot.get_cog("Utilities").clear_msg(text, everyone=False)
+                msg = await channel.send(text)
+                if event_type == "welcome":
+                    self.join_cache[member.guild.id, member.id] = msg.id
             except discord.Forbidden:
                 self.bot.dispatch("server_warning",
                                     ServerWarningType.WELCOME_MISSING_TXT_PERMISSIONS,
@@ -94,6 +104,21 @@ class Welcomer(commands.Cog):
                                     is_join=event_type == "welcome")
             except Exception as err:
                 self.bot.dispatch("error", err, f"{member.guild} | {channel.name}")
+
+    async def delete_cached_welcome_message(self, channel: discord.TextChannel, message_id: int):
+        "Try to delete a cached welcome message"
+        # Check if the guild has enabled this feature
+        if not await self.bot.get_config(channel.guild.id, "delete_welcome_on_quick_leave"):
+            return False
+        try:
+            msg = await channel.fetch_message(message_id)
+            await msg.delete()
+            return True
+        except discord.HTTPException as err:
+            self.bot.log.debug(f"Failed to delete welcome message {message_id} in {channel.guild.id} | {channel.id}: {err}")
+        except Exception as err:
+            self.bot.dispatch("error", err, f"While deleting welcome message in {channel.guild.id} | {channel.id}")
+        return False
 
     async def check_owner_server(self, member: discord.Member):
         """Vérifie si un nouvel arrivant est un propriétaire de serveur"""

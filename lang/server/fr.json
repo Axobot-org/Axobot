@@ -66,6 +66,7 @@
         "bot_news": "Liste des salons dans lesquels envoyer les news du bot : %{value}",
         "clear_allowed_roles": "Liste des rôles qui peuvent utiliser la commande 'clear' : %{value}",
         "compress_help": "L'affichage de la commande `help` doit-il être compressé ? %{value}",
+        "delete_welcome_on_quick_leave": "Supprimer le message de bienvenue lorsqu'un membre quitte le serveur juste après avoir rejoint ? %{value}",
         "description": "Description du serveur :\n %{value}",
         "enable_fun": "Les commandes répertoriées dans la commande `!fun` sont-elles activées ? %{value}",
         "enable_xp": "Le système d'xp doit-il être activé ? %{value}",
