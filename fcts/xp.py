@@ -20,7 +20,7 @@ from PIL import Image, ImageDraw, ImageEnhance, ImageFont, ImageSequence
 
 from libs.tips import UserTip
 
-from . import args, checks
+from fcts import args, checks
 
 importlib.reload(args)
 importlib.reload(checks)

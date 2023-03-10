@@ -4,7 +4,7 @@ import importlib
 import re
 from discord.ext import commands
 from libs.bot_classes import Axobot, MyContext
-from . import checks, args
+from fcts import checks, args
 importlib.reload(checks)
 importlib.reload(args)
 

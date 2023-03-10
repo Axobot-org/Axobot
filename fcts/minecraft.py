@@ -16,7 +16,7 @@ from libs.bot_classes import Axobot, MyContext
 from libs.formatutils import FormatUtils
 from libs.rss.rss_general import FeedObject
 
-from . import checks
+from fcts import checks
 
 
 class Minecraft(commands.Cog):
