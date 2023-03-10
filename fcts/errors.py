@@ -9,7 +9,7 @@ from discord.ext import commands, tasks
 from libs.bot_classes import MyContext, Axobot
 from libs.errors import NotDuringEventError, VerboseCommandError
 
-from . import checks
+from fcts import checks
 
 AllowedCtx = typing.Union[MyContext, discord.Message, discord.Interaction, str]
 

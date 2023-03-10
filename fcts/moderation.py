@@ -12,7 +12,7 @@ from libs.formatutils import FormatUtils
 from libs.paginator import Paginator
 from libs.views import ConfirmView
 
-from . import args, checks
+from fcts import args, checks
 from fcts.cases import Case
 
 importlib.reload(checks)

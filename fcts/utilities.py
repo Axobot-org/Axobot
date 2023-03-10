@@ -11,7 +11,7 @@ from discord.ext import commands
 from libs.bot_classes import MyContext, Axobot
 from libs.serverconfig.options_list import options
 
-from . import args
+from fcts import args
 
 importlib.reload(args)
 

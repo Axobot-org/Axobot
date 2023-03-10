@@ -21,7 +21,7 @@ from libs.bot_classes import PRIVATE_GUILD_ID, SUPPORT_GUILD_ID, Axobot, MyConte
 from libs.enums import RankCardsFlag, UserFlag
 from libs.views import ConfirmView
 
-from . import checks
+from fcts import checks
 
 
 def cleanup_code(content: str):

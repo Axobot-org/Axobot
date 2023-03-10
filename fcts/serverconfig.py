@@ -1,4 +1,3 @@
-import copy
 import json
 import time
 from typing import Any, Optional
@@ -85,7 +84,7 @@ class ServerConfig(commands.Cog):
         if await self.db_delete_guild(guild_id):
             for option_name in options_list:
                 if (guild_id, option_name) in self.cache:
-                    del self.cache[(guild_id, option_name)]
+                    del self.cache._items[(guild_id, option_name)]
             return True
         return False
 

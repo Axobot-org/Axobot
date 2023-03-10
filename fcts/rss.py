@@ -19,7 +19,7 @@ from libs.paginator import PaginatedSelectView, Paginator
 from libs.rss import RssMessage, TwitterRSS, YoutubeRSS, feed_parse
 from libs.rss.rss_general import FeedObject, FeedType
 
-from . import args, checks
+from fcts import args, checks
 
 importlib.reload(args)
 importlib.reload(checks)

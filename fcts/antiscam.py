@@ -17,7 +17,7 @@ from libs.antiscam.training_bayes import train_model
 from libs.bot_classes import MyContext, Axobot
 from libs.formatutils import FormatUtils
 
-from . import checks
+from fcts import checks
 
 
 def is_immune(member: discord.Member) -> bool:

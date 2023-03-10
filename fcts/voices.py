@@ -5,7 +5,7 @@ import discord
 import aiohttp
 from discord.ext import commands
 
-from . import checks
+from fcts import checks
 from libs.bot_classes import Axobot, MyContext
 
 RANDOM_NAMES_URL = 'https://randommer.io/api/Name?nameType=surname&quantity=20'

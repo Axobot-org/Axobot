@@ -8,14 +8,13 @@ from cachingutils import LRUCache
 from discord import app_commands
 from discord.ext import commands, tasks
 
+from fcts import checks
 from fcts.args import serverlog
 from fcts.tickets import TicketCreationEvent
 from libs.antiscam.classes import PredictionResult
 from libs.bot_classes import Axobot, MyContext
 from libs.enums import ServerWarningType
 from libs.formatutils import FormatUtils
-
-from . import checks
 
 DISCORD_INVITE = re.compile(r'(?:https?://)?(?:www[.\s])?((?:discord[.\s](?:gg|io|me|li(?:nk)?)|discordapp\.com/invite|discord\.com/invite|dsc\.gg)[/ ]{,3}[\w-]{1,25}(?!\w))')
 
