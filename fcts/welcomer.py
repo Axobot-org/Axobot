@@ -88,6 +88,8 @@ class Welcomer(commands.Cog):
             try:
                 text = text.format_map(self.bot.SafeDict(
                     user=member.mention if event_type=='welcome' else member.name,
+                    user_idname=str(member),
+                    user_id=str(member.id),
                     server=member.guild.name,
                     owner=member.guild.owner.name,
                     member_count=member.guild.member_count,
