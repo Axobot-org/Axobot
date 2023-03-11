@@ -62,6 +62,8 @@ class ServerConfig(commands.Cog):
             return False
         if await self.db_set_value(guild_id, option_name, to_raw(option_name, value)):
             self.cache[(guild_id, option_name)] = value
+            if option_name == "prefix":
+                await self.bot.prefix_manager.update_prefix(guild_id, value)
             return True
         return False
 
@@ -74,6 +76,8 @@ class ServerConfig(commands.Cog):
         if await self.db_delete_option(guild_id, option_name):
             if (guild_id, option_name) in self.cache:
                 del self.cache._items[(guild_id, option_name)]
+            if option_name == "prefix":
+                await self.bot.prefix_manager.reset_prefix(guild_id)
             return True
         return False
 
@@ -85,6 +89,7 @@ class ServerConfig(commands.Cog):
             for option_name in options_list:
                 if (guild_id, option_name) in self.cache:
                     del self.cache._items[(guild_id, option_name)]
+                    await self.bot.prefix_manager.reset_prefix(guild_id)
             return True
         return False
 
