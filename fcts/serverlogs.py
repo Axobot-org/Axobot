@@ -950,7 +950,11 @@ Minimum age required by anti-raid: {min_age}"
                 description=f"**{event.user.mention} ({event.user.id}) has opened a ticket**",
                 colour=discord.Color.dark_grey()
             )
-            emb.add_field(name="Topic", value=event.topic_name)
+            if raw_emoji := event.topic_emoji:
+                name = str(discord.PartialEmoji.from_str(raw_emoji)) + " " + event.topic_name
+            else:
+                name = event.topic_name
+            emb.add_field(name="Topic", value=name)
             emb.add_field(name="Ticket name", value=event.name)
             emb.add_field(name="Channel", value=event.channel.mention, inline=False)
             await self.validate_logs(event.guild, channel_ids, emb, "ticket_creation")

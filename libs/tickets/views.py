@@ -8,7 +8,8 @@ class TicketCreationEvent:
     "Represents a ticket being created"
     def __init__(self, topic: dict, name: str, interaction: discord.Interaction, channel: Union[discord.TextChannel, discord.Thread]):
         self.topic = topic
-        self.topic_name = topic["topic"]
+        self.topic_emoji: Optional[str] = topic["topic_emoji"]
+        self.topic_name: str = topic["topic"]
         self.name = name
         self.guild = interaction.guild
         self.user = interaction.user
