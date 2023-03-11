@@ -43,11 +43,11 @@ class PrefixManager:
         if not self.bot.database_online:
             raise RuntimeError("Database is not loaded")
         # prepare the SQL query
-        query = f"SELECT `prefix` FROM `servers` WHERE `ID` = %s AND `beta` = %s"
+        query = "SELECT `value` FROM `serverconfig` WHERE `guild_id` = %s AND `option_name` = 'prefix' AND `beta` = %s"
         # get the thing
         async with self.bot.db_query(query, (guild_id, self.bot.beta), fetchone=True) as query_result:
-            if query_result and len(query_result['prefix']) > 0:
-                prefix: str = query_result['prefix']
+            if query_result and len(query_result['value']) > 0:
+                prefix: str = query_result['value']
             else:
                 prefix = '!'
         # and return
@@ -58,3 +58,9 @@ class PrefixManager:
         self.bot.log.debug(
             "Prefix updated for guild %s : changed to %s", guild_id, prefix)
         self.cache[guild_id] = prefix
+
+    async def reset_prefix(self, guild_id: int):
+        "Reset the prefix cache for a guild"
+        self.bot.log.debug("Prefix reset for guild %s", guild_id)
+        if guild_id in self.cache:
+            del self.cache._items[guild_id]
