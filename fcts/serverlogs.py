@@ -468,7 +468,7 @@ class ServerLogs(commands.Cog):
         added_roles = [role for role in after.roles if role not in before.roles]
         removed_roles = [role for role in before.roles if role not in after.roles]
         emb = discord.Embed(
-            description=f"**Member {before.mention} updated**",
+            description=f"**Member {before.mention} ({before.id}) updated**",
             color=discord.Color.blurple()
         )
         if removed_roles:
