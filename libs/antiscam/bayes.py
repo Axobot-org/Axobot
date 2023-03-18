@@ -14,11 +14,13 @@ CUSTOM_ATTRS = {'contains_everyone', 'url_score', 'mentions_count',
                 'punctuation_count', 'max_frequency', 'caps_percentage', 'avg_word_len'}
 
 class RoundValueType(TypedDict):
+    "Used to know how many decimals to round the values to"
     max_frequency: int
     caps_percentage: int
     avg_word_len: int
 
-class SpamDetector(object):
+
+class SpamDetector:
     """Implementation of Naive Bayes for binary classification"""
     def __init__(self, round_values: RoundValueType):
         self.round_values = round_values
