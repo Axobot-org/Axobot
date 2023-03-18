@@ -274,10 +274,10 @@ class BotStats(commands.Cog):
 
     async def db_get_antiscam_enabled_count(self):
         "Get the number of active guilds where antiscam is enabled"
-        query = f"SELECT `guild_id` FROM `serverconfig` WHERE `option_name` = 'anti_scam' AND `value` = %s"
+        query = "SELECT `guild_id` FROM `serverconfig` WHERE `option_name` = 'anti_scam' AND `value` = %s"
         count = 0
         guild_ids = {guild.id for guild in self.bot.guilds}
-        async with self.bot.db_query(query, (True,)) as query_results:
+        async with self.bot.db_query(query, ("True",)) as query_results:
             for row in query_results:
                 if row["guild_id"] in guild_ids:
                     count += 1
