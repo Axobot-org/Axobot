@@ -470,7 +470,7 @@ class Rss(commands.Cog):
             tr_type = await self.bot._(guild.id, "rss."+feed.type)
             # formatted channel
             if channel := guild.get_channel_or_thread(feed.channel_id):
-                tr_channel = channel.mention
+                tr_channel = '#' + channel.name
             else:
                 tr_channel = "#deleted"
             # better name format (for Twitter/YouTube ID)
@@ -492,7 +492,8 @@ class Rss(commands.Cog):
                 ))
         return options
 
-    async def ask_rss_id(self, input_id: Optional[int], ctx: MyContext, title:str, feed_filter: Callable[[FeedObject], bool]=None, max_count: Optional[int]=1) -> Optional[list[int]]:
+    async def ask_rss_id(self, input_id: Optional[int], ctx: MyContext, title: str,
+                         feed_filter: Callable[[FeedObject], bool]=None, max_count: Optional[int]=1) -> Optional[list[int]]:
         "Ask the user to select a feed ID"
         selection = []
         if feed_filter is None:
@@ -697,7 +698,7 @@ class Rss(commands.Cog):
     @commands.guild_only()
     @commands.check(can_use_rss)
     @commands.check(checks.database_connected)
-    async def move_guild_feed(self, ctx:MyContext, ID:Optional[int]=None, channel:discord.TextChannel=None):
+    async def move_guild_feed(self, ctx: MyContext, feed_id: Optional[int]=None, channel: Optional[discord.TextChannel]=None):
         """Move a rss feed in another channel
 
         ..Example rss move
@@ -714,9 +715,10 @@ class Rss(commands.Cog):
                 channel = ctx.channel
             try:
                 feeds_ids = await self.ask_rss_id(
-                    ID,
+                    feed_id,
                     ctx,
                     await self.bot._(ctx.guild.id, "rss.choose-mentions-1"),
+                    feed_filter=lambda f: f.channel_id != channel.id,
                     max_count=None
                 )
                 err = None
