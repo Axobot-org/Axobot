@@ -9,6 +9,7 @@ from discord.ext import commands
 
 from fcts import checks
 from libs.bot_classes import Axobot, MyContext
+from libs.serverconfig.autocomplete import autocomplete_main
 from libs.serverconfig.config_paginator import ServerConfigPaginator
 from libs.serverconfig.converters import AllRepresentation, from_input, from_raw, to_display, to_raw
 from libs.serverconfig.options_list import options as options_list
@@ -266,8 +267,8 @@ class ServerConfig(commands.Cog):
             if data["is_listed"] and current in name
         )
         return [
-            app_commands.Choice(name=value[1], value=value[1])
-            for value in filtered
+            app_commands.Choice(name=name, value=name)
+            for _, name in filtered
         ][:25]
 
     @commands.hybrid_group(name='config')
@@ -304,6 +305,16 @@ class ServerConfig(commands.Cog):
     @config_set.autocomplete("option")
     async def sconfig_change_autocomplete_opt(self, _: discord.Interaction, option: str):
         return await self.option_name_autocomplete(option)
+
+    @config_set.autocomplete("value")
+    async def sconfig_change_autocomplete_val(self, interaction: discord.Interaction, value: str):
+        "Autocomplete the value of a config option"
+        if option_name := interaction.namespace.option:
+            try:
+                return await autocomplete_main(self.bot, interaction, option_name, value)
+            except Exception as err:
+                self.bot.dispatch("error", err, interaction)
+        return []
 
 
     @config_main.command(name="reset")
