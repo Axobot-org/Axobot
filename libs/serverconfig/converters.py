@@ -8,7 +8,7 @@ from discord.ext import commands
 from fcts.args import UnicodeEmoji
 from libs.bot_classes import MyContext
 from libs.emojis_manager import EmojisManager
-from .options_list import options as options_list
+from libs.serverconfig.options_list import options as options_list
 
 
 log = logging.getLogger("runner")
@@ -104,7 +104,7 @@ class ColorOptionRepresentation(TypedDict):
     default: Optional[int]
     is_listed: bool
 
-class LevelupChannelRepresentation(TypedDict):
+class LevelupChannelOptionRepresentation(TypedDict):
     type: Literal["levelup_channel"]
     default: Optional[str]
     is_listed: bool
@@ -123,7 +123,7 @@ AllRepresentation = Union[
     CategoryOptionRepresentation,
     EmojisListOptionRepresentation,
     ColorOptionRepresentation,
-    LevelupChannelRepresentation,
+    LevelupChannelOptionRepresentation,
 ]
 
 class OptionConverter:
@@ -648,7 +648,7 @@ class ColorOption(OptionConverter):
 
 class LevelupChannelOption(OptionConverter):
     @staticmethod
-    def from_raw(raw: str, repr: LevelupChannelRepresentation, guild: discord.guild):
+    def from_raw(raw: str, repr: LevelupChannelOptionRepresentation, guild: discord.guild):
         if raw in {"any", "none"}:
             return raw
         channel_repr: TextChannelOptionRepresentation = repr | {
@@ -671,7 +671,7 @@ class LevelupChannelOption(OptionConverter):
         return TextChannelOption.to_display(value)
 
     @staticmethod
-    async def from_input(raw: str, repr: LevelupChannelRepresentation, guild: discord.Guild, ctx: MyContext):
+    async def from_input(raw: str, repr: LevelupChannelOptionRepresentation, guild: discord.Guild, ctx: MyContext):
         if raw.lower() in {"any", "none"}:
             return raw.lower()
         channel_repr: TextChannelOptionRepresentation = repr | {
