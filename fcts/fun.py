@@ -1044,6 +1044,14 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         }).strip()
         await ctx.send(f"```py\n{code}\n```")
 
+    @commands.command(name="avatar", aliases=['pfp'])
+    @commands.cooldown(2, 10, commands.BucketType.user)
+    async def avatar(self, ctx: MyContext, user: typing.Optional[discord.Member]):
+        """Get the avatar of a user"""
+        if user is None:
+            user = ctx.author
+        await ctx.send(user.avatar.url)
+
 
 async def setup(bot):
     await bot.add_cog(Fun(bot))
