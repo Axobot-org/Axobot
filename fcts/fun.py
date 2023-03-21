@@ -1,4 +1,3 @@
-import copy
 import datetime
 import importlib
 import operator
@@ -12,7 +11,6 @@ from math import ceil
 import aiohttp
 import autopep8
 import discord
-import emoji as emojilib
 import geocoder
 from discord.ext import commands
 from pytz import timezone
