@@ -764,14 +764,14 @@ class Xp(commands.Cog):
             self.bot.dispatch("command_error", ctx, err)
 
     async def send_card(self, ctx: MyContext, user: discord.User, xp: int, rank: int, ranks_nb: int, used_system: str, levels_info=None):
+        style = await self.bot.get_cog('Utilities').get_xp_style(user)
         try:
             myfile = discord.File('./assets/cards/{}-{}-{}.{}'.format(user.id,xp,rank,'gif' if user.display_avatar.is_animated() else 'png'))
         except FileNotFoundError:
-            style = await self.bot.get_cog('Utilities').get_xp_style(user)
             txts = [await self.bot._(ctx.channel, "xp.card-level"), await self.bot._(ctx.channel, "xp.card-rank")]
             static = not (user.display_avatar.is_animated() and await self.bot.get_cog("Users").db_get_user_config(user.id, "animated_card"))
             self.bot.log.debug(f"XP card for user {user.id} ({xp=} - {style=} - {static=})")
-            myfile = await self.create_card(user,style,xp,used_system,[rank,ranks_nb],txts,force_static=static,levels_info=levels_info)
+            myfile = await self.create_card(user, style, xp, used_system, [rank, ranks_nb], txts, force_static=static, levels_info=levels_info)
             if UsersCog := self.bot.get_cog("Users"):
                 try:
                     await UsersCog.db_used_rank(user.id)
