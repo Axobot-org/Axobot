@@ -7,6 +7,7 @@ from discord.app_commands import Choice
 from libs.bot_classes import Axobot
 from libs.serverconfig.converters import (BooleanOptionRepresentation,
                                           CategoryOptionRepresentation,
+                                          EmojisListOptionRepresentation,
                                           EnumOptionRepresentation,
                                           FloatOptionRepresentation,
                                           IntOptionRepresentation,
@@ -41,6 +42,8 @@ async def autocomplete_main(bot: Axobot, interaction: Interaction, option: str, 
         return await _autocomplete_voice_channel(bot, interaction, option_data, current)
     if option_data["type"] == "category":
         return await _autocomplete_category(bot, interaction, option_data, current)
+    if option_data["type"] == "emojis_list":
+        return await _autocomplete_emojis_list(bot, interaction, option_data, current)
     if option_data["type"] == "levelup_channel":
         return await _autocomplete_levelup_channel(bot, interaction, option_data, current)
     return []
@@ -195,6 +198,34 @@ async def _autocomplete_category(_: Axobot, interaction: Interaction, _option: C
             for category in interaction.guild.categories
         )
         choices = [Choice(name=name, value=value) for _, name, value in categories]
+    return choices[:25]
+
+
+async def _autocomplete_emojis_list(_: Axobot, interaction: Interaction, option: EmojisListOptionRepresentation, current: str):
+    "Autocompletion for emojis list options"
+    if current:
+        if " " in current:
+            typed_emojis = current.split(" ")
+            if len(typed_emojis) > option["max_count"]:
+                truncated_current = " ".join(typed_emojis[:option["max_count"]])
+                return [Choice(name=truncated_current, value=truncated_current)]
+            current = typed_emojis[-1]
+            previous = " ".join(typed_emojis[:-1]) + " "
+        else:
+            previous = ""
+        current = current.strip(":")
+        emojis = sorted(
+            (not emoji.name.startswith(current), emoji.name.lower(), ':'+emoji.name+':', str(emoji.id))
+            for emoji in interaction.guild.emojis
+            if current.lower() in emoji.name.lower() or current == str(emoji.id)
+        )
+        choices = [Choice(name=previous + name, value=previous + value) for _, _, name, value in emojis]
+    else:
+        emojis = sorted(
+            (emoji.name.lower(), ':'+emoji.name+':', str(emoji.id))
+            for emoji in interaction.guild.emojis
+        )
+        choices = [Choice(name=name, value=value) for _, name, value in emojis]
     return choices[:25]
 
 
