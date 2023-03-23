@@ -1,4 +1,35 @@
 {
+    "bool": {
+        "true": "Oui",
+        "false": "Non"
+    },
+    "enum": {
+        "anti_raid": {
+            "none": "aucun",
+            "smooth": "faible",
+            "careful": "modéré",
+            "high": "élevé",
+            "(╯°□°）╯︵ ┻━┻": "extrême"
+        },
+        "language": {
+            "fr": "français",
+            "en": "anglais",
+            "lolcat": "lolcat",
+            "fi": "finlandais",
+            "de": "allemand",
+            "fr2": "français familier"
+        },
+        "ttt_display": {
+            "disabled": "désactivé",
+            "short": "compressé",
+            "normal": "normal"
+        },
+        "xp_type": {
+            "global": "global",
+            "mee6-like": "mee6-like",
+            "local": "local"
+        }
+    },
     "config-list": "Liste des options disponibles :%{text}Plus d'information : %{link}",
     "deleted-channel": "salon supprimé",
     "deleted-role": "rôle supprimé",

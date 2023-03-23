@@ -1,4 +1,35 @@
 {
+    "bool": {
+        "true": "Yes",
+        "false": "No"
+    },
+    "enum": {
+        "anti_raid": {
+            "none": "none",
+            "smooth": "smooth",
+            "careful": "careful",
+            "high": "high",
+            "(╯°□°）╯︵ ┻━┻": "extreme"
+        },
+        "language": {
+            "fr": "French",
+            "en": "English",
+            "lolcat": "lolcat",
+            "fi": "Finnish",
+            "de": "German",
+            "fr2": "Familiar French"
+        },
+        "ttt_display": {
+            "disabled": "disabled",
+            "short": "short",
+            "normal": "normal"
+        },
+        "xp_type": {
+            "global": "global",
+            "mee6-like": "mee6-like",
+            "local": "local"
+        }
+    },
     "config-list": "List of available options: %{text}More info at %{link}",
     "deleted-channel": "deleted channel",
     "deleted-role": "deleted role",

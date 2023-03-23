@@ -5,6 +5,7 @@ import i18n
 
 from libs.bot_classes import Axobot, MyContext
 from libs.serverconfig.options_list import options
+from libs.translator import AxobotTranslator
 
 SourceType = Union[None, int, discord.Guild, discord.TextChannel, discord.Thread,
                    discord.Member, discord.User, discord.DMChannel, discord.Interaction,
@@ -27,11 +28,17 @@ class Languages(discord.ext.commands.Cog):
         i18n.load_path.clear()
         i18n.load_path.append('./lang')
 
+    async def cog_load(self):
+        await self.bot.tree.set_translator(AxobotTranslator(self.bot))
+
+    async def cog_unload(self):
+        await self.bot.tree.set_translator(None)
+
     @property
     def default_language(self) -> str:
         return options["language"]["default"]
 
-    async def tr(self, source: SourceType, string_id: str, **args):
+    async def tr(self, source: SourceType, string_id: str, **kwargs):
         """Renvoie le texte en fonction de la langue"""
         if isinstance(source, discord.Guild):
             # get ID from guild
@@ -79,18 +86,18 @@ class Languages(discord.ext.commands.Cog):
         if lang_opt not in self.languages:
             # if lang not known: fallback to default
             lang_opt = self.default_language
-        return await self._get_translation(lang_opt, string_id, **args)
+        return await self._get_translation(lang_opt, string_id, **kwargs)
 
-    async def _get_translation(self, locale: str, string_id: str, **args):
+    async def _get_translation(self, locale: str, string_id: str, **kwargs) -> Union[str, list]:
         if string_id == '_used_locale':
             return locale
         try:
-            translation = i18n.t(string_id, locale=locale, **args)
+            translation = i18n.t(string_id, locale=locale, **kwargs)
         except KeyError:
             await self.msg_not_found(string_id, locale)
             if locale == "en":
                 return string_id
-            return await self._get_translation("en", string_id, **args)
+            return await self._get_translation("en", string_id, **kwargs)
         return translation
 
     async def msg_not_found(self, string_id: str, lang: str):
@@ -98,6 +105,7 @@ class Languages(discord.ext.commands.Cog):
         try:
             err = f"Le message {string_id} n'a pas été trouvé dans la base de donnée! (langue {lang})"
             await self.bot.get_cog('Errors').senf_err_msg(err)
+            self.bot.log.warning(err)
         except Exception: # pylint: disable=broad-except
             self.bot.log.error("Something went wrong while reporting a translation as missing", exc_info=True)
 
