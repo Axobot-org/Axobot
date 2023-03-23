@@ -3,11 +3,13 @@ import logging
 from typing import Literal, Optional, TypedDict, Union
 
 import discord
+from discord.app_commands import locale_str as _T
 from discord.ext import commands
 
 from fcts.args import UnicodeEmoji
 from libs.bot_classes import MyContext
 from libs.emojis_manager import EmojisManager
+from libs.bot_classes import Axobot
 from libs.serverconfig.options_list import options as options_list
 
 
@@ -136,7 +138,7 @@ class OptionConverter:
         raise NotImplementedError
 
     @staticmethod
-    def to_display(value) -> str:
+    def to_display(option_name: str, value) -> str:
         raise NotImplementedError
 
     @staticmethod
@@ -190,13 +192,16 @@ def to_raw(option_name: str, value):
     converter = get_converter(option_name)
     return converter.to_raw(value)
 
-def to_display(option_name: str, value):
+async def to_display(option_name: str, value, guild: discord.Guild, bot: "Axobot") -> Optional[str]:
     if value is None:
         if option_name == "levelup_msg":
             return "default"
         return None
     converter = get_converter(option_name)
-    return converter.to_display(value)
+    result = converter.to_display(option_name, value)
+    if isinstance(result, discord.app_commands.locale_str):
+        return await bot._(guild, result.message)
+    return result
 
 async def from_input(option_name: str, raw: str, guild: discord.Guild, ctx: MyContext):
     if raw is None:
@@ -222,7 +227,7 @@ class IntOption(OptionConverter):
         return str(value)
 
     @staticmethod
-    def to_display(value: int):
+    def to_display(_option_name, value: int):
         return str(value)
 
     @staticmethod
@@ -255,7 +260,7 @@ class FloatOption(OptionConverter):
         return str(value)
 
     @staticmethod
-    def to_display(value: float):
+    def to_display(_option_name, value: float):
         return str(value)
 
     @staticmethod
@@ -280,8 +285,11 @@ class BooleanOption(OptionConverter):
         return str(value)
 
     @staticmethod
-    def to_display(value: bool):
-        return "Yes" if value else "No"
+    def to_display(_option_name, value: bool):
+        if value:
+            return _T("server.bool.true")
+        else:
+            return _T("server.bool.false")
 
     @staticmethod
     async def from_input(raw: str, repr: BooleanOptionRepresentation, guild: discord.Guild, ctx: MyContext):
@@ -303,8 +311,8 @@ class EnumOption(OptionConverter):
         return value
 
     @staticmethod
-    def to_display(value: str):
-        return value
+    def to_display(option_name, value: str):
+        return _T(f"server.enum.{option_name}.{value}")
 
     @staticmethod
     async def from_input(raw: str, repr: EnumOptionRepresentation, guild: discord.Guild, ctx: MyContext):
@@ -322,7 +330,7 @@ class TextOption(OptionConverter):
         return value
 
     @staticmethod
-    def to_display(value: str):
+    def to_display(_option_name, value: str):
         return value
 
     @staticmethod
@@ -352,7 +360,7 @@ class RoleOption(OptionConverter):
         return str(value.id)
 
     @staticmethod
-    def to_display(value: discord.Role):
+    def to_display(_option_name, value: discord.Role):
         return value.mention
 
     @staticmethod
@@ -388,7 +396,7 @@ class RolesListOption(OptionConverter):
         return json.dumps([role.id for role in value])
 
     @staticmethod
-    def to_display(value: list[discord.Role]):
+    def to_display(_option_name, value: list[discord.Role]):
         return ", ".join(role.mention for role in value)
 
     @staticmethod
@@ -434,7 +442,7 @@ class TextChannelOption(OptionConverter):
         return str(value.id)
 
     @staticmethod
-    def to_display(value: Union[discord.TextChannel, discord.Thread]):
+    def to_display(_option_name, value: Union[discord.TextChannel, discord.Thread]):
         return value.mention
 
     @staticmethod
@@ -471,7 +479,7 @@ class TextChannelsListOption(OptionConverter):
         return json.dumps([channel.id for channel in value])
 
     @staticmethod
-    def to_display(value: list[Union[discord.TextChannel, discord.Thread]]):
+    def to_display(_option_name, value: list[Union[discord.TextChannel, discord.Thread]]):
         return ", ".join(channel.mention for channel in value)
 
     @staticmethod
@@ -518,7 +526,7 @@ class VoiceChannelOption(OptionConverter):
         return str(value.id)
 
     @staticmethod
-    def to_display(value: discord.channel.VocalGuildChannel):
+    def to_display(_option_name, value: discord.channel.VocalGuildChannel):
         return value.mention
 
     @staticmethod
@@ -554,7 +562,7 @@ class CategoryOption(OptionConverter):
         return str(value.id)
 
     @staticmethod
-    def to_display(value: discord.CategoryChannel):
+    def to_display(_option_name, value: discord.CategoryChannel):
         return value.name
 
     @staticmethod
@@ -592,7 +600,7 @@ class EmojisListOption(OptionConverter):
         return json.dumps([emoji.id if isinstance(emoji, discord.Emoji) else emoji for emoji in value])
 
     @staticmethod
-    def to_display(value: list[Union[UnicodeEmoji, discord.Emoji]]):
+    def to_display(_option_name, value: list[Union[UnicodeEmoji, discord.Emoji]]):
         return " ".join(str(emoji) for emoji in value)
 
     @staticmethod
@@ -635,7 +643,7 @@ class ColorOption(OptionConverter):
         return f"{value:06X}"
 
     @staticmethod
-    def to_display(value: int):
+    def to_display(_option_name, value: int):
         return f"#{value:06X}"
 
     @staticmethod
@@ -665,7 +673,7 @@ class LevelupChannelOption(OptionConverter):
         return TextChannelOption.to_raw(value)
 
     @staticmethod
-    def to_display(value: Union[str, discord.TextChannel]):
+    def to_display(_option_name, value: Union[str, discord.TextChannel]):
         if isinstance(value, str):
             return value
         return TextChannelOption.to_display(value)

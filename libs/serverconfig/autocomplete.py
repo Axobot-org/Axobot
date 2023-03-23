@@ -3,6 +3,7 @@ from typing import Union
 import discord
 from discord import Interaction
 from discord.app_commands import Choice
+from discord.app_commands import locale_str as _T
 
 from libs.bot_classes import Axobot
 from libs.serverconfig.converters import (BooleanOptionRepresentation,
@@ -24,6 +25,7 @@ async def autocomplete_main(bot: Axobot, interaction: Interaction, option: str, 
     if option not in options_list:
         return []
     option_data = options_list[option]
+    option_data["option_name"] = option
     if option_data["type"] == "int":
         return await _autocomplete_integer(bot, interaction, option_data, current)
     if option_data["type"] == "float":
@@ -82,20 +84,33 @@ async def _autocomplete_boolean(_bot: Axobot, _interaction: Interaction, _option
             for value in possibilities
             if current in value
         )
-        return [Choice(name=value, value=value) for _, value in filtered]
-    return [Choice(name=value, value=value) for value in possibilities]
+        return [
+            Choice(name=_T("server.bool."+value, default=value), value=value)
+            for _, value in filtered
+        ]
+    return [
+        Choice(name=_T("server.bool."+value, default=value), value=value)
+        for value in possibilities
+    ]
 
 async def _autocomplete_enum(_bot: Axobot, _interaction: Interaction, option: EnumOptionRepresentation, current: str):
     "Autocompletion for enum options"
+    tr_key = f"server.enum.{option['option_name']}."
     if current:
         filtered = sorted(
             (not value.startswith(current), value)
             for value in option["values"]
             if current in value
         )
-        choices = [Choice(name=value, value=value) for _, value in filtered]
+        choices = [
+            Choice(name=_T(tr_key+value, default=value), value=value)
+            for _, value in filtered
+        ]
     else:
-        choices = [Choice(name=value, value=value) for value in option["values"]]
+        choices = [
+            Choice(name=_T(tr_key+value, default=value), value=value)
+            for value in option["values"]
+        ]
     return choices[:25]
 
 

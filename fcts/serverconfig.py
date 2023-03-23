@@ -429,7 +429,7 @@ class ServerConfig(commands.Cog):
         if not opt_data["is_listed"]:
             return await ctx.send(await self.bot._(ctx.guild.id, "server.option-notfound"))
         value = await self.get_option(guild.id, option)
-        if (display := to_display(option, value)) is None:
+        if (display := await to_display(option, value, guild, self.bot)) is None:
             display = "Ø"
         elif len(display) > 1024:
             display = display[:1023] + "…"
@@ -453,7 +453,7 @@ class ServerConfig(commands.Cog):
                 return await self.bot._(ctx.guild.id, f"server.set_success.levelup_channel.{value}", opt=option_name)
             else:
                 return await self.bot._(ctx.guild.id, f"server.set_success.levelup_channel.channel", opt=option_name, val=value.mention)
-        str_value = to_display(option_name, value)
+        str_value = await to_display(option_name, value, ctx.guild, self.bot)
         return await self.bot._(ctx.guild.id, f"server.set_success.{option_type}", opt=option_name, val=str_value)
 
     async def _get_set_error_message(self, ctx: MyContext, option_name: str, error: ValueError, value: Any):
