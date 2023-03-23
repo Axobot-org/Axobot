@@ -254,8 +254,11 @@ class Errors(commands.Cog):
             await self.on_error(error, f"Modal submission interaction | {guild}")
         elif interaction.type == discord.InteractionType.component:
             await self.on_error(error, f"Component interaction | {guild}")
+        elif interaction.type == discord.InteractionType.autocomplete:
+            await self.on_error(error, f"Command autocompletion | {guild}")
         else:
             self.bot.log.warn(f"Unhandled interaction error type: {interaction.type}")
+            await self.on_error(error, None)
 
     @commands.Cog.listener()
     async def on_error(self, error: Exception, ctx: typing.Optional[AllowedCtx] = None):
