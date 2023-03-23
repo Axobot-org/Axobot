@@ -419,9 +419,14 @@ class ServerLogs(commands.Cog):
                 colour=discord.Color.orange()
             )
             emb.set_author(name=str(message.author), icon_url=message.author.display_avatar)
-            if len(invites) == 1 and (invite := await self.bot.fetch_invite(invites[0])):
-                if invite.created_at:
-                    emb.add_field(name="Invite created at", value=f"<t:{invite.created_at.timestamp():.0f}>")
+            if len(invites) == 1:
+                try:
+                    invite = await self.bot.fetch_invite(invites[0])
+                except discord.HTTPException:
+                    pass
+                else:
+                    if invite.created_at:
+                        emb.add_field(name="Invite created at", value=f"<t:{invite.created_at.timestamp():.0f}>")
             emb.add_field(name="Message Author", value=f"{message.author} ({message.author.id})")
             emb.add_field(name="Message sent at", value=f"<t:{message.created_at.timestamp():.0f}>")
             invites_formatted: set[str] = set(invite.replace(' ', '') for invite in invites)
