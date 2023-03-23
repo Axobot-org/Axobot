@@ -173,9 +173,9 @@ class RandomForest:
         "Predict the class index for each given message"
         result = [0 for _ in range(len(x_dataset))]
         for tree in self.trees:
-            for i, x in enumerate(tree.predict(x_dataset)):
-                result[i] += x/len(self.trees)
-        return [round(x) for x in result]
+            for i, msg_class in enumerate(tree.predict(x_dataset)):
+                result[i] += msg_class/len(self.trees)
+        return [round(prediction) for prediction in result]
 
     def get_external_accuracy(self, data: list[Message]) -> float:
         "Get the model accuracy based on a given dataset"
