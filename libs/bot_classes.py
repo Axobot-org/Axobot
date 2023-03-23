@@ -4,7 +4,7 @@ import sys
 import time
 from io import BytesIO
 from json import dumps
-from typing import (TYPE_CHECKING, Any, Callable, Coroutine, Literal, Optional,
+from typing import (TYPE_CHECKING, Callable, Awaitable, Literal, Optional,
                     Union, overload)
 
 import discord
@@ -328,7 +328,7 @@ class Axobot(commands.bot.AutoShardedBot):
         return datetime.datetime.now(datetime.timezone.utc)
 
     @property
-    def _(self) -> Callable[..., Coroutine[Any, Any, str]]:
+    def _(self) -> Callable[..., Awaitable[str]]:
         """Translate something"""
         cog = self.get_cog('Languages')
         if cog is None:
