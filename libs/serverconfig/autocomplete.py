@@ -128,18 +128,25 @@ async def _autocomplete_role(_bot: Axobot, interaction: Interaction, option: Rol
         and (option["allow_everyone"] or not role.is_default())
     )
     if current:
+        current = current.lower()
         roles = sorted(
-            (not role.name.startswith(current), role.name.lower(), role.name, str(role.id))
+            (not role.name.lower().startswith(current), role.name.lower(), role.name, str(role.id))
             for role in filtered_roles
             if current.lower() in role.name.lower() or current == str(role.id)
         )
-        choices = [Choice(name=name, value=value) for _, _, name, value in roles]
+        choices = [
+            Choice(name=(name if name.startswith('@') else '@'+name), value=value)
+            for _, _, name, value in roles
+        ]
     else:
         roles = sorted(
             (role.name.lower(), role.name, str(role.id))
             for role in filtered_roles
         )
-        choices = [Choice(name=name, value=value) for _, name, value in roles]
+        choices = [
+            Choice(name=(name if name.startswith('@') else '@'+name), value=value)
+            for _, name, value in roles
+        ]
     return choices[:25]
 
 
@@ -156,18 +163,19 @@ async def _autocomplete_text_channel(_: Axobot, interaction: Interaction, option
         and (option["allow_non_nsfw_channels"] or channel.is_nsfw())
     )
     if current:
+        current = current.lower()
         channels = sorted(
             (not channel.name.startswith(current), channel.name.lower(), channel.name, str(channel.id))
             for channel in filtered_channels
             if current.lower() in channel.name.lower() or current == str(channel.id)
         )
-        choices = [Choice(name=name, value=value) for _, _, name, value in channels]
+        choices = [Choice(name='#'+name, value=value) for _, _, name, value in channels]
     else:
         channels = sorted(
             (channel.name.lower(), channel.name, str(channel.id))
             for channel in filtered_channels
         )
-        choices = [Choice(name=name, value=value) for _, name, value in channels]
+        choices = [Choice(name='#'+name, value=value) for _, name, value in channels]
     return choices[:25]
 
 
@@ -228,9 +236,9 @@ async def _autocomplete_emojis_list(_: Axobot, interaction: Interaction, option:
             previous = " ".join(typed_emojis[:-1]) + " "
         else:
             previous = ""
-        current = current.strip(":")
+        current = current.strip(":").lower()
         emojis = sorted(
-            (not emoji.name.startswith(current), emoji.name.lower(), ':'+emoji.name+':', str(emoji.id))
+            (not emoji.name.lower().startswith(current), emoji.name.lower(), ':'+emoji.name+':', str(emoji.id))
             for emoji in interaction.guild.emojis
             if current.lower() in emoji.name.lower() or current == str(emoji.id)
         )
@@ -266,5 +274,5 @@ async def _autocomplete_levelup_channel(_bot: Axobot, interaction: Interaction,
             for channel in interaction.guild.text_channels
         )
         choices = [Choice(name=value, value=value) for value in special_values]
-        choices += [Choice(name="#"+name, value=value) for _, name, value in channels]
+        choices += [Choice(name='#'+name, value=value) for _, name, value in channels]
     return choices[:25]
