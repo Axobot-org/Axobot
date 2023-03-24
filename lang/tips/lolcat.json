@@ -1,0 +1,12 @@
+{
+    "embed": {
+        "title": [
+            "PRO-TIP",
+            "Did u know?",
+            "Hey, wanna know smth cool?",
+            "Handy Hint!",
+            "Have u tried that?"
+        ]
+    },
+    "rank_card_personalisation": "U can change ur xp card with teh %{profile_cmd} cmd!"
+}
