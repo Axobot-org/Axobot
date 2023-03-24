@@ -16,6 +16,10 @@
             "false": "U do ur own job, okay?",
             "true": "I'll help u, no worries :green_heart:"
         },
+        "show_tips": {
+            "false": "U'll no longer get super cool tips from me",
+            "true": "I'll make sure to help u with super cool tips from now"
+        },
         "usernames_log": {
             "false": "U've disallowd the recordering of Ur usr names & nics",
             "true": "You've enabld the things taht i do with ur usr names & nicks"
