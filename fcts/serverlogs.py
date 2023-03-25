@@ -304,10 +304,10 @@ class ServerLogs(commands.Cog):
             if (now - entry.created_at).total_seconds() > 5:
                 continue
             if check is None or check(entry):
-                if stats_cog:
+                if stats_cog and action != discord.AuditLogAction.kick:
                     await stats_cog.on_serverlogs_audit_search(True)
                 return entry
-        if stats_cog:
+        if stats_cog and action != discord.AuditLogAction.kick:
             await stats_cog.on_serverlogs_audit_search(False)
 
 
