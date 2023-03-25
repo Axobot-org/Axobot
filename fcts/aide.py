@@ -54,7 +54,7 @@ class Help(commands.Cog):
         urls = ""
         bot_invite = "https://zrunner.me/" + ("invitezbot" if self.bot.entity_id == 0 else "invite-axobot")
         for i, url in enumerate([
-            'http://discord.gg/N55zY88',
+            'https://discord.gg/N55zY88',
             bot_invite,
             'https://zbot.rtfd.io/',
             'https://twitter.com/z_runnerr',
