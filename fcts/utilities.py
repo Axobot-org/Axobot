@@ -85,7 +85,7 @@ class Utilities(commands.Cog):
             return False
         if await self.bot.check_axobot_presence(ctx=ctx):
             if ctx.prefix and ctx.prefix.strip() == self.bot.user.mention:
-                invite = 'http://discord.gg/N55zY88'
+                invite = 'https://discord.gg/N55zY88'
                 await ctx.send(await self.bot._(ctx.guild.id, "errors.zbot-migration", invite=invite))
             return False
         if self.config is None:

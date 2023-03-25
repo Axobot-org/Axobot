@@ -26,8 +26,8 @@ importlib.reload(checks)
 
 
 
-web_link={'fr-minecraft':'http://fr-minecraft.net/rss.php',
-          'frm':'http://fr-minecraft.net/rss.php',
+web_link={'fr-minecraft':'https://fr-minecraft.net/rss.php',
+          'frm':'https://fr-minecraft.net/rss.php',
           'minecraft.net':'https://fr-minecraft.net/minecraft_net_rss.xml',
           'gunivers':'https://gunivers.net/feed/'
           }
