@@ -19,6 +19,10 @@
             "de": "German",
             "fr2": "Familiar French"
         },
+        "levelup_channel": {
+            "none": "no message",
+            "any": "any channel"
+        },
         "ttt_display": {
             "disabled": "disabled",
             "short": "short",

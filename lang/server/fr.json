@@ -19,6 +19,10 @@
             "de": "allemand",
             "fr2": "français familier"
         },
+        "levelup_channel": {
+            "none": "pas de message",
+            "any": "n'importe quel salon"
+        },
         "ttt_display": {
             "disabled": "désactivé",
             "short": "compressé",
