@@ -59,7 +59,7 @@ class Xp(commands.Cog):
     @commands.Cog.listener()
     async def on_ready(self):
         self.table = 'xp_beta' if self.bot.beta else 'xp'
-        await self.bdd_load_cache(-1)
+        await self.db_load_cache(None)
         if not self.bot.database_online:
             await self.bot.unload_extension("fcts.xp")
 
@@ -106,17 +106,17 @@ class Xp(commands.Cog):
         if len(content)<self.minimal_size or await self.check_spam(content) or await self.bot.potential_command(msg):
             return
         if len(self.cache["global"]) == 0:
-            await self.bdd_load_cache(-1)
+            await self.db_load_cache(None)
         giv_points = await self.calc_xp(msg)
         if msg.author.id in self.cache['global'].keys():
             prev_points = self.cache['global'][msg.author.id][1]
         else:
-            prev_points = await self.bdd_get_xp(msg.author.id, None)
+            prev_points = await self.db_get_xp(msg.author.id, None)
             if prev_points is not None and len(prev_points) > 0:
                 prev_points = prev_points[0]['xp']
             else:
                 prev_points = 0
-        await self.bdd_set_xp(msg.author.id, giv_points, 'add')
+        await self.db_set_xp(msg.author.id, giv_points, 'add')
         # check for sus people
         if msg.author.id in self.sus:
             await self.send_sus_msg(msg, giv_points)
@@ -131,7 +131,7 @@ class Xp(commands.Cog):
     async def add_xp_1(self, msg:discord.Message, rate: float):
         """MEE6-like xp type"""
         if msg.guild.id not in self.cache.keys():
-            await self.bdd_load_cache(msg.guild.id)
+            await self.db_load_cache(msg.guild.id)
         if msg.author.id in self.cache[msg.guild.id].keys():
             if time.time() - self.cache[msg.guild.id][msg.author.id][0] < 60:
                 return
@@ -141,12 +141,12 @@ class Xp(commands.Cog):
         if msg.author.id in self.cache[msg.guild.id].keys():
             prev_points = self.cache[msg.guild.id][msg.author.id][1]
         else:
-            prev_points = await self.bdd_get_xp(msg.author.id, msg.guild.id)
+            prev_points = await self.db_get_xp(msg.author.id, msg.guild.id)
             if prev_points is not None and len(prev_points) > 0:
                 prev_points = prev_points[0]['xp']
             else:
                 prev_points = 0
-        await self.bdd_set_xp(msg.author.id, giv_points, 'add', msg.guild.id)
+        await self.db_set_xp(msg.author.id, giv_points, 'add', msg.guild.id)
         # check for sus people
         if msg.author.id in self.sus:
             await self.send_sus_msg(msg, giv_points)
@@ -160,7 +160,7 @@ class Xp(commands.Cog):
     async def add_xp_2(self, msg:discord.Message, rate: float):
         """Local xp type"""
         if msg.guild.id not in self.cache.keys():
-            await self.bdd_load_cache(msg.guild.id)
+            await self.db_load_cache(msg.guild.id)
         if msg.author.id in self.cache[msg.guild.id].keys():
             if time.time() - self.cache[msg.guild.id][msg.author.id][0] < self.cooldown:
                 return
@@ -171,12 +171,12 @@ class Xp(commands.Cog):
         if msg.author.id in self.cache[msg.guild.id].keys():
             prev_points = self.cache[msg.guild.id][msg.author.id][1]
         else:
-            prev_points = await self.bdd_get_xp(msg.author.id, msg.guild.id)
+            prev_points = await self.db_get_xp(msg.author.id, msg.guild.id)
             if prev_points is not None and len(prev_points) > 0:
                 prev_points = prev_points[0]['xp']
             else:
                 prev_points = 0
-        await self.bdd_set_xp(msg.author.id, giv_points, 'add', msg.guild.id)
+        await self.db_set_xp(msg.author.id, giv_points, 'add', msg.guild.id)
         # check for sus people
         if msg.author.id in self.sus:
             await self.send_sus_msg(msg, giv_points)
@@ -327,7 +327,7 @@ class Xp(commands.Cog):
         await chan.send(embed=emb)
 
 
-    async def get_table(self, guild: int, createIfNeeded: bool=True):
+    async def get_table_name(self, guild: int, create_if_missing: bool=True):
         """Get the table name of a guild, and create one if no one exist"""
         if guild is None:
             return self.table
@@ -337,7 +337,7 @@ class Xp(commands.Cog):
             cursor.execute("SELECT 1 FROM `{}` LIMIT 1;".format(guild))
             return guild
         except mysql.connector.errors.ProgrammingError:
-            if createIfNeeded:
+            if create_if_missing:
                 cursor.execute("CREATE TABLE `{}` LIKE `example`;".format(guild))
                 self.bot.log.info(f"[get_table] XP Table `{guild}` created")
                 cursor.execute("SELECT 1 FROM `{}` LIMIT 1;".format(guild))
@@ -346,7 +346,7 @@ class Xp(commands.Cog):
                 return None
 
 
-    async def bdd_set_xp(self, userID: int, points: int, Type: str='add', guild: int=None):
+    async def db_set_xp(self, user_id: int, points: int, action: typing.Literal['add', 'set']='add', guild: int=None):
         """Ajoute/reset de l'xp à un utilisateur dans la database"""
         try:
             if not self.bot.database_online:
@@ -358,13 +358,13 @@ class Xp(commands.Cog):
                 cnx = self.bot.cnx_axobot
             else:
                 cnx = self.bot.cnx_xp
-            table = await self.get_table(guild)
+            table = await self.get_table_name(guild)
             cursor = cnx.cursor(dictionary = True)
-            if Type=='add':
-                query = ("INSERT INTO `{t}` (`userID`,`xp`) VALUES ('{u}','{p}') ON DUPLICATE KEY UPDATE xp = xp + '{p}';".format(t=table,p=points,u=userID))
+            if action == 'add':
+                query = f"INSERT INTO `{table}` (`userID`,`xp`) VALUES (%(u)s, %(p)s) ON DUPLICATE KEY UPDATE xp = xp + %(p)s;"
             else:
-                query = ("INSERT INTO `{t}` (`userID`,`xp`) VALUES ('{u}','{p}') ON DUPLICATE KEY UPDATE xp = '{p}';".format(t=table,p=points,u=userID))
-            cursor.execute(query)
+                query = f"INSERT INTO `{table}` (`userID`,`xp`) VALUES (%(u)s, %(p)s) ON DUPLICATE KEY UPDATE xp = %(p)s;"
+            cursor.execute(query, {'p': points, 'u': user_id})
             cnx.commit()
             cursor.close()
             return True
@@ -372,48 +372,49 @@ class Xp(commands.Cog):
             self.bot.dispatch("error", err)
             return False
 
-    async def bdd_get_xp(self, userID: int, guild: int):
+    async def db_get_xp(self, user_id: int, guild_id: typing.Optional[int]):
+        "Get the xp of a user in a guild"
         try:
             if not self.bot.database_online:
                 await self.bot.unload_extension("fcts.xp")
                 return None
-            if guild is None:
+            if guild_id is None:
                 cnx = self.bot.cnx_axobot
             else:
                 cnx = self.bot.cnx_xp
-            table = await self.get_table(guild, False)
+            table = await self.get_table_name(guild_id, False)
             if table is None:
                 return None
-            query = ("SELECT `xp` FROM `{}` WHERE `userID`={} AND `banned`=0".format(table,userID))
+            query = f"SELECT `xp` FROM `{table}` WHERE `userID` = %s AND `banned` = 0"
             cursor = cnx.cursor(dictionary = True)
-            cursor.execute(query)
+            cursor.execute(query, (user_id,))
             liste = list()
             for x in cursor:
                 liste.append(x)
             if len(liste) == 1:
-                g = 'global' if guild is None else guild
+                g = 'global' if guild_id is None else guild_id
                 if isinstance(g, int) and g not in self.cache:
-                    await self.bdd_load_cache(g)
-                if userID in self.cache[g].keys():
-                    self.cache[g][userID][1] = liste[0]['xp']
+                    await self.db_load_cache(g)
+                if user_id in self.cache[g].keys():
+                    self.cache[g][user_id][1] = liste[0]['xp']
                 else:
-                    self.cache[g][userID] = [round(time.time())-60,liste[0]['xp']]
+                    self.cache[g][user_id] = [round(time.time())-60,liste[0]['xp']]
             cursor.close()
             return liste
         except Exception as err:
             self.bot.dispatch("error", err)
 
-    async def bdd_get_nber(self, guild: int=None):
-        """Get the number of ranked users"""
+    async def db_get_users_count(self, guild_id: typing.Optional[int]=None):
+        """Get the number of ranked users in a guild (or in the global database)"""
         try:
             if not self.bot.database_online:
                 await self.bot.unload_extension("fcts.xp")
                 return None
-            if guild is None:
+            if guild_id is None:
                 cnx = self.bot.cnx_axobot
             else:
                 cnx = self.bot.cnx_xp
-            table = await self.get_table(guild, False)
+            table = await self.get_table_name(guild_id, False)
             if table is None:
                 return 0
             query = ("SELECT COUNT(*) FROM `{}` WHERE `banned`=0".format(table))
@@ -429,21 +430,21 @@ class Xp(commands.Cog):
         except Exception as err:
             self.bot.dispatch("error", err)
 
-    async def bdd_load_cache(self, guild: int):
+    async def db_load_cache(self, guild_id: typing.Optional[int]):
+        "Load the XP cache for a given guild (or the global cache)"
         try:
             if not self.bot.database_online:
                 await self.bot.unload_extension("fcts.xp")
                 return
-            target_global = (guild == -1)
-            if target_global:
+            if guild_id is None:
                 self.bot.log.info("[xp] Loading XP cache (global)")
                 cnx = self.bot.cnx_axobot
                 query = ("SELECT `userID`,`xp` FROM `{}` WHERE `banned`=0".format(self.table))
             else:
-                self.bot.log.info("[xp] Loading XP cache (guild {})".format(guild))
-                table = await self.get_table(guild,False)
+                self.bot.log.info("[xp] Loading XP cache (guild {})".format(guild_id))
+                table = await self.get_table_name(guild_id,False)
                 if table is None:
-                    self.cache[guild] = dict()
+                    self.cache[guild_id] = dict()
                     return
                 cnx = self.bot.cnx_xp
                 query = ("SELECT `userID`,`xp` FROM `{}` WHERE `banned`=0".format(table))
@@ -452,32 +453,34 @@ class Xp(commands.Cog):
             liste = list()
             for x in cursor:
                 liste.append(x)
-            if target_global:
+            if guild_id is None:
                 if len(self.cache['global'].keys()) == 0:
                     self.cache['global'] = dict()
                 for l in liste:
                     self.cache['global'][l['userID']] = [round(time.time())-60, int(l['xp'])]
             else:
-                if guild not in self.cache.keys():
-                    self.cache[guild] = dict()
+                if guild_id not in self.cache.keys():
+                    self.cache[guild_id] = dict()
                 for l in liste:
-                    self.cache[guild][l['userID']] = [round(time.time())-60, int(l['xp'])]
+                    self.cache[guild_id][l['userID']] = [round(time.time())-60, int(l['xp'])]
             cursor.close()
             return
         except Exception as err:
             self.bot.dispatch("error", err)
 
-    async def bdd_get_top(self, top: int=None, guild: discord.Guild=None):
+    async def db_get_top(self, limit: int=None, guild: discord.Guild=None):
+        "Get the top of the guild (or the global top)"
         try:
             if not self.bot.database_online:
                 await self.bot.unload_extension("fcts.xp")
                 return None
             if guild is not None and await self.bot.get_config(guild.id, "xp_type") != "global":
                 cnx = self.bot.cnx_xp
-                query = ("SELECT * FROM `{}` order by `xp` desc".format(await self.get_table(guild.id,False)))
+                table = await self.get_table_name(guild.id, False)
+                query = f"SELECT * FROM `{table}`ORDER BY `xp` DESC"
             else:
                 cnx = self.bot.cnx_axobot
-                query = ("SELECT * FROM `{}` order by `xp` desc".format(self.table))
+                query = f"SELECT * FROM `{self.table}` ORDER BY `xp` DESC"
             cursor = cnx.cursor(dictionary = True)
             try:
                 cursor.execute(query)
@@ -488,15 +491,15 @@ class Xp(commands.Cog):
             liste = list()
             if guild is None:
                 liste = list(cursor)
-                if top is not None:
-                    liste = liste[:top]
+                if limit is not None:
+                    liste = liste[:limit]
             else:
                 ids = [x.id for x in guild.members]
                 i = 0
                 l2 = list(cursor)
-                if top is None:
-                    top = len(l2)
-                while len(liste)<top and i<len(l2):
+                if limit is None:
+                    limit = len(l2)
+                while len(liste)<limit and i<len(l2):
                     if l2[i]['userID'] in ids:
                         liste.append(l2[i])
                     i += 1
@@ -505,7 +508,7 @@ class Xp(commands.Cog):
         except Exception as err:
             self.bot.dispatch("error", err)
 
-    async def bdd_get_rank(self, user_id: int, guild: discord.Guild=None):
+    async def db_get_rank(self, user_id: int, guild: discord.Guild=None):
         """Get the rank of a user"""
         try:
             if not self.bot.database_online:
@@ -513,10 +516,11 @@ class Xp(commands.Cog):
                 return None
             if guild is not None and await self.bot.get_config(guild.id, "xp_type") != "global":
                 cnx = self.bot.cnx_xp
-                query = ("SELECT `userID`,`xp`, @curRank := @curRank + 1 AS rank FROM `{}` p, (SELECT @curRank := 0) r WHERE `banned`='0' ORDER BY xp desc;".format(await self.get_table(guild.id, False)))
+                table = await self.get_table_name(guild.id, False)
+                query = f"SELECT `userID`,`xp`, @curRank := @curRank + 1 AS rank FROM `{table}` p, (SELECT @curRank := 0) r WHERE `banned`='0' ORDER BY xp desc;"
             else:
                 cnx = self.bot.cnx_axobot
-                query = ("SELECT `userID`,`xp`, @curRank := @curRank + 1 AS rank FROM `{}` p, (SELECT @curRank := 0) r WHERE `banned`='0' ORDER BY xp desc;".format(self.table))
+                query = f"SELECT `userID`,`xp`, @curRank := @curRank + 1 AS rank FROM `{self.table}` p, (SELECT @curRank := 0) r WHERE `banned`='0' ORDER BY xp desc;"
             cursor = cnx.cursor(dictionary = True)
             try:
                 cursor.execute(query)
@@ -524,11 +528,11 @@ class Xp(commands.Cog):
                 if err.errno == 1146:
                     return {"rank":0, "xp":0}
                 raise err
-            userdata = dict()
+            userdata = {}
             i = 0
-            users = list()
+            users = set()
             if guild is not None:
-                users = [x.id for x in guild.members]
+                users = {x.id for x in guild.members}
             for x in cursor:
                 if (guild is not None and x['userID'] in users) or guild is None:
                     i += 1
@@ -542,7 +546,7 @@ class Xp(commands.Cog):
         except Exception as err:
             self.bot.dispatch("error", err)
 
-    async def bdd_total_xp(self):
+    async def db_get_total_xp(self):
         """Get the total number of earned xp"""
         try:
             if not self.bot.database_online:
@@ -551,17 +555,6 @@ class Xp(commands.Cog):
             query = f"SELECT SUM(xp) as total FROM `{self.table}`"
             async with self.bot.db_query(query, fetchone=True) as query_results:
                 result = round(query_results['total'])
-
-            # cnx = self.bot.cnx_xp
-            # cursor = cnx.cursor()
-            # cursor.execute("show tables")
-            # tables = [x[0] for x in cursor if x[0].isnumeric()]
-            # for table in tables:
-            #     cursor.execute("SELECT SUM(xp) FROM `{}`".format(table))
-            #     res = [x for x in cursor]
-            #     if res[0][0] is not None:
-            #         result += round(res[0][0])
-            # cursor.close()
             return result
         except Exception as err:
             self.bot.dispatch("error", err)
@@ -695,7 +688,7 @@ class Xp(commands.Cog):
         return (45,180,105)
 
     async def get_xp(self, user: discord.User, guild_id: int):
-        xp = await self.bdd_get_xp(user.id, guild_id)
+        xp = await self.db_get_xp(user.id, guild_id)
         if xp is None or (isinstance(xp,list) and len(xp) == 0):
             return
         return xp[0]['xp']
@@ -731,15 +724,15 @@ class Xp(commands.Cog):
                 return await ctx.send(await self.bot._(ctx.channel, "xp.2-no-xp"))
             levels_info = None
             if xp_used_type == "global":
-                ranks_nb = await self.bdd_get_nber()
+                ranks_nb = await self.db_get_users_count()
                 try:
-                    rank = (await self.bdd_get_rank(user.id))['rank']
+                    rank = (await self.db_get_rank(user.id))['rank']
                 except KeyError:
                     rank = "?"
             else:
-                ranks_nb = await self.bdd_get_nber(ctx.guild.id)
+                ranks_nb = await self.db_get_users_count(ctx.guild.id)
                 try:
-                    rank = (await self.bdd_get_rank(user.id,ctx.guild))['rank']
+                    rank = (await self.db_get_rank(user.id,ctx.guild))['rank']
                 except KeyError:
                     rank = "?"
             if isinstance(rank, float):
@@ -898,16 +891,15 @@ class Xp(commands.Cog):
         if xp_system_used == "global":
             if scope == 'global':
                 if len(self.cache["global"]) == 0:
-                    await self.bdd_load_cache(-1)
+                    await self.db_load_cache(None)
                 ranks = sorted([{'userID':key, 'xp':value[1]} for key,value in self.cache['global'].items()], key=lambda x:x['xp'], reverse=True)
                 max_page = ceil(len(self.cache['global'])/20)
             elif scope == 'guild':
-                ranks = await self.bdd_get_top(10000, guild=ctx.guild)
+                ranks = await self.db_get_top(10000, guild=ctx.guild)
                 max_page = ceil(len(ranks)/20)
         else:
-            #ranks = await self.bdd_get_top(20*page,guild=ctx.guild)
             if not ctx.guild.id in self.cache.keys():
-                await self.bdd_load_cache(ctx.guild.id)
+                await self.db_load_cache(ctx.guild.id)
             ranks = sorted([{'userID':key, 'xp':value[1]} for key,value in self.cache[ctx.guild.id].items()], key=lambda x:x['xp'], reverse=True)
             max_page = ceil(len(ranks)/20)
         if page < 1:
@@ -926,7 +918,7 @@ class Xp(commands.Cog):
             await asyncio.sleep(0.2)
         f_name = await self.bot._(ctx.channel, "xp.top-name", min=(page-1)*20+1, max=i, page=page, total=max_page)
         # author
-        rank = await self.bdd_get_rank(ctx.author.id,ctx.guild if (scope=='guild' or xp_system_used != "global") else None)
+        rank = await self.db_get_rank(ctx.author.id,ctx.guild if (scope=='guild' or xp_system_used != "global") else None)
         if len(rank) == 0:
             your_rank = {'name':"__"+await self.bot._(ctx.channel, "xp.top-your")+"__",'value':await self.bot._(ctx.guild, "xp.1-no-xp")}
         else:
@@ -978,14 +970,14 @@ class Xp(commands.Cog):
         try:
             xp_used_type: str = await self.bot.get_config(ctx.guild.id, "xp_type")
             prev_xp = await self.get_xp(user, None if xp_used_type == "global" else ctx.guild.id)
-            await self.bdd_set_xp(user.id, xp, Type='set', guild=ctx.guild.id)
+            await self.db_set_xp(user.id, xp, action='set', guild=ctx.guild.id)
             await ctx.send(await self.bot._(ctx.guild.id, "xp.change-xp-ok", user=str(user), xp=xp))
         except Exception as err:
             await ctx.send(await self.bot._(ctx.guild.id, "minecraft.serv-error"))
             self.bot.dispatch("error", err, ctx)
         else:
             if ctx.guild.id not in self.cache.keys():
-                await self.bdd_load_cache(ctx.guild.id)
+                await self.db_load_cache(ctx.guild.id)
             self.cache[ctx.guild.id][user.id] = [round(time.time()), xp]
             s = "XP of user {} `{}` edited (from {} to {}) in server `{}`".format(user, user.id, prev_xp, xp, ctx.guild.id)
             self.bot.log.info("[xp] " + s)
@@ -1110,7 +1102,7 @@ class Xp(commands.Cog):
             used_system: str = await self.bot.get_config(ctx.guild.id, "xp_type")
             xps = [
                 {'user':x['userID'],'xp':x['xp']}
-                for x in await self.bdd_get_top(top=None, guild=None if used_system == "global" else ctx.guild)
+                for x in await self.db_get_top(limit=None, guild=None if used_system == "global" else ctx.guild)
             ]
             for member in xps:
                 m = ctx.guild.get_member(member['user'])
