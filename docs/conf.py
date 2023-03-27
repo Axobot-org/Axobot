@@ -26,7 +26,9 @@ author = 'ZRunner'
 # The short X.Y version
 version = '4.3'
 # The full version, including alpha/beta/rc tags
-release = '4.3.1'
+release = '4.3.2'
+
+_documentation_name = "Axobot Documentation"
 
 
 # -- General configuration ---------------------------------------------------
@@ -98,7 +100,7 @@ html_static_path = []
 #
 # html_sidebars = {}
 
-html_title = "Axobot Documentation"
+html_title = _documentation_name
 
 html_copy_source = False
 
@@ -133,7 +135,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'axobot.tex', 'Axobot Documentation',
+    (master_doc, 'axobot.tex', _documentation_name,
      'ZRunner', 'manual'),
 ]
 
@@ -143,7 +145,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'axobot', 'Axobot Documentation',
+    (master_doc, 'axobot', _documentation_name,
      [author], 1)
 ]
 
@@ -154,7 +156,7 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'axobot', 'Axobot Documentation',
+    (master_doc, 'axobot', _documentation_name,
      author, 'axobot', 'Axobot is a cool multipurpose Discord bot.',
      'Miscellaneous'),
 ]
