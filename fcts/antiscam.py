@@ -373,7 +373,7 @@ class AntiScam(commands.Cog):
         if not await self.bot.get_config(msg.guild.id, "anti_scam"):
             return
         message: Message = Message.from_raw(msg.content, len(msg.mentions), self.agent.websites_list)
-        if len(message.normd_message) < 3:
+        if len(message.normd_message.split()) < 3:
             return
         result = self.agent.predict_bot(message)
         if result.result > 1:
