@@ -791,7 +791,9 @@ class Xp(commands.Cog):
                     pass
             else:
                 await ctx.send(file=myfile)
-        except discord.errors.HTTPException:
+        except discord.errors.Forbidden:
+            await ctx.send(await self.bot._(ctx.channel, "xp.card-forbidden"))
+        except discord.errors.HTTPException as err:
             await ctx.send(await self.bot._(ctx.channel, "xp.card-too-large"))
         else:
             if style == self.default_xp_style:
