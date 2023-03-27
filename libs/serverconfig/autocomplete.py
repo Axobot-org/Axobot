@@ -264,15 +264,19 @@ async def _autocomplete_levelup_channel(_bot: Axobot, interaction: Interaction,
         )
         choices = [Choice(name=name, value=value) for _, _, name, value in channels][:23]
         for value in special_values:
+            value_name = _T("server.enum.levelup_channel." + value, default=value)
             if value.startswith(current):
-                choices = [Choice(name=value, value=value)] + choices
+                choices = [Choice(name=value_name, value=value)] + choices
             else:
-                choices.append(Choice(name=value, value=value))
+                choices.append(Choice(name=value_name, value=value))
     else:
         channels = sorted(
             (channel.name.lower(), channel.name, str(channel.id))
             for channel in interaction.guild.text_channels
         )
-        choices = [Choice(name=value, value=value) for value in special_values]
+        choices = [
+            Choice(name=_T("server.enum.levelup_channel." + value, default=value), value=value)
+            for value in special_values
+        ]
         choices += [Choice(name='#'+name, value=value) for _, name, value in channels]
     return choices[:25]

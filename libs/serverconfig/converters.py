@@ -673,10 +673,10 @@ class LevelupChannelOption(OptionConverter):
         return TextChannelOption.to_raw(value)
 
     @staticmethod
-    def to_display(_option_name, value: Union[str, discord.TextChannel]):
+    def to_display(option_name, value: Union[str, discord.TextChannel]):
         if isinstance(value, str):
-            return value
-        return TextChannelOption.to_display(value)
+            return _T(f"server.enum.{option_name}.{value}")
+        return TextChannelOption.to_display(option_name, value)
 
     @staticmethod
     async def from_input(raw: str, repr: LevelupChannelOptionRepresentation, guild: discord.Guild, ctx: MyContext):
