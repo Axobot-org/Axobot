@@ -119,7 +119,7 @@ class Info(commands.Cog):
             users,bots = self.get_users_nber(ignored_guilds)
             # Total XP
             if self.bot.database_online:
-                total_xp = await self.bot.get_cog('Xp').bdd_total_xp()
+                total_xp = await self.bot.get_cog('Xp').db_get_total_xp()
             else:
                 total_xp = ""
             # Commands within 24h

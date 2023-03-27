@@ -157,9 +157,9 @@ class Welcomer(commands.Cog):
             return
         used_xp_type: str = await self.bot.get_config(member.guild.id, "xp_type")
         if used_xp_type == "global":
-            xp = await self.bot.get_cog('Xp').bdd_get_xp(member.id, None)
+            xp = await self.bot.get_cog('Xp').db_get_xp(member.id, None)
         else:
-            xp = await self.bot.get_cog('Xp').bdd_get_xp(member.id, member.guild.id)
+            xp = await self.bot.get_cog('Xp').db_get_xp(member.id, member.guild.id)
         if xp is not None and len(xp) == 1:
             await self.bot.get_cog('Xp').give_rr(
                 member,
