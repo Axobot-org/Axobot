@@ -1,6 +1,7 @@
 from typing import TYPE_CHECKING
 
 from discord import Locale, app_commands
+from discord.app_commands.translator import TranslationContextLocation
 
 if TYPE_CHECKING:
     from libs.bot_classes import Axobot
@@ -17,9 +18,15 @@ class AxobotTranslator(app_commands.Translator):
             lang = "en"
         elif locale == Locale.finnish:
             lang = "fi"
-        else:
+        elif locale in {Locale.british_english, Locale.american_english}:
             lang = "en"
-        result = await self.bot.get_cog("Languages")._get_translation(lang, string.message)
-        if result == string.message and "." in result:
+        elif context.location == TranslationContextLocation.choice_name:
+            lang = "en"
+        else:
+            return None
+        try:
+            result = await self.bot.get_cog("Languages").get_translation(lang, string.message)
+        except KeyError:
+            self.bot.log.warning(f"[translator] Missing translation for '{string.message}' in {locale} ({lang})")
             return string.extras.get("default")
         return result
