@@ -333,8 +333,8 @@ class Admin(commands.Cog):
         if branch:
             try:
                 repo.git.checkout(branch)
-            except exc.GitCommandError as e:
-                self.bot.dispatch("command_error", ctx, e)
+            except exc.GitCommandError as err:
+                self.bot.dispatch("command_error", ctx, err)
             else:
                 msg = await msg.edit(content=msg.content+f"\nBranche {branch} correctement sélectionnée")
         origin = repo.remotes.origin
