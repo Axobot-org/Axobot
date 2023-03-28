@@ -86,19 +86,18 @@ class Languages(discord.ext.commands.Cog):
         if lang_opt not in self.languages:
             # if lang not known: fallback to default
             lang_opt = self.default_language
-        return await self._get_translation(lang_opt, string_id, **kwargs)
+        try:
+            return await self.get_translation(lang_opt, string_id, **kwargs)
+        except KeyError:
+            await self.msg_not_found(string_id, lang_opt)
+            if lang_opt == "en":
+                return string_id
+            return await self.get_translation("en", string_id, **kwargs)
 
-    async def _get_translation(self, locale: str, string_id: str, **kwargs) -> Union[str, list]:
+    async def get_translation(self, locale: str, string_id: str, **kwargs) -> Union[str, list]:
         if string_id == '_used_locale':
             return locale
-        try:
-            translation = i18n.t(string_id, locale=locale, **kwargs)
-        except KeyError:
-            await self.msg_not_found(string_id, locale)
-            if locale == "en":
-                return string_id
-            return await self._get_translation("en", string_id, **kwargs)
-        return translation
+        return i18n.t(string_id, locale=locale, **kwargs)
 
     async def msg_not_found(self, string_id: str, lang: str):
         "Signal to the dev that a translation is missing"
