@@ -482,6 +482,7 @@ class ServerConfig(commands.Cog):
         if option_name not in options_list:
             await ctx.send(await self.bot._(ctx.guild.id, "server.option-notfound"))
             return
+        await ctx.defer()
         try:
             value = await from_input(option_name, raw_input, ctx.guild, ctx)
         except ValueError as err:
