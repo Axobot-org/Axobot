@@ -15,12 +15,12 @@ import aiohttp
 import discord
 import mysql
 import numpy as np
+from discord import app_commands
 from discord.ext import commands
 from PIL import Image, ImageDraw, ImageEnhance, ImageFont, ImageSequence
 
-from libs.tips import UserTip
-
 from fcts import args, checks
+from libs.tips import UserTip
 
 importlib.reload(args)
 importlib.reload(checks)
@@ -693,10 +693,11 @@ class Xp(commands.Cog):
             return
         return xp[0]['xp']
 
-    @commands.command(name="rank")
+    @commands.hybrid_command(name="rank")
+    @app_commands.describe(user="The user to get the rank of. If not specified, it will be you.")
     @commands.bot_has_permissions(send_messages=True)
-    @commands.cooldown(1,20,commands.BucketType.user)
-    async def rank(self, ctx: MyContext, *, user: args.user=None):
+    @commands.cooldown(1, 20, commands.BucketType.user)
+    async def rank(self, ctx: MyContext, *, user: typing.Optional[discord.User]=None):
         """Display a user XP.
         If you don't send any user, I'll display your own XP
 
@@ -711,6 +712,8 @@ class Xp(commands.Cog):
                 user = ctx.author
             if user.bot:
                 return await ctx.send(await self.bot._(ctx.channel, "xp.bot-rank"))
+            send_in_private = ctx.guild is None or await self.bot.get_config(ctx.guild.id, "rank_in_dm")
+            await ctx.defer(ephemeral=send_in_private)
             if ctx.guild is not None:
                 if not await self.bot.get_config(ctx.guild.id, "enable_xp"):
                     return await ctx.send(await self.bot._(ctx.guild.id, "xp.xp-disabled"))
@@ -871,15 +874,15 @@ class Xp(commands.Cog):
     @commands.command(name="top")
     @commands.bot_has_permissions(send_messages=True)
     @commands.cooldown(5,60,commands.BucketType.user)
-    async def top(self, ctx: MyContext, page: typing.Optional[int]=1, scope: args.LeaderboardType='global'):
+    async def top(self, ctx: MyContext, page: typing.Optional[int]=1, scope: typing.Literal["global", "server"]='global'):
         """Get the list of the highest levels
         Each page has 20 users
 
         ..Example top 3
 
-        ..Example top 7 guild
+        ..Example top 7 server
 
-        ..Example top guild
+        ..Example top server
 
         ..Doc user.html#get-the-general-ranking"""
         if ctx.guild is not None:
@@ -957,7 +960,7 @@ class Xp(commands.Cog):
     @commands.command(name='set_xp', aliases=["setxp", "set-xp"])
     @commands.guild_only()
     @commands.check(checks.has_admin)
-    async def set_xp(self, ctx: MyContext, user: args.user, xp: int):
+    async def set_xp(self, ctx: MyContext, user: discord.User, xp: int):
         """Set the XP of a user
 
         ..Example set_xp 3000 @someone"""
