@@ -32,6 +32,7 @@
     "notduringevent": "This command is only available during certain events. Check %{cmd} for more info!",
     "notrightroles": "You don't have the necessary roles for this command",
     "quoteserror": "Oops, a quotation mark error has occurred. Be sure to correctly use the quotes \", so that each open quote will be closed further on",
+    "rangeerror": "This value must be no less than %{min}, but you sent %{value}",
     "rolenotfound": "Unable to find the role `%{r}`",
     "toomanytxtchan": "You have too many accessible text channels",
     "unknown": "Oops, an error occurred :confused: Try again later, or contact support (command %{about}).",
