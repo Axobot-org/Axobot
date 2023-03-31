@@ -474,7 +474,9 @@ class ServerLogs(commands.Cog):
     async def handle_member_roles(self, before: discord.Member, after: discord.Member, channel_ids: list[int]):
         "Handle member_roles log"
         added_roles = [role for role in after.roles if role not in before.roles]
-        removed_roles = [role for role in before.roles if role not in after.roles]
+        removed_roles = [role for role in before.roles if role not in after.roles and role in after.guild.roles]
+        if len(added_roles) == 0 and len(removed_roles) == 0:
+            return
         emb = discord.Embed(
             description=f"**Member {before.mention} ({before.id}) updated**",
             color=discord.Color.blurple()
