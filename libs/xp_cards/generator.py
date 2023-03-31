@@ -3,14 +3,16 @@ from PIL import Image, ImageDraw, ImageFont
 from libs.xp_cards.card_types import CardData, RgbColor, TextData
 from libs.xp_cards.cards_metadata import get_card_data
 
+CARD_SIZE = (1021, 340)
+
 
 def paste_avatar(avatar: Image.Image, dest: Image.Image, position: tuple[int, int]):
     """Paste the avatar onto the destination image"""
-    pos_x, pos_y = position
-    mask_img = dest.copy().crop((pos_x, pos_y, pos_x + avatar.width, pos_y + avatar.height))
-    alpha = mask_img.split()[3]
-    mask = Image.eval(alpha, lambda x: 255 if x < 8 else 0)
-    dest.paste(avatar, (pos_x, pos_y), mask)
+    mask = Image.open("./assets/card-models/mask_1_pfp.png")
+    mask = mask.resize(CARD_SIZE, resample=Image.Resampling.LANCZOS)
+    mask = mask.crop(mask.getbbox())
+    avatar = avatar.resize(mask.size, resample=Image.Resampling.LANCZOS)
+    dest.paste(avatar, position, mask=mask)
 
 def add_text(dest: Image.Image, texts: dict[str, TextData]):
     """Add text to the destination image"""
@@ -57,7 +59,7 @@ def add_text(dest: Image.Image, texts: dict[str, TextData]):
 def draw_xp_bar_1(dest: Image.Image, full_bar_color: RgbColor, xp_percent: float):
     "Replace gray pixels in the xp bar with the full_bar_color"
     right_border = (967-302)*xp_percent + 302
-    mask = Image.open("./assets/card-models/xp_bar_mask_1.png")
+    mask = Image.open("./assets/card-models/mask_1_xp_bar.png")
     mask = mask.crop((0, 0, round(right_border), 340))
     dest.paste(full_bar_color, mask=mask)
     return dest
@@ -66,17 +68,16 @@ def draw_xp_bar_2(dest: Image.Image, full_bar_color: RgbColor, xp_percent: float
     "Replace gray pixels in the xp bar with the full_bar_color"
     # Bar starts at 29 and ends at 992
     right_border = (992-29)*xp_percent + 29
-    mask = Image.open("./assets/card-models/xp_bar_mask_2.png")
+    mask = Image.open("./assets/card-models/mask_2_xp_bar.png")
     mask = mask.crop((0, 0, round(right_border), 340))
     dest.paste(full_bar_color, mask=mask)
     return dest
 
 def draw_card(avatar: Image.Image, data: CardData):
     "Do the magic"
-    background_img = Image.open("./assets/card-models/" + data['type'] + ".png")
+    background_img = Image.open("./assets/card-models/" + data['type'] + ".png").resize(CARD_SIZE)
 
-    avatar_img = avatar.resize(data['avatar_size'], resample=Image.Resampling.LANCZOS)
-    paste_avatar(avatar_img, background_img, data['avatar_position'])
+    paste_avatar(avatar, background_img, data['avatar_position'])
     add_text(background_img, data['texts'])
     if data['xp_bar_type'] == 1:
         background_img = draw_xp_bar_1(background_img, data['xp_bar_color'], data['xp_percent'])

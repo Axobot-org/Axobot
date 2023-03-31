@@ -93,9 +93,9 @@
                             255
                         ]
                     ],
-                    "font_size": 23,
+                    "font_size": 22,
                     "alignment": "center",
-                    "font": "RobotoSlab-Regular.ttf"
+                    "font": "Verdana.ttf"
                 }
             }
         },
