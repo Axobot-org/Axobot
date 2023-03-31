@@ -33,7 +33,7 @@ class Paginator(ui.View):
 
     async def send_init(self, ctx: MyContext):
         "Build the first page, before anyone actually click"
-        contents = await self.get_page_content(None, 1)
+        contents = await self.get_page_content(None, self.page)
         await self._update_buttons()
         return await ctx.send(**contents, view=self)
 
