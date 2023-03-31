@@ -6,21 +6,21 @@ import random
 import re
 import string
 import time
-import typing
 from io import BytesIO
-from math import ceil, sqrt
-from urllib.request import Request, urlopen
+from math import ceil
+from typing import Literal, Optional
 
 import aiohttp
 import discord
 import mysql
-import numpy as np
 from discord import app_commands
 from discord.ext import commands
-from PIL import Image, ImageDraw, ImageEnhance, ImageFont, ImageSequence
+from PIL import Image, ImageFont
 
 from fcts import args, checks
 from libs.tips import UserTip
+from libs.xp_cards.cards_metadata import get_card_data
+from libs.xp_cards.generator import draw_card
 
 importlib.reload(args)
 importlib.reload(checks)
@@ -29,6 +29,7 @@ from libs.serverconfig.options_list import options
 
 
 class Xp(commands.Cog):
+    "XP system"
 
     def __init__(self, bot: Axobot):
         self.bot = bot
@@ -97,9 +98,9 @@ class Xp(commands.Cog):
         elif used_xp_type == "local":
             await self.add_xp_2(msg, rate)
 
-    async def add_xp_0(self, msg: discord.Message, rate: float):
+    async def add_xp_0(self, msg: discord.Message, _rate: float):
         """Global xp type"""
-        if msg.author.id in self.cache['global'].keys():
+        if msg.author.id in self.cache['global']:
             if time.time() - self.cache['global'][msg.author.id][0] < self.cooldown:
                 return
         content = msg.clean_content
@@ -108,14 +109,10 @@ class Xp(commands.Cog):
         if len(self.cache["global"]) == 0:
             await self.db_load_cache(None)
         giv_points = await self.calc_xp(msg)
-        if msg.author.id in self.cache['global'].keys():
+        if msg.author.id in self.cache['global']:
             prev_points = self.cache['global'][msg.author.id][1]
         else:
-            prev_points = await self.db_get_xp(msg.author.id, None)
-            if prev_points is not None and len(prev_points) > 0:
-                prev_points = prev_points[0]['xp']
-            else:
-                prev_points = 0
+            prev_points = await self.db_get_xp(msg.author.id, None) or 0
         await self.db_set_xp(msg.author.id, giv_points, 'add')
         # check for sus people
         if msg.author.id in self.sus:
@@ -141,11 +138,7 @@ class Xp(commands.Cog):
         if msg.author.id in self.cache[msg.guild.id].keys():
             prev_points = self.cache[msg.guild.id][msg.author.id][1]
         else:
-            prev_points = await self.db_get_xp(msg.author.id, msg.guild.id)
-            if prev_points is not None and len(prev_points) > 0:
-                prev_points = prev_points[0]['xp']
-            else:
-                prev_points = 0
+            prev_points = await self.db_get_xp(msg.author.id, msg.guild.id) or 0
         await self.db_set_xp(msg.author.id, giv_points, 'add', msg.guild.id)
         # check for sus people
         if msg.author.id in self.sus:
@@ -171,11 +164,7 @@ class Xp(commands.Cog):
         if msg.author.id in self.cache[msg.guild.id].keys():
             prev_points = self.cache[msg.guild.id][msg.author.id][1]
         else:
-            prev_points = await self.db_get_xp(msg.author.id, msg.guild.id)
-            if prev_points is not None and len(prev_points) > 0:
-                prev_points = prev_points[0]['xp']
-            else:
-                prev_points = 0
+            prev_points = await self.db_get_xp(msg.author.id, msg.guild.id) or 0
         await self.db_set_xp(msg.author.id, giv_points, 'add', msg.guild.id)
         # check for sus people
         if msg.author.id in self.sus:
@@ -192,7 +181,7 @@ class Xp(commands.Cog):
         """Check if this channel/user can get xp"""
         if msg.guild is None:
             return False
-        chans: typing.Optional[discord.abc.MessageableChannel] = await self.bot.get_config(msg.guild.id, "noxp_channels")
+        chans: Optional[discord.abc.MessageableChannel] = await self.bot.get_config(msg.guild.id, "noxp_channels")
         return chans is not None and msg.channel in chans
 
 
@@ -205,7 +194,7 @@ class Xp(commands.Cog):
         destination = await self.get_lvlup_chan(msg)
         if destination is None or (not msg.channel.permissions_for(msg.guild.me).send_messages):
             return
-        text: typing.Optional[str] = await self.bot.get_config(msg.guild.id, "levelup_msg")
+        text: Optional[str] = await self.bot.get_config(msg.guild.id, "levelup_msg")
         if text is None or len(text) == 0:
             text = random.choice(await self.bot._(msg.channel, "xp.default_levelup"))
             while (not '{random}' in text) and random.random() < 0.75:
@@ -247,7 +236,7 @@ class Xp(commands.Cog):
             content = content.replace(match.group(0),"")
         return min(round(len(content)*self.xp_per_char), self.max_xp_per_msg)
 
-    async def calc_level(self, xp: int, system: typing.Literal["global", "mee6-like", "local"]):
+    async def calc_level(self, xp: int, system: Literal["global", "mee6-like", "local"]):
         """Calculate the level corresponding to a given xp amount
         Returns the current level, the xp needed for the next level and the xp needed for the current level"""
         if system != "mee6-like":
@@ -346,7 +335,7 @@ class Xp(commands.Cog):
                 return None
 
 
-    async def db_set_xp(self, user_id: int, points: int, action: typing.Literal['add', 'set']='add', guild: int=None):
+    async def db_set_xp(self, user_id: int, points: int, action: Literal['add', 'set']='add', guild: int=None):
         """Ajoute/reset de l'xp à un utilisateur dans la database"""
         try:
             if not self.bot.database_online:
@@ -372,7 +361,7 @@ class Xp(commands.Cog):
             self.bot.dispatch("error", err)
             return False
 
-    async def db_get_xp(self, user_id: int, guild_id: typing.Optional[int]):
+    async def db_get_xp(self, user_id: int, guild_id: Optional[int]) -> Optional[int]:
         "Get the xp of a user in a guild"
         try:
             if not self.bot.database_online:
@@ -388,23 +377,20 @@ class Xp(commands.Cog):
             query = f"SELECT `xp` FROM `{table}` WHERE `userID` = %s AND `banned` = 0"
             cursor = cnx.cursor(dictionary = True)
             cursor.execute(query, (user_id,))
-            liste = list()
-            for x in cursor:
-                liste.append(x)
-            if len(liste) == 1:
+            if result := cursor.fetchone():
                 g = 'global' if guild_id is None else guild_id
                 if isinstance(g, int) and g not in self.cache:
                     await self.db_load_cache(g)
                 if user_id in self.cache[g].keys():
-                    self.cache[g][user_id][1] = liste[0]['xp']
+                    self.cache[g][user_id][1] = result['xp']
                 else:
-                    self.cache[g][user_id] = [round(time.time())-60,liste[0]['xp']]
+                    self.cache[g][user_id] = [round(time.time())-60,result ['xp']]
             cursor.close()
-            return liste
+            return result['xp'] if result else None
         except Exception as err:
             self.bot.dispatch("error", err)
 
-    async def db_get_users_count(self, guild_id: typing.Optional[int]=None):
+    async def db_get_users_count(self, guild_id: Optional[int]=None):
         """Get the number of ranked users in a guild (or in the global database)"""
         try:
             if not self.bot.database_online:
@@ -430,7 +416,7 @@ class Xp(commands.Cog):
         except Exception as err:
             self.bot.dispatch("error", err)
 
-    async def db_load_cache(self, guild_id: typing.Optional[int]):
+    async def db_load_cache(self, guild_id: Optional[int]):
         "Load the XP cache for a given guild (or the global cache)"
         try:
             if not self.bot.database_online:
@@ -560,144 +546,17 @@ class Xp(commands.Cog):
             self.bot.dispatch("error", err)
 
 
-    async def get_raw_image(self, url:str):
-        req = Request(url, headers={'User-Agent': 'Mozilla/5.0'})
-        im = Image.open(BytesIO(urlopen(req).read()))
-        return im
-
-    def calc_pos(self, text:str, font, x: int, y: int, align: str='center'):
-        w,h = font.getsize(text)
-        if align == 'center':
-            return x-w/2,y-h/2
-        elif align == 'right':
-            return x-w,y-h/2
-
-    async def create_card(self, user: discord.User, style, xp, used_system: str, rank=[1,0], txt=['NIVEAU','RANG'], force_static=False, levels_info=None):
-        """Crée la carte d'xp pour un utilisateur"""
-        card = Image.open("./assets/card-models/{}.png".format(style))
-        bar_colors = await self.get_xp_bar_color(user.id)
-        if levels_info is None:
-            levels_info = await self.calc_level(xp, used_system)
-        colors = {'name':(124, 197, 118),'xp':(124, 197, 118),'NIVEAU':(255, 224, 77),'rank':(105, 157, 206),'bar':bar_colors, 'bar_background': (180, 180, 180)}
-        if style in {'blurple21', 'blurple22'}:
-            colors = {'name':(240, 240, 255),'xp':(235, 235, 255),'NIVEAU':(245, 245, 255),'rank':(255, 255, 255),'bar':(250, 250, 255), 'bar_background': (27, 29, 31)}
-
-        if not user.display_avatar.is_animated() or force_static:
-            pfp = await self.get_raw_image(user.display_avatar.replace(format="png", size=256))
-            img = await self.bot.loop.run_in_executor(None,self.add_overlay,pfp.resize(size=(282,282)),user,card,xp,rank,txt,colors,levels_info)
-            img.save('./assets/cards/{}-{}-{}.png'.format(user.id,xp,rank[0]))
-            card.close()
-            return discord.File('./assets/cards/{}-{}-{}.png'.format(user.id,xp,rank[0]))
-
-        else:
-            async with aiohttp.ClientSession() as cs:
-                async with cs.get(str(user.display_avatar.replace(format='gif',size=256))) as r:
-                    response = await r.read()
-                    pfp = Image.open(BytesIO(response))
-
-            images = []
-            duration = []
-            frames = [frame.copy() for frame in ImageSequence.Iterator(pfp)]
-            for frame in frames:
-                frame = frame.convert(mode='RGBA')
-                img = await self.bot.loop.run_in_executor(None,self.add_overlay,frame.resize(size=(282,282)),user,card.copy(),xp,rank,txt,colors,levels_info)
-                img = ImageEnhance.Contrast(img).enhance(1.5).resize((800,265))
-                images.append(img)
-                duration.append(pfp.info['duration'])
-
-            card.close()
-
-            # image_file_object = BytesIO()
-            gif = images[0]
-            filename = './assets/cards/{}-{}-{}.gif'.format(user.id,xp,rank[0])
-            gif.save(filename, format='gif', save_all=True, append_images=images[1:], loop=0, duration=duration, subrectangles=True)
-            # image_file_object.seek(0)
-            # return discord.File(fp=image_file_object, filename='card.gif')
-            return discord.File('./assets/cards/{}-{}-{}.gif'.format(user.id,xp,rank[0]))
-            # imageio.mimwrite('./assets/cards/{}-{}-{}.gif'.format(user.id,xp,rank[0]), images, format="GIF-PIL", duration=duration, subrectangles=True)
-            # return discord.File('./assets/cards/{}-{}-{}.gif'.format(user.id,xp,rank[0]))
-
-    def compress(self, original_file, max_size, scale: float):
-        assert(0.0 < scale < 1.0)
-        orig_image = Image.open(original_file)
-        cur_size = orig_image.size
-
-        while True:
-            cur_size = (int(cur_size[0] * scale), int(cur_size[1] * scale))
-            resized_file = orig_image.resize(cur_size, Image.ANTIALIAS)
-
-            with BytesIO() as file_bytes:
-                resized_file.save(file_bytes, optimize=True, quality=95, format='png')
-
-                if file_bytes.tell() <= max_size:
-                    file_bytes.seek(0, 0)
-                    return file_bytes
-
-    def add_overlay(self, pfp, user: discord.User, img, xp: int, rank: list, txt: list, colors, levels_info):
-        #img = Image.new('RGBA', (card.width, card.height), color = (250,250,250,0))
-        #img.paste(pfp, (20, 29))
-        #img.paste(card, (0, 0), card)
-        cardL = img.load()
-        pfpL = pfp.load()
-        for x in range(list(img.size)[0]):
-            for y in range(img.size[1]):
-                if sqrt((x-162)**2 + (y-170)**2) < 139:
-                    cardL[x,y] = pfpL[x-20,y-29]
-                elif cardL[x, y][3]<128:
-                    cardL[x,y] = (255,255,255,0)
-
-
-        xp_fnt = self.fonts['xp_fnt']
-        NIVEAU_fnt = self.fonts['NIVEAU_fnt']
-        levels_fnt = self.fonts['levels_fnt']
-        rank_fnt = self.fonts['rank_fnt']
-        RANK_fnt = self.fonts['RANK_fnt']
-        name_fnt = self.fonts['name_fnt']
-
-        img = self.add_xp_bar(img,xp-levels_info[2],levels_info[1]-levels_info[2],colors['bar'], colors['bar_background'])
-        d = ImageDraw.Draw(img)
-        d.text(self.calc_pos(user.name,name_fnt,610,68), user.name, font=name_fnt, fill=colors['name'])
-        temp = '{} / {} xp ({}/{})'.format(xp-levels_info[2],levels_info[1]-levels_info[2],xp,levels_info[1])
-        d.text((self.calc_pos(temp,xp_fnt,625,237)), temp, font=xp_fnt, fill=colors['xp'])
-        d.text((380,140), txt[0], font=NIVEAU_fnt, fill=colors['NIVEAU'])
-        d.text((self.calc_pos(str(levels_info[0]),levels_fnt,740,160,'right')), str(levels_info[0]), font=levels_fnt, fill=colors['xp'])
-        temp = '{x[0]}/{x[1]}'.format(x=rank)
-        d.text((self.calc_pos(txt[1],RANK_fnt,893,147,'center')), txt[1], font=RANK_fnt, fill=colors['rank'])
-        d.text((self.calc_pos(temp,rank_fnt,893,180,'center')), temp, font=rank_fnt, fill=colors['rank'])
-        return img
-
-    def add_xp_bar(self, img, xp: int, needed_xp: int, color: tuple[int, int, int], background: tuple[int, int, int]):
-        """Colorize the xp bar"""
-        error_rate = 25
-        data = np.array(img)   # "data" is a height x width x 4 numpy array
-        red, green, blue, alpha = data.T # Temporarily unpack the bands for readability
-
-        # Replace white with red... (leaves alpha values alone...)
-        white_areas = (abs(red)-background[0] < error_rate) & (
-            abs(blue)-background[1] < error_rate) & (abs(green)-background[2] < error_rate)
-        white_areas[:298] = False & False & False
-        white_areas[..., :260] = False & False & False
-        white_areas[..., 300:] = False & False & False
-        max_x = round(298 + (980-298)*xp/needed_xp)
-        white_areas[max_x:] = False & False & False
-        #white_areas[298:980] = True & True & True
-        data[..., :-1][white_areas.T] = color # Transpose back needed
-        return Image.fromarray(data)
-
-    async def get_xp_bar_color(self, userID:int):
-        return (45,180,105)
-
-    async def get_xp(self, user: discord.User, guild_id: int):
-        xp = await self.db_get_xp(user.id, guild_id)
-        if xp is None or (isinstance(xp,list) and len(xp) == 0):
-            return
-        return xp[0]['xp']
+    async def get_image_from_url(self, url: str):
+        "Download an image from an url"
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url) as response:
+                return Image.open(BytesIO(await response.read()))
 
     @commands.hybrid_command(name="rank")
     @app_commands.describe(user="The user to get the rank of. If not specified, it will be you.")
     @commands.bot_has_permissions(send_messages=True)
     @commands.cooldown(1, 20, commands.BucketType.user)
-    async def rank(self, ctx: MyContext, *, user: typing.Optional[discord.User]=None):
+    async def rank(self, ctx: MyContext, *, user: Optional[discord.User]=None):
         """Display a user XP.
         If you don't send any user, I'll display your own XP
 
@@ -720,12 +579,12 @@ class Xp(commands.Cog):
                 xp_used_type: str = await self.bot.get_config(ctx.guild.id, "xp_type")
             else:
                 xp_used_type = options['xp_type']["default"]
-            xp = await self.get_xp(user,None if xp_used_type == "global" else ctx.guild.id)
+            xp = await self.db_get_xp(user.id, None if xp_used_type == "global" else ctx.guild.id)
             if xp is None:
                 if ctx.author == user:
                     return await ctx.send(await self.bot._(ctx.channel, "xp.1-no-xp"))
                 return await ctx.send(await self.bot._(ctx.channel, "xp.2-no-xp"))
-            levels_info = None
+            levels_info = await self.calc_level(xp, xp_used_type)
             if xp_used_type == "global":
                 ranks_nb = await self.db_get_users_count()
                 try:
@@ -745,59 +604,97 @@ class Xp(commands.Cog):
             # If we can send the rank card
             if ctx.guild is None or use_author_dm or ctx.channel.permissions_for(ctx.guild.me).attach_files:
                 try:
-                    await self.send_card(ctx, user, xp, rank, ranks_nb, xp_used_type, levels_info)
+                    await self.send_card(ctx, user, xp, rank, ranks_nb, levels_info)
                     return
                 except Exception as err:  # pylint: disable=broad-except
                     # log the error and fall back to embed/text
                     self.bot.dispatch("error", err, ctx)
             # if we can send embeds
             if ctx.can_send_embed:
-                await self.send_embed(ctx, user, xp, rank, ranks_nb, levels_info, xp_used_type)
+                await self.send_embed(ctx, user, xp, rank, ranks_nb, levels_info)
                 return
             # fall back to raw text
-            await self.send_txt(ctx, user, xp, rank, ranks_nb, levels_info, xp_used_type)
+            await self.send_txt(ctx, user, xp, rank, ranks_nb, levels_info)
         except Exception as err:
             self.bot.dispatch("command_error", ctx, err)
 
-    async def send_card(self, ctx: MyContext, user: discord.User, xp: int, rank: int, ranks_nb: int, used_system: str, levels_info=None):
+    async def create_card(self, translation_map: dict[str, str], user: discord.User, style: str, xp: int, rank: int, ranks_nb: int, levels_info: tuple[int, int, int]):
+        "Find the user rank card, or generate a new one, based on given data"
+        # file_ext = 'gif' if user.display_avatar.is_animated() else 'png'
+        file_ext = "png"
+        filepath = f"./assets/cards/{user.id}-{xp}-{rank}.{file_ext}"
+        # check if the card has already been generated, and return it if it is the case
+        if os.path.isfile(filepath):
+            return discord.File(filepath)
+        static = not (
+            user.display_avatar.is_animated()
+            and await self.bot.get_cog("Users").db_get_user_config(user.id, "animated_card")
+        )
+        self.bot.log.debug(f"XP card for user {user.id} ({xp=} - {style=} - {static=})")
+        user_avatar = await self.get_image_from_url(user.display_avatar.replace(format="png", size=256).url)
+        card_data = get_card_data(
+            card_name=style,
+            translation_map=translation_map,
+            username=user.display_name,
+            level=levels_info[0],
+            rank=rank,
+            participants=ranks_nb,
+            current_xp=levels_info[2],
+            xp_to_next_level=levels_info[1],
+            total_xp=xp
+        )
+        generated_card = draw_card(user_avatar, card_data,)
+        generated_card.save(filepath)
+        card_image = discord.File(filepath, filename=f"{user.id}-{xp}-{rank}.png")
+
+        # update our internal stats for the number of cards generated
+        if users_cog := self.bot.get_cog("Users"):
+            try:
+                await users_cog.db_used_rank(user.id)
+            except Exception as err:
+                self.bot.dispatch("error", err)
+        if stats_cog := self.bot.get_cog("BotStats"):
+            stats_cog.xp_cards["generated"] += 1
+        return card_image
+
+    async def send_card(self, ctx: MyContext, user: discord.User, xp: int, rank: int, ranks_nb: int, levels_info: tuple[int, int, int]):
+        """Generate and send a user rank card
+        levels_info contains (current level, xp needed for the next level, xp needed for the current level)"""
         style = await self.bot.get_cog('Utilities').get_xp_style(user)
+        translations_map = {
+            "LEVEL": await self.bot._(ctx.channel, "xp.card-level"),
+            "RANK": await self.bot._(ctx.channel, "xp.card-rank"),
+        }
         try:
-            myfile = discord.File('./assets/cards/{}-{}-{}.{}'.format(user.id,xp,rank,'gif' if user.display_avatar.is_animated() else 'png'))
-        except FileNotFoundError:
-            txts = [await self.bot._(ctx.channel, "xp.card-level"), await self.bot._(ctx.channel, "xp.card-rank")]
-            static = not (user.display_avatar.is_animated() and await self.bot.get_cog("Users").db_get_user_config(user.id, "animated_card"))
-            self.bot.log.debug(f"XP card for user {user.id} ({xp=} - {style=} - {static=})")
-            myfile = await self.create_card(user, style, xp, used_system, [rank, ranks_nb], txts, force_static=static, levels_info=levels_info)
-            if UsersCog := self.bot.get_cog("Users"):
-                try:
-                    await UsersCog.db_used_rank(user.id)
-                except Exception as err:
-                    self.bot.dispatch("error", err, ctx)
-            if statsCog := self.bot.get_cog("BotStats"):
-                statsCog.xp_cards["generated"] += 1
+            card_image = await self.create_card(translations_map, user, style, xp, rank, ranks_nb, levels_info)
+        except ValueError as err:
+            self.bot.dispatch("command_error", ctx, err)
+            return
+        # check if we should send the card in DM or in the channel
         send_in_private = ctx.guild is None or await self.bot.get_config(ctx.guild.id, "rank_in_dm")
         try:
             if ctx.interaction:
-                await ctx.send(file=myfile, ephemeral=send_in_private)
+                await ctx.send(file=card_image, ephemeral=send_in_private)
             elif send_in_private:
-                await ctx.author.send(file=myfile)
+                await ctx.author.send(file=card_image)
                 try:
                     await ctx.message.delete()
                 except discord.HTTPException:
                     pass
             else:
-                await ctx.send(file=myfile)
+                await ctx.send(file=card_image)
         except discord.errors.Forbidden:
             await ctx.send(await self.bot._(ctx.channel, "xp.card-forbidden"))
-        except discord.errors.HTTPException as err:
+        except discord.errors.HTTPException:
             await ctx.send(await self.bot._(ctx.channel, "xp.card-too-large"))
         else:
             if style == self.default_xp_style:
                 await self.send_rankcard_tip(ctx)
-        if statsCog := self.bot.get_cog("BotStats"):
-            statsCog.xp_cards["sent"] += 1
+        if stats_cog := self.bot.get_cog("BotStats"):
+            stats_cog.xp_cards["sent"] += 1
 
     async def send_rankcard_tip(self, ctx: MyContext):
+        "Send a tip about the rank card personalisation"
         if random.random() > 0.2:
             return
         if not await self.bot.get_cog("Users").db_get_user_config(ctx.author.id, "show_tips"):
@@ -808,10 +705,9 @@ class Xp(commands.Cog):
             profile_cmd = await self.bot.get_command_mention("profile card")
             await self.bot.tips_manager.send_tip(ctx, UserTip.RANK_CARD_PERSONALISATION, profile_cmd=profile_cmd)
 
-    async def send_embed(self, ctx: MyContext, user: discord.User, xp, rank, ranks_nb, levels_info, used_system: str):
+    async def send_embed(self, ctx: MyContext, user: discord.User, xp, rank, ranks_nb,  levels_info: tuple[int, int, int]):
+        "Send the user rank as an embed (fallback from card generation)"
         txts = [await self.bot._(ctx.channel, "xp.card-level"), await self.bot._(ctx.channel, "xp.card-rank")]
-        if levels_info is None:
-            levels_info = await self.calc_level(xp, used_system)
         emb = discord.Embed(color=self.embed_color)
         emb.set_author(name=user, icon_url=user.display_avatar)
         emb.add_field(name='XP', value="{}/{}".format(xp, levels_info[1]))
@@ -825,10 +721,9 @@ class Xp(commands.Cog):
         else:
             await ctx.send(embed=emb)
 
-    async def send_txt(self, ctx: MyContext, user: discord.User, xp, rank, ranks_nb, levels_info, used_system: str):
+    async def send_txt(self, ctx: MyContext, user: discord.User, xp, rank, ranks_nb,  levels_info: tuple[int, int, int]):
+        "Send the user rank as a text message (fallback from embed)"
         txts = [await self.bot._(ctx.channel, "xp.card-level"), await self.bot._(ctx.channel, "xp.card-rank")]
-        if levels_info is None:
-            levels_info = await self.calc_level(xp, used_system)
         msg = """__**{}**__
 **XP** {}/{}
 **{}** {}
@@ -842,6 +737,7 @@ class Xp(commands.Cog):
             await ctx.send(msg)
 
     def convert_average(self, nbr: int) -> str:
+        "Convert a large number to its short version (ex: 1000000 -> 1M)"
         res = str(nbr)
         for power, symb in ((9,'G'), (6,'M'), (3,'k')):
             if nbr >= 10**power:
@@ -850,7 +746,8 @@ class Xp(commands.Cog):
         return res
 
     async def create_top_main(self, ranks, nbr, page, ctx: MyContext, used_system: str):
-        txt = list()
+        "Main method to create the top embed"
+        txt = []
         i = (page-1)*nbr
         for u in ranks[:nbr]:
             i += 1
@@ -874,7 +771,7 @@ class Xp(commands.Cog):
     @commands.command(name="top")
     @commands.bot_has_permissions(send_messages=True)
     @commands.cooldown(5,60,commands.BucketType.user)
-    async def top(self, ctx: MyContext, page: typing.Optional[int]=1, scope: typing.Literal["global", "server"]='global'):
+    async def top(self, ctx: MyContext, page: Optional[int]=1, scope: Literal["global", "server"]='global'):
         """Get the list of the highest levels
         Each page has 20 users
 
@@ -972,19 +869,19 @@ class Xp(commands.Cog):
             return await ctx.send(await self.bot._(ctx.guild.id, "xp.negative-xp"))
         try:
             xp_used_type: str = await self.bot.get_config(ctx.guild.id, "xp_type")
-            prev_xp = await self.get_xp(user, None if xp_used_type == "global" else ctx.guild.id)
+            prev_xp = await self.db_get_xp(user.id, None if xp_used_type == "global" else ctx.guild.id)
             await self.db_set_xp(user.id, xp, action='set', guild=ctx.guild.id)
             await ctx.send(await self.bot._(ctx.guild.id, "xp.change-xp-ok", user=str(user), xp=xp))
         except Exception as err:
             await ctx.send(await self.bot._(ctx.guild.id, "minecraft.serv-error"))
             self.bot.dispatch("error", err, ctx)
         else:
-            if ctx.guild.id not in self.cache.keys():
+            if ctx.guild.id not in self.cache:
                 await self.db_load_cache(ctx.guild.id)
             self.cache[ctx.guild.id][user.id] = [round(time.time()), xp]
-            s = "XP of user {} `{}` edited (from {} to {}) in server `{}`".format(user, user.id, prev_xp, xp, ctx.guild.id)
-            self.bot.log.info("[xp] " + s)
-            emb = discord.Embed(description=s,color=8952255, timestamp=self.bot.utcnow())
+            desc = f"XP of user {user} `{user.id}` edited (from {prev_xp} to {xp}) in server `{ctx.guild.id}`"
+            self.bot.log.info("[xp] " + desc)
+            emb = discord.Embed(description=desc,color=8952255, timestamp=self.bot.utcnow())
             emb.set_footer(text=ctx.guild.name)
             emb.set_author(name=self.bot.user, icon_url=self.bot.user.display_avatar)
             await self.bot.send_embed(emb)
