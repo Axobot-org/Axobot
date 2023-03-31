@@ -445,35 +445,47 @@ class ServerConfig(commands.Cog):
         option_type = options_list[option_name]["type"]
         if option_type == "boolean":
             if value:
-                return await self.bot._(ctx.guild.id, f"server.set_success.boolean.true", opt=option_name)
+                return await self.bot._(ctx.guild.id, "server.set_success.boolean.true", opt=option_name)
             else:
-                return await self.bot._(ctx.guild.id, f"server.set_success.boolean.false", opt=option_name)
+                return await self.bot._(ctx.guild.id, "server.set_success.boolean.false", opt=option_name)
         if option_type == "levelup_channel":
             if value in {"none", "any"}:
                 return await self.bot._(ctx.guild.id, f"server.set_success.levelup_channel.{value}", opt=option_name)
             else:
-                return await self.bot._(ctx.guild.id, f"server.set_success.levelup_channel.channel", opt=option_name, val=value.mention)
+                return await self.bot._(ctx.guild.id,
+                                        "server.set_success.levelup_channel.channel",
+                                        opt=option_name, val=value.mention)
         str_value = await to_display(option_name, value, ctx.guild, self.bot)
         return await self.bot._(ctx.guild.id, f"server.set_success.{option_type}", opt=option_name, val=str_value)
 
-    async def _get_set_error_message(self, ctx: MyContext, option_name: str, error: ValueError, value: Any):
+    async def _get_set_error_message(self, ctx: MyContext, _option_name: str, error: ValueError, _value: Any):
         "Generate a proper error message for an invalid value"
-        repr: AllRepresentation = error.args[2]
-        if repr["type"] in {"int", "float"}:
-            return await self.bot._(ctx.guild.id, f"server.set_error.{repr['type']}_err", min=repr["min"], max=repr["max"])
-        if repr["type"] == "enum":
-            return await self.bot._(ctx.guild.id, f"server.set_error.ENUM_INVALID", list=', '.join(repr["values"]))
-        if repr["type"] == "text":
-            return await self.bot._(ctx.guild.id, f"server.set_error.text_err", min=repr["min_length"], max=repr["max_length"])
+        option_data: AllRepresentation = error.args[2]
+        if option_data["type"] in {"int", "float"}:
+            return await self.bot._(ctx.guild.id,
+                                    f"server.set_error.{option_data['type']}_err",
+                                    min=option_data["min"], max=option_data["max"])
+        if option_data["type"] == "enum":
+            return await self.bot._(ctx.guild.id, "server.set_error.ENUM_INVALID", list=', '.join(option_data["values"]))
+        if option_data["type"] == "text":
+            return await self.bot._(ctx.guild.id,
+                                    "server.set_error.text_err",
+                                    min=option_data["min_length"], max=option_data["max_length"])
         error_name: str = error.args[1]
         if error_name in {"ROLES_TOO_FEW", "ROLES_TOO_MANY"}:
-            return await self.bot._(ctx.guild.id, "server.set_error.roles_list", min=repr["min_count"], max=repr["max_count"])
+            return await self.bot._(ctx.guild.id,
+                                    "server.set_error.roles_list",
+                                    min=option_data["min_count"], max=option_data["max_count"])
         if error_name in {"CHANNELS_TOO_FEW", "CHANNELS_TOO_MANY"}:
-            return await self.bot._(ctx.guild.id, "server.set_error.channels_list", min=repr["min_count"], max=repr["max_count"])
+            return await self.bot._(ctx.guild.id,
+                                    "server.set_error.channels_list",
+                                    min=option_data["min_count"], max=option_data["max_count"])
         if error_name in {"EMOJIS_TOO_FEW", "EMOJIS_TOO_MANY"}:
-            if repr["min_count"] == repr["max_count"]:
-                return await self.bot._(ctx.guild.id, "server.set_error.emojis_list_exact", count=repr["min_count"])
-            return await self.bot._(ctx.guild.id, "server.set_error.emojis_list", min=repr["min_count"], max=repr["max_count"])
+            if option_data["min_count"] == option_data["max_count"]:
+                return await self.bot._(ctx.guild.id, "server.set_error.emojis_list_exact", count=option_data["min_count"])
+            return await self.bot._(ctx.guild.id,
+                                    "server.set_error.emojis_list",
+                                    min=option_data["min_count"], max=option_data["max_count"])
         user_input = error.args[3] if len(error.args) > 3 else None
         return await self.bot._(ctx.guild.id, "server.set_error." + error_name, input=user_input)
 
