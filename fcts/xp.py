@@ -1,4 +1,3 @@
-import asyncio
 import importlib
 import operator
 import os
@@ -8,16 +7,18 @@ import string
 import time
 from io import BytesIO
 from math import ceil
-from typing import Literal, Optional
+from typing import Literal, Optional, TypedDict
 
 import aiohttp
 import discord
 import mysql
+from cachingutils import acached
 from discord import app_commands
 from discord.ext import commands
 from PIL import Image, ImageFont
 
 from fcts import args, checks
+from libs.paginator import Paginator
 from libs.tips import UserTip
 from libs.xp_cards.cards_metadata import get_card_data
 from libs.xp_cards.generator import draw_card
@@ -26,6 +27,8 @@ importlib.reload(args)
 importlib.reload(checks)
 from libs.bot_classes import Axobot, MyContext
 from libs.serverconfig.options_list import options
+
+LEADERBOARD_SCOPE = Literal["global", "server"]
 
 
 class Xp(commands.Cog):
@@ -214,7 +217,7 @@ class Xp(commands.Cog):
         """Vérifie si un text contient du spam"""
         if len(text)>0 and (text[0] in string.punctuation or text[1] in string.punctuation):
             return True
-        d = dict()
+        d = {}
         for c in text:
             if c in d.keys():
                 d[c] += 1
@@ -552,6 +555,16 @@ class Xp(commands.Cog):
             async with session.get(url) as response:
                 return Image.open(BytesIO(await response.read()))
 
+    async def clear_cards(self, delete_all: bool=False):
+        """Delete outdated rank cards"""
+        files =  os.listdir('./assets/cards/')
+        done: set[str] = set()
+        for f in sorted([f.split('-')+['./assets/cards/'+f] for f in files], key=operator.itemgetter(1), reverse=True):
+            if delete_all or f[0] in done:
+                os.remove(f[3])
+            else:
+                done.add(f[0])
+
     @commands.hybrid_command(name="rank")
     @app_commands.describe(user="The user to get the rank of. If not specified, it will be you.")
     @commands.bot_has_permissions(send_messages=True)
@@ -736,122 +749,155 @@ class Xp(commands.Cog):
         else:
             await ctx.send(msg)
 
-    def convert_average(self, nbr: int) -> str:
-        "Convert a large number to its short version (ex: 1000000 -> 1M)"
-        res = str(nbr)
-        for power, symb in ((9,'G'), (6,'M'), (3,'k')):
-            if nbr >= 10**power:
-                res = str(round(nbr/10**power, 1)) + symb
-                break
-        return res
 
-    async def create_top_main(self, ranks, nbr, page, ctx: MyContext, used_system: str):
-        "Main method to create the top embed"
-        txt = []
-        i = (page-1)*nbr
-        for u in ranks[:nbr]:
-            i += 1
-            user = self.bot.get_user(u['user'])
-            if user is None:
-                try:
-                    user = await self.bot.fetch_user(u['user'])
-                except discord.NotFound:
-                    user = await self.bot._(ctx.channel, "xp.del-user")
-            if isinstance(user, discord.User):
-                user_name = discord.utils.escape_markdown(user.name)
-                if len(user_name) > 18:
-                    user_name = user_name[:15]+'...'
+    class TopPaginator(Paginator):
+        "Paginator used to display the leaderboard"
+
+        def __init__(self, client: Axobot, user: discord.User, guild: discord.Guild, scope: LEADERBOARD_SCOPE,
+                     start_page: int, stop_label: str = "Quit", timeout: int = 180):
+            super().__init__(client, user, stop_label, timeout)
+            class Position(TypedDict):
+                "A position in the leaderboard"
+                username: str
+                userid: int
+                level: int
+                xp: int
+                xp_label: str
+
+            self.guild = guild
+            self.scope = scope
+            self.page = start_page
+            self.positions: list[Position] = []
+            self.cog = client.get_cog("Xp")
+            self.used_system: str = None
+            self.max_page: int = 1
+
+        def convert_average(self, nbr: int) -> str:
+            "Convert a large number to its short version (ex: 1000000 -> 1M)"
+            res = str(nbr)
+            for power, symb in ((9,'G'), (6,'M'), (3,'k')):
+                if nbr >= 10**power:
+                    res = str(round(nbr/10**power, 1)) + symb
+                    break
+            return res
+
+        async def get_page_count(self):
+            return self.max_page
+
+        @acached()
+        async def get_user_rank(self):
+            "Get the embed field content corresponding to the user's rank"
+            pos = [(i, pos) for i, pos in enumerate(self.positions) if pos["userid"] == self.user.id]
+            field_name = "__" + await self.client._(self.guild, "xp.top-your") + "__"
+            if len(pos) == 0:
+                value = await self.client._(self.guild, "xp.1-no-xp")
             else:
-                user_name = user
-            l = await self.calc_level(u['xp'], used_system)
-            xp = self.convert_average(u['xp'])
-            txt.append('{} • **{} |** `lvl {}` **|** `xp {}`'.format(i,"__"+user_name+"__" if user==ctx.author else user_name,l[0],xp))
-        return txt,i
+                rank, data = pos[0]
+                value = f"**#{rank} |** `lvl {data['level']}` **|** `xp {data['xp_label']}`"
+            return {
+                "name": field_name,
+                "value": value,
+            }
+
+        async def fetch_data(self):
+            "Fetch the required data to display the leaderboard"
+            self.used_system = await self.client.get_config(self.guild.id, 'xp_type')
+            if self.used_system == "global":
+                if self.scope == 'global':
+                    if len(self.cog.cache["global"]) == 0:
+                        await self.cog.db_load_cache(None)
+                    rows = self.cog.cache['global']
+                else:
+                    rows = {
+                        int(row["userId"]): (0, row["xp"])
+                        for row in await self.cog.db_get_top(10000, guild=self.guild)
+                    }
+            else:
+                if not self.guild.id in self.cog.cache.keys():
+                    await self.cog.db_load_cache(self.guild.id)
+                rows = self.cog.cache[self.guild.id]
+            for user_id, data in rows.items():
+                user = self.client.get_user(user_id)
+                if user is None:
+                    try:
+                        user = await self.client.fetch_user(user_id)
+                    except discord.NotFound:
+                        user = await self.client._(self.guild, "xp.del-user")
+                if isinstance(user, discord.User):
+                    user_name = discord.utils.escape_markdown(user.name)
+                    if len(user_name) > 18:
+                        user_name = user_name[:15]+'...'
+                    if user == self.user:
+                        user_name = "__" + user_name + "__"
+                else:
+                    user_name = user
+                level = await self.cog.calc_level(data[1], self.used_system)
+                xp = self.convert_average(data[1])
+                self.positions.append({
+                    "username": user_name,
+                    "userid": user_id,
+                    "level": level[0],
+                    "xp": data[1],
+                    "xp_label": xp
+                })
+
+            self.max_page = ceil(len(self.positions)/20)
+
+        async def get_page_content(self, _interaction, page: int):
+            "Get the content of a page"
+            if page > self.max_page:
+                page = self.page = self.max_page
+            txt = []
+            i = (page-1)*20
+            for row in self.positions[(page-1)*20:page*20]:
+                i += 1
+                username = row['username']
+                lvl = row['level']
+                xp = row['xp_label']
+                txt.append(f"{i} • **{username} |** `lvl {lvl}` **|** `xp\u200B{xp}`")
+            # title
+            if self.scope == 'guild' or self.used_system != "global":
+                embed_title = await self.client._(self.guild, "xp.top-title-2")
+            else:
+                embed_title = await self.client._(self.guild, "xp.top-title-1")
+            # field name
+            field_title = await self.client._(self.guild, "xp.top-name", min=(page-1)*20+1, max=i, page=page, total=self.max_page)
+            emb = discord.Embed(title=embed_title, color=self.cog.embed_color)
+            emb.add_field(name=field_title, value="\n".join(txt), inline=False)
+            # user rank
+            emb.add_field(**await self.get_user_rank())
+            # embed footer with user info
+            emb.set_footer(text=self.user, icon_url=self.user.display_avatar)
+            return {
+                "embed": emb
+            }
 
     @commands.command(name="top")
     @commands.bot_has_permissions(send_messages=True)
     @commands.cooldown(5,60,commands.BucketType.user)
-    async def top(self, ctx: MyContext, page: Optional[int]=1, scope: Literal["global", "server"]='global'):
+    async def top(self, ctx: MyContext, page: commands.Range[int, 1]=1, scope: LEADERBOARD_SCOPE='global'):
         """Get the list of the highest levels
-        Each page has 20 users
 
-        ..Example top 3
-
-        ..Example top 7 server
+        ..Example top
 
         ..Example top server
+
+        ..Example top 7
 
         ..Doc user.html#get-the-general-ranking"""
         if ctx.guild is not None:
             if not await self.bot.get_config(ctx.guild.id,'enable_xp'):
                 return await ctx.send(await self.bot._(ctx.guild.id, "xp.xp-disabled"))
-            xp_system_used: str = await self.bot.get_config(ctx.guild.id,'xp_type')
-        else:
-            xp_system_used = "global"
-        if xp_system_used == "global":
-            if scope == 'global':
-                if len(self.cache["global"]) == 0:
-                    await self.db_load_cache(None)
-                ranks = sorted([{'userID':key, 'xp':value[1]} for key,value in self.cache['global'].items()], key=lambda x:x['xp'], reverse=True)
-                max_page = ceil(len(self.cache['global'])/20)
-            elif scope == 'guild':
-                ranks = await self.db_get_top(10000, guild=ctx.guild)
-                max_page = ceil(len(ranks)/20)
-        else:
-            if not ctx.guild.id in self.cache.keys():
-                await self.db_load_cache(ctx.guild.id)
-            ranks = sorted([{'userID':key, 'xp':value[1]} for key,value in self.cache[ctx.guild.id].items()], key=lambda x:x['xp'], reverse=True)
-            max_page = ceil(len(ranks)/20)
         if page < 1:
             return await ctx.send(await self.bot._(ctx.channel, "xp.low-page"))
-        elif max_page == 0:
-            return await ctx.send(await self.bot._(ctx.channel, "xp.no-rank"))
-        elif page > max_page:
-            return await ctx.send(await self.bot._(ctx.channel, "xp.high-page"))
-        ranks = ranks[(page-1)*20:]
-        ranks = [{'user':x['userID'],'xp':x['xp']} for x in ranks]
-        nbr = 20
-        txt, i = await self.create_top_main(ranks,nbr,page,ctx,xp_system_used)
-        while len("\n".join(txt)) > 1000 and nbr > 0:
-            nbr -= 1
-            txt, i = await self.create_top_main(ranks,nbr,page,ctx,xp_system_used)
-            await asyncio.sleep(0.2)
-        f_name = await self.bot._(ctx.channel, "xp.top-name", min=(page-1)*20+1, max=i, page=page, total=max_page)
-        # author
-        rank = await self.db_get_rank(ctx.author.id,ctx.guild if (scope=='guild' or xp_system_used != "global") else None)
-        if len(rank) == 0:
-            your_rank = {'name':"__"+await self.bot._(ctx.channel, "xp.top-your")+"__",'value':await self.bot._(ctx.guild, "xp.1-no-xp")}
-        else:
-            lvl = await self.calc_level(rank['xp'], xp_system_used)
-            lvl = lvl[0]
-            rk = rank['rank'] if 'rank' in rank.keys() else '?'
-            xp = self.convert_average(rank['xp'])
-            your_rank = {'name':"__"+await self.bot._(ctx.channel, "xp.top-your")+"__", 'value':"**#{} |** `lvl {}` **|** `xp {}`".format(rk, lvl, xp)}
-            del rk
-        # title
-        if scope == 'guild' or xp_system_used != "global":
-            t = await self.bot._(ctx.channel, "xp.top-title-2")
-        else:
-            t = await self.bot._(ctx.channel, "xp.top-title-1")
-        if ctx.can_send_embed:
-            emb = discord.Embed(title=t, color=self.embed_color)
-            emb.add_field(name=f_name, value="\n".join(txt), inline=False)
-            emb.add_field(**your_rank)
-            emb.set_footer(text=ctx.author, icon_url=ctx.author.display_avatar)
-            await ctx.send(embed=emb)
-        else:
-            await ctx.send(f_name+"\n\n"+'\n'.join(txt))
-
-
-    async def clear_cards(self, all: bool=False):
-        """Delete outdated rank cards"""
-        files =  os.listdir('./assets/cards/')
-        done: set[str] = set()
-        for f in sorted([f.split('-')+['./assets/cards/'+f] for f in files], key=operator.itemgetter(1), reverse=True):
-            if all or f[0] in done:
-                os.remove(f[3])
-            else:
-                done.add(f[0])
+        _quit = await self.bot._(ctx.guild.id, "misc.quit")
+        view = self.TopPaginator(self.bot, ctx.author, ctx.guild, scope, page, _quit.capitalize())
+        await view.fetch_data()
+        msg = await view.send_init(ctx)
+        if msg:
+            if await view.wait():
+                # only manually disable if it was a timeout (ie. not a user stop)
+                await view.disable(msg)
 
 
     @commands.command(name='set_xp', aliases=["setxp", "set-xp"])
