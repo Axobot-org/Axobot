@@ -26,13 +26,13 @@ This command is used to view the number of xp, rank and level of a member. You c
 Get the general ranking
 -----------------------
 
-**Syntax:** :code:`top [page] (guild|global)`
+**Syntax:** :code:`top [page] (global|server)`
 
 If you want to know who is at the top of the ranking, or who is following you so closely, this command is the ideal function. It allows you to have the name, xp and level of 20 people per page. The operation of the pages is quite intuitive: page 1 shows 20 first users, page 2 between 21 and 40, page 3 between 41 and 60, and so on. Simple, right?
 
-If you give the argument `guild` (or `server`, as you want), the top will only display users who are on the current server, instead of all bot users.
+If you give the argument `server`, the top will only display users who are currently on the server, instead of all bot users.
 
-.. note:: The bot can send this message without special permission, but don't hesitate to give him permission to `send embeds <perms.html#embed-links>`__ to make the result more aesthetic!
+.. note:: The bot will need the `send embeds <perms.html#embed-links>`__ to display the leaderboard!
 
 
 ---------
