@@ -92,7 +92,8 @@ def get_card_data(
         "avatar_size": (meta["avatar_size"], meta["avatar_size"]),
         "avatar_position": meta["avatar_position"],
         "xp_bar_color": tuple(colors["xp_bar"]),
-        "xp_bar_type": 1 if card_name in V1_CARDS else 2,
+        "xp_bar_position": meta["xp_bar_position"],
+        "card_version": 1 if card_name in V1_CARDS else 2,
         "xp_percent": current_xp / xp_to_next_level,
         "texts": texts
     }

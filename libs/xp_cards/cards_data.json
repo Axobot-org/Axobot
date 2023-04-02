@@ -3,8 +3,8 @@
         "v1": {
             "avatar_size": 282,
             "avatar_position": [
-                21,
-                29
+                23,
+                31
             ],
             "texts": {
                 "username": {
@@ -97,7 +97,17 @@
                     "alignment": "center",
                     "font": "Verdana.ttf"
                 }
-            }
+            },
+            "xp_bar_position": [
+                [
+                    302,
+                    266
+                ],
+                [
+                    967,
+                    296
+                ]
+            ]
         },
         "v2": {
             "avatar_size": 107,
@@ -181,7 +191,17 @@
                     "alignment": "center",
                     "font": "RobotoSlab-Regular.ttf"
                 }
-            }
+            },
+            "xp_bar_position": [
+                [
+                    302,
+                    266
+                ],
+                [
+                    967,
+                    296
+                ]
+            ]
         }
     },
     "colors": {
@@ -196,7 +216,18 @@
                 "xp": [124, 197, 118]
             }
         },
-        "christmas22": {
+        "admin": {
+            "xp_bar": [230, 0, 0],
+            "texts": {
+                "username": [230, 200, 25],
+                "level_label": [230, 25, 40],
+                "level": [252, 32, 46],
+                "rank_label": [215, 0, 0],
+                "rank": [230, 0, 0],
+                "xp": [230, 185, 11]
+            }
+        },
+        "christmas20": {
             "xp_bar": [204, 255, 255],
             "texts": {
                 "username": [255, 255, 255],
@@ -207,7 +238,7 @@
                 "xp": [255, 255, 255]
             }
         },
-        "christmas20": {
+        "christmas22": {
             "xp_bar": [204, 255, 255],
             "texts": {
                 "username": [255, 255, 255],
