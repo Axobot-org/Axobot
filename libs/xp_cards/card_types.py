@@ -16,6 +16,7 @@ class CardMetaData(TypedDict):
     avatar_size: int
     avatar_position: tuple[int, int]
     texts: TextMetaData
+    xp_bar_position: tuple[tuple[int, int], tuple[int, int]] # (x1, y1), (x2, y2)
 
 class ColorsData(TypedDict):
     "Contains info about colors to apply to a card style"
@@ -32,5 +33,7 @@ class CardData(TypedDict):
     avatar_size: tuple[int, int]
     avatar_position: tuple[int, int]
     xp_bar_color: RgbColor
+    xp_bar_position: tuple[tuple[int, int], tuple[int, int]] # (x1, y1), (x2, y2)
+    card_version: Literal[1, 2]
     xp_percent: float
     texts: dict[str, TextData]

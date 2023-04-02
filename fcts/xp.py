@@ -20,8 +20,7 @@ from PIL import Image, ImageFont
 from fcts import args, checks
 from libs.paginator import Paginator
 from libs.tips import UserTip
-from libs.xp_cards.cards_metadata import get_card_data
-from libs.xp_cards.generator import draw_card
+from libs.xp_cards.generator import CardGeneration
 
 importlib.reload(args)
 importlib.reload(checks)
@@ -645,10 +644,11 @@ class Xp(commands.Cog):
         )
         self.bot.log.debug(f"XP card for user {user.id} ({xp=} - {style=} - {static=})")
         user_avatar = await self.get_image_from_url(user.display_avatar.replace(format="png", size=256).url)
-        card_data = get_card_data(
+        card_generator = CardGeneration(
             card_name=style,
             translation_map=translation_map,
             username=user.display_name,
+            avatar=user_avatar,
             level=levels_info[0],
             rank=rank,
             participants=ranks_nb,
@@ -656,7 +656,7 @@ class Xp(commands.Cog):
             xp_to_next_level=levels_info[1],
             total_xp=xp
         )
-        generated_card = draw_card(user_avatar, card_data,)
+        generated_card = card_generator.draw_card()
         generated_card.save(filepath)
         card_image = discord.File(filepath, filename=f"{user.id}-{xp}-{rank}.png")
 
