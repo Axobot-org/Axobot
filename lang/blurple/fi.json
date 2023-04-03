@@ -1,7 +1,13 @@
 {
+    "blurplefy": {
+        "starting": "Aloitetaan %{name} käyttäjälle %{user}",
+        "success": "%{user}, tässä on kuvasi!"
+    },
     "check_intro": "%{user}, aloitetaan blurple kuva analyysi (Muista että tämä voi kestää hetken)",
     "collect": {
+        "title": "Blurple tapahtuma",
         "too-quick": "On liian aikaista! Voit hankkia tapahtuma pisteitä %{time} jälkeen!"
     },
-    "missing-attachment-perm": "Ups, minulta puuttuu käyttöoikeudet kuvien lähettämiseen!"
+    "missing-attachment-perm": "Ups, minulta puuttuu käyttöoikeudet kuvien lähettämiseen!",
+    "unknown-err": "Hups, jokin meni pieleen! %{err}"
 }

@@ -1,13 +1,18 @@
 {
-    "cases-0": "%{nbr} tapaukset löydetty: (%{start}-%{end})",
+    "records_number": "%{nbr} tulosta löytyi",
     "deleted": "Tapaus #%{ID} on poistettu!",
     "display": {
         "date": "**Päivämäärä:** %{data}",
+        "duration": "**Kesto:** %{data}",
         "guild": "**Palvelin:** %{data}",
+        "moderator": "**Valvoja:** %{data}",
         "reason": "**Syy:** %{data}",
-        "type": "**Tyyppi:** %{data}"
+        "title": "Käyttäjän %{user} (%{user_id}) rekisteri",
+        "type": "**Tyyppi:** %{data}",
+        "user": "**Käyttäjä:** %{data}"
     },
     "list-0": "**Tyyppi:** {T}\n**Valvoja:** {M}**Päivämäärä:** {D}**Syy:** {R}*",
+    "list-1": "**Palvelin:** {G}\n**Tyyppi:** {T}\n**Valvoja:** {M}\n**Päivämäärä:** {D}\n**Syy:** *{R}*",
     "no-case": "Tällä käyttäjällä ei ole yhtään tapahtumia!",
     "no-user": "Tämä on mahdotonta löytää tämä käyttäjä. :eyes:",
     "no_database": "Jonkun ajan tietokannan alas käynnin takia, tämä komento on pois käytöstä",

@@ -25,8 +25,8 @@
     "hint-useless": "Ouvre un ticket",
     "missing-category-config": "Oups, je n'ai pas pu créer votre ticket parce que personne ne m'a dit où les créer. Vous devriez demander à un modérateur du serveur d'utiliser la commande %{set_category}.",
     "missing-perms-creation": {
-        "channel": "Oups, je n'ai pas pu créer de salon pour votre ticket. Assurez-vous que j'ai les permissions nécessaires et réessayez.",
-        "thread": "Oups, je n'ai pas pu créer de fil pour votre. Assurez-vous que j'ai les permissions nécessaires et réessayez."
+        "channel": "Oups, je n'ai pas pu créer de salon pour votre ticket. Assurez-vous que j'ai les permissions nécessaires dans la catégorie \"%{category}\" et réessayez.",
+        "thread": "Oups, je n'ai pas pu créer de fil pour votre. Assurez-vous que j'ai les permissions nécessaires dans %{channel} et réessayez."
     },
     "missing-perms-setup": {
         "to-member": "Oups, je n'ai pas pu configurer correctement le salon de votre ticket. Veuillez demander à un modérateur de serveur de corriger mes permissions, sinon toute personne ayant accès à la catégorie des tickets pourrait être en mesure de lire votre ticket.",
@@ -34,6 +34,27 @@
     },
     "nothing-to-edit": "Rien à modifier !",
     "other": "autre",
+    "review": {
+        "category": "Categorie",
+        "channel": "Salon",
+        "default": "Configuration par défaut",
+        "deleted-category": "Catégorie ou salon supprimé %{id}",
+        "deleted-role": "Rôle supprimé %{id}",
+        "embed": {
+            "desc-global": "Voici un aperçu de la configuration du système de tickets pour ce serveur",
+            "desc-topic": "Voici un aperçu de la configuration du système de tickets pour le sujet \"%{topic}\" spécifiquement",
+            "title-global": "Aperçu de la configuration générale",
+            "title-topic": "Aperçu de la configuration du topic \"%{topic}\""
+        },
+        "emoji": "Émoji",
+        "format": "Format du nom",
+        "hint": "Message d'aide",
+        "no-config": "Ce serveur n'utilise pas le système de tickets",
+        "prompt": "Invite de sélection",
+        "role": "Rôle autorisé",
+        "topic-no-config": "Pas de configuration spécifique pour ce topic",
+        "topic-not-found": "Aucun topic avec cet ID n'a été trouvé"
+    },
     "role-edited": {
         "default": "Le rôle autorisé à accéder aux tickets par défaut a été modifié !",
         "default-reset": "Le rôle autorisé à accéder aux tickets par défaut a bien été réinitialisé à 'aucun rôle' !",
@@ -44,7 +65,7 @@
     "text-edited": "Le message affiché avec la sélection du ticket a été modifié",
     "ticket-created": "Ticket ouvert dans %{channel} avec le topic \"%{topic}\" !",
     "ticket-introduction": {
-        "description": "Bienvenue %{user} dans votre ticket au sujet de '%{ticket_name}' ! Quelqu'un devrais vous répondre dans les plus brefs délais.\nPour rappel, vous avez sélectionné le topic **'%{topic_name}'**",
+        "description": "Bienvenue %{user} dans votre ticket au sujet de '%{ticket_name}' ! Quelqu'un devrais vous répondre dans les plus brefs délais.\n\nPour rappel, vous avez sélectionné le topic **'%{topic_name}'**",
         "title": "Nouveau ticket créé !"
     },
     "title-modal": {

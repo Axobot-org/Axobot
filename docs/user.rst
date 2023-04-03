@@ -1,8 +1,8 @@
-==================
-User configuration
-==================
+=====================
+👤 User configuration
+=====================
 
-Users have a very important place in the bot code. Well, after all, without users, no bot, right? That's why we're currently working to give you as much as possible with ZBot, so you can fully enjoy your experience. 
+Users have a very important place in the bot code. Well, after all, without users, no bot, right? That's why we're currently working to give you as much as possible with ZBot, so you can fully enjoy your experience.
 
 In this section, you will find the XP module, a classic in Discord bots, as well as a command to change your own preferences, such as the color of your xp card or the language used in your personal messages. Don't worry, other possibilities are planned and will be added later!
 
@@ -45,13 +45,11 @@ We were talking about adding customization options for each user. Here is the se
 Change your xp card
 -------------------
 
-**Syntax:** :code:`profile card [style]`
+**Syntax:** :code:`profile card <style>`
 
-With this command, you can change the design of your xp card (the one used for the `rank` command). A long list of styles are available to everyone, but others are exclusively unlocked and reserved for certain people (more details on this part will come later).
+With this command, you can change the design of your xp card (the one used for the `rank` command). A long list of styles are available to everyone, but others are exclusively unlocked and reserved for certain people.
 
-If you use the command without argument, the bot will show you an example of a xp card with the style you currently have. But if you enter a style name that does not exist, it will give you a list of usable styles *for you*.
-
-You can also use the command :code:`profile card-preview <style>` to get a preview of a specific style with your avatar.
+You can also use the command :code:`profile card-preview [style]` to get a preview of a specific style with your avatar. If you don't specify any style, the bot will show you a card preview with your current style.
 
 .. note:: Note that to be able to display your card, the bot needs `Attach Files <perms.html#attach-files>`__ permission!
 
@@ -69,14 +67,12 @@ Option 'animated_card'
 
 This option allows you to enable the rendering of your xp card in.gif format if you have an animated profile image. Since the image processing time is much longer, with reduced quality, this option is disabled by default.
 
-
 Option 'auto_unafk'
 ===================
 
 This option has been designed for people who don't want to manually type the `unafk` command as soon as they are back. So by activating this system, Axobot will automatically remove the AFK tag from you as soon as you send a message. As simple as that!
 
+Option 'show_tips'
+==================
 
-Option 'usernames_log'
-======================
-
-By default Axobot records when you change your nickname, whether it is your main name or the nickname in a server. This data is then used for the results of the `usernames <infos.html#usernames-history>`__ command, and nowhere else. But for confidentiality reasons you can prevent your future changes from being saved at any time, via this option.
+Axobot can send you little tips from time to time, to help you use the bot better and let you discover features that might interest you. If you are clever enough not to need this help, don't hesitate to disable this option!

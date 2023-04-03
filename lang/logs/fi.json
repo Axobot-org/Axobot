@@ -1,4 +1,5 @@
 {
+    "ban": "Käyttäjälle %{user} (%{userid}) on annettu porttikielto",
     "case-del": "The case #%{id} has been deleted (concerning %{user})",
     "case-reason": "Tapaus #%{id} on muokattu:\\n`Vanha syy:` %{old}\\n`Uusi syy:` %{new}",
     "clear": "%{number} viestiä poistettu kanavalla %{channel}",

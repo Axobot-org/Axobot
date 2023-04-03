@@ -8,19 +8,82 @@
 Welcome to Axobot documentation!
 ================================
 
-Welcome to the **ZBot** bot documentation, a Discord bot coded in Python 3 by a small French developer, *Z_runner*. You will find in the documentation all the explanations on each of the usable commands, as well as the list of the last additions and some code examples. The documentation is currently in English but the bot is available in several languages, including its main language, French.
+Welcome to the **Axobot** documentation, a Discord bot coded in Python by a random French developer, *Z_runner*. You will find in the documentation all the explanations on each of the usable commands, as well as the list of the last additions and some code examples. The documentation is currently in English but the bot is available in several languages, including its main language, French.
 
-The `Moderation` section displays every command related to the moderation of a server: clear, slowmode, kick, ban... The `Minecraft` section allows you to discover all Minecraft related commands: item search or server check. The `Info` section is about commands that allow you to get information about members, roles, channels, server etc. The `Configuration` sections are a guide to allow you to correctly configure the bot on your server, or for yourself as user. The `Permissions` page allows you to put exactly the right permissions in the bot, nothing unnecessary or dangerous! `RSS` section is there to follow websites, YouTube/Twitter/Twitch channels and other feeds, without worrying about it. And other sections are continually being added!
 
-.. note:: If you want to invite this bot to a server, `just click here <https://discord.com/oauth2/authorize?client_id=486896267788812288&scope=bot&permissions=1007021171>`_! And to join our official support server, `click on this link <https://discord.gg/N55zY88>`_!
+.. grid:: 2
 
-Translations of the Axobot `Privacy Policy <legal/privacy.html>`_ and its `Terms of Service <legal/tos.html>`_ have been added to this documentation as a guide.
+    .. grid-item::
+
+        .. button-link:: https://zrunner.me/invite-axobot
+            :color: primary
+            :align: right
+            :shadow:
+
+            Start using Axobot!
+
+    .. grid-item::
+
+        .. button-link:: https://discord.gg/N55zY88
+            :color: primary
+            :align: left
+            :outline:
+
+            Join our support server
+
 
 .. warning:: Zbot becomes Axobot! Your favorite bot changes its name and avatar to become even more friendly! Read the `V4 changelog <v4.html>`_ for details on this really huge update.
 
+
+💡 Built-in features
+--------------------
+
+.. grid:: 2
+
+    .. grid-item-card:: 🎖️ XP System
+        :link: server.html#xp-system
+        :margin: 0 3 0 0
+
+        Give XP to your active members and let them level up and getting roles!
+
+    .. grid-item-card:: 🔊 Auto Voice Channels
+        :link: server.html#voice-channels-managment
+        :margin: 0 3 0 0
+
+        Create voice channels automatically when a user joins a voice channel!
+
+    .. grid-item-card:: ❓ Tickets
+        :link: tickets
+        :link-type: doc
+        :margin: 0 3 0 0
+
+        Allow your members to easily contact your staff in a private channel!
+
+    .. grid-item-card:: 👮 Anti-scam AI
+        :link: moderator.html#anti-scam
+        :margin: 0 3 0 0
+
+        Use our custom AI to detect scam messages and warn your staff!
+
+    .. grid-item-card:: 🗞️ RSS feeds
+        :link: rss
+        :link-type: doc
+        :margin: 0 3 0 0
+
+        Follow your favorite YouTuber, Twitter account, Twitch channel and more!
+
+    .. grid-item-card:: ⚙ Advanced configuration
+        :link: server.html#config-options
+        :margin: 0 3 0 0
+
+        Axobot is a highly configurable bot, with more than 50 options for you to discover!
+
+And even more!
+
+
 .. toctree::
    :maxdepth: 2
-   :caption: List of available sections:
+   :caption: 📂 List of available sections
 
    perms
    moderator
@@ -37,15 +100,7 @@ Translations of the Axobot `Privacy Policy <legal/privacy.html>`_ and its `Terms
 
 .. toctree::
    :maxdepth: 1
-   :caption: Our articles:
+   :caption: 💬 Our articles
 
    v4
    scam-detector
-
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`

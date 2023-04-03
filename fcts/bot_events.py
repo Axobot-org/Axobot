@@ -198,7 +198,7 @@ class BotEvents(commands.Cog):
                 await ctx.send(embed=emb)
             else:
                 txt = f"""**{title}**\n\n{event_desc}
-                
+
                 __{(await self.bot._(ctx.channel, "misc.beginning")).capitalize()}:__ {begin}
                 __{(await self.bot._(ctx.channel, "misc.end")).capitalize()}:__ {end}
                 """

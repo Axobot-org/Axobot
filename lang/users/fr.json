@@ -16,6 +16,10 @@
             "false": "Vous devez enlever le tag AFK vous-même",
             "true": "Je vous enlèverai le tag AFK dès que vous enverrez un message"
         },
+        "show_tips": {
+            "false": "Vous ne recevrez plus d'astuces du bot",
+            "true": "Vous recevrez occasionnellement des astuces du bot"
+        },
         "usernames_log": {
             "false": "Vous avez désactivé l'enregistrement de vos noms d'utilisateurs ainsi que de vos surnoms",
             "true": "Vous avez autorisé l'enregistrement de vos noms d'utilisateurs ainsi que de vos surnoms"

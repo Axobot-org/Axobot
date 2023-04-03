@@ -46,6 +46,7 @@ class BotStats(commands.Cog):
         self.ticket_events = {"creation": 0}
         self.usernames = {"guild": 0, "user": 0, "deleted": 0}
         self.emitted_serverlogs: dict[str, int] = {}
+        self.serverlogs_audit_search: typing.Optional[tuple[int, int]] = None
         self.last_backup_size: typing.Optional[int] = None
 
     async def cog_load(self):
@@ -165,10 +166,21 @@ class BotStats(commands.Cog):
         if message.channel.id != 625319946271850537 or len(message.embeds) != 1:
             return
         embed = message.embeds[0]
-        if match := re.search(r"Database backup done! \((\d+(?:\.\d+)?)([GM])\)", embed.description):
+        if match := re.search(r"Database backup done! \((\d+(?:\.\d+)?)([GMK])\)", embed.description):
             unit = match.group(2)
-            self.last_backup_size = float(match.group(1)) / (1024 if unit == "M" else 1)
+            self.last_backup_size = float(match.group(1))
+            if unit == "M":
+                self.last_backup_size *= 1024
+            elif unit == "K":
+                self.last_backup_size *= 1024**2
             self.bot.log.info(f"Last backup size detected: {self.last_backup_size}G")
+
+    async def on_serverlogs_audit_search(self, success: bool):
+        "Called when a serverlog audit logs search is done"
+        if prev := self.serverlogs_audit_search:
+            self.serverlogs_audit_search = (prev[0]+1, prev[1]+success)
+        else:
+            self.serverlogs_audit_search = (1, success)
 
     async def db_get_disabled_rss(self) -> int:
         "Count the number of disabled RSS feeds in any guild"
@@ -201,7 +213,7 @@ class BotStats(commands.Cog):
                 FROM `axobot`.`dailies`
                 ORDER BY points
             ) AS subq
-            WHERE subq.row_index 
+            WHERE subq.row_index
             IN (FLOOR(@row_index / 2) , CEIL(@row_index / 2))"""
         async with self.bot.db_query(query, (now, "dailies.median", *args), multi=True) as _:
             pass
@@ -236,7 +248,7 @@ class BotStats(commands.Cog):
                 WHERE `events_points` != 0
                 ORDER BY events_points
             ) AS subq
-            WHERE subq.row_index 
+            WHERE subq.row_index
             IN (FLOOR(@row_index / 2) , CEIL(@row_index / 2))"""
         async with self.bot.db_query(query, (now, "eventpoints.median", *args), multi=True) as _:
             pass
@@ -258,14 +270,14 @@ class BotStats(commands.Cog):
         return ((query, (now, f"logs.{kind}.enabled", count, self.bot.entity_id))
             for kind, count in enabled_kinds.items()
         )
-            
+
 
     async def db_get_antiscam_enabled_count(self):
         "Get the number of active guilds where antiscam is enabled"
-        query = f"SELECT `guild_id` FROM `serverconfig` WHERE `option_name` = 'anti_scam' AND `value` = %s"
+        query = "SELECT `guild_id` FROM `serverconfig` WHERE `option_name` = 'anti_scam' AND `value` = %s"
         count = 0
         guild_ids = {guild.id for guild in self.bot.guilds}
-        async with self.bot.db_query(query, (True,)) as query_results:
+        async with self.bot.db_query(query, ("True",)) as query_results:
             for row in query_results:
                 if row["guild_id"] in guild_ids:
                     count += 1
@@ -363,6 +375,10 @@ class BotStats(commands.Cog):
             for k, v in self.emitted_serverlogs.items():
                 cursor.execute(query, (now, f'logs.{k}.emitted', v, 0, 'event/min', True, self.bot.entity_id))
             self.emitted_serverlogs.clear()
+            if self.serverlogs_audit_search is not None:
+                audit_search_percent = round(self.serverlogs_audit_search[1] / self.serverlogs_audit_search[0] * 100, 1)
+                cursor.execute(query, (now, 'logs.audit_search', audit_search_percent, 1, '%', False, self.bot.entity_id))
+                self.serverlogs_audit_search = None
             # Last backup save
             if self.last_backup_size:
                 cursor.execute(query, (now, 'backup.size', self.last_backup_size, 1, 'Gb', False, self.bot.entity_id))

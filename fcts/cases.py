@@ -110,7 +110,7 @@ class Cases(commands.Cog):
                         case_type=elem['type'],
                         mod_id=elem['mod'],
                         date=elem['created_at'],
-                        reason=elem['reason'], 
+                        reason=elem['reason'],
                         duration=elem['duration']
                     )
                     liste.append(case)
@@ -207,12 +207,11 @@ class Cases(commands.Cog):
     async def see_case_main(self, ctx: MyContext, guild: discord.Guild, user: discord.User):
         if guild is not None:
             criters = ["`user`='{}'".format(user.id),"guild='{}'".format(guild)]
-            syntax: str = await self.bot._(ctx.guild,'cases.list-0')  
+            syntax: str = await self.bot._(ctx.guild,'cases.list-0')
         else:
             syntax: str = await self.bot._(ctx.guild,'cases.list-1')
             criters = ["`user`='{}'".format(user.id)]
         try:
-            MAX_CASES = 60
             cases = await self.get_case(criters=criters)
             cases.reverse()
             if cases is None or len(cases) == 0:
@@ -228,7 +227,7 @@ class Cases(commands.Cog):
                     "Paginator used to display a user record"
                     users: dict[int, Optional[discord.User]]
 
-                    async def get_page_count(self, interaction) -> int:
+                    async def get_page_count(self) -> int:
                         length = len(cases)
                         if length == 0:
                             return 1
@@ -257,12 +256,12 @@ class Cases(commands.Cog):
                                 formated_duration = await FormatUtils.time_delta(case.duration,lang=lang,year=False,form="short")
                                 text += "\n" + await self.client._(interaction,'cases.display.duration', data=formated_duration)
                             embed.add_field(name=await self.client._(interaction, "cases.title-search", ID=case.id), value=text, inline=True)
-                        footer = f"{ctx.author}  |  {page}/{await self.get_page_count(interaction)}"
+                        footer = f"{ctx.author}  |  {page}/{await self.get_page_count()}"
                         embed.set_footer(text=footer, icon_url=ctx.author.display_avatar)
                         return {
                             "embed": embed
                         }
-                
+
                 _quit = await self.bot._(ctx.guild, "misc.quit")
                 view = RecordsPaginator(self.bot, ctx.author, stop_label=_quit.capitalize())
                 await view.send_init(ctx)

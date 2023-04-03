@@ -101,6 +101,30 @@
         "{0} oli jaettu Thanoksen kanssa",
         "Thanos päätti muuttaa {0} tuhkiin. Ihmiskunnan hyväksi ...."
     ],
+    "tip-list": [
+        "Tiesitkö että, **Jees1#5825** käänsi tämän botin suomeksi?",
+        "Pro-vinkki: vaihtaaksesi botin kieltä, käytä komentoa %{config_cmd}!",
+        "Pro-vinkki: Löydät selitykset jokaisesta komennosta botin dokumentaatiosta osoitteessa https://zbot.rtfd.io. Ehkä myös komennoista joista et tiennyt!",
+        "Tiesitkö, että komennon %{stat_cmd} tulokset piilottavat joitakin palvelimia, kuten \"bottiluettelo\" palvelimia tai sisäisiä palvelimia",
+        "Tiesitkö, että minut oli alun perin suunniteltu Minecraft-yhteisön palvelimelle. Siitä nimeni tulikin, ja siksi minulla on joitakin Minecraftiin liittyviä komentoja.",
+        "Tiesitkö, että ensimmäinen versio botista oli koodattu helmikuussa 2018 henkilökohtaiseen käyttöön. Tuolloin oli vain muutama yksinkertainen komento, kuten %{clear_cmd} ja %{say_cmd}",
+        "Pro-vinkki: %{say_cmd} komennolla voit käyttää emojeita miltä tahansa palvelimelta, jossa olen - jopa animoituja emojeita! Anna emoji niin, miten itse käyttäisit sitä",
+        "Pro-tip: With the `say` command, you can use the emojis from any server where Zbot is, even animated emojis! Just give the emoji as if you were using it yourself",
+        "Pro-tip: To use a custom emoji in the `react` command, just give its name. And it works with any emoji!",
+        "Pro-tip: With the command `me <text>`, you can make the bot say what you want, with your nickname in front of it! Like, for example, \"*Wumpus likes bananas*\".",
+        "Pro-tip: The command `roll Nothing, Nothing, Nothing, Nothing, Nothing, PAN !` allows you to play Russian roulette! Be careful with that, though, okay?",
+        "Pro-tip: If you need help, feel free to use the `osekour` command",
+        "Tiesitkö, että aiemmin minun profiilini kuva oli... kriipperi!",
+        "Tiesitkö, että botin henkilökunta koostuu taitavasta kehittäjä Administa, toisesta administa nimetty \"kibble\" nimisen merkin mukaisesti sekä kissasta, Porttikielto vasarasta ja sienestä!",
+        "Pro-vinkki: Komento %{say_cmd} on erittäin hyödyllinen anonyymien viestien lähettämiseen... ainakin kun sinulla on pääsy siihen.",
+        "Pro-vinkki: Komento %{discordlinks_cmd} antaa sinulle kaikki Discordiin liittyvät hyödylliset linkit!",
+        "Tiesitkö, että kaikki bottiin liittyvät kuviot, mallit ja piirrustukset ovat Adri#9223:n jälkeä, mukaan lukien valtava luettelo emojeita, joita käytetään %{bigtext_cmd} komennossa!",
+        "Tiesitkö, että viime aikoihin asti virallinen nimeni oli 'Zbot', viitaten suoraan tekijääni, Z_runner:iin",
+        "Pro-vinkki: Botilla on Discord palvelin, jossa voit nähdä tunnetut bugit ja äänestää seuraavia päivityksiä varten! Käytä %{about_cmd} komentoa saadaksesi kutsun",
+        "Pro-tip: The bot has a Discord, where you can see the current bugs and vote for the next updates! Use the `about` command to get the invite",
+        "Tiesitkö, että voit antaa kuvauksen palvelimestasi, jota voidaan käyttää muissa palvelimissa komennon %{config_cmd} `kuvaus` vaihtoehdon avulla",
+        "Tiesitkö, että joissakin erikoistapahtumissa on mahdollista saada keräilijä xp kortteja. Älä unohda seurata uutisia virallisella palvelimellamme tai komennolla %{event_cmd}!"
+    ],
     "uninhabited-city": "Asumaton kaupunki :confused:",
     "vote-0": "Sinä voit laittaa enemmän kuin 20 vaihtoehtoa, ja myös vähemmän negatiivisia!"
 }

@@ -12,6 +12,10 @@
         "users-info": "Käyttäjän tietoa"
     },
     "check-desc": {
+        "bot_can_embed": [
+            "Botilla on lupa lähettää upotettuja linkkejä",
+            "Sinun täytyy sallia botin lähettää upotettuja linkkejä"
+        ],
         "bot_has_permissions": [
             "Botilla on riittävästi käyttöoikeuksia",
             "Botilla ei ole riittävästi käyttöoikeuksia"
@@ -35,6 +39,10 @@
         "can_mute": [
             "Yksi sinun rooleista voi käyttää komentoa (`mute_allowed_roles`)",
             "Sallittu rooli puuttuu (`mute_allowed_roles`)"
+        ],
+        "can_say": [
+            "Yksi sinun rooleista voi käyttää komentoa (`say_allowed_roles`)",
+            "Sallittu rooli puuttuu (`say_allowed_roles`)"
         ],
         "can_slowmode": [
             "Yksi sinun rooleista voi käyttää komentoa (`slowmode`_allowed_roles)",
@@ -64,9 +72,21 @@
             "Sinulla on 'Järjestelmänvalvoja' käyttöoikeus",
             "'Järjestelmänvalvoja' käyttöoikeus puuttuu"
         ],
+        "has_audit_logs": [
+            "Sinulla on 'Katso valvontalokia' käyttöoikeus",
+            "'Katso valvontalokia' käyttöoikeus puuttuu"
+        ],
         "has_embed_links": [
             "Sinulla on 'Upota linkkejä' käyttöoikeus",
             "Sinulla täytyy olla 'Upota linkkejä' käyttöoikeus"
+        ],
+        "has_manage_channels": [
+            "Sinulla on 'Hallinnoi kanavia' käyttöoikeus",
+            "'Hallinnoi kanavia' käyttooikeus puuttuu"
+        ],
+        "has_manage_emojis": [
+            "Sinulla on 'Hallinnoi emojeja ja tarroja' käyttöoikeus",
+            "Sinulla täytyy olla 'Hallinnoi emojeja ja tarroja' käyttöoikeus"
         ],
         "has_manage_guild": [
             "Sinulla on 'Hallinnoi palvelinta' käyttöoikeus",
@@ -87,6 +107,10 @@
         "has_permissions": [
             "Sinulla on riittävästi käyttöoikeuksia",
             "Sinulla ei ole riittävästi käyttöoikeuksia"
+        ],
+        "in_support_server": [
+            "Olet botin tukipalvelimella",
+            "Voit käyttää tätä komentoa vain botin tukipalvelimella."
         ],
         "is_bot_admin": [
             "Sinun täytyy olla botin ylläpitäjä",
@@ -115,18 +139,23 @@
         "is_ttt_enabled": [
             "Ristinolla peli on käytössä",
             "Ristinolla peli täytyy laittaa käyttöön tällä palvelimella"
-        ],
-        "verify_role_exists": [
-            "Vahvistus rooli on asetettu",
-            "Vahvistus roolia ei ole asetettu"
         ]
     },
-    "cmd-count": "%{nbr} komentoa",
+    "cmd-count": {
+        "zero": "Ei komentoa",
+        "one": "1 komento\nLisätietoja: `%{p}help %{cog}`",
+        "other": "%{count} komentoa\n`%{p}help %{cog}` saadaksesi lista"
+    },
     "cmd-not-found": "Komentoa  \"%{cmd}\" ei ole nimetty",
+    "cog-empty-dm": "Mikään tämän kategorian komento ei toimi yksityisviesteissä!",
     "description": "Kuvaus",
     "embed_title": "Käytettävissä olevat komennot käyttäjälle %{u}",
     "embed_title_dm": "Yksityisviesteissä toimivat komennot",
     "footer": "Viestitä {}help komento niin saat lisätietoja tietyistä komennoista",
+    "more-subcmds": {
+        "one": "ja 1 lisää",
+        "many": "ja %{count} lisää"
+    },
     "no-desc-cmd": "Ei lisätietoja tästä komennosta.",
     "no-desc-cog": "Ei lisätietoja tästä cog:stä.",
     "no-subcmd": "komenolla `%{cmd}`ei ole toissijaista komentoa",

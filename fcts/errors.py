@@ -73,7 +73,8 @@ class Errors(commands.Cog):
         # Anything in ignored will return and prevent anything happening.
         if isinstance(error, ignored) and not isinstance(error, actually_not_ignored):
             if isinstance(error, commands.CheckFailure) and ctx.interaction:
-                await ctx.send(await self.bot._(ctx.channel, "errors.checkfailure", help_cmd="`!help`"), ephemeral=True)
+                help_cmd = await self.bot.get_command_mention("help")
+                await ctx.send(await self.bot._(ctx.channel, "errors.checkfailure", help_cmd=help_cmd), ephemeral=True)
             if self.bot.beta and ctx.guild:
                 await ctx.send(f"`Ignored error:` [{error.__class__.__module__}.{error.__class__.__name__}] {error}")
             return
@@ -234,8 +235,9 @@ class Errors(commands.Cog):
     async def on_interaction_error(self, interaction: discord.Interaction, error: discord.app_commands.AppCommandError):
         "Called when an error is raised during an interaction"
         if isinstance(error, discord.app_commands.CheckFailure):
+            help_cmd = await self.bot.get_command_mention("help")
             await interaction.response.send_message(
-                await self.bot._(interaction, "errors.checkfailure", help_cmd="`!help`"),
+                await self.bot._(interaction, "errors.checkfailure", help_cmd=help_cmd),
                 ephemeral=True)
             return
         if interaction.guild:
@@ -273,8 +275,7 @@ class Errors(commands.Cog):
             if isinstance(ctx, discord.Message):
                 ctx = await self.bot.get_context(ctx)
             tr = traceback.format_exception(type(error), error, error.__traceback__)
-            tr = " ".join(tr)[:1950]
-            msg = f"```python\n{tr}\n```"
+            tr = " ".join(tr)
             # get context clue
             if ctx is None:
                 context = "Internal Error"
@@ -289,13 +290,23 @@ class Errors(commands.Cog):
                 context = f"{ctx.guild.name} | {ctx.channel.name}"
             # if channel is the private beta channel, send it there
             if isinstance(ctx, (MyContext, discord.Interaction)) and ctx.channel.id == 625319425465384960:
-                await ctx.channel.send(context + "\n" + msg)
+                await ctx.channel.send(f"{context}\n```py\n{tr[:1950]}\n```")
             else:
-                await self.senf_err_msg(context + "\n" + msg)
+                await self.send_error_msg_autoformat(context, tr)
             self.bot.log.warning(f"[on_error] {error}", exc_info=exc_info)
         except Exception as err: # pylint: disable=broad-except
             self.bot.log.error(f"[on_error] {err}", exc_info=exc_info)
 
+    async def send_error_msg_autoformat(self, context: str, python_message: str):
+        """Envoie un message dans le salon d'erreur"""
+        success = True
+        for i in range(0, len(python_message), 1950):
+            if i == 0:
+                msg = context + f"\n```py\n{python_message[i:i+1950]}\n```"
+            else:
+                msg = f"```py\n{python_message[i:i+1950]}\n```"
+            success = success and await self.senf_err_msg(msg)
+        return success
 
     async def senf_err_msg(self, msg: str):
         """Envoie un message dans le salon d'erreur"""

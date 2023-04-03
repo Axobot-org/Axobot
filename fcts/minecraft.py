@@ -1,4 +1,5 @@
 import datetime
+import json
 import re
 import time
 from typing import Any, Union
@@ -10,7 +11,8 @@ import requests
 from dateutil.parser import isoparse
 from discord.ext import commands
 from frmc_lib import SearchType
-from libs.bot_classes import MyContext, Axobot
+
+from libs.bot_classes import Axobot, MyContext
 from libs.formatutils import FormatUtils
 from libs.rss.rss_general import FeedObject
 
@@ -483,10 +485,12 @@ Every information come from the website www.fr-minecraft.net"""
             try:
                 r = requests.get("https://api.mcsrvstat.us/1/" +
                                  str(ip), timeout=5).json()
+            except json.decoder.JSONDecodeError:
+                return await self.bot._(guild, "minecraft.serv-error")
             except Exception as err:
                 if not isinstance(err, requests.exceptions.ReadTimeout):
-                    self.bot.log.error("[mc-server-2] Erreur sur l'url {} :".format(url))
-                self.bot.dispatch("error", err)
+                    self.bot.log.error(f"[mc-server-2] Erreur sur l'url {url} :")
+                self.bot.dispatch("error", err, f"While checking minecraft server {ip}")
                 return await self.bot._(guild, "minecraft.serv-error")
         if r["debug"]["ping"] is False:
             return await self.bot._(guild, "minecraft.no-ping")
