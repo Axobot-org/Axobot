@@ -250,21 +250,22 @@ class Admin(commands.Cog):
             if channel is None:
                 continue
             lang: typing.Optional[str] = await ctx.bot.get_config(guild.id, 'language')
-            if lang not in self.update.keys():
+            if lang not in self.update:
                 lang = 'en'
             mentions_roles: list[discord.Role] = await self.bot.get_config(guild.id, 'update_mentions') or []
             mentions = " ".join(x.mention for x in mentions_roles if x is not None)
             allowed_mentions = discord.AllowedMentions(everyone=False, roles=True)
             try:
                 await channel.send(self.update[lang]+"\n\n"+mentions, allowed_mentions=allowed_mentions)
-            except Exception as e:
-                self.bot.dispatch("error", e, ctx)
+            except Exception as err:
+                self.bot.dispatch("error", err, ctx)
             else:
                 count += 1
             if guild.id == 356067272730607628:
                 fr_chan = guild.get_channel(494870602146906113)
                 if fr_chan != channel:
-                    await fr_chan.send(self.update['fr']+"\n\n"+mentions, allowed_mentions=allowed_mentions)
+                    # special treatment for the French channel in the bot support server
+                    await fr_chan.send(self.update['fr'] + "\n\n<@&1092557246921179257>", allowed_mentions=allowed_mentions)
                     count += 1
 
         await ctx.send("Message envoyé dans {} salons !".format(count))
