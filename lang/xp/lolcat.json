@@ -5,6 +5,7 @@
     "bot-rank": "Bots like myself can't have any xp...sad times.",
     "card-level": "LVL",
     "card-rank": "SEAT",
+    "card-forbidden": "Whoops, cant send u DMs. Plz check u accept friendly DMs and try again :innocent:",
     "card-too-large": "Oops, un'ble 2 send ur card :eyes: maybe ur file is just 2 heavy, maybe u'can just 4 example disable the animation of ur card (command `profile config animated_card false`) idk, i'm not an engineer :shrug:",
     "change-global-xp": "NOT possible 2 edit XP of the global super mega system!",
     "change-xp-ok": "XP of teh user %{user} have been set 2 %{xp}xp!",
