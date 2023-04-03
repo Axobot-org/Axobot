@@ -49,7 +49,7 @@ class PrefixManager:
             if query_result and len(query_result['value']) > 0:
                 prefix: str = query_result['value']
             else:
-                prefix = '!'
+                prefix = options_list["prefix"]["default"]
         # and return
         return prefix
 
