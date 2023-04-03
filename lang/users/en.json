@@ -16,6 +16,10 @@
             "false": "You must remove the AFK tag yourself",
             "true": "I'll remove the AFK tag from you as soon as you send a message"
         },
+        "show_tips": {
+            "false": "You will no longer receive tips from the bot",
+            "true": "You will casually receive tips from the bot"
+        },
         "usernames_log": {
             "false": "You have disabled the recording of your user names and nicknames",
             "true": "You have authorized the recording of your user names and nicknames"

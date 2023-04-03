@@ -100,7 +100,8 @@ Slowmode works up to one message every 6h (21600s)
             return
         await ctx.defer()
         if users is None and contains_file is None and contains_url is None and contains_invite is None and is_pinned is None:
-            return await self.clear_simple(ctx,number)
+            return await self.clear_simple(ctx, number)
+        user_ids = None if users is None else {u.id for u in users}
 
         def check(msg: discord.Message):
             # do not delete invocation message
@@ -112,14 +113,14 @@ Slowmode works up to one message every 6h (21600s)
                 return False
             if contains_file is not None and bool(msg.attachments) != contains_file:
                 return False
-            r = self.bot.get_cog("Utilities").sync_check_any_link(msg.content)
-            if contains_url is not None and (r is not None) != contains_url:
+            url_match = self.bot.get_cog("Utilities").sync_check_any_link(msg.content)
+            if contains_url is not None and (url_match is not None) != contains_url:
                 return False
-            i = self.bot.get_cog("Utilities").sync_check_discord_invite(msg.content)
-            if contains_invite is not None and (i is not None) != contains_invite:
+            invite_match = self.bot.get_cog("Utilities").sync_check_discord_invite(msg.content)
+            if contains_invite is not None and (invite_match is not None) != contains_invite:
                 return False
             if users and msg.author is not None:
-                return str(msg.author.id) in users
+                return msg.author.id in user_ids
             return True
 
         if ctx.interaction:
@@ -520,7 +521,7 @@ This will remove the role 'muted' for the targeted member
         confirm_txt = await self.bot._(ctx.guild.id, "moderation.mute-config.confirm")
         confirm_txt += "\n\n" + await self.bot._(ctx.guild.id, "moderation.mute-config.tip", mute=await self.bot.get_command_mention("mute"))
         confirm_msg = await ctx.send(confirm_txt, view=confirm_view)
-        
+
         await confirm_view.wait()
         await confirm_view.disable(confirm_msg)
         if not confirm_view.value:
@@ -850,7 +851,7 @@ You must be an administrator of this server to use this command.
             saved_bans: list[discord.guild.BanEntry] = []
             users: set[int] = set()
 
-            async def get_page_count(self, interaction) -> int:
+            async def get_page_count(self) -> int:
                 length = len(self.saved_bans)
                 if length == 0:
                     return 1
@@ -883,7 +884,7 @@ You must be an administrator of this server to use this command.
                         else:
                             values = [str(entry.user) for entry in self.saved_bans[i:i+10]]
                         emb.add_field(name=f"{column_start}-{column_end}", value="\n".join(values))
-                footer = f"{ctx.author}  |  {page}/{await self.get_page_count(interaction)}"
+                footer = f"{ctx.author}  |  {page}/{await self.get_page_count()}"
                 emb.set_footer(text=footer, icon_url=ctx.author.display_avatar)
                 return {
                     "embed": emb
@@ -915,7 +916,7 @@ The 'show_reasons' parameter is used to display the mute reasons.
             "Paginator used to display muted users"
             users_map: dict[int, Optional[discord.User]] = {}
 
-            async def get_page_count(self, interaction) -> int:
+            async def get_page_count(self) -> int:
                 length = len(muted_list)
                 if length == 0:
                     return 1
@@ -952,7 +953,7 @@ The 'show_reasons' parameter is used to display the mute reasons.
                                 user = await self._resolve_user(user_id)
                                 values.append(str(user))
                         emb.add_field(name=f"{column_start}-{column_end}", value="\n".join(values))
-                footer = f"{ctx.author}  |  {page}/{await self.get_page_count(interaction)}"
+                footer = f"{ctx.author}  |  {page}/{await self.get_page_count()}"
                 emb.set_footer(text=footer, icon_url=ctx.author.display_avatar)
                 return {
                     "embed": emb
@@ -1071,7 +1072,7 @@ The 'show_reasons' parameter is used to display the mute reasons.
         ]
 
         class EmojisPaginator(Paginator):
-            async def get_page_count(self, _: discord.Interaction) -> int:
+            async def get_page_count(self) -> int:
                 length = len(emotes)
                 if length == 0:
                     return 1

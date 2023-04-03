@@ -1,6 +1,6 @@
-===============
-Roles reactions
-===============
+==================
+🏷️ Roles reactions
+==================
 
 The reaction role system is increasingly used in Discord servers because of its simplicity. It allows your users to obtain or withdraw a role by simply clicking on a reaction. It is faster than a command to enter, more ergonomic, and it allows a better presentation of the obtainable roles... what more could you ask for?
 

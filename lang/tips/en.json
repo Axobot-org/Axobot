@@ -1,0 +1,12 @@
+{
+    "embed": {
+        "title": [
+            "Pro-tip",
+            "Did you know?",
+            "Did you know that...?",
+            "Handy Hint",
+            "Have you tried...?"
+        ]
+    },
+    "rank_card_personalisation": "You can change your rank card background with the %{profile_cmd} command!"
+}

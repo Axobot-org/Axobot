@@ -1,5 +1,5 @@
 {
-    "config-help": "Cette commande sert principalement à configurer votre serveur. En faisant `%{p}config see [option]`, tu obtiendrez l'aperçu des configurations actuelles, et les administrateurs du serveur peuvent entrer `%{p}config change <option> valeur1, valeur2...` pour modifier une configuration, ou `%{p}config del <option>` pour réinitialiser l'option (`%{p}config change <option> del` fonctionne de même).\nLa liste des options disponible est accessible à l'adresse <https://zbot.rtfd.io/en/latest/server.html#list-of-every-option>",
+    "config-help": "Cette commande sert principalement à configurer votre serveur. En faisant `%{p}config see [option]`, tu obtiendrez l'aperçu des configurations actuelles, et les administrateurs du serveur peuvent entrer `%{p}config set <option> valeur1, valeur2...` pour modifier une configuration, ou `%{p}config del <option>` pour réinitialiser l'option (`%{p}config set <option> del` fonctionne de même).\nLa liste des options disponible est accessible à l'adresse <https://zbot.rtfd.io/en/latest/server.html#list-of-every-option>",
     "config-list": "Liste des options disponibles :%{text}Plus d'information : %{link}",
     "edit-error": {
         "anti_raid": "Ce niveau n'existe pas :eyes:. Voici la liste des niveaux actuellement disponibles : %{list}",

@@ -25,8 +25,8 @@
     "hint-useless": "Creet a ticket",
     "missing-category-config": "Oops, I couldnt creete ur ticket cause no'ne told me wheere to creete them. Please ask a servr moderator to use the %{set_category} cmd.",
     "missing-perms-creation": {
-        "channel": "Ouch, I couldnt creete a new ticket channel. Pliz make sure I haz teh requiwed permissions nd try again.",
-        "thread": "Woops, I couldnt creete a new ticket threed. Pleez make sure I haz teh requird permissionz and try harder."
+        "channel": "Ouch, I couldnt creete a new ticket channel. Pliz make sure I haz teh requiwed permissions in \"%{category}\" nd try again.",
+        "thread": "Woops, I couldnt creete a new ticket threed. Pleez make sure I haz teh requird permissionz in %{channel} and try harder."
     },
     "missing-perms-setup": {
         "to-member": "Oopsie, I couldnt setup ur ticket channel. Pls ask a server moderator 2 fix my perms, or any1 havin access to teh tickets thing may be able 2 read ur ticket and that might be uncool u know?",
@@ -34,6 +34,27 @@
     },
     "nothing-to-edit": "Nothin to edit!!",
     "other": "Smth else",
+    "review": {
+        "category": "Catègoryz",
+        "channel": "Chanel",
+        "default": "Base configurashiun",
+        "deleted-category": "Deletd place with id %{id}",
+        "deleted-role": "Deletd tag %{id}",
+        "embed": {
+            "desc-global": "Herz a revie ov ur all configuration for dis server",
+            "desc-topic": "Herz a review ov ur config 4 teh topic \"%{topic}\" only",
+            "title-global": "Global config blink",
+            "title-topic": "\"%{topic}\" config review"
+        },
+        "emoji": "Emoji",
+        "format": "Name format",
+        "hint": "Hint msg",
+        "no-config": "Dis server dont use teh cool ticket systm :sadcat:",
+        "prompt": "Select prompt",
+        "role": "Allowd rolz",
+        "topic-no-config": "No specific config 4 dis topic",
+        "topic-not-found": "No topic w/ dis ID"
+    },
     "role-edited": {
         "default": "Yup okay, ur default role allowd to see tickets have been changd!",
         "default-reset": "Yup okay, ur default role allowd to see tickets have been reset 2 'no one HAH'!",

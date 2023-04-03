@@ -1,8 +1,8 @@
-==========
-Moderation
-==========
+=============
+🔨 Moderation
+=============
 
-Like many Discord bots, ZBot allows you to moderate your server in different ways. You will find the classic commands to delete messages, mute, kick out or ban a member, as well as being able to slow down or freeze a chat completely. 
+Like many Discord bots, ZBot allows you to moderate your server in different ways. You will find the classic commands to delete messages, mute, kick out or ban a member, as well as being able to slow down or freeze a chat completely.
 
 Among the features in preparation you will find the members' records as well as the possibility of sending warnings, or a section on automatic moderation.
 
@@ -25,13 +25,13 @@ Mute/Unmute
 -----------
 
 .. warning::
-    This section describes the use of the mute system when coupled with a "muted" role. As of Axobot 4.0.3, having a special role is no longer mandatory, and Axobot will use Discord's "time out" feature when no role has been configured to mute.  
+    This section describes the use of the mute system when coupled with a "muted" role. As of Axobot 4.0.3, having a special role is no longer mandatory, and Axobot will use Discord's "time out" feature when no role has been configured to mute.
 
     If you have a role set to mute but wish to switch to the time out system, you can use the :code:`config reset muted_role` command.
 
 **Syntax:** :code:`mute <user> [duration] [reason]`
 
-This command mutes a member, preventing them from typing. 
+This command mutes a member, preventing them from typing.
 
 The principle is to assign the *muted* role to the member, in order to distinguish them from the others. Simply configure the permissions to have the "send messages" option disabled in your channels. And if configuring the role is too much work for you, you can ask the bot to try to setup it automatically with the :code:`mute-config` command (see below).
 
@@ -55,7 +55,7 @@ Slowmode
 
 **Syntax:** :code:`slowmode <seconds>` or :code:`slowmode off`
 
-Slowmode keeps your text channel quiet when excited people have decided to talk a little too fast. More precisely, it prevents members from posting messages too often. The frequency between two consecutive messages from the same member is indicated in the command.  
+Slowmode keeps your text channel quiet when excited people have decided to talk a little too fast. More precisely, it prevents members from posting messages too often. The frequency between two consecutive messages from the same member is indicated in the command.
 
 .. note:: The system uses a brand new feature released on September 8th in Discord beta. It therefore is a completely new as in very few bots have it) feature and can be highly integrated into your applications. It is even better than just deleting messages.
 
@@ -67,11 +67,11 @@ Clear
 
 This command allows you to efficiently delete messages, with a list of possible parameters for more accuracy. You can thus specify a list of members to check by mentioning them, if it should delete all messages containing files/images, or all containing links or Discord invitations, or even pinned messages. By default, the bot will not delete pinned messages.
 
-Be careful, all specified settings must be validated for the message to be deleted. For example, if you enter :code:`/clear 10 users: @Z_runner#7515 contains_file: True`, the bot will check in the last ten messages if the message comes from Z_runner#7515 AND if the message contains an image. 
+Be careful, all specified settings must be validated for the message to be deleted. For example, if you enter :code:`/clear 10 users: @Z_runner#7515 contains_file: True`, the bot will check in the last ten messages if the message comes from Z_runner#7515 AND if the message contains an image.
 
 If you enter :code:`/clear 25 contains_url: True`, the bot will clear the last 25 messages if they contains a link AND if they're not pinned, no matter the author.
 
-If you enter :code:`/clear 1000 users: @Z_runner#7515 @ZBot beta#4940`, the bot will delete all (not pinned) messages contained in the last 1000 messages of the channel AND written by Z_runner#7515 OR ZBot beta#4940 
+If you enter :code:`/clear 1000 users: @Z_runner#7515 @ZBot beta#4940`, the bot will delete all (not pinned) messages contained in the last 1000 messages of the channel AND written by Z_runner#7515 OR ZBot beta#4940.
 
 .. warning:: The permissions "`Manage messages <perms.html#manage-messages>`__" and "`Read messages history <perms.html#read-message-history>`__" are required.
 
@@ -117,9 +117,9 @@ To cancel this action, use the Discord interface or the `unban <#unban>`__ comma
 
 **Syntax:** :code:`unban <user> [reason]`
 
-This command allows you to revoke a ban, whether it was made via this bot or not. Just fill in the exact name or the identifier of the member you wish to be unbanned so that the bot can find the member you choose in the list of banned members for the member in question. 
+This command allows you to revoke a ban, whether it was made via this bot or not. Just fill in the exact name or the identifier of the member you wish to be unbanned so that the bot can find the member you choose in the list of banned members for the member in question.
 
-The persons authorized to use this command are the same as for the `ban <#ban>`__ command(see the :code:`config` command). 
+The persons authorized to use this command are the same as for the `ban <#ban>`__ command(see the :code:`config` command).
 
 .. warning:: For both commands to succeed, the bot must have "`Ban members <perms.html#ban-members>`__" permissions (as well as be placed higher than the highest role of the member to ban).
 
@@ -187,7 +187,7 @@ Anti-raid
 
 *Not a command, but a server option.*
 
-This option allows you to moderate the entry of your server, with several levels of security. Here is the list of levels: 
+This option allows you to moderate the entry of your server, with several levels of security. Here is the list of levels:
 
 * 0 (None): no filter
 * 1 (Smooth): kick members with invitations in their nickname
@@ -239,7 +239,7 @@ Types of logs
 -------------
 
 * **antiraid:** A new member is kicked or banned by the raid detection system
-* **antiscan:** A message is flagged as a potential scam by the antiscam AI
+* **antiscam:** A message is flagged as a potential scam by the antiscam AI
 * **bot_warnings:** Axobot couldn't do its job due to an external factor (like a missing permission)
 * **discord_invite:** A member just sent a message containing one or more Discord server invite link
 * **ghost_ping:** A member deleted a message containing a user mention right after sending it
@@ -256,6 +256,8 @@ Types of logs
 * **message_update:** A message is edited
 * **message_delete:** A message is deleted
 * **role_creation:** A role is created
+* **role_deletion:** A role is deleted
+* **role_update:** A role has been edited
 * **ticket_creation:** A `ticket <tickets.html>`__ has been opened
 
 

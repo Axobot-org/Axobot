@@ -25,8 +25,8 @@
     "hint-useless": "Create a ticket",
     "missing-category-config": "Oops, I couldn't create your ticket because no one told me where to create them. Please ask a server moderator to use the %{set_category} command.",
     "missing-perms-creation": {
-        "channel": "Oops, I couldn't create a new ticket channel. Please make sure I have the required permissions and try again.",
-        "thread": "Oops, I couldn't create a new ticket thread. Please make sure I have the required permissions and try again."
+        "channel": "Oops, I couldn't create a new ticket channel. Please make sure I have the required permissions in the \"%{category}\" category and try again.",
+        "thread": "Oops, I couldn't create a new ticket thread. Please make sure I have the required permissions in %{channel} and try again."
     },
     "missing-perms-setup": {
         "to-member": "Oops, I couldn't properly set up your ticket channel. Please ask a server moderator to fix my permissions, otherwise anyone having access to the tickets category may be able to read your ticket.",
@@ -34,6 +34,27 @@
     },
     "nothing-to-edit": "Nothing to edit!",
     "other": "other",
+    "review": {
+        "category": "Category",
+        "channel": "Channel",
+        "default": "Default configuration",
+        "deleted-category": "Deleted category or channel %{id}",
+        "deleted-role": "Deleted role %{id}",
+        "embed": {
+            "desc-global": "Here is a review of the global configuration of the ticket system for this server",
+            "desc-topic": "Here is a review of the configuration of the ticket system for the topic \"%{topic}\" specifically",
+            "title-global": "Global configuration review",
+            "title-topic": "Configuration review for topic \"%{topic}\""
+        },
+        "emoji": "Emoji",
+        "format": "Name format",
+        "hint": "Hint message",
+        "no-config": "This server does not use the ticket system",
+        "prompt": "Selection prompt",
+        "role": "Allowed role",
+        "topic-no-config": "No specific configuration for this topic",
+        "topic-not-found": "No topic with this ID was found"
+    },
     "role-edited": {
         "default": "The default role allowed to see tickets has been edited!",
         "default-reset": "The default role allowed to see tickets has been reset to no role!",
@@ -44,7 +65,7 @@
     "text-edited": "The message displayed with the selection of a ticket has been edited",
     "ticket-created": "Ticket opened in %{channel} with the topic \"%{topic}\"!",
     "ticket-introduction": {
-        "description": "Welcome %{user} in your ticket about '%{ticket_name}'! Someone should quickly answer your concerns right here.\nAs a reminder, you selected the topic **'%{topic_name}'**",
+        "description": "Welcome %{user} in your ticket about '%{ticket_name}'! Someone should quickly answer your concerns right here.\n\nAs a reminder, you selected the topic **'%{topic_name}'**",
         "title": "New ticket created!"
     },
     "title-modal": {

@@ -227,7 +227,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
                     await ctx.message.delete(delay=0)
             except commands.CommandError: # user can't use 'say'
                 pass
-    
+
     @commands.command(name="shuffle", hidden=True)
     @commands.check(is_fun_enabled)
     async def shuffle(self, ctx: MyContext, *, name: typing.Union[discord.Member, str]):
@@ -284,9 +284,9 @@ You can specify a verification limit by adding a number in argument (up to 1.000
     @commands.check(is_fun_enabled)
     async def kill(self, ctx: MyContext, * , name: str=None):
         """Just try to kill someone with a fun message
-        
+
         ..Example kill herobrine
-        
+
         ..Doc fun.html#kill"""
         if name is None:
             victime = ctx.author.display_name
@@ -614,7 +614,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         else:
             await ctx.send(random.choice(await self.bot._(ctx.channel,"fun.piece-0")))
 
-    @commands.command(name="weather", aliases=['météo'], enabled=False)
+    @commands.command(name="weather", aliases=['météo'])
     @commands.cooldown(4, 30, type=commands.BucketType.guild)
     async def weather(self, ctx:MyContext, *, city:str):
         """Get the weather of a city
@@ -711,18 +711,18 @@ You can specify a verification limit by adding a number in argument (up to 1.000
             await ctx.send(await self.bot._(ctx.guild.id,"fun.afk.unafk-done"))
             if ctx.author.nick and ctx.author.nick.endswith(" [AFK]"):
                 try:
-                    await ctx.author.edit(nick=ctx.author.display_name.replace(" [AFK]",''))                
+                    await ctx.author.edit(nick=ctx.author.display_name.replace(" [AFK]",''))
                 except discord.errors.Forbidden:
                     pass
         else:
             await ctx.send(await self.bot._(ctx.guild.id,"fun.afk.unafk-cant"))
-    
+
     @commands.Cog.listener()
     async def on_message(self, msg: discord.Message):
         if msg.guild and not await self.bot.check_axobot_presence(guild=msg.guild):
             await self.check_afk(msg)
             await self.check_suggestion(msg)
-    
+
     async def check_afk(self, msg: discord.Message):
         """Check if someone pinged is afk"""
         if msg.author.bot:
@@ -737,12 +737,14 @@ You can specify a verification limit by adding a number in argument (up to 1.000
                 if member.id not in self.afk_guys or len(self.afk_guys[member.id]) == 0:
                     await msg.channel.send(await self.bot._(msg.guild.id,"fun.afk.afk-user-noreason"))
                 else:
-                    reason = await self.utilities.clear_msg(await self.bot._(msg.guild.id,"fun.afk.afk-user-reason",reason=self.afk_guys[member.id]),ctx=ctx)
+                    tr = await self.bot._(msg.guild.id,"fun.afk.afk-user-reason",reason=self.afk_guys[member.id])
+                    reason = await self.utilities.clear_msg(tr, ctx=ctx)
                     await msg.channel.send(reason)
+        # auto unafk if the author was afk and has enabled it
         if isinstance(ctx.author, discord.Member) and not await checks.is_a_cmd(msg, self.bot):
-            if (ctx.author.nick and ctx.author.nick.endswith(' [AFK]')) or ctx.author.id in self.afk_guys.keys():
-                user_config = await self.utilities.get_db_userinfo(["auto_unafk"],[f'`userID`={ctx.author.id}'])
-                if user_config is None or (not user_config['auto_unafk']):
+            if (ctx.author.nick and ctx.author.nick.endswith(' [AFK]')) or ctx.author.id in self.afk_guys:
+                user_config = await self.bot.get_cog("Users").db_get_user_config(ctx.author, "auto_unafk")
+                if user_config is False:
                     return
                 await self.unafk(ctx)
 
@@ -918,13 +920,9 @@ You can specify a verification limit by adding a number in argument (up to 1.000
             _title = await self.bot._(ctx.channel, "fun.discordjobs-title")
             class JobsPaginator(Paginator):
                 "Paginator used to display jobs offers"
-                async def send_init(self, ctx: MyContext):
-                    "Create and send 1st page"
-                    contents = await self.get_page_content(None, 1)
-                    await self._update_buttons(None)
-                    await ctx.send(**contents, view=self)
-                async def get_page_count(self, _: discord.Interaction) -> int:
+                async def get_page_count(self) -> int:
                     return ceil(len(f_jobs)/30)
+
                 async def get_page_content(self, interaction: discord.Interaction, page: int):
                     "Create one page"
                     # to_display = f_jobs[(page-1)*30:page*30]
@@ -934,7 +932,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
                     for i in range(page_start, page_end, 10):
                         column_start, column_end = i+1, min(i+10, len(f_jobs))
                         emb.add_field(name=f"{column_start}-{column_end}", value="\n".join(f_jobs[i:i+10]))
-                    footer = f"Page {page}/{await self.get_page_count(interaction)}"
+                    footer = f"Page {page}/{await self.get_page_count()}"
                     emb.set_footer(text=footer)
                     return {
                         "embed": emb

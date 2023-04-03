@@ -2,3 +2,4 @@
 sphinx
 sphinxext-opengraph>=0.6
 sphinx_book_theme
+sphinx_design

@@ -64,7 +64,7 @@ class AntiScamAgent:
                 return super().find_class(module, name)
         with open(os.path.dirname(__file__)+"/data/bayes_model.pkl", 'rb') as raw:
             return CustomUnpickler(raw).load()
-    
+
     @staticmethod
     def save_model_to_file(model: RandomForest):
         "Save the model to a file"

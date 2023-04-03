@@ -18,6 +18,8 @@ import numpy as np
 from discord.ext import commands
 from PIL import Image, ImageDraw, ImageEnhance, ImageFont, ImageSequence
 
+from libs.tips import UserTip
+
 from . import args, checks
 
 importlib.reload(args)
@@ -41,20 +43,19 @@ class Xp(commands.Cog):
         self.max_xp_per_msg = 70
         self.file = 'xp'
         self.sus = None
+        self.default_xp_style = "dark"
         self.types = ['global','mee6-like','local']
-        try:
-            verdana_name = 'Verdana.ttf'
-        except OSError:
-            verdana_name = 'Veranda.ttf'
+        verdana_font = "./assets/fonts/Verdana.ttf"
+        roboto_font = "./assets/fonts/Roboto-Medium.ttf"
         self.fonts = {
-            'xp_fnt': ImageFont.truetype(verdana_name, 24),
-            'NIVEAU_fnt': ImageFont.truetype(verdana_name, 42),
-            'levels_fnt': ImageFont.truetype(verdana_name, 65),
-            'rank_fnt': ImageFont.truetype(verdana_name, 29),
-            'RANK_fnt': ImageFont.truetype(verdana_name, 23),
-            'name_fnt': ImageFont.truetype('Roboto-Medium.ttf', 40),
+            'xp_fnt': ImageFont.truetype(verdana_font, 24),
+            'NIVEAU_fnt': ImageFont.truetype(verdana_font, 42),
+            'levels_fnt': ImageFont.truetype(verdana_font, 65),
+            'rank_fnt': ImageFont.truetype(verdana_font, 29),
+            'RANK_fnt': ImageFont.truetype(verdana_font, 23),
+            'name_fnt': ImageFont.truetype(roboto_font, 40),
         }
-    
+
     @commands.Cog.listener()
     async def on_ready(self):
         self.table = 'xp_beta' if self.bot.beta else 'xp'
@@ -95,7 +96,7 @@ class Xp(commands.Cog):
             await self.add_xp_1(msg, rate)
         elif used_xp_type == "local":
             await self.add_xp_2(msg, rate)
-    
+
     async def add_xp_0(self, msg: discord.Message, rate: float):
         """Global xp type"""
         if msg.author.id in self.cache['global'].keys():
@@ -126,7 +127,7 @@ class Xp(commands.Cog):
             await self.send_levelup(msg, new_lvl)
             await self.give_rr(msg.author, new_lvl, await self.rr_list_role(msg.guild.id))
             await self.bot.get_cog("Utilities").add_user_eventPoint(msg.author.id, round(new_lvl/5))
-    
+
     async def add_xp_1(self, msg:discord.Message, rate: float):
         """MEE6-like xp type"""
         if msg.guild.id not in self.cache.keys():
@@ -304,20 +305,18 @@ class Xp(commands.Cog):
                 if self.bot.beta:
                     self.bot.dispatch("error", err)
         return c
-    
+
     async def reload_sus(self):
         """Check who should be observed for potential xp cheating"""
-        cog = self.bot.get_cog("Utilities")
-        if cog is None:
+        if not self.bot.database_online:
             return
-        result = await cog.get_db_userinfo(['userID'], ['xp_suspect=1'])
-        if result is None or len(result) == 0:
-            return
-        if len(result) > 1:
-            result = [item['userID'] for item in result]
-        self.sus = set(result)
+        query = "SELECT userID FROM `users` WHERE `xp_suspect` = 1"
+        async with self.bot.db_query(query) as query_result:
+            if not query_result:
+                return
+            self.sus = {item['userID'] for item in query_result}
         self.bot.log.info("[xp] Reloaded xp suspects (%d suspects)", len(self.sus))
-    
+
     async def send_sus_msg(self, msg: discord.Message, xp: int):
         """Send a message into the sus channel"""
         chan = self.bot.get_channel(785877971944472597)
@@ -372,7 +371,7 @@ class Xp(commands.Cog):
         except Exception as err:
             self.bot.dispatch("error", err)
             return False
-    
+
     async def bdd_get_xp(self, userID: int, guild: int):
         try:
             if not self.bot.database_online:
@@ -403,7 +402,7 @@ class Xp(commands.Cog):
             return liste
         except Exception as err:
             self.bot.dispatch("error", err)
-    
+
     async def bdd_get_nber(self, guild: int=None):
         """Get the number of ranked users"""
         try:
@@ -445,7 +444,7 @@ class Xp(commands.Cog):
                 table = await self.get_table(guild,False)
                 if table is None:
                     self.cache[guild] = dict()
-                    return 
+                    return
                 cnx = self.bot.cnx_xp
                 query = ("SELECT `userID`,`xp` FROM `{}` WHERE `banned`=0".format(table))
             cursor = cnx.cursor(dictionary = True)
@@ -506,7 +505,7 @@ class Xp(commands.Cog):
         except Exception as err:
             self.bot.dispatch("error", err)
 
-    async def bdd_get_rank(self, userID: int, guild: discord.Guild=None):
+    async def bdd_get_rank(self, user_id: int, guild: discord.Guild=None):
         """Get the rank of a user"""
         try:
             if not self.bot.database_online:
@@ -533,7 +532,7 @@ class Xp(commands.Cog):
             for x in cursor:
                 if (guild is not None and x['userID'] in users) or guild is None:
                     i += 1
-                if x['userID']== userID:
+                if x['userID']== user_id:
                     # x['rank'] = i
                     userdata = x
                     userdata["rank"] = round(userdata["rank"])
@@ -694,14 +693,14 @@ class Xp(commands.Cog):
 
     async def get_xp_bar_color(self, userID:int):
         return (45,180,105)
-    
+
     async def get_xp(self, user: discord.User, guild_id: int):
         xp = await self.bdd_get_xp(user.id, guild_id)
         if xp is None or (isinstance(xp,list) and len(xp) == 0):
             return
         return xp[0]['xp']
 
-    @commands.command(name='rank')
+    @commands.command(name="rank")
     @commands.bot_has_permissions(send_messages=True)
     @commands.cooldown(1,20,commands.BucketType.user)
     async def rank(self, ctx: MyContext, *, user: args.user=None):
@@ -745,8 +744,10 @@ class Xp(commands.Cog):
                     rank = "?"
             if isinstance(rank, float):
                 rank = int(rank)
+            send_in_private = ctx.guild is None or await self.bot.get_config(ctx.guild.id, "rank_in_dm")
+            use_author_dm = send_in_private and ctx.interaction is None
             # If we can send the rank card
-            if ctx.guild is None or ctx.channel.permissions_for(ctx.guild.me).attach_files:
+            if ctx.guild is None or use_author_dm or ctx.channel.permissions_for(ctx.guild.me).attach_files:
                 try:
                     await self.send_card(ctx, user, xp, rank, ranks_nb, xp_used_type, levels_info)
                     return
@@ -768,27 +769,46 @@ class Xp(commands.Cog):
         except FileNotFoundError:
             style = await self.bot.get_cog('Utilities').get_xp_style(user)
             txts = [await self.bot._(ctx.channel, "xp.card-level"), await self.bot._(ctx.channel, "xp.card-rank")]
-            static = await self.bot.get_cog('Utilities').get_db_userinfo(['animated_card'],[f'`userID`={user.id}'])
-            if user.display_avatar.is_animated():
-                if static is not None:
-                    static = not static['animated_card']
-                else:
-                    static = True
-            self.bot.log.debug("XP card for user {} ({}xp - style {})".format(user.id,xp,style))
+            static = not (user.display_avatar.is_animated() and await self.bot.get_cog("Users").db_get_user_config(user.id, "animated_card"))
+            self.bot.log.debug(f"XP card for user {user.id} ({xp=} - {style=} - {static=})")
             myfile = await self.create_card(user,style,xp,used_system,[rank,ranks_nb],txts,force_static=static,levels_info=levels_info)
             if UsersCog := self.bot.get_cog("Users"):
                 try:
-                    await UsersCog.used_rank(user.id)
+                    await UsersCog.db_used_rank(user.id)
                 except Exception as err:
                     self.bot.dispatch("error", err, ctx)
             if statsCog := self.bot.get_cog("BotStats"):
                 statsCog.xp_cards["generated"] += 1
+        send_in_private = ctx.guild is None or await self.bot.get_config(ctx.guild.id, "rank_in_dm")
         try:
-            await ctx.send(file=myfile)
+            if ctx.interaction:
+                await ctx.send(file=myfile, ephemeral=send_in_private)
+            elif send_in_private:
+                await ctx.author.send(file=myfile)
+                try:
+                    await ctx.message.delete()
+                except discord.HTTPException:
+                    pass
+            else:
+                await ctx.send(file=myfile)
         except discord.errors.HTTPException:
             await ctx.send(await self.bot._(ctx.channel, "xp.card-too-large"))
+        else:
+            if style == self.default_xp_style:
+                await self.send_rankcard_tip(ctx)
         if statsCog := self.bot.get_cog("BotStats"):
             statsCog.xp_cards["sent"] += 1
+
+    async def send_rankcard_tip(self, ctx: MyContext):
+        if random.random() > 0.2:
+            return
+        if not await self.bot.get_cog("Users").db_get_user_config(ctx.author.id, "show_tips"):
+            # tips are disabled
+            return
+        if await self.bot.tips_manager.should_show_user_tip(ctx.author.id, UserTip.RANK_CARD_PERSONALISATION):
+            # user has not seen this tip yet
+            profile_cmd = await self.bot.get_command_mention("profile card")
+            await self.bot.tips_manager.send_tip(ctx, UserTip.RANK_CARD_PERSONALISATION, profile_cmd=profile_cmd)
 
     async def send_embed(self, ctx: MyContext, user: discord.User, xp, rank, ranks_nb, levels_info, used_system: str):
         txts = [await self.bot._(ctx.channel, "xp.card-level"), await self.bot._(ctx.channel, "xp.card-rank")]
@@ -799,7 +819,13 @@ class Xp(commands.Cog):
         emb.add_field(name='XP', value="{}/{}".format(xp, levels_info[1]))
         emb.add_field(name=txts[0].title(), value=levels_info[0])
         emb.add_field(name=txts[1].title(), value="{}/{}".format(rank, ranks_nb))
-        await ctx.send(embed=emb)
+        send_in_private = await self.bot.get_config(ctx.guild.id, "rank_in_dm")
+        if ctx.interaction:
+            await ctx.send(embed=emb, ephemeral=send_in_private)
+        elif send_in_private:
+            await ctx.author.send(embed=emb)
+        else:
+            await ctx.send(embed=emb)
 
     async def send_txt(self, ctx: MyContext, user: discord.User, xp, rank, ranks_nb, levels_info, used_system: str):
         txts = [await self.bot._(ctx.channel, "xp.card-level"), await self.bot._(ctx.channel, "xp.card-rank")]
@@ -809,7 +835,13 @@ class Xp(commands.Cog):
 **XP** {}/{}
 **{}** {}
 **{}** {}/{}""".format(user.name, xp, levels_info[1], txts[0].title(), levels_info[0], txts[1].title(), rank, ranks_nb)
-        await ctx.send(msg)
+        send_in_private = await self.bot.get_config(ctx.guild.id, "rank_in_dm")
+        if ctx.interaction:
+            await ctx.send(msg, ephemeral=send_in_private)
+        elif send_in_private:
+            await ctx.author.send(msg)
+        else:
+            await ctx.send(msg)
 
     def convert_average(self, nbr: int) -> str:
         res = str(nbr)
@@ -992,7 +1024,7 @@ class Xp(commands.Cog):
     @commands.guild_only()
     async def rr_main(self, ctx: MyContext):
         """Manage your roles rewards like a boss
-        
+
         ..Doc server.html#roles-rewards"""
         if ctx.subcommand_passed is None:
             await ctx.send_help(ctx.command)
@@ -1002,9 +1034,9 @@ class Xp(commands.Cog):
     async def rr_add(self, ctx: MyContext, level:int, *, role:discord.Role):
         """Add a role reward
         This role will be given to every member who reaches the level
-        
+
         ..Example rr add 10 Slowly farming
-        
+
         ..Doc server.html#roles-rewards"""
         try:
             if role.name == '@everyone':
@@ -1063,7 +1095,7 @@ class Xp(commands.Cog):
     @commands.cooldown(1,300,commands.BucketType.guild)
     async def rr_reload(self, ctx: MyContext):
         """Refresh roles rewards for the whole server
-        
+
         ..Doc server.html#roles-rewards"""
         try:
             if not ctx.guild.me.guild_permissions.manage_roles:
