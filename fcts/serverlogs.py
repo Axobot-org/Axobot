@@ -983,11 +983,14 @@ Minimum age required by anti-raid: {min_age}"
                 await self.handle_guild_icon(before, after, channel_ids)
 
     async def handle_guild_features(self, before: discord.Guild, after: discord.Guild, channel_ids: list[int]):
+        """Handle when guild receives or loses perks"""
         emb = discord.Embed(
             description="**Server features updates**",
             colour=discord.Color.blurple()
         )
-        _ = lambda x: self.bot._(after.id, "info.info.guild-features."+x)
+        async def _(key: str):
+            res = await self.bot._(after.id, "info.info.guild-features."+key)
+            return key if "." in res else res
         removed_features = [await _(f) for f in before.features if f not in after.features]
         added_features = [await _(f) for f in after.features if f not in before.features]
         if len(removed_features + added_features) == 0:
