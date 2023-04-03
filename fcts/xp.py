@@ -759,14 +759,19 @@ class Xp(commands.Cog):
             class Position(TypedDict):
                 "A position in the leaderboard"
                 username: str
-                userid: int
+                user_id: int
                 level: int
                 xp: int
                 xp_label: str
+            class RawData(TypedDict):
+                "Raw data for the leaderboard"
+                xp: int
+                user_id: int
 
             self.guild = guild
             self.scope = scope
             self.page = start_page
+            self.raw_data: list[Optional[RawData]] = []
             self.positions: list[Position] = []
             self.cog = client.get_cog("Xp")
             self.used_system: str = None
@@ -787,10 +792,18 @@ class Xp(commands.Cog):
         @acached()
         async def get_user_rank(self):
             "Get the embed field content corresponding to the user's rank"
-            pos = [(i, pos) for i, pos in enumerate(self.positions) if pos["userid"] == self.user.id]
+            pos = [(i, pos) for i, pos in enumerate(self.positions) if pos is not None and pos["user_id"] == self.user.id]
             field_name = "__" + await self.client._(self.guild, "xp.top-your") + "__"
             if len(pos) == 0:
-                value = await self.client._(self.guild, "xp.1-no-xp")
+                # fetch from raw data
+                pos = [(i, pos) for i, pos in enumerate(self.raw_data) if pos is not None and pos["user_id"] == self.user.id]
+                if len(pos) == 0:
+                    value = await self.client._(self.guild, "xp.1-no-xp")
+                else:
+                    rank = pos[0][0] + 1
+                    level = await self.cog.calc_level(pos[0][1]["xp"], self.used_system)
+                    xp_label = self.convert_average(pos[0][1]["xp"])
+                    value = f"**#{rank} |** `lvl {level}` **|** `xp {xp_label}`"
             else:
                 rank, data = pos[0]
                 value = f"**#{rank} |** `lvl {data['level']}` **|** `xp {data['xp_label']}`"
@@ -806,21 +819,37 @@ class Xp(commands.Cog):
                 if self.scope == 'global':
                     if len(self.cog.cache["global"]) == 0:
                         await self.cog.db_load_cache(None)
-                    rows = self.cog.cache['global']
+                    self.raw_data = [
+                        {"user_id": user_id, "xp": data[1]}
+                        for user_id, data in self.cog.cache['global'].items()
+                    ]
                 else:
-                    rows = {
-                        int(row["userId"]): (0, row["xp"])
+                    self.raw_data = [
+                        {"user_id": int(row["userId"]), "xp": row["xp"]}
                         for row in await self.cog.db_get_top(10000, guild=self.guild)
-                    }
+                    ]
             else:
                 if not self.guild.id in self.cog.cache.keys():
                     await self.cog.db_load_cache(self.guild.id)
-                rows = self.cog.cache[self.guild.id]
-            for user_id, data in rows.items():
-                user = self.client.get_user(user_id)
+                self.raw_data = [
+                        {"user_id": user_id, "xp": data[1]}
+                        for user_id, data in self.cog.cache[self.guild.id].items()
+                    ]
+            self.raw_data.sort(key=lambda x: x["xp"], reverse=True)
+            self.max_page = ceil(len(self.raw_data)/20)
+            self.positions = [None for _ in range(len(self.raw_data))]
+
+        async def _load_page(self):
+            "Load the user data for the current page"
+            i = (self.page-1)*20
+            for data in self.raw_data[(self.page-1)*20:self.page*20]:
+                if self.positions[i] is not None:
+                    i += 1
+                    continue
+                user = self.client.get_user(data["user_id"])
                 if user is None:
                     try:
-                        user = await self.client.fetch_user(user_id)
+                        user = await self.client.fetch_user(data["user_id"])
                     except discord.NotFound:
                         user = await self.client._(self.guild, "xp.del-user")
                 if isinstance(user, discord.User):
@@ -831,22 +860,22 @@ class Xp(commands.Cog):
                         user_name = "__" + user_name + "__"
                 else:
                     user_name = user
-                level = await self.cog.calc_level(data[1], self.used_system)
-                xp = self.convert_average(data[1])
-                self.positions.append({
+                level = await self.cog.calc_level(data["xp"], self.used_system)
+                xp = self.convert_average(data["xp"])
+                self.positions[i] = {
                     "username": user_name,
-                    "userid": user_id,
+                    "user_id": data["user_id"],
                     "level": level[0],
-                    "xp": data[1],
+                    "xp": data["xp"],
                     "xp_label": xp
-                })
-
-            self.max_page = ceil(len(self.positions)/20)
+                }
+                i += 1
 
         async def get_page_content(self, _interaction, page: int):
             "Get the content of a page"
             if page > self.max_page:
                 page = self.page = self.max_page
+            await self._load_page()
             txt = []
             i = (page-1)*20
             for row in self.positions[(page-1)*20:page*20]:
@@ -891,6 +920,7 @@ class Xp(commands.Cog):
                 return await ctx.send(await self.bot._(ctx.guild.id, "xp.xp-disabled"))
         if page < 1:
             return await ctx.send(await self.bot._(ctx.channel, "xp.low-page"))
+        await ctx.defer()
         _quit = await self.bot._(ctx.guild.id, "misc.quit")
         view = self.TopPaginator(self.bot, ctx.author, ctx.guild, scope, page, _quit.capitalize())
         await view.fetch_data()
