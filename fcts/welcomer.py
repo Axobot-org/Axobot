@@ -160,10 +160,10 @@ class Welcomer(commands.Cog):
             xp = await self.bot.get_cog('Xp').db_get_xp(member.id, None)
         else:
             xp = await self.bot.get_cog('Xp').db_get_xp(member.id, member.guild.id)
-        if xp is not None and len(xp) == 1:
+        if xp is not None:
             await self.bot.get_cog('Xp').give_rr(
                 member,
-                (await self.bot.get_cog('Xp').calc_level(xp[0]['xp'],used_xp_type))[0],
+                (await self.bot.get_cog('Xp').calc_level(xp, used_xp_type))[0],
                 await self.bot.get_cog('Xp').rr_list_role(member.guild.id)
             )
 
