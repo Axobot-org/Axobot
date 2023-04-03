@@ -792,15 +792,15 @@ class Xp(commands.Cog):
         @acached()
         async def get_user_rank(self):
             "Get the embed field content corresponding to the user's rank"
-            pos = [(i, pos) for i, pos in enumerate(self.positions) if pos is not None and pos["user_id"] == self.user.id]
+            pos = [(i+1, pos) for i, pos in enumerate(self.positions) if pos is not None and pos["user_id"] == self.user.id]
             field_name = "__" + await self.client._(self.guild, "xp.top-your") + "__"
             if len(pos) == 0:
                 # fetch from raw data
-                pos = [(i, pos) for i, pos in enumerate(self.raw_data) if pos is not None and pos["user_id"] == self.user.id]
+                pos = [(i+1, pos) for i, pos in enumerate(self.raw_data) if pos is not None and pos["user_id"] == self.user.id]
                 if len(pos) == 0:
                     value = await self.client._(self.guild, "xp.1-no-xp")
                 else:
-                    rank = pos[0][0] + 1
+                    rank = pos[0][0]
                     level = await self.cog.calc_level(pos[0][1]["xp"], self.used_system)
                     xp_label = self.convert_average(pos[0][1]["xp"])
                     value = f"**#{rank} |** `lvl {level}` **|** `xp {xp_label}`"
@@ -883,7 +883,7 @@ class Xp(commands.Cog):
                 username = row['username']
                 lvl = row['level']
                 xp = row['xp_label']
-                txt.append(f"{i} • **{username} |** `lvl {lvl}` **|** `xp\u200B{xp}`")
+                txt.append(f"{i} • **{username} |** `lvl {lvl}` **|** `xp {xp}`")
             # title
             if self.scope == 'guild' or self.used_system != "global":
                 embed_title = await self.client._(self.guild, "xp.top-title-2")
