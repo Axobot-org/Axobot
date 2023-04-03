@@ -825,7 +825,7 @@ class Xp(commands.Cog):
                     ]
                 else:
                     self.raw_data = [
-                        {"user_id": int(row["userId"]), "xp": row["xp"]}
+                        {"user_id": int(row["userID"]), "xp": row["xp"]}
                         for row in await self.cog.db_get_top(10000, guild=self.guild)
                     ]
             else:
@@ -905,7 +905,7 @@ class Xp(commands.Cog):
     @app_commands.describe(page="The page number", scope="The scope of the leaderboard (global or server)")
     @commands.bot_has_permissions(send_messages=True)
     @commands.cooldown(5,60,commands.BucketType.user)
-    async def top(self, ctx: MyContext, page: commands.Range[int, 1]=1, scope: LEADERBOARD_SCOPE='global'):
+    async def top(self, ctx: MyContext, page: Optional[commands.Range[int, 1]]=1, scope: LEADERBOARD_SCOPE='global'):
         """Get the list of the highest XP users
 
         ..Example top
