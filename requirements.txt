@@ -23,6 +23,7 @@ flatten-json
 python-dateutil
 LRFutils==0.1.2
 GitPython
+Pillow>=9.1
 
 # Antiscam training
 pandas

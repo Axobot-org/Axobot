@@ -1,4 +1,39 @@
 {
+    "bool": {
+        "true": "Oui",
+        "false": "Non"
+    },
+    "enum": {
+        "anti_raid": {
+            "none": "aucun",
+            "smooth": "faible",
+            "careful": "modéré",
+            "high": "élevé",
+            "(╯°□°）╯︵ ┻━┻": "extrême"
+        },
+        "language": {
+            "fr": "français",
+            "en": "anglais",
+            "lolcat": "lolcat",
+            "fi": "finnois",
+            "de": "allemand",
+            "fr2": "français familier"
+        },
+        "levelup_channel": {
+            "none": "pas de message",
+            "any": "n'importe quel salon"
+        },
+        "ttt_display": {
+            "disabled": "désactivé",
+            "short": "compressé",
+            "normal": "normal"
+        },
+        "xp_type": {
+            "global": "global",
+            "mee6-like": "mee6-like",
+            "local": "local"
+        }
+    },
     "config-list": "Liste des options disponibles :%{text}Plus d'information : %{link}",
     "deleted-channel": "salon supprimé",
     "deleted-role": "rôle supprimé",
@@ -66,6 +101,7 @@
         "bot_news": "Liste des salons dans lesquels envoyer les news du bot : %{value}",
         "clear_allowed_roles": "Liste des rôles qui peuvent utiliser la commande 'clear' : %{value}",
         "compress_help": "L'affichage de la commande `help` doit-il être compressé ? %{value}",
+        "delete_welcome_on_quick_leave": "Supprimer le message de bienvenue lorsqu'un membre quitte le serveur juste après avoir rejoint ? %{value}",
         "description": "Description du serveur :\n %{value}",
         "enable_fun": "Les commandes répertoriées dans la commande `!fun` sont-elles activées ? %{value}",
         "enable_xp": "Le système d'xp doit-il être activé ? %{value}",

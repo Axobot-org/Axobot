@@ -11,7 +11,7 @@ from discord.ext import commands
 from libs.bot_classes import Axobot, MyContext
 from libs.enums import RankCardsFlag, UserFlag
 
-from . import args, checks
+from fcts import args, checks
 
 importlib.reload(args)
 importlib.reload(checks)
@@ -205,9 +205,12 @@ class Users(commands.Cog):
             await ctx.defer()
             if style is None:
                 style = await self.bot.get_cog('Utilities').get_xp_style(ctx.author)
-            txts = [await self.bot._(ctx.channel, 'xp.card-level'), await self.bot._(ctx.channel, 'xp.card-rank')]
             desc = await self.bot._(ctx.channel, 'users.card-desc')
-            card = await self.bot.get_cog('Xp').create_card(ctx.author, style, 25, 0, [1, 0], txts, force_static=True)
+            translations_map = {
+                "LEVEL": await self.bot._(ctx.channel, "xp.card-level"),
+                "RANK": await self.bot._(ctx.channel, "xp.card-rank"),
+            }
+            card = await self.bot.get_cog('Xp').create_card(translations_map, ctx.author, style, 25, 0, 1, [1, 2, 1])
             await ctx.send(desc, file=card)
         else:
             await ctx.send(await self.bot._(ctx.channel, 'users.missing-attach-files'))

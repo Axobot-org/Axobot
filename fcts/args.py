@@ -75,19 +75,6 @@ class cardStyle(str):
             raise commands.errors.BadArgument('Invalid card style: '+argument)
 
 
-class LeaderboardTypeConverter(str):
-    @classmethod
-    async def convert(cls, ctx: "MyContext", argument: str) -> str:
-        if argument in {'server', 'guild', 'serveur', 'local'}:
-            if ctx.guild is None:
-                raise commands.errors.BadArgument(f'Cannot use {argument} leaderboard type outside a server')
-            return 'guild'
-        elif argument in {'all', 'global', 'tout'}:
-            return 'global'
-        raise commands.errors.BadArgument(f'Invalid leaderboard type: {argument}')
-LeaderboardType = typing.Annotated[typing.Literal["guild", "global"], LeaderboardTypeConverter]
-
-
 class Invite(commands.Converter):
     def __init__(self):
         pass

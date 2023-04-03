@@ -12,7 +12,7 @@ from libs.formatutils import FormatUtils
 from libs.paginator import Paginator
 from libs.views import ConfirmView
 
-from . import args, checks
+from fcts import args, checks
 from fcts.cases import Case
 
 importlib.reload(checks)
@@ -440,7 +440,7 @@ You can also mute this member for a defined duration, then use the following for
             result: int = query_results[0]['count']
         return bool(result)
 
-    async def bdd_muted_list(self, guild_id: int, reasons: bool = False) -> Union[Dict[int, str], List[int]]:
+    async def db_get_muted_list(self, guild_id: int, reasons: bool = False) -> Union[Dict[int, str], List[int]]:
         """List muted users for a specific guild
         Set 'reasons' to True if you want the attached reason"""
         if reasons:
@@ -906,7 +906,7 @@ The 'show_reasons' parameter is used to display the mute reasons.
 
 ..Doc moderator.html#banlist-mutelist"""
         try:
-            muted_list = await self.bdd_muted_list(ctx.guild.id, reasons=show_reasons)
+            muted_list = await self.db_get_muted_list(ctx.guild.id, reasons=show_reasons)
         except Exception as err:
             await ctx.send(await self.bot._(ctx.guild.id, "moderation.error"))
             self.bot.dispatch("error", err, ctx)

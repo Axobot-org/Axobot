@@ -8,7 +8,7 @@ import aiohttp
 import discord
 from discord.ext import commands, tasks
 
-from . import args, checks
+from fcts import args, checks
 
 importlib.reload(args)
 importlib.reload(checks)

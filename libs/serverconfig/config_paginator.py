@@ -54,7 +54,7 @@ class ServerConfigPaginator(Paginator):
             embed.set_thumbnail(url=self.guild.icon.with_static_format('png'))
         replace_mentions = interaction.guild.id != self.guild.id
         for option, value in page_config_map.items():
-            if (display := to_display(option, value)) is None:
+            if (display := await to_display(option, value, self.guild, self.client)) is None:
                 display = "Ø"
             elif len(display) > 1024:
                 display = display[:1023] + "…"

@@ -24,7 +24,7 @@ async def train_model(data: list[Message], quick_train: bool=False):
     # Start the training
     search = RandomizedSearchCV(model, param_grid,
                                 scoring="balanced_accuracy",
-                                n_iter=5 if quick_train else 30,
+                                n_iter=5 if quick_train else 40,
                                 n_jobs=-1,
                                 error_score='raise'
                                 )

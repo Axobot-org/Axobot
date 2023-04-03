@@ -258,7 +258,9 @@ Types of logs
 * **role_creation:** A role is created
 * **role_deletion:** A role is deleted
 * **role_update:** A role has been edited
+* **server_update:** The server has been edited (icon, name, or features)
 * **ticket_creation:** A `ticket <tickets.html>`__ has been opened
+* **user_update:** A user profile has been otherwise edited (usually badges)
 
 
 --------------

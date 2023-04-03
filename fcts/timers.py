@@ -10,7 +10,7 @@ from libs.formatutils import FormatUtils
 from libs.paginator import PaginatedSelectView
 from libs.views import ConfirmView
 
-from . import args, checks
+from fcts import args, checks
 
 class Timers(commands.Cog):
     def __init__(self, bot: Axobot):

@@ -1,0 +1,253 @@
+{
+    "meta": {
+        "v1": {
+            "avatar_size": 282,
+            "avatar_position": [
+                23,
+                31
+            ],
+            "texts": {
+                "username": {
+                    "position": [
+                        [
+                            310,
+                            43
+                        ],
+                        [
+                            910,
+                            102
+                        ]
+                    ],
+                    "font_size": 40,
+                    "alignment": "center",
+                    "font": "Roboto-Medium.ttf"
+                },
+                "level_label": {
+                    "position": [
+                        [
+                            335,
+                            125
+                        ],
+                        [
+                            590,
+                            210
+                        ]
+                    ],
+                    "font_size": 50,
+                    "alignment": "center",
+                    "font": "Roboto-Medium.ttf"
+                },
+                "level": {
+                    "position": [
+                        [
+                            560,
+                            122
+                        ],
+                        [
+                            740,
+                            210
+                        ]
+                    ],
+                    "font_size": 55,
+                    "alignment": "right",
+                    "font": "Roboto-Medium.ttf"
+                },
+                "rank_label": {
+                    "position": [
+                        [
+                            800,
+                            135
+                        ],
+                        [
+                            980,
+                            165
+                        ]
+                    ],
+                    "font_size": 22,
+                    "alignment": "center",
+                    "font": "Verdana.ttf"
+                },
+                "rank": {
+                    "position": [
+                        [
+                            800,
+                            160
+                        ],
+                        [
+                            980,
+                            205
+                        ]
+                    ],
+                    "font_size": 33,
+                    "alignment": "center",
+                    "font": "Verdana.ttf"
+                },
+                "xp": {
+                    "position": [
+                        [
+                            410,
+                            221
+                        ],
+                        [
+                            855,
+                            255
+                        ]
+                    ],
+                    "font_size": 22,
+                    "alignment": "center",
+                    "font": "Verdana.ttf"
+                }
+            },
+            "xp_bar_position": [
+                [
+                    302,
+                    266
+                ],
+                [
+                    967,
+                    296
+                ]
+            ]
+        },
+        "v2": {
+            "avatar_size": 107,
+            "avatar_position": [
+                29,
+                21
+            ],
+            "texts": {
+                "username": {
+                    "position": [
+                        [
+                            205,
+                            30
+                        ],
+                        [
+                            815,
+                            68
+                        ]
+                    ],
+                    "font_size": 38,
+                    "alignment": "center",
+                    "font": "Roboto-Medium.ttf"
+                },
+                "level": {
+                    "position": [
+                        [
+                            330,
+                            135
+                        ],
+                        [
+                            497,
+                            206
+                        ]
+                    ],
+                    "font_size": 55,
+                    "alignment": "center",
+                    "font": "Roboto-Medium.ttf"
+                },
+                "rank": {
+                    "position": [
+                        [
+                            530,
+                            135
+                        ],
+                        [
+                            690,
+                            212
+                        ]
+                    ],
+                    "font_size": 45,
+                    "alignment": "center",
+                    "font": "Verdana.ttf"
+                },
+                "current_xp": {
+                    "position": [
+                        [
+                            305,
+                            306
+                        ],
+                        [
+                            497,
+                            319
+                        ]
+                    ],
+                    "font_size": 21,
+                    "alignment": "center",
+                    "font": "RobotoSlab-Regular.ttf"
+                },
+                "total_xp": {
+                    "position": [
+                        [
+                            522,
+                            306
+                        ],
+                        [
+                            729,
+                            319
+                        ]
+                    ],
+                    "font_size": 21,
+                    "alignment": "center",
+                    "font": "RobotoSlab-Regular.ttf"
+                }
+            },
+            "xp_bar_position": [
+                [
+                    302,
+                    266
+                ],
+                [
+                    967,
+                    296
+                ]
+            ]
+        }
+    },
+    "colors": {
+        "default": {
+            "xp_bar": [45, 180, 105],
+            "texts": {
+                "username": [124, 197, 118],
+                "level_label": [255, 224, 77],
+                "level": [124, 197, 118],
+                "rank_label": [105, 157, 206],
+                "rank": [105, 157, 206],
+                "xp": [124, 197, 118]
+            }
+        },
+        "admin": {
+            "xp_bar": [230, 0, 0],
+            "texts": {
+                "username": [230, 200, 25],
+                "level_label": [230, 25, 40],
+                "level": [252, 32, 46],
+                "rank_label": [215, 0, 0],
+                "rank": [230, 0, 0],
+                "xp": [230, 185, 11]
+            }
+        },
+        "christmas20": {
+            "xp_bar": [204, 255, 255],
+            "texts": {
+                "username": [255, 255, 255],
+                "level_label": [255, 255, 255],
+                "level": [255, 255, 255],
+                "rank_label": [255, 255, 255],
+                "rank": [255, 255, 255],
+                "xp": [255, 255, 255]
+            }
+        },
+        "christmas22": {
+            "xp_bar": [204, 255, 255],
+            "texts": {
+                "username": [255, 255, 255],
+                "level_label": [255, 255, 255],
+                "level": [255, 255, 255],
+                "rank_label": [255, 255, 255],
+                "rank": [255, 255, 255],
+                "xp": [255, 255, 255]
+            }
+        }
+    }
+}

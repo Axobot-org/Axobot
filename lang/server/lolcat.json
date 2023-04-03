@@ -1,4 +1,39 @@
 {
+    "bool": {
+        "true": "Yup",
+        "false": "Nope"
+    },
+    "enum": {
+        "anti_raid": {
+            "none": "nothing",
+            "smooth": "smoooth",
+            "careful": "keep-an-eye-open",
+            "high": "stay-alert",
+            "(╯°□°）╯︵ ┻━┻": "(╯°□°）╯︵ ┻━┻"
+        },
+        "language": {
+            "fr": "Baguette",
+            "en": "'merican",
+            "lolcat": "lolcat",
+            "fi": "Finnnish",
+            "de": "German",
+            "fr2": "FriendlyFrench"
+        },
+        "levelup_channel": {
+            "none": "no msg",
+            "any": "anywhere"
+        },
+        "ttt_display": {
+            "disabled": "disabld",
+            "short": "kwick",
+            "normal": "nörmal"
+        },
+        "xp_type": {
+            "global": "gëneral",
+            "mee6-like": "mee6-copy",
+            "local": "here-only"
+        }
+    },
     "config-list": "List ov options cool taht u can use: %{text}More info @ %{link}",
     "deleted-channel": "?channel?",
     "deleted-role": "?role?",
@@ -71,6 +106,7 @@
         "bot_news": "Liist for channnnels were 2 sendz bot nweZ: %{value}",
         "clear_allowed_roles": "Lizt of rawles dat can us teh 'clear' commend: %{value}",
         "compress_help": "Shuld teh help cmd be smoller? %{value}",
+        "delete_welcome_on_quick_leave": "Shuld I delete teh welcome msg whenever someone quick-join-and-leave-faster-than-a-cheetah? %{value}",
         "description": "Server description:\n %{value}",
         "enable_fun": "Arr' teh commands listed in te `fun` comand allowed? %{value}",
         "enable_xp": "Shald teh xperiense systèm be enabld? %{value}",
