@@ -19,6 +19,10 @@
             "de": "German",
             "fr2": "FriendlyFrench"
         },
+        "levelup_channel": {
+            "none": "no msg",
+            "any": "anywhere"
+        },
         "ttt_display": {
             "disabled": "disabld",
             "short": "kwick",
