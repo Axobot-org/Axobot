@@ -23,7 +23,7 @@ from libs.formatutils import FormatUtils
 from libs.rss.rss_general import FeedObject
 from utils import count_code_lines
 
-from . import args, checks
+from fcts import args, checks
 
 default_color = discord.Color(0x50e3c2)
 
@@ -119,7 +119,7 @@ class Info(commands.Cog):
             users,bots = self.get_users_nber(ignored_guilds)
             # Total XP
             if self.bot.database_online:
-                total_xp = await self.bot.get_cog('Xp').bdd_total_xp()
+                total_xp = await self.bot.get_cog('Xp').db_get_total_xp()
             else:
                 total_xp = ""
             # Commands within 24h
@@ -724,7 +724,9 @@ Available types: member, role, user, emoji, channel, server, invite, category
         # Member count
         embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.role-3"), value=await self.bot._(ctx.guild.id,"info.info.guild-7", c=guild.member_count, b=bots, o=online))
         # Channel count
-        embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.guild-6"), value=await self.bot._(ctx.guild.id,"info.info.guild-3", txt=len(guild.text_channels), voc=len(guild.voice_channels), cat=len(guild.categories)))
+        text_count = sum(1 for channel in guild.channels if isinstance(channel, (discord.TextChannel, discord.ForumChannel)))
+        voice_count = sum(1 for channel in guild.channels if isinstance(channel, (discord.VoiceChannel, discord.StageChannel)))
+        embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.guild-6"), value=await self.bot._(ctx.guild.id,"info.info.guild-3", txt=text_count, voc=voice_count, cat=len(guild.categories)))
         # Invite count
         if guild.me.guild_permissions.manage_guild:
             len_invites = str(len(await guild.invites()))

@@ -32,6 +32,7 @@
     "notduringevent": "Cette commande est uniquement disponible lors de certains événements. Utilise %{cmd} pour en savoir plus !",
     "notrightroles": "Vous n'avez pas les rôles nécessaires pour cette commande",
     "quoteserror": "Oups, une erreur de guillemets est survenue. Assurez-vous de bien utiliser les guillemets \", de manière à ce que chaque guillemet ouvert soit fermé plus loin",
+    "rangeerror": "Cette valeur doit être d'au moins %{min}, mais vous avez envoyé %{value}",
     "rolenotfound": "Impossible de trouver le rôle `%{r}`",
     "toomanytxtchan": "Vous avez trop de salons textuels accessibles",
     "unknown": "Oups, une erreur est survenue :confused: Réessayez plus tard, ou contactez le support (commande %{about}).",

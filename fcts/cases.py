@@ -11,7 +11,7 @@ from libs.bot_classes import MyContext, Axobot
 from libs.formatutils import FormatUtils
 from libs.paginator import Paginator
 
-from . import args
+from fcts import args
 
 importlib.reload(args)
 

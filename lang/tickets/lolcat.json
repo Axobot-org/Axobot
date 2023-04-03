@@ -65,7 +65,7 @@
     "text-edited": "Ye okay i'll use ur weird text, if u insist :coolcat:",
     "ticket-created": "I created u ur ticket in %{channel}. Btw \"%{topic}\" is a wzird reason imo",
     "ticket-introduction": {
-        "description": "Ok so!\n%{user} wantd to create a ticket 'bout '%{ticket_name}' apparently. In da category **'%{topic_name}'**. Dont ask me y\n.",
+        "description": "Ok so!\n\n%{user} wantd to create a ticket 'bout '%{ticket_name}' apparently. In da category **'%{topic_name}'**. Dont ask me y.",
         "title": "Mew ticket created!"
     },
     "title-modal": {

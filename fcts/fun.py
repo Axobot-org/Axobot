@@ -1,4 +1,3 @@
-import copy
 import datetime
 import importlib
 import operator
@@ -12,7 +11,6 @@ from math import ceil
 import aiohttp
 import autopep8
 import discord
-import emoji as emojilib
 import geocoder
 from discord.ext import commands
 from pytz import timezone
@@ -22,7 +20,7 @@ from libs.formatutils import FormatUtils
 from libs.paginator import Paginator
 from utils import flatten_list
 
-from . import args, checks
+from fcts import args, checks
 from fcts.checks import is_fun_enabled
 
 importlib.reload(checks)
@@ -334,10 +332,9 @@ You can specify a verification limit by adding a number in argument (up to 1.000
 
         ..Doc fun.html#cat"""
         await ctx.send(random.choice([
-            'http://images6.fanpop.com/image/photos/40800000/tummy-rub-kitten-animated-gif-cute-kittens-40838484-380-227.gif',
-            'http://25.media.tumblr.com/7774fd7794d99b5998318ebd5438ba21/tumblr_n2r7h35U211rudcwro1_400.gif',
+            'https://images6.fanpop.com/image/photos/40800000/tummy-rub-kitten-animated-gif-cute-kittens-40838484-380-227.gif',
+            'https://25.media.tumblr.com/7774fd7794d99b5998318ebd5438ba21/tumblr_n2r7h35U211rudcwro1_400.gif',
             'https://tenor.com/view/seriously-seriously-cat-cat-really-cat-really-look-cat-look-gif-22182662',
-            'https://tenor.com/view/mybc-gif-24798373',
             'http://coquelico.c.o.pic.centerblog.net/chat-peur.gif',
             'https://tenor.com/view/nope-bye-cat-leave-done-gif-12387359'
         ]))
@@ -582,7 +579,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         """How to use Google
 
         ..Doc fun.html#lmgtfy"""
-        link = "http://lmgtfy.com/?q="+search.replace("\n","+").replace(" ","+")
+        link = "https://lmgtfy.com/?q="+search.replace("\n","+").replace(" ","+")
         await ctx.send('<'+link+'>')
         await ctx.message.delete(delay=0)
 
@@ -1043,6 +1040,14 @@ You can specify a verification limit by adding a number in argument (up to 1.000
             "ignore": set()
         }).strip()
         await ctx.send(f"```py\n{code}\n```")
+
+    @commands.command(name="avatar", aliases=['pfp'])
+    @commands.cooldown(2, 10, commands.BucketType.user)
+    async def avatar(self, ctx: MyContext, user: typing.Optional[discord.Member]):
+        """Get the avatar of a user"""
+        if user is None:
+            user = ctx.author
+        await ctx.send(user.avatar.url)
 
 
 async def setup(bot):

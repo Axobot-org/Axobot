@@ -8,7 +8,7 @@ from discord import app_commands
 from discord.ext import commands, tasks
 from mysql.connector.errors import IntegrityError
 
-from . import checks
+from fcts import checks
 from libs.bot_classes import MyContext, Axobot
 from libs.twitch.api_agent import TwitchApiAgent
 from libs.twitch.types import (GroupedStreamerDBObject, PlatformId,

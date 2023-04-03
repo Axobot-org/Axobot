@@ -8,14 +8,13 @@ from cachingutils import LRUCache
 from discord import app_commands
 from discord.ext import commands, tasks
 
+from fcts import checks
 from fcts.args import serverlog
 from fcts.tickets import TicketCreationEvent
 from libs.antiscam.classes import PredictionResult
 from libs.bot_classes import Axobot, MyContext
 from libs.enums import ServerWarningType
 from libs.formatutils import FormatUtils
-
-from . import checks
 
 DISCORD_INVITE = re.compile(r'(?:https?://)?(?:www[.\s])?((?:discord[.\s](?:gg|io|me|li(?:nk)?)|discordapp\.com/invite|discord\.com/invite|dsc\.gg)[/ ]{,3}[\w-]{1,25}(?!\w))')
 
@@ -26,9 +25,10 @@ class ServerLogs(commands.Cog):
     logs_categories = {
         "automod": {"antiraid", "antiscam"},
         "bot": {"bot_warnings"},
-        "members": {"member_roles", "member_nick", "member_avatar", "member_join", "member_leave", "member_verification"},
+        "members": {"member_roles", "member_nick", "member_avatar", "member_join", "member_leave", "member_verification", "user_update"},
         "moderation": {"member_ban", "member_unban", "member_timeout", "member_kick"},
         "messages": {"message_update", "message_delete", "discord_invite", "ghost_ping"},
+        "other": {"server_update"},
         "roles": {"role_creation", "role_update", "role_deletion"},
         "tickets": {"ticket_creation"},
     }
@@ -305,10 +305,10 @@ class ServerLogs(commands.Cog):
             if (now - entry.created_at).total_seconds() > 5:
                 continue
             if check is None or check(entry):
-                if stats_cog:
+                if stats_cog and action != discord.AuditLogAction.kick:
                     await stats_cog.on_serverlogs_audit_search(True)
                 return entry
-        if stats_cog:
+        if stats_cog and action != discord.AuditLogAction.kick:
             await stats_cog.on_serverlogs_audit_search(False)
 
 
@@ -420,8 +420,16 @@ class ServerLogs(commands.Cog):
                 colour=discord.Color.orange()
             )
             emb.set_author(name=str(message.author), icon_url=message.author.display_avatar)
-            emb.add_field(name="Created at", value=f"<t:{message.created_at.timestamp():.0f}>")
+            if len(invites) == 1:
+                try:
+                    invite = await self.bot.fetch_invite(invites[0])
+                except discord.HTTPException:
+                    pass
+                else:
+                    if invite.created_at:
+                        emb.add_field(name="Invite created at", value=f"<t:{invite.created_at.timestamp():.0f}>")
             emb.add_field(name="Message Author", value=f"{message.author} ({message.author.id})")
+            emb.add_field(name="Message sent at", value=f"<t:{message.created_at.timestamp():.0f}>")
             invites_formatted: set[str] = set(invite.replace(' ', '') for invite in invites)
             try:
                 emb.add_field(name="Invite" if len(invites) == 1 else "Invites", value="\n".join(invites_formatted), inline=False)
@@ -460,13 +468,18 @@ class ServerLogs(commands.Cog):
         # member verification
         if (before.pending and not after.pending) and (channel_ids := await self.is_log_enabled(before.guild.id, "member_verification")):
             await self.handle_member_verification(before, after, channel_ids)
+        # public flags
+        if before.public_flags != after.public_flags and (channel_ids := await self.is_log_enabled(before.guild.id, "user_update")):
+            await self.handle_member_flags(before, after, channel_ids)
 
     async def handle_member_roles(self, before: discord.Member, after: discord.Member, channel_ids: list[int]):
         "Handle member_roles log"
         added_roles = [role for role in after.roles if role not in before.roles]
-        removed_roles = [role for role in before.roles if role not in after.roles]
+        removed_roles = [role for role in before.roles if role not in after.roles and role in after.guild.roles]
+        if len(added_roles) == 0 and len(removed_roles) == 0:
+            return
         emb = discord.Embed(
-            description=f"**Member {before.mention} updated**",
+            description=f"**Member {before.mention} ({before.id}) updated**",
             color=discord.Color.blurple()
         )
         if removed_roles:
@@ -585,6 +598,31 @@ class ServerLogs(commands.Cog):
                 value=f"<t:{after.joined_at.timestamp():.0f}> ({delta})",
                 inline=False)
         await self.validate_logs(after.guild, channel_ids, emb, "member_verification")
+
+    async def handle_member_flags(self, before: discord.Member, after: discord.Member, channel_ids: list[int]):
+        "Handle user public flags change ('user_update')"
+        before_flags = before.public_flags
+        after_flags = after.public_flags
+        if not before_flags.verified_bot and after_flags.verified_bot:
+            description = f"**Bot {before.mention} has been verified**"
+        elif not before_flags.active_developer and after_flags.active_developer:
+            description = f"User {before.mention} **got the active developer badge**"
+        elif before_flags.active_developer and not after_flags.active_developer:
+            description = f"User {before.mention} **lost their active developer badge**"
+        elif not before_flags.discord_certified_moderator and after_flags.active_developer:
+            description = f"User {before.mention} is now a **Discord certified moderator**"
+        elif before_flags.discord_certified_moderator and not after_flags.discord_certified_moderator:
+            description = f"User {before.mention} is **no longer a Discord certified moderator**"
+        else:
+            self.bot.dispatch("error", ValueError(f"Unknown flag change between {before_flags} and {after_flags}"))
+            return
+        emb = discord.Embed(
+            description=description,
+            color=discord.Color.blurple(),
+        )
+        emb.add_field(name="User ID", value=str(after.id))
+        emb.set_author(name=str(after), icon_url=after.avatar or after.default_avatar)
+        await self.validate_logs(after.guild, channel_ids, emb, "member_avatar")
 
     async def get_member_specs(self, member: discord.Member) -> list[str]:
         "Get specific things to note for a member"
@@ -923,10 +961,76 @@ Minimum age required by anti-raid: {min_age}"
                 description=f"**{event.user.mention} ({event.user.id}) has opened a ticket**",
                 colour=discord.Color.dark_grey()
             )
-            emb.add_field(name="Topic", value=event.topic_name)
+            if raw_emoji := event.topic_emoji:
+                name = str(discord.PartialEmoji.from_str(raw_emoji)) + " " + event.topic_name
+            else:
+                name = event.topic_name
+            emb.add_field(name="Topic", value=name)
             emb.add_field(name="Ticket name", value=event.name)
             emb.add_field(name="Channel", value=event.channel.mention, inline=False)
             await self.validate_logs(event.guild, channel_ids, emb, "ticket_creation")
+
+    @commands.Cog.listener()
+    async def on_guild_update(self, before: discord.Guild, after: discord.Guild):
+        """Triggered when a guild is updated
+        Corresponding log: server_update"""
+        if channel_ids := await self.is_log_enabled(after.id, "server_update"):
+            if before.features != after.features:
+                await self.handle_guild_features(before, after, channel_ids)
+            if before.icon != after.icon:
+                await self.handle_guild_name(before, after, channel_ids)
+            if before.name != after.name:
+                await self.handle_guild_icon(before, after, channel_ids)
+
+    async def handle_guild_features(self, before: discord.Guild, after: discord.Guild, channel_ids: list[int]):
+        emb = discord.Embed(
+            description="**Server features updates**",
+            colour=discord.Color.blurple()
+        )
+        _ = lambda x: self.bot._(after.id, "info.info.guild-features."+x)
+        removed_features = [await _(f) for f in before.features if f not in after.features]
+        added_features = [await _(f) for f in after.features if f not in before.features]
+        if len(removed_features + added_features) == 0:
+            return
+        if removed_features:
+            emb.add_field(name="Removed features", value="\n".join(removed_features))
+        if added_features:
+            emb.add_field(name="Added features", value="\n".join(added_features))
+        await self.validate_logs(after, channel_ids, emb, "server_update")
+
+    async def handle_guild_icon(self, before: discord.Guild, after: discord.Guild, channel_ids: list[int]):
+        """Handle the guild icon update log"""
+        if before.icon is None:
+            emb = discord.Embed(
+                description="**Server icon added**",
+                colour=discord.Color.blurple(),
+            )
+            emb.set_image(url=after.icon)
+        elif after.icon is None:
+            emb = discord.Embed(
+                description="**Server icon removed**",
+                colour=discord.Color.blurple(),
+            )
+            emb.add_field(name="Previous icon", value=before.icon.url)
+        else:
+            emb = discord.Embed(
+                description="**Server icon updated**",
+                colour=discord.Color.blurple(),
+            )
+            emb.add_field(name="Previous icon", value=before.icon.url)
+            emb.set_image(url=after.icon)
+        await self.validate_logs(after, channel_ids, emb, "server_update")
+
+    async def handle_guild_name(self, before: discord.Guild, after: discord.Guild, channel_ids: list[int]):
+        """Handle the guild name update log"""
+        if before.name != after.name:
+            emb = discord.Embed(
+                description="**Server name updated**",
+                colour=discord.Color.blurple(),
+            )
+            emb.add_field(name="Previous name", value=before.name)
+            emb.add_field(name="New name", value=after.name)
+            await self.validate_logs(after, channel_ids, emb, "server_update")
 
     @commands.Cog.listener()
     async def on_server_warning(self, warning_type: ServerWarningType, guild: discord.Guild, **kwargs):

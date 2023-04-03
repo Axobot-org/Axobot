@@ -1,16 +1,17 @@
-from collections import defaultdict
-from datetime import datetime
 import math
 import re
 import typing
-import aiohttp
+from collections import defaultdict
+from datetime import datetime
 
+import aiohttp
+import discord
 import mysql
 import psutil
-import discord
 from discord.ext import commands, tasks
+
 from fcts.tickets import TicketCreationEvent
-from libs.bot_classes import MyContext, Axobot
+from libs.bot_classes import Axobot, MyContext
 from libs.enums import ServerWarningType, UsernameChangeRecord
 
 try:
@@ -48,6 +49,7 @@ class BotStats(commands.Cog):
         self.emitted_serverlogs: dict[str, int] = {}
         self.serverlogs_audit_search: typing.Optional[tuple[int, int]] = None
         self.last_backup_size: typing.Optional[int] = None
+        self.role_reactions = {"added": 0, "removed": 0}
 
     async def cog_load(self):
          # pylint: disable=no-member
@@ -155,7 +157,7 @@ class BotStats(commands.Cog):
             self.received_events['SLASH_CMD_USE'] = self.received_events.get('SLASH_CMD_USE', 0) + 1
 
     @commands.Cog.listener()
-    async def on_serverlog(self, guild_id: int, channel_id: int, log_type: str):
+    async def on_serverlog(self, _guild_id: int, _channel_id: int, log_type: str):
         "Called when a serverlog is emitted"
         self.emitted_serverlogs[log_type] = self.emitted_serverlogs.get(log_type, 0) + 1
 
@@ -383,6 +385,13 @@ class BotStats(commands.Cog):
             if self.last_backup_size:
                 cursor.execute(query, (now, 'backup.size', self.last_backup_size, 1, 'Gb', False, self.bot.entity_id))
                 self.last_backup_size = None
+            # role reactions
+            if self.role_reactions["added"]:
+                cursor.execute(query, (now, 'role_reactions.added', self.role_reactions["added"], 0, 'reactions', True, self.bot.entity_id))
+                self.role_reactions["added"] = 0
+            if self.role_reactions["removed"]:
+                cursor.execute(query, (now, 'role_reactions.removed', self.role_reactions["removed"], 0, 'reactions', True, self.bot.entity_id))
+                self.role_reactions["removed"] = 0
             # Push everything
             cnx.commit()
         except mysql.connector.errors.IntegrityError as err: # usually duplicate primary key

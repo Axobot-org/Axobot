@@ -9,7 +9,7 @@ from discord.ext import commands, tasks
 from libs.bot_classes import MyContext, Axobot
 from libs.errors import NotDuringEventError, VerboseCommandError
 
-from . import checks
+from fcts import checks
 
 AllowedCtx = typing.Union[MyContext, discord.Message, discord.Interaction, str]
 
@@ -115,6 +115,10 @@ class Errors(commands.Cog):
 
             ALLOWED = discord.AllowedMentions(everyone=False, users=False, roles=False)
             raw_error = str(error)
+            # value must be less than 1 but received -1
+            if isinstance(error, commands.RangeError):
+                return await send_err('errors.rangeerror', min=error.minimum, value=error.value)
+
             # Could not convert "limit" into int. OR Converting to "int" failed for parameter "number".
             reason = re.search(r'Could not convert \"(?P<arg>[^\"]+)\" into (?P<type>[^.\n]+)',raw_error)
             if reason is None:
@@ -254,8 +258,11 @@ class Errors(commands.Cog):
             await self.on_error(error, f"Modal submission interaction | {guild}")
         elif interaction.type == discord.InteractionType.component:
             await self.on_error(error, f"Component interaction | {guild}")
+        elif interaction.type == discord.InteractionType.autocomplete:
+            await self.on_error(error, f"Command autocompletion | {guild}")
         else:
             self.bot.log.warn(f"Unhandled interaction error type: {interaction.type}")
+            await self.on_error(error, None)
 
     @commands.Cog.listener()
     async def on_error(self, error: Exception, ctx: typing.Optional[AllowedCtx] = None):

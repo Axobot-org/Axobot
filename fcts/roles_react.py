@@ -1,10 +1,13 @@
-from typing import Any, Optional, Tuple, Union
-import discord
 import importlib
 import re
+from typing import Any, Optional, Tuple, Union
+
+import discord
 from discord.ext import commands
+
+from fcts import args, checks
 from libs.bot_classes import Axobot, MyContext
-from . import checks, args
+
 importlib.reload(checks)
 importlib.reload(args)
 
@@ -37,8 +40,8 @@ class RolesReact(commands.Cog):
             msg = await chan.fetch_message(payload.message_id)
         except discord.NotFound: # we don't care about those
             return None, None
-        except Exception as e:
-            self.bot.log.warning(f"Could not fetch roles-reactions message {payload.message_id} in guild {payload.guild_id}: {e}")
+        except Exception as err:
+            self.bot.log.warning(f"Could not fetch roles-reactions message {payload.message_id} in guild {payload.guild_id}: {err}")
             return None, None
         if len(msg.embeds) == 0 or msg.embeds[0].footer.text != self.footer_txt:
             return None, None
@@ -282,7 +285,9 @@ Opposite is the subcommand 'join'
             return
         await self.give_remove_role(ctx.author, role, ctx.guild, ctx.channel, give=False)
 
-    async def give_remove_role(self, user: discord.Member, role: discord.Role, guild: discord.Guild, channel: Union[discord.TextChannel, discord.Thread], give: bool = True, ignore_success: bool = False, ignore_failure: bool = False):
+    async def give_remove_role(self, user: discord.Member, role: discord.Role, guild: discord.Guild,
+                               channel: Union[discord.TextChannel, discord.Thread], give: bool = True,
+                               ignore_success: bool = False, ignore_failure: bool = False):
         """Add or remove a role to a user if possible"""
         if self.bot.zombie_mode:
             return
@@ -299,6 +304,8 @@ Opposite is the subcommand 'join'
                 return await channel.send(await self.bot._(guild.id, 'moderation.mute.cant-mute'))
             if role.position >= guild.me.top_role.position:
                 return await channel.send(await self.bot._(guild.id, 'moderation.role.too-high', r=role.name))
+        if stats_cog := self.bot.get_cog("BotStats"):
+            stats_cog.role_reactions["added" if give else "removed"] += 1
         try:
             if give:
                 await user.add_roles(role, reason="Roles reaction")

@@ -7,7 +7,7 @@ import typing
 from discord.ext import commands
 from io import BytesIO
 
-from . import checks
+from fcts import checks
 importlib.reload(checks)
 
 

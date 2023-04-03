@@ -19,7 +19,7 @@ RE_PUNCTUATION = re.compile(r'(?:[^\w\d\s]|_)+')
 RE_PUNCTUATION_NO_DOTS = re.compile(r'(?:[^\w\d\s\.\!\?]|_)+')
 RE_DOTS = re.compile(r'[\.\!\?]+')
 RE_MULTIPLE_WHITESPACES = re.compile(r'\s{2,}')
-RE_LEADING_WHITESPACES = re.compile(r'^\s+|\s*?$')
+RE_INDENTATION = re.compile(r'(?:^\s+)|(?:\s+$)', re.MULTILINE)
 RE_DISCORD_USER = re.compile(r'<@!?\d{15,}>')
 RE_DISCORD_ROLE = re.compile(r'<@&\d{15,}>')
 RE_DISCORD_EMOJI = re.compile(r'<a?:\w+:\d+>')
@@ -78,7 +78,7 @@ def normalize_chars(message: str, remove_dots: bool = True) -> str:
         for match in RE_DOTS.finditer(message):
             message = message.replace(match.group(0), f" {match.group(0)} ")
     message = RE_MULTIPLE_WHITESPACES.sub(' ', message)
-    message = RE_LEADING_WHITESPACES.sub(' ', message)
+    message = RE_INDENTATION.sub('', message)
     return message.strip()
 
 

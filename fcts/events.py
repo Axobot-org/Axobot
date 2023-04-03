@@ -449,7 +449,7 @@ class Events(commands.Cog):
             bot_count,
             10e6 if self.bot.latency == float("inf") else round(self.bot.latency, 3),
             self.bot.get_cog("Info").codelines,
-            await self.bot.get_cog('Xp').bdd_total_xp(),
+            await self.bot.get_cog('Xp').db_get_total_xp(),
             rss_feeds,
             active_rss_feeds,
             supportserver_members,

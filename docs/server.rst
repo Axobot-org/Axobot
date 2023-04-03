@@ -59,48 +59,49 @@ This subcommand can be useful to reset an option to its default value. By execut
 List of every option
 --------------------
 
-* prefix: Character string that will be the bot prefix, for all commands, beginning with the validation message. The prefix must be between 1 and 5 characters long. By default, :code:`!`.
-* language: Language of the bot. Currently only the languages :code:`fr` (French), :code:`en` (English), :code:`fi` (Finnish) and :code:`de` (German) are available (also you can use :code:`lolcat` or :code:`fr2` for more fun). The change takes place as soon as the order is validated by the system. Default :code:`fr`.
-* description: Description of the server, used for the `info server <infos.html#info>`__ command and potential partners. Default empty.
-* clear_allowed_roles: List of roles allowed to use the `clear <moderator.html#clear>`__ command. By default, none.
-* slowmode_allowed_roles: List of roles allowed to use the `slowmode <moderator.html#slowmode>`__ and `freeze <moderator.html#freeze>`__ commands. By default, none.
-* mute_allowed_roles: List of roles allowed to use the `mute <moderator.html#mute-unmute>`__ command. By default, none.
-* kick_allowed_roles: List of roles allowed to use the `kick <moderator.html#kick>`__ command. By default, none.
-* ban_allowed_roles: List of roles allowed to use the `ban <moderator.html#ban>`__ command. By default, none.
-* warn_allowed_roles: List of roles allowed to use the `warn <moderator.html#warn>`__ and `cases <moderator.html#handling-cases>`__ commands. By default, none.
-* say_allowed_roles: List of roles allowed to use the `say` command. By default, none.
-* welcome_channel: List of channels where messages when a member joins/leaves the server will be sent. By default, none.
-* welcome: Message sent when a member joins your server. Some variables are usable, enter the `welcome <infos.html#welcome>`__ command to see them.
-* leave: Message sent when a member leave your server. Some variables are usable, the same as for the welcome message.
-* welcome_roles: List of roles automatically given to members when they join the server. It is necessary that the bot is above the roles in question, and that it has the permission "Manage roles".
-* bot_news: List of channels to which new bot products will be sent. These are the new bugs found as well as the new features added. None by default.
-* modlogs_channel: Channel where all moderation logs (ban, warn, clear...) will be sent.
-* poll_channels: List of channels in which the bot will add the reactions 👍 and 👎 to each message
-* enable_xp: Boolean indicating whether the xp system is activated. Default is :code:`True`.
-* levelup_msg: Message to send when someone reaches a new XP level. You can use :code:`{level}` variable to include the reached level, and :code:`{user}` to mention the user (or `{username}` if you only want the name). Default is a random sentence.
-* levelup_channel: Channel where the bot will send every levelup announcement message. It can be either a text channel, or "none" for no channel (Axobot won't send any levelup channel), or "any" if you want it in the same channel as the message. Default to any.
-* xp_rate: Exp modifier, which multiplies the gain of xp by this number. It must be between 0.1 and 3, rounded to the nearest 1/100.
-* xp_type: Type of XP system to use: :code:`global` if you want to use the accross-server system, common with every other servers which use it, or :code:`local` if you want a more private system. There is also a :code:`mee6-like` system, which uses the same rules as the MEE6 bot, and is also local. Default to :code:`global`.
-* noxp_channels: List of text channels where members will not be able to earn any exp. Not necessary if XP is disabled in your server.
 * anti_caps_lock: Boolean indicating whether the bot should send a warning message when a message with too much capitalization is sent. Default is True.
-* enable_fun: Boolean indicating if the fun part (documentation in preparation) is activated. If so, all commands in this section will be available. Default is :code:`True`.
-* membercounter: A voice salon whose name displays the number of members on the server
 * anti_raid: Anti-raid protection with some useful features. More information `here <moderator.html#anti-raid>`__. Default level: 0
-* vote_emojis: List of emojis that the bot will have to use when there is a voting message. This case may occur when using the vote command, or in a poll channel.
-* morpion_emojis: List of emojis used to play on tic-tac-toe. Two emojis must be entered: one for the bot, and one for the player. Discord emojis as well as server emojis can work.
-* rank_in_dm: Boolean indicating whether the rank command message should be sent as a private message or not. If the value is set to :code:`True`, the message will be sent in DM or as an ephemeral message.
-* help_in_dm: Boolean indicating whether the help command message should be sent as a private message or not. If the value is set to :code:`True`, the message will be sent in DM or as an ephemeral message.
+* ban_allowed_roles: List of roles allowed to use the `ban <moderator.html#ban>`__ command. By default, none.
+* bot_news: List of channels to which new bot products will be sent. These are the new bugs found as well as the new features added. None by default.
+* clear_allowed_roles: List of roles allowed to use the `clear <moderator.html#clear>`__ command. By default, none.
 * compress_help: Boolean indicating whether the full help message (without any specified command/module) should show every command or only their count
+* delete_welcome_on_quick_leave: Boolean indicating whether the welcome message should be deleted if the member leaves the server quickly. Default is :code:`False`.
+* description: Description of the server, used for the `info server <infos.html#info>`__ command and potential partners. Default empty.
+* enable_fun: Boolean indicating if the fun part (documentation in preparation) is activated. If so, all commands in this section will be available. Default is :code:`True`.
+* enable_xp: Boolean indicating whether the xp system is activated. Default is :code:`True`.
+* help_in_dm: Boolean indicating whether the help command message should be sent as a private message or not. If the value is set to :code:`True`, the message will be sent in DM or as an ephemeral message.
+* kick_allowed_roles: List of roles allowed to use the `kick <moderator.html#kick>`__ command. By default, none.
+* language: Language of the bot. Currently only the languages :code:`fr` (French), :code:`en` (English), :code:`fi` (Finnish) and :code:`de` (German) are available (also you can use :code:`lolcat` or :code:`fr2` for more fun). The change takes place as soon as the order is validated by the system. Default :code:`fr`.
+* leave: Message sent when a member leave your server. Some variables are usable, the same as for the welcome message.
+* levelup_channel: Channel where the bot will send every levelup announcement message. It can be either a text channel, or "none" for no channel (Axobot won't send any levelup channel), or "any" if you want it in the same channel as the message. Default to any.
+* levelup_msg: Message to send when someone reaches a new XP level. You can use :code:`{level}` variable to include the reached level, and :code:`{user}` to mention the user (or `{username}` if you only want the name). Default is a random sentence.
+* membercounter: A voice salon whose name displays the number of members on the server
+* modlogs_channel: Channel where all moderation logs (ban, warn, clear...) will be sent.
+* morpion_emojis: List of emojis used to play on tic-tac-toe. Two emojis must be entered: one for the bot, and one for the player. Discord emojis as well as server emojis can work.
+* mute_allowed_roles: List of roles allowed to use the `mute <moderator.html#mute-unmute>`__ command. By default, none.
 * muted_role: Role used to mute your members. If no role is specified, Axobot will check for any role called "muted", and create one if needed, with basic permissions.
+* noxp_channels: List of text channels where members will not be able to earn any exp. Not necessary if XP is disabled in your server.
 * partner_channel: One channel where every partners of the server will be displayed. Default to None.
 * partner_color: The color of the partners embeds. Can be hex, integer or common english names. Default to #a713fe.
 * partner_role: A role given to every administrator of a partner server. Default to None.
-* update_mentions: A list of roles which will be mentioned in each update changelog. You can enable those changelogs with the `bot_news` option. Default to None.
-* voice_roles: List of roles given to people being in a voice channel
-* voice_channel: Channel used by the automated voice channels system (see `below <server.html#voice-channels-managment>`__)
-* voice_category: Category used by the automated voice channels system (see `below <server.html#voice-channels-managment>`__)
-* voice_channel_format: Name format used by the automated voice channels system (see `below <server.html#voice-channels-managment>`__)
+* poll_channels: List of channels in which the bot will add the reactions 👍 and 👎 to each message
+* prefix: Character string that will be the bot prefix, for all commands, beginning with the validation message. The prefix must be between 1 and 5 characters long. By default, :code:`!`.
+* rank_in_dm: Boolean indicating whether the rank command message should be sent as a private message or not. If the value is set to :code:`True`, the message will be sent in DM or as an ephemeral message.
+* say_allowed_roles: List of roles allowed to use the `say` command. By default, none.
+* slowmode_allowed_roles: List of roles allowed to use the `slowmode <moderator.html#slowmode>`__ and `freeze <moderator.html#freeze>`__ commands. By default, none.
 * ttt_display: How to use the tic-tac-toe game. "Disabled" will prevent your users from playing it, "normal" will use it as usual and "short" will avoid spam messages.
+* update_mentions: A list of roles which will be mentioned in each update changelog. You can enable those changelogs with the `bot_news` option. Default to None.
+* voice_category: Category used by the automated voice channels system (see `below <server.html#voice-channels-managment>`__)
+* voice_channel: Channel used by the automated voice channels system (see `below <server.html#voice-channels-managment>`__)
+* voice_channel_format: Name format used by the automated voice channels system (see `below <server.html#voice-channels-managment>`__)
+* voice_roles: List of roles given to people being in a voice channel
+* vote_emojis: List of emojis that the bot will have to use when there is a voting message. This case may occur when using the vote command, or in a poll channel.
+* warn_allowed_roles: List of roles allowed to use the `warn <moderator.html#warn>`__ and `cases <moderator.html#handling-cases>`__ commands. By default, none.
+* welcome: Message sent when a member joins your server. Some variables are usable, enter the `welcome <infos.html#welcome>`__ command to see them.
+* welcome_channel: List of channels where messages when a member joins/leaves the server will be sent. By default, none.
+* welcome_roles: List of roles automatically given to members when they join the server. It is necessary that the bot is above the roles in question, and that it has the permission "Manage roles".
+* xp_rate: Exp modifier, which multiplies the gain of xp by this number. It must be between 0.1 and 3, rounded to the nearest 1/100.
+* xp_type: Type of XP system to use: :code:`global` if you want to use the accross-server system, common with every other servers which use it, or :code:`local` if you want a more private system. There is also a :code:`mee6-like` system, which uses the same rules as the MEE6 bot, and is also local. Default to :code:`global`.
 
 
 ---------

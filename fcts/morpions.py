@@ -77,9 +77,9 @@ class Morpions(commands.Cog):
             if len(self.emojis) < 2:
                 self.emojis = (':red_circle:', ':blue_circle:')
 
-        async def player_starts(self) -> bool:
+        async def player_starts(self):
             """Retourne True si le joueur commence"""
-            return random.choice([True, False])
+            return random.random() < 0.5
 
         async def display_grid(self, grille: list) -> str:
             """Affiche la grille qui est une liste sous forme de chaine de caractères"""

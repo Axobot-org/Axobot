@@ -1,4 +1,3 @@
-import copy
 import json
 import time
 from typing import Any, Optional
@@ -10,6 +9,7 @@ from discord.ext import commands
 
 from fcts import checks
 from libs.bot_classes import Axobot, MyContext
+from libs.serverconfig.autocomplete import autocomplete_main
 from libs.serverconfig.config_paginator import ServerConfigPaginator
 from libs.serverconfig.converters import AllRepresentation, from_input, from_raw, to_display, to_raw
 from libs.serverconfig.options_list import options as options_list
@@ -267,8 +267,8 @@ class ServerConfig(commands.Cog):
             if data["is_listed"] and current in name
         )
         return [
-            app_commands.Choice(name=value[1], value=value[1])
-            for value in filtered
+            app_commands.Choice(name=name, value=name)
+            for _, name in filtered
         ][:25]
 
     @commands.hybrid_group(name='config')
@@ -305,6 +305,16 @@ class ServerConfig(commands.Cog):
     @config_set.autocomplete("option")
     async def sconfig_change_autocomplete_opt(self, _: discord.Interaction, option: str):
         return await self.option_name_autocomplete(option)
+
+    @config_set.autocomplete("value")
+    async def sconfig_change_autocomplete_val(self, interaction: discord.Interaction, value: str):
+        "Autocomplete the value of a config option"
+        if option_name := interaction.namespace.option:
+            try:
+                return await autocomplete_main(self.bot, interaction, option_name, value)
+            except Exception as err:
+                self.bot.dispatch("error", err, interaction)
+        return []
 
 
     @config_main.command(name="reset")
@@ -419,7 +429,7 @@ class ServerConfig(commands.Cog):
         if not opt_data["is_listed"]:
             return await ctx.send(await self.bot._(ctx.guild.id, "server.option-notfound"))
         value = await self.get_option(guild.id, option)
-        if (display := to_display(option, value)) is None:
+        if (display := await to_display(option, value, guild, self.bot)) is None:
             display = "Ø"
         elif len(display) > 1024:
             display = display[:1023] + "…"
@@ -435,35 +445,47 @@ class ServerConfig(commands.Cog):
         option_type = options_list[option_name]["type"]
         if option_type == "boolean":
             if value:
-                return await self.bot._(ctx.guild.id, f"server.set_success.boolean.true", opt=option_name)
+                return await self.bot._(ctx.guild.id, "server.set_success.boolean.true", opt=option_name)
             else:
-                return await self.bot._(ctx.guild.id, f"server.set_success.boolean.false", opt=option_name)
+                return await self.bot._(ctx.guild.id, "server.set_success.boolean.false", opt=option_name)
         if option_type == "levelup_channel":
             if value in {"none", "any"}:
                 return await self.bot._(ctx.guild.id, f"server.set_success.levelup_channel.{value}", opt=option_name)
             else:
-                return await self.bot._(ctx.guild.id, f"server.set_success.levelup_channel.channel", opt=option_name, val=value.mention)
-        str_value = to_display(option_name, value)
+                return await self.bot._(ctx.guild.id,
+                                        "server.set_success.levelup_channel.channel",
+                                        opt=option_name, val=value.mention)
+        str_value = await to_display(option_name, value, ctx.guild, self.bot)
         return await self.bot._(ctx.guild.id, f"server.set_success.{option_type}", opt=option_name, val=str_value)
 
-    async def _get_set_error_message(self, ctx: MyContext, option_name: str, error: ValueError, value: Any):
+    async def _get_set_error_message(self, ctx: MyContext, _option_name: str, error: ValueError, _value: Any):
         "Generate a proper error message for an invalid value"
-        repr: AllRepresentation = error.args[2]
-        if repr["type"] in {"int", "float"}:
-            return await self.bot._(ctx.guild.id, f"server.set_error.{repr['type']}_err", min=repr["min"], max=repr["max"])
-        if repr["type"] == "enum":
-            return await self.bot._(ctx.guild.id, f"server.set_error.ENUM_INVALID", list=', '.join(repr["values"]))
-        if repr["type"] == "text":
-            return await self.bot._(ctx.guild.id, f"server.set_error.text_err", min=repr["min_length"], max=repr["max_length"])
+        option_data: AllRepresentation = error.args[2]
+        if option_data["type"] in {"int", "float"}:
+            return await self.bot._(ctx.guild.id,
+                                    f"server.set_error.{option_data['type']}_err",
+                                    min=option_data["min"], max=option_data["max"])
+        if option_data["type"] == "enum":
+            return await self.bot._(ctx.guild.id, "server.set_error.ENUM_INVALID", list=', '.join(option_data["values"]))
+        if option_data["type"] == "text":
+            return await self.bot._(ctx.guild.id,
+                                    "server.set_error.text_err",
+                                    min=option_data["min_length"], max=option_data["max_length"])
         error_name: str = error.args[1]
         if error_name in {"ROLES_TOO_FEW", "ROLES_TOO_MANY"}:
-            return await self.bot._(ctx.guild.id, "server.set_error.roles_list", min=repr["min_count"], max=repr["max_count"])
+            return await self.bot._(ctx.guild.id,
+                                    "server.set_error.roles_list",
+                                    min=option_data["min_count"], max=option_data["max_count"])
         if error_name in {"CHANNELS_TOO_FEW", "CHANNELS_TOO_MANY"}:
-            return await self.bot._(ctx.guild.id, "server.set_error.channels_list", min=repr["min_count"], max=repr["max_count"])
+            return await self.bot._(ctx.guild.id,
+                                    "server.set_error.channels_list",
+                                    min=option_data["min_count"], max=option_data["max_count"])
         if error_name in {"EMOJIS_TOO_FEW", "EMOJIS_TOO_MANY"}:
-            if repr["min_count"] == repr["max_count"]:
-                return await self.bot._(ctx.guild.id, "server.set_error.emojis_list_exact", count=repr["min_count"])
-            return await self.bot._(ctx.guild.id, "server.set_error.emojis_list", min=repr["min_count"], max=repr["max_count"])
+            if option_data["min_count"] == option_data["max_count"]:
+                return await self.bot._(ctx.guild.id, "server.set_error.emojis_list_exact", count=option_data["min_count"])
+            return await self.bot._(ctx.guild.id,
+                                    "server.set_error.emojis_list",
+                                    min=option_data["min_count"], max=option_data["max_count"])
         user_input = error.args[3] if len(error.args) > 3 else None
         return await self.bot._(ctx.guild.id, "server.set_error." + error_name, input=user_input)
 
@@ -472,6 +494,7 @@ class ServerConfig(commands.Cog):
         if option_name not in options_list:
             await ctx.send(await self.bot._(ctx.guild.id, "server.option-notfound"))
             return
+        await ctx.defer()
         try:
             value = await from_input(option_name, raw_input, ctx.guild, ctx)
         except ValueError as err:

@@ -16,7 +16,7 @@ from libs.bot_classes import Axobot, MyContext
 from libs.formatutils import FormatUtils
 from libs.rss.rss_general import FeedObject
 
-from . import checks
+from fcts import checks
 
 
 class Minecraft(commands.Cog):
@@ -523,7 +523,7 @@ Every information come from the website www.fr-minecraft.net"""
             async with session.get(url, timeout=10) as resp:
                 try:
                     search: dict = await resp.json()
-                    self.uuid_cache[username] = search["id"]
+                    self.uuid_cache[username] = search.get("id")
                 except aiohttp.ContentTypeError:
                     self.uuid_cache[username] = None
         return self.uuid_cache[username]

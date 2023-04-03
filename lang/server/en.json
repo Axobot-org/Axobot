@@ -1,4 +1,39 @@
 {
+    "bool": {
+        "true": "Yes",
+        "false": "No"
+    },
+    "enum": {
+        "anti_raid": {
+            "none": "none",
+            "smooth": "smooth",
+            "careful": "careful",
+            "high": "high",
+            "(╯°□°）╯︵ ┻━┻": "extreme"
+        },
+        "language": {
+            "fr": "French",
+            "en": "English",
+            "lolcat": "lolcat",
+            "fi": "Finnish",
+            "de": "German",
+            "fr2": "Familiar French"
+        },
+        "levelup_channel": {
+            "none": "no message",
+            "any": "any channel"
+        },
+        "ttt_display": {
+            "disabled": "disabled",
+            "short": "short",
+            "normal": "normal"
+        },
+        "xp_type": {
+            "global": "global",
+            "mee6-like": "mee6-like",
+            "local": "local"
+        }
+    },
     "config-list": "List of available options: %{text}More info at %{link}",
     "deleted-channel": "deleted channel",
     "deleted-role": "deleted role",
@@ -71,6 +106,7 @@
         "bot_news": "List of channels where to send bot news: %{value}",
         "clear_allowed_roles": "List of roles that can use the \"clear\" command: %{value}",
         "compress_help": "Should the display of the `help` command be compressed? %{value}",
+        "delete_welcome_on_quick_leave": "Should I delete the welcome message when a member leaves right after joining? %{value}",
         "description": "Server description:\n %{value}",
         "enable_fun": "Are the commands listed in the `fun` command enabled? %{value}",
         "enable_xp": "Should the xp system be enabled? %{value}",

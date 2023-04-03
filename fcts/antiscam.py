@@ -1,4 +1,3 @@
-import copy
 import time
 import typing
 
@@ -6,6 +5,7 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
+from fcts import checks
 from libs.antiscam import AntiScamAgent, Message, update_unicode_map
 from libs.antiscam.classes import (EMBED_COLORS, MsgReportView,
                                    PredictionResult, get_avg_word_len,
@@ -14,10 +14,8 @@ from libs.antiscam.classes import (EMBED_COLORS, MsgReportView,
 from libs.antiscam.normalization import normalize
 from libs.antiscam.similarities import check_message
 from libs.antiscam.training_bayes import train_model
-from libs.bot_classes import MyContext, Axobot
+from libs.bot_classes import Axobot, MyContext
 from libs.formatutils import FormatUtils
-
-from . import checks
 
 
 def is_immune(member: discord.Member) -> bool:
@@ -246,10 +244,9 @@ class AntiScam(commands.Cog):
         """Enable the antiscam feature in your server
 
         ..Doc moderator.html#anti-scam"""
-        msg: discord.Message = copy.copy(ctx.message)
-        msg.content =  f'{ctx.prefix}config set anti_scam true'
-        new_ctx = await self.bot.get_context(msg)
-        await self.bot.invoke(new_ctx)
+        config_cmd = self.bot.get_command("config set")
+        if await config_cmd.can_run(ctx):
+            await config_cmd(ctx, "anti_scam", value="true")
 
     @antiscam.command(name="disable")
     @commands.guild_only()
@@ -258,10 +255,9 @@ class AntiScam(commands.Cog):
         """Disable the antiscam feature in your server
 
         ..Doc moderator.html#anti-scam"""
-        msg: discord.Message = copy.copy(ctx.message)
-        msg.content =  f'{ctx.prefix}config set anti_scam false'
-        new_ctx = await self.bot.get_context(msg)
-        await self.bot.invoke(new_ctx)
+        config_cmd = self.bot.get_command("config set")
+        if await config_cmd.can_run(ctx):
+            await config_cmd(ctx, "anti_scam", value="false")
 
     @antiscam.command(name="fetch-unicode", with_app_command=False)
     @commands.check(checks.is_bot_admin)
@@ -373,7 +369,7 @@ class AntiScam(commands.Cog):
         if not await self.bot.get_config(msg.guild.id, "anti_scam"):
             return
         message: Message = Message.from_raw(msg.content, len(msg.mentions), self.agent.websites_list)
-        if len(message.normd_message) < 3:
+        if len(message.normd_message.split()) < 3:
             return
         result = self.agent.predict_bot(message)
         if result.result > 1:
