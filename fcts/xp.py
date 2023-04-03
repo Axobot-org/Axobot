@@ -634,7 +634,7 @@ class Xp(commands.Cog):
         "Find the user rank card, or generate a new one, based on given data"
         # file_ext = 'gif' if user.display_avatar.is_animated() else 'png'
         file_ext = "png"
-        filepath = f"./assets/cards/{user.id}-{xp}-{rank}.{file_ext}"
+        filepath = f"./assets/cards/{user.id}-{xp}-{style}.{file_ext}"
         # check if the card has already been generated, and return it if it is the case
         if os.path.isfile(filepath):
             return discord.File(filepath)
