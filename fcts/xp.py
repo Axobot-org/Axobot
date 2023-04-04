@@ -803,7 +803,7 @@ class Xp(commands.Cog):
                     rank = pos[0][0]
                     level = await self.cog.calc_level(pos[0][1]["xp"], self.used_system)
                     xp_label = self.convert_average(pos[0][1]["xp"])
-                    value = f"**#{rank} |** `lvl {level}` **|** `xp {xp_label}`"
+                    value = f"**#{rank} |** `lvl {level[0]}` **|** `xp {xp_label}`"
             else:
                 rank, data = pos[0]
                 value = f"**#{rank} |** `lvl {data['level']}` **|** `xp {data['xp_label']}`"
@@ -885,7 +885,7 @@ class Xp(commands.Cog):
                 xp = row['xp_label']
                 txt.append(f"{i} • **{username} |** `lvl {lvl}` **|** `xp {xp}`")
             # title
-            if self.scope == 'guild' or self.used_system != "global":
+            if self.scope == "server" or self.used_system != "global":
                 embed_title = await self.client._(self.guild, "xp.top-title-2")
             else:
                 embed_title = await self.client._(self.guild, "xp.top-title-1")
