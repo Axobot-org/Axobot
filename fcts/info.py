@@ -948,7 +948,12 @@ Available types: member, role, user, emoji, channel, server, invite, category
         if len(disp_lang) == 0:
             disp_lang = ["Unknown"]
         # User name
-        user_name = str(user)+' <:BOT:544149528761204736>' if user.bot else str(user)
+        if user.bot and discord.PublicUserFlags.verified_bot in user.public_flags:
+            user_name = str(user) + "<:botverified:1093225375963811920>"
+        elif user.bot:
+            user_name = str(user) + "<:bot:1093225377377308692>"
+        else:
+            user_name = str(user)
         # XP sus
         xp_sus = "Unknown"
         if Xp := self.bot.get_cog("Xp"):
