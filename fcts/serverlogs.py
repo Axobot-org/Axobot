@@ -773,7 +773,8 @@ class ServerLogs(commands.Cog):
             )
             emb.set_footer(text=f"Role ID: {role.id}")
             emb.add_field(name="Name", value=role.name, inline=False)
-            emb.add_field(name="Color", value=str(role.color))
+            color_url = f"https://www.color-hex.com/color/{role.color.value:x}"
+            emb.add_field(name="Color", value=f"[{role.color}]({color_url})")
             if specs := await self.get_role_specs(role):
                 emb.add_field(name="Specificities", value=", ".join(specs), inline=False)
             # if we have access to audit logs, try to find who created the role
@@ -799,7 +800,9 @@ class ServerLogs(commands.Cog):
                 emb.add_field(name="Name", value=f"{before.name} -> {after.name}", inline=False)
             # role color
             if before.color != after.color:
-                emb.add_field(name="Color", value=f"{before.color} -> {after.color}", inline=False)
+                before_color_url = f"https://www.color-hex.com/color/{before.color.value:x}"
+                after_color_url = f"https://www.color-hex.com/color/{after.color.value:x}"
+                emb.add_field(name="Color", value=f"[{before.color}]({before_color_url}) -> [{after.color}]({after_color_url})", inline=False)
             # mentionnable
             if before.mentionable != after.mentionable:
                 emb.add_field(name="Mentionnable", value="Enabled" if after.mentionable else "Disabled")
@@ -857,7 +860,8 @@ class ServerLogs(commands.Cog):
             )
             emb.set_footer(text=f"Role ID: {role.id}")
             emb.add_field(name="Name", value=role.name, inline=False)
-            emb.add_field(name="Color", value=str(role.color))
+            color_url = f"https://www.color-hex.com/color/{role.color.value:x}"
+            emb.add_field(name="Color", value=f"[{role.color}]({color_url})")
             if specs := await self.get_role_specs(role):
                 emb.add_field(name="Specificities", value=", ".join(specs), inline=False)
             # try to find who deleted the role

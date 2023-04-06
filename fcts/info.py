@@ -492,7 +492,8 @@ Available types: member, role, user, emoji, channel, server, invite, category
         # ID
         embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.role-0"), value=str(role.id),inline=True)
         # Color
-        embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.role-1"), value=str(role.color),inline=True)
+        color_url = f"https://www.color-hex.com/color/{role.color.value:x}"
+        embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.role-1"), value=f"[{role.color}]({color_url})",inline=True)
         # Mentionnable
         if role.mentionable:
             mentio = await self.bot._(ctx.guild.id,"misc.yes")
