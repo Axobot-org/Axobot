@@ -189,11 +189,11 @@ Anti-raid
 
 This option allows you to moderate the entry of your server, with several levels of security. Here is the list of levels:
 
-* 0 (None): no filter
-* 1 (Smooth): kick members with invitations in their nickname
-* 2 (Careful): kick accounts created less than 2 hours before
-* 3 (High): ban members with invitations in their nickname for a week, and kick accounts created less than 12h before
-* 4 ((╯°□°）╯︵ ┻━┻): ban accounts created less than 3 hours before for a week, ban accounts created less than 1h before for 2 weeks, and simply kick those created less than 24h before
+* None: no filter
+* Smooth: kick members with invitations in their nickname
+* Careful: kick accounts created less than 2 hours before
+* High: ban members with invitations in their nickname for a week, and kick accounts created less than 12h before
+* Extreme: ban accounts created less than 3 hours before for a week, ban accounts created less than 1h before for 2 weeks, and simply kick those created less than 24h before
 
 .. note:: Note that the levels are cumulative: level 3 will also have the specificities of levels 1 and 2
 

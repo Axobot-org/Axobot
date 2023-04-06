@@ -12,7 +12,7 @@ options: dict[str, "AllRepresentation"] = {
     },
     "anti_raid": {
         "type": "enum",
-        "values": ["none", "smooth", "careful", "high", "(╯°□°）╯︵ ┻━┻"],
+        "values": ["none", "smooth", "careful", "high", "extreme"],
         "default": "none",
         "is_listed": True,
     },
