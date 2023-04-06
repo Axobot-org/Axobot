@@ -49,7 +49,7 @@ If you want to keep an eye on the number of rss/Minecraft feeds registered on yo
 Mention a role
 --------------
 
-**Syntax:** :code:`rss roles [feed ID] [silent] [roles]`
+**Syntax:** :code:`rss set-mentions [feed ID] [silent] [roles]`
 
 This rss feed tracking option allows you to notify a role when a new post arrives. The roles mentioned are different between rss feeds, which allows you a greater handling.
 
@@ -66,7 +66,7 @@ The "roles" arguments is the list of roles you want to mention, separated by spa
 Change the text
 ---------------
 
-**Syntax:** :code:`rss text [feed ID] [new text]`
+**Syntax:** :code:`rss set-text [feed ID] [new text]`
 
 This command is particularly useful if you want to change the text of an rss feed tracking, for example to have a customized text, or in your native language. Many tools are at your disposal (also known as *variables*) that allow an optimal personalization of the message. That's right, we thought of you.
 
@@ -100,7 +100,7 @@ If no identifier is given, the bot will ask you which one to modify.  As for the
 Setup a feed embed
 ------------------
 
-**Syntax:** :code:`rss use_embed [feed ID] [use embed]` or :code:`rss embed <feed ID> [use embed] <parameters>`
+**Syntax:** :code:`rss set-embed [feed ID] [use embed]` or :code:`rss set-embed <feed ID> [use embed] <parameters>`
 
 Sometimes people want to have a lot of control over what is happening in the world. Since we are unable to offer it to them, we offer you a great control on the embeds sent by rss feeds. The first command allows you to enable the use of embed instead of classic text, the second one allows you to choose a title, a color and a custom footer.
 
