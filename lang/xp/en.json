@@ -45,6 +45,10 @@
     ],
     "del-user": "<deleted user>",
     "high-page": "There are not that many pages!",
+    "levelup-dm": {
+        "title": "Levelup!",
+        "footer": "From server %{servername}"
+    },
     "levelup-items": [
         "sword",
         "bow",

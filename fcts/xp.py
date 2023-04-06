@@ -72,6 +72,8 @@ class Xp(commands.Cog):
             return None
         if value == "any":
             return msg.channel
+        if value == "dm":
+            return msg.author.dm_channel or await msg.author.create_dm()
         return value
 
     @commands.Cog.listener(name="on_message")
@@ -199,18 +201,29 @@ class Xp(commands.Cog):
         text: Optional[str] = await self.bot.get_config(msg.guild.id, "levelup_msg")
         if text is None or len(text) == 0:
             text = random.choice(await self.bot._(msg.channel, "xp.default_levelup"))
-            while (not '{random}' in text) and random.random() < 0.75:
+            while '{random}' not in text and random.random() < 0.75:
                 text = random.choice(await self.bot._(msg.channel, "xp.default_levelup"))
         if '{random}' in text:
             item = random.choice(await self.bot._(msg.channel, "xp.levelup-items"))
         else:
             item = ''
-        await destination.send(text.format_map(self.bot.SafeDict(
+        text = text.format_map(self.bot.SafeDict(
             user=msg.author.mention,
             level=lvl,
             random=item,
             username=msg.author.display_name
-        )))
+        ))
+        if isinstance(destination, discord.DMChannel) and msg.guild:
+            embed = discord.Embed(
+                title=await self.bot._(destination, "xp.levelup-dm.title"),
+                color=discord.Color.gold(),
+                description=text
+            )
+            footer = await self.bot._(destination, "xp.levelup-dm.footer", servername=msg.guild.name)
+            embed.set_footer(text=footer, icon_url=msg.guild.icon)
+            await destination.send(embed=embed)
+        else:
+            await destination.send(text)
 
     async def check_spam(self, text: str):
         """Vérifie si un text contient du spam"""

@@ -255,7 +255,7 @@ async def _autocomplete_emojis_list(_: Axobot, interaction: Interaction, option:
 async def _autocomplete_levelup_channel(_bot: Axobot, interaction: Interaction,
                                         _option: LevelupChannelOptionRepresentation, current: str):
     "Autocompletion for the levelup channel option"
-    special_values = ("any", "none")
+    special_values = ("any", "none", "dm")
     if current:
         channels = sorted(
             (not channel.name.startswith(current), channel.name.lower(), channel.name, str(channel.id))

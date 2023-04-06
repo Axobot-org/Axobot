@@ -659,7 +659,7 @@ class ColorOption(OptionConverter):
 class LevelupChannelOption(OptionConverter):
     @staticmethod
     def from_raw(raw: str, repr: LevelupChannelOptionRepresentation, guild: discord.guild):
-        if raw in {"any", "none"}:
+        if raw in {"any", "none", "dm"}:
             return raw
         channel_repr: TextChannelOptionRepresentation = repr | {
             "allow_threads": True,
@@ -682,7 +682,7 @@ class LevelupChannelOption(OptionConverter):
 
     @staticmethod
     async def from_input(raw: str, repr: LevelupChannelOptionRepresentation, guild: discord.Guild, ctx: MyContext):
-        if raw.lower() in {"any", "none"}:
+        if raw.lower() in {"any", "none", "dm"}:
             return raw.lower()
         channel_repr: TextChannelOptionRepresentation = repr | {
             "allow_threads": True,
