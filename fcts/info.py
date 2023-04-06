@@ -439,9 +439,11 @@ Available types: member, role, user, emoji, channel, server, invite, category
             embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.member-8"), value = member.activity.state, inline=True)
         # Bot
         if member.bot:
-            botb = await self.bot._(ctx.guild.id,"misc.yes")
+            botb = await self.bot._(ctx.guild.id, "misc.yes")
+            if member.public_flags.verified_bot:
+                botb += " (" + await self.bot._(ctx.guild.id, "misc.verified") + ")"
         else:
-            botb = await self.bot._(ctx.guild.id,"misc.no")
+            botb = await self.bot._(ctx.guild.id, "misc.no")
         embed.add_field(name="Bot", value=botb.capitalize())
         # Administrator
         if ctx.channel.permissions_for(member).administrator:
@@ -521,8 +523,11 @@ Available types: member, role, user, emoji, channel, server, invite, category
     async def user_infos(self, ctx: MyContext, user: discord.User):
         lang = await self.bot._(ctx.guild.id,"_used_locale")
         since = await self.bot._(ctx.guild.id,"misc.since")
+        # is bot
         if user.bot:
             botb = await self.bot._(ctx.guild.id,"misc.yes")
+            if user.public_flags:
+                botb += " (" + await self.bot._(ctx.guild.id, "misc.verified") + ")"
         else:
             botb = await self.bot._(ctx.guild.id,"misc.no")
         if user in ctx.guild.members:
