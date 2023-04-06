@@ -402,6 +402,8 @@ class Rss(commands.Cog):
                             else:
                                 roles.append(item)
                         roles = ", ".join(roles)
+                        if feed.silent_mention:
+                            roles += " <:silent:1093658138567245925>"
                     # feed name
                     feed_name: str = feed.link
                     if feed.type == 'tw' and feed.link.isnumeric():
@@ -549,12 +551,13 @@ class Rss(commands.Cog):
         else:
             return arg.split(" ")
 
-    @rss_main.command(name="mentions", aliases=['roles', 'mention'])
+    @rss_main.command(name="edit-mentions", aliases=['edit-mention'])
     @commands.guild_only()
     @commands.check(can_use_rss)
     @commands.check(checks.database_connected)
-    async def roles_feeds(self, ctx: MyContext, ID:int=None, *, mentions: Optional[str]):
+    async def roles_feeds(self, ctx: MyContext, feed_id: Optional[int]=None, silent: Optional[bool]=None, *, mentions: Optional[str]):
         """Configures a role to be notified when a news is posted
+        The "silent" parameter (Yes/No) allows you to send new feeds as silent messages, which won't send push notifications to your users.
         If you want to use the @everyone role, please put the server ID instead of the role name.
 
         ..Example rss mentions
@@ -567,7 +570,7 @@ class Rss(commands.Cog):
         try:
             # ask for feed IDs
             feeds_ids = await self.ask_rss_id(
-                ID,
+                feed_id,
                 ctx,
                 await self.bot._(ctx.guild.id, "rss.choose-mentions-1"),
                 feed_filter=lambda f: f.type != "mc",
@@ -656,13 +659,23 @@ class Rss(commands.Cog):
         try:
             if roles_ids is None:
                 for feed in feeds:
+                    values = []
                     if len(feed.role_ids) > 0:
-                        await self.db_update_feed(feed.feed_id, values=[('roles', '')])
+                        values.append(('roles', ''))
+                    if silent is not None and feed.silent_mention != silent:
+                        values.append(('silent_mention', silent))
+                    if len(values) > 0:
+                        await self.db_update_feed(feed.feed_id, values=values)
                 await ctx.send(await self.bot._(ctx.guild.id, "rss.roles.edit-success", count=0))
             else:
                 for feed in feeds:
+                    values = []
                     if feed.role_ids != roles_ids:
-                        await self.db_update_feed(feed.feed_id, values=[('roles', ';'.join(roles_ids))])
+                        values.append(('roles', ';'.join(roles_ids)))
+                    if silent is not None and feed.silent_mention != silent:
+                        values.append(('silent_mention', silent))
+                    if len(values) > 0:
+                        await self.db_update_feed(feed.feed_id, values=values)
                 await ctx.send(await self.bot._(ctx.guild.id, "rss.roles.edit-success", count=len(names), roles=", ".join(names)))
         except Exception as err:
             cmd = await self.bot.get_command_mention("about")
@@ -1322,17 +1335,16 @@ class Rss(commands.Cog):
         for item in roles:
             if item == '':
                 continue
-            role = discord.utils.get(channel.guild.roles,id=int(item))
-            if role is not None:
+            if role := channel.guild.get_role(int(item)):
                 mentions.append(role)
         if self.bot.zombie_mode:
             return
         allowed_mentions = discord.AllowedMentions(everyone=False, roles=True)
         try:
             if isinstance(t, discord.Embed):
-                await channel.send(" ".join(obj.mentions), embed=t, allowed_mentions=allowed_mentions)
+                await channel.send(" ".join(obj.mentions), embed=t, allowed_mentions=allowed_mentions, silent=obj.feed.silent_mention)
             else:
-                await channel.send(t, allowed_mentions=allowed_mentions)
+                await channel.send(t, allowed_mentions=allowed_mentions, silent=obj.feed.silent_mention)
             if send_stats:
                 if statscog := self.bot.get_cog("BotStats"):
                     statscog.rss_stats['messages'] += 1

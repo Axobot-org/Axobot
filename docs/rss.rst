@@ -49,11 +49,13 @@ If you want to keep an eye on the number of rss/Minecraft feeds registered on yo
 Mention a role
 --------------
 
-**Syntax:** :code:`rss roles [feed ID] [roles]`
+**Syntax:** :code:`rss roles [feed ID] [silent] [roles]`
 
 This rss feed tracking option allows you to notify a role when a new post arrives. The roles mentioned are different between rss feeds, which allows you a greater handling.
 
 The "feed ID" argument is the identifier of the feed (found with the command `rss list <#see-every-feed>`__). If you do not enter this argument, or if the feed can't be found, the bot will open a menu where you can choose which feed to modify. Then another menu will allow you to choose which roles you want to mention.
+
+The "silent" argument allows you to set the messages as silent. When this option is enabled, mentions will still appear for your users, but they will no longer receive push notifications when the message is sent. This is the same way it works when you send a message starting with @silent. Default is "false" (disabled).
 
 The "roles" arguments is the list of roles you want to mention, separated by spaces (if some of them contains spaces, you can use quotations "..." instead). If not specified, Axobot will ask you for the list. You can either use names or IDs, or put "none" to remove every mention.
 
