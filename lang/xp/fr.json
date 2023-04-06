@@ -45,6 +45,10 @@
     ],
     "del-user": "<deleted user>",
     "high-page": "Il n'y a pas autant de pages !",
+    "levelup-dm": {
+        "title": "Changement de niveau !",
+        "footer": "Dans le serveur %{servername}"
+    },
     "levelup-items": [
         "cette épée",
         "cet arc",

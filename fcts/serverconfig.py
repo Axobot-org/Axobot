@@ -449,7 +449,7 @@ class ServerConfig(commands.Cog):
             else:
                 return await self.bot._(ctx.guild.id, "server.set_success.boolean.false", opt=option_name)
         if option_type == "levelup_channel":
-            if value in {"none", "any"}:
+            if value in {"none", "any", "dm"}:
                 return await self.bot._(ctx.guild.id, f"server.set_success.levelup_channel.{value}", opt=option_name)
             else:
                 return await self.bot._(ctx.guild.id,

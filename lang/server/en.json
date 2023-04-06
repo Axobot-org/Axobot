@@ -21,7 +21,8 @@
         },
         "levelup_channel": {
             "none": "no message",
-            "any": "any channel"
+            "any": "any channel",
+            "dm": "private message"
         },
         "ttt_display": {
             "disabled": "disabled",
@@ -94,7 +95,8 @@
         "levelup_channel": {
             "any": "Levelup messages will now be posted directly in the chat",
             "channel": "Levelup messages will now be sent to %{val}",
-            "none": "Levelup messages won't be sent anymore"
+            "none": "Levelup messages won't be sent anymore",
+            "dm": "Levelup messages will be sent in users' Direct Messages"
         }
     },
     "server_desc": {

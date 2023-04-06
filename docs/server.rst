@@ -126,7 +126,7 @@ There are several ways to customize your xp system. In particular, you have 4 `c
 
 - **Prevent xp in some channels:** although Axobot prevents people from earning xp with its commands, it cannot detect commands from other bots. So you can prevent your members from earning xp in certain channels via the :code:`noxp_channels` option, which contains a list of all channels where your users can't have any experience points.
 
-- **Select a channel where to send levelup messages:** sometimes levelup messages can be a bit spammy. So you have an option to select a single channel where to send level up messages. It is also possible to disable these messages via the same option. Enter the command :code:`config set levelup_channel` followed by the name of your channel, or "none" to disable the message.
+- **Select a channel where to send levelup messages:** sometimes levelup messages can be a bit spammy. So you have an option to select a single channel where to send level up messages. It is also possible to disable these messages via the same option. Enter the command :code:`config set levelup_channel` followed by the name of your channel, or an other special value ("none" to disable the message, "any" to select the current channel, or "dm" to send in the user's Direct Messages).
 
 
 

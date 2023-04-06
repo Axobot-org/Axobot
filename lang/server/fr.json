@@ -21,7 +21,8 @@
         },
         "levelup_channel": {
             "none": "pas de message",
-            "any": "n'importe quel salon"
+            "any": "n'importe quel salon",
+            "dm": "en message privé"
         },
         "ttt_display": {
             "disabled": "désactivé",
@@ -89,7 +90,8 @@
         "levelup_channel": {
             "any": "Les messages de changement de niveaux seront maintenant directement posté dans le tchat",
             "channel": "Les messages de changement de niveaux seront maintenant dans le salon %{val}",
-            "none": "Les messages de changement de niveaux ne seront maintenant plus envoyés"
+            "none": "Les messages de changement de niveaux ne seront maintenant plus envoyés",
+            "dm": "Les messages de changement de niveaux seront maintenant envoyés en Messages Privés"
         }
     },
     "server_desc": {
