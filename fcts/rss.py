@@ -551,7 +551,7 @@ class Rss(commands.Cog):
         else:
             return arg.split(" ")
 
-    @rss_main.command(name="edit-mentions", aliases=['edit-mention'])
+    @rss_main.command(name="set-mentions", aliases=['set-mention'])
     @commands.guild_only()
     @commands.check(can_use_rss)
     @commands.check(checks.database_connected)
@@ -751,7 +751,7 @@ class Rss(commands.Cog):
         except Exception as err:
             await ctx.send(await self.bot._(ctx.guild.id,"rss.guild-error", err=err))
 
-    @rss_main.command(name="text")
+    @rss_main.command(name="set-text")
     @commands.guild_only()
     @commands.check(can_use_rss)
     @commands.check(checks.database_connected)
@@ -814,7 +814,7 @@ class Rss(commands.Cog):
         else:
             await ctx.send(await self.bot._(ctx.guild.id,"rss.text-success.multiple", text=text))
 
-    @rss_main.command(name="use_embed",aliases=['embed'])
+    @rss_main.command(name="set-embed", aliases=['embed'])
     @commands.guild_only()
     @commands.check(can_use_rss)
     @commands.check(checks.database_connected)
