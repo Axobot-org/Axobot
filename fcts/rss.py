@@ -84,6 +84,7 @@ class Rss(commands.Cog):
 
 
     @commands.hybrid_group(name="rss")
+    @app_commands.default_permissions(manage_guild=True)
     @commands.cooldown(2, 15, commands.BucketType.channel)
     async def rss_main(self, ctx: MyContext):
         """Search for recent posts, or manage your server RSS feeds
