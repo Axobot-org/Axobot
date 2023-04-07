@@ -495,10 +495,9 @@ class Rss(commands.Cog):
         _quit = await self.bot._(ctx.guild, "misc.quit")
         view = FeedsPaginator(self.bot, ctx.author, stop_label=_quit.capitalize())
         msg = await view.send_init(ctx)
-        if msg:
-            if await view.wait():
-                # only manually disable if it was a timeout (ie. not a user stop)
-                await view.disable(msg)
+        if msg and await view.wait():
+            # only manually disable if it was a timeout (ie. not a user stop)
+            await view.disable(msg)
 
     async def _get_feed_name(self, feed: FeedObject) -> str:
         name = feed.link
@@ -615,7 +614,7 @@ class Rss(commands.Cog):
         return selection
 
     def parse_output(self, arg: str) -> list[str]:
-        r = re.findall(r'((?<![\\])[\"])((?:.(?!(?<![\\])\1))*.?)\1', arg)
+        r = re.findall(r'((?<!\\)\")((?:.(?!(?<!\\)\1))*.?)\1', arg)
         if len(r) > 0:
             flatten = lambda l: [item for sublist in l for item in sublist]
             params = [[x for x in group if x != '"'] for group in r]
@@ -1266,8 +1265,8 @@ class Rss(commands.Cog):
                         channel=feeds.feed['title'] if 'title' in feeds.feed.keys() else '?',
                         image=img)
                     liste.append(obj)
-                except:
-                    pass
+                except Exception as err:
+                    self.bot.dispatch("error", err)
             liste.reverse()
             return liste
 
@@ -1413,7 +1412,7 @@ class Rss(commands.Cog):
     async def db_increment_errors(self, working_ids: list[int], broken_ids: list[int]) -> int:
         "Increments recent_errors value by 1 for each of these IDs, and set it to 0 for the others"
         if self.bot.zombie_mode:
-            return
+            return 0
         if working_ids:
             working_ids_list = ', '.join(map(str, working_ids))
             query = f"UPDATE `{self.table}` SET `recent_errors` = 0 WHERE `ID` IN ({working_ids_list})"
@@ -1599,7 +1598,7 @@ class Rss(commands.Cog):
                 statscog.rss_stats["checked"] = checked_count
                 statscog.rss_stats["errors"] = len(errors_ids)
             # await self.db_set_active_guilds(set(feed.guild_id for feed in feeds_list))
-            await self.db_set_last_refresh(set(feed.feed_id for feed in feeds_list))
+            await self.db_set_last_refresh(list(feed.feed_id for feed in feeds_list))
         if len(errors_ids) > 0:
             desc.append(f"{len(errors_ids)} errors: {' '.join(str(x) for x in errors_ids)}")
             # update errors count in database
@@ -1626,7 +1625,6 @@ class Rss(commands.Cog):
             self.bot.log.warning('Base de donnée hors ligne - check rss annulé')
             return
         self.bot.log.info(" Boucle rss commencée !")
-        start_time = time.time()
         try:
             await self.main_loop()
         except Exception as err:
