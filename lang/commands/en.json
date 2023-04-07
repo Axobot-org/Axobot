@@ -93,5 +93,231 @@
     "command_description": {
     },
     "group_description": {
+    },
+    "param_name": {
+        "antiscam test": {
+            "text": "text"
+        },
+        "antiscam report": {
+            "message": "message"
+        },
+        "slowmode": {
+            "seconds": "seconds"
+        },
+        "clear": {
+            "number": "number",
+            "users": "users",
+            "contains_file": "contains-file",
+            "contains_url": "contains-url",
+            "contains_invite": "contains-invite",
+            "is_pinned": "is-pinned"
+        },
+        "kick": {
+            "user": "user",
+            "reason": "reason"
+        },
+        "warn": {
+            "user": "user",
+            "message": "message"
+        },
+        "mute": {
+            "user": "user",
+            "time": "time",
+            "reason": "reason"
+        },
+        "ban": {
+            "user": "user",
+            "time": "time",
+            "days_to_delete": "days-to-delete",
+            "reason": "reason"
+        },
+        "unban": {
+            "user": "user",
+            "reason": "reason"
+        },
+        "softban": {
+            "user": "user",
+            "reason": "reason"
+        },
+        "banlist": {
+            "show_reasons": "show-reasons"
+        },
+        "mutelist": {
+            "show_reasons": "show-reasons"
+        },
+        "emoji rename": {
+            "emoji": "emoji",
+            "name": "name"
+        },
+        "emoji restrict": {
+            "emoji": "emoji",
+            "roles": "roles"
+        },
+        "emoji clear": {
+            "message": "message",
+            "emoji": "emoji"
+        },
+        "role set-color": {
+            "role": "role",
+            "color": "color"
+        },
+        "role members-list": {
+            "role": "role"
+        },
+        "role grant": {
+            "role": "role",
+            "users": "users"
+        },
+        "role revoke": {
+            "role": "role",
+            "users": "users"
+        },
+        "unhoist": {
+            "chars": "characters"
+        },
+        "destop": {
+            "start_message": "from-message"
+        },
+        "permissions": {
+            "channel": "channel",
+            "target": "target"
+        },
+        "rss youtube": {
+            "channel": "channel"
+        },
+        "rss twitch": {
+            "channel": "channel"
+        },
+        "rss twitter": {
+            "name": "name"
+        },
+        "rss web": {
+            "link": "link"
+        },
+        "rss deviantart": {
+            "user": "user"
+        },
+        "rss add": {
+            "link": "link"
+        },
+        "rss remove": {
+            "feed": "feed"
+        },
+        "rss enable": {
+            "feed": "feed"
+        },
+        "rss disable": {
+            "feed": "feed"
+        },
+        "rss set-mentions": {
+            "feed": "feed",
+            "silent": "silent",
+            "mentions": "mentions"
+        },
+        "rss move": {
+            "feed": "feed",
+            "channel": "channel"
+        },
+        "rss set-text": {
+            "feed": "feed",
+            "text": "text"
+        },
+        "rss set-embed": {
+            "feed": "feed",
+            "value": "value",
+            "arguments": "arguments"
+        },
+        "modlogs list": {
+            "channel": "channel"
+        },
+        "modlogs enable": {
+            "logs": "logs",
+            "channel": "channel"
+        },
+        "modlogs disable": {
+            "logs": "logs",
+            "channel": "channel"
+        },
+        "config set": {
+            "option": "option",
+            "value": "value"
+        },
+        "config reset": {
+            "option": "option"
+        },
+        "config see": {
+            "option": "option"
+        },
+        "tickets portal set-hint": {
+            "message": "message"
+        },
+        "tickets portal set-role": {
+            "role": "role"
+        },
+        "tickets portal set-text": {
+            "message": "message"
+        },
+        "tickets portal set-category": {
+            "category_or_channel": "category-or-channel"
+        },
+        "tickets portal set-format": {
+            "name_format": "name-format"
+        },
+        "tickets topic add": {
+            "name": "name",
+            "emote": "emote"
+        },
+        "tickets topic remove": {
+            "topic_id": "topic-id"
+        },
+        "tickets topic set-emote": {
+            "topic_id": "topic-id",
+            "emote": "emote"
+        },
+        "tickets topic set-hint": {
+            "topic_id": "topic-id",
+            "message": "message"
+        },
+        "tickets topic set-role": {
+            "topic_id": "topic-id",
+            "role": "role"
+        },
+        "tickets topic set-format": {
+            "name_format": "name-format",
+            "topic_id": "topic-id"
+        },
+        "tickets review-config": {
+            "topic_id": "topic-id"
+        },
+        "remindme": {
+            "duration": "duration",
+            "message": "message"
+        },
+        "twitch subscribe": {
+            "streamer": "streamer"
+        },
+        "twitch unsubscribe": {
+            "streamer": "streamer"
+        },
+        "twitch check-stream": {
+            "streamer": "streamer"
+        },
+        "profile card-preview": {
+            "style": "style"
+        },
+        "profile card": {
+            "style": "style"
+        },
+        "profile config": {
+            "option": "option",
+            "enable": "enable"
+        },
+        "rank": {
+            "user": "user"
+        },
+        "top": {
+            "page": "page",
+            "scope": "scope"
+        }
     }
 }
