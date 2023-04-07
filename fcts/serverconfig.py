@@ -115,7 +115,7 @@ class ServerConfig(commands.Cog):
 
     async def get_languages(self, ignored_guilds: list[int]):
         "Return stats on used languages"
-        if not self.bot.database_online or not 'Languages' in self.bot.cogs:
+        if not self.bot.database_online or 'Languages' not in self.bot.cogs:
             return {}
         query = "SELECT `guild_id`, `value` FROM `serverconfig` WHERE `option_name` = 'language' AND `beta` = %s"
         values_list: list[str] = []
@@ -282,7 +282,6 @@ class ServerConfig(commands.Cog):
                 await self.config_see(ctx, subcommand_passed)
             else:
                 await ctx.send_help("config")
-                return
 
     @config_main.command(name="set")
     @app_commands.describe(
@@ -412,10 +411,9 @@ class ServerConfig(commands.Cog):
         _quit = await self.bot._(ctx.guild, "misc.quit")
         view = ServerConfigPaginator(self.bot, ctx.author, stop_label=_quit.capitalize(), guild=guild, cog=self)
         msg = await view.send_init(ctx)
-        if msg:
-            if await view.wait():
-                # only manually disable if it was a timeout (ie. not a user stop)
-                await view.disable(msg)
+        if msg and await view.wait():
+            # only manually disable if it was a timeout (ie. not a user stop)
+            await view.disable(msg)
 
     async def send_specific_config(self, guild: discord.Guild, ctx: MyContext, option: str):
         "Send the specific config value for guild into a channel"
