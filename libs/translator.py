@@ -45,11 +45,16 @@ class AxobotTranslator(app_commands.Translator):
                 return None
             cmd_name = context.data.qualified_name
             return await self._translate_cmd(lang, f"commands.command_name.{cmd_name}", locale)
+        elif context.location == TranslationContextLocation.parameter_name:
+            if await is_ignored_command(context.data.command):
+                return None
+            cmd_name = context.data.command.qualified_name
+            return await self._translate_cmd(lang, f"commands.param_name.{cmd_name}.{string.message}", locale)
         elif context.location in {
             TranslationContextLocation.command_description,
             TranslationContextLocation.group_description,
-            TranslationContextLocation.parameter_name,
             TranslationContextLocation.parameter_description,
+            TranslationContextLocation.choice_name,
         }:
             return
         else:
