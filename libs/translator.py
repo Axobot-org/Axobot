@@ -22,19 +22,22 @@ class AxobotTranslator(app_commands.Translator):
     def __init__(self, bot: "Axobot"):
         self.bot = bot
 
-    async def translate(self, string, locale, context):
+    async def get_lang_from_locale(self, locale: Locale):
         if locale == Locale.french:
-            lang = "fr"
-        elif locale == Locale.german:
-            lang = "en"
-        elif locale == Locale.finnish:
-            lang = "fi"
-        elif locale in {Locale.british_english, Locale.american_english}:
-            lang = "en"
+            return "fr"
+        if locale == Locale.german:
+            return "en"
+        if locale == Locale.finnish:
+            return "fi"
+        if locale in {Locale.british_english, Locale.american_english}:
+            return "en"
         # elif context.location == TranslationContextLocation.choice_name:
             # lang = "en"
-        else:
-            return None
+        return None
+
+    async def translate(self, string, locale, context):
+        if (lang := await self.get_lang_from_locale(locale)) is None:
+            return
         if context.location == TranslationContextLocation.group_name:
             if await is_ignored_command(context.data):
                 return None
