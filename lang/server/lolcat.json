@@ -21,7 +21,8 @@
         },
         "levelup_channel": {
             "none": "no msg",
-            "any": "anywhere"
+            "any": "anywhere",
+            "dm": "spy-mode-communication"
         },
         "ttt_display": {
             "disabled": "disabld",
@@ -94,7 +95,8 @@
         "levelup_channel": {
             "any": "Levelup msgs will naw be post directly in teh chat",
             "channel": "lvlup messages will naw be sent 2 %{val}",
-            "none": "Levelup msg won't :b: send anymore :sad:"
+            "none": "Levelup msg won't :b: send anymore :sad:",
+            "dm": "lvl msg will be sent directly in dm"
         }
     },
     "server_desc": {
