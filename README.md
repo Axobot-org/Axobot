@@ -1,10 +1,9 @@
 # Axobot V4 - A Discord Bot
 
-[![discord.py](https://img.shields.io/badge/Discord.py-2.1-brightgreen.svg)](https://github.com/Rapptz/discord.py)
+[![discord.py](https://img.shields.io/badge/Discord.py-2.2-brightgreen.svg)](https://github.com/Rapptz/discord.py)
 [![Docs status](https://readthedocs.org/projects/zbot/badge/?version=latest)](https://zbot.readthedocs.io)
 [![Crowdin](https://badges.crowdin.net/zbot/localized.svg)](https://crowdin.com/project/zbot)
 ![Last commit](https://img.shields.io/github/last-commit/ZRunner/ZBot.svg?label=Last+commit+on+develop)
-[![GitHub Super-Linter](https://github.com/ZRunner/ZBot/workflows/Lint%20Code%20Base/badge.svg)](https://github.com/marketplace/actions/super-linter)
 
 [![Discord server](https://discord.com/api/v8/guilds/356067272730607628/widget.png)](https://discord.gg/N55zY88)
 [![Discord bot](https://top.gg/api/widget/status/1048011651145797673.svg)](https://zrunner.me/invite-axobot)
