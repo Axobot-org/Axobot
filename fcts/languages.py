@@ -97,7 +97,11 @@ class Languages(discord.ext.commands.Cog):
             await self.msg_not_found(string_id, lang_opt)
             if lang_opt == "en":
                 return string_id
-            return await self.get_translation("en", string_id, **kwargs)
+            try: # try again in english
+                return await self.get_translation("en", string_id, **kwargs)
+            except KeyError:
+                await self.msg_not_found(string_id, "en")
+                return string_id
 
     async def get_translation(self, locale: str, string_id: str, **kwargs) -> Union[str, list]:
         "Get a translation from the i18n files directly"
