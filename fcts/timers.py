@@ -13,18 +13,21 @@ from libs.views import ConfirmView
 from fcts import args, checks
 
 class Timers(commands.Cog):
+    "Reminders system"
+
     def __init__(self, bot: Axobot):
         self.bot = bot
         self.file = "timers"
 
     async def db_get_reminder(self, reminder_id: int, user: Optional[int] = None) -> Optional[dict]:
+        "Get a specific reminder for a user"
         if user is not None:
             query = "SELECT * FROM `timed` WHERE user=%s AND action='timer' AND ID=%s AND `beta`=%s"
-            args = (user, reminder_id, self.bot.beta)
+            q_args = (user, reminder_id, self.bot.beta)
         else:
             query = "SELECT * FROM `timed` WHERE action='timer' AND ID=%s AND `beta`=%s"
-            args = (reminder_id, self.bot.beta)
-        async with self.bot.db_query(query, args, fetchone=True) as query_result:
+            q_args = (reminder_id, self.bot.beta)
+        async with self.bot.db_query(query, q_args, fetchone=True) as query_result:
             return query_result
 
     async def db_get_user_reminders(self, user: int) -> list[dict]:
@@ -111,10 +114,19 @@ class Timers(commands.Cog):
         if duration > 60*60*24*365*5:
             await ctx.send(await self.bot._(ctx.channel, "timers.rmd.too-long"))
             return
-        f_duration = await FormatUtils.time_delta(duration,lang=await self.bot._(ctx.channel,'_used_locale'), year=True, form='developed')
+        lang = await self.bot._(ctx.channel,'_used_locale')
+        f_duration = await FormatUtils.time_delta(duration, lang=lang, year=True, form='developed')
         try:
-            d = {'msg_url': ctx.message.jump_url}
-            await ctx.bot.task_handler.add_task("timer", duration, ctx.author.id, ctx.guild.id if ctx.guild else None, ctx.channel.id, message, data=d)
+            data = {'msg_url': ctx.message.jump_url}
+            await ctx.bot.task_handler.add_task(
+                "timer",
+                duration,
+                ctx.author.id,
+                ctx.guild.id if ctx.guild else None,
+                ctx.channel.id,
+                message,
+                data
+            )
         except Exception as err:
             self.bot.dispatch("command_error", ctx, err)
         else:

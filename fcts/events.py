@@ -119,6 +119,7 @@ class Events(commands.Cog):
             await self.register_userlog_name(before, after, tries+1)
 
     async def db_register_memberlog(self, user_id: int, before: str, after: str, guild_id: int=0):
+        "Register in the database a nickname or a username change"
         query = "INSERT INTO `usernames_logs` (`user`,`old`,`new`,`guild`,`beta`) VALUES (%(u)s, %(o)s, %(n)s, %(g)s, %(b)s)"
         query_args = { 'u': user_id, 'o': before, 'n': after, 'g': guild_id, 'b': self.bot.beta }
         async with self.bot.db_query(query, query_args):
