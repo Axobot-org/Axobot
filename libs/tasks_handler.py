@@ -1,10 +1,9 @@
 from __future__ import annotations
 
-import datetime
 import json
 import re
-from typing import TYPE_CHECKING
-from datetime import timezone
+from datetime import datetime, timedelta, timezone
+from typing import TYPE_CHECKING, Literal, Optional, TypedDict, Union
 
 import discord
 
@@ -14,29 +13,95 @@ if TYPE_CHECKING:
     from libs.bot_classes import Axobot
 
 
+class DbTask(TypedDict):
+    "A task stored in the database"
+    ID: int
+    guild: Optional[int]
+    channel: Optional[int]
+    user: int
+    action: Literal["mute", "ban", "timer"]
+    begin: datetime
+    duration: int
+    message: Optional[str]
+    data: Optional[str]
+    beta: bool
+
+class RecreateReminderView(discord.ui.View):
+    "A simple view allowing users to recreate a sent reminder"
+
+    def __init__(self, bot: Axobot, task: DbTask):
+        self.bot = bot
+        self.task = task
+        super().__init__(timeout=600)
+
+    async def init(self):
+        "Create the button with the correct label"
+        duration = await FormatUtils.time_delta(
+            self.task['duration'],
+            lang=await self.bot._(self.task["guild"], '_used_locale'),
+            form='developed'
+        )
+        label = await self.bot._(self.task["guild"], "timers.rmd.recreate-reminder", duration=duration)
+        remindme_btn = discord.ui.Button(label=label, style=discord.ButtonStyle.blurple, emoji='⏳')
+        remindme_btn.callback = self.on_pressed
+        self.add_item(remindme_btn)
+
+    async def on_pressed(self, interaction: discord.Interaction):
+        "Called when the button is pressed"
+        await interaction.response.defer(ephemeral=True)
+        # remove the last hyperlink markdown from the message
+        clean_msg = re.sub(r'\s+\[.+?\]\(.+?\)$', '', self.task['message'])
+        await self.bot.task_handler.add_task(
+                "timer",
+                self.task['duration'],
+                self.task["user"],
+                self.task["guild"],
+                self.task["channel"],
+                clean_msg,
+                self.task["data"]
+            )
+        await interaction.followup.send(
+            await self.bot._(interaction.user, "timers.rmd.recreated"),
+            ephemeral=True
+        )
+        await self.disable(interaction)
+
+    async def verify(self, interaction: discord.Interaction):
+        return interaction.user.id == self.task['user']
+
+    async def disable(self, interaction: Union[discord.Interaction, discord.Message]):
+        "Called when the timeout has expired"
+        for child in self.children:
+            child.disabled = True
+        if isinstance(interaction, discord.Interaction):
+            await interaction.followup.edit_message(
+                interaction.message.id,
+                content=interaction.message.content,
+                view=self
+            )
+        else:
+            await interaction.edit(content=interaction.content, view=self)
+        self.stop()
+
 class TaskHandler:
     "Handler for timed tasks (like reminders or planned unban)"
 
     def __init__(self, bot: Axobot):
         self.bot = bot
 
-    async def get_events_from_db(self, get_all: bool = False, id_only: bool = False):
+    async def get_events_from_db(self, get_all: bool = False) -> list[DbTask]:
         """Renvoie une liste de tous les events qui doivent être exécutés"""
         try:
-            if id_only:
-                query = ("SELECT `ID` FROM `timed` WHERE beta=%s")
-            else:
-                query = ("SELECT * FROM `timed` WHERE beta=%s")
+            query = ("SELECT * FROM `timed` WHERE beta=%s")
             events: list[dict] = []
             async with self.bot.db_query(query, (self.bot.beta,)) as query_results:
                 for row in query_results:
-                    if not id_only:
-                        row['begin'] = row['begin'].replace(tzinfo=timezone.utc)
+                    row['begin'] = row['begin'].replace(tzinfo=timezone.utc)
                     if get_all:
                         events.append(row)
                     else:
-                        now = self.bot.utcnow() if row["begin"].tzinfo else datetime.datetime.utcnow()
-                        if id_only or (row['begin'] + datetime.timedelta(seconds=row['duration'])) < now:
+                        now = self.bot.utcnow() if row["begin"].tzinfo else datetime.utcnow()
+                        if row['begin'] + timedelta(seconds=row['duration']) < now:
                             events.append(row)
             return events
         except Exception as err:  # pylint: disable=broad-except
@@ -130,7 +195,9 @@ class TaskHandler:
 
             if task['data'] is not None:
                 task['data'] = json.loads(task['data'])
-            msg = await self.bot._(channel, "timers.rmd.embed-asked", user=user.mention, duration=f_duration)
+            text = await self.bot._(channel, "timers.rmd.embed-asked", user=user.mention, duration=f_duration)
+            view = RecreateReminderView(self.bot, task)
+            await view.init()
             if isinstance(channel, (discord.User, discord.DMChannel)) or channel.permissions_for(guild.me).embed_links:
                 if task['data'] is not None and 'msg_url' in task['data']:
                     click_here = await self.bot._(channel, "timers.rmd.embed-link")
@@ -141,17 +208,17 @@ class TaskHandler:
                 imgs = re.findall(r'(https://\S+\.(?:png|jpe?g|webp|gif))', task['message'])
                 if len(imgs) > 0:
                     emb.set_image(url=imgs[0])
-                await channel.send(msg, embed=emb)
+                await channel.send(text, embed=emb, view=view)
             else:
-                await channel.send(msg+"\n"+task["message"])
+                await channel.send(text+"\n"+task["message"], view=view)
         except discord.errors.Forbidden:
             return False
         except Exception as err:  # pylint: disable=broad-except
             raise err
         return True
 
-    async def add_task(self, action: str, duration: int, userid: int, guildid: int = None,
-                       channelid: int = None, message: str = None, data: dict = None):
+    async def add_task(self, action: str, duration: int, userid: int, guildid: Optional[int] = None,
+                       channelid: Optional[int] = None, message: Optional[str] = None, data: Optional[dict] = None):
         """Add a task to the list"""
         tasks_list = await self.get_events_from_db(get_all=True)
         for task in tasks_list:
@@ -186,7 +253,7 @@ class TaskHandler:
 
     async def remove_task(self, task_id: int):
         """Remove a task (usually after execution)"""
-        query = ("DELETE FROM `timed` WHERE `timed`.`ID` = {}".format(task_id))
+        query = f"DELETE FROM `timed` WHERE `timed`.`ID` = {task_id}"
         async with self.bot.db_query(query):
             pass
         return True
