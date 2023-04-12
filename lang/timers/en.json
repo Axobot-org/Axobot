@@ -17,8 +17,6 @@
         "embed-title": "Reminder",
         "empty": "Oops, you don't have any pending reminder...",
         "item": "ID: `{id}` | In: {duration} | Channel: {channel} | Message: {msg}",
-        "recreate-reminder": "Remind me again in %{duration}",
-        "recreated": "A new reminder has been created!",
         "saved": "Got it! I'll remind you in %{duration}",
         "select-placeholder": "Select one or more reminders",
         "title": "List of your reminders",
