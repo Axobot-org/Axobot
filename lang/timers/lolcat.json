@@ -17,6 +17,8 @@
         "embed-title": "Reminder",
         "empty": "Oops, U don't have any pending reminder lol",
         "item": "ID: `{id}` | In: {duration} | Chan: {channel} | Msg: {msg}",
+        "recreate-reminder": "Try again in %{duration}",
+        "recreated": "New rmd had bn registered!",
         "saved": "Got it! I'll remind you in %{duration} OwO",
         "select-placeholder": "Select 1+ rmd",
         "title": "I'll remind u that becuz ur dumb-dumb :bongocat:",
