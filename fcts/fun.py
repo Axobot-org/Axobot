@@ -786,22 +786,36 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         if not destination.permissions_for(ctx.guild.me).embed_links:
             return await ctx.send(await self.bot._(ctx.channel,"fun.no-embed-perm"))
         embed_color = ctx.bot.get_cog('ServerConfig').embed_color
-        k = {'title':"",'content':"",'url':'','footer':"",'image':'','color':embed_color}
-        for key,value in arguments.items():
-            if key=='title':
+        k = {'title': "", 'content': "", 'url': '',
+             'footer': "", 'image': '', 'color': embed_color}
+        for key, value in arguments.items():
+            # replace description and colour fields
+            if key == "description":
+                key = "content"
+            elif key == "colour":
+                key = "color"
+            # limit title length
+            if key == 'title':
                 k['title'] = value[:255]
-            elif key=='content' or key=='url' or key=='image':
-                k[key] = value.replace("\\n","\n")
-            elif key=='footer':
+            # limit footer length
+            elif key == 'footer':
                 k['footer'] = value[:90]
-            elif key=='color' or key=="colour":
-                c = await args.Color().convert(ctx,value)
-                if c is not None:
-                    k['color'] = c
+            # replace \n with real newlines in content
+            elif key == "content":
+                k[key] = value.replace("\\n", "\n")
+            # eval embed color
+            elif key == "color":
+                if color := await args.Color().convert(ctx, value):
+                    k['color'] = color
+            # add url and image links
+            elif key in {'url', 'image'} and value.startswith("http"):
+                k[key] = value
         emb = discord.Embed(title=k['title'], description=k['content'], url=k['url'], color=k['color'])
         emb.set_author(name=ctx.author, icon_url=ctx.author.display_avatar)
-        emb.set_thumbnail(url=k['image'])
-        emb.set_footer(text=k['footer'])
+        if "image" in k:
+            emb.set_thumbnail(url=k['image'])
+        if "footer" in k:
+            emb.set_footer(text=k['footer'])
         try:
             await destination.send(embed=emb)
         except Exception as err:

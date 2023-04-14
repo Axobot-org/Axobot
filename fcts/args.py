@@ -159,7 +159,7 @@ class AnyEmoji(commands.Converter):
 
 class arguments(commands.Converter):
     "Convert arguments to a foo=bar dictionary"
-    async def convert(self, ctx: "MyContext", argument: str) -> dict:
+    async def convert(self, ctx: "MyContext", argument: str) -> dict[str, str]:
         answer = dict()
         for result in re.finditer(r'(\w+) ?= ?\"((?:[^\"\\]|\\\"|\\)+)\"', argument):
             answer[result.group(1)] = result.group(2).replace('\\"', '"')
