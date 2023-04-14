@@ -12,11 +12,9 @@ To manage this plugin (add, edit or remove feeds), you will need at least the Ma
 See the last post
 -----------------
 
-**Syntax:** :code:`rss <youtube|twitter|twitch|deviant|web> <name|link>`
+**Syntax:** :code:`rss last-post <name|link> [youtube|twitter|twitch|deviant|web]`
 
-This command allows you to see the last post of a youtube channel, a user on Twitter or Twitch or DeviantArt, or an rss feed. You can enter :code:`rss <type> help` to get a more complex guide to this command.
-
-To go faster, aliases such as 'yt' or 'tw' are available! YouTube channel names or frequently used web links are already listed in the bot database. Remember to check it out!
+This command allows you to see the last post of a youtube channel, a user on Twitter or Twitch or DeviantArt, or from any valid RSS feed. If you provide a full URL, the bot will automatically detect the type of feed. If you only provide the name of the channel, you will have to specify the type of feed.
 
 .. note:: No specific permission is required for this command. Remember to allow the use of external emojis to get a prettier look.
 
