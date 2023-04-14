@@ -44,13 +44,19 @@ class YoutubeRSS:
         async with session.get("https://www.youtube.com/user/"+name) as resp:
             return resp.status < 400
 
+    @acached(timeout=3600, include_posargs=[2])
+    async def _is_valid_channel_custom_url(self, session: aiohttp.ClientSession, name: str):
+        async with session.get("https://www.youtube.com/c/"+name) as resp:
+            return resp.status < 400
+
     async def is_valid_channel(self, name: str):
         "Check if a channel identifier is actually valid"
         if name is None or not isinstance(name, str):
             return False
         async with aiohttp.ClientSession(cookies=self.cookies) as session:
             return await self._is_valid_channel_id(session, name) \
-                or await self._is_valid_channel_name(session, name)
+                or await self._is_valid_channel_name(session, name) \
+                or await self._is_valid_channel_custom_url(session, name)
 
     @acached(timeout=86400)
     async def get_channel_by_any_url(self, url: str):
@@ -66,7 +72,7 @@ class YoutubeRSS:
                 if self._is_valid_channel_id(session, match.group(1)):
                     return match.group(1)
             return None
-        identifier, name = channels[0].split(": ", 1)
+        identifier, _ = channels[0].split(": ", 1)
         return identifier
 
     @cached(timeout=86400*2) # 2-days cache because we use it really really often
@@ -81,20 +87,32 @@ class YoutubeRSS:
     def get_channel_name_by_id(self, channel_id: str):
         return self.search_service.query_channel_title(channel_id)
 
-    async def get_feed(self, channel: discord.TextChannel, identifiant: str, date: dt.datetime=None, session: aiohttp.ClientSession=None) -> Union[str, list[RssMessage]]:
-        if identifiant == 'help':
-            return await self.bot._(channel, "rss.yt-help")
-        url = 'https://www.youtube.com/feeds/videos.xml?channel_id='+identifiant
-        feeds = await feed_parse(self.bot, url, 7, session)
-        if feeds is None:
-            return await self.bot._(channel, "rss.research-timeout")
-        if not feeds.entries:
+    async def _get_feed_list(self, identifiant: str, session: aiohttp.ClientSession=None):
+        _session = session or aiohttp.ClientSession()
+        if await self._is_valid_channel_id(_session, identifiant):
+            url = 'https://www.youtube.com/feeds/videos.xml?channel_id='+identifiant
+        elif await self._is_valid_channel_name(_session, identifiant):
             url = 'https://www.youtube.com/feeds/videos.xml?user='+identifiant
-            feeds = await feed_parse(self.bot, url, 7, session)
-            if feeds is None:
-                return await self.bot._(channel, "rss.nothing")
-            if not feeds.entries:
-                return await self.bot._(channel, "rss.nothing")
+        elif await self._is_valid_channel_custom_url(_session, identifiant):
+            if channel_id := self.get_channel_by_user_name(identifiant):
+                url = 'https://www.youtube.com/feeds/videos.xml?channel_id='+channel_id
+            else:
+                if session is None:
+                    await _session.close()
+                return None
+        feeds = await feed_parse(self.bot, url, 7, session)
+        if session is None:
+            await _session.close()
+        return feeds
+
+    async def get_feed(self, channel: discord.TextChannel, identifiant: str, date: dt.datetime=None,
+                       session: aiohttp.ClientSession=None) -> Union[str, list[RssMessage]]:
+        "Get the RSS feed of a youtube channel"
+        feeds = await self._get_feed_list(identifiant, session)
+        if feeds is None:
+            return await self.bot._(channel, "rss.nothing")
+        if not feeds.entries:
+            return await self.bot._(channel, "rss.nothing")
         if not date:
             feed = feeds.entries[0]
             img_url = None

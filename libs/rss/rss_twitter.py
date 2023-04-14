@@ -66,8 +66,6 @@ class TwitterRSS:
 
     async def get_feed(self, channel: discord.TextChannel, name: str, date: dt.datetime=None) -> Union[str, list[RssMessage]]:
         "Get tweets from a given Twitter user"
-        if name == 'help':
-            return await self.bot._(channel, "rss.tw-help")
         try:
             if isinstance(name, int) or name.isnumeric():
                 posts = self.api.GetUserTimeline(user_id=int(name), exclude_replies=True)

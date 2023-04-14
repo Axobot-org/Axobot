@@ -93,17 +93,55 @@ class Rss(commands.Cog):
         if ctx.subcommand_passed is None:
             await ctx.send_help(ctx.command)
 
-    @rss_main.command(name="youtube", aliases=['yt'])
-    @app_commands.describe(channel="The YouTube channel to search the last video for")
-    async def request_yt(self, ctx: MyContext, channel: str):
-        """Search the last video of a YouTube channel
+    @rss_main.command(name="last-post")
+    @app_commands.describe(url="The URL of the feed to search the last post for", feed_type="The type of the feed")
+    @app_commands.rename(feed_type="type")
+    async def rss_last_post(self, ctx: MyContext, url: str,
+                            feed_type: Optional[Literal["youtube", "twitter", "twitch", "deviantart", "web"]]):
+        """Search the last post of a feed
 
-        ..Example rss youtube UCZ5XnGb-3t7jCkXdawN2tkA
+        ..Example rss last-post https://www.youtube.com/channel/UCZ5XnGb-3t7jCkXdawN2tkA
 
-        ..Example rss youtube https://www.youtube.com/channel/UCZ5XnGb-3t7jCkXdawN2tkA
+        ..Example rss last-post aureliensama twitter
+
+        ..Example rss last-post https://www.twitch.tv/aureliensama twitch
+
+        ..Example rss last-post https://fr-minecraft.net/rss.php web
 
         ..Doc rss.html#see-the-last-post"""
         await ctx.defer()
+        if feed_type is None:
+            feed_type = await self.get_feed_type_from_url(url)
+        if feed_type == "youtube":
+            await self.last_post_youtube(ctx, url)
+        elif feed_type == "twitter":
+            await self.last_post_twitter(ctx, url)
+        elif feed_type == "twitch":
+            await self.last_post_twitch(ctx, url)
+        elif feed_type == "deviantart":
+            await self.request_deviant(ctx, url)
+        elif feed_type == "web":
+            await self.request_web(ctx, url)
+        else:
+            await ctx.send(await self.bot._(ctx.channel, "rss.invalid-flow"))
+
+    async def get_feed_type_from_url(self, url: str):
+        "Get the type of a feed from its URL"
+        if self.youtube_rss.is_youtube_url(url):
+            return "youtube"
+        if self.twitter_rss.is_twitter_url(url):
+            return "twitter"
+        if re.match(r'^https://(www\.)?twitch\.tv/\w+', url):
+            return "twitch"
+        if re.match(r'https://(?:www\.)deviantart.com/', url):
+            return "deviantart"
+        if re.match(r'^https://', url):
+            return "web"
+        return None
+
+
+    async def last_post_youtube(self, ctx: MyContext, channel: str):
+        "Search for the last video of a youtube channel"
         if self.youtube_rss.is_youtube_url(channel):
             # apparently it's a youtube.com link
             channel = await self.youtube_rss.get_channel_by_any_url(channel)
@@ -125,17 +163,8 @@ class Rss(commands.Cog):
             else:
                 await ctx.send(obj)
 
-    @rss_main.command(name="twitch",aliases=['tv'])
-    @app_commands.describe(channel="The Twitch channel to search the last video for")
-    async def request_twitch(self, ctx: MyContext, channel: str):
-        """Search the last video of a Twitch channel
-
-        ..Example rss twitch aureliensama
-
-        ..Example rss tv https://www.twitch.tv/aureliensama
-
-        ..Doc rss.html#see-the-last-post"""
-        await ctx.defer()
+    async def last_post_twitch(self, ctx: MyContext, channel: str):
+        "Search for the last video of a twitch channel"
         if re.match(r'^https://(www\.)?twitch\.tv/\w+', channel):
             channel = await self.parse_twitch_url(channel)
             if channel is None:
@@ -152,18 +181,9 @@ class Rss(commands.Cog):
             else:
                 await ctx.send(obj)
 
-    @rss_main.command(name="twitter", aliases=["tw"])
-    @app_commands.describe(name="The Twitter account to search the last tweet for")
-    async def request_tw(self, ctx: MyContext, name: str):
-        """Search the last tweet of a Twitter account
-
-        ..Example rss twitter https://twitter.com/z_runnerr
-
-        ..Example rss tw z_runnerr
-
-        ..Doc rss.html#see-the-last-post"""
-        await ctx.defer()
-        if re.match(r'https://(?:www\.)?twitter\.com/', name):
+    async def last_post_twitter(self, ctx: MyContext, name: str):
+        "Search for the last tweet of a twitter user"
+        if self.twitter_rss.is_twitter_url(name):
             name = await self.twitter_rss.get_userid_from_url(name)
         try:
             text = await self.twitter_rss.get_feed(ctx.channel, name)
@@ -182,14 +202,23 @@ class Rss(commands.Cog):
                 else:
                     await ctx.send(obj)
 
-    @rss_main.command(name="web")
-    @app_commands.describe(link="The website feed URL to search the last post for")
+    async def request_deviant(self, ctx: MyContext, user: str):
+        "Search for the last post of a deviantart user"
+        if re.match(r'https://(?:www\.)deviantart.com/', user):
+            user = await self.parse_deviant_url(user)
+        text = await self.rss_deviant(ctx.guild,user)
+        if isinstance(text, str):
+            await ctx.send(text)
+        else:
+            form = await self.bot._(ctx.channel, "rss.deviant-form-last")
+            obj = await text[0].create_msg(form)
+            if isinstance(obj,discord.Embed):
+                await ctx.send(embed=obj)
+            else:
+                await ctx.send(obj)
+
     async def request_web(self, ctx: MyContext, link: str):
-        """Search the last post on any conventional RSS feed
-
-        ..Example rss web https://fr-minecraft.net/rss.php
-
-        ..Doc rss.html#see-the-last-post"""
+        "Search for the last post of a web feed"
         link = web_link.get(link, link)
         try:
             text = await self.rss_web(ctx.channel,link)
@@ -200,27 +229,6 @@ class Rss(commands.Cog):
             await ctx.send(text)
         else:
             form = await self.bot._(ctx.channel, "rss.web-form-last")
-            obj = await text[0].create_msg(form)
-            if isinstance(obj,discord.Embed):
-                await ctx.send(embed=obj)
-            else:
-                await ctx.send(obj)
-
-    @rss_main.command(name="deviantart", aliases=['deviant'])
-    @app_commands.describe(user="The DeviantArt account to search the last art for")
-    async def request_deviant(self, ctx: MyContext, user: str):
-        """Search the last pictures of a DeviantArt user
-
-        ..Example rss deviant https://www.deviantart.com/adri526
-
-        ..Doc rss.html#see-the-last-post"""
-        if re.match(r'https://(?:www\.)deviantart.com/', user):
-            user = await self.parse_deviant_url(user)
-        text = await self.rss_deviant(ctx.guild,user)
-        if isinstance(text, str):
-            await ctx.send(text)
-        else:
-            form = await self.bot._(ctx.channel, "rss.deviant-form-last")
             obj = await text[0].create_msg(form)
             if isinstance(obj,discord.Embed):
                 await ctx.send(embed=obj)
@@ -1164,8 +1172,7 @@ class Rss(commands.Cog):
             return liste
 
     async def rss_web(self, channel: discord.TextChannel, url: str, date: datetime.datetime=None, session: ClientSession=None):
-        if url == 'help':
-            return await self.bot._(channel, "rss.web-help")
+        "Get the last rss feed from a given url"
         feeds = await feed_parse(self.bot, url, 9, session)
         if feeds is None:
             return await self.bot._(channel, "rss.research-timeout")
