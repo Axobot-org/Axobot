@@ -29,11 +29,7 @@
         "unhoist": "unhoist",
         "destop": "destop",
         "permissions": "permissions",
-        "rss youtube": "youtube",
-        "rss twitch": "twitch",
-        "rss twitter": "twitter",
-        "rss web": "web",
-        "rss deviantart": "deviantart",
+        "rss last-post": "last-post",
         "rss add": "add",
         "rss remove": "remove",
         "rss enable": "enable",
@@ -185,20 +181,9 @@
             "channel": "channel",
             "target": "target"
         },
-        "rss youtube": {
-            "channel": "channel"
-        },
-        "rss twitch": {
-            "channel": "channel"
-        },
-        "rss twitter": {
-            "name": "name"
-        },
-        "rss web": {
-            "link": "link"
-        },
-        "rss deviantart": {
-            "user": "user"
+        "rss last-post": {
+            "url": "url",
+            "type": "feed-type"
         },
         "rss add": {
             "link": "link"
