@@ -31,7 +31,7 @@
     "guild-complete": "%{count} rss streams have been correctly reloaded, in %{time} seconds!",
     "guild-error": "An error occurred during the procedure: `%{err}`\nIf you think this error is not your own, you can report it to support",
     "guild-loading": "Reloading %{emoji}",
-    "invalid-flow": "This url is invalid (empty or inaccessible rss feeds) :confused:",
+    "invalid-flow": "This url is invalid (empty or inaccessible RSS feeds) :confused:",
     "invalid-link": "Oops, this url address is invalid or incomplete :confused:",
     "list": "*Type the number of the feeds to modify*\n\n**Link - Type - Channel - Mentions**\n",
     "list-disabled": "(disabled)",
@@ -73,7 +73,6 @@
     "tw": "Twitter",
     "tw-default-flow": "{logo}  | New tweet of {author}! ({date})\n\n{title}\n\nLink: {link}\n\n{mentions}",
     "tw-form-last": "{logo}  |  Here is the last tweet of {author}:\nWritten on {date}\n\n{title}\n\nLink: {url}",
-    "tw-help": "To search for a twitter channel, you must enter the identifier of that channel. You will find it at the end of the string url, it usually corresponds to the user's name.\nFor example, for %https://twitter.com/Mc_AsiliS*, you must enter `Mc_AsiliS`.",
     "tw-no-tweet": "It looks like this user has never tweeted :confused:",
     "twitch": "Twitch",
     "twitch-default-flow": "{logo}  | New live by {author}! ({date})\n\n{title}\n\nLink: {link}\n\n{mentions}",
@@ -86,11 +85,9 @@
     "web": "Web",
     "web-default-flow": "{logo}  | New post on {channel} ({date}):\n        {title}\n\n{link}\n\n{mentions}",
     "web-form-last": "{logo}  |  Here is the last post on {channel}:\n**{title}**\n*Written on {date}*\nLink: {link}",
-    "web-help": "To search for an rss feed from any website, simply enter the rss/atom feed url as a parameter. If the feed is valid, I will send you the last article posted on this site.\n*Tip: some rss feeds are already filled in my code. Sometimes you can just put `fr-minecraft` or `minecraft.net`* :wink:",
     "web-invalid": "Oops, this url address is invalid :confused:",
     "yt": "YouTube",
     "yt-default-flow": "{logo}  | New video of {author}: **{title}**\nPublished on {date}\nLink: {link}\n{mentions}",
     "yt-form-last": "{logo}  | Here is the last video of {author}:\n{title}\nPublished on {date}\nLink: {url}",
-    "yt-help": "To search for a youtube channel, you must enter the channel ID. You will find it at the end of the string url, it can be either the name, or a string of random characters.\n*Tip: some channels are already filled in my code. Sometimes you can just put `neil3000` or `Oxisius`* :wink:",
     "yt-invalid": "Oops, I couldn't find any YouTube channel with this ID!"
 }
