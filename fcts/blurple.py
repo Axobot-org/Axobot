@@ -1,25 +1,26 @@
 import asyncio
 import datetime
-from random import randint
-import aiohttp
+import importlib
 import json
 import typing
-import importlib
+from random import randint
 
+import aiohttp
 import discord
 from discord.ext import commands
 from discord.ext.commands import Cog
 
 from libs import blurple
-from libs.blurple import convert_image, check_image
+from libs.blurple import check_image, convert_image
 from libs.formatutils import FormatUtils
+
 importlib.reload(blurple)
 from libs.bot_classes import Axobot, MyContext
 
 
 class LinkConverter(commands.Converter):
     async def convert(self, ctx: MyContext, argument: str):
-        if not argument.startswith(('http://', 'https://')):
+        if not argument.startswith('https://'):
             raise commands.errors.BadArgument('Could not convert "{}" into URL'.format(argument))
 
         for _ in range(10):
