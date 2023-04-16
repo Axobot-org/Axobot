@@ -165,7 +165,7 @@ class BotStats(commands.Cog):
     @commands.Cog.listener()
     async def on_reminder_snooze(self, initial_duration: int, snooze_duration: int):
         "Called when a reminder is snoozed"
-        self.snooze_events[(initial_duration, snooze_duration)] += 1
+        self.snooze_events[(initial_duration, round(snooze_duration))] += 1
 
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
