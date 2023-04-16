@@ -1,3 +1,4 @@
+import datetime
 import re
 import typing
 
@@ -9,12 +10,14 @@ if typing.TYPE_CHECKING:
     from libs.bot_classes import MyContext
 
 
-class tempdelta(float):
+class Duration(float):
+    "Specific argument converter for durations input"
+
     @classmethod
-    async def convert(cls, ctx: "MyContext", argument: str) -> int:
-        duration = 0
+    async def convert(cls, _ctx: typing.Optional["MyContext"], argument: str) -> int:
+        "Converts a string to a duration in seconds."
+        duration: int = 0
         found = False
-        # ctx.invoked_with
         for symbol, coef in [('w', 604800), ('d', 86400), ('h', 3600), ('m', 60), ('min', 60)]:
             r = re.search(r'^(\d+)'+symbol+'$', argument)
             if r is not None:
@@ -26,13 +29,13 @@ class tempdelta(float):
             found = True
         r = re.search(r'^(\d+) ?mo(?:nths?)?$', argument)
         if r is not None:
-            now = then = ctx.bot.utcnow()
+            now = then = datetime.datetime.now(datetime.timezone.utc)
             then += relativedelta(months=int(r.group(1)))
             duration += (then - now).total_seconds()
             found = True
         r = re.search(r'^(\d+) ?y(?:ears?)?$', argument)
         if r is not None:
-            now = then = ctx.bot.utcnow()
+            now = then = datetime.datetime.now(datetime.timezone.utc)
             then += relativedelta(years=int(r.group(1)))
             duration += (then - now).total_seconds()
             found = True
@@ -41,7 +44,7 @@ class tempdelta(float):
         return duration
 
 
-class user(discord.User):
+class AnyUser(discord.User):
     @classmethod
     async def convert(cls, ctx: "MyContext", argument: str) -> discord.User:
         res = None
