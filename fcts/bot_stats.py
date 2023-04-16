@@ -50,6 +50,7 @@ class BotStats(commands.Cog):
         self.serverlogs_audit_search: typing.Optional[tuple[int, int]] = None
         self.last_backup_size: typing.Optional[int] = None
         self.role_reactions = {"added": 0, "removed": 0}
+        self.snooze_events: dict[tuple[int, int], int] = defaultdict(int)
 
     async def cog_load(self):
          # pylint: disable=no-member
@@ -161,6 +162,10 @@ class BotStats(commands.Cog):
         "Called when a serverlog is emitted"
         self.emitted_serverlogs[log_type] = self.emitted_serverlogs.get(log_type, 0) + 1
 
+    @commands.Cog.listener()
+    async def on_reminder_snooze(self, initial_duration: int, snooze_duration: int):
+        "Called when a reminder is snoozed"
+        self.snooze_events[(initial_duration, snooze_duration)] += 1
 
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
@@ -392,6 +397,10 @@ class BotStats(commands.Cog):
             if self.role_reactions["removed"]:
                 cursor.execute(query, (now, 'role_reactions.removed', self.role_reactions["removed"], 0, 'reactions', True, self.bot.entity_id))
                 self.role_reactions["removed"] = 0
+            # snoozed reminders
+            for (initial_duration, snooze_duration), count in self.snooze_events.items():
+                cursor.execute(query, (now, f'reminders.snoozed.{initial_duration}.{snooze_duration}', count, 0, 'reminders', True, self.bot.entity_id))
+            self.snooze_events.clear()
             # Push everything
             cnx.commit()
         except mysql.connector.errors.IntegrityError as err: # usually duplicate primary key

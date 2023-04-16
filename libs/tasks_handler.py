@@ -38,6 +38,7 @@ class RecreateReminderView(discord.ui.View):
         "Create the button with the correct label"
         def on_pressed_decorator(duration: int):
             async def on_pressed(interaction: discord.Interaction):
+                self.bot.dispatch("reminder_snooze", self.task["duration"], duration)
                 await self.on_pressed(interaction, duration)
             return on_pressed
         identic_duration = await FormatUtils.time_delta(
