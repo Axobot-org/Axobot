@@ -36,24 +36,38 @@ class RecreateReminderView(discord.ui.View):
 
     async def init(self):
         "Create the button with the correct label"
-        duration = await FormatUtils.time_delta(
+        def on_pressed_decorator(duration: int):
+            async def on_pressed(interaction: discord.Interaction):
+                await self.on_pressed(interaction, duration)
+            return on_pressed
+        identic_duration = await FormatUtils.time_delta(
             self.task['duration'],
             lang=await self.bot._(self.task["guild"], '_used_locale'),
             form='developed'
         )
-        label = await self.bot._(self.task["guild"], "timers.rmd.recreate-reminder", duration=duration)
-        remindme_btn = discord.ui.Button(label=label, style=discord.ButtonStyle.blurple, emoji='⏳')
-        remindme_btn.callback = self.on_pressed
-        self.add_item(remindme_btn)
+        identic_label = await self.bot._(self.task["guild"], "timers.rmd.recreate-reminder", duration=identic_duration)
+        identic_btn = discord.ui.Button(label=identic_label, style=discord.ButtonStyle.blurple, emoji='⏳')
+        identic_btn.callback = on_pressed_decorator(self.task['duration'])
+        self.add_item(identic_btn)
+        if self.task['duration'] != 60 * 10:
+            ten_min_duration = await FormatUtils.time_delta(
+                60 * 10,
+                lang=await self.bot._(self.task["guild"], '_used_locale'),
+                form='developed'
+            )
+            ten_min_label = await self.bot._(self.task["guild"], "timers.rmd.recreate-reminder", duration=ten_min_duration)
+            ten_min_btn = discord.ui.Button(label=ten_min_label, style=discord.ButtonStyle.blurple, emoji='⏰')
+            ten_min_btn.callback = on_pressed_decorator(60 * 10)
+            self.add_item(ten_min_btn)
 
-    async def on_pressed(self, interaction: discord.Interaction):
+    async def on_pressed(self, interaction: discord.Interaction, duration):
         "Called when the button is pressed"
         await interaction.response.defer(ephemeral=True)
         # remove the last hyperlink markdown from the message
         clean_msg = re.sub(r'\s+\[.+?\]\(.+?\)$', '', self.task['message'])
         await self.bot.task_handler.add_task(
                 "timer",
-                self.task['duration'],
+                duration,
                 self.task["user"],
                 self.task["guild"],
                 self.task["channel"],
