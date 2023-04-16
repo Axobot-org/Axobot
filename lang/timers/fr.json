@@ -3,6 +3,11 @@
         "cancelled": "Abandon de la procédure",
         "cleared": "Vos rappels ont bien été supprimés !",
         "confirm": "Êtes-vous sûr de vouloir supprimer tous vos rappels ? (%{count} en cours)",
+        "custom-duration": {
+            "button": "Durée personnalisée",
+            "title": "Durée personnalisée de rappel",
+            "input": "Entrez une durée pour votre rappel"
+        },
         "delete": {
             "error": "Un problème est survenu lors de la suppression de vos rappels. Veuillez réessayer ou contacter notre support.",
             "success": {

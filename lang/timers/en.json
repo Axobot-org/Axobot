@@ -3,6 +3,11 @@
         "cancelled": "Dropping the process",
         "cleared": "Your reminders have been deleted!",
         "confirm": "Are you sure you want to delete all your reminders? (%{count} pending)",
+        "custom-duration": {
+            "button": "Custom duration",
+            "title": "Custom reminder duration",
+            "input": "Enter a duration for your reminder"
+        },
         "delete": {
             "error": "Something went wrong while deleting your reminders. Please try again or contact support.",
             "success": {
