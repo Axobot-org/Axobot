@@ -12,7 +12,7 @@
             "title": "Choisissez quel(s) rappel(s) vous souhaitez supprimer"
         },
         "embed-asked": "%{user}, vous m'avez demandé il y a %{duration} de vous rappeler ceci :",
-        "embed-date": "Date de demande",
+        "embed-date": "Date de la demande",
         "embed-link": "Message d'origine",
         "embed-title": "Rappel",
         "empty": "Oups, vous n'avez aucun rappel en cours...",

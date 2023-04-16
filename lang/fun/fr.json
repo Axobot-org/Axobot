@@ -89,13 +89,6 @@
     ],
     "piece-1": "Raté, c'est tombé sur la tranche !",
     "react-0": "Impossible de trouver le message correspondant. Il faut rentrer l'ID du message en 1er argument, et l'émoji en 2e :upside_down:\n Vérifiez aussi que je possède la permission de lire l'historique des messages !",
-    "reminds-asked": "%{user}, vous m'avez demandé il y a %{duration} de vous rappeler ceci :",
-    "reminds-date": "Date de demande",
-    "reminds-link": "Message d'origine",
-    "reminds-saved": "C'est noté ! Je vous le rappelerai dans %{duration}",
-    "reminds-title": "Rappel",
-    "reminds-too-long": "Impossible de mettre une durée aussi longue",
-    "reminds-too-short": "Vous avez saisi une durée invalide",
     "say-no-perm": "Vous ne possédez pas la permission d'envoyer des messages dans le salon %{channel}",
     "thanos": [
         "{0} a été épargné par Thanos",
