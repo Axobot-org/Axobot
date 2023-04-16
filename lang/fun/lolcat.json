@@ -89,13 +89,6 @@
     ],
     "piece-1": "Faild, 't fell on teh edge!",
     "react-0": "Unable 2 find teh correspondin mssage. U must giv teh mesage ID in da furst argumnt, an teh emoji in da secondz :upside_down:\n Also check dat I haz permishun 2 reed msgs hystory!",
-    "reminds-asked": "%{user}, u asked me %{duration} ago 2 remind you this:",
-    "reminds-date": "Ask date",
-    "reminds-link": "First msg",
-    "reminds-saved": "Got it! I'll remind you in %{duration} OwO",
-    "reminds-title": "Reminder",
-    "reminds-too-long": "Unable 2 set such a long duration .-.",
-    "reminds-too-short": "U entered an invalid duration",
     "say-no-perm": "LMAO dont try 2 cheat and first get perm in %{channel} pls",
     "thanos": [
         "{0} wus spard by Thanos",
