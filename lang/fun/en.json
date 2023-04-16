@@ -89,13 +89,6 @@
     ],
     "piece-1": "Failed, it fell on the edge!",
     "react-0": "Unable to find the corresponding message. You must enter the message ID in the first argument, and the emoji in the second :upside_down:\n Also check that I have permission to read the message history!",
-    "reminds-asked": "%{user}, you asked me %{duration} ago to remind you of this:",
-    "reminds-date": "Request date",
-    "reminds-link": "Original message",
-    "reminds-saved": "Got it! I'll remind you in %{duration}",
-    "reminds-title": "Reminder",
-    "reminds-too-long": "Impossible to set such a long duration",
-    "reminds-too-short": "You have entered an invalid duration",
     "say-no-perm": "You do not have permission to send messages in the channel %{channel}",
     "thanos": [
         "{0} was spared by Thanos",
