@@ -33,3 +33,6 @@ libs/*/data/base_websites.csv
 assets/card-models/*.png
 assets/cards/*.png
 assets/images/*
+
+# SonarQube
+.scannerwork/
