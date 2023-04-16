@@ -23,7 +23,7 @@
         "empty": "Oups, vous n'avez aucun rappel en cours...",
         "item": "ID : `{id}` | Dans : {duration} | Salon : {channel} | Message : {msg}",
         "recreate-reminder": "Rappelle-le moi dans %{duration}",
-        "recreated": "Un nouveau rappel a bien été créé !",
+        "recreated": "Un nouveau rappel a bien été créé pour dans %{duration}!",
         "saved": "C'est noté ! Je vous le rappelerai dans %{duration}",
         "select-placeholder": "Sélectionnez un ou plusieurs rappels",
         "title": "Liste de vos rappels",
