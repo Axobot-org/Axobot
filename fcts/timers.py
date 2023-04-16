@@ -66,7 +66,7 @@ class Timers(commands.Cog):
     @app_commands.describe(duration="The duration to wait, eg. '2d 4h'", message="The message to remind you of")
     @commands.cooldown(5, 30, commands.BucketType.channel)
     @commands.cooldown(5, 60, commands.BucketType.user)
-    async def remindme(self, ctx: MyContext, duration: commands.Greedy[args.tempdelta], *, message: str):
+    async def remindme(self, ctx: MyContext, duration: commands.Greedy[args.Duration], *, message: str):
         """Create a new reminder
         This is actually an alias of `reminder create`
 
@@ -91,7 +91,7 @@ class Timers(commands.Cog):
     @commands.cooldown(5,30,commands.BucketType.channel)
     @commands.cooldown(5,60,commands.BucketType.user)
     @commands.check(checks.database_connected)
-    async def remind_create(self, ctx: MyContext, duration: commands.Greedy[args.tempdelta], *, message: str):
+    async def remind_create(self, ctx: MyContext, duration: commands.Greedy[args.Duration], *, message: str):
         """Create a new reminder
 
         Please use the following format:

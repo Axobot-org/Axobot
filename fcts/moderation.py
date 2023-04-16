@@ -330,7 +330,7 @@ Slowmode works up to one message every 6h (21600s)
     @commands.cooldown(5,20, commands.BucketType.guild)
     @commands.guild_only()
     @commands.check(checks.can_mute)
-    async def mute(self, ctx: MyContext, user: discord.Member, time: commands.Greedy[args.tempdelta], *, reason="Unspecified"):
+    async def mute(self, ctx: MyContext, user: discord.Member, time: commands.Greedy[args.Duration], *, reason="Unspecified"):
         """Timeout someone.
 You can also mute this member for a defined duration, then use the following format:
 `XXm` : XX minutes
@@ -546,7 +546,7 @@ This will remove the role 'muted' for the targeted member
     @commands.cooldown(5,20, commands.BucketType.guild)
     @commands.guild_only()
     @commands.check(checks.can_ban)
-    async def ban(self, ctx:MyContext, user:args.user, time:commands.Greedy[args.tempdelta]=None, days_to_delete:Optional[int]=0, *, reason="Unspecified"):
+    async def ban(self, ctx:MyContext, user:args.AnyUser, time:commands.Greedy[args.Duration]=None, days_to_delete:Optional[int]=0, *, reason="Unspecified"):
         """Ban someone
 The 'days_to_delete' option represents the number of days worth of messages to delete from the user in the guild, bewteen 0 and 7
 
