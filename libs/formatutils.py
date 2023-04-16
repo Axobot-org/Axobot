@@ -4,6 +4,9 @@ from typing import Union
 
 from babel import dates, numbers
 from dateutil.relativedelta import relativedelta
+from discord.ext import commands
+
+from fcts.args import Duration
 
 
 def get_locale(lang: str):
@@ -116,3 +119,18 @@ class FormatUtils:
         "Format any number in the given language"
         locale = get_locale(lang)
         return numbers.format_decimal(number, locale=locale)
+
+    @staticmethod
+    async def parse_duration(duration: str) -> int:
+        """Parses a string duration into a number of seconds"""
+        duration = duration.lower()
+        try:
+            return await Duration.convert(None, duration)
+        except commands.BadArgument:
+            result = 0
+            try:
+                for word in duration.split():
+                    result += await Duration.convert(None, word)
+                return result
+            except commands.BadArgument:
+                raise ValueError("Invalid duration") from None
