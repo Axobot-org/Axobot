@@ -89,13 +89,6 @@
     ],
     "piece-1": "Epäonnistui, se tippu reunaan!",
     "react-0": "En voinut löytää corresponding viestiä. Sinun täytyy lisätä viesti ID ensimmäiseen argumenttiin, ja emoji toiseen:upside_down:\n Katso myös että voin lukea kanavan viesti historiaa!",
-    "reminds-asked": "%{user}, pyysit minua muistuttaa sinua %{duration} sitten tästä:",
-    "reminds-date": "Pyydetty",
-    "reminds-link": "Alkuperäinen viesti",
-    "reminds-saved": "Selvä! Muistutan sinua %{duration} päästä",
-    "reminds-title": "Musitutus",
-    "reminds-too-long": "Mahdotonta laittaa niin pitkää aikaa",
-    "reminds-too-short": "Olet laittanut pätemättömän ajan",
     "say-no-perm": "Sinulla ei ole käyttöoikeuksia lähettämään viestejä kanavalle %{channel}",
     "thanos": [
         "{0} oli jaettu Thanoksen kanssa",
