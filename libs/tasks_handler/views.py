@@ -66,8 +66,13 @@ class RecreateReminderView(discord.ui.View):
                 clean_msg,
                 self.task["data"]
             )
+        f_duration = await FormatUtils.time_delta(
+            duration,
+            lang=await self.bot._(self.task["guild"], '_used_locale'),
+            form='developed'
+        )
         await interaction.followup.send(
-            await self.bot._(interaction.user, "timers.rmd.recreated"),
+            await self.bot._(interaction.user, "timers.rmd.recreated", duration=f_duration),
             ephemeral=True
         )
         await self.disable(interaction)
