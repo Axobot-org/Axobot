@@ -133,7 +133,7 @@ class Rss(commands.Cog):
             return "twitter"
         if re.match(r'^https://(www\.)?twitch\.tv/\w+', url):
             return "twitch"
-        if re.match(r'https://(?:www\.)deviantart.com/', url):
+        if re.match(r'^https://(www\.)?deviantart\.com/w+', url):
             return "deviantart"
         if re.match(r'^https://', url):
             return "web"
