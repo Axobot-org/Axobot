@@ -118,9 +118,9 @@ class ServerLogs(commands.Cog):
             return query_result > 0
 
 
-    @tasks.loop(seconds=30)
+    @tasks.loop(seconds=20)
     async def send_logs_task(self):
-        "Send ready logs every 30s to avoid rate limits"
+        "Send ready logs every 20s to avoid rate limits"
         try:
             for channel, embeds in dict(self.to_send).items():
                 if not embeds or channel.guild.me is None:
