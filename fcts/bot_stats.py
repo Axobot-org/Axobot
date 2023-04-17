@@ -331,7 +331,7 @@ class BotStats(commands.Cog):
             if self.rss_loop_finished:
                 for k, v in self.rss_stats.items():
                     cursor.execute(query, (now, 'rss.'+k, v, 0, k, k == "messages", self.bot.entity_id))
-                self.rss_stats.clear()
+                    self.rss_stats[k] = 0
                 self.rss_loop_finished = False
             cursor.execute(query, (now, 'rss.disabled', await self.db_get_disabled_rss(), 0, 'disabled', False, self.bot.entity_id))
             # XP cards
