@@ -4,7 +4,7 @@
         "cleared": "Vos rappels ont bien été supprimés !",
         "confirm": "Êtes-vous sûr de vouloir supprimer tous vos rappels ? (%{count} en cours)",
         "custom-duration": {
-            "button": "Durée personnalisée",
+            "button": "Autre durée",
             "title": "Durée personnalisée de rappel",
             "input": "Entrez une durée pour votre rappel"
         },
@@ -22,7 +22,6 @@
         "embed-title": "Rappel",
         "empty": "Oups, vous n'avez aucun rappel en cours...",
         "item": "ID : `{id}` | Dans : {duration} | Salon : {channel} | Message : {msg}",
-        "recreate-reminder": "Rappelle-le moi dans %{duration}",
         "recreated": "Un nouveau rappel a bien été créé pour dans %{duration}!",
         "saved": "C'est noté ! Je vous le rappelerai dans %{duration}",
         "select-placeholder": "Sélectionnez un ou plusieurs rappels",
