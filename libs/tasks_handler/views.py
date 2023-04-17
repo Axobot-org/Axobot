@@ -29,7 +29,7 @@ class RecreateReminderView(discord.ui.View):
             lang=await self.bot._(self.task["guild"], '_used_locale'),
             form='developed'
         )
-        identic_btn = discord.ui.Button(label=identic_duration, style=discord.ButtonStyle.blurple, emoji='⏰')
+        identic_btn = discord.ui.Button(label="+ " + identic_duration, style=discord.ButtonStyle.blurple, emoji='⏰')
         identic_btn.callback = on_pressed_decorator(self.task['duration'])
         self.add_item(identic_btn)
         # 10min button
@@ -39,7 +39,7 @@ class RecreateReminderView(discord.ui.View):
                 lang=await self.bot._(self.task["guild"], '_used_locale'),
                 form='developed'
             )
-            ten_min_btn = discord.ui.Button(label=ten_min_duration, style=discord.ButtonStyle.blurple, emoji='⏰')
+            ten_min_btn = discord.ui.Button(label="+ " + ten_min_duration, style=discord.ButtonStyle.blurple, emoji='⏰')
             ten_min_btn.callback = on_pressed_decorator(60 * 10)
             self.add_item(ten_min_btn)
         # custom duration button
