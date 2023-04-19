@@ -96,7 +96,7 @@
     },
     "server_desc": {
         "anti_caps_lock": "Dois-je envoyer un message d'avertissement lorsqu'un membre envoie trop de majuscules ? %{value}",
-        "anti_raid": "Niveau de la protection anti-raid : %{value} \n*([Documentation](https://zbot.rtfd.io/en/latest/moderator.html#anti-raid))*",
+        "anti_raid": "Niveau de la protection anti-raid : %{value} \n*([Documentation](https://axobot.rtfd.io/en/latest/moderator.html#anti-raid))*",
         "anti_scam": "Dois-je lire tous les messages pour détecter et supprimer les messages dangereux ? %{value}",
         "autoremove_xp": "Points d'expériences enlevés chaque jour aux membres inactifs : %{value}",
         "ban_allowed_roles": "Liste des rôles qui peuvent utiliser la commande 'ban' : %{value}",

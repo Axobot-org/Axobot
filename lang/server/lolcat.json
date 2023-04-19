@@ -101,7 +101,7 @@
     },
     "server_desc": {
         "anti_caps_lock": "Shuld the baot sent a mssge when a mmBEr sents TOO MANY C:a:PITAL LETERZ ??!!??! %{value}",
-        "anti_raid": "Lev3l of anti-rayderz protect: %{value} \n*([Dowcumetaton](https://zbot.rtfd.io/en/latest/moderator.html#anti-raid))*",
+        "anti_raid": "Lev3l of anti-rayderz protect: %{value} \n*([Dowcumetaton](https://axobot.rtfd.io/en/latest/moderator.html#anti-raid))*",
         "anti_scam": "Internet is dangerouz. Make sur 2 check where ur clickin. am I not right? %{value}",
         "autoremove_xp": "XP points taken /day to sleeping people: %{value}",
         "ban_allowed_roles": "List for r:o2:les that cawn use this command 'ban': %{value}",

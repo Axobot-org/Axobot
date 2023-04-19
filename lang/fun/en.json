@@ -64,7 +64,7 @@
     "no-database": "As our database is offline, access to fun commands is restricted to people with permission \"Manage Server\"",
     "no-embed-perm": "I don't have permission to \"Embed links\" :confused:",
     "no-emoji": "Unable to find this emoji!",
-    "no-fun": "Fun commands have been disabled on this server. To see their list, look at https://zbot.rtfd.io/en/latest/fun.html",
+    "no-fun": "Fun commands have been disabled on this server. To see their list, look at https://axobot.rtfd.io/en/latest/fun.html",
     "no-reaction": "Unable to add reactions. Please check my permissions...",
     "no-roll": "No choice found",
     "no-say": "Unable to send any message in this channel",
@@ -97,7 +97,7 @@
     "tip-list": [
         "Did you know? There are several languages for the bot, including one very fun to test: lolcat",
         "Pro-tip: to change the bot language, use the command %{config_cmd}!",
-        "Pro-tip: you will find explanations of each command in the bot documentation, at https://zbot.rtfd.io. Maybe even commands you didn't know about!",
+        "Pro-tip: you will find explanations of each command in the bot documentation, at https://axobot.rtfd.io. Maybe even commands you didn't know about!",
         "Did you know? The results of the %{stat_cmd} command hide some servers, such as bot list servers, or internal ones",
         "Did you know? I was originally designed for a server in a Minecraft community. That is where I made my name, and that's why I have some Minecraft-related commands.",
         "Did you know? The first version of the bot was written in February 2018, for personal use. At the time there were only two or three easy commands to make, like %{clear_cmd} and %{say_cmd}",

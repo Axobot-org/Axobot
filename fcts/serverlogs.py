@@ -917,7 +917,7 @@ class ServerLogs(commands.Cog):
                 description=f"**{member.mention} ({member.id}) kicked by anti-raid**",
                 colour=discord.Color.orange()
             )
-            doc = "https://zbot.rtfd.io/en/latest/moderator.html#anti-raid"
+            doc = "https://axobot.rtfd.io/en/latest/moderator.html#anti-raid"
             emb.set_author(name=str(member), url=doc, icon_url=member.display_avatar)
             # reason
             if account_creation_treshold := data.get("account_creation_treshold"):
@@ -939,7 +939,7 @@ Minimum age required by anti-raid: {min_age}"
                 description=f"**{member.mention} ({member.id}) banned by anti-raid**",
                 colour=discord.Color.red()
             )
-            doc = "https://zbot.rtfd.io/en/latest/moderator.html#anti-raid"
+            doc = "https://axobot.rtfd.io/en/latest/moderator.html#anti-raid"
             emb.set_author(name=str(member), url=doc, icon_url=member.display_avatar)
             # reason
             if account_creation_treshold := data.get("account_creation_treshold"):

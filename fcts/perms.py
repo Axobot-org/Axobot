@@ -159,7 +159,7 @@ class Perms(commands.Cog):
                 embed.add_field(name=self.bot.zws, value=paragraph)
 
             _whatisthat = await self.bot._(ctx, "permissions.whatisthat")
-            embed.add_field(name=self.bot.zws, value=f'[{_whatisthat}](https://zbot.readthedocs.io/en/latest/perms.html)',
+            embed.add_field(name=self.bot.zws, value=f'[{_whatisthat}](https://axobot.readthedocs.io/en/latest/perms.html)',
                             inline=False)
             embed.set_author(name=name, icon_url=avatar)
             embed.set_footer(text=ctx.author, icon_url=ctx.author.display_avatar)
