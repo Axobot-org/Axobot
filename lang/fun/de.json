@@ -63,7 +63,7 @@
     "no-database": "As our database is offline, access to fun commands is restricted to people with permission \"Manage Server\"",
     "no-embed-perm": "Ich hab keine Rechte für \"Embed links\" :confused:",
     "no-emoji": "Dieser Emoji wurde nicht gefunden!",
-    "no-fun": "Spaß Befehle wurden auf diesem Server Deaktiviert. Um denn eine Liste von ihnen zu sehen klicke Hier https://zbot.rtfd.io/en/latest/fun.html",
+    "no-fun": "Spaß Befehle wurden auf diesem Server Deaktiviert. Um denn eine Liste von ihnen zu sehen klicke Hier https://axobot.rtfd.io/en/latest/fun.html",
     "no-reaction": "Fehler beim Hinzufügen der Reaktion, bitte check meine Berechtigungen...",
     "no-roll": "Keine Wahl gefunden",
     "no-say": "Es ist mir nicht möglich hier Nachrichten zu versenden",

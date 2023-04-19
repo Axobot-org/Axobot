@@ -17,9 +17,9 @@ The purpose of this document (hereinafter the "**Privacy Policy**") is to descri
 
 Any natural person using Axobot acknowledges having fully read the Privacy Policy at the time of its implementation or use.
 
-Axobot is available, in its official version, on the website https://zbot.readthedocs.io. It can also sometimes be accessible on mirror sites or referencing sites.
+Axobot is available, in its official version, on the website https://axobot.readthedocs.io. It can also sometimes be accessible on mirror sites or referencing sites.
 
-The service(s) proposed by Axobot (hereafter the "Service") consist in the addition of additional functionalities to the Discord platform, all detailed in the documentation available at https://zbot.readthedocs.io/.
+The service(s) proposed by Axobot (hereafter the "Service") consist in the addition of additional functionalities to the Discord platform, all detailed in the documentation available at https://axobot.readthedocs.io/.
 
 This page explains our policies regarding the collection, use and disclosure of personal data when you use our Service and the choices available to you regarding such data.
 
@@ -33,7 +33,7 @@ We use your data to provide and improve the Service. By using the Service, you c
 
 * **Service**
 
-By Service we mean the additional functionalities brought by Axobot in the use of the Discord platform, all detailed in the documentation available at https://zbot.readthedocs.io/.
+By Service we mean the additional functionalities brought by Axobot in the use of the Discord platform, all detailed in the documentation available at https://axobot.readthedocs.io/.
 
 * **Discord or Discord Platform**
 
@@ -61,7 +61,7 @@ We collect several types of data for different purposes, but only in order to pr
 * Part of the Data is stored in databases hosted on our servers, in order to provide you with our Service in an optimal way, either directly entered by the User (for example, configuration of the Service), or automatically when you use the Discord platform (for example, experience level system relating to your activity in text channels) after activation of a feature of the Service.
 * Other Data may be loaded in the RAM of the server hosting the Axobot Service, in order to keep the Axobot application running smoothly and responsively. These Data loaded in RAM are in no way collected or recorded in databases or exported in files.
 * No use of the Data is made for commercial purposes.
-* The Data is collected only for support purposes, improvement of the Service or for statistical purposes. The uses are detailed in Article 5 below. This statistical information is accessible through the Discord platform. The commands made available to the User to view the statistics are available in the general documentation of the Service, at the following address: https://zbot.readthedocs.io.
+* The Data is collected only for support purposes, improvement of the Service or for statistical purposes. The uses are detailed in Article 5 below. This statistical information is accessible through the Discord platform. The commands made available to the User to view the statistics are available in the general documentation of the Service, at the following address: https://axobot.readthedocs.io.
 
 
 5. Use of Data

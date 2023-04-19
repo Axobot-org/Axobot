@@ -311,7 +311,7 @@ ORDER BY usages DESC LIMIT %(limit)s"""
     async def display_doc(self, ctx: MyContext):
         """Get the documentation url"""
         text = self.bot.emojis_manager.customs['readthedocs'] + await self.bot._(ctx.channel,"info.docs") + \
-            " https://zbot.rtfd.io"
+            " https://axobot.rtfd.io"
         if self.bot.entity_id == 0:
             text += '/en/main'
         elif self.bot.entity_id == 1:

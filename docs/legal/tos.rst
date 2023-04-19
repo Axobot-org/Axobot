@@ -17,9 +17,9 @@ The purpose of this document (hereinafter the "**Terms of Service**") is to prov
 
 Any natural person using Axobot acknowledges having fully understood these Terms of Service at the latest at the time of its implementation or use.
 
-Axobot is available, in its official version, on the website https://zbot.readthedocs.io. It may also be accessible on mirror sites or referral sites.
+Axobot is available, in its official version, on the website https://axobot.readthedocs.io. It may also be accessible on mirror sites or referral sites.
 
-The service(s) offered by Axobot (hereinafter the "**Service**") consist in the addition of additional functionalities to the DISCORD platform, all of which are detailed in the documentation available at https://zbot.readthedocs.io/. Therefore, the use of the Service requires the creation and use of an account on the DISCORD platform (hereinafter the "**User Account**").
+The service(s) offered by Axobot (hereinafter the "**Service**") consist in the addition of additional functionalities to the DISCORD platform, all of which are detailed in the documentation available at https://axobot.readthedocs.io/. Therefore, the use of the Service requires the creation and use of an account on the DISCORD platform (hereinafter the "**User Account**").
 
 **Since Axobot relies on the DISCORD platform, it is up to the User to find out about the General Terms of Service implemented by DISCORD (https://discord.com) and about any exceptions that these conditions might make to our General Terms of Service.**
 
@@ -75,7 +75,7 @@ The same applies to any information or page presented by DISCORD about or in con
 6. Support provided
 -------------------
 
-We implement several solutions to provide the User with assistance in using the Service. In particular, a complete documentation of the public features of the Service is available at https://zbot.rtfd.io and is kept up to date as much as possible. User may also contact us through our support server (whose invitation link is https://discord.gg/N55zY88), our GitHub repository (at https://github.com/ZRunner/Axobot), or as a last resort by email (at z.runner.mc@gmail.com).
+We implement several solutions to provide the User with assistance in using the Service. In particular, a complete documentation of the public features of the Service is available at https://axobot.rtfd.io and is kept up to date as much as possible. User may also contact us through our support server (whose invitation link is https://discord.gg/N55zY88), our GitHub repository (at https://github.com/ZRunner/Axobot), or as a last resort by email (at z.runner.mc@gmail.com).
 
 Despite our best efforts, we cannot guarantee that the User will receive a satisfactory response to their requests, whether it is a request for help with their use of the Service, a suggestion for improvement, a bug report, or any other interaction with support. This support is offered on a voluntary basis by each participant, and we cannot be held responsible for any incompleteness, inaccuracy or lack of response to the User, or for any consequences thereof.
 
