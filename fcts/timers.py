@@ -62,6 +62,12 @@ class Timers(commands.Cog):
         async with self.bot.db_query(query, (user, self.bot.beta)) as _:
             pass
 
+    async def db_register_reminder_snooze(self, original_duration: int, new_duration: int):
+        "Register a snooze"
+        query = "INSERT INTO `reminder_snoozes_logs` (`original_duration`, `snooze_duration`, `beta`) VALUES (%s, %s, %s)"
+        async with self.bot.db_query(query, (original_duration, new_duration, self.bot.beta)):
+            pass
+
     @commands.hybrid_command(name="remindme", aliases=['rmd'])
     @app_commands.describe(duration="The duration to wait, eg. '2d 4h'", message="The message to remind you of")
     @commands.cooldown(5, 30, commands.BucketType.channel)
@@ -316,6 +322,12 @@ class Timers(commands.Cog):
         if confirm_view.value:
             await self.db_delete_all_user_reminders(ctx.author.id)
             await ctx.send(await self.bot._(ctx.channel, "timers.rmd.cleared"))
+
+
+    @commands.Cog.listener()
+    async def on_reminder_snooze(self, initial_duration: int, snooze_duration: int):
+        "Called when a reminder is snoozed"
+        await self.db_register_reminder_snooze(initial_duration, snooze_duration)
 
 
 async def setup(bot):
