@@ -409,34 +409,35 @@ Available types: member, role, user, emoji, channel, server, invite, category
                 await ctx.guild.chunk()
             position = str(sorted(ctx.guild.members, key=lambda m: m.joined_at).index(member) + 1) + "/" + str(len(ctx.guild.members))
             embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.member-3"), value=position, inline=True)
-        # Status
-        status_value = (await self.bot._(ctx.guild.id,f"misc.{member.status}")).capitalize()
-        embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.member-4"), value=status_value, inline=True)
-        # Activity
-        if member.activity is not None and (member.activity.type == discord.ActivityType.custom and
-                member.activity.emoji is None and member.activity.name is None):
-            # that's just a bug from discord apparently
-            member.activity = None
-        if member.activity is None:
-            m_activity = str(await self.bot._(ctx.guild.id, "misc.activity.nothing")).capitalize()
-        elif member.activity.type == discord.ActivityType.playing:
-            m_activity = str(await self.bot._(ctx.guild.id, "misc.activity.play")).capitalize() + " " + member.activity.name
-        elif member.activity.type == discord.ActivityType.streaming:
-            m_activity = str(await self.bot._(ctx.guild.id, "misc.activity.stream")).capitalize() + f" ({member.activity.name})"
-        elif member.activity.type == discord.ActivityType.listening:
-            m_activity = str(await self.bot._(ctx.guild.id, "misc.activity.listen")).capitalize() + " " + member.activity.name
-        elif member.activity.type == discord.ActivityType.watching:
-            m_activity = str(await self.bot._(ctx.guild.id, "misc.activity.watch")).capitalize() +" " + member.activity.name
-        elif member.activity.type == discord.ActivityType.custom:
-            emoji = str(member.activity.emoji if member.activity.emoji else '')
-            m_activity = emoji + " " + (member.activity.name if member.activity.name else '')
-            m_activity = m_activity.strip()
-        else:
-            m_activity="Error"
-        if member.activity is None or member.activity.type != 4:
-            embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.member-5"), value = m_activity,inline=True)
-        else:
-            embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.member-8"), value = member.activity.state, inline=True)
+        if self.bot.intents.presences:
+            # Status
+            status_value = (await self.bot._(ctx.guild.id,f"misc.{member.status}")).capitalize()
+            embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.member-4"), value=status_value, inline=True)
+            # Activity
+            if member.activity is not None and (member.activity.type == discord.ActivityType.custom and
+                    member.activity.emoji is None and member.activity.name is None):
+                # that's just a bug from discord apparently
+                member.activity = None
+            if member.activity is None:
+                m_activity = str(await self.bot._(ctx.guild.id, "misc.activity.nothing")).capitalize()
+            elif member.activity.type == discord.ActivityType.playing:
+                m_activity = str(await self.bot._(ctx.guild.id, "misc.activity.play")).capitalize() + " " + member.activity.name
+            elif member.activity.type == discord.ActivityType.streaming:
+                m_activity = str(await self.bot._(ctx.guild.id, "misc.activity.stream")).capitalize() + f" ({member.activity.name})"
+            elif member.activity.type == discord.ActivityType.listening:
+                m_activity = str(await self.bot._(ctx.guild.id, "misc.activity.listen")).capitalize() + " " + member.activity.name
+            elif member.activity.type == discord.ActivityType.watching:
+                m_activity = str(await self.bot._(ctx.guild.id, "misc.activity.watch")).capitalize() +" " + member.activity.name
+            elif member.activity.type == discord.ActivityType.custom:
+                emoji = str(member.activity.emoji if member.activity.emoji else '')
+                m_activity = emoji + " " + (member.activity.name if member.activity.name else '')
+                m_activity = m_activity.strip()
+            else:
+                m_activity="Error"
+            if member.activity is None or member.activity.type != 4:
+                embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.member-5"), value = m_activity,inline=True)
+            else:
+                embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.member-8"), value = member.activity.state, inline=True)
         # Bot
         if member.bot:
             botb = await self.bot._(ctx.guild.id, "misc.yes")
@@ -692,7 +693,7 @@ Available types: member, role, user, emoji, channel, server, invite, category
             embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.guild-2"), value=str(channel.rtc_region).capitalize())
         await ctx.send(embed=embed)
 
-    @info_main.command(name="guild", aliases=["server"])
+    @info_main.command(name="server", aliases=["guild"])
     @commands.guild_only()
     async def guild_info(self, ctx: MyContext):
         lang = await self.bot._(ctx.guild.id,"_used_locale")
@@ -728,6 +729,8 @@ Available types: member, role, user, emoji, channel, server, invite, category
         created_since = await FormatUtils.time_delta(delta.total_seconds(), lang=lang, year=True, hour=delta.total_seconds() < 86400)
         embed.add_field(name=await self.bot._(ctx.guild.id, "info.info.member-1"), value = "{} ({} {})".format(created_date, since, created_since), inline=False)
         # Member count
+        if not self.bot.intents.presences:
+            online = "?"
         embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.role-3"), value=await self.bot._(ctx.guild.id,"info.info.guild-7", c=guild.member_count, b=bots, o=online))
         # Channel count
         text_count = sum(1 for channel in guild.channels if isinstance(channel, (discord.TextChannel, discord.ForumChannel)))
@@ -777,7 +780,8 @@ Available types: member, role, user, emoji, channel, server, invite, category
             bit=round(guild.bitrate_limit/1000),
             fil=round(guild.filesize_limit/1.049e+6),
             emo=guild.emoji_limit,
-            mem=guild.max_presences))
+            mem=guild.max_presences
+        ))
         # Features
         if len(guild.features) > 0:
             tr = lambda x: self.bot._(ctx.guild.id,"info.info.guild-features."+x)
@@ -1128,18 +1132,22 @@ Available types: member, role, user, emoji, channel, server, invite, category
         ..Doc infos.html#membercount"""
         if not ctx.channel.permissions_for(ctx.guild.me).send_messages:
             return
-        total, bots, c_co, unverified = await self.bot.get_cog("Utilities").get_members_repartition(ctx.guild.members)
-        h = total - bots
-        h_p = "< 1" if 0 < h / total < 0.01 else ("> 99" if 1 > h/total > 0.99 else round(h*100/total))
-        b_p = "< 1" if 0 < bots / total < 0.01 else ("> 99" if 1 > bots/total > 0.99 else round(bots*100/total))
-        c_p = "< 1" if 0 < c_co / total < 0.01 else ("> 99" if 1 > c_co/total > 0.99 else round(c_co*100/total))
-        pen_p = "< 1" if 0 < unverified / total < 0.01 else ("> 99" if 1 > unverified/total > 0.99 else round(unverified*100/total))
-        l = [(await self.bot._(ctx.guild.id, "info.membercount-0"), total),
-             (await self.bot._(ctx.guild.id, "info.membercount-2"), "{} ({}%)".format(h, h_p)),
-             (await self.bot._(ctx.guild.id, "info.membercount-1"), "{} ({}%)".format(bots, b_p)),
-             (await self.bot._(ctx.guild.id, "info.membercount-3"), "{} ({}%)".format(c_co, c_p))]
+        total, bots_count, online_count, unverified = await self.bot.get_cog("Utilities").get_members_repartition(ctx.guild.members)
+        humans_count = total - bots_count
+        get_count = lambda nbr: "< 1" if 0 < nbr / total < 0.01 else ("> 99" if 1 > nbr/total > 0.99 else round(nbr*100/total))
+        humans_percent = get_count(humans_count)
+        bots_percent = get_count(bots_count)
+        online_percent = get_count(online_count)
+        unverified_percent = get_count(unverified)
+        l = [
+            (await self.bot._(ctx.guild.id, "info.membercount-0"), total),
+            (await self.bot._(ctx.guild.id, "info.membercount-2"), "{} ({}%)".format(humans_count, humans_percent)),
+            (await self.bot._(ctx.guild.id, "info.membercount-1"), "{} ({}%)".format(bots_count, bots_percent)),
+        ]
+        if self.bot.intents.presences:
+            l.append((await self.bot._(ctx.guild.id, "info.membercount-3"), "{} ({}%)".format(online_count, online_percent)))
         if "MEMBER_VERIFICATION_GATE_ENABLED" in ctx.guild.features:
-            l.append((await self.bot._(ctx.guild.id, "info.membercount-4"), "{} ({}%)".format(unverified, pen_p)))
+            l.append((await self.bot._(ctx.guild.id, "info.membercount-4"), "{} ({}%)".format(unverified, unverified_percent)))
         if ctx.can_send_embed:
             embed = discord.Embed(colour=ctx.guild.me.color)
             for i in l:
