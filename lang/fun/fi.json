@@ -64,7 +64,7 @@
     "no-database": "Kun tietokantamme on offline tilassa, mahollisuus hauska komentoihin on vain käyttäjille joilla on käyttöoikeudet \"Hallinnoi palvelinta\"",
     "no-embed-perm": "Minulla ei ole käyttöoikeuksia \"Embed links\" :confused:",
     "no-emoji": "Mahdotonta löytää tämä emoji!",
-    "no-fun": "Hauska komennot ovat kytketty pois käytöstä tällä serverillä. Näet listan niistä täältä: https://zbot.rtfd.io/en/latest/fun.html",
+    "no-fun": "Hauska komennot ovat kytketty pois käytöstä tällä serverillä. Näet listan niistä täältä: https://axobot.rtfd.io/en/latest/fun.html",
     "no-reaction": "Mahdotonta lisätä reaktioita. Katso minun käyttöoikeudet...",
     "no-roll": "Ei vaihtoehtoa löydetty",
     "no-say": "En voi lähettää viestiä tälle kanavalle",
@@ -97,7 +97,7 @@
     "tip-list": [
         "Tiesitkö että, **Jees1#5825** käänsi tämän botin suomeksi?",
         "Pro-vinkki: vaihtaaksesi botin kieltä, käytä komentoa %{config_cmd}!",
-        "Pro-vinkki: Löydät selitykset jokaisesta komennosta botin dokumentaatiosta osoitteessa https://zbot.rtfd.io. Ehkä myös komennoista joista et tiennyt!",
+        "Pro-vinkki: Löydät selitykset jokaisesta komennosta botin dokumentaatiosta osoitteessa https://axobot.rtfd.io. Ehkä myös komennoista joista et tiennyt!",
         "Tiesitkö, että komennon %{stat_cmd} tulokset piilottavat joitakin palvelimia, kuten \"bottiluettelo\" palvelimia tai sisäisiä palvelimia",
         "Tiesitkö, että minut oli alun perin suunniteltu Minecraft-yhteisön palvelimelle. Siitä nimeni tulikin, ja siksi minulla on joitakin Minecraftiin liittyviä komentoja.",
         "Tiesitkö, että ensimmäinen versio botista oli koodattu helmikuussa 2018 henkilökohtaiseen käyttöön. Tuolloin oli vain muutama yksinkertainen komento, kuten %{clear_cmd} ja %{say_cmd}",

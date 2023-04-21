@@ -3,100 +3,17 @@ from __future__ import annotations
 import json
 import re
 from datetime import datetime, timedelta, timezone
-from typing import TYPE_CHECKING, Literal, Optional, TypedDict, Union
+from typing import TYPE_CHECKING, Optional
 
 import discord
 
 from libs.formatutils import FormatUtils
 
+from .types import DbTask
+from .views import RecreateReminderView
+
 if TYPE_CHECKING:
     from libs.bot_classes import Axobot
-
-
-class DbTask(TypedDict):
-    "A task stored in the database"
-    ID: int
-    guild: Optional[int]
-    channel: Optional[int]
-    user: int
-    action: Literal["mute", "ban", "timer"]
-    begin: datetime
-    duration: int
-    message: Optional[str]
-    data: Optional[str]
-    beta: bool
-
-class RecreateReminderView(discord.ui.View):
-    "A simple view allowing users to recreate a sent reminder"
-
-    def __init__(self, bot: Axobot, task: DbTask):
-        self.bot = bot
-        self.task = task
-        super().__init__(timeout=600)
-
-    async def init(self):
-        "Create the button with the correct label"
-        def on_pressed_decorator(duration: int):
-            async def on_pressed(interaction: discord.Interaction):
-                self.bot.dispatch("reminder_snooze", self.task["duration"], duration)
-                await self.on_pressed(interaction, duration)
-            return on_pressed
-        identic_duration = await FormatUtils.time_delta(
-            self.task['duration'],
-            lang=await self.bot._(self.task["guild"], '_used_locale'),
-            form='developed'
-        )
-        identic_label = await self.bot._(self.task["guild"], "timers.rmd.recreate-reminder", duration=identic_duration)
-        identic_btn = discord.ui.Button(label=identic_label, style=discord.ButtonStyle.blurple, emoji='⏳')
-        identic_btn.callback = on_pressed_decorator(self.task['duration'])
-        self.add_item(identic_btn)
-        if self.task['duration'] != 60 * 10:
-            ten_min_duration = await FormatUtils.time_delta(
-                60 * 10,
-                lang=await self.bot._(self.task["guild"], '_used_locale'),
-                form='developed'
-            )
-            ten_min_label = await self.bot._(self.task["guild"], "timers.rmd.recreate-reminder", duration=ten_min_duration)
-            ten_min_btn = discord.ui.Button(label=ten_min_label, style=discord.ButtonStyle.blurple, emoji='⏰')
-            ten_min_btn.callback = on_pressed_decorator(60 * 10)
-            self.add_item(ten_min_btn)
-
-    async def on_pressed(self, interaction: discord.Interaction, duration):
-        "Called when the button is pressed"
-        await interaction.response.defer(ephemeral=True)
-        # remove the last hyperlink markdown from the message
-        clean_msg = re.sub(r'\s+\[.+?\]\(.+?\)$', '', self.task['message'])
-        await self.bot.task_handler.add_task(
-                "timer",
-                duration,
-                self.task["user"],
-                self.task["guild"],
-                self.task["channel"],
-                clean_msg,
-                self.task["data"]
-            )
-        await interaction.followup.send(
-            await self.bot._(interaction.user, "timers.rmd.recreated"),
-            ephemeral=True
-        )
-        await self.disable(interaction)
-
-    async def verify(self, interaction: discord.Interaction):
-        return interaction.user.id == self.task['user']
-
-    async def disable(self, interaction: Union[discord.Interaction, discord.Message]):
-        "Called when the timeout has expired"
-        for child in self.children:
-            child.disabled = True
-        if isinstance(interaction, discord.Interaction):
-            await interaction.followup.edit_message(
-                interaction.message.id,
-                content=interaction.message.content,
-                view=self
-            )
-        else:
-            await interaction.edit(content=interaction.content, view=self)
-        self.stop()
 
 class TaskHandler:
     "Handler for timed tasks (like reminders or planned unban)"

@@ -133,7 +133,7 @@ class Rss(commands.Cog):
             return "twitter"
         if re.match(r'^https://(www\.)?twitch\.tv/\w+', url):
             return "twitch"
-        if re.match(r'https://(?:www\.)deviantart.com/', url):
+        if re.match(r'^https://(www\.)?deviantart\.com/w+', url):
             return "deviantart"
         if re.match(r'^https://', url):
             return "web"
@@ -1572,10 +1572,6 @@ class Rss(commands.Cog):
         success_ids: list[int] = []
         errors_ids: list[int] = []
         checked_count = 0
-        if guild_id is None:
-            if statscog := self.bot.get_cog("BotStats"):
-                statscog.rss_stats['messages'] = 0
-                statscog.rss_stats['warnings'] = 0
         session = ClientSession()
         for feed in feeds_list:
             if not feed.enabled:
@@ -1599,11 +1595,14 @@ class Rss(commands.Cog):
             await asyncio.sleep(self.time_between_feeds_check)
         await session.close()
         self.bot.get_cog('Minecraft').feeds.clear()
-        desc = [f"**RSS loop done** in {time.time()-start:.0f}s ({len(success_ids)}/{checked_count} feeds)"]
+        elapsed_time = round(time.time() - start)
+        desc = [f"**RSS loop done** in {elapsed_time}s ({len(success_ids)}/{checked_count} feeds)"]
         if guild_id is None:
             if statscog := self.bot.get_cog("BotStats"):
                 statscog.rss_stats["checked"] = checked_count
                 statscog.rss_stats["errors"] = len(errors_ids)
+                statscog.rss_stats["time"] = elapsed_time
+                statscog.rss_loop_finished = True
             # await self.db_set_active_guilds(set(feed.guild_id for feed in feeds_list))
             await self.db_set_last_refresh(list(feed.feed_id for feed in feeds_list))
         if len(errors_ids) > 0:

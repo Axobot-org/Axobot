@@ -22,7 +22,7 @@
     "no-database": "Como nuestra base de datos está desconectada, el acceso a los comandos de diversión está restringido a personas con permiso \"Gestionar Servidor\"",
     "no-embed-perm": "No tengo permiso para \"Insertar Enlaces\" :confused:",
     "no-emoji": "¡Incapaz de encontrar este emoji!",
-    "no-fun": "Los comandos divertidos han sido desactivados en este servidor. Para ver su lista, mira este enlace : https://zbot.rtfd.io/en/latest/fun.html",
+    "no-fun": "Los comandos divertidos han sido desactivados en este servidor. Para ver su lista, mira este enlace : https://axobot.rtfd.io/en/latest/fun.html",
     "no-reaction": "Incapaz de adicionar reacciones. Por favor, verifique mis permisos...",
     "no-roll": "No se encontró ninguna opción",
     "no-say": "No se puede enviar mensajes en este canal",
@@ -54,7 +54,7 @@
     "tip-list": [
         "¿Sabías eso? Hay varios idiomas para el bot, incluyendo uno muy divertido: `lolcat`",
         "Consejo profesional: para modificar el idioma del bot, use el comando %{config_cmd} !",
-        "Consejo profesional: Encontrarás explicaciones de cada comando en la documentación del bot, en https://zbot.rtfd.io; ¡Quizás incluso comandos que no conocías!",
+        "Consejo profesional: Encontrarás explicaciones de cada comando en la documentación del bot, en https://axobot.rtfd.io; ¡Quizás incluso comandos que no conocías!",
         "¿Sabías eso? Los resultados del comando %{stats_cmd} ocultan algunos servidores, como los servidores de listas de robots, o los servidores internos.",
         "¿Sabías eso? El bot fue diseñado originalmente para un servidor en una comunidad de Minecraft. Ahí es donde se hizo famoso, y por eso que tiene comandos sobre el tema del juego.",
         "¿Sabías eso? La primera versión del bot fue escrita en febrero de 2018, para uso privado. En ese momento sólo había dos o tres comandos fáciles de ejecutar, como %{clear_cmd} y %{say_cmd}.",

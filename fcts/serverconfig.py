@@ -384,7 +384,7 @@ class ServerConfig(commands.Cog):
         """Get the list of every usable option"""
         options = sorted(options_list.keys())
         txt = "\n```\n-{}\n```\n".format('\n-'.join(options))
-        link = "<https://zbot.readthedocs.io/en/latest/server.html#list-of-every-option>"
+        link = "<https://axobot.readthedocs.io/en/latest/server.html#list-of-every-option>"
         await ctx.send(await self.bot._(ctx.guild.id, "server.config-list",
                                         text=txt, link=link))
 

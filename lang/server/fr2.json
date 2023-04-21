@@ -1,5 +1,5 @@
 {
-    "config-help": "Cette commande sert principalement à configurer votre serveur. En faisant `%{p}config see [option]`, tu obtiendrez l'aperçu des configurations actuelles, et les administrateurs du serveur peuvent entrer `%{p}config set <option> valeur1, valeur2...` pour modifier une configuration, ou `%{p}config del <option>` pour réinitialiser l'option (`%{p}config set <option> del` fonctionne de même).\nLa liste des options disponible est accessible à l'adresse <https://zbot.rtfd.io/en/latest/server.html#list-of-every-option>",
+    "config-help": "Cette commande sert principalement à configurer votre serveur. En faisant `%{p}config see [option]`, tu obtiendrez l'aperçu des configurations actuelles, et les administrateurs du serveur peuvent entrer `%{p}config set <option> valeur1, valeur2...` pour modifier une configuration, ou `%{p}config del <option>` pour réinitialiser l'option (`%{p}config set <option> del` fonctionne de même).\nLa liste des options disponible est accessible à l'adresse <https://axobot.rtfd.io/en/latest/server.html#list-of-every-option>",
     "config-list": "Liste des options disponibles :%{text}Plus d'information : %{link}",
     "edit-error": {
         "anti_raid": "Ce niveau n'existe pas :eyes:. Voici la liste des niveaux actuellement disponibles : %{list}",
@@ -48,7 +48,7 @@
     "see-title": "Voici ici la configuration actuelle du serv %{guild}",
     "server_desc": {
         "anti_caps_lock": "Faut que j'envoie un message lorsqu'un membre envoie trop de majuscules :thinking: ? %{value}",
-        "anti_raid": "Voici le niveau de la protection anti-raid : %{value} \n*([Documentation](https://zbot.rtfd.io/en/latest/moderator.html#anti-raid))*",
+        "anti_raid": "Voici le niveau de la protection anti-raid : %{value} \n*([Documentation](https://axobot.rtfd.io/en/latest/moderator.html#anti-raid))*",
         "autoremove_xp": "Le bot enlèvera {xp} points d'xp par jour aux membres inactifs. Quelle punition !",
         "ban_allowed_roles": "Voici tous ceux qui peuvent ban quelqu'un : %{value}. Faites attention !",
         "bot_news": "Voici la liste des salons dans lesquels envoyer les news du bot : %{value}",

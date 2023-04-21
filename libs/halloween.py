@@ -22,7 +22,7 @@ class LinkConverter(str):
     @classmethod
     async def convert(cls, ctx: MyContext, argument: str):
         "Convert an argument into a media link, by using Discord CDN proxy and embed system"
-        if not argument.startswith(('http://', 'https://')):
+        if not argument.startswith('https://'):
             raise commands.errors.BadArgument(f'Could not convert "{argument}" into URL')
         if argument.startswith('https://cdn.discordapp.com/attachments/'):
             return argument

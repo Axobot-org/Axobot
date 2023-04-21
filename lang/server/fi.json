@@ -1,5 +1,5 @@
 {
-    "config-help": "Tätä komentoa yleensä käytetään palvelimen konfigurointiin. Viestittämällä `%{p}config see [option]` sinä aiot saada näyn tämänaikaisesta konfiguraatiosta, ja palvelimen järjestelmänvalvojat voivat viestittää `%{p}config set <option> ominaisuus1, ominaisuus2...` jolla voi muuttaa konfigurointia, tai `%{p}config del <option>` jolla voi asettaa uudelleen vaitoehdon (`%{p}config set <option>` toimii samallain). Lista mahdollisista vaihtoehdoista löytyy täältä: <https://zbot.rtfd.io/en/latest/server.html#list-of-every-option>",
+    "config-help": "Tätä komentoa yleensä käytetään palvelimen konfigurointiin. Viestittämällä `%{p}config see [option]` sinä aiot saada näyn tämänaikaisesta konfiguraatiosta, ja palvelimen järjestelmänvalvojat voivat viestittää `%{p}config set <option> ominaisuus1, ominaisuus2...` jolla voi muuttaa konfigurointia, tai `%{p}config del <option>` jolla voi asettaa uudelleen vaitoehdon (`%{p}config set <option>` toimii samallain). Lista mahdollisista vaihtoehdoista löytyy täältä: <https://axobot.rtfd.io/en/latest/server.html#list-of-every-option>",
     "config-list": "Lista saatavilla olevista vaihtoehdoista: %{text}Lisätietoja täältä %{link}",
     "edit-error": {
         "anti_raid": "Tämä taso ei ole olemassa. Tässä on lista kaikista mahdollisista tasoista: %{list}",
@@ -46,7 +46,7 @@
     "see-title": "%{guild} palvelin konfigurointi",
     "server_desc": {
         "anti_caps_lock": "Pitäisikö botin lähettää viesti kun jäsen lähettää liikaa isoja kirjaimia? %{value}",
-        "anti_raid": "Taso anti-raid suojeluksesta: %{value} \n*([Dokumentaatio](https://zbot.rtfd.io/en/latest/moderator.html#anti-raid))*",
+        "anti_raid": "Taso anti-raid suojeluksesta: %{value} \n*([Dokumentaatio](https://axobot.rtfd.io/en/latest/moderator.html#anti-raid))*",
         "autoremove_xp": "Kokemuspisteet jotka poistetaan päivittäin epäaktiivisilta jäseniltä: %{value}",
         "ban_allowed_roles": "Lista rookeista jotka voivat käyttää komentoa 'ban': %{value}",
         "bot_news": "Lista kanavista johon lähetetään botin uutiset: %{value}",
