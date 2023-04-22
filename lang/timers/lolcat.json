@@ -3,6 +3,11 @@
         "cancelled": "ok well, cancelled UwU",
         "cleared": ":deleted:",
         "confirm": "U sure u wanna delete 'em all? (%{count} small bois)",
+        "custom-duration": {
+            "button": "Smth else",
+            "title": "SPECIAL DURATION JUST4U",
+            "input": "Enter something here"
+        },
         "delete": {
             "error": "Whoopsie, something unexpected happend. Pls try again later, or contact our super cool support!",
             "success": {
@@ -17,6 +22,7 @@
         "embed-title": "Reminder",
         "empty": "Oops, U don't have any pending reminder lol",
         "item": "ID: `{id}` | In: {duration} | Chan: {channel} | Msg: {msg}",
+        "recreated": "Roger that, new reminder created",
         "saved": "Got it! I'll remind you in %{duration} OwO",
         "select-placeholder": "Select 1+ rmd",
         "title": "I'll remind u that becuz ur dumb-dumb :bongocat:",

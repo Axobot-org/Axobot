@@ -24,7 +24,7 @@
     "no-database": "Veritabanımız çevrimdışı olduğundan, eğlence komutlarına erişim \"Sunucuyu Yönet\" iznine sahip kişilerle sınırlıdır",
     "no-embed-perm": "\"Bağlantı Yerleştir\" iznim yok 😕",
     "no-emoji": "Bu emoji bulunamadı!",
-    "no-fun": "Bu sunucuda eğlence komutları devre dışı bırakıldı. Listelerini görmek için https://zbot.rtfd.io/en/latest/fun.html adresine bakın",
+    "no-fun": "Bu sunucuda eğlence komutları devre dışı bırakıldı. Listelerini görmek için https://axobot.rtfd.io/en/latest/fun.html adresine bakın",
     "no-reaction": "Tepki eklenemiyor. Lütfen izinlerimi kontrol et...",
     "no-roll": "Seçenek bulunamadı",
     "no-say": "Bu kanalda herhangi bir mesaj gönderilemiyor",

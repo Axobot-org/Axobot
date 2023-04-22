@@ -3,6 +3,11 @@
         "cancelled": "Dropping the process",
         "cleared": "Your reminders have been deleted!",
         "confirm": "Are you sure you want to delete all your reminders? (%{count} pending)",
+        "custom-duration": {
+            "button": "Other duration",
+            "title": "Custom reminder duration",
+            "input": "Enter a duration for your reminder"
+        },
         "delete": {
             "error": "Something went wrong while deleting your reminders. Please try again or contact support.",
             "success": {
@@ -17,6 +22,7 @@
         "embed-title": "Reminder",
         "empty": "Oops, you don't have any pending reminder...",
         "item": "ID: `{id}` | In: {duration} | Channel: {channel} | Message: {msg}",
+        "recreated": "A new reminder has been created for %{duration}!",
         "saved": "Got it! I'll remind you in %{duration}",
         "select-placeholder": "Select one or more reminders",
         "title": "List of your reminders",

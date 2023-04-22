@@ -1,29 +1,29 @@
 :orphan:
-:og:description: A translated version of the Zbot Terms of Service.
+:og:description: A translated version of the Axobot Terms of Service.
 
 ================
 Terms of Service
 ================
 
-Zbot, as any verified Discord app, has its own terms of services, defining among other things how you should use our app and what to expect from us. We provide you with a translation of these terms here, but only as a guide. **This version cannot be used as a replacement for the original and official version**, available in French at https://zrunner.me/zbot-cgu.pdf.
+Axobot, as any verified Discord app, has its own terms of services, defining among other things how you should use our app and what to expect from us. We provide you with a translation of these terms here, but only as a guide. **This version cannot be used as a replacement for the original and official version**, available in French at https://zrunner.me/axobot-cgu.pdf.
 
-Here is the unofficial translation of the October 18, 2022 version.
+Here is the unofficial translation of the December 2, 2022 version.
 
 
 1. Object
 ---------
 
-The purpose of this document (hereinafter the "**Terms of Service**") is to provide a legal framework for the terms and conditions under which the ZBot application (hereinafter "**ZBot**", "**we**", "**us**", "**our**") is made available to users (hereinafter the "**User(s)**" or "**you**") of the DISCORD platform.
+The purpose of this document (hereinafter the "**Terms of Service**") is to provide a legal framework for the terms and conditions under which the Axobot application (hereinafter "**Axobot**", "**we**", "**us**", "**our**") is made available to users (hereinafter the "**User(s)**" or "**you**") of the DISCORD platform.
 
-Any natural person using ZBot acknowledges having fully understood these Terms of Service at the latest at the time of its implementation or use.
+Any natural person using Axobot acknowledges having fully understood these Terms of Service at the latest at the time of its implementation or use.
 
-ZBot is available, in its official version, on the website https://zbot.readthedocs.io. It may also be accessible on mirror sites or referral sites.
+Axobot is available, in its official version, on the website https://axobot.readthedocs.io. It may also be accessible on mirror sites or referral sites.
 
-The service(s) offered by ZBot (hereinafter the "**Service**") consist in the addition of additional functionalities to the DISCORD platform, all of which are detailed in the documentation available at https://zbot.readthedocs.io/. Therefore, the use of the Service requires the creation and use of an account on the DISCORD platform (hereinafter the "**User Account**").
+The service(s) offered by Axobot (hereinafter the "**Service**") consist in the addition of additional functionalities to the DISCORD platform, all of which are detailed in the documentation available at https://axobot.readthedocs.io/. Therefore, the use of the Service requires the creation and use of an account on the DISCORD platform (hereinafter the "**User Account**").
 
-**Since ZBot relies on the DISCORD platform, it is up to the User to find out about the General Terms of Service implemented by DISCORD (https://discord.com) and about any exceptions that these conditions might make to our General Terms of Service.**
+**Since Axobot relies on the DISCORD platform, it is up to the User to find out about the General Terms of Service implemented by DISCORD (https://discord.com) and about any exceptions that these conditions might make to our General Terms of Service.**
 
-**ZBot is an application that is made available to its Users for free. The User is advised that the support and maintenance of ZBot is carried out according to the free time of its developers and that no guarantee is given to the Users.**
+**Axobot is an application that is made available to its Users for free. The User is advised that the support and maintenance of Axobot is carried out according to the free time of its developers and that no guarantee is given to the Users.**
 
 
 2. Access to the Service
@@ -75,7 +75,7 @@ The same applies to any information or page presented by DISCORD about or in con
 6. Support provided
 -------------------
 
-We implement several solutions to provide the User with assistance in using the Service. In particular, a complete documentation of the public features of the Service is available at https://zbot.rtfd.io and is kept up to date as much as possible. User may also contact us through our support server (whose invitation link is https://discord.gg/N55zY88), our GitHub repository (at https://github.com/ZRunner/ZBot), or as a last resort by email (at z.runner.mc@gmail.com).
+We implement several solutions to provide the User with assistance in using the Service. In particular, a complete documentation of the public features of the Service is available at https://axobot.rtfd.io and is kept up to date as much as possible. User may also contact us through our support server (whose invitation link is https://discord.gg/N55zY88), our GitHub repository (at https://github.com/ZRunner/Axobot), or as a last resort by email (at z.runner.mc@gmail.com).
 
 Despite our best efforts, we cannot guarantee that the User will receive a satisfactory response to their requests, whether it is a request for help with their use of the Service, a suggestion for improvement, a bug report, or any other interaction with support. This support is offered on a voluntary basis by each participant, and we cannot be held responsible for any incompleteness, inaccuracy or lack of response to the User, or for any consequences thereof.
 

@@ -119,6 +119,7 @@ class Events(commands.Cog):
             await self.register_userlog_name(before, after, tries+1)
 
     async def db_register_memberlog(self, user_id: int, before: str, after: str, guild_id: int=0):
+        "Register in the database a nickname or a username change"
         query = "INSERT INTO `usernames_logs` (`user`,`old`,`new`,`guild`,`beta`) VALUES (%(u)s, %(o)s, %(n)s, %(g)s, %(b)s)"
         query_args = { 'u': user_id, 'o': before, 'n': after, 'g': guild_id, 'b': self.bot.beta }
         async with self.bot.db_query(query, query_args):
@@ -477,7 +478,7 @@ class Events(commands.Cog):
             def __init__(self):
                 super().__init__()
                 self.add_item(discord.ui.Button(label='Invite Axobot', url="https://zrunner.me/invite-axobot", style=discord.ButtonStyle.blurple))
-                self.add_item(discord.ui.Button(label='About the migration', url="https://zbot.readthedocs.io/en/latest/v4.html#new-identity"))
+                self.add_item(discord.ui.Button(label='About the migration', url="https://axobot.readthedocs.io/en/latest/v4.html#new-identity"))
                 self.add_item(discord.ui.Button(label='Support server', url="https://discord.gg/N55zY88"))
 
         if self.bot.entity_id == 0 and random.random() < 0.1:

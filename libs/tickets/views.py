@@ -77,7 +77,7 @@ class AskTitleModal(discord.ui.Modal):
     "Ask a user the name of their ticket"
     name = discord.ui.TextInput(label="", placeholder=None, style=discord.TextStyle.short, max_length=100)
 
-    def __init__(self, guild_id: int, topic: dict, title: str, input_label: str, input_placeholder: str, callback: Callable):
+    def __init__(self, guild_id: int, topic: dict, title: str, input_label: str, input_placeholder: str, callback: Callable[[discord.Interaction, dict, str], Any]):
         super().__init__(title=title, timeout=600)
         self.guild_id = guild_id
         self.topic = topic

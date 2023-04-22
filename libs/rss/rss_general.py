@@ -166,6 +166,7 @@ class FeedObject:
         self.embed_footer: str = from_dict['embed_footer']
         self.embed_title: str = from_dict['embed_title']
         self.embed_color: int = from_dict['embed_color']
+        self.silent_mention: bool = from_dict['silent_mention']
         self.last_update: Optional[datetime.datetime] = from_dict['last_update'].replace(tzinfo=datetime.timezone.utc) if from_dict['last_update'] else from_dict['last_update']
         self.last_refresh: Optional[datetime.datetime] = from_dict['last_refresh'].replace(tzinfo=datetime.timezone.utc) if from_dict['last_refresh'] else from_dict['last_refresh']
         self.recent_errors: int = from_dict['recent_errors']
@@ -196,6 +197,7 @@ class FeedObject:
             "embed_footer": "",
             "embed_title": "",
             "embed_color": "",
+            "silent_mention": False,
             "last_update": None,
             "last_refresh": None,
             "recent_errors": 0,

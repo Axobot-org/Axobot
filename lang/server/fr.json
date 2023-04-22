@@ -9,7 +9,7 @@
             "smooth": "faible",
             "careful": "modéré",
             "high": "élevé",
-            "(╯°□°）╯︵ ┻━┻": "extrême"
+            "extreme": "extrême"
         },
         "language": {
             "fr": "français",
@@ -21,7 +21,8 @@
         },
         "levelup_channel": {
             "none": "pas de message",
-            "any": "n'importe quel salon"
+            "any": "n'importe quel salon",
+            "dm": "en message privé"
         },
         "ttt_display": {
             "disabled": "désactivé",
@@ -89,12 +90,13 @@
         "levelup_channel": {
             "any": "Les messages de changement de niveaux seront maintenant directement posté dans le tchat",
             "channel": "Les messages de changement de niveaux seront maintenant dans le salon %{val}",
-            "none": "Les messages de changement de niveaux ne seront maintenant plus envoyés"
+            "none": "Les messages de changement de niveaux ne seront maintenant plus envoyés",
+            "dm": "Les messages de changement de niveaux seront maintenant envoyés en Messages Privés"
         }
     },
     "server_desc": {
         "anti_caps_lock": "Dois-je envoyer un message d'avertissement lorsqu'un membre envoie trop de majuscules ? %{value}",
-        "anti_raid": "Niveau de la protection anti-raid : %{value} \n*([Documentation](https://zbot.rtfd.io/en/latest/moderator.html#anti-raid))*",
+        "anti_raid": "Niveau de la protection anti-raid : %{value} \n*([Documentation](https://axobot.rtfd.io/en/latest/moderator.html#anti-raid))*",
         "anti_scam": "Dois-je lire tous les messages pour détecter et supprimer les messages dangereux ? %{value}",
         "autoremove_xp": "Points d'expériences enlevés chaque jour aux membres inactifs : %{value}",
         "ban_allowed_roles": "Liste des rôles qui peuvent utiliser la commande 'ban' : %{value}",

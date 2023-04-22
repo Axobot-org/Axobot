@@ -1,17 +1,16 @@
 # Axobot V4 - A Discord Bot
 
-[![discord.py](https://img.shields.io/badge/Discord.py-2.1-brightgreen.svg)](https://github.com/Rapptz/discord.py)
-[![Docs status](https://readthedocs.org/projects/zbot/badge/?version=latest)](https://zbot.readthedocs.io)
+[![discord.py](https://img.shields.io/badge/Discord.py-2.2-brightgreen.svg)](https://github.com/Rapptz/discord.py)
+[![Docs status](https://readthedocs.org/projects/axobot/badge/?version=latest)](https://axobot.readthedocs.io)
 [![Crowdin](https://badges.crowdin.net/zbot/localized.svg)](https://crowdin.com/project/zbot)
 ![Last commit](https://img.shields.io/github/last-commit/ZRunner/ZBot.svg?label=Last+commit+on+develop)
-[![GitHub Super-Linter](https://github.com/ZRunner/ZBot/workflows/Lint%20Code%20Base/badge.svg)](https://github.com/marketplace/actions/super-linter)
 
 [![Discord server](https://discord.com/api/v8/guilds/356067272730607628/widget.png)](https://discord.gg/N55zY88)
 [![Discord bot](https://top.gg/api/widget/status/1048011651145797673.svg)](https://zrunner.me/invite-axobot)
 
 Welcome to the Axobot (previously ZBot) bot documentation, a Discord bot coded in Python 3 by a small French developer, **Z_runner**. You will find in the documentation all the explanations on each of the usable commands, as well as the list of the last additions and some code examples. The documentation is currently in English but the bot is available in several languages, including its main language, French.
 
-Full documentation can be found on the [ReadTheDocs](https://zbot.readthedocs.io/en/latest/) page
+Full documentation can be found on the [ReadTheDocs](https://axobot.readthedocs.io/en/latest/) page
 
 ## The Bot
 

@@ -45,6 +45,10 @@
     ],
     "del-user": "<deleted usr>",
     "high-page": "There aren't so much pages!",
+    "levelup-dm": {
+        "title": "WATCHOUT!NEWLEVEL!CONGRATS!",
+        "footer": "From place %{servername}"
+    },
     "levelup-items": [
         "this guitar",
         "this dagger",

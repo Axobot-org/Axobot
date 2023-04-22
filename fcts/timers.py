@@ -13,18 +13,21 @@ from libs.views import ConfirmView
 from fcts import args, checks
 
 class Timers(commands.Cog):
+    "Reminders system"
+
     def __init__(self, bot: Axobot):
         self.bot = bot
         self.file = "timers"
 
     async def db_get_reminder(self, reminder_id: int, user: Optional[int] = None) -> Optional[dict]:
+        "Get a specific reminder for a user"
         if user is not None:
             query = "SELECT * FROM `timed` WHERE user=%s AND action='timer' AND ID=%s AND `beta`=%s"
-            args = (user, reminder_id, self.bot.beta)
+            q_args = (user, reminder_id, self.bot.beta)
         else:
             query = "SELECT * FROM `timed` WHERE action='timer' AND ID=%s AND `beta`=%s"
-            args = (reminder_id, self.bot.beta)
-        async with self.bot.db_query(query, args, fetchone=True) as query_result:
+            q_args = (reminder_id, self.bot.beta)
+        async with self.bot.db_query(query, q_args, fetchone=True) as query_result:
             return query_result
 
     async def db_get_user_reminders(self, user: int) -> list[dict]:
@@ -59,11 +62,17 @@ class Timers(commands.Cog):
         async with self.bot.db_query(query, (user, self.bot.beta)) as _:
             pass
 
+    async def db_register_reminder_snooze(self, original_duration: int, new_duration: int):
+        "Register a snooze"
+        query = "INSERT INTO `reminder_snoozes_logs` (`original_duration`, `snooze_duration`, `beta`) VALUES (%s, %s, %s)"
+        async with self.bot.db_query(query, (original_duration, new_duration, self.bot.beta)):
+            pass
+
     @commands.hybrid_command(name="remindme", aliases=['rmd'])
     @app_commands.describe(duration="The duration to wait, eg. '2d 4h'", message="The message to remind you of")
     @commands.cooldown(5, 30, commands.BucketType.channel)
     @commands.cooldown(5, 60, commands.BucketType.user)
-    async def remindme(self, ctx: MyContext, duration: commands.Greedy[args.tempdelta], *, message: str):
+    async def remindme(self, ctx: MyContext, duration: commands.Greedy[args.Duration], *, message: str):
         """Create a new reminder
         This is actually an alias of `reminder create`
 
@@ -88,7 +97,7 @@ class Timers(commands.Cog):
     @commands.cooldown(5,30,commands.BucketType.channel)
     @commands.cooldown(5,60,commands.BucketType.user)
     @commands.check(checks.database_connected)
-    async def remind_create(self, ctx: MyContext, duration: commands.Greedy[args.tempdelta], *, message: str):
+    async def remind_create(self, ctx: MyContext, duration: commands.Greedy[args.Duration], *, message: str):
         """Create a new reminder
 
         Please use the following format:
@@ -111,10 +120,19 @@ class Timers(commands.Cog):
         if duration > 60*60*24*365*5:
             await ctx.send(await self.bot._(ctx.channel, "timers.rmd.too-long"))
             return
-        f_duration = await FormatUtils.time_delta(duration,lang=await self.bot._(ctx.channel,'_used_locale'), year=True, form='developed')
+        lang = await self.bot._(ctx.channel,'_used_locale')
+        f_duration = await FormatUtils.time_delta(duration, lang=lang, year=True, form='developed')
         try:
-            d = {'msg_url': ctx.message.jump_url}
-            await ctx.bot.task_handler.add_task("timer", duration, ctx.author.id, ctx.guild.id if ctx.guild else None, ctx.channel.id, message, data=d)
+            data = {'msg_url': ctx.message.jump_url}
+            await ctx.bot.task_handler.add_task(
+                "timer",
+                duration,
+                ctx.author.id,
+                ctx.guild.id if ctx.guild else None,
+                ctx.channel.id,
+                message,
+                data
+            )
         except Exception as err:
             self.bot.dispatch("command_error", ctx, err)
         else:
@@ -304,6 +322,12 @@ class Timers(commands.Cog):
         if confirm_view.value:
             await self.db_delete_all_user_reminders(ctx.author.id)
             await ctx.send(await self.bot._(ctx.channel, "timers.rmd.cleared"))
+
+
+    @commands.Cog.listener()
+    async def on_reminder_snooze(self, initial_duration: int, snooze_duration: int):
+        "Called when a reminder is snoozed"
+        await self.db_register_reminder_snooze(initial_duration, snooze_duration)
 
 
 async def setup(bot):

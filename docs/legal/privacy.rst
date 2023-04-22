@@ -1,31 +1,31 @@
 :orphan:
-:og:description: A translated version of the Zbot privacy policy
+:og:description: A translated version of the Axobot privacy policy
 
 ==============
 Privacy Policy
 ==============
 
-Zbot has a very specific Privacy Policy, defining among other things our use of the collected data. We provide you with a translation of this policy here, but only as a guide. **This version cannot be used as a replacement for the original and official version**, available in French at https://zrunner.me/zbot-privacy.pdf.
+Axobot has a very specific Privacy Policy, defining among other things our use of the collected data. We provide you with a translation of this policy here, but only as a guide. **This version cannot be used as a replacement for the original and official version**, available in French at https://zrunner.me/zbot-privacy.pdf.
 
-Here is the unofficial translation of the August 13, 2020 version.
+Here is the unofficial translation of the December 2, 2022 version.
 
 
 1. Object
 ---------
 
-The purpose of this document (hereinafter the "**Privacy Policy**") is to describe the conditions under which ZBot (hereinafter "**ZBot**", "we", "us", "our") collects and processes the personal data (hereinafter the "Data") of the users using the service offered by ZBot (hereinafter "**User**" or "you") on the occasion of its use.
+The purpose of this document (hereinafter the "**Privacy Policy**") is to describe the conditions under which Axobot (hereinafter "**Axobot**", "we", "us", "our") collects and processes the personal data (hereinafter the "Data") of the users using the service offered by Axobot (hereinafter "**User**" or "you") on the occasion of its use.
 
-Any natural person using ZBot acknowledges having fully read the Privacy Policy at the time of its implementation or use.
+Any natural person using Axobot acknowledges having fully read the Privacy Policy at the time of its implementation or use.
 
-ZBot is available, in its official version, on the website https://zbot.readthedocs.io. It can also sometimes be accessible on mirror sites or referencing sites.
+Axobot is available, in its official version, on the website https://axobot.readthedocs.io. It can also sometimes be accessible on mirror sites or referencing sites.
 
-The service(s) proposed by ZBot (hereafter the "Service") consist in the addition of additional functionalities to the Discord platform, all detailed in the documentation available at https://zbot.readthedocs.io/.
+The service(s) proposed by Axobot (hereafter the "Service") consist in the addition of additional functionalities to the Discord platform, all detailed in the documentation available at https://axobot.readthedocs.io/.
 
 This page explains our policies regarding the collection, use and disclosure of personal data when you use our Service and the choices available to you regarding such data.
 
 We use your data to provide and improve the Service. By using the Service, you consent to the collection and use of information in accordance with this policy.
 
-**ZBot relies on the DISCORD platform, it is up to the User to inform themselves about the security policy implemented by DISCORD (https://discord.com) and about the possible exceptions that this policy could bring to our Privacy Policy, in particular by recording some data collected by ZBot in a transparent way for us.**
+**Axobot relies on the DISCORD platform, it is up to the User to inform themselves about the security policy implemented by DISCORD (https://discord.com) and about the possible exceptions that this policy could bring to our Privacy Policy, in particular by recording some data collected by Axobot in a transparent way for us.**
 
 
 2. Definitions
@@ -33,7 +33,7 @@ We use your data to provide and improve the Service. By using the Service, you c
 
 * **Service**
 
-By Service we mean the additional functionalities brought by ZBot in the use of the Discord platform, all detailed in the documentation available at https://zbot.readthedocs.io/.
+By Service we mean the additional functionalities brought by Axobot in the use of the Discord platform, all detailed in the documentation available at https://axobot.readthedocs.io/.
 
 * **Discord or Discord Platform**
 
@@ -59,15 +59,15 @@ We collect several types of data for different purposes, but only in order to pr
 
 * The Data collected by the Service are those posted by the Users in the channels, defined by the Users during the administration of a server, and in general any information communicated through Discord's services.
 * Part of the Data is stored in databases hosted on our servers, in order to provide you with our Service in an optimal way, either directly entered by the User (for example, configuration of the Service), or automatically when you use the Discord platform (for example, experience level system relating to your activity in text channels) after activation of a feature of the Service.
-* Other Data may be loaded in the RAM of the server hosting the ZBot Service, in order to keep the ZBot application running smoothly and responsively. These Data loaded in RAM are in no way collected or recorded in databases or exported in files.
+* Other Data may be loaded in the RAM of the server hosting the Axobot Service, in order to keep the Axobot application running smoothly and responsively. These Data loaded in RAM are in no way collected or recorded in databases or exported in files.
 * No use of the Data is made for commercial purposes.
-* The Data is collected only for support purposes, improvement of the Service or for statistical purposes. The uses are detailed in Article 5 below. This statistical information is accessible through the Discord platform. The commands made available to the User to view the statistics are available in the general documentation of the Service, at the following address: https://zbot.readthedocs.io.
+* The Data is collected only for support purposes, improvement of the Service or for statistical purposes. The uses are detailed in Article 5 below. This statistical information is accessible through the Discord platform. The commands made available to the User to view the statistics are available in the general documentation of the Service, at the following address: https://axobot.readthedocs.io.
 
 
 5. Use of Data
 --------------
 
-ZBot uses the collected Data:
+Axobot uses the collected Data:
 
 * To provide and ensure our Service
 * To let you know about changes to our Service
@@ -89,18 +89,18 @@ All Data Collected:
 6. Data Transfer
 ----------------
 
-The Data collected by ZBot are only stored on our server hosted by OVH in France (https://www.ovh.com).
+The Data collected by Axobot are only stored on our server hosted by OVH in France (https://www.ovh.com).
 
-ZBot will take all reasonable steps to ensure that your data is treated securely and in accordance with this Privacy Policy and your Personal Data will not be transferred to any organization or country unless adequate controls are in place, including with respect to the security of your data and other personal data.
+Axobot will take all reasonable steps to ensure that your data is treated securely and in accordance with this Privacy Policy and your Personal Data will not be transferred to any organization or country unless adequate controls are in place, including with respect to the security of your data and other personal data.
 
 
 7. Data Communication
 ---------------------
 
-ZBot may disclose your Personal Data if it believes in good faith that it is necessary to do so in order to :
+Axobot may disclose your Personal Data if it believes in good faith that it is necessary to do so in order to :
 
 * Fulfill a legal obligation
-* Protect and defend the rights or property of ZBot
+* Protect and defend the rights or property of Axobot
 * Preventing or investigating possible wrongdoing within the Service
 * Ensure the personal safety of users of the Service or the public
 * To protect against civil liability.
@@ -109,7 +109,7 @@ ZBot may disclose your Personal Data if it believes in good faith that it is nec
 8. Data Security
 ----------------
 
-The security of your data is important to us. However, please keep in mind that no method of data transmission over the Internet or method of electronic storage is 100% secure. While we strive to use appropriate methods to protect your Data, we cannot guarantee its absolute security. ZBot is a free Service and we have limited financial resources at this time. We do our best within the limits of what is financially possible and reasonable.
+The security of your data is important to us. However, please keep in mind that no method of data transmission over the Internet or method of electronic storage is 100% secure. While we strive to use appropriate methods to protect your Data, we cannot guarantee its absolute security. Axobot is a free Service and we have limited financial resources at this time. We do our best within the limits of what is financially possible and reasonable.
 
 
 9. Service Providers
