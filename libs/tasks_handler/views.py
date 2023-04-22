@@ -83,7 +83,7 @@ class RecreateReminderView(discord.ui.View):
             callback=self.on_pressed
         ))
 
-    async def verify(self, interaction: discord.Interaction):
+    async def interaction_check(self, interaction: discord.Interaction):
         return interaction.user.id == self.task['user']
 
     async def disable(self, interaction: Union[discord.Interaction, discord.Message]):
