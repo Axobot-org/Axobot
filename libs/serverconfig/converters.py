@@ -302,10 +302,10 @@ class BooleanOption(OptionConverter):
 class EnumOption(OptionConverter):
     @staticmethod
     def from_raw(raw: str, repr: EnumOptionRepresentation, guild: discord.Guild):
-        if raw not in repr["values"]:
-            raise ValueError("Invalid enum value")
         if raw == "(╯°□°）╯︵ ┻━┻":
             return "extreme"
+        if raw not in repr["values"]:
+            raise ValueError("Invalid enum value")
         return raw
 
     @staticmethod
