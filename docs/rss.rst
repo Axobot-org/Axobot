@@ -12,11 +12,9 @@ To manage this plugin (add, edit or remove feeds), you will need at least the Ma
 See the last post
 -----------------
 
-**Syntax:** :code:`rss <youtube|twitter|twitch|deviant|web> <name|link>`
+**Syntax:** :code:`rss last-post <name|link> [youtube|twitter|twitch|deviant|web]`
 
-This command allows you to see the last post of a youtube channel, a user on Twitter or Twitch or DeviantArt, or an rss feed. You can enter :code:`rss <type> help` to get a more complex guide to this command.
-
-To go faster, aliases such as 'yt' or 'tw' are available! YouTube channel names or frequently used web links are already listed in the bot database. Remember to check it out!
+This command allows you to see the last post of a youtube channel, a user on Twitter or Twitch or DeviantArt, or from any valid RSS feed. If you provide a full URL, the bot will automatically detect the type of feed. If you only provide the name of the channel, you will have to specify the type of feed.
 
 .. note:: No specific permission is required for this command. Remember to allow the use of external emojis to get a prettier look.
 
@@ -49,11 +47,13 @@ If you want to keep an eye on the number of rss/Minecraft feeds registered on yo
 Mention a role
 --------------
 
-**Syntax:** :code:`rss roles [feed ID] [roles]`
+**Syntax:** :code:`rss set-mentions [feed ID] [silent] [roles]`
 
 This rss feed tracking option allows you to notify a role when a new post arrives. The roles mentioned are different between rss feeds, which allows you a greater handling.
 
 The "feed ID" argument is the identifier of the feed (found with the command `rss list <#see-every-feed>`__). If you do not enter this argument, or if the feed can't be found, the bot will open a menu where you can choose which feed to modify. Then another menu will allow you to choose which roles you want to mention.
+
+The "silent" argument allows you to set the messages as silent. When this option is enabled, mentions will still appear for your users, but they will no longer receive push notifications when the message is sent. This is the same way it works when you send a message starting with @silent. Default is "false" (disabled).
 
 The "roles" arguments is the list of roles you want to mention, separated by spaces (if some of them contains spaces, you can use quotations "..." instead). If not specified, Axobot will ask you for the list. You can either use names or IDs, or put "none" to remove every mention.
 
@@ -64,7 +64,7 @@ The "roles" arguments is the list of roles you want to mention, separated by spa
 Change the text
 ---------------
 
-**Syntax:** :code:`rss text [feed ID] [new text]`
+**Syntax:** :code:`rss set-text [feed ID] [new text]`
 
 This command is particularly useful if you want to change the text of an rss feed tracking, for example to have a customized text, or in your native language. Many tools are at your disposal (also known as *variables*) that allow an optimal personalization of the message. That's right, we thought of you.
 
@@ -98,7 +98,7 @@ If no identifier is given, the bot will ask you which one to modify.  As for the
 Setup a feed embed
 ------------------
 
-**Syntax:** :code:`rss use_embed [feed ID] [use embed]` or :code:`rss embed <feed ID> [use embed] <parameters>`
+**Syntax:** :code:`rss set-embed [feed ID] [use embed]` or :code:`rss set-embed <feed ID> [use embed] <parameters>`
 
 Sometimes people want to have a lot of control over what is happening in the world. Since we are unable to offer it to them, we offer you a great control on the embeds sent by rss feeds. The first command allows you to enable the use of embed instead of classic text, the second one allows you to choose a title, a color and a custom footer.
 

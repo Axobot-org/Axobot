@@ -9,7 +9,7 @@
             "smooth": "smooth",
             "careful": "careful",
             "high": "high",
-            "(╯°□°）╯︵ ┻━┻": "extreme"
+            "extreme": "extreme"
         },
         "language": {
             "fr": "French",
@@ -21,7 +21,8 @@
         },
         "levelup_channel": {
             "none": "no message",
-            "any": "any channel"
+            "any": "any channel",
+            "dm": "private message"
         },
         "ttt_display": {
             "disabled": "disabled",
@@ -94,12 +95,13 @@
         "levelup_channel": {
             "any": "Levelup messages will now be posted directly in the chat",
             "channel": "Levelup messages will now be sent to %{val}",
-            "none": "Levelup messages won't be sent anymore"
+            "none": "Levelup messages won't be sent anymore",
+            "dm": "Levelup messages will be sent in users' Direct Messages"
         }
     },
     "server_desc": {
         "anti_caps_lock": "Should I send a message when a member sends too many capital letters? %{value}",
-        "anti_raid": "Level of anti-raid protection: %{value} \n*([Documentation](https://zbot.rtfd.io/en/latest/moderator.html#anti-raid))*",
+        "anti_raid": "Level of anti-raid protection: %{value} \n*([Documentation](https://axobot.rtfd.io/en/latest/moderator.html#anti-raid))*",
         "anti_scam": "Should I check for malicious messages and delete them? %{value}",
         "autoremove_xp": "Experience points removed daily from inactive members: %{value}",
         "ban_allowed_roles": "List of roles that can use the command \"ban\": %{value}",

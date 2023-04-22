@@ -8,6 +8,8 @@ import time
 from typing import Callable, Literal, Optional, Union
 
 import discord
+from cachingutils import acached
+from discord import app_commands
 import twitter
 from aiohttp import ClientSession, client_exceptions
 from discord.ext import commands, tasks
@@ -81,24 +83,65 @@ class Rss(commands.Cog):
         self.loop_child.cancel() # pylint: disable=no-member
 
 
-    @commands.group(name="rss")
-    @commands.cooldown(2,15,commands.BucketType.channel)
+    @commands.hybrid_group(name="rss")
+    @app_commands.default_permissions(manage_guild=True)
+    @commands.cooldown(2, 15, commands.BucketType.channel)
     async def rss_main(self, ctx: MyContext):
-        """See the last post of a rss feed
+        """Search for recent posts, or manage your server RSS feeds
 
         ..Doc rss.html#rss"""
         if ctx.subcommand_passed is None:
             await ctx.send_help(ctx.command)
 
-    @rss_main.command(name="youtube",aliases=['yt'])
-    async def request_yt(self, ctx: MyContext, *, channel):
-        """The last video of a YouTube channel
+    @rss_main.command(name="last-post")
+    @app_commands.describe(url="The URL of the feed to search the last post for", feed_type="The type of the feed")
+    @app_commands.rename(feed_type="type")
+    async def rss_last_post(self, ctx: MyContext, url: str,
+                            feed_type: Optional[Literal["youtube", "twitter", "twitch", "deviantart", "web"]]):
+        """Search the last post of a feed
 
-        ..Example rss youtube UCZ5XnGb-3t7jCkXdawN2tkA
+        ..Example rss last-post https://www.youtube.com/channel/UCZ5XnGb-3t7jCkXdawN2tkA
 
-        ..Example rss youtube https://www.youtube.com/channel/UCZ5XnGb-3t7jCkXdawN2tkA
+        ..Example rss last-post aureliensama twitter
+
+        ..Example rss last-post https://www.twitch.tv/aureliensama twitch
+
+        ..Example rss last-post https://fr-minecraft.net/rss.php web
 
         ..Doc rss.html#see-the-last-post"""
+        await ctx.defer()
+        if feed_type is None:
+            feed_type = await self.get_feed_type_from_url(url)
+        if feed_type == "youtube":
+            await self.last_post_youtube(ctx, url)
+        elif feed_type == "twitter":
+            await self.last_post_twitter(ctx, url)
+        elif feed_type == "twitch":
+            await self.last_post_twitch(ctx, url)
+        elif feed_type == "deviantart":
+            await self.request_deviant(ctx, url)
+        elif feed_type == "web":
+            await self.request_web(ctx, url)
+        else:
+            await ctx.send(await self.bot._(ctx.channel, "rss.invalid-flow"))
+
+    async def get_feed_type_from_url(self, url: str):
+        "Get the type of a feed from its URL"
+        if self.youtube_rss.is_youtube_url(url):
+            return "youtube"
+        if self.twitter_rss.is_twitter_url(url):
+            return "twitter"
+        if re.match(r'^https://(www\.)?twitch\.tv/\w+', url):
+            return "twitch"
+        if re.match(r'^https://(www\.)?deviantart\.com/w+', url):
+            return "deviantart"
+        if re.match(r'^https://', url):
+            return "web"
+        return None
+
+
+    async def last_post_youtube(self, ctx: MyContext, channel: str):
+        "Search for the last video of a youtube channel"
         if self.youtube_rss.is_youtube_url(channel):
             # apparently it's a youtube.com link
             channel = await self.youtube_rss.get_channel_by_any_url(channel)
@@ -120,15 +163,8 @@ class Rss(commands.Cog):
             else:
                 await ctx.send(obj)
 
-    @rss_main.command(name="twitch",aliases=['tv'])
-    async def request_twitch(self, ctx: MyContext, channel):
-        """The last video of a Twitch channel
-
-        ..Example rss twitch aureliensama
-
-        ..Example rss tv https://www.twitch.tv/aureliensama
-
-        ..Doc rss.html#see-the-last-post"""
+    async def last_post_twitch(self, ctx: MyContext, channel: str):
+        "Search for the last video of a twitch channel"
         if re.match(r'^https://(www\.)?twitch\.tv/\w+', channel):
             channel = await self.parse_twitch_url(channel)
             if channel is None:
@@ -145,16 +181,9 @@ class Rss(commands.Cog):
             else:
                 await ctx.send(obj)
 
-    @rss_main.command(name='twitter',aliases=['tw'])
-    async def request_tw(self, ctx: MyContext, name):
-        """The last tweet of a Twitter account
-
-        ..Example rss twitter https://twitter.com/z_runnerr
-
-        ..Example rss tw z_runnerr
-
-        ..Doc rss.html#see-the-last-post"""
-        if re.match(r'https://(?:www\.)?twitter\.com/', name):
+    async def last_post_twitter(self, ctx: MyContext, name: str):
+        "Search for the last tweet of a twitter user"
+        if self.twitter_rss.is_twitter_url(name):
             name = await self.twitter_rss.get_userid_from_url(name)
         try:
             text = await self.twitter_rss.get_feed(ctx.channel, name)
@@ -173,13 +202,23 @@ class Rss(commands.Cog):
                 else:
                     await ctx.send(obj)
 
-    @rss_main.command(name="web")
-    async def request_web(self, ctx: MyContext, link):
-        """The last post on any other rss feed
+    async def request_deviant(self, ctx: MyContext, user: str):
+        "Search for the last post of a deviantart user"
+        if re.match(r'https://(?:www\.)deviantart.com/', user):
+            user = await self.parse_deviant_url(user)
+        text = await self.rss_deviant(ctx.guild,user)
+        if isinstance(text, str):
+            await ctx.send(text)
+        else:
+            form = await self.bot._(ctx.channel, "rss.deviant-form-last")
+            obj = await text[0].create_msg(form)
+            if isinstance(obj,discord.Embed):
+                await ctx.send(embed=obj)
+            else:
+                await ctx.send(obj)
 
-        ..Example rss web https://fr-minecraft.net/rss.php
-
-        ..Doc rss.html#see-the-last-post"""
+    async def request_web(self, ctx: MyContext, link: str):
+        "Search for the last post of a web feed"
         link = web_link.get(link, link)
         try:
             text = await self.rss_web(ctx.channel,link)
@@ -190,26 +229,6 @@ class Rss(commands.Cog):
             await ctx.send(text)
         else:
             form = await self.bot._(ctx.channel, "rss.web-form-last")
-            obj = await text[0].create_msg(form)
-            if isinstance(obj,discord.Embed):
-                await ctx.send(embed=obj)
-            else:
-                await ctx.send(obj)
-
-    @rss_main.command(name="deviantart",aliases=['deviant'])
-    async def request_deviant(self, ctx: MyContext, user):
-        """The last pictures of a DeviantArt user
-
-        ..Example rss deviant https://www.deviantart.com/adri526
-
-        ..Doc rss.html#see-the-last-post"""
-        if re.match(r'https://(?:www\.)deviantart.com/', user):
-            user = await self.parse_deviant_url(user)
-        text = await self.rss_deviant(ctx.guild,user)
-        if isinstance(text, str):
-            await ctx.send(text)
-        else:
-            form = await self.bot._(ctx.channel, "rss.deviant-form-last")
             obj = await text[0].create_msg(form)
             if isinstance(obj,discord.Embed):
                 await ctx.send(embed=obj)
@@ -228,7 +247,7 @@ class Rss(commands.Cog):
     @commands.check(can_use_rss)
     @commands.check(checks.database_connected)
     async def system_add(self, ctx: MyContext, link: str):
-        """Subscribe to a rss feed, displayed on this channel regularly
+        """Subscribe to a rss feed, and automatically send updates in this channel
 
         ..Example rss add https://www.deviantart.com/adri526
 
@@ -284,14 +303,15 @@ class Rss(commands.Cog):
     @commands.guild_only()
     @commands.check(checks.database_connected)
     @commands.check(can_use_rss)
-    async def systeme_rm(self, ctx: MyContext, feed_id:int=None):
-        """Delete an rss feed from the list
+    async def systeme_rm(self, ctx: MyContext, feed: Optional[str]=None):
+        """Unsubscribe from a RSS feed
 
         ..Example rss remove
 
         ..Doc rss.html#delete-a-followed-feed"""
+        input_feed_id = int(feed) if feed is not None and feed.isnumeric() else None
         feed_ids = await self.ask_rss_id(
-            feed_id,
+            input_feed_id,
             ctx,
             await self.bot._(ctx.guild.id, "rss.choose-delete"),
             max_count=None
@@ -304,19 +324,27 @@ class Rss(commands.Cog):
         self.bot.log.info(f"RSS feed deleted into server {ctx.guild.id} ({ids})")
         await self.send_log(f"Feed deleted into server {ctx.guild.id} ({ids})", ctx.guild)
 
+    @systeme_rm.autocomplete("feed")
+    async def systeme_rm_autocomplete(self, interaction: discord.Interaction, current: str):
+        try:
+            return await self.get_feeds_choice(interaction.guild.id, current.lower())
+        except Exception as err:
+            self.bot.dispatch("interaction_error", interaction, err)
+
     @rss_main.command(name="enable")
     @commands.guild_only()
     @commands.check(checks.database_connected)
     @commands.check(can_use_rss)
-    async def feed_enable(self, ctx: MyContext, feed_id:int=None):
+    async def feed_enable(self, ctx: MyContext, feed: Optional[str]=None):
         """Re-enable a disabled feed
 
         ..Example rss enable
 
         ..Doc rss.html#enable-or-disable-a-feed
         """
+        input_feed_id = int(feed) if feed is not None and feed.isnumeric() else None
         feed_ids = await self.ask_rss_id(
-            feed_id,
+            input_feed_id,
             ctx,
             await self.bot._(ctx.guild.id, "rss.choose-enable"),
             feed_filter=lambda f: not f.enabled,
@@ -330,19 +358,31 @@ class Rss(commands.Cog):
         self.bot.log.info(f"RSS feed enabled into server {ctx.guild.id} ({ids})")
         await self.send_log(f"Feed enabled into server {ctx.guild.id} ({ids})", ctx.guild)
 
+    @feed_enable.autocomplete("feed")
+    async def feed_enable_autocomplete(self, interaction: discord.Interaction, current: str):
+        try:
+            return await self.get_feeds_choice(
+                interaction.guild.id,
+                current.lower(),
+                feed_filter=lambda f: not f.enabled,
+                )
+        except Exception as err:
+            self.bot.dispatch("interaction_error", interaction, err)
+
     @rss_main.command(name="disable")
     @commands.guild_only()
     @commands.check(checks.database_connected)
     @commands.check(can_use_rss)
-    async def feed_disable(self, ctx: MyContext, feed_id:int=None):
+    async def feed_disable(self, ctx: MyContext, feed: Optional[str]=None):
         """Disable a RSS feed
 
         ..Example rss disable
 
         ..Doc rss.html#enable-or-disable-a-feed
         """
+        input_feed_id = int(feed) if feed is not None and feed.isnumeric() else None
         feed_ids = await self.ask_rss_id(
-            feed_id,
+            input_feed_id,
             ctx,
             await self.bot._(ctx.guild.id, "rss.choose-disable"),
             feed_filter=lambda f: f.enabled,
@@ -356,12 +396,23 @@ class Rss(commands.Cog):
         self.bot.log.info(f"RSS feed disabled into server {ctx.guild.id} ({ids})")
         await self.send_log(f"Feed disabled into server {ctx.guild.id} ({ids})", ctx.guild)
 
+    @feed_disable.autocomplete("feed")
+    async def feed_disable_autocomplete(self, interaction: discord.Interaction, current: str):
+        try:
+            return await self.get_feeds_choice(
+                interaction.guild.id,
+                current.lower(),
+                feed_filter=lambda f: f.enabled,
+                )
+        except Exception as err:
+            self.bot.dispatch("interaction_error", interaction, err)
+
     @rss_main.command(name="list")
     @commands.guild_only()
     @commands.check(checks.database_connected)
     @commands.check(can_use_rss)
     async def list_feeds(self, ctx: MyContext):
-        """Get a list of every rss/Minecraft feed
+        """Get a list of every subscribed RSS/Minecraft feed
 
         ..Doc rss.html#see-every-feed"""
         feeds_list = await self.db_get_guild_feeds(ctx.guild.id)
@@ -402,6 +453,8 @@ class Rss(commands.Cog):
                             else:
                                 roles.append(item)
                         roles = ", ".join(roles)
+                        if feed.silent_mention:
+                            roles += " <:silent:1093658138567245925>"
                     # feed name
                     feed_name: str = feed.link
                     if feed.type == 'tw' and feed.link.isnumeric():
@@ -450,11 +503,22 @@ class Rss(commands.Cog):
         _quit = await self.bot._(ctx.guild, "misc.quit")
         view = FeedsPaginator(self.bot, ctx.author, stop_label=_quit.capitalize())
         msg = await view.send_init(ctx)
-        if msg:
-            if await view.wait():
-                # only manually disable if it was a timeout (ie. not a user stop)
-                await view.disable(msg)
+        if msg and await view.wait():
+            # only manually disable if it was a timeout (ie. not a user stop)
+            await view.disable(msg)
 
+    async def _get_feed_name(self, feed: FeedObject) -> str:
+        name = feed.link
+        if feed.type == 'tw' and feed.link.isnumeric():
+            if user := await self.twitter_rss.get_user_from_id(int(feed.link)):
+                name = user.screen_name
+        elif feed.type == 'yt' and (channel_name := self.youtube_rss.get_channel_name_by_id(feed.link)):
+            name = channel_name
+        elif feed.type == 'mc' and feed.link.endswith(':'):
+            name = name[:-1]
+        if len(name) > 90:
+            name = name[:89] + '…'
+        return name
 
     async def transform_feeds_to_options(self, feeds: list[FeedObject], guild: discord.Guild) -> list[discord.SelectOption]:
         "Transform a list of FeedObject into a list usable by a discord Select"
@@ -474,14 +538,7 @@ class Rss(commands.Cog):
             else:
                 tr_channel = "#deleted"
             # better name format (for Twitter/YouTube ID)
-            name = feed.link
-            if feed.type == 'tw' and feed.link.isnumeric():
-                if user := await self.twitter_rss.get_user_from_id(int(feed.link)):
-                    name = user.screen_name
-            elif feed.type == 'yt' and (channel_name := self.youtube_rss.get_channel_name_by_id(feed.link)):
-                name = channel_name
-            if len(name) > 90:
-                name = name[:89] + '…'
+            name = await self._get_feed_name(feed)
             # emoji
             emoji = feed.get_emoji(self.bot.emojis_manager)
             options.append(discord.SelectOption(
@@ -491,6 +548,30 @@ class Rss(commands.Cog):
                 emoji=emoji
                 ))
         return options
+
+    @acached(timeout=30)
+    async def _get_feeds_for_choice(self, guild_id: int, feed_filter: Callable[[FeedObject], bool]=None):
+        guild_feeds = await self.db_get_guild_feeds(guild_id)
+        if feed_filter:
+            return [feed for feed in guild_feeds if feed_filter(feed)]
+        return guild_feeds
+
+    @acached(timeout=30)
+    async def get_feeds_choice(self, guild_id: int, current: str, feed_filter: Callable[[FeedObject], bool]=None) -> list[app_commands.Choice[str]]:
+        feeds: list[FeedObject] = await self._get_feeds_for_choice(guild_id, feed_filter)
+        if len(feeds) == 0:
+            return []
+        choices: list[tuple[bool, int, app_commands.Choice]] = []
+        for feed in feeds:
+            # formatted feed type name
+            feed_type = await self.bot._(guild_id, "rss."+feed.type)
+            # better name format (for Twitter/YouTube ID)
+            name = await self._get_feed_name(feed)
+            if current not in name.lower() and current not in feed.link.lower() and current not in str(feed.feed_id):
+                continue
+            choice = app_commands.Choice(name=f"<{feed_type}> {name}", value=str(feed.feed_id))
+            choices.append((current not in name, name, choice))
+        return [choice for _, _, choice in sorted(choices, key=lambda x: x[0:2])]
 
     async def ask_rss_id(self, input_id: Optional[int], ctx: MyContext, title: str,
                          feed_filter: Callable[[FeedObject], bool]=None, max_count: Optional[int]=1) -> Optional[list[int]]:
@@ -541,7 +622,7 @@ class Rss(commands.Cog):
         return selection
 
     def parse_output(self, arg: str) -> list[str]:
-        r = re.findall(r'((?<![\\])[\"])((?:.(?!(?<![\\])\1))*.?)\1', arg)
+        r = re.findall(r'((?<!\\)\")((?:.(?!(?<!\\)\1))*.?)\1', arg)
         if len(r) > 0:
             flatten = lambda l: [item for sublist in l for item in sublist]
             params = [[x for x in group if x != '"'] for group in r]
@@ -549,25 +630,27 @@ class Rss(commands.Cog):
         else:
             return arg.split(" ")
 
-    @rss_main.command(name="mentions", aliases=['roles', 'mention'])
+    @rss_main.command(name="set-mentions", aliases=['set-mention'])
     @commands.guild_only()
     @commands.check(can_use_rss)
     @commands.check(checks.database_connected)
-    async def roles_feeds(self, ctx: MyContext, ID:int=None, *, mentions: Optional[str]):
+    async def roles_feeds(self, ctx: MyContext, feed: Optional[str]=None, silent: Optional[bool]=None, *, mentions: Optional[str]):
         """Configures a role to be notified when a news is posted
+        The "silent" parameter (Yes/No) allows you to send new feeds as silent messages, which won't send push notifications to your users.
         If you want to use the @everyone role, please put the server ID instead of the role name.
 
         ..Example rss mentions
 
-        ..Example rss mentions 6678466620137
+        ..Example rss mentions 6678466620137 True
 
         ..Example rss mentions 6678466620137 "Announcements" "Twitch subs"
 
         ..Doc rss.html#mention-a-role"""
+        input_feed_id = int(feed) if feed is not None and feed.isnumeric() else None
         try:
             # ask for feed IDs
             feeds_ids = await self.ask_rss_id(
-                ID,
+                input_feed_id,
                 ctx,
                 await self.bot._(ctx.guild.id, "rss.choose-mentions-1"),
                 feed_filter=lambda f: f.type != "mc",
@@ -656,19 +739,40 @@ class Rss(commands.Cog):
         try:
             if roles_ids is None:
                 for feed in feeds:
+                    values = []
                     if len(feed.role_ids) > 0:
-                        await self.db_update_feed(feed.feed_id, values=[('roles', '')])
+                        values.append(('roles', ''))
+                    if silent is not None and feed.silent_mention != silent:
+                        values.append(('silent_mention', silent))
+                    if len(values) > 0:
+                        await self.db_update_feed(feed.feed_id, values=values)
                 await ctx.send(await self.bot._(ctx.guild.id, "rss.roles.edit-success", count=0))
             else:
                 for feed in feeds:
+                    values = []
                     if feed.role_ids != roles_ids:
-                        await self.db_update_feed(feed.feed_id, values=[('roles', ';'.join(roles_ids))])
+                        values.append(('roles', ';'.join(roles_ids)))
+                    if silent is not None and feed.silent_mention != silent:
+                        values.append(('silent_mention', silent))
+                    if len(values) > 0:
+                        await self.db_update_feed(feed.feed_id, values=values)
                 await ctx.send(await self.bot._(ctx.guild.id, "rss.roles.edit-success", count=len(names), roles=", ".join(names)))
         except Exception as err:
             cmd = await self.bot.get_command_mention("about")
             await ctx.send(await self.bot._(ctx.guild, "errors.unknown2", about=cmd))
             self.bot.dispatch("error", err, ctx)
             return
+
+    @roles_feeds.autocomplete("feed")
+    async def roles_feeds_autocomplete(self, interaction: discord.Interaction, current: str):
+        try:
+            return await self.get_feeds_choice(
+                interaction.guild.id,
+                current.lower(),
+                feed_filter=lambda f: f.type != "mc",
+                )
+        except Exception as err:
+            self.bot.dispatch("interaction_error", interaction, err)
 
 
     @rss_main.command(name="reload")
@@ -698,7 +802,7 @@ class Rss(commands.Cog):
     @commands.guild_only()
     @commands.check(can_use_rss)
     @commands.check(checks.database_connected)
-    async def move_guild_feed(self, ctx: MyContext, feed_id: Optional[int]=None, channel: Optional[discord.TextChannel]=None):
+    async def move_guild_feed(self, ctx: MyContext, feed: Optional[str]=None, channel: Optional[discord.TextChannel]=None):
         """Move a rss feed in another channel
 
         ..Example rss move
@@ -710,12 +814,13 @@ class Rss(commands.Cog):
         ..Example rss move 3078731683662 #cool-channels
 
         ..Doc rss.html#move-a-feed"""
-        try:
-            if channel is None:
+        input_feed_id = int(feed) if feed is not None and feed.isnumeric() else None
+        if channel is None:
                 channel = ctx.channel
+        try:
             try:
                 feeds_ids = await self.ask_rss_id(
-                    feed_id,
+                    input_feed_id,
                     ctx,
                     await self.bot._(ctx.guild.id, "rss.choose-mentions-1"),
                     feed_filter=lambda f: f.channel_id != channel.id,
@@ -738,11 +843,21 @@ class Rss(commands.Cog):
         except Exception as err:
             await ctx.send(await self.bot._(ctx.guild.id,"rss.guild-error", err=err))
 
-    @rss_main.command(name="text")
+    @move_guild_feed.autocomplete("feed")
+    async def move_guild_feed_autocomplete(self, interaction: discord.Interaction, current: str):
+        try:
+            return await self.get_feeds_choice(
+                interaction.guild.id,
+                current.lower(),
+                )
+        except Exception as err:
+            self.bot.dispatch("interaction_error", interaction, err)
+
+    @rss_main.command(name="set-text")
     @commands.guild_only()
     @commands.check(can_use_rss)
     @commands.check(checks.database_connected)
-    async def change_text_feed(self, ctx: MyContext, ID: Optional[int]=None, *, text=None):
+    async def change_text_feed(self, ctx: MyContext, feed: Optional[str]=None, *, text=None):
         """Change the text of an rss feed
 
         Available variables:
@@ -761,10 +876,11 @@ class Rss(commands.Cog):
         ..Example rss text
 
         ..Doc rss.html#change-the-text"""
+        input_feed_id = int(feed) if feed is not None and feed.isnumeric() else None
         try:
             # ask for feed IDs
             feeds_ids = await self.ask_rss_id(
-                ID,
+                input_feed_id,
                 ctx,
                 await self.bot._(ctx.guild.id, "rss.choose-mentions-1"),
                 feed_filter=lambda f: f.type != "mc",
@@ -801,11 +917,22 @@ class Rss(commands.Cog):
         else:
             await ctx.send(await self.bot._(ctx.guild.id,"rss.text-success.multiple", text=text))
 
-    @rss_main.command(name="use_embed",aliases=['embed'])
+    @change_text_feed.autocomplete("feed")
+    async def change_text_feed_autocomplete(self, interaction: discord.Interaction, current: str):
+        try:
+            return await self.get_feeds_choice(
+                interaction.guild.id,
+                current.lower(),
+                feed_filter=lambda f: f.type != "mc",
+                )
+        except Exception as err:
+            self.bot.dispatch("interaction_error", interaction, err)
+
+    @rss_main.command(name="set-embed", aliases=['embed'])
     @commands.guild_only()
     @commands.check(can_use_rss)
     @commands.check(checks.database_connected)
-    async def change_use_embed(self, ctx: MyContext, feed_id: Optional[int] = None, value: bool = None, *, arguments: args.arguments = None):
+    async def change_use_embed(self, ctx: MyContext, feed: Optional[str] = None, value: bool = None, *, arguments: args.arguments = None):
         """Use an embed or not for a feed
         You can also provide arguments to change the color/text of the embed. Followed arguments are usable:
         - color: color of the embed (hex or decimal value)
@@ -815,11 +942,12 @@ class Rss(commands.Cog):
         ..Example rss embed 6678466620137 true title="hey u" footer = "Hi \\n i'm a footer"
 
         ..Doc rss.html#setup-a-feed-embed"""
+        input_feed_id = int(feed) if feed is not None and feed.isnumeric() else None
         try:
             err = None
             try:
                 feeds_ids = await self.ask_rss_id(
-                    feed_id,
+                    input_feed_id,
                     ctx,
                     await self.bot._(ctx.guild.id, "rss.choose-mentions-1"),
                     feed_filter=lambda f: f.type != "mc",
@@ -876,7 +1004,18 @@ class Rss(commands.Cog):
             await ctx.send(await self.bot._(ctx.guild.id, "rss.guild-error", err=err))
             self.bot.dispatch("error", err, ctx)
 
-    @rss_main.command(name="test")
+    @change_use_embed.autocomplete("feed")
+    async def change_use_embed_autocomplete(self, interaction: discord.Interaction, current: str):
+        try:
+            return await self.get_feeds_choice(
+                interaction.guild.id,
+                current.lower(),
+                feed_filter=lambda f: f.type != "mc"
+                )
+        except Exception as err:
+            self.bot.dispatch("interaction_error", interaction, err)
+
+    @rss_main.command(name="test", with_app_command=False)
     @commands.check(checks.is_support_staff)
     async def test_rss(self, ctx: MyContext, url, *, args=None):
         """Test if an rss feed is usable"""
@@ -1033,8 +1172,7 @@ class Rss(commands.Cog):
             return liste
 
     async def rss_web(self, channel: discord.TextChannel, url: str, date: datetime.datetime=None, session: ClientSession=None):
-        if url == 'help':
-            return await self.bot._(channel, "rss.web-help")
+        "Get the last rss feed from a given url"
         feeds = await feed_parse(self.bot, url, 9, session)
         if feeds is None:
             return await self.bot._(channel, "rss.research-timeout")
@@ -1134,8 +1272,8 @@ class Rss(commands.Cog):
                         channel=feeds.feed['title'] if 'title' in feeds.feed.keys() else '?',
                         image=img)
                     liste.append(obj)
-                except:
-                    pass
+                except Exception as err:
+                    self.bot.dispatch("error", err)
             liste.reverse()
             return liste
 
@@ -1281,7 +1419,7 @@ class Rss(commands.Cog):
     async def db_increment_errors(self, working_ids: list[int], broken_ids: list[int]) -> int:
         "Increments recent_errors value by 1 for each of these IDs, and set it to 0 for the others"
         if self.bot.zombie_mode:
-            return
+            return 0
         if working_ids:
             working_ids_list = ', '.join(map(str, working_ids))
             query = f"UPDATE `{self.table}` SET `recent_errors` = 0 WHERE `ID` IN ({working_ids_list})"
@@ -1322,17 +1460,16 @@ class Rss(commands.Cog):
         for item in roles:
             if item == '':
                 continue
-            role = discord.utils.get(channel.guild.roles,id=int(item))
-            if role is not None:
+            if role := channel.guild.get_role(int(item)):
                 mentions.append(role)
         if self.bot.zombie_mode:
             return
         allowed_mentions = discord.AllowedMentions(everyone=False, roles=True)
         try:
             if isinstance(t, discord.Embed):
-                await channel.send(" ".join(obj.mentions), embed=t, allowed_mentions=allowed_mentions)
+                await channel.send(" ".join(obj.mentions), embed=t, allowed_mentions=allowed_mentions, silent=obj.feed.silent_mention)
             else:
-                await channel.send(t, allowed_mentions=allowed_mentions)
+                await channel.send(t, allowed_mentions=allowed_mentions, silent=obj.feed.silent_mention)
             if send_stats:
                 if statscog := self.bot.get_cog("BotStats"):
                     statscog.rss_stats['messages'] += 1
@@ -1435,10 +1572,6 @@ class Rss(commands.Cog):
         success_ids: list[int] = []
         errors_ids: list[int] = []
         checked_count = 0
-        if guild_id is None:
-            if statscog := self.bot.get_cog("BotStats"):
-                statscog.rss_stats['messages'] = 0
-                statscog.rss_stats['warnings'] = 0
         session = ClientSession()
         for feed in feeds_list:
             if not feed.enabled:
@@ -1462,13 +1595,16 @@ class Rss(commands.Cog):
             await asyncio.sleep(self.time_between_feeds_check)
         await session.close()
         self.bot.get_cog('Minecraft').feeds.clear()
-        desc = [f"**RSS loop done** in {time.time()-start:.0f}s ({len(success_ids)}/{checked_count} feeds)"]
+        elapsed_time = round(time.time() - start)
+        desc = [f"**RSS loop done** in {elapsed_time}s ({len(success_ids)}/{checked_count} feeds)"]
         if guild_id is None:
             if statscog := self.bot.get_cog("BotStats"):
                 statscog.rss_stats["checked"] = checked_count
                 statscog.rss_stats["errors"] = len(errors_ids)
+                statscog.rss_stats["time"] = elapsed_time
+                statscog.rss_loop_finished = True
             # await self.db_set_active_guilds(set(feed.guild_id for feed in feeds_list))
-            await self.db_set_last_refresh(set(feed.feed_id for feed in feeds_list))
+            await self.db_set_last_refresh(list(feed.feed_id for feed in feeds_list))
         if len(errors_ids) > 0:
             desc.append(f"{len(errors_ids)} errors: {' '.join(str(x) for x in errors_ids)}")
             # update errors count in database
@@ -1495,7 +1631,6 @@ class Rss(commands.Cog):
             self.bot.log.warning('Base de donnée hors ligne - check rss annulé')
             return
         self.bot.log.info(" Boucle rss commencée !")
-        start_time = time.time()
         try:
             await self.main_loop()
         except Exception as err:

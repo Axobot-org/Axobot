@@ -27,6 +27,7 @@ Every information come from the website www.fr-minecraft.net"""
         self.bot = bot
         self.feeds = {}
         self.file = "minecraft"
+        self.embed_color = 0x16BD06
         self.uuid_cache: dict[str, str] = {}
 
     @commands.command(name="mojang", aliases=['mojang_status'], enabled=False)
@@ -132,7 +133,7 @@ Every information come from the website www.fr-minecraft.net"""
             await ctx.send(await self.bot._(ctx.channel, "minecraft.no-block"))
             return
         title = "{} - {}".format((await self.bot._(ctx.channel, "minecraft.names"))[0], block.name)
-        embed = discord.Embed(title=title, color=discord.Colour(int('16BD06', 16)), url=block.url,
+        embed = discord.Embed(title=title, color=self.embed_color, url=block.url,
             timestamp=ctx.message.created_at, description=await self.bot._(ctx.channel, "minecraft.contact-mail"))
         if block.image:
             embed.set_thumbnail(url=block.image.replace(" ", "%20"))
@@ -167,7 +168,7 @@ Every information come from the website www.fr-minecraft.net"""
             await ctx.send(await self.bot._(ctx.channel, "minecraft.no-entity"))
             return
         title = "{} - {}".format((await self.bot._(ctx.channel, "minecraft.names"))[1], entity.name)
-        embed = discord.Embed(title=title, color=int('16BD06', 16), url=entity.url, timestamp=ctx.message.created_at, description=await self.bot._(ctx.channel, "minecraft.contact-mail"))
+        embed = discord.Embed(title=title, color=self.embed_color, url=entity.url, timestamp=ctx.message.created_at, description=await self.bot._(ctx.channel, "minecraft.contact-mail"))
         if entity.image:
             embed.set_thumbnail(url=entity.image)
         embed.set_footer(text=ctx.author, icon_url=ctx.author.display_avatar)
@@ -203,7 +204,7 @@ Every information come from the website www.fr-minecraft.net"""
             await ctx.send(await self.bot._(ctx.channel, "minecraft.no-item"))
             return
         title = "{} - {}".format((await self.bot._(ctx.channel, "minecraft.names"))[2], item.name)
-        embed = discord.Embed(title=title, color=int('16BD06', 16), url=item.url, timestamp=ctx.message.created_at, description=await self.bot._(ctx.channel, "minecraft.contact-mail"))
+        embed = discord.Embed(title=title, color=self.embed_color, url=item.url, timestamp=ctx.message.created_at, description=await self.bot._(ctx.channel, "minecraft.contact-mail"))
         if item.image is not None:
             embed.set_thumbnail(url=item.image)
         embed.set_footer(text=ctx.author, icon_url=ctx.author.display_avatar)
@@ -237,7 +238,7 @@ Every information come from the website www.fr-minecraft.net"""
             await ctx.send(await self.bot._(ctx.channel, "minecraft.no-cmd"))
             return
         title = "{} - {}".format((await self.bot._(ctx.channel, "minecraft.names"))[3], cmd.name)
-        embed = discord.Embed(title=title, color=int('16BD06', 16), url=cmd.url, timestamp=ctx.message.created_at, description=await self.bot._(ctx.channel, "minecraft.contact-mail"))
+        embed = discord.Embed(title=title, color=self.embed_color, url=cmd.url, timestamp=ctx.message.created_at, description=await self.bot._(ctx.channel, "minecraft.contact-mail"))
         embed.set_footer(text=ctx.author, icon_url=ctx.author.display_avatar)
         l = (cmd.name, " ".join(cmd.syntax), cmd.examples, cmd.version)
         for e, v in enumerate(await self.bot._(ctx.channel, "minecraft.cmd-fields")):
@@ -278,7 +279,7 @@ Every information come from the website www.fr-minecraft.net"""
             await ctx.send(await self.bot._(ctx.channel, "minecraft.no-adv"))
             return
         title = "{} - {}".format((await self.bot._(ctx.channel, "minecraft.names"))[4], adv.name)
-        embed = discord.Embed(title=title, color=int('16BD06', 16), url=adv.url, timestamp=ctx.message.created_at, description=await self.bot._(ctx.channel, "minecraft.contact-mail"))
+        embed = discord.Embed(title=title, color=self.embed_color, url=adv.url, timestamp=ctx.message.created_at, description=await self.bot._(ctx.channel, "minecraft.contact-mail"))
         embed.set_footer(text=ctx.author, icon_url=ctx.author.display_avatar)
         if adv.image is not None:
             embed.set_thumbnail(url=adv.image)
@@ -348,7 +349,8 @@ Every information come from the website www.fr-minecraft.net"""
         }
         title = "{} - {}".format((await self.bot._(ctx.channel, "minecraft.names"))[5], search['name'])
         embed = discord.Embed(
-            title=title, color=int('16BD06', 16),
+            title=title,
+            color=self.embed_color,
             url=search["links"]['websiteUrl'],
             timestamp=ctx.message.created_at)
         embed.set_footer(text=ctx.author, icon_url=ctx.author.display_avatar)
@@ -383,7 +385,7 @@ Every information come from the website www.fr-minecraft.net"""
         title = await self.bot._(ctx.channel, "minecraft.player-skin-title", player=username)
         download = await self.bot._(ctx.channel, "minecraft.player-skin-download")
         emb = discord.Embed(
-            title=title, description=f"[{download}](https://crafatar.com/skins/{uuid})")
+            title=title, color=self.embed_color, description=f"[{download}](https://crafatar.com/skins/{uuid})")
         emb.set_image(url=f"https://crafatar.com/renders/body/{uuid}?overlay")
         await self.send_embed(ctx, emb)
 

@@ -255,7 +255,7 @@ class Utilities(commands.Cog):
         votes = list()
         async with aiohttp.ClientSession() as session:
             try:  # https://top.gg/bot/486896267788812288
-                async with session.get(f'https://top.gg/api/bots/486896267788812288/check?userId={userid}', headers={'Authorization': str(self.bot.dbl_token)}) as r:
+                async with session.get(f'https://top.gg/api/bots/{self.bot.user.id}/check?userId={userid}', headers={'Authorization': str(self.bot.dbl_token)}) as r:
                     json = await r.json()
                     if json["error"]:
                         raise ValueError("Error while checking votes on top.gg: "+json["error"])

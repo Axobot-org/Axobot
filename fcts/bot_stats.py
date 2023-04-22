@@ -1,8 +1,8 @@
 import math
 import re
-import typing
 from collections import defaultdict
 from datetime import datetime
+from typing import Optional, Union, TypedDict
 
 import aiohttp
 import discord
@@ -27,6 +27,15 @@ async def get_ram_data():
     data = psutil.virtual_memory()
     return data.percent, (data.total - data.available)
 
+class RssStats(TypedDict):
+    "RSS-loop-related stats"
+    checked: int
+    messages: int
+    errors: int
+    warnings: int
+    time: int
+
+
 class BotStats(commands.Cog):
     """Hey, I'm a test cog! Happy to meet you :wave:"""
 
@@ -36,7 +45,8 @@ class BotStats(commands.Cog):
         self.received_events = {'CMD_USE': 0}
         self.commands_uses: dict[str, int] = {}
         self.app_commands_uses: dict[str, int] = {}
-        self.rss_stats = {'checked': 0, 'messages': 0, 'errors': 0, 'warnings': 0}
+        self.rss_stats: RssStats = {'checked': 0, 'messages': 0, 'errors': 0, 'warnings': 0, 'time': 0}
+        self.rss_loop_finished = False
         self.xp_cards = {'generated': 0, 'sent': 0}
         self.process = psutil.Process()
         self.bot_cpu_records: list[float] = []
@@ -47,9 +57,10 @@ class BotStats(commands.Cog):
         self.ticket_events = {"creation": 0}
         self.usernames = {"guild": 0, "user": 0, "deleted": 0}
         self.emitted_serverlogs: dict[str, int] = {}
-        self.serverlogs_audit_search: typing.Optional[tuple[int, int]] = None
-        self.last_backup_size: typing.Optional[int] = None
+        self.serverlogs_audit_search: Optional[tuple[int, int]] = None
+        self.last_backup_size: Optional[int] = None
         self.role_reactions = {"added": 0, "removed": 0}
+        self.snooze_events: dict[tuple[int, int], int] = defaultdict(int)
 
     async def cog_load(self):
          # pylint: disable=no-member
@@ -161,6 +172,10 @@ class BotStats(commands.Cog):
         "Called when a serverlog is emitted"
         self.emitted_serverlogs[log_type] = self.emitted_serverlogs.get(log_type, 0) + 1
 
+    @commands.Cog.listener()
+    async def on_reminder_snooze(self, initial_duration: int, snooze_duration: int):
+        "Called when a reminder is snoozed"
+        self.snooze_events[(initial_duration, round(snooze_duration))] += 1
 
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
@@ -313,8 +328,11 @@ class BotStats(commands.Cog):
                 cursor.execute(query, (now, 'app_cmd.'+k, v, 0, 'cmd/min', True, self.bot.entity_id))
             self.app_commands_uses.clear()
             # RSS stats
-            for k, v in self.rss_stats.items():
-                cursor.execute(query, (now, 'rss.'+k, v, 0, k, k == "messages", self.bot.entity_id))
+            if self.rss_loop_finished:
+                for k, v in self.rss_stats.items():
+                    cursor.execute(query, (now, 'rss.'+k, v, 0, k, k == "messages", self.bot.entity_id))
+                    self.rss_stats[k] = 0
+                self.rss_loop_finished = False
             cursor.execute(query, (now, 'rss.disabled', await self.db_get_disabled_rss(), 0, 'disabled', False, self.bot.entity_id))
             # XP cards
             if self.xp_cards["generated"]:
@@ -392,6 +410,10 @@ class BotStats(commands.Cog):
             if self.role_reactions["removed"]:
                 cursor.execute(query, (now, 'role_reactions.removed', self.role_reactions["removed"], 0, 'reactions', True, self.bot.entity_id))
                 self.role_reactions["removed"] = 0
+            # snoozed reminders
+            for (initial_duration, snooze_duration), count in self.snooze_events.items():
+                cursor.execute(query, (now, f'reminders.snoozed.{initial_duration}.{snooze_duration}', count, 0, 'reminders', True, self.bot.entity_id))
+            self.snooze_events.clear()
             # Push everything
             cnx.commit()
         except mysql.connector.errors.IntegrityError as err: # usually duplicate primary key
@@ -408,7 +430,7 @@ class BotStats(commands.Cog):
     async def on_sql_loop_error(self, error: Exception):
         self.bot.dispatch("error", error, "SQL stats loop has stopped <@279568324260528128>")
 
-    async def get_stats(self, variable: str, minutes: int) -> typing.Union[int, float, str, None]:
+    async def get_stats(self, variable: str, minutes: int) -> Union[int, float, str, None]:
         """Get the sum of a certain variable in the last X minutes"""
         cnx = self.bot.cnx_axobot
         cursor = cnx.cursor(dictionary=True)

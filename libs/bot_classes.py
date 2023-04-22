@@ -102,6 +102,7 @@ class Axobot(commands.bot.AutoShardedBot):
         allowed_mentions = discord.AllowedMentions(everyone=False, roles=False)
         # defining intents usage
         intents = discord.Intents.all()
+        intents.presences = False
         intents.typing = False
         intents.webhooks = False
         intents.integrations = False

@@ -9,7 +9,7 @@ from libs.translator import AxobotTranslator
 
 SourceType = Union[None, int, discord.Guild, discord.TextChannel, discord.Thread,
                    discord.Member, discord.User, discord.DMChannel, discord.Interaction,
-                   MyContext]
+                   discord.PartialMessageable, MyContext]
 
 
 class Languages(discord.ext.commands.Cog):
@@ -40,6 +40,11 @@ class Languages(discord.ext.commands.Cog):
 
     async def tr(self, source: SourceType, string_id: str, **kwargs):
         """Renvoie le texte en fonction de la langue"""
+        if isinstance(source, discord.PartialMessageable):
+            if source.guild_id:
+                source = source.guild_id
+            else:
+                source = await self.bot.fetch_channel(source.id)
         if isinstance(source, discord.Guild):
             # get ID from guild
             source = source.id
@@ -92,9 +97,14 @@ class Languages(discord.ext.commands.Cog):
             await self.msg_not_found(string_id, lang_opt)
             if lang_opt == "en":
                 return string_id
-            return await self.get_translation("en", string_id, **kwargs)
+            try: # try again in english
+                return await self.get_translation("en", string_id, **kwargs)
+            except KeyError:
+                await self.msg_not_found(string_id, "en")
+                return string_id
 
     async def get_translation(self, locale: str, string_id: str, **kwargs) -> Union[str, list]:
+        "Get a translation from the i18n files directly"
         if string_id == '_used_locale':
             return locale
         return i18n.t(string_id, locale=locale, **kwargs)

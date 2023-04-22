@@ -27,9 +27,9 @@ class Help(commands.Cog):
     @property
     def doc_url(self):
         return (
-            "https://zbot.readthedocs.io/en/main/",
-            "https://zbot.readthedocs.io/en/develop/",
-            "https://zbot.readthedocs.io/en/latest/",
+            "https://axobot.readthedocs.io/en/main/",
+            "https://axobot.readthedocs.io/en/develop/",
+            "https://axobot.readthedocs.io/en/latest/",
         )[self.bot.entity_id]
 
     async def cog_unload(self):
@@ -56,7 +56,7 @@ class Help(commands.Cog):
         for i, url in enumerate([
             'https://discord.gg/N55zY88',
             bot_invite,
-            'https://zbot.rtfd.io/',
+            'https://axobot.rtfd.io/',
             'https://twitter.com/z_runnerr',
             'https://zrunner.me/zbot-faq',
             'https://zrunner.me/axobot-privacy.pdf'

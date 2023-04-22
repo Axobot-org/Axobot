@@ -179,7 +179,7 @@ class Cases(commands.Cog):
     @case_main.command(name="list")
     @commands.guild_only()
     @commands.cooldown(5, 30, commands.BucketType.user)
-    async def see_case(self, ctx: MyContext, *, user:args.user):
+    async def see_case(self, ctx: MyContext, *, user:args.AnyUser):
         """Get every case of a user
         This user can have left the server
 
@@ -193,7 +193,7 @@ class Cases(commands.Cog):
     @case_main.command(name="glist")
     @commands.guild_only()
     @commands.check(is_support_staff)
-    async def see_case_2(self, ctx: MyContext, guild: Optional[args.Guild], *, user:args.user):
+    async def see_case_2(self, ctx: MyContext, guild: Optional[args.Guild], *, user:args.AnyUser):
         """Get every case of a user on a specific guild or on every guilds
         This user can have left the server
 
