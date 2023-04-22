@@ -1027,7 +1027,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
 
     async def check_suggestion(self, message: discord.Message):
         "Check for any message sent in a poll channel, in order to add proper reactions"
-        if message.guild is None or not self.bot.is_ready() or not self.bot.database_online:
+        if message.guild is None or not self.bot.is_ready() or not self.bot.database_online or message.content.startswith('.'):
             return
         try:
             channels: typing.Optional[list[discord.TextChannel]] = await self.bot.get_config(message.guild.id, "poll_channels")
