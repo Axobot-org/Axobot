@@ -140,9 +140,11 @@ class TaskHandler:
                 imgs = re.findall(r'(https://\S+\.(?:png|jpe?g|webp|gif))', task['message'])
                 if len(imgs) > 0:
                     emb.set_image(url=imgs[0])
-                await channel.send(text, embed=emb, view=view)
+                msg = await channel.send(text, embed=emb, view=view)
+                view.message = msg
             else:
-                await channel.send(text+"\n"+task["message"], view=view)
+                msg = await channel.send(text+"\n"+task["message"], view=view)
+                view.message = msg
         except discord.errors.Forbidden:
             return False
         except Exception as err:  # pylint: disable=broad-except
