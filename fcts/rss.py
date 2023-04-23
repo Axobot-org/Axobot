@@ -145,9 +145,9 @@ class Rss(commands.Cog):
         if self.youtube_rss.is_youtube_url(channel):
             # apparently it's a youtube.com link
             channel = await self.youtube_rss.get_channel_by_any_url(channel)
-        if channel is not None and not await self.youtube_rss.is_valid_channel(channel):
-            # argument is not a channel name or ID, but it may be a custom name
-            channel = self.youtube_rss.get_channel_by_custom_url(channel)
+        else:
+            # get the channel ID from its ID, name or custom URL
+            channel = await self.youtube_rss.get_channel_by_any_term(channel)
         if channel is None:
             # we couldn't get the ID based on user input
             await ctx.send(await self.bot._(ctx.channel, "rss.yt-invalid"))
