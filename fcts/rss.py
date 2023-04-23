@@ -1579,6 +1579,7 @@ class Rss(commands.Cog):
             try:
                 if feed.type == 'tw' and self.twitter_over_capacity:
                     continue
+                start_time = time.time()
                 checked_count += 1
                 if feed.type == 'mc':
                     if await self.bot.get_cog('Minecraft').check_feed(feed, send_stats=(guild_id is None)):
@@ -1592,6 +1593,8 @@ class Rss(commands.Cog):
                         errors_ids.append(feed.feed_id)
             except Exception as err:
                 self.bot.dispatch("error", err, f"RSS feed {feed.feed_id}")
+            end_time = time.time()
+            await self._log_rss_feed_time(feed.feed_id, round(end_time - start_time, 3))
             await asyncio.sleep(self.time_between_feeds_check)
         await session.close()
         self.bot.get_cog('Minecraft').feeds.clear()
@@ -1645,6 +1648,16 @@ class Rss(commands.Cog):
     async def loop_error(self, error: Exception):
         "When the loop fails"
         self.bot.dispatch("error", error, "RSS main loop has stopped <@279568324260528128>")
+
+    async def _log_rss_feed_time(self, feed_id: int, duration: float):
+        "Log the time it took to check a feed"
+        if not self.bot.rss_enabled:
+            return
+        if not self.bot.database_online:
+            return
+        query = "INSERT INTO `rss_feed_time` (`feed_id`, `duration`, `entity_id`) VALUES (%s, %s, %s)"
+        async with self.bot.db_query(query, (feed_id, duration, self.bot.entity_id)):
+            pass
 
 
     @commands.command(name="rss_loop",hidden=True)
