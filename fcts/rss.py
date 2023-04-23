@@ -113,7 +113,7 @@ class Rss(commands.Cog):
         if feed_type is None:
             feed_type = await self.get_feed_type_from_url(url)
         if feed_type == "youtube":
-            await self.last_post_youtube(ctx, url)
+            await self.last_post_youtube(ctx, url.lower())
         elif feed_type == "twitter":
             await self.last_post_twitter(ctx, url)
         elif feed_type == "twitch":
