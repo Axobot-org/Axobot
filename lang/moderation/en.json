@@ -102,6 +102,7 @@
             "one": "-> 1 role revoked out of %{m}",
             "zero": "-> No role could be revoked out of %{m}"
         },
+        "temp-grant-success": "The role %{role} has been granted to %{user} for %{time}!",
         "too-high": "Oops, this role is too high for me to change. Please move my role above the role `%{r}` before trying again :confused:"
     },
     "slowmode": {

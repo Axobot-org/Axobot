@@ -1159,12 +1159,43 @@ The 'show_reasons' parameter is used to display the mute reasons.
         emb.set_footer(text=ctx.author, icon_url=ctx.author.display_avatar)
         await ctx.send(embed=emb)
 
+    @main_role.command(name="temporary-grant")
+    @commands.cooldown(3, 30, commands.BucketType.guild)
+    @commands.guild_only()
+    @commands.check(checks.has_manage_roles)
+    async def roles_temp_grant(self, ctx: MyContext, role: discord.Role, user: discord.Member, time: commands.Greedy[args.Duration]):
+        """Temporary give a role to a member
+
+        ..Example role temporary-grant Slime Theo 1h
+
+        ..Doc moderator.html#role-manager"""
+        duration = sum(time)
+        if duration == 0:
+            raise commands.MissingRequiredArgument(ctx.command.clean_params['time'])
+        if duration > 60*60*24*31: # max 31 days
+            await ctx.send(await self.bot._(ctx.guild.id, "timers.rmd.too-long"))
+            return
+        if not ctx.guild.me.guild_permissions.manage_roles:
+            return await ctx.send(await self.bot._(ctx.guild.id, "moderation.mute.cant-mute"))
+        my_position = ctx.guild.me.roles[-1].position
+        if role.position >= my_position:
+            return await ctx.send(await self.bot._(ctx.guild.id, "moderation.role.give-too-high", r=role.name))
+        if role.position >= ctx.author.roles[-1].position:
+            return await ctx.send(await self.bot._(ctx.guild.id, "moderation.role.give-roles-higher"))
+        await user.add_roles(role, reason=f"Asked by {ctx.author}")
+        await self.bot.task_handler.add_task('role-grant', duration, user.id, ctx.guild.id, data={'role': role.id})
+        f_duration = await FormatUtils.time_delta(duration, lang=await self.bot._(ctx.guild,'_used_locale'), form="short")
+        await ctx.send(
+            await self.bot._(ctx.guild.id, "moderation.role.temp-grant-success", role=role.name, user=user.mention, time=f_duration),
+            allowed_mentions=discord.AllowedMentions.none()
+        )
+
 
     @main_role.command(name="grant", aliases=["add", "give"])
     @commands.cooldown(1, 30, commands.BucketType.guild)
     @commands.guild_only()
     @commands.check(checks.has_manage_roles)
-    async def roles_give(self, ctx:MyContext, role:discord.Role, users:commands.Greedy[Union[discord.Role,discord.Member,Literal['everyone']]]):
+    async def roles_give(self, ctx: MyContext, role: discord.Role, users: commands.Greedy[Union[discord.Role, discord.Member, Literal['everyone']]]):
         """Give a role to a list of roles/members
         Users list may be either members or roles, or even only one member
 

@@ -102,6 +102,7 @@
             "one": "-> 1 rôle retiré sur %{m} !",
             "zero": "-> Aucun rôle n'a pu être retiré sur les %{m}"
         },
+        "temp-grant-success": "Le rôle %{role} a bien été donné à %{user} pour %{time} !",
         "too-high": "Oups, ce rôle est trop haut pour que je puisse le modifier. Merci de déplacer mon rôle au-dessus du rôle `%{r}` avant de réessayer :confused:"
     },
     "slowmode": {

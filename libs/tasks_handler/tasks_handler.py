@@ -66,7 +66,7 @@ class TaskHandler:
                     await self.remove_task(task['ID'])
                 except Exception as err:  # pylint: disable=broad-except
                     self.bot.dispatch("error", err)
-                    self.bot.log.error("[unmute_task] Impossible d'unmute automatiquement : %s", err)
+                    self.bot.log.error("[unmute_task] Unable to auto unmute %s", err)
             if task['action'] == 'ban':
                 try:
                     guild = self.bot.get_guild(task['guild'])
@@ -82,7 +82,7 @@ class TaskHandler:
                     await self.remove_task(task['ID'])
                 except Exception as err:  # pylint: disable=broad-except
                     self.bot.dispatch("error", err)
-                    self.bot.log.error("[unban_task] Impossible d'unban automatiquement : %s", err)
+                    self.bot.log.error("[unban_task] Unable to auto unban: %s", err)
             if task['action'] == "timer":
                 try:
                     sent = await self.task_timer(task)
@@ -90,10 +90,32 @@ class TaskHandler:
                     await self.remove_task(task['ID'])
                 except Exception as err:  # pylint: disable=broad-except
                     self.bot.dispatch("error", err)
-                    self.bot.log.error("[timer_task] Impossible d'envoyer un timer : %s", err)
+                    self.bot.log.error("[timer_task] Unable to send timer: %s", err)
                 else:
                     if sent:
                         await self.remove_task(task['ID'])
+            if task['action'] == "role-grant":
+                try:
+                    guild = self.bot.get_guild(task['guild'])
+                    if guild is None:
+                        continue
+                    user = guild.get_member(task['user'])
+                    if user is None:
+                        continue
+                    try:
+                        data = json.loads(task['data'])
+                    except (json.JSONDecodeError, KeyError):
+                        continue
+                    role = guild.get_role(data['role'])
+                    if role is not None:
+                        try:
+                            await user.remove_roles(role, reason="Temp role expired")
+                        except discord.Forbidden:
+                            pass
+                    await self.remove_task(task['ID'])
+                except Exception as err:  # pylint: disable=broad-except
+                    self.bot.dispatch("error", err)
+                    self.bot.log.error("[role-grant_task] Unable to remove temporary role: %s", err)
 
     async def task_timer(self, task: dict) -> bool:
         """Send a reminder
