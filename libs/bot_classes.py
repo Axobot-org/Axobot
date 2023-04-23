@@ -4,11 +4,11 @@ import sys
 import time
 from io import BytesIO
 from json import dumps
-from typing import (TYPE_CHECKING, Callable, Awaitable, Literal, Optional,
+from typing import (TYPE_CHECKING, Awaitable, Callable, Literal, Optional,
                     Union, overload)
 
+import aiohttp
 import discord
-import requests
 from cachingutils import acached
 from discord.ext import commands
 from mysql.connector import connect as sql_connect
@@ -347,7 +347,10 @@ class Axobot(commands.bot.AutoShardedBot):
             await cog.send(embeds, url)
         elif url is not None and url.startswith('https://'):
             embeds = (embed.to_dict() for embed in embeds)
-            requests.post(url, json={"embeds": embeds})
+            async with aiohttp.ClientSession() as session:
+                async with session.post(url, json={"embeds": embeds}) as resp:
+                    if resp.status >= 400:
+                        self.log.error("Unable to send embed to %s: %s", url, await resp.text())
 
     async def potential_command(self, message: discord.Message):
         "Check if a message is potentially a bot command"
@@ -377,7 +380,7 @@ class Axobot(commands.bot.AutoShardedBot):
             return f"</{command_name}:{command.id}>"
         if command := self.get_command(command_name):
             return f"`{command.qualified_name}`"
-        self.log.error(f"Trying to mention invalid command: {command_name}")
+        self.log.error("Trying to mention invalid command: %s", command_name)
         return f"`{command_name}`"
 
     async def check_axobot_presence(self, *, ctx: Optional[MyContext] = None, guild: Optional[discord.Guild] = None, interaction: Optional[discord.Interaction] = None, guild_id: Optional[int] = None, channel_id: Optional[int] = None):

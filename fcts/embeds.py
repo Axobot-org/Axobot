@@ -1,8 +1,7 @@
-from json.decoder import JSONDecodeError
-
+import aiohttp
 import discord
-import requests
 from discord.ext import commands
+
 from libs.bot_classes import Axobot
 
 BASE_URL = 'https://discord.com/api/webhooks/'
@@ -24,23 +23,24 @@ class Embeds(commands.Cog):
         if url is None:
             url = BASE_URL + self.logs['beta'] if self.bot.beta else BASE_URL + self.logs['classic']
         else:
-            if url in self.logs.keys():
+            if url in self.logs:
                 url = BASE_URL + self.logs[url]
-        liste = list()
+        embeds_list = []
         for embed in embeds:
             if isinstance(embed, discord.Embed):
-                liste.append(embed.to_dict())
+                embeds_list.append(embed.to_dict())
             else:
-                liste.append(embed["embed"])
-        resp = requests.post(url, json={"embeds":liste})
-        try:
-            msg: dict = resp.json()
-        except JSONDecodeError:
-            return
-        else:
-            if "error" in msg.keys():
-                err_msg = "`Erreur webhook {}:` [code {}] {}".format(url,resp.status_code,msg)
-                await self.bot.get_cog('Errors').senf_err_msg(err_msg)
+                embeds_list.append(embed["embed"])
+        async with aiohttp.ClientSession() as session:
+            async with session.post(url, json={"embeds": embeds_list}) as resp:
+                try:
+                    msg: dict = await resp.json()
+                except aiohttp.ContentTypeError:
+                    return
+                else:
+                    if "error" in msg:
+                        err_msg = f"`Webhook error {url}:` [{resp.status}] {msg}"
+                        await self.bot.get_cog('Errors').senf_err_msg(err_msg)
 
 
 async def setup(bot):

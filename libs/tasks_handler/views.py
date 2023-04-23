@@ -1,5 +1,5 @@
 import re
-from typing import TYPE_CHECKING, Callable, Union
+from typing import TYPE_CHECKING, Callable, Optional, Union
 
 import discord
 
@@ -16,6 +16,7 @@ class RecreateReminderView(discord.ui.View):
     def __init__(self, bot: "Axobot", task: DbTask):
         self.bot = bot
         self.task = task
+        self.message: Optional[discord.Message] = None
         super().__init__(timeout=600)
 
     async def init(self):
@@ -99,6 +100,12 @@ class RecreateReminderView(discord.ui.View):
         else:
             await interaction.edit(content=interaction.content, view=self)
         self.stop()
+
+    async def on_timeout(self):
+        "Called when the timeout has expired"
+        if self.message:
+            self.clear_items()
+            await self.message.edit(content=self.message.content, view=self)
 
 
 class AskDurationModal(discord.ui.Modal):

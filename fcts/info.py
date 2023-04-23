@@ -1,5 +1,4 @@
 import asyncio
-import copy
 import datetime
 import importlib
 import locale
@@ -13,17 +12,16 @@ from subprocess import call as system_call  # Execute a shell command
 import aiohttp
 import discord
 import psutil
-import requests
 from discord.ext import commands
 from discord.ext.commands.converter import run_converters
+
 from docs import conf
+from fcts import args, checks
 from libs import bitly_api
-from libs.bot_classes import PRIVATE_GUILD_ID, MyContext, Axobot
+from libs.bot_classes import PRIVATE_GUILD_ID, Axobot, MyContext
 from libs.formatutils import FormatUtils
 from libs.rss.rss_general import FeedObject
 from utils import count_code_lines
-
-from fcts import args, checks
 
 default_color = discord.Color(0x50e3c2)
 
@@ -239,13 +237,10 @@ ORDER BY usages DESC LIMIT %(limit)s"""
         ..Doc infos.html#bot-invite"""
         raw_oauth = "<" + discord.utils.oauth_url(self.bot.user.id) + ">"
         url = "https://zrunner.me/" + ("invitezbot" if self.bot.entity_id == 0 else "invite-axobot")
-        try:
-            r = requests.get(url, timeout=3)
-        except requests.exceptions.Timeout:
-            url = raw_oauth
-        else:
-            if r.status_code >= 400:
-                url = raw_oauth
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url, timeout=3) as resp:
+                if resp.status >= 400:
+                    url = raw_oauth
         cmd = await self.bot.get_command_mention("about")
         await ctx.send(await self.bot._(ctx.channel, "info.botinvite", url=url, about=cmd))
 
