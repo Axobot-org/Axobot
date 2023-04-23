@@ -4,7 +4,7 @@ import os
 import pickle
 from typing import Optional, Union
 
-import requests
+import aiohttp
 
 from .bayes import RandomForest, SpamDetector
 from .classes import Message, PredictionResult
@@ -91,7 +91,9 @@ class AntiScamAgent:
 
 async def update_unicode_map():
     "Update the unicode map file from the unicode.org website of confusable characters"
-    lines = requests.get("https://www.unicode.org/Public/security/latest/confusables.txt").text.split("\n")
+    async with aiohttp.ClientSession() as session:
+        async with session.get("https://www.unicode.org/Public/security/latest/confusables.txt") as resp:
+            lines = (await resp.text()).split("\n")
     json_data = {}
     for line in lines:
         data = list(map(lambda x: x.strip(), line.split('#',1)[0].split(';')[:2]))

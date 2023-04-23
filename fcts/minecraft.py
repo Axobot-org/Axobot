@@ -7,16 +7,14 @@ from typing import Any, Union
 import aiohttp
 import discord
 import frmc_lib
-import requests
 from dateutil.parser import isoparse
 from discord.ext import commands
 from frmc_lib import SearchType
 
+from fcts import checks
 from libs.bot_classes import Axobot, MyContext
 from libs.formatutils import FormatUtils
 from libs.rss.rss_general import FeedObject
-
-from fcts import checks
 
 
 class Minecraft(commands.Cog):
@@ -440,7 +438,9 @@ Every information come from the website www.fr-minecraft.net"""
         else:
             url = "https://api.minetools.eu/ping/"+str(ip)+"/"+str(port)
         try:
-            r: dict = requests.get(url, timeout=5).json()
+            async with aiohttp.ClientSession() as session:
+                async with session.get(url, timeout=5) as resp:
+                    r: dict = await resp.json()
         except Exception:
             return await self.create_server_2(guild, ip, port)
         if "error" in r:
@@ -480,20 +480,17 @@ Every information come from the website www.fr-minecraft.net"""
         else:
             url = "https://api.mcsrvstat.us/1/"+str(ip)+"/"+str(port)
         try:
-            r = requests.get(url, timeout=5).json()
-        except requests.exceptions.ConnectionError:
+            async with aiohttp.ClientSession() as session:
+                async with session.get(url, timeout=5) as resp:
+                    r: dict = await resp.json()
+        except aiohttp.ClientConnectorError:
             return await self.bot._(guild, "minecraft.no-api")
-        except:
-            try:
-                r = requests.get("https://api.mcsrvstat.us/1/" +
-                                 str(ip), timeout=5).json()
-            except json.decoder.JSONDecodeError:
-                return await self.bot._(guild, "minecraft.serv-error")
-            except Exception as err:
-                if not isinstance(err, requests.exceptions.ReadTimeout):
-                    self.bot.log.error(f"[mc-server-2] Erreur sur l'url {url} :")
-                self.bot.dispatch("error", err, f"While checking minecraft server {ip}")
-                return await self.bot._(guild, "minecraft.serv-error")
+        except json.decoder.JSONDecodeError:
+            return await self.bot._(guild, "minecraft.serv-error")
+        except Exception as err:
+            self.bot.log.error(f"[mc-server-2] Erreur sur l'url {url} :")
+            self.bot.dispatch("error", err, f"While checking minecraft server {ip}")
+            return await self.bot._(guild, "minecraft.serv-error")
         if r["debug"]["ping"] is False:
             return await self.bot._(guild, "minecraft.no-ping")
         if 'list' in r['players'].keys():
