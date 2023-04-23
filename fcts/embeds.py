@@ -23,7 +23,7 @@ class Embeds(commands.Cog):
         if url is None:
             url = BASE_URL + self.logs['beta'] if self.bot.beta else BASE_URL + self.logs['classic']
         else:
-            if url in self.logs.keys():
+            if url in self.logs:
                 url = BASE_URL + self.logs[url]
         embeds_list = []
         for embed in embeds:
@@ -38,7 +38,7 @@ class Embeds(commands.Cog):
                 except aiohttp.ContentTypeError:
                     return
                 else:
-                    if "error" in msg.keys():
+                    if "error" in msg:
                         err_msg = f"`Webhook error {url}:` [{resp.status}] {msg}"
                         await self.bot.get_cog('Errors').senf_err_msg(err_msg)
 
