@@ -64,13 +64,18 @@ class YoutubeRSS:
         match = re.search(self.url_pattern, url)
         if match is None:
             return None
+        return await self.get_channel_by_any_term(match.group(1))
+
+    @acached(timeout=86400)
+    async def get_channel_by_any_term(self, name: str):
+        "Find a channel ID from any youtube URL"
         _, channels, _ = self.search_service.search_term(
-            match.group(1), "channel")
+            name, "channel")
         if len(channels) == 0:
             # it may be an unreferenced channel ID
             async with aiohttp.ClientSession(cookies=self.cookies) as session:
-                if self._is_valid_channel_id(session, match.group(1)):
-                    return match.group(1)
+                if self._is_valid_channel_id(session, name):
+                    return name
             return None
         identifier, _ = channels[0].split(": ", 1)
         return identifier
@@ -88,22 +93,8 @@ class YoutubeRSS:
         return self.search_service.query_channel_title(channel_id)
 
     async def _get_feed_list(self, identifiant: str, session: aiohttp.ClientSession=None):
-        _session = session or aiohttp.ClientSession()
-        if await self._is_valid_channel_id(_session, identifiant):
-            url = 'https://www.youtube.com/feeds/videos.xml?channel_id='+identifiant
-        elif await self._is_valid_channel_name(_session, identifiant):
-            url = 'https://www.youtube.com/feeds/videos.xml?user='+identifiant
-        elif await self._is_valid_channel_custom_url(_session, identifiant):
-            if channel_id := self.get_channel_by_user_name(identifiant):
-                url = 'https://www.youtube.com/feeds/videos.xml?channel_id='+channel_id
-            else:
-                if session is None:
-                    await _session.close()
-                return None
-        feeds = await feed_parse(self.bot, url, 7, session)
-        if session is None:
-            await _session.close()
-        return feeds
+        url = 'https://www.youtube.com/feeds/videos.xml?channel_id='+identifiant
+        return await feed_parse(self.bot, url, 7, session)
 
     async def get_feed(self, channel: discord.TextChannel, identifiant: str, date: dt.datetime=None,
                        session: aiohttp.ClientSession=None) -> Union[str, list[RssMessage]]:

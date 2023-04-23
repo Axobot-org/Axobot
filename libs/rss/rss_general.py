@@ -5,7 +5,6 @@ import datetime
 import time
 from typing import TYPE_CHECKING, Any, Optional, Union, Literal
 
-import async_timeout
 import discord
 import feedparser
 from aiohttp import ClientSession, client_exceptions
@@ -22,10 +21,9 @@ async def feed_parse(bot: Axobot, url: str, timeout: int, session: ClientSession
     # if session is provided, we have to not close it
     _session = session or ClientSession()
     try:
-        async with async_timeout.timeout(timeout) as timeout_manager:
-            async with _session.get(url) as response:
-                html = await response.text()
-                headers = response.raw_headers
+        async with _session.get(url, timeout=timeout) as response:
+            html = await response.text()
+            headers = response.raw_headers
     except (UnicodeDecodeError, client_exceptions.ClientError):
         if session is None:
             await _session.close()
@@ -33,6 +31,8 @@ async def feed_parse(bot: Axobot, url: str, timeout: int, session: ClientSession
     except asyncio.exceptions.TimeoutError:
         if session is None:
             await _session.close()
+        # request was cancelled by timeout
+        bot.log.info("[RSS] feed_parse got a timeout")
         return None
     except Exception as err:
         if session is None:
@@ -40,10 +40,6 @@ async def feed_parse(bot: Axobot, url: str, timeout: int, session: ClientSession
         raise err
     if session is None:
         await _session.close()
-    if timeout_manager.expired:
-        # request was cancelled by timeout
-        bot.log.info("[RSS] feed_parse got a timeout")
-        return None
     headers = {k.decode("utf-8").lower(): v.decode("utf-8") for k, v in headers}
     return feedparser.parse(html, response_headers=headers)
 
