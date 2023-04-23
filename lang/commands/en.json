@@ -181,7 +181,7 @@
             "channel": "channel",
             "target": "target"
         },
-        "last-post": {
+        "last-post": 
             "url": "url",
             "type": "feed-type"
         },
