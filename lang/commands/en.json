@@ -29,7 +29,7 @@
         "unhoist": "unhoist",
         "destop": "destop",
         "permissions": "permissions",
-        "rss last-post": "last-post",
+        "last-post": "last-post",
         "rss add": "add",
         "rss remove": "remove",
         "rss enable": "enable",
@@ -181,7 +181,7 @@
             "channel": "channel",
             "target": "target"
         },
-        "rss last-post": {
+        "last-post": {
             "url": "url",
             "type": "feed-type"
         },

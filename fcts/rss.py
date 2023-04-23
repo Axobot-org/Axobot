@@ -82,20 +82,10 @@ class Rss(commands.Cog):
     async def cog_unload(self):
         self.loop_child.cancel() # pylint: disable=no-member
 
-
-    @commands.hybrid_group(name="rss")
-    @app_commands.default_permissions(manage_guild=True)
-    @commands.cooldown(2, 15, commands.BucketType.channel)
-    async def rss_main(self, ctx: MyContext):
-        """Search for recent posts, or manage your server RSS feeds
-
-        ..Doc rss.html#rss"""
-        if ctx.subcommand_passed is None:
-            await ctx.send_help(ctx.command)
-
-    @rss_main.command(name="last-post")
+    @commands.hybrid_command(name="last-post")
     @app_commands.describe(url="The URL of the feed to search the last post for", feed_type="The type of the feed")
     @app_commands.rename(feed_type="type")
+    @commands.cooldown(3, 20, commands.BucketType.user)
     async def rss_last_post(self, ctx: MyContext, url: str,
                             feed_type: Optional[Literal["youtube", "twitter", "twitch", "deviantart", "web"]]):
         """Search the last post of a feed
@@ -235,6 +225,16 @@ class Rss(commands.Cog):
             else:
                 await ctx.send(obj)
 
+
+    @commands.hybrid_group(name="rss")
+    @app_commands.default_permissions(manage_guild=True)
+    @commands.cooldown(2, 15, commands.BucketType.channel)
+    async def rss_main(self, ctx: MyContext):
+        """Search for recent posts, or manage your server RSS feeds
+
+        ..Doc rss.html#rss"""
+        if ctx.subcommand_passed is None:
+            await ctx.send_help(ctx.command)
 
     async def is_overflow(self, guild: discord.Guild) -> tuple[bool, int]:
         """Check if a guild still has at least a slot
@@ -816,7 +816,7 @@ class Rss(commands.Cog):
         ..Doc rss.html#move-a-feed"""
         input_feed_id = int(feed) if feed is not None and feed.isnumeric() else None
         if channel is None:
-                channel = ctx.channel
+            channel = ctx.channel
         try:
             try:
                 feeds_ids = await self.ask_rss_id(
@@ -1017,7 +1017,7 @@ class Rss(commands.Cog):
 
     @rss_main.command(name="test", with_app_command=False)
     @commands.check(checks.is_support_staff)
-    async def test_rss(self, ctx: MyContext, url, *, args=None):
+    async def test_rss(self, ctx: MyContext, url, *, arguments=None):
         """Test if an rss feed is usable"""
         url = url.replace('<','').replace('>','')
         feeds = await feed_parse(self.bot, url, 8)
@@ -1034,15 +1034,15 @@ class Rss(commands.Cog):
                 txt += f"feeds.entries[0]\n```py\n{feeds.entries[0]}\n```"
             else:
                 txt += f"feeds.entries[0].keys()\n```py\n{feeds.entries[0].keys()}\n```"
-        if args is not None and 'feeds' in args and 'ctx' not in args:
-            txt += "\n{}\n```py\n{}\n```".format(args, eval(args))
+        if arguments is not None and 'feeds' in arguments and 'ctx' not in arguments:
+            txt += "\n{}\n```py\n{}\n```".format(arguments, eval(arguments))
         try:
             await ctx.send(txt)
         except discord.DiscordException as err:
             print("[rss_test] Error:",err)
             await ctx.send("`Error`: "+str(err))
             print(txt)
-        if args is None:
+        if arguments is None:
             ok = '<:greencheck:513105826555363348>'
             notok = '<:redcheck:513105827817717762>'
             nothing = '<:_nothing:446782476375949323>'
