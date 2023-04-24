@@ -3,7 +3,6 @@
     "about-1": "Kutsu minut toiseen palvelimeen:",
     "about-2": "Botin dokumentaatio:",
     "about-3": "Minun tekijäni Twitter käyttäjä:",
-    "about-4": "Lyhyt UKK:",
     "about-5": "Tietosuojakäytäntö:",
     "about-main": "Morjens! Olen %{mention}!\nOlen botti joka antaa sinun tehdä monia asioita: valvontaa, tasoitusta, tilastoja, kumppanien hallintaa ja monia muita hyödyllisiä komentoja (ja myös turhia)!\nVoit aloittaa kirjoittamalla `!help` tällä kanavalla nähdäksesi kaikki komennot, sitten `!config see` antaa sinun nähdä konfiguraatiot.\nMinun omistaja ja minä haluamme kiittää näitä käyttäjää Awhikax kaikesta avusta monissa hankaluuksissa, käyttäjää Aragorn1202 kaikista ideoista ja ymmärtävistä lauseista, käyttäjää Adri kaikista mahtavista logoista, emojeista ja profiili kuvista, ja koko kääntäjä ryhmää isosta työstä!\n\n:globe_with_meridians: Hyödyllisiä linkkejä: %{links}\n\nHyvää päivän jatkoa!",
     "admins-list": "Järjestelmänvalvojat tälle botille ovat : %{admins}",
