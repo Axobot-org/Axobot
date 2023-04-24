@@ -5,7 +5,7 @@
 Privacy Policy
 ==============
 
-Axobot has a very specific Privacy Policy, defining among other things our use of the collected data. We provide you with a translation of this policy here, but only as a guide. **This version cannot be used as a replacement for the original and official version**, available in French at https://zrunner.me/zbot-privacy.pdf.
+Axobot has a very specific Privacy Policy, defining among other things our use of the collected data. We provide you with a translation of this policy here, but only as a guide. **This version cannot be used as a replacement for the original and official version**, available in French at https://zrunner.me/axobot-privacy.pdf.
 
 Here is the unofficial translation of the December 2, 2022 version.
 
