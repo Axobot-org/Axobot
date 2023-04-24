@@ -82,13 +82,7 @@ class Errors(commands.Cog):
             await ctx.send(await self.bot._(ctx.channel, 'errors.notrightroles'), ephemeral=True)
             return
         elif isinstance(error, commands.CommandError) and str(error) == "Database offline":
-            from utils import OUTAGE_REASON
-            if OUTAGE_REASON:
-                lang = await self.bot._(ctx.channel, '_used_locale')
-                reason = OUTAGE_REASON.get(lang, OUTAGE_REASON['en'])
-                await ctx.send(await self.bot._(ctx.channel, 'errors.nodb-2', reason=reason))
-            else:
-                await ctx.send(await self.bot._(ctx.channel, 'errors.nodb-1'))
+            await ctx.send(await self.bot._(ctx.channel, 'errors.nodb-1'))
             return
         elif isinstance(error, commands.ExpectedClosingQuoteError):
             await ctx.send(await self.bot._(ctx.channel, 'errors.quoteserror'), ephemeral=True)
