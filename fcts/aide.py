@@ -58,7 +58,6 @@ class Help(commands.Cog):
             bot_invite,
             'https://axobot.rtfd.io/',
             'https://twitter.com/z_runnerr',
-            'https://zrunner.me/zbot-faq',
             'https://zrunner.me/axobot-privacy.pdf'
         ]):
             urls += "\n:arrow_forward: " + await self.bot._(ctx.channel, f"info.about-{i}") + " <" + url + ">"
@@ -102,7 +101,7 @@ Enable "Embed Links" permission for better rendering
             return False
         return await self.bot.get_config(context.guild.id, 'help_in_dm')
 
-    async def help_command(self, ctx: MyContext, commands: Optional[list[str]] = None):
+    async def help_command(self, ctx: MyContext, commands_arg: Optional[list[str]] = None):
         """Main command for the creation of the help message
 If the bot can't send the new command format, it will try to send the old one."""
         async with ctx.channel.typing():
@@ -121,17 +120,17 @@ If the bot can't send the new command format, it will try to send the old one.""
             bot_usr = destination.me if isinstance(destination, discord.DMChannel) else destination.guild.me
             title = ""
 
-            if commands is not None and " ".join(commands).lower() in self.commands_data:
-                categ_name = [" ".join(commands).lower()]
+            if commands_arg is not None and " ".join(commands_arg).lower() in self.commands_data:
+                categ_name = [" ".join(commands_arg).lower()]
             else:
                 translated_categories = {
                     k: await self.bot._(ctx.channel, f"help.categories.{k}")
                     for k in self.commands_data.keys()
                 }
-                if commands is None:
+                if commands_arg is None:
                     categ_name = []
                 else:
-                    categ_name = [k for k, v in translated_categories.items() if v.lower() == " ".join(commands).lower()]
+                    categ_name = [k for k, v in translated_categories.items() if v.lower() == " ".join(commands_arg).lower()]
 
             if len(categ_name) == 1: # cog name
                 if categ_name[0] == "unclassed":
@@ -142,15 +141,15 @@ If the bot can't send the new command format, it will try to send the old one.""
                 pages = await self.all_commands(ctx, sorted(temp, key=self.sort_by_name))
                 if len(pages) == 0 and ctx.guild is None:
                     pages = [await self.bot._(ctx.channel, "help.cog-empty-dm")]
-            elif not commands:  # no command
+            elif not commands_arg:  # no command
                 compress: bool = await self.bot.get_config(ctx.guild.id, 'compress_help') if ctx.guild else False
                 pages = await self.all_commands(ctx, sorted([c for c in self.bot.commands], key=self.sort_by_name), compress=compress)
                 if ctx.guild is None:
                     title = await self.bot._(ctx.channel, "help.embed_title_dm")
                 else:
                     title = await self.bot._(ctx.channel, "help.embed_title", u=str(ctx.author))
-            elif len(commands) == 1:  # Unique command name?
-                name = commands[0]
+            elif len(commands_arg) == 1:  # Unique command name?
+                name = commands_arg[0]
                 command = None
                 if name in self.bot.cogs:
                     cog = self.bot.get_cog(name)
@@ -165,12 +164,12 @@ If the bot can't send the new command format, it will try to send the old one.""
                         return
                     pages = await self.cmd_help(ctx, command, destination.permissions_for(bot_usr).embed_links)
             else:  # sub-command name?
-                name = commands[0]
+                name = commands_arg[0]
                 command = self.bot.all_commands.get(name)
                 if command is None:
                     await destination.send(await self.bot._(ctx.channel, "help.cmd-not-found", cmd=name))
                     return
-                for key in commands[1:]:
+                for key in commands_arg[1:]:
                     try:
                         command = command.all_commands.get(key)
                         if command is None:
@@ -184,8 +183,8 @@ If the bot can't send the new command format, it will try to send the old one.""
             ft = await self.bot._(ctx.channel, "help.footer")
             prefix = await self.bot.prefix_manager.get_prefix(ctx.guild)
         if len(pages) == 0:
-            self.bot.dispatch("error", ValueError(f"Unable to find help for the command {' '.join(commands)}"))
-            await destination.send(await self.bot._(ctx.channel, "help.cmd-not-found", cmd=" ".join(commands)))
+            self.bot.dispatch("error", ValueError(f"Unable to find help for the command {' '.join(commands_arg)}"))
+            await destination.send(await self.bot._(ctx.channel, "help.cmd-not-found", cmd=" ".join(commands_arg)))
             return
         if destination.permissions_for(bot_usr).embed_links:
             if ctx.guild is not None:

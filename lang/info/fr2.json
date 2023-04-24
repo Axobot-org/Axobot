@@ -3,7 +3,6 @@
     "about-1": "Un lien pour m'inviter sur un autre serv :",
     "about-2": "La doc*umentation* du bot :",
     "about-3": "Le Twitter de mon créateur 🧐 :",
-    "about-4": "Une mini *mini* FAQ :",
     "about-5": "La politique de confidentialité 🥴 :",
     "about-main": "Salut, je suis %{mention} !\n\nJe suis un *super* ||👍|| bot qui te permet de faire un ***énorme*** tas de choses : modération, système d'XP, statistiques, gestion de partenaires, et bien plus (ouais, rien que ça 😂) !\n*Bon, y'a deux-trois trucs complètement useless mais chut* 😂\n\nTu peux taper `!help` dans le chat pour voir la liste des commandes dispo, et `!config see` pour voir la liste des options de configuration sur le serveur.\n\nMon créateur (Z_runner) et moi-même ||*hum, hum...* 🧐|| aimerions remercier Awhikax pour son soutien durant différentes crises, Aragorn1202 pour toutes ses idées et phrases pleines de bon sens ||😂|| ||*Sans compter son aide dans le test de la commande de ban xD||, Adri pour tous ces magnifiques logos, emojis, et images de profil, et toutes l'équipe de traduction pour leur long travail !\n\n🌐 Quelques liens qui pourraient être utiles : %{links}\n\nPasse une excellente journée !",
     "admins-list": "Les administrateurs de ce bot sont : %{admins}",
