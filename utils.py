@@ -15,10 +15,6 @@ from discord.ext import commands
 if TYPE_CHECKING:
     from libs.bot_classes import Axobot
 
-OUTAGE_REASON = {
-    'fr': "Un des datacenters de notre hébergeur OVH a pris feu, rendant ,inaccessible le serveur et toutes ses données. Une vieille sauvegarde de la base de donnée sera peut-être utilisée ultérieurement. Plus d'informations sur https://zbot.statuspage.io/",
-    'en': "One of the datacenters of our host OVH caught fire, making the server and all its data inaccessible. An old backup of the database may be used later. More information on https://zbot.statuspage.io/"
-}
 
 async def get_prefix(bot:"Axobot", msg: discord.Message) -> list:
     """Get the correct bot prefix from a message
