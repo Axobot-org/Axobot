@@ -3,7 +3,6 @@
     "about-1": "Der Link um mich auf einen anderen Server einzuladen:",
     "about-2": "Die Bot Dokumententation",
     "about-3": "Twitter Account von meinem Ersteller:",
-    "about-4": "Ein kurzes FAQ:",
     "about-5": "Die Datenschutzbestimmungen:",
     "about-main": "Hallo! Ich bin %{mention}!\nIch bin ein Bot, der dir viele Sachen erlaubt wie zum Beispiel: Moderation, xp System, Statistiken, Partner Management und vieles mehr (und auch unnötige Sachen)!\nDu kannst anfangen, indem du `!help` in den Chat eingibst um eine Liste aller Befehle zu sehen, dann `!config see` um die möglichen Konfigurations Optionen zu sehen.\n\nMein Besitzer (Z_runner) und ich würden gerne Awhikax für seinen support während allen möglichen Kriesen danken, Aragorn1202 für all seine Ideen danken und Adri für all die schönen Logos, Emojis und Profil Bildern danken und den ganzen Übersetzern für die lange Arbeit danken!\n\n:globe_with_meridians: Einige Links könnten noch nützlich sein : %{links}\n\nHab einen schönen Tag!",
     "admins-list": "Die Administratoren dieses Bots sind: %{admins}",
