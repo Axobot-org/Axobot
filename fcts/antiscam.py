@@ -158,7 +158,7 @@ class AntiScam(commands.Cog):
                             )
         emb.set_footer(
             text=f'Sent by {author} • ID {row_id}',
-            icon_url=author.avatar or None
+            icon_url=author.display_avatar
         )
         emb.add_field(name="Status", value=status.title())
         if predicted:

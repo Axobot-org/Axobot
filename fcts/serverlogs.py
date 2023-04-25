@@ -486,7 +486,7 @@ class ServerLogs(commands.Cog):
             emb.add_field(name="Roles revoked", value=' '.join(r.mention for r in removed_roles), inline=False)
         if added_roles:
             emb.add_field(name="Roles granted", value=' '.join(r.mention for r in added_roles), inline=False)
-        emb.set_author(name=str(after), icon_url=after.avatar or after.default_avatar)
+        emb.set_author(name=str(after), icon_url=after.display_avatar)
         # if we have access to audit logs and no role come from an integration, try to get the user who edited the roles
         if any(not role.managed for role in added_roles+removed_roles):
             if entry := await self.search_audit_logs(before.guild, discord.AuditLogAction.member_role_update,
@@ -510,7 +510,7 @@ class ServerLogs(commands.Cog):
             escaped_before = discord.utils.escape_markdown(before.nick)
             escaped_after = discord.utils.escape_markdown(after.nick)
             emb.add_field(name="Nickname changed", value=f"From '{escaped_before}' to '{escaped_after}'")
-        emb.set_author(name=str(after), icon_url=after.avatar or after.default_avatar)
+        emb.set_author(name=str(after), icon_url=after.display_avatar)
         after_nick = after.nick
         if entry := await self.search_audit_logs(before.guild, discord.AuditLogAction.member_update,
                                                  check=lambda entry: (
@@ -530,7 +530,7 @@ class ServerLogs(commands.Cog):
         before_txt = "None" if before.guild_avatar is None else f"[Before]({before.guild_avatar})"
         after_txt = "None" if after.guild_avatar is None else f"[After]{after.guild_avatar}"
         emb.add_field(name="Server avatar edited", value=f"{before_txt} -> {after_txt}")
-        emb.set_author(name=str(after), icon_url=after.avatar or after.default_avatar)
+        emb.set_author(name=str(after), icon_url=after.display_avatar)
         await self.validate_logs(after.guild, channel_ids, emb, "member_avatar")
 
     async def handle_member_timeout(self, before: discord.Member, after: discord.Member, channel_ids: list[int]):
@@ -542,7 +542,7 @@ class ServerLogs(commands.Cog):
         )
         duration = await FormatUtils.time_delta(now, after.timed_out_until, lang='en')
         emb.add_field(name="Duration", value=f"{duration} (until <t:{after.timed_out_until.timestamp():.0f}>)", inline=False)
-        emb.set_author(name=str(after), icon_url=after.avatar or after.default_avatar)
+        emb.set_author(name=str(after), icon_url=after.display_avatar)
         # try to get who timeouted that member
         if entry := await self.search_audit_logs(before.guild, discord.AuditLogAction.member_update,
                                                  check=lambda entry: (entry.target.id == before.id
@@ -566,7 +566,7 @@ class ServerLogs(commands.Cog):
             value=f"<t:{before.timed_out_until.timestamp():.0f}> (in {duration})",
             inline=False
         )
-        emb.set_author(name=str(after), icon_url=after.avatar or after.default_avatar)
+        emb.set_author(name=str(after), icon_url=after.display_avatar)
         # try to get who timeouted that member
         if entry := await self.search_audit_logs(before.guild, discord.AuditLogAction.member_update,
                                                  check=lambda entry: (entry.target.id == before.id
@@ -621,7 +621,7 @@ class ServerLogs(commands.Cog):
             color=discord.Color.blurple(),
         )
         emb.add_field(name="User ID", value=str(after.id))
-        emb.set_author(name=str(after), icon_url=after.avatar or after.default_avatar)
+        emb.set_author(name=str(after), icon_url=after.display_avatar)
         await self.validate_logs(after.guild, channel_ids, emb, "member_avatar")
 
     async def get_member_specs(self, member: discord.Member) -> list[str]:
