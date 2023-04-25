@@ -740,7 +740,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         # auto unafk if the author was afk and has enabled it
         if isinstance(ctx.author, discord.Member) and not await checks.is_a_cmd(msg, self.bot):
             if (ctx.author.nick and ctx.author.nick.endswith(' [AFK]')) or ctx.author.id in self.afk_guys:
-                user_config = await self.bot.get_cog("Users").db_get_user_config(ctx.author, "auto_unafk")
+                user_config = await self.bot.get_cog("Users").db_get_user_config(ctx.author.id, "auto_unafk")
                 if user_config is False:
                     return
                 await self.unafk(ctx)
