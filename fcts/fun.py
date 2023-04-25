@@ -1061,7 +1061,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         """Get the avatar of a user"""
         if user is None:
             user = ctx.author
-        await ctx.send(user.avatar.url)
+        await ctx.send(user.display_avatar.url)
 
 
 async def setup(bot):

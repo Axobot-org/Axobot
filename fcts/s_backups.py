@@ -201,7 +201,7 @@ Arguments are:
                 webs.append({
                     'channel': w.channel_id,
                     'name': w.name,
-                    'avatar': w.avatar.url if w.avatar else None,
+                    'avatar': w.display_avatar.url,
                     'url': w.url
                 })
             back['webhooks'] = webs
