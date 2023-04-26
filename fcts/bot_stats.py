@@ -371,6 +371,10 @@ class BotStats(commands.Cog):
             if self.antiscam["deletion"]:
                 cursor.execute(query, (now, 'antiscam.deletion', self.antiscam["deletion"], 0, 'deletion/min', True, self.bot.entity_id))
             self.antiscam["warning"] = self.antiscam["deletion"] = 0
+            # antiscam scanned messages
+            if antiscam_cog := self.bot.get_cog("AntiScam"):
+                cursor.execute(query, (now, 'antiscam.scanned', antiscam_cog.scanned_messages, 0, 'messages/min', True, self.bot.entity_id))
+                antiscam_cog.scanned_messages = 0
             # antiscam activated count
             cursor.execute(query, (now, 'antiscam.activated', await self.db_get_antiscam_enabled_count(), 0, 'guilds', False, self.bot.entity_id))
             # tickets creation
@@ -378,12 +382,12 @@ class BotStats(commands.Cog):
                 cursor.execute(query, (now, 'tickets.creation', self.ticket_events["creation"], 0, 'tickets/min', True, self.bot.entity_id))
                 self.ticket_events["creation"] = 0
             # username changes
-            cursor.execute(query, (now, 'usernames.guild', self.usernames["guild"], 0, 'nicknames/min', True, self.bot.entity_id))
-            self.usernames["guild"] = 0
-            cursor.execute(query, (now, 'usernames.user', self.usernames["user"], 0, 'usernames/min', True, self.bot.entity_id))
-            self.usernames["user"] = 0
-            cursor.execute(query, (now, 'usernames.deleted', self.usernames["deleted"], 0, 'usernames/min', True, self.bot.entity_id))
-            self.usernames["deleted"] = 0
+            # cursor.execute(query, (now, 'usernames.guild', self.usernames["guild"], 0, 'nicknames/min', True, self.bot.entity_id))
+            # self.usernames["guild"] = 0
+            # cursor.execute(query, (now, 'usernames.user', self.usernames["user"], 0, 'usernames/min', True, self.bot.entity_id))
+            # self.usernames["user"] = 0
+            # cursor.execute(query, (now, 'usernames.deleted', self.usernames["deleted"], 0, 'usernames/min', True, self.bot.entity_id))
+            # self.usernames["deleted"] = 0
             if self.bot.current_event:
                 # Dailies points
                 await self.db_record_dailies_values(now)
