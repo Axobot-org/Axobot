@@ -42,6 +42,7 @@ class AntiScam(commands.Cog):
             callback=self.report_context_menu,
         )
         self.bot.tree.add_command(self.report_ctx_menu)
+        self.messages_scanned = 0
 
     async def cog_load(self):
         "Load websites list from database"
@@ -371,6 +372,7 @@ class AntiScam(commands.Cog):
         message: Message = Message.from_raw(msg.content, len(msg.mentions), self.agent.websites_list)
         if len(message.normd_message.split()) < 3:
             return
+        self.messages_scanned += 1
         result = self.agent.predict_bot(message)
         if result.result > 1:
             message.category = 0
