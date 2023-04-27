@@ -148,5 +148,18 @@
         "xp_rate": "Modficateur de gains d'xp : %{value}",
         "xp_type": "Type de système d'xp : %{value}"
     },
-    "value-deleted": "La valeur de l'option '%{option}' a bien été remise à sa valeur par défaut"
+    "tips": {
+        "antiscam_enable_logs": "Vous pouvez activer les logs de l'antiscam avec la commande %{modlogs_enable}",
+        "title": "Super astuce"
+    },
+    "value-deleted": "La valeur de l'option '%{option}' a bien été remise à sa valeur par défaut",
+    "warnings": {
+        "antiraid_kick_ban": "J'ai besoin des permissions 'Expulser des membres' et 'Bannir des membres' pour appliquer la protection anti-raid",
+        "antiraid_kick": "J'ai besoin de la permission 'Expulser des membres' pour appliquer la protection anti-raid",
+        "antiraid_ban": "J'ai besoin de la permission 'Bannir des membres' pour appliquer la protection anti-raid",
+        "channel_write_permissions": "J'ai besoin de la permission d'envoyer des messages dans %{channel} pour cette option",
+        "moderation_command": "J'ai besoin de la permission '%{perm}' pour appliquer cette commande",
+        "title": "Warning",
+        "xp_should_be_local": "Cette option ne fonctionne qu'avec le système d'XP local. Vous pouvez modifier le système d'XP du serveur avec l'option de configuration 'xp_type'"
+    }
 }
