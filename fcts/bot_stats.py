@@ -373,8 +373,8 @@ class BotStats(commands.Cog):
             self.antiscam["warning"] = self.antiscam["deletion"] = 0
             # antiscam scanned messages
             if antiscam_cog := self.bot.get_cog("AntiScam"):
-                cursor.execute(query, (now, 'antiscam.scanned', antiscam_cog.scanned_messages, 0, 'messages/min', True, self.bot.entity_id))
-                antiscam_cog.scanned_messages = 0
+                cursor.execute(query, (now, 'antiscam.scanned', antiscam_cog.messages_scanned, 0, 'messages/min', True, self.bot.entity_id))
+                antiscam_cog.messages_scanned = 0
             # antiscam activated count
             cursor.execute(query, (now, 'antiscam.activated', await self.db_get_antiscam_enabled_count(), 0, 'guilds', False, self.bot.entity_id))
             # tickets creation
