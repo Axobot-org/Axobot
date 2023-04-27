@@ -120,12 +120,10 @@ class PredictionResult:
         }
 
     def to_string(self, categories: dict):
-        probas = '\n    - '.join(f'{categories[c]}: {round(p*100, 1)}%' for c, p in self.probabilities.items())
-        return f"""Result: {categories[self.result]}
-
-Probabilities:
-    - {probas}
-        """
+        text = f"Result: {categories[self.result]}\n\nProbabilities:\n"
+        for category, proba in self.probabilities.items():
+            text += f"    - {categories[category]}: {round(proba*100, 1)}%\n"
+        return text
 
 class MsgReportView(discord.ui.View):
     "Embed view in the internal reports channel, used to confirm/deny/delete a message report"
