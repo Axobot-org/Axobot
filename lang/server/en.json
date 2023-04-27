@@ -153,5 +153,18 @@
         "xp_rate": "XP earnings modifier: %{value}",
         "xp_type": "XP system used: %{value}"
     },
-    "value-deleted": "The \"%{option}\" option value has been reset to its default value"
+    "tips": {
+        "antiscam_enable_logs": "You can enable logs for the antiscam system with the command %{modlogs_enable}",
+        "title": "Pro tip"
+    },
+    "value-deleted": "The \"%{option}\" option value has been reset to its default value",
+    "warnings": {
+        "antiraid_kick_ban": "I need both 'Kick members' and 'Ban members' permissions to apply the anti-raid protection",
+        "antiraid_kick": "I need the 'Kick members' permission to apply the anti-raid protection",
+        "antiraid_ban": "I need the 'Ban members' permission to apply the anti-raid protection",
+        "channel_write_permissions": "I need to be able to send messages in %{channel} for this option",
+        "moderation_command": "I need the '%{perm}' permission to apply this command",
+        "title": "Warning",
+        "xp_should_be_local": "This option only works for local XP system. You can change the server XP system with the 'xp_type' configuration option"
+    }
 }

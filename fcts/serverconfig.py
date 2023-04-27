@@ -10,6 +10,7 @@ from discord.ext import commands
 from fcts import checks
 from libs.bot_classes import Axobot, MyContext
 from libs.serverconfig.autocomplete import autocomplete_main
+from libs.serverconfig.checks import check_config
 from libs.serverconfig.config_paginator import ServerConfigPaginator
 from libs.serverconfig.converters import AllRepresentation, from_input, from_raw, to_display, to_raw
 from libs.serverconfig.options_list import options as options_list
@@ -503,7 +504,8 @@ class ServerConfig(commands.Cog):
                 await ctx.send(await self.bot._(ctx.guild.id, "server.internal-error"))
             return
         await self.set_option(ctx.guild.id, option_name, value)
-        await ctx.send(await self._get_set_success_message(ctx, option_name, value))
+        check_embed = await check_config(self.bot, ctx.guild, option_name, value)
+        await ctx.send(await self._get_set_success_message(ctx, option_name, value), embed=check_embed)
         # Send internal log
         msg = f"Changed option in server {ctx.guild.id}: {option_name} = `{to_raw(option_name, value)}`"
         emb = discord.Embed(description=msg, color=self.log_color, timestamp=self.bot.utcnow())
