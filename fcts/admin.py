@@ -757,17 +757,15 @@ Cette option affecte tous les serveurs"""
                     await ctx.send(f"Oops, askip le propriétaire de {guild.id} n'existe pas ._.")
                     continue
                 owner_list.append(guild.owner_id)
+        text: list[str] = []
         for member in server.members:
             if member.id in owner_list and role not in member.roles:
-                await ctx.send("Rôle ajouté à "+str(member))
+                text.append("Rôle ajouté à "+str(member))
                 await member.add_roles(role,reason="This user support me")
             elif (member.id not in owner_list) and role in member.roles:
-                await ctx.send("Rôle supprimé à "+str(member))
+                text.append("Rôle supprimé à "+str(member))
                 await member.remove_roles(role,reason="This user doesn't support me anymore")
-        if ctx.interaction:
-            await ctx.send("Done!")
-        else:
-            await self.add_success_reaction(ctx.message)
+        await ctx.send("\n".join(text))
 
     async def _get_ideas_list(self, channel: discord.TextChannel):
         "Get ideas from the ideas channel"
