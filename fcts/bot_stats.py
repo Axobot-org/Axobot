@@ -68,6 +68,7 @@ class BotStats(commands.Cog):
         self.record_cpu_usage.start()
         self.record_ws_latency.start()
         self.status_loop.start()
+        self.heartbeat_loop.start()
 
     async def cog_unload(self):
          # pylint: disable=no-member
@@ -75,6 +76,7 @@ class BotStats(commands.Cog):
         self.record_cpu_usage.cancel()
         self.record_ws_latency.cancel()
         self.status_loop.stop()
+        self.heartbeat_loop.stop()
 
     @tasks.loop(seconds=10)
     async def record_cpu_usage(self):
@@ -475,6 +477,23 @@ class BotStats(commands.Cog):
     @status_loop.error
     async def on_status_loop_error(self, error: Exception):
         self.bot.dispatch("error", error, "When sending stats to statuspage.io (<@279568324260528128>)")
+
+    @tasks.loop(minutes=2)
+    async def heartbeat_loop(self):
+        "Register a hearbeat in our database every 2min"
+        if not self.bot.internal_loop_enabled:
+            return
+        query = "INSERT INTO `statsbot`.`heartbeat` (`entity_id`) VALUES (%s)"
+        async with self.bot.db_query(query, (self.bot.entity_id,)):
+            self.bot.log.debug("Heartbeat sent to database")
+
+    @heartbeat_loop.before_loop
+    async def before_heartbeat_loop(self):
+        await self.bot.wait_until_ready()
+
+    @heartbeat_loop.error
+    async def on_heartbeat_loop_error(self, error: Exception):
+        self.bot.dispatch("error", error, "When sending heartbeat to statsbot (<@279568324260528128>)")
 
 
 async def setup(bot):
