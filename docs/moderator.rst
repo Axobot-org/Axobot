@@ -24,20 +24,15 @@ This command allows you to warn a member, without really sanctioning them. This 
 Mute/Unmute
 -----------
 
-.. warning::
-    This section describes the use of the mute system when coupled with a "muted" role. As of Axobot 4.0.3, having a special role is no longer mandatory, and Axobot will use Discord's "time out" feature when no role has been configured to mute.
-
-    If you have a role set to mute but wish to switch to the time out system, you can use the :code:`config reset muted_role` command.
+.. tip:: Check our `in-depth article <articles/mute.html>`_ to know everything about the mute command: how to configure it in your server, what are the diffenrent ways tomute people, and how to use its commands efficiently!
 
 **Syntax:** :code:`mute <user> [duration] [reason]`
 
-This command mutes a member, preventing them from typing.
+This command mutes a member, preventing them from sending messages. If you configured a muted role, Axobot will give it to the member, and remove it when the mute is over. If you didn't, Axobot will use Discord's "time out" feature, which will prevent the member from sending messages for the duration of the mute.
 
-The principle is to assign the *muted* role to the member, in order to distinguish them from the others. Simply configure the permissions to have the "send messages" option disabled in your channels. And if configuring the role is too much work for you, you can ask the bot to try to setup it automatically with the :code:`mute-config` command (see below).
+The duration of the temporary mute is quite flexible: use :code:`XXd` for days, :code:`XXh` for hours and :code:`XXm` for minutes (replacing **XX** by the corresponding number, of course!)
 
-The duration of the tempmute is quite flexible: use :code:`XXd` for days, :code:`XXh` for hours and :code:`XXm` for minutes (replacing **XX** by the corresponding number, of course!)
-
-.. warning:: The muted role must be placed below the bot role, and the bot must have "`Manage roles <perms.html#manage-roles>`__" (to give the role) permission.
+.. warning:: if you use a "muted" role, the role must be placed below the bot role, and the bot must have "`Manage roles <perms.html#manage-roles>`__" (to give the role) permission.
 
 .. note:: Axobot remembers when a member is muted in your server, and only delete this information when someone uses the !unmute command. So, if a member tries to lose his "muted" role by leaving and joining the server, Axobot will give them back his role, even if you removed it manually (without the command)!
 

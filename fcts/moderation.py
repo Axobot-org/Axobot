@@ -342,7 +342,7 @@ You can also mute this member for a defined duration, then use the following for
 
 ..Example mute @someone Plz respect me
 
-..Doc moderator.html#mute-unmute"""
+..Doc articles/mute"""
         duration = sum(time)
         if duration > 0:
             if duration > 60*60*24*365*3: # max 3 years
@@ -465,7 +465,7 @@ This will remove the role 'muted' for the targeted member
 
 ..Example unmute @someone
 
-..Doc moderator.html#mute-unmute"""
+..Doc articles/mute"""
         role = await self.get_muted_role(ctx.guild)
         # if role not in user.roles:
         if not await self.is_muted(ctx.guild, user, role):

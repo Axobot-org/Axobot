@@ -104,3 +104,4 @@ And even more!
 
    articles/v4
    articles/scam-detector
+   articles/mute
