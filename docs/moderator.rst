@@ -205,7 +205,7 @@ Anti-scam
 
 **How does it work?**
 
-Axobot has an advanced scam message detection system, involving a `highly trained AI <scam-detector.html>`__ that has been conscientiously built over several months. This allows you to automatically filter and remove any messages that are dangerous to your members, such as Nitro scams or other suspicious links.
+Axobot has an advanced scam message detection system, involving a `highly trained AI <articles/scam-detector.html>`__ that has been conscientiously built over several months. This allows you to automatically filter and remove any messages that are dangerous to your members, such as Nitro scams or other suspicious links.
 
 When Axobot is certain that a message is dangerous, it will delete the message immediately and send a log to the logs channel if you have configured it. If Axobot detects a "probably dangerous" message, it will not take any action but will send you an alert in this same logs channel. So make sure you have configured an antiscam logs channel if you enable this feature.
 
