@@ -32,7 +32,7 @@ Welcome to the **Axobot** documentation, a Discord bot coded in Python by a rand
             Join our support server
 
 
-.. warning:: Zbot becomes Axobot! Your favorite bot changes its name and avatar to become even more friendly! Read the `V4 changelog <v4.html>`_ for details on this really huge update.
+.. warning:: Zbot becomes Axobot! Your favorite bot changes its name and avatar to become even more friendly! Read the `V4 changelog <articles/v4.html>`_ for details on this really huge update.
 
 
 💡 Built-in features
@@ -102,5 +102,5 @@ And even more!
    :maxdepth: 1
    :caption: 💬 Our articles
 
-   v4
-   scam-detector
+   articles/v4
+   articles/scam-detector
