@@ -478,7 +478,7 @@ class Events(commands.Cog):
             def __init__(self):
                 super().__init__()
                 self.add_item(discord.ui.Button(label='Invite Axobot', url="https://zrunner.me/invite-axobot", style=discord.ButtonStyle.blurple))
-                self.add_item(discord.ui.Button(label='About the migration', url="https://axobot.readthedocs.io/en/latest/v4.html#new-identity"))
+                self.add_item(discord.ui.Button(label='About the migration', url="https://axobot.readthedocs.io/en/latest/articles/v4.html#new-identity"))
                 self.add_item(discord.ui.Button(label='Support server', url="https://discord.gg/N55zY88"))
 
         if self.bot.entity_id == 0 and random.random() < 0.1:
