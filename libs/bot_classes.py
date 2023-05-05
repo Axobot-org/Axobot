@@ -32,6 +32,7 @@ if TYPE_CHECKING:
     from fcts.cases import Cases
     from fcts.errors import Errors
     from fcts.minecraft import Minecraft
+    from fcts.moderation import Moderation
     from fcts.partners import Partners
     from fcts.rss import Rss
     from fcts.serverconfig import ServerConfig
@@ -199,6 +200,10 @@ class Axobot(commands.bot.AutoShardedBot):
 
     @overload
     def get_cog(self, name: Literal["Minecraft"]) -> Optional["Minecraft"]:
+        ...
+
+    @overload
+    def get_cog(self, name: Literal["Moderation"]) -> Optional["Moderation"]:
         ...
 
     @overload
