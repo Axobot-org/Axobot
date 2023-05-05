@@ -1,12 +1,12 @@
+import asyncio
 from typing import Literal, Optional
 
 import discord
-from discord.ext import commands
 from cachingutils import Cache
+from discord.ext import commands
 
 from libs.bot_classes import Axobot
 from libs.enums import ServerWarningType
-from libs.serverconfig.options_list import options
 
 
 class Welcomer(commands.Cog):
@@ -65,12 +65,21 @@ class Welcomer(commands.Cog):
                 await self.send_msg(member, "leave")
             await self.bot.get_cog('Events').check_user_left(member)
 
+    async def _is_raider(self, member: discord.Member):
+        "Use the AntiRaid cog to check if a member has just been detected as a potential raider"
+        if raid_cog := self.bot.get_cog("AntiRaid"):
+            if (self.bot.utcnow() - member.joined_at).total_seconds() < 3:
+                # wait a few seconds to let the cog do its job
+                await asyncio.sleep(2)
+            return await raid_cog.is_raider(member)
+        return False
+
     async def send_msg(self, member: discord.Member, event_type: Literal["welcome", "leave"]):
         """Envoie un message de bienvenue/départ dans le serveur"""
         if self.bot.zombie_mode:
             return
         text: Optional[str] = await self.bot.get_config(member.guild.id, event_type)
-        if member.id in self.no_message or (event_type == "welcome" and await self.raid_check(member)):
+        if member.id in self.no_message or (event_type == "welcome" and await self._is_raider(member)):
             return
         if self.bot.get_cog('Utilities').sync_check_any_link(member.name) is not None:
             return
@@ -93,7 +102,8 @@ class Welcomer(commands.Cog):
                     server=member.guild.name,
                     owner=member.guild.owner.name,
                     member_count=member.guild.member_count,
-                    type=botormember))
+                    type=botormember
+                ))
                 text = await self.bot.get_cog("Utilities").clear_msg(text, everyone=False)
                 msg = await channel.send(text)
                 if event_type == "welcome":
@@ -169,115 +179,16 @@ class Welcomer(commands.Cog):
 
     async def check_muted(self, member: discord.Member):
         """Give the muted role to that user if needed"""
-        modCog = self.bot.get_cog("Moderation")
-        if not modCog or not self.bot.database_online:
+        mod_cog = self.bot.get_cog("Moderation")
+        if not mod_cog or not self.bot.database_online:
             return
-        if await modCog.is_muted(member.guild, member, None):
-            role = await modCog.get_muted_role(member.guild)
+        if await mod_cog.is_muted(member.guild, member, None):
+            role = await mod_cog.get_muted_role(member.guild)
             if role:
                 try:
                     await member.add_roles(role)
                 except discord.Forbidden:
                     pass
-
-
-    async def kick(self, member: discord.Member, reason: str):
-        # if user is too high
-        if member.roles[-1].position >= member.guild.me.roles[-1].position:
-            return False
-        # try to send a DM but don't mind if we can't
-        try:
-            await member.send(await self.bot._(member, "moderation.raid-kicked", guild=member.guild.name))
-        except (discord.Forbidden, discord.HTTPException):
-            pass
-        try:
-            await member.guild.kick(member, reason=reason)
-        except (discord.Forbidden, discord.HTTPException):
-            return False
-        else:
-            await self.bot.get_cog("Moderation").send_modlogs("kick", member, self.bot.user, member.guild, reason=reason)
-            return True
-
-    async def ban(self, member: discord.Member, reason: str, duration: int = None):
-        # if user is too high
-        if member.roles[-1].position >= member.guild.me.roles[-1].position:
-            return False
-        # try to send a DM but don't mind if we can't
-        try:
-            await member.send(await self.bot._(member, "moderation.raid-banned", guild=member.guild.name))
-        except (discord.Forbidden, discord.HTTPException):
-            pass
-        try:
-            await member.guild.ban(member, reason=reason)
-        except (discord.Forbidden, discord.HTTPException):
-            return False
-        else:
-            if duration:
-                await self.bot.task_handler.add_task('ban', duration, member.id, member.guild.id)
-            log = str(await self.bot._(member.guild.id,"logs.ban")).format(member=member,reason=reason,case=None)
-            await self.bot.get_cog("Events").send_logs_per_server(member.guild,"ban",log,member.guild.me)
-            return True
-
-    async def raid_check(self, member: discord.Member):
-        # if guild is unavailable or the bot left the guild
-        if member.guild is None or member.guild.me is None:
-            return False
-        level_name: str = await self.bot.get_config(member.guild.id, "anti_raid")
-        # if level is unreadable or bot can't kick
-        if level_name != "none" or not member.guild.channels[0].permissions_for(member.guild.me).kick_members:
-            return
-        level: int = options["anti_raid"]["values"].index(level_name)
-        can_ban = member.guild.get_member(self.bot.user.id).guild_permissions.ban_members
-        account_created_since = (self.bot.utcnow() - member.created_at).total_seconds()
-        # Level 4
-        if level >= 4:
-            if account_created_since <= 86400: # kick accounts created less than 1d before
-                if await self.kick(member,await self.bot._(member.guild.id,"logs.reason.young")):
-                    self.bot.dispatch("antiraid_kick", member, {"account_creation_treshold": 86400})
-                    return True
-            if account_created_since <= 3600 and can_ban: # ban (2w) members created less than 1h before
-                if await self.ban(member, await self.bot._(member.guild.id,"logs.reason.young"), 86400*14):
-                    self.bot.dispatch("antiraid_ban", member, {
-                        "account_creation_treshold": 3600,
-                        "duration": 86400*14
-                    })
-                    return True
-            elif account_created_since <= 3600*3 and can_ban: # ban (1w) members created less than 3h before
-                if await self.ban(member, await self.bot._(member.guild.id,"logs.reason.young"), 86400*7):
-                    self.bot.dispatch("antiraid_ban", member, {
-                        "account_creation_treshold": 3600*3,
-                        "duration": 86400*7
-                    })
-                    return True
-        # Level 3 or more
-        if level >= 3 and can_ban:
-            # ban (1w) members with invitations in their nickname
-            if self.bot.get_cog('Utilities').sync_check_discord_invite(member.name) is not None:
-                if await self.ban(member, await self.bot._(member.guild.id,"logs.reason.invite"), 86400*7):
-                    self.bot.dispatch("antiraid_ban", member, {
-                        "discord_invite": True,
-                        "duration": 86400*7
-                    })
-                    return True
-            if account_created_since <= 3600*12: # kick accounts created less than 45min before
-                if await self.kick(member,await self.bot._(member.guild.id,"logs.reason.young")):
-                    self.bot.dispatch("antiraid_kick", member, {"account_creation_treshold": 3600*12})
-                    return True
-        # Level 2 or more
-        if level >= 2: # kick accounts created less than 15min before
-            if account_created_since <= 3600*2:
-                if await self.kick(member,await self.bot._(member.guild.id,"logs.reason.young")):
-                    self.bot.dispatch("antiraid_kick", member, {"account_creation_treshold": 3600*2})
-                    return True
-        # Level 1 or more
-        if level >= 1: # kick members with invitations in their nickname
-            if self.bot.get_cog('Utilities').sync_check_discord_invite(member.name) is not None:
-                if await self.kick(member,await self.bot._(member.guild.id,"logs.reason.invite")):
-                    self.bot.dispatch("antiraid_kick", member, {"discord_invite": True})
-                    return True
-        # Nothing got triggered
-        return False
-
 
     async def give_roles(self, member: discord.Member):
         """Give new roles to new users"""
