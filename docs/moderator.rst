@@ -182,15 +182,33 @@ Anti-raid
 
 *Not a command, but a server option.*
 
-This option allows you to moderate the entry of your server, with several levels of security. Here is the list of levels:
+This option allows you to moderate the entry of your server, with several levels of security. You can enable it with the :code:`/config set anti_raid` command followed by the level you want.
 
-* None: no filter
-* Smooth: kick members with invitations in their nickname
-* Careful: kick accounts created less than 2 hours before
-* High: ban members with invitations in their nickname for a week, and kick accounts created less than 12h before
-* Extreme: ban accounts created less than 3 hours before for a week, ban accounts created less than 1h before for 2 weeks, and simply kick those created less than 24h before
+Here is the list of levels:
 
-.. note:: Note that the levels are cumulative: level 3 will also have the specificities of levels 1 and 2
+* None
+    * no filter
+* Smooth
+    * kick users with invitations in their nickname
+    * time-out for 20min users sending 30 mentions in a short time
+* Careful
+    * kick accounts created less than 2 hours before
+    * time-out for 30min users sending 20 mentions in a short time
+    * time-out for 15min users sending 10 mentions in a short time
+* High
+    * ban users with invitations in their nickname for a week
+    * kick accounts created less than 12h before
+    * kick users sending 20 mentions in a short time
+    * time-out for 30min users sending 10 mentions in a short time
+* Extreme
+    * ban accounts created less than 3 hours before for a week
+    * ban accounts created less than 1h before for 2 weeks
+    * ban users sending 20 mentions in a short time for 2 week
+    * kick accounts created less than 24h before
+    * kick users sending 15 mentions in a short time
+    * time-out for 1h users sending 10 mentions in a short time
+
+.. note:: Note that the levels are cumulative: for example level 3 will also have the specificities of levels 1 and 2
 
 .. warning:: The bot must have access to "`Kick members <perms.html#kick-members>`__" and "`Ban members <perms.html#ban-members>`__" permissions
 
