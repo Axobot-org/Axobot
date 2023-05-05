@@ -302,9 +302,9 @@ Slowmode works up to one message every 6h (21600s)
         async with self.bot.db_query(query, (member.id, member.guild.id)):
             pass
 
-    async def check_mute_context(self, ctx: MyContext, role: discord.Role, user: discord.Member):
+    async def check_mute_context(self, ctx: MyContext, role: discord.Role, member: discord.Member):
         "Return True if the user can be muted in the given context"
-        if await self.is_muted(ctx.guild, user, role):
+        if await self.is_muted(ctx.guild, member, role):
             await ctx.send(await self.bot._(ctx.guild.id, "moderation.mute.already-mute"))
             return False
         if not ctx.guild.me.guild_permissions.manage_roles:
@@ -314,7 +314,7 @@ Slowmode works up to one message every 6h (21600s)
             if not ctx.guild.me.guild_permissions.moderate_members:
                 await ctx.send(await self.bot._(ctx.guild.id, "moderation.mute.cant-timeout"))
                 return False
-            if user.top_role.position >= ctx.guild.me.roles[-1].position:
+            if member.top_role.position >= ctx.guild.me.roles[-1].position:
                 await ctx.send(await self.bot._(ctx.guild.id, "moderation.mute.too-high"))
                 return False
             return True
@@ -427,16 +427,16 @@ You can also mute this member for a defined duration, then use the following for
         async with self.bot.db_query(query, (user.id, guild.id)):
             pass
 
-    async def is_muted(self, guild: discord.Guild, user: discord.User, role: Optional[discord.Role]) -> bool:
+    async def is_muted(self, guild: discord.Guild, member: discord.Member, role: Optional[discord.Role]) -> bool:
         """Check if a user is currently muted"""
+        if member.is_timed_out():
+            return True
         if not self.bot.database_online:
             if role is None:
                 return False
-            if not isinstance(user, discord.Member):
-                return False
-            return role in user.roles
+            return role in member.roles
         query = "SELECT COUNT(*) AS count FROM `mutes` WHERE guildid=%s AND userid=%s"
-        async with self.bot.db_query(query, (guild.id, user.id)) as query_results:
+        async with self.bot.db_query(query, (guild.id, member.id)) as query_results:
             result: int = query_results[0]['count']
         return bool(result)
 
@@ -459,7 +459,7 @@ You can also mute this member for a defined duration, then use the following for
     @commands.cooldown(5,20, commands.BucketType.guild)
     @commands.guild_only()
     @commands.check(checks.can_mute)
-    async def unmute(self, ctx:MyContext, *, user:discord.Member):
+    async def unmute(self, ctx:MyContext, *, user: discord.Member):
         """Unmute someone
 This will remove the role 'muted' for the targeted member
 
