@@ -37,7 +37,7 @@ class RssStats(TypedDict):
 
 
 class BotStats(commands.Cog):
-    """Hey, I'm a test cog! Happy to meet you :wave:"""
+    "Send internal stats to our database"
 
     def __init__(self, bot: Axobot):
         self.bot = bot
