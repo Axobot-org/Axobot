@@ -26,6 +26,7 @@ from utils import get_prefix
 
 if TYPE_CHECKING:
     from fcts.aide import Help
+    from fcts.antiraid import AntiRaid
     from fcts.bot_events import BotEvents
     from fcts.bot_stats import BotStats
     from fcts.cases import Cases
@@ -171,6 +172,10 @@ class Axobot(commands.bot.AutoShardedBot):
         # subclass to the super() method, which tells the bot to
         # use the new MyContext class
         return await super().get_context(source, cls=cls)
+
+    @overload
+    def get_cog(self, name: Literal["AntiRaid"]) -> Optional["AntiRaid"]:
+        ...
 
     @overload
     def get_cog(self, name: Literal["BotStats"]) -> Optional["BotStats"]:
