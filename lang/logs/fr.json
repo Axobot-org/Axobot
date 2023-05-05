@@ -9,6 +9,7 @@
         "autounmute": "unmute automatique",
         "invite": "Automod (invitation Discord)",
         "memberchan": "Action automatique (config membercount)",
+        "mentions": "Automod (spam de mentions)",
         "unban": "unban par %{user}",
         "unmute": "unmute par %{user}",
         "welcome_roles": "Action automatique (config welcome_roles)",
