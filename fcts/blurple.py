@@ -188,13 +188,13 @@ Online editor: https://projectblurple.com/paint
             return
         last_data: typing.Optional[dict] = await events_cog.db_get_dailies(ctx.author.id)
         cooldown = 3600*3
-        if last_data is None or (datetime.datetime.now() - last_data['last_update']).total_seconds() > cooldown:
+        if last_data is None or (self.bot.utcnow() - last_data['last_update']).total_seconds() > cooldown:
             points = randint(*self.hourly_reward)
             await self.bot.get_cog("Utilities").add_user_eventPoint(ctx.author.id, points)
             await events_cog.db_add_dailies(ctx.author.id, points)
             txt = await self.bot._(ctx.channel, "halloween.daily.got-points", pts=points)
         else:
-            time_since_available = (datetime.datetime.now() - last_data['last_update']).total_seconds()
+            time_since_available = (self.bot.utcnow() - last_data['last_update']).total_seconds()
             time_remaining = cooldown - time_since_available
             lang = await self.bot._(ctx.channel, '_used_locale')
             remaining = await FormatUtils.time_delta(time_remaining, lang=lang)
