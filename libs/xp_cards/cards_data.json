@@ -1,7 +1,7 @@
 {
     "meta": {
         "v1": {
-            "avatar_size": 282,
+            "avatar_size": 278,
             "avatar_position": [
                 23,
                 31
@@ -67,7 +67,7 @@
                     "alignment": "center",
                     "font": "Verdana.ttf"
                 },
-                "rank": {
+                "rank_and_participants": {
                     "position": [
                         [
                             800,
@@ -109,97 +109,112 @@
                 ]
             ]
         },
-        "v2": {
-            "avatar_size": 107,
+        "v3": {
+            "avatar_size": 257,
             "avatar_position": [
-                29,
-                21
+                31,
+                41
             ],
             "texts": {
                 "username": {
                     "position": [
                         [
-                            205,
-                            30
+                            340,
+                            49
                         ],
                         [
-                            815,
-                            68
+                            681,
+                            79
                         ]
                     ],
-                    "font_size": 38,
+                    "font_size": 55,
                     "alignment": "center",
-                    "font": "Roboto-Medium.ttf"
+                    "font": "Ginto.ttf"
                 },
                 "level": {
                     "position": [
                         [
-                            330,
-                            135
+                            778,
+                            94
                         ],
                         [
-                            497,
+                            931,
+                            196
+                        ]
+                    ],
+                    "font_size": 70,
+                    "alignment": "center",
+                    "font": "Ginto.ttf"
+                },
+                "rank": {
+                    "position": [
+                        [
+                            395,
+                            155
+                        ],
+                        [
+                            490,
                             206
                         ]
                     ],
                     "font_size": 55,
                     "alignment": "center",
-                    "font": "Roboto-Medium.ttf"
+                    "font": "Ginto.ttf"
                 },
-                "rank": {
+                "participants": {
                     "position": [
                         [
-                            530,
-                            135
+                            536,
+                            155
                         ],
                         [
-                            690,
-                            212
+                            631,
+                            206
                         ]
                     ],
-                    "font_size": 45,
+                    "font_size": 55,
                     "alignment": "center",
-                    "font": "Verdana.ttf"
+                    "font": "Ginto.ttf"
                 },
-                "current_xp": {
+                "xp_to_next_level_with_text": {
                     "position": [
                         [
-                            305,
-                            306
+                            515,
+                            255
                         ],
                         [
-                            497,
-                            319
-                        ]
-                    ],
-                    "font_size": 21,
-                    "alignment": "center",
-                    "font": "RobotoSlab-Regular.ttf"
-                },
-                "total_xp": {
-                    "position": [
-                        [
-                            522,
-                            306
-                        ],
-                        [
-                            729,
-                            319
+                            735,
+                            272
                         ]
                     ],
                     "font_size": 21,
                     "alignment": "center",
-                    "font": "RobotoSlab-Regular.ttf"
+                    "font": "Ginto.ttf"
+                },
+                "total_xp_with_text": {
+                    "position": [
+                        [
+                            515,
+                            315
+                        ],
+                        [
+                            735,
+                            328
+                        ]
+                    ],
+                    "font_size": 21,
+                    "alignment": "center",
+                    "font": "Ginto.ttf"
                 }
             },
             "xp_bar_position": [
                 [
                     302,
-                    266
+                    278
                 ],
                 [
-                    967,
-                    296
+                    951,
+                    307
                 ]
             ]
         }
@@ -212,8 +227,12 @@
                 "level_label": [255, 224, 77],
                 "level": [124, 197, 118],
                 "rank_label": [105, 157, 206],
+                "rank_and_participants": [105, 157, 206],
                 "rank": [105, 157, 206],
-                "xp": [124, 197, 118]
+                "participants": [105, 157, 206],
+                "xp": [124, 197, 118],
+                "xp_to_next_level_with_text": [124, 197, 118],
+                "total_xp_with_text": [124, 197, 118]
             }
         },
         "admin": {
@@ -223,7 +242,7 @@
                 "level_label": [230, 25, 40],
                 "level": [252, 32, 46],
                 "rank_label": [215, 0, 0],
-                "rank": [230, 0, 0],
+                "rank_and_participants": [230, 0, 0],
                 "xp": [230, 185, 11]
             }
         },
@@ -234,7 +253,7 @@
                 "level_label": [255, 255, 255],
                 "level": [255, 255, 255],
                 "rank_label": [255, 255, 255],
-                "rank": [255, 255, 255],
+                "rank_and_participants": [255, 255, 255],
                 "xp": [255, 255, 255]
             }
         },
@@ -245,8 +264,19 @@
                 "level_label": [255, 255, 255],
                 "level": [255, 255, 255],
                 "rank_label": [255, 255, 255],
-                "rank": [255, 255, 255],
+                "rank_and_participants": [255, 255, 255],
                 "xp": [255, 255, 255]
+            }
+        },
+        "blurple23": {
+            "xp_bar": [255, 255, 255],
+            "texts": {
+                "username": [255, 255, 255],
+                "level": [255, 255, 255],
+                "rank": [255, 255, 255],
+                "participants": [255, 255, 255],
+                "xp_to_next_level_with_text": [255, 255, 255],
+                "total_xp_with_text": [255, 255, 255]
             }
         }
     }
