@@ -112,6 +112,10 @@
             "You are in the bot support server",
             "You can only use this command in the support server"
         ],
+        "is_blurple": [
+            "The Discord Birthday event is underway, enjoy it!",
+            "There are no Blurple event at the moment"
+        ],
         "is_bot_admin": [
             "You need to be one of the bot Admins",
             "You are not a bot Admin"
@@ -122,7 +126,7 @@
         ],
         "is_halloween": [
             "The Halloween event is underway, enjoy it!",
-            "There are no Halloween type events at the moment"
+            "There are no Halloween event at the moment"
         ],
         "is_owner": [
             "You must be the owner of the bot",
