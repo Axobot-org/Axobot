@@ -317,7 +317,7 @@ def find_max_index(array: list[float]):
             closest = i
     return closest
 
-def color_ratios(img: Image.Image, colors: list[tuple[int, int, int]]):
+def color_ratios(img: Image.Image, colors: list[ColorType]):
     "Calculate the ratio of present colors in the given image (between 0.0 and 1.0)"
     img = img.convert('RGBA')
     total_pixels = img.width * img.height # number of pixels in the image
@@ -466,13 +466,13 @@ async def check_image_general(image: Image.Image, colors_refs: list[ColorType], 
             for frame in ImageSequence.Iterator(img):
                 resized = frame.resize((round(img.width / 3), round(img.height / 3)))
                 values = color_ratios(resized, colors_refs)
-                for i in range(4):
-                    total[i] += values[i]
+                for i, value in enumerate(values):
+                    total[i] += value
                 count += 1
 
             ratios = [0 for _ in range(len(total))]
             for i, value_color in enumerate(total):
-                ratios[i] = round(10000 * value_color / count) / 100
+                ratios[i] = round(100 * value_color / count, 2)
 
             passed = ratios[-1] <= 10
 
@@ -482,7 +482,7 @@ async def check_image_general(image: Image.Image, colors_refs: list[ColorType], 
 
             ratios = [0 for _ in range(len(values))]
             for i, value_color in enumerate(values):
-                ratios[i] = round(10000 * value_color) / 100
+                ratios[i] = round(100 * value_color, 2)
 
             passed = ratios[-1] <= 10
 
