@@ -17,7 +17,7 @@ class RecreateReminderView(discord.ui.View):
         self.bot = bot
         self.task = task
         self.message: Optional[discord.Message] = None
-        super().__init__(timeout=600)
+        super().__init__(timeout=60*60) # 1h
 
     async def init(self):
         "Create the button with the correct label"
