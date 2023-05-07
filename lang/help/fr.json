@@ -112,6 +112,10 @@
             "Vous êtes bien dans le serveur de support du bot",
             "Vous ne pouvez l'utiliser que dans le serveur de support"
         ],
+        "is_blurple": [
+            "L'anniversaire de Discord est en cours, profitez-en !",
+            "Il n'y a aucun événement Blurple actuellement"
+        ],
         "is_bot_admin": [
             "Il faut être administrateur du bot",
             "Vous n'êtes pas administrateur du bot"
@@ -122,7 +126,7 @@
         ],
         "is_halloween": [
             "L'événement Halloween est en cours, profitez-en !",
-            "Il n'y a aucun événement de type Halloween actuellement"
+            "Il n'y a aucun événement Halloween actuellement"
         ],
         "is_owner": [
             "Il faut être le propriétaire du bot",
