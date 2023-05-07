@@ -979,33 +979,36 @@ class Xp(commands.Cog):
     async def gen_rr_id(self):
         return round(time.time()/2)
 
-    async def rr_add_role(self, guildID:int, roleID:int, level:int):
+    async def rr_add_role(self, guild_id: int, role_id: int, level:int):
         """Add a role reward in the database"""
-        ID = await self.gen_rr_id()
-        query = "INSERT INTO `roles_rewards` (`ID`,`guild`,`role`,`level`) VALUES (%(i)s,%(g)s,%(r)s,%(l)s);"
-        async with self.bot.db_query(query, { 'i': ID, 'g': guildID, 'r': roleID, 'l': level }):
+        reward_id = await self.gen_rr_id()
+        query = "INSERT INTO `roles_rewards` (`ID`, `guild`, `role`, `level`) VALUES (%(i)s, %(g)s, %(r)s, %(l)s);"
+        async with self.bot.db_query(query, { 'i': reward_id, 'g': guild_id, 'r': role_id, 'l': level }):
             pass
         return True
 
-    async def rr_list_role(self, guild:int, level:int=-1):
+    async def rr_list_role(self, guild_id: int, level: int = -1):
         """List role rewards in the database"""
         if level < 0:
-            query = f"SELECT * FROM `roles_rewards` WHERE guild={guild} ORDER BY level;"
+            query = "SELECT * FROM `roles_rewards` WHERE `guild`=%s ORDER BY `level`;"
+            query_args = (guild_id,)
         else:
-            query = f"SELECT * FROM `roles_rewards` WHERE guild={guild} AND level={level} ORDER BY level;"
-        async with self.bot.db_query(query) as query_results:
+            query = "SELECT * FROM `roles_rewards` WHERE `guild`=%s AND `level`=%s ORDER BY `level`;"
+            query_args = (guild_id, level)
+        async with self.bot.db_query(query, query_args) as query_results:
             liste = list(query_results)
         return liste
 
-    async def rr_remove_role(self, ID:int):
+    async def rr_remove_role(self, role_id: int):
         """Remove a role reward from the database"""
-        query = ("DELETE FROM `roles_rewards` WHERE `ID`={};".format(ID))
-        async with self.bot.db_query(query):
+        query = "DELETE FROM `roles_rewards` WHERE `ID` = %s;"
+        async with self.bot.db_query(query, (role_id,)):
             pass
         return True
 
-    @commands.group(name="roles_rewards", aliases=['rr'])
+    @commands.hybrid_group(name="roles-rewards", aliases=['rr'])
     @commands.guild_only()
+    @app_commands.default_permissions(manage_roles=True)
     async def rr_main(self, ctx: MyContext):
         """Manage your roles rewards like a boss
 
@@ -1014,8 +1017,8 @@ class Xp(commands.Cog):
             await ctx.send_help(ctx.command)
 
     @rr_main.command(name="add")
-    @commands.check(checks.has_manage_guild)
-    async def rr_add(self, ctx: MyContext, level:int, *, role:discord.Role):
+    @commands.check(checks.has_manage_roles)
+    async def rr_add(self, ctx: MyContext, level: commands.Range[int, 1], *, role: discord.Role):
         """Add a role reward
         This role will be given to every member who reaches the level
 
@@ -1044,20 +1047,26 @@ class Xp(commands.Cog):
 
         ..Doc server.html#roles-rewards"""
         try:
-            l = await self.rr_list_role(ctx.guild.id)
+            roles_list = await self.rr_list_role(ctx.guild.id)
         except Exception as err:
             self.bot.dispatch("command_error", ctx, err)
         else:
-            des = '\n'.join(["• <@&{}> : lvl {}".format(x['role'], x['level']) for x in l])
+            if roles_list:
+                desc = '\n'.join([
+                    f"• <@&{x['role']}> : lvl {x['level']}"
+                    for x in roles_list
+                ])
+            else:
+                desc = await self.bot._(ctx.guild.id, "xp.no-rr-list", add=await self.bot.get_command_mention("roles-rewards add"))
             max_rr: int = await self.bot.get_config(ctx.guild.id, "rr_max_number")
-            title = await self.bot._(ctx.guild.id,"xp.rr_list", c=len(l), max=max_rr)
-            emb = discord.Embed(title=title, description=des, timestamp=ctx.message.created_at)
+            title = await self.bot._(ctx.guild.id,"xp.rr_list", c=len(roles_list), max=max_rr)
+            emb = discord.Embed(title=title, description=desc, timestamp=ctx.message.created_at)
             emb.set_footer(text=ctx.author, icon_url=ctx.author.display_avatar)
             await ctx.send(embed=emb)
 
     @rr_main.command(name="remove")
-    @commands.check(checks.has_manage_guild)
-    async def rr_remove(self, ctx: MyContext, level:int):
+    @commands.check(checks.has_manage_roles)
+    async def rr_remove(self, ctx: MyContext, level: commands.Range[int, 1]):
         """Remove a role reward
         When a member reaches this level, no role will be given anymore
 
@@ -1075,8 +1084,8 @@ class Xp(commands.Cog):
             await ctx.send(await self.bot._(ctx.guild.id, "xp.rr-removed", level=level))
 
     @rr_main.command(name="reload")
-    @commands.check(checks.has_manage_guild)
-    @commands.cooldown(1,300,commands.BucketType.guild)
+    @commands.check(checks.has_manage_roles)
+    @commands.cooldown(1, 300, commands.BucketType.guild)
     async def rr_reload(self, ctx: MyContext):
         """Refresh roles rewards for the whole server
 
@@ -1084,22 +1093,21 @@ class Xp(commands.Cog):
         try:
             if not ctx.guild.me.guild_permissions.manage_roles:
                 return await ctx.send(await self.bot._(ctx.guild.id,'moderation.mute.cant-mute'))
-            c = 0
+            count = 0
             rr_list = await self.rr_list_role(ctx.guild.id)
             if len(rr_list) == 0:
                 await ctx.send(await self.bot._(ctx.guild, "xp.no-rr-2"))
                 return
             used_system: str = await self.bot.get_config(ctx.guild.id, "xp_type")
             xps = [
-                {'user':x['userID'],'xp':x['xp']}
+                {'user': x['userID'], 'xp':x['xp']}
                 for x in await self.db_get_top(limit=None, guild=None if used_system == "global" else ctx.guild)
             ]
-            for member in xps:
-                m = ctx.guild.get_member(member['user'])
-                if m is not None:
-                    level = (await self.calc_level(member['xp'], used_system))[0]
-                    c += await self.give_rr(m, level, rr_list, remove=True)
-            await ctx.send(await self.bot._(ctx.guild.id, "xp.rr-reload", role_count=c,member_count=ctx.guild.member_count))
+            for member_data in xps:
+                if member := ctx.guild.get_member(member_data['user']):
+                    level = (await self.calc_level(member_data['xp'], used_system))[0]
+                    count += await self.give_rr(member, level, rr_list, remove=True)
+            await ctx.send(await self.bot._(ctx.guild.id, "xp.rr-reload", role_count=count,member_count=ctx.guild.member_count))
         except Exception as err:
             self.bot.dispatch("command_error", ctx, err)
 

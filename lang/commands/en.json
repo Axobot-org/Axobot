@@ -24,6 +24,7 @@
         "emoji list": "list",
         "role set-color": "set-color",
         "role members-list": "members-list",
+        "role temporary-grant": "temporary-grant",
         "role grant": "grant",
         "role revoke": "revoke",
         "unhoist": "unhoist",
@@ -71,7 +72,11 @@
         "profile card": "card",
         "profile config": "config",
         "rank": "rank",
-        "top": "top"
+        "top": "top",
+        "roles-rewards add": "add",
+        "roles-rewards list": "list",
+        "roles-rewards remove": "remove",
+        "roles-rewards reload": "reload"
     },
     "group_name": {
         "antiscam": "antiscam",
@@ -84,7 +89,8 @@
         "tickets portal": "portal",
         "tickets topic": "topic",
         "twitch": "twitch",
-        "profile": "profile"
+        "profile": "profile",
+        "roles-rewards": "roles-rewards"
     },
     "command_description": {
     },
@@ -162,6 +168,11 @@
         },
         "role members-list": {
             "role": "role"
+        },
+        "role temporary-grant": {
+            "role": "role",
+            "user": "user",
+            "time": "time"
         },
         "role grant": {
             "role": "role",
@@ -306,6 +317,13 @@
         "top": {
             "page": "page",
             "scope": "scope"
+        },
+        "roles-rewards add": {
+            "level": "level",
+            "role": "role"
+        },
+        "roles-rewards remove": {
+            "level": "level"
         }
     }
 }
