@@ -345,7 +345,7 @@ class BotEvents(commands.Cog):
         last_data = await self.db_get_dailies(ctx.author.id)
         cooldown = 3600/2 # 30min
         time_since_available: int = 0 if last_data is None else (
-            datetime.datetime.now() - last_data['last_update']).total_seconds() - cooldown
+            self.bot.utcnow() - last_data['last_update']).total_seconds() - cooldown
         if time_since_available >= 0:
             points = randint(*self.hourly_reward)
             await self.bot.get_cog("Utilities").add_user_eventPoint(ctx.author.id, points)
