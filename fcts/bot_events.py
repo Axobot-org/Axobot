@@ -334,6 +334,12 @@ class BotEvents(commands.Cog):
         "Get dailies info about a user"
         query = "SELECT * FROM `dailies` WHERE userid = %(u)s;"
         async with self.bot.db_query(query, {'u': userid}) as query_results:
+            if not query_results:
+                return None
+            result = query_results[0]
+            # apply utc offset
+            result['first_update'] = result['first_update'].replace(tzinfo=datetime.timezone.utc)
+            result['last_update'] = result['last_update'].replace(tzinfo=datetime.timezone.utc)
             return query_results[0] if len(query_results) > 0 else None
 
     @commands.command(name="fish")
