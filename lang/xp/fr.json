@@ -140,6 +140,7 @@
     "no-rank": "Personne n'a encore obtenu d'xp, réessayez plus tard !",
     "no-rr": "Aucun rôle n'a été configuré pour ce niveau",
     "no-rr-2": "Vous n'avez aucun rôle-récompense configuré !",
+    "no-rr-list": "Aucun rôle-récompense n'a encore été configuré !\nVous pouvez ajouter des rôles-récompenses avec la commande %{add}.",
     "rr-added": "Le rôle %{role} a correctement été ajouté pour le niveau %{level} !",
     "rr-reload": "%{role_count} rôles mis à jour / %{member_count} membres scannés",
     "rr-removed": "Plus aucun rôle ne sera donné pour le niveau %{level}",
