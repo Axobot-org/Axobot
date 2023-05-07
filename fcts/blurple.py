@@ -53,9 +53,9 @@ Original code: https://github.com/project-blurple/blurplefier
 Their server: https://discord.gg/qEmKyCf
 Online editor: https://projectblurple.com/paint
 
-..Example b blurplefy
+..Example b lightfy
 
-..Example b  blurplefy ++more-dark-blurple ++more-dark-blurple ++more-white ++less-blurple
+..Example b lightfy ++more-dark-blurple ++more-dark-blurple ++more-white ++less-blurple
 
 ..Example b darkfy @Axobot
 
