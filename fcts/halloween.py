@@ -187,7 +187,7 @@ A BIG thanks to the Project Blurple and their original code for the colorization
             return
         last_data: typing.Optional[dict] = await events_cog.db_get_dailies(ctx.author.id)
         cooldown = 3600
-        if last_data is None or (datetime.datetime.now() - last_data['last_update']).total_seconds() > cooldown:
+        if last_data is None or (self.bot.utcnow() - last_data['last_update']).total_seconds() > cooldown:
             points = randint(*self.hourly_reward)
             await self.bot.get_cog("Utilities").add_user_eventPoint(ctx.author.id, points)
             await events_cog.db_add_dailies(ctx.author.id, points)
