@@ -292,7 +292,7 @@ class BotEvents(commands.Cog):
             msg += f"\n\n__{_rank_total}:__ {points}\n__{_rank_global}:__ {user_rank}"
             await ctx.send(msg)
 
-    @events_main.command(name="collect")
+    @events_main.command(name="collect", enabled=False)
     @commands.cooldown(3, 60, commands.BucketType.user)
     async def event_collect(self, ctx: MyContext):
         "Collect your Christmas present!"
@@ -342,7 +342,7 @@ class BotEvents(commands.Cog):
             result['last_update'] = result['last_update'].replace(tzinfo=datetime.timezone.utc)
             return query_results[0] if len(query_results) > 0 else None
 
-    @commands.command(name="fish")
+    @commands.command(name="fish", enabled=False)
     async def fish(self, ctx: MyContext):
         "Try to catch a fish and get some event points!"
         if not self.current_event or self.current_event_data['type'] != "fish":
