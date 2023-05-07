@@ -140,6 +140,7 @@
     "no-rank": "No one has got any xp yet, try again later!",
     "no-rr": "No role has been configured for this level",
     "no-rr-2": "You didn't set any role reward yet!",
+    "no-rr-list": "No role reward has been configured yet!\nYou can add roles-rewards with the %{add} command.",
     "rr-added": "The role `%{role}` has been correctly added for level %{level}!",
     "rr-reload": "%{role_count} updated roles / %{member_count} scanned members",
     "rr-removed": "No role will be given for level %{level} anymore",
