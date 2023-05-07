@@ -1,9 +1,7 @@
-# -*- coding: utf-8 -*-
-
 import asyncio
 import io
 import math
-import typing
+from typing import Annotated, Any, Callable, Optional, TypedDict, Union
 
 import discord
 from discord.ext import commands
@@ -11,10 +9,9 @@ from PIL import Image, ImageSequence
 
 from libs.bot_classes import MyContext
 
-DARK_ORANGE = (205, 100, 10)
-ORANGE = (255, 140, 26)
-WHITE = (255, 255, 255)
-BLACK = (35, 39, 42)
+ColorType = tuple[int, int, int]
+ColorAlphaType = tuple[int, int, int, int]
+VariationType = tuple[float, float, float, float]
 
 class LinkConverter(str):
     "Represents a media link"
@@ -53,7 +50,7 @@ class TargetConverter:
 
         return await LinkConverter().convert(ctx, argument)
 
-TargetConverterType = typing.Annotated[typing.Union[discord.Member, discord.PartialEmoji, LinkConverter], TargetConverter]
+TargetConverterType = Annotated[Union[discord.Member, discord.PartialEmoji, LinkConverter], TargetConverter]
 
 class ColorVariation(str):
     "Represents a usable color variation for color conversion algorithm"
@@ -65,11 +62,21 @@ class ColorVariation(str):
             raise commands.errors.BadArgument('Not a valid flag!')
         return argument
 
-VariationFlagType = typing.Literal["hallowify", "edge-detect", "filter"]
+async def get_url_from_ctx(ctx: MyContext, who: Optional[TargetConverterType]):
+    "Get the resource URL from either the who argument or the context"
+    if ctx.message.attachments:
+        url = ctx.message.attachments[0].proxy_url
+    elif who is None:
+        url = ctx.author.display_avatar.url
+    else:
+        if isinstance(who, str):  # LinkConverter
+            url = who
+        elif isinstance(who, discord.PartialEmoji):
+            url = who.url
+        else:
+            url = who.display_avatar.url
+    return url
 
-ColorType = tuple[int, int, int]
-ColorAlphaType = tuple[int, int, int, int]
-VariationType = tuple[float, float, float, float]
 
 # source: https://dev.to/enzoftware/how-to-build-amazing-image-filters-with-python-median-filter---sobel-filter---5h7
 def edge_antialiasing(img: Image.Image):
@@ -162,7 +169,7 @@ def edge_antialiasing(img: Image.Image):
     return new_img
 
 
-def place_edges(img: Image.Image, edge_img: Image.Image, modifier: dict[str, typing.Any]):
+def place_edges(img: Image.Image, edge_img: Image.Image, modifier: dict[str, Any]):
     edge_img_minimum = 10
     edge_img_maximum = edge_img.crop().getextrema()[0][1]
     for x in range(1, img.width - 1):
@@ -175,33 +182,22 @@ def place_edges(img: Image.Image, edge_img: Image.Image, modifier: dict[str, typ
     return img
 
 
-def f(x: float, n: int, d: ColorType, m: tuple[float, float, float], l: ColorType):
+def resized_img(x: float, n: int, d: ColorType, m: tuple[float, float, float], l: ColorType):
     return round(((l[n] - d[n]) / 255) * (255 ** m[n] - (255 - x) ** m[n]) ** (1 / m[n]) + d[n])
 
-
-def light(x: float) -> ColorType:
-    # return tuple(f(x, i, (78, 93, 148), (0.641, 0.716, 1.262), (255, 255, 255)) for i in range(3))
-    return tuple(f(x, i, DARK_ORANGE, (1.2, 0.75, 0.42), WHITE) for i in range(3))
-
-
-def dark(x: float) -> ColorType:
-    # return tuple(f(x, i, (35, 39, 42), (1.064, 1.074, 1.162), (114, 137, 218)) for i in range(3))
-    return tuple(f(x, i, BLACK, (1.2, 1.07, 1.04), ORANGE) for i in range(3))
-
-
-def edge_detect(img: Image.Image, modifier: dict[str, typing.Any], variation: VariationType, maximum: int, minimum: int):
+def edge_detect(img: Image.Image, modifier: dict[str, Any], variation: VariationType, maximum: int, minimum: int):
     img = img.convert('RGBA')
     edge_img = edge_antialiasing(img)
-    img = hallowify(img, modifier, variation, maximum, minimum)
+    img = colorify_image(img, modifier, variation, maximum, minimum)
     new_img = place_edges(img, edge_img, modifier)
     return new_img
 
 
-def interpolate(color1: int, color2: int, percent: float):
+def interpolate(color1, color2, percent):
     return round((color2 - color1) * percent + color1)
 
 
-def f2(x: float, n: int, colors: list[ColorType], variation: VariationType):
+def f2(x, n, colors, variation):
     if x < variation[0]:
         return colors[0][n]
     elif x < variation[1]:
@@ -217,7 +213,7 @@ def f2(x: float, n: int, colors: list[ColorType], variation: VariationType):
         return colors[2][n]
 
 
-def f3(x: float, n: int, colors: list[ColorType], cur_color: ColorAlphaType):
+def f3(x, n, colors, cur_color):
     array = []
 
     for i in range(len(colors)):
@@ -232,22 +228,21 @@ def f3(x: float, n: int, colors: list[ColorType], cur_color: ColorAlphaType):
         return interpolate(colors[2][n], colors[1][n], x)
 
 
-def colorify(x: float, colors: list[ColorType], variation: VariationType):
+def _colorify(x, colors, variation):
     return tuple(f2(x, i, colors, variation) for i in range(3))
 
 
-def edge_colorify(x: float, colors: list[ColorType], cur_color: ColorAlphaType):
+def edge_colorify(x, colors, cur_color):
     return tuple(f3(x, i, colors, cur_color) for i in range(3))
 
 
-def remove_alpha(img: Image.Image, bg: ColorAlphaType):
+def remove_alpha(img: Image.Image, bg: ColorType):
     alpha = img.convert('RGBA').getchannel('A')
     background = Image.new("RGBA", img.size, bg)
     background.paste(img, mask=alpha)
     return background
 
-
-def HALLOWEEN_filter(img: Image.Image, modifier: dict[str, typing.Any], variation: VariationType, maximum: int, minimum: int):
+def variations_filter(img: Image.Image, modifier: dict[str, Any], _variation: VariationType, _maximum: int, minimum: int):
     img = img.convert('LA')
     pixels = img.getdata()
     img = img.convert('RGBA')
@@ -256,15 +251,18 @@ def HALLOWEEN_filter(img: Image.Image, modifier: dict[str, typing.Any], variatio
     img.putdata((*map(lambda x: results[x[0]] + (x[1],), pixels),))
     return img
 
-
-def hallowify(img: Image.Image, modifier: dict[str, typing.Any], variation: VariationType, maximum: int, minimum: int):
+def colorify_image(img: Image.Image, modifier: dict[str, Any], variation: VariationType, maximum: int, minimum: int):
     img = img.convert('LA')
     pixels = img.getdata()
     img = img.convert('RGBA')
-    results = [colorify((x - minimum) / (maximum - minimum), modifier['colors'], variation) if x >= minimum else 0 for x in range(256)]
+    results = [
+        _colorify((x - minimum) / (maximum - minimum), modifier['colors'], variation)
+        if x >= minimum
+        else 0
+        for x in range(256)
+    ]
     img.putdata((*map(lambda x: results[x[0]] + (x[1],), pixels),))
     return img
-
 
 def variation_maker(base: VariationType, var: VariationType):
     if var[0] <= -100:
@@ -309,17 +307,15 @@ def distance_to_color(color1: ColorType, color2: ColorType):
         total += (255 - abs(color1[i] - color2[i])) / 255
     return total / 3
 
-
 def find_max_index(array: list[float]):
     "Find the index of the maximum value in an array"
     maximum = 0
     closest = None
-    for i in range(len(array)):
-        if array[i] > maximum:
-            maximum = array[i]
+    for i, value in enumerate(array):
+        if value > maximum:
+            maximum = value
             closest = i
     return closest
-
 
 def color_ratios(img: Image.Image, colors: list[tuple[int, int, int]]):
     "Calculate the ratio of present colors in the given image (between 0.0 and 1.0)"
@@ -356,90 +352,35 @@ def color_ratios(img: Image.Image, colors: list[tuple[int, int, int]]):
     return percent
 
 
-MODIFIERS = {
-    'light': {
-        'func': light,
-        'colors': [DARK_ORANGE, ORANGE, WHITE],
-        'color_names': ['Dark Orange', 'Orange', 'White']
-    },
-    'dark': {
-        'func': dark,
-        'colors': [BLACK, DARK_ORANGE, ORANGE],
-        'color_names': ['Not Quite Black', 'Dark Orange', 'Orange']
-    },
-    'all': {
-        'colors': [BLACK, DARK_ORANGE, ORANGE, WHITE],
-        'color_names': ['Not Quite Black', 'Dark Orange', 'Orange', 'White']
-    }
-}
-
-METHODS = {
-    'hallowify': hallowify,
-    'edge-detect': edge_detect,
-    'filter': HALLOWEEN_filter
-}
-VARIATIONS = {
-    None: (0, 0, 0, 0),
-    'light++more-white': (0, 0, -.05, -.05),
-    'light++more-halloween': (-.05, -.05, .05, .05),
-    'light++more-dark-halloween': (.05, .05, 0, 0),
-    'dark++more-halloween': (0, 0, -.05, -.05),
-    'dark++more-dark-halloween': (-.05, -.05, .05, .05),
-    'dark++more-not-quite-black': (.05, .05, 0, 0),
-    'light++less-white': (0, 0, .05, .05),
-    'light++less-halloween': (.05, .05, -.05, -.05),
-    'light++less-dark-halloween': (-.05, -.05, 0, 0),
-    'dark++less-halloween': (0, 0, .05, .05),
-    'dark++less-dark-halloween': (.05, .05, -.05, -.05),
-    'dark++less-not-quite-black': (-.05, -.05, 0, 0),
-    'light++no-white': (0, 0, 500, 500),
-    'light++no-halloween': (0, 500, -500, 0),
-    'light++no-dark-halloween': (-500, -500, 0, 0),
-    'dark++no-halloween': (0, 0, 500, 500),
-    'dark++no-dark-halloween': (0, 500, -500, 0),
-    'dark++no-not-quite-black': (-500, -500, 0, 0),
-    '++classic': (.15, -.15, .15, -.15),
-    '++less-gradient': (.05, -.05, .05, -.05),
-    '++more-gradient': (-.05, .05, -.05, .05),
-    '++invert': invert_colors,
-    '++shift': shift_colors,
-    'lightbg++white-bg': (255, 255, 255, 255),
-    'lightbg++halloween-bg': ORANGE+(255,),
-    'lightbg++dark-halloween-bg': DARK_ORANGE+(255,),
-    'darkbg++halloween-bg': ORANGE+(255,),
-    'darkbg++dark-halloween-bg': DARK_ORANGE+(255,),
-    'darkbg++not-quite-black-bg': BLACK+(255,),
-}
-
-
-def convert_image(image: Image.Image, modifier: str, method: str, variations: list[str]):
+async def convert_image_general(image: Image.Image, modifier: str, method: str, selected_variations: list[str],
+                        modifiers: dict[str, dict], base_color_var: VariationType, methods: dict[str, Callable],
+                        variations: dict[str, VariationType]):
     "Change an image colors into orange-black colors by using given modifier, method and variations"
     try:
-        modifier_converter = dict(MODIFIERS[modifier])
+        modifier_converter = dict(modifiers[modifier])
     except KeyError:
-        raise RuntimeError('Invalid image modifier.')
+        raise RuntimeError('Invalid image modifier', modifier) from None
 
     try:
-        method_converter = METHODS[method]
+        method_converter = methods[method]
     except KeyError:
-        raise RuntimeError('Invalid image method.')
+        raise RuntimeError('Invalid image method', method) from None
 
     if image == b'':
         raise RuntimeError('Invalid image')
 
-    variations.sort()
+    selected_variations.sort()
     background_color = None
-    base_color_var = (.7, .42, .14, .85)
     variation_converter = (0, 0, 0, 0)
-    for var in variations:
+    for var in selected_variations:
         try:
-            variation_converter = VARIATIONS[var]
+            variation_converter = variations[var]
         except KeyError:
             try:
-                variation_converter = VARIATIONS[modifier + var]
+                variation_converter = variations[modifier + var]
             except KeyError:
                 try:
-                    variation_converter = VARIATIONS[modifier + 'bg' + var]
+                    variation_converter = variations[modifier + 'bg' + var]
                     background_color = variation_converter
                     continue
                 except KeyError:
@@ -486,7 +427,7 @@ def convert_image(image: Image.Image, modifier: str, method: str, variations: li
                                duration=durations)
             except TypeError as err:
                 print(err)
-                raise RuntimeError('Invalid GIF.')
+                raise RuntimeError('Invalid GIF') from None
 
             filename = f'{modifier}.gif'
 
@@ -507,26 +448,31 @@ def convert_image(image: Image.Image, modifier: str, method: str, variations: li
     return discord.File(out, filename=filename)
 
 
-async def check_image(image: Image.Image):
-    "Check if an image has enough of the event colors, and return the analyse data"
-    colors_refs: list[tuple[int, int, int]] = MODIFIERS["all"]["colors"]
-    colors_names: list[tuple[int, int, int]] = MODIFIERS["all"]["color_names"]
+class CheckResultColor(TypedDict):
+    name: str
+    ratio: float
 
+class CheckResult(TypedDict):
+    passed: bool
+    colors: list[CheckResultColor]
+
+async def check_image_general(image: Image.Image, colors_refs: list[ColorType], colors_names: list[ColorType]) -> CheckResult:
+    "Check if an image has enough of the event colors, and return the analyse data"
     with Image.open(io.BytesIO(image)) as img:
         if img.format == "GIF":
             total = [0, 0, 0, 0, 0]
             count = 0
 
             for frame in ImageSequence.Iterator(img):
-                f = frame.resize((round(img.width / 3), round(img.height / 3)))
-                values = color_ratios(f, colors_refs)
+                resized = frame.resize((round(img.width / 3), round(img.height / 3)))
+                values = color_ratios(resized, colors_refs)
                 for i in range(4):
                     total[i] += values[i]
                 count += 1
 
             ratios = [0 for _ in range(len(total))]
-            for i in range(len(total)):
-                ratios[i] = round(10000 * total[i] / count) / 100
+            for i, value_color in enumerate(total):
+                ratios[i] = round(10000 * value_color / count) / 100
 
             passed = ratios[-1] <= 10
 
@@ -535,8 +481,8 @@ async def check_image(image: Image.Image):
             values = color_ratios(img, colors_refs)
 
             ratios = [0 for _ in range(len(values))]
-            for i in range(len(values)):
-                ratios[i] = round(10000 * values[i]) / 100
+            for i, value_color in enumerate(values):
+                ratios[i] = round(10000 * value_color) / 100
 
             passed = ratios[-1] <= 10
 
@@ -547,7 +493,7 @@ async def check_image(image: Image.Image):
             'ratio': ratio
         })
     colors.append({
-        'name': 'Non-Halloween',
+        'name': 'Non-Color',
         'ratio': ratios[-1]
     })
     data = {
