@@ -32,7 +32,8 @@ V1_CARDS = {
     "yellow",
 }
 
-V2_CARDS = {
+V3_CARDS = {
+    "blurple23",
 }
 
 JSON_DATA_FILE = os.path.dirname(__file__) + "/cards_data.json"
@@ -42,8 +43,8 @@ def get_card_meta(card_name: str) -> CardMetaData:
     """Return the metadata for the card"""
     if card_name in V1_CARDS:
         version = "v1"
-    elif card_name in V2_CARDS:
-        version = "v2"
+    elif card_name in V3_CARDS:
+        version = "v3"
     else:
         raise ValueError(f"Unknown card type: {card_name}")
     with open(JSON_DATA_FILE, "r", encoding="utf8") as file:
@@ -115,8 +116,10 @@ def get_card_texts(
         "level_label": translation_map.get("LEVEL", "Level"),
         "level": str(level),
         "rank_label": translation_map.get("RANK", "RANK"),
-        "rank": f"{rank}/{participants}",
-        "current_xp": f"{current_xp}/{xp_to_next_level}",
-        "total_xp": f"{total_xp}/{total_xp + xp_to_next_level - current_xp}",
+        "rank_and_participants": f"{rank}/{participants}",
+        "rank": str(rank),
+        "participants": str(participants),
+        "xp_to_next_level_with_text": f"{xp_to_next_level} left to levelup!",
+        "total_xp_with_text": f"{total_xp} Total XP",
         "xp": f"{current_xp}/{xp_to_next_level} ({total_xp}/{total_xp + xp_to_next_level - current_xp})"
     }
