@@ -27,7 +27,7 @@ class CardGeneration:
 
     def _paste_avatar(self):
         """Paste the avatar onto the destination image"""
-        self.avatar = self.avatar.resize((278, 278), resample=Image.Resampling.LANCZOS)
+        self.avatar = self.avatar.resize(self.data["avatar_size"], resample=Image.Resampling.LANCZOS)
         self.result.paste(self.avatar, self.data["avatar_position"])
 
     def _add_text(self):
