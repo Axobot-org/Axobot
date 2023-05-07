@@ -150,5 +150,23 @@
             ],
             "probability": 0.05
         }
+    },
+    "blurple-2023": {
+        "begin": "2023-05-07",
+        "end": "2023-05-28",
+        "type": "blurple",
+        "icon": null,
+        "color": 5793266,
+        "objectives": [
+            {
+                "points": 300,
+                "reward_type": "rankcard",
+                "rank_card": "blurple23"
+            },
+            {
+                "points": 600,
+                "reward_type": "custom"
+            }
+        ]
     }
 }
