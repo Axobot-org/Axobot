@@ -210,6 +210,11 @@ class BotStats(commands.Cog):
 
     async def db_record_dailies_values(self, now: datetime):
         "Record into the stats table the total, min, max and median dailies values, as well as the number of dailies rows"
+        # check if any daily is present
+        query = "SELECT COUNT(*) FROM `axobot`.`dailies`"
+        async with self.bot.db_query(query, fetchone=True, astuple=True) as query_result:
+            if query_result[0] == 0:
+                return
         args = ("points", False, self.bot.entity_id)
         # Total
         query = "INSERT INTO `statsbot`.`zbot` SELECT %s, %s, SUM(points) AS value, 0, %s, %s, %s FROM `axobot`.`dailies`"
@@ -423,7 +428,7 @@ class BotStats(commands.Cog):
             # Push everything
             cnx.commit()
         except mysql.connector.errors.IntegrityError as err: # usually duplicate primary key
-            self.bot.log.warning(f"Stats loop iteration cancelled: {err}")
+            self.bot.log.warning(f"Stats loop iteration cancelled: {err}", exc_info=True)
         # if something goes wrong, we still have to close the cursor
         cursor.close()
 
