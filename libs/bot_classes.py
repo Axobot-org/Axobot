@@ -245,13 +245,16 @@ class Axobot(commands.bot.AutoShardedBot):
                 self._cnx[0][0].close()
             self.log.debug('Connecting to MySQL (user %s, database "%s")',
                            self.database_keys['user'], self.database_keys['database1'])
-            self._cnx[0][0] = sql_connect(user=self.database_keys['user'],
+            self._cnx[0][0] = sql_connect(
+                user=self.database_keys['user'],
                 password=self.database_keys['password'],
                 host=self.database_keys['host'],
                 database=self.database_keys['database1'],
                 buffered=True,
                 charset='utf8mb4',
-                collation='utf8mb4_unicode_ci')
+                collation='utf8mb4_unicode_ci',
+                connection_timeout=5
+            )
             self._cnx[0][1] = round(time.time())
         else:
             raise ValueError(dict)
@@ -284,11 +287,14 @@ class Axobot(commands.bot.AutoShardedBot):
                 self._cnx[1][0].close()
             self.log.debug('Connecting to MySQL (user %s, database "%s")',
                            self.database_keys['user'], self.database_keys['database2'])
-            self._cnx[1][0] = sql_connect(user=self.database_keys['user'],
+            self._cnx[1][0] = sql_connect(
+                user=self.database_keys['user'],
                 password=self.database_keys['password'],
                 host=self.database_keys['host'],
                 database=self.database_keys['database2'],
-                buffered=True)
+                buffered=True,
+                connection_timeout=5
+            )
             self._cnx[1][1] = round(time.time())
         else:
             raise ValueError(dict)
