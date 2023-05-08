@@ -1631,7 +1631,7 @@ class Rss(commands.Cog):
         if not self.bot.rss_enabled:
             return
         if not self.bot.database_online:
-            self.bot.log.warning('Base de donnée hors ligne - check rss annulé')
+            self.bot.log.warning('[rss ] Database is offline, skipping rss loop')
             return
         self.bot.log.info(" Boucle rss commencée !")
         try:
