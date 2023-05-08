@@ -129,7 +129,7 @@ Online editor: https://projectblurple.com/paint
         await ctx.reply(await ctx.bot._(ctx.channel, 'blurple.blurplefy.success', user=ctx.author.mention), file=result)
         if not isinstance(old_msg, discord.InteractionMessage):
             await old_msg.delete()
-        await self.bot.get_cog("Utilities").add_user_eventPoint(ctx.author.id, 3)
+        await self.bot.get_cog("Utilities").add_user_eventPoint(ctx.author.id, 1)
 
     @blurple_main.command("lightfy")
     @commands.cooldown(6, 120, commands.BucketType.member)
