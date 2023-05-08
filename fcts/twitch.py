@@ -37,13 +37,13 @@ class Twitch(commands.Cog):
             self.bot.others["twitch"]["client_secret"]
         )
         self.bot.log.info("[twitch] connected to API")
-        self.stream_check_task.start()
+        self.stream_check_task.start() # pylint: disable=no-member
 
     async def cog_unload(self):
         "Close the Twitch session"
         await self.agent.close_session()
         self.bot.log.info("[twitch] connection closed")
-        self.stream_check_task.cancel()
+        self.stream_check_task.cancel() # pylint: disable=no-member
 
     async def db_add_streamer(self, guild_id: int, platform: PlatformId, user_id: str, user_name: str):
         "Add a streamer to the database"
@@ -326,6 +326,9 @@ class Twitch(commands.Cog):
     async def stream_check_task(self):
         "Check if any subscribed streamer is streaming and send notifications"
         await self.bot.wait_until_ready()
+        if not self.bot.database_online:
+            self.bot.log.info("[twitch] Database is offline, skipping stream check")
+            return
         count = 0
         streamer_ids: dict[str, _StreamersReadyForNotification] = {}
         for streamer in await self.db_get_guilds_per_streamers("twitch"):

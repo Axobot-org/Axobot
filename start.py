@@ -69,6 +69,9 @@ async def main():
     if client.database_online:
         client.connect_database_axobot()
         client.connect_database_xp()
+    elif len(args.token) < 30:
+        client.log.fatal("Invalid bot token")
+        return
 
     if args.token == 'zbot':
         bot_data = tokens.get_token(client, 486896267788812288)
@@ -84,7 +87,7 @@ async def main():
         client.entity_id = bot_data["entity_id"]
         client.beta = True
     elif len(args.token) < 30:
-        print("Invalid bot token")
+        client.log.fatal("Invalid bot token")
         return
     else:
         token: str = args.token
