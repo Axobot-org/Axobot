@@ -1,16 +1,17 @@
 import datetime
 import json
-from random import randint
 import random
+from random import randint
 from typing import Optional
 
 import discord
 from discord.ext import commands
-from libs.bot_classes import MyContext, Axobot
-from libs.bot_events import EventData, EventType
-from libs.formatutils import FormatUtils
 
 from fcts.checks import is_fun_enabled
+from libs.bot_classes import Axobot, MyContext
+from libs.bot_events import EventData, EventType
+from libs.formatutils import FormatUtils
+from utils import OUTAGE_REASON
 
 translations_data = {
     "fr": {
@@ -246,50 +247,58 @@ class BotEvents(commands.Cog):
 
         if user is None:
             user = ctx.author
-        user_rank_query = await self.bot.get_cog("Utilities").get_eventsPoints_rank(user.id)
-        if user_rank_query is None:
-            user_rank = await self.bot._(ctx.channel, "bot_events.unclassed")
-            points = 0
-        else:
-            total_ranked = await self.bot.get_cog("Utilities").get_eventsPoints_nbr()
-            if user_rank_query['rank'] <= total_ranked:
-                user_rank = f"{user_rank_query['rank']}/{total_ranked}"
-            else:
-                user_rank = await self.bot._(ctx.channel, "bot_events.unclassed")
-            points: int = user_rank_query["events_points"]
-        title = await self.bot._(ctx.channel, "bot_events.rank-title")
-        prices: dict[str, dict[str, str]] = translations_data[lang]['events-prices']
-        if current_event in prices:
-            emojis = self.bot.emojis_manager.customs["green_check"], self.bot.emojis_manager.customs["red_cross"]
-            prices_list = []
-            for price, desc in prices[current_event].items():
-                emoji = emojis[0] if int(price) <= points else emojis[1]
-                prices_list.append(f"{emoji}{min(points, int(price))}/{price}: {desc}")
-            prices = "\n".join(prices_list)
-            objectives_title = await self.bot._(ctx.channel, "bot_events.objectives")
-        else:
-            prices = ""
-            objectives_title = ""
-        _rank_total = await self.bot._(ctx.channel, "bot_events.rank-total")
-        _position_global = await self.bot._(ctx.channel, "bot_events.position-global")
-        _rank_global = await self.bot._(ctx.channel, "bot_events.leaderboard-global", count=5)
 
+        if self.bot.database_online:
+            user_rank_query = await self.bot.get_cog("Utilities").get_eventsPoints_rank(user.id)
+            if user_rank_query is None:
+                user_rank = await self.bot._(ctx.channel, "bot_events.unclassed")
+                points = 0
+            else:
+                total_ranked = await self.bot.get_cog("Utilities").get_eventsPoints_nbr()
+                if user_rank_query['rank'] <= total_ranked:
+                    user_rank = f"{user_rank_query['rank']}/{total_ranked}"
+                else:
+                    user_rank = await self.bot._(ctx.channel, "bot_events.unclassed")
+                points: int = user_rank_query["events_points"]
+            prices: dict[str, dict[str, str]] = translations_data[lang]['events-prices']
+            if current_event in prices:
+                emojis = self.bot.emojis_manager.customs["green_check"], self.bot.emojis_manager.customs["red_cross"]
+                prices_list = []
+                for price, desc in prices[current_event].items():
+                    emoji = emojis[0] if int(price) <= points else emojis[1]
+                    prices_list.append(f"{emoji}{min(points, int(price))}/{price}: {desc}")
+                prices = "\n".join(prices_list)
+                objectives_title = await self.bot._(ctx.channel, "bot_events.objectives")
+            else:
+                prices = ""
+                objectives_title = ""
+            _rank_total = await self.bot._(ctx.channel, "bot_events.rank-total")
+            _position_global = await self.bot._(ctx.channel, "bot_events.position-global")
+            _rank_global = await self.bot._(ctx.channel, "bot_events.leaderboard-global", count=5)
+
+        title = await self.bot._(ctx.channel, "bot_events.rank-title")
         if ctx.can_send_embed:
             desc = await self.bot._(ctx.channel, "bot_events.xp-howto")
             emb = discord.Embed(title=title, description=desc, color=self.current_event_data["color"])
             user: discord.User
             emb.set_author(name=user, icon_url=user.display_avatar.replace(static_format="png", size=32))
-            if objectives_title != "":
-                emb.add_field(name=objectives_title, value=prices, inline=False)
-            emb.add_field(name=_rank_total, value=str(points))
-            emb.add_field(name=_position_global, value=user_rank)
-            emb.add_field(name=_rank_global, value=await self.get_top_5(), inline=False)
+            if self.bot.database_online:
+                if objectives_title != "":
+                    emb.add_field(name=objectives_title, value=prices, inline=False)
+                emb.add_field(name=_rank_total, value=str(points))
+                emb.add_field(name=_position_global, value=user_rank)
+                emb.add_field(name=_rank_global, value=await self.get_top_5(), inline=False)
+            else:
+                lang = await self.bot._(ctx.channel, '_used_locale')
+                reason = OUTAGE_REASON.get(lang, OUTAGE_REASON['en'])
+                emb.add_field(name="OUTAGE", value=reason)
             await ctx.send(embed=emb)
         else:
             msg = f"**{title}** ({user})"
-            if objectives_title != "":
-                msg += f"\n\n__{objectives_title}:__\n{prices}"
-            msg += f"\n\n__{_rank_total}:__ {points}\n__{_rank_global}:__ {user_rank}"
+            if self.bot.database_online:
+                if objectives_title != "":
+                    msg += f"\n\n__{objectives_title}:__\n{prices}"
+                msg += f"\n\n__{_rank_total}:__ {points}\n__{_rank_global}:__ {user_rank}"
             await ctx.send(msg)
 
     @events_main.command(name="collect", enabled=False)
