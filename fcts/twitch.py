@@ -327,7 +327,7 @@ class Twitch(commands.Cog):
         "Check if any subscribed streamer is streaming and send notifications"
         await self.bot.wait_until_ready()
         if not self.bot.database_online:
-            self.bot.log.info("[twitch] Database is offline, skipping stream check")
+            self.bot.log.warning("[twitch] Database is offline, skipping stream check")
             return
         count = 0
         streamer_ids: dict[str, _StreamersReadyForNotification] = {}
