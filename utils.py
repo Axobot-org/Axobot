@@ -16,8 +16,8 @@ if TYPE_CHECKING:
     from libs.bot_classes import Axobot
 
 OUTAGE_REASON = {
-    'fr': "Un des datacenters de notre hébergeur OVH a pris feu, rendant ,inaccessible le serveur et toutes ses données. Une vieille sauvegarde de la base de donnée sera peut-être utilisée ultérieurement. Plus d'informations sur https://zbot.statuspage.io/",
-    'en': "One of the datacenters of our host OVH caught fire, making the server and all its data inaccessible. An old backup of the database may be used later. More information on https://zbot.statuspage.io/"
+    'fr': "Nous faisons de notre mieux pour rétablir nos services dans les plus brefs délais, mais la panne peut être hors de notre contrôle. Plus d'informations sur https://zbot.statuspage.io/ ou sur notre serveur Discord.",
+    'en': "We do our best to restore our services as soon as possible, but the failure may be beyond our control. More information on https://zbot.statuspage.io/ or in our Discord server."
 }
 
 async def get_prefix(bot:"Axobot", msg: discord.Message) -> list:
@@ -98,16 +98,21 @@ def load_sql_connection(bot: "Axobot"):
     "Load the connection to the database, preferably in local mode"
     try:
         try:
-            cnx = mysql.connector.connect(user=bot.database_keys['user'],
-                                          password=bot.database_keys['password'],
-                                          host="127.0.0.1",
-                                          database=bot.database_keys['database1'])
+            cnx = mysql.connector.connect(
+                user=bot.database_keys['user'],
+                password=bot.database_keys['password'],
+                host="127.0.0.1",
+                database=bot.database_keys['database1']
+            )
         except (mysql_errors.InterfaceError, mysql_errors.ProgrammingError, mysql_errors.DatabaseError):
             bot.log.warning("Unable to access local dabatase - attempt via IP")
-            cnx = mysql.connector.connect(user=bot.database_keys['user'],
-                                          password=bot.database_keys['password'],
-                                          host=bot.database_keys['host'],
-                                          database=bot.database_keys['database1'])
+            cnx = mysql.connector.connect(
+                user=bot.database_keys['user'],
+                password=bot.database_keys['password'],
+                host=bot.database_keys['host'],
+                database=bot.database_keys['database1'],
+                connection_timeout=5
+            )
             bot.log.info("Database connected remotely")
         else:
             bot.log.info("Database connected locally")
