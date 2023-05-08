@@ -118,14 +118,14 @@ A BIG thanks to the Project Blurple and their original code for the colorization
         try:
             async with aiohttp.ClientSession() as session:
                 async with session.get(str(url)) as image:
-                    result = await convert_blurple(await image.read(), fmodifier, method, variations or [])
+                    result = await convert_halloween(await image.read(), fmodifier, method, variations or [])
         except RuntimeError as err:
             await ctx.send(await ctx.bot._(ctx.channel, 'blurple.unknown-err', err=str(err)))
             return
         await ctx.reply(await ctx.bot._(ctx.channel, 'blurple.blurplefy.success', user=ctx.author.mention), file=result)
         if not isinstance(old_msg, discord.InteractionMessage):
             await old_msg.delete()
-        await ctx.bot.get_cog("Utilities").add_user_eventPoint(ctx.author.id, 3)
+        await ctx.bot.get_cog("Utilities").add_user_eventPoint(ctx.author.id, 1)
 
     @hallow_main.command()
     @commands.cooldown(6, 120, commands.BucketType.member)
