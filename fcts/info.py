@@ -45,6 +45,7 @@ class Info(commands.Cog):
         self.BitlyClient = bitly_api.Bitly(api_key=self.bot.others['bitly'])
         self.process = psutil.Process()
         self.process.cpu_percent()
+        self.codelines: typing.Optional[int] = None
 
     @commands.Cog.listener()
     async def on_ready(self):
@@ -76,6 +77,7 @@ class Info(commands.Cog):
         return len([x for x in self.bot.guilds if x.id not in ignored_guilds])
 
     @commands.group(name="stats")
+    @commands.check(checks.database_connected)
     @commands.cooldown(3, 60, commands.BucketType.guild)
     async def stats_main(self, ctx: MyContext):
         """Display some statistics about the bot
@@ -111,7 +113,7 @@ class Info(commands.Cog):
             ]
             langs_list.sort(reverse=True, key=lambda x: x[1])
             lang_total = sum([x[1] for x in langs_list])
-            langs_list = ' | '.join(["{}: {}%".format(x[0],round(x[1]/lang_total*100)) for x in langs_list if x[1] > 0])
+            langs_list = ' | '.join([f"{x[0]}: {x[1]/lang_total*100:.0f}%" for x in langs_list if x[1] > 0])
             del lang_total
             # Users/bots
             users,bots = self.get_users_nber(ignored_guilds)
@@ -1273,18 +1275,18 @@ Available types: member, role, user, emoji, channel, server, invite, category
             if not ctx.bot.beta:
                 query = "SELECT `version`, `release_date` FROM `changelogs` WHERE beta=False ORDER BY release_date"
             else:
-                query = f"SELECT `version`, `release_date` FROM `changelogs` ORDER BY release_date"
+                query = "SELECT `version`, `release_date` FROM `changelogs` ORDER BY release_date"
             async with self.bot.db_query(query) as query_results:
                 results = query_results
             desc = "\n".join(reversed(["**v{}:** <t:{:.0f}>".format(x['version'],x['release_date'].timestamp()) for x in results]))
-            time = None
+            last_release_time = None
             title = await self.bot._(ctx.channel,'info.changelogs.index')
         else:
             if version is None:
                 if not ctx.bot.beta:
                     query = "SELECT *, CONVERT_TZ(`release_date`, @@session.time_zone, '+00:00') AS `utc_release` FROM `changelogs` WHERE beta=False ORDER BY release_date DESC LIMIT 1"
                 else:
-                    query = f"SELECT *, CONVERT_TZ(`release_date`, @@session.time_zone, '+00:00') AS `utc_release` FROM `changelogs` ORDER BY release_date DESC LIMIT 1"
+                    query = "SELECT *, CONVERT_TZ(`release_date`, @@session.time_zone, '+00:00') AS `utc_release` FROM `changelogs` ORDER BY release_date DESC LIMIT 1"
             else:
                 query = f"SELECT *, CONVERT_TZ(`release_date`, @@session.time_zone, '+00:00') AS `utc_release` FROM `changelogs` WHERE `version`='{version}'"
                 if not ctx.bot.beta:
@@ -1296,13 +1298,13 @@ Available types: member, role, user, emoji, channel, server, invite, category
                 if used_lang not in results[0].keys():
                     used_lang = "en"
                 desc = results[0][used_lang]
-                time = results[0]['utc_release']
+                last_release_time = results[0]['utc_release']
                 title = (await self.bot._(ctx.channel,'misc.version')).capitalize() + ' ' + results[0]['version']
         if len(results) == 0:
             await ctx.send(await self.bot._(ctx.channel,'info.changelog.notfound'))
         elif ctx.can_send_embed:
             embed_color = ctx.bot.get_cog('ServerConfig').embed_color
-            emb = discord.Embed(title=title, description=desc, timestamp=time, color=embed_color)
+            emb = discord.Embed(title=title, description=desc, timestamp=last_release_time, color=embed_color)
             await ctx.send(embed=emb)
         else:
             await ctx.send(desc)

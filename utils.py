@@ -15,6 +15,10 @@ from discord.ext import commands
 if TYPE_CHECKING:
     from libs.bot_classes import Axobot
 
+OUTAGE_REASON = {
+    'fr': "Nous faisons de notre mieux pour rétablir nos services dans les plus brefs délais, mais la panne peut être hors de notre contrôle. Plus d'informations sur https://zbot.statuspage.io/ ou sur notre serveur Discord.",
+    'en': "We do our best to restore our services as soon as possible, but the failure may be beyond our control. More information on https://zbot.statuspage.io/ or in our Discord server."
+}
 
 async def get_prefix(bot:"Axobot", msg: discord.Message) -> list:
     """Get the correct bot prefix from a message
@@ -94,16 +98,21 @@ def load_sql_connection(bot: "Axobot"):
     "Load the connection to the database, preferably in local mode"
     try:
         try:
-            cnx = mysql.connector.connect(user=bot.database_keys['user'],
-                                          password=bot.database_keys['password'],
-                                          host="127.0.0.1",
-                                          database=bot.database_keys['database1'])
+            cnx = mysql.connector.connect(
+                user=bot.database_keys['user'],
+                password=bot.database_keys['password'],
+                host="127.0.0.1",
+                database=bot.database_keys['database1']
+            )
         except (mysql_errors.InterfaceError, mysql_errors.ProgrammingError, mysql_errors.DatabaseError):
             bot.log.warning("Unable to access local dabatase - attempt via IP")
-            cnx = mysql.connector.connect(user=bot.database_keys['user'],
-                                          password=bot.database_keys['password'],
-                                          host=bot.database_keys['host'],
-                                          database=bot.database_keys['database1'])
+            cnx = mysql.connector.connect(
+                user=bot.database_keys['user'],
+                password=bot.database_keys['password'],
+                host=bot.database_keys['host'],
+                database=bot.database_keys['database1'],
+                connection_timeout=5
+            )
             bot.log.info("Database connected remotely")
         else:
             bot.log.info("Database connected locally")
