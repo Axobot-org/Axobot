@@ -645,18 +645,17 @@ class Xp(commands.Cog):
 
     async def create_card(self, translation_map: dict[str, str], user: discord.User, style: str, xp: int, rank: int, ranks_nb: int, levels_info: tuple[int, int, int]):
         "Find the user rank card, or generate a new one, based on given data"
-        # file_ext = 'gif' if user.display_avatar.is_animated() else 'png'
-        file_ext = "png"
-        filepath = f"./assets/cards/{user.id}-{xp}-{style}.{file_ext}"
-        # check if the card has already been generated, and return it if it is the case
-        if os.path.isfile(filepath):
-            return discord.File(filepath)
         static = not (
             user.display_avatar.is_animated()
             and await self.bot.get_cog("Users").db_get_user_config(user.id, "animated_card")
         )
+        file_ext = 'png' if static else 'gif'
+        filepath = f"./assets/cards/{user.id}-{xp}-{style}.{file_ext}"
+        # check if the card has already been generated, and return it if it is the case
+        if os.path.isfile(filepath):
+            return discord.File(filepath)
         self.bot.log.debug(f"XP card for user {user.id} ({xp=} - {style=} - {static=})")
-        user_avatar = await self.get_image_from_url(user.display_avatar.replace(format="png", size=256).url)
+        user_avatar = await self.get_image_from_url(user.display_avatar.replace(format=file_ext, size=256).url)
         card_generator = CardGeneration(
             card_name=style,
             translation_map=translation_map,
@@ -670,8 +669,14 @@ class Xp(commands.Cog):
             total_xp=xp
         )
         generated_card = card_generator.draw_card()
-        generated_card.save(filepath)
-        card_image = discord.File(filepath, filename=f"{user.id}-{xp}-{rank}.png")
+        if isinstance(generated_card, list):
+            generated_card[0].save(
+                filepath,
+                save_all=True, append_images=generated_card[1:], duration=user_avatar.info['duration'], loop=0, disposal=2
+            )
+        else:
+            generated_card.save(filepath)
+        card_image = discord.File(filepath, filename=f"{user.id}-{xp}-{rank}.{file_ext}")
 
         # update our internal stats for the number of cards generated
         if users_cog := self.bot.get_cog("Users"):
