@@ -31,7 +31,8 @@ libs/*/data/base_websites.csv
 
 # private assets
 assets/card-models/*.png
-assets/cards/*.png
+assets/cards/
+!assets/cards/.gitkeep
 assets/images/*
 
 # SonarQube
