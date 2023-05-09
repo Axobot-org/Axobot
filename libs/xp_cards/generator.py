@@ -1,4 +1,4 @@
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw, ImageFont, ImageSequence
 
 from libs.xp_cards.cards_metadata import get_card_data
 
@@ -22,16 +22,31 @@ class CardGeneration:
         self.avatar = avatar
         self.data = get_card_data(card_name, translation_map, username,
                                   level, rank, participants, current_xp, xp_to_next_level, total_xp)
-        self.result = Image.new('RGBA', CARD_SIZE, (255, 255, 255, 0))
+        if self.avatar.format == "GIF":
+            self.result = [
+                Image.new('RGBA', CARD_SIZE, (255, 255, 255, 0))
+                for _ in range(self.avatar.n_frames)
+            ]
+        else:
+            self.result = Image.new('RGBA', CARD_SIZE, (255, 255, 255, 0))
 
 
     def _paste_avatar(self):
         """Paste the avatar onto the destination image"""
-        self.avatar = self.avatar.resize(self.data["avatar_size"], resample=Image.Resampling.LANCZOS)
-        self.result.paste(self.avatar, self.data["avatar_position"])
+        should_resize = self.avatar.size != self.data["avatar_size"]
+        if isinstance(self.result, list):
+            for (avatar_frame, result_frame) in zip(ImageSequence.Iterator(self.avatar), self.result):
+                if should_resize:
+                    avatar_frame = avatar_frame.resize(self.data["avatar_size"], resample=Image.Resampling.LANCZOS)
+                result_frame.paste(avatar_frame, self.data["avatar_position"])
+        else:
+            if should_resize:
+                self.avatar = self.avatar.resize(self.data["avatar_size"], resample=Image.Resampling.LANCZOS)
+            self.result.paste(self.avatar, self.data["avatar_position"])
 
     def _add_text(self):
         """Add text to the destination image"""
+        rendered_texts = []
         for text, data in self.data["texts"].items():
             alignment = data['alignment']
             rect = data['position']
@@ -68,13 +83,26 @@ class CardGeneration:
                 pos = w_pow, h_pos
             else:
                 continue
+            rendered_texts.append({
+                "xy": pos,
+                "text": text,
+                "fill": color,
+                "font": font,
+                "anchor": "lt",
+            })
+        if isinstance(self.result, list):
+            for frame in self.result:
+                draw = ImageDraw.Draw(frame)
+                for text in rendered_texts:
+                    draw.text(**text)
+        else:
             draw = ImageDraw.Draw(self.result)
-            draw.text(pos, text, color, font=font, anchor="lt")
+            for text in rendered_texts:
+                draw.text(**text)
 
     def _draw_xp_bar(self):
         "Place the xp bar on the card"
         min_width = 28
-        draw = ImageDraw.Draw(self.result)
         bar_pos_1, bar_pos_2 = self.data["xp_bar_position"]
         bar_x = bar_pos_1[0]
         bar_y = bar_pos_1[1]
@@ -82,18 +110,32 @@ class CardGeneration:
         width = max(min_width, round(max_width*self.data["xp_percent"]))
         height = bar_pos_2[1] - bar_pos_1[1]
         radius = min(width, height) // 2
-        draw.rounded_rectangle(
-            ((bar_x, bar_y), (bar_x + width, bar_y + height)),
-            radius,
-            fill=self.data['xp_bar_color']
-        )
+        if isinstance(self.result, list):
+            for frame in self.result:
+                draw = ImageDraw.Draw(frame)
+                draw.rounded_rectangle(
+                    ((bar_x, bar_y), (bar_x + width, bar_y + height)),
+                    radius,
+                    fill=self.data['xp_bar_color']
+                )
+        else:
+            draw = ImageDraw.Draw(self.result)
+            draw.rounded_rectangle(
+                ((bar_x, bar_y), (bar_x + width, bar_y + height)),
+                radius,
+                fill=self.data['xp_bar_color']
+            )
 
     def draw_card(self):
         "Do the magic"
         background_img = Image.open("./assets/card-models/" + self.data['type'] + ".png").resize(CARD_SIZE)
 
         self._paste_avatar()
-        self.result.paste(background_img, (0, 0), background_img)
+        if isinstance(self.result, list):
+            for frame in self.result:
+                frame.paste(background_img, (0, 0), background_img)
+        else:
+            self.result.paste(background_img, (0, 0), background_img)
         self._add_text()
         self._draw_xp_bar()
 
@@ -119,7 +161,10 @@ def main():
         print("Error: invalid card style")
         return
     background_img = generator.draw_card()
-    background_img.save("result-method2.png")
+    if isinstance(background_img, list):
+        background_img[0].save("result-method2.gif", save_all=True, append_images=background_img[1:])
+    else:
+        background_img.save("result-method2.png")
 
 if __name__ == "__main__":
     main()
