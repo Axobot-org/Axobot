@@ -82,9 +82,8 @@ class CardGeneration:
         width = max(min_width, round(max_width*self.data["xp_percent"]))
         height = bar_pos_2[1] - bar_pos_1[1]
         radius = min(width, height) // 2
-        print("rounded bar", (bar_x, bar_y, bar_x + width, bar_y + height))
         draw.rounded_rectangle(
-            (bar_x, bar_y, bar_x + width, bar_y + height),
+            ((bar_x, bar_y), (bar_x + width, bar_y + height)),
             radius,
             fill=self.data['xp_bar_color']
         )
