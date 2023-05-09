@@ -1,4 +1,4 @@
-discord.py>=2.1
+discord.py~=2.2.0
 aiohttp
 mysql-connector-python>=8.0
 frmc-lib @ git+https://github.com/ZRunner/fr-mc-python-lib.git@v1.0.6
@@ -23,7 +23,7 @@ flatten-json
 python-dateutil
 LRFutils==0.1.2
 GitPython
-Pillow>=9.1
+Pillow~=9.4.0
 
 # Antiscam training
 pandas
