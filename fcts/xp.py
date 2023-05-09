@@ -691,11 +691,7 @@ class Xp(commands.Cog):
             "LEVEL": await self.bot._(ctx.channel, "xp.card-level"),
             "RANK": await self.bot._(ctx.channel, "xp.card-rank"),
         }
-        try:
-            card_image = await self.create_card(translations_map, user, style, xp, rank, ranks_nb, levels_info)
-        except ValueError as err:
-            self.bot.dispatch("command_error", ctx, err)
-            return
+        card_image = await self.create_card(translations_map, user, style, xp, rank, ranks_nb, levels_info)
         # check if we should send the card in DM or in the channel
         send_in_private = ctx.guild is None or await self.bot.get_config(ctx.guild.id, "rank_in_dm")
         try:
