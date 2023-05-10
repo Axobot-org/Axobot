@@ -14,6 +14,7 @@ from libs.colors_events import (ColorVariation, HalloweenVariationFlagType,
                                 TargetConverterType, check_halloween,
                                 convert_halloween, get_url_from_ctx)
 from libs.errors import NotDuringEventError
+from libs.formatutils import FormatUtils
 
 
 async def is_halloween(ctx: MyContext):
@@ -30,7 +31,8 @@ class Halloween(Cog):
         self.bot = bot
         self.file = "halloween"
         self.embed_color = discord.Color.orange()
-        self.hourly_reward = [4, 17]
+        self.hourly_reward = [2, 15]
+        self.hourly_cooldown = 3600
         try:
             with open("halloween-cache.json", "r", encoding="utf-8") as file:
                 self.cache = json.load(file)
@@ -86,7 +88,7 @@ A BIG thanks to the Project Blurple and their original code for the colorization
         `++no-white` removes all White
         `++no-halloween` removes all Orange
         `++no-dark-halloween` removes all Dark Halloween
-        `++classic` uses the classic transformation from Blurplefier 2018
+        `++classic` uses the classic transformation from 2018
         `++less-gradient` removes colors smoothness
         `++more-gradient` adds colors smoothness
         `++invert` swaps the darkest color and lightest color
@@ -109,25 +111,28 @@ A BIG thanks to the Project Blurple and their original code for the colorization
                             who: typing.Optional[TargetConverterType] = None):
         "Method called under the hood of each modifier command"
         if not (ctx.guild is None or ctx.channel.permissions_for(ctx.guild.me).attach_files):
-            await ctx.send(await ctx.bot._(ctx.channel, "blurple.missing-attachment-perm"))
+            await ctx.send(await self.bot._(ctx.channel, "color-event.missing-attachment-perm"))
             return
 
         url = await get_url_from_ctx(ctx, who)
 
-        old_msg = await ctx.send(f"Starting {fmodifier} hallowifying for {ctx.author.mention}...")
+        old_msg = await ctx.send(
+            await self.bot._(ctx.channel, 'color-event.colorify.starting', name=fmodifier+'fy', user=ctx.author.mention)
+        )
         try:
             async with aiohttp.ClientSession() as session:
                 async with session.get(str(url)) as image:
                     result = await convert_halloween(await image.read(), fmodifier, method, variations or [])
         except RuntimeError as err:
-            await ctx.send(await ctx.bot._(ctx.channel, 'blurple.unknown-err', err=str(err)))
+            await ctx.send(await self.bot._(ctx.channel, 'color-event.unknown-err', err=str(err)))
             return
-        await ctx.reply(await ctx.bot._(ctx.channel, 'blurple.blurplefy.success', user=ctx.author.mention), file=result)
+        await ctx.reply(await self.bot._(ctx.channel, 'color-event.colorify.success', user=ctx.author.mention), file=result)
         if not isinstance(old_msg, discord.InteractionMessage):
             await old_msg.delete()
-        await ctx.bot.get_cog("Utilities").add_user_eventPoint(ctx.author.id, 1)
+        if self.bot.database_online:
+            await ctx.bot.get_cog("Utilities").add_user_eventPoint(ctx.author.id, 1)
 
-    @hallow_main.command()
+    @hallow_main.command("lightfy")
     @commands.cooldown(6, 120, commands.BucketType.member)
     @commands.cooldown(20, 60, commands.BucketType.guild)
     @commands.check(is_halloween)
@@ -137,7 +142,7 @@ A BIG thanks to the Project Blurple and their original code for the colorization
         "Lightfy an image"
         await self.color_command("light", ctx, method, variations, who)
 
-    @hallow_main.command()
+    @hallow_main.command("darkfy")
     @commands.cooldown(6, 120, commands.BucketType.member)
     @commands.cooldown(20, 60, commands.BucketType.guild)
     @commands.check(is_halloween)
@@ -147,13 +152,11 @@ A BIG thanks to the Project Blurple and their original code for the colorization
         "Darkfy an image"
         await self.color_command("dark", ctx, method, variations, who)
 
-    @hallow_main.command()
+    @hallow_main.command("check")
     @commands.cooldown(2, 60, commands.BucketType.member)
     @commands.cooldown(30, 40, commands.BucketType.guild)
     @commands.check(is_halloween)
-    async def check(self, ctx: MyContext,
-                    who: typing.Optional[TargetConverterType] = None
-                    ):
+    async def check(self, ctx: MyContext,who: typing.Optional[TargetConverterType] = None):
         """Check an image to know if you're cool enough.
 
         ..Example halloween check
@@ -162,40 +165,47 @@ A BIG thanks to the Project Blurple and their original code for the colorization
 
         url = await get_url_from_ctx(ctx, who)
 
-        old_msg = await ctx.send(f"Starting check for {ctx.author.mention}...")
+        old_msg = await ctx.send(await ctx.bot._(ctx.channel, "color-event.halloween.check.intro", user=ctx.author.mention))
         async with aiohttp.ClientSession() as session:
             async with session.get(str(url)) as image:
                 result = await check_halloween(await image.read())
         answer = "\n".join(f"> {color['name']}: {color['ratio']}%" for color in result['colors'])
-        await ctx.reply(f"Results:\n{answer}")
-        if result["passed"] and ctx.author.id not in self.cache:
-            await ctx.bot.get_cog("Utilities").add_user_eventPoint(ctx.author.id, 40)
+        await ctx.reply(await self.bot._(ctx.channel, "color-event.halloween.check.result", user=ctx.author.mention, results=answer))
+        if result["passed"] and self.bot.database_online and ctx.author.id not in self.cache:
+            reward_points = 40
+            await ctx.bot.get_cog("Utilities").add_user_eventPoint(ctx.author.id, reward_points)
             self.cache.append(ctx.author.id)
             with open("halloween-cache.json", "w", encoding="utf-8") as file:
                 json.dump(self.cache, file)
-            await ctx.send(f"{ctx.author.mention} you just won 40 event xp thanks to your hallow-iful picture!")
+            await ctx.send(await self.bot._(ctx.channel, "color-event.halloween.check.reward", user=ctx.author.mention, amount=reward_points))
         if not isinstance(old_msg, discord.InteractionMessage):
             await old_msg.delete()
 
 
     @hallow_main.command(name="collect")
     @commands.check(is_halloween)
-    async def hw_collect(self, ctx: MyContext):
+    async def collect(self, ctx: MyContext):
         """Get some events points every hour"""
         events_cog = self.bot.get_cog("BotEvents")
         if events_cog is None:
             return
-        last_data: typing.Optional[dict] = await events_cog.db_get_dailies(ctx.author.id)
-        cooldown = 3600
-        if last_data is None or (self.bot.utcnow() - last_data['last_update']).total_seconds() > cooldown:
+        last_data = await events_cog.db_get_dailies(ctx.author.id)
+        if last_data is None or (self.bot.utcnow() - last_data['last_update']).total_seconds() > self.hourly_cooldown:
             points = randint(*self.hourly_reward)
             await self.bot.get_cog("Utilities").add_user_eventPoint(ctx.author.id, points)
             await events_cog.db_add_dailies(ctx.author.id, points)
-            txt = await self.bot._(ctx.channel, "halloween.daily.got-points", pts=points)
+            if points > 0:
+                txt = await self.bot._(ctx.channel, "color-event.collect.got-points", pts=points)
+            else:
+                txt = await self.bot._(ctx.channel, "color-event.collect.lost-points", pts=points)
         else:
-            txt = await self.bot._(ctx.channel, "halloween.daily.too-quick")
+            time_since_available = (self.bot.utcnow() - last_data['last_update']).total_seconds()
+            time_remaining = self.hourly_cooldown - time_since_available
+            lang = await self.bot._(ctx.channel, '_used_locale')
+            remaining = await FormatUtils.time_delta(time_remaining, lang=lang)
+            txt = await self.bot._(ctx.channel, "color-event.collect.too-quick", time=remaining)
         if ctx.can_send_embed:
-            title = "Halloween event"
+            title = await self.bot._(ctx.channel, "color-event.halloween.collect-title")
             emb = discord.Embed(title=title, description=txt, color=self.embed_color)
             await ctx.send(embed=emb)
         else:
