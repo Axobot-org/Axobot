@@ -6,7 +6,7 @@ from discord import app_commands
 from discord.ext import commands
 
 from fcts import checks
-from libs.antiscam import AntiScamAgent, Message, update_unicode_map
+from libs.antiscam import AntiScamAgent, Message
 from libs.antiscam.classes import (EMBED_COLORS, MsgReportView,
                                    PredictionResult, get_avg_word_len,
                                    get_caps_count, get_max_frequency,
@@ -15,7 +15,6 @@ from libs.antiscam.normalization import normalize
 from libs.antiscam.similarities import check_message
 from libs.antiscam.training_bayes import train_model
 from libs.bot_classes import Axobot, MyContext
-from libs.formatutils import FormatUtils
 
 
 def is_immune(member: discord.Member) -> bool:
@@ -259,47 +258,6 @@ class AntiScam(commands.Cog):
         config_cmd = self.bot.get_command("config set")
         if await config_cmd.can_run(ctx):
             await config_cmd(ctx, "anti_scam", value="false")
-
-    @antiscam.command(name="fetch-unicode", with_app_command=False)
-    @commands.check(checks.is_bot_admin)
-    async def antiscam_refetch_uneicode(self, ctx: MyContext):
-        "Refetch the unicode map of confusable characters"
-        if not self.bot.beta:
-            await ctx.send("Not usable in production!", ephemeral=True)
-            return
-        await update_unicode_map()
-        await ctx.send("Done!")
-
-    @antiscam.command(name="update-table", with_app_command=False)
-    @commands.check(checks.is_bot_admin)
-    async def antiscam_update_table(self, ctx: MyContext):
-        "Update the recorded messages table"
-        msg = await ctx.send("Hold on, I'm on it...")
-        counter = await self.db_update_messages(self.table)
-        await msg.edit(content=f"{counter} messages updated!")
-
-    @antiscam.command(name="train", with_app_command=False)
-    @commands.check(checks.is_bot_admin)
-    async def antiscam_train_model(self, ctx: MyContext):
-        "Re-train the antiscam model (DESTRUCTIVE ACTION)"
-        if not self.bot.beta:
-            await ctx.send("Not usable in production!", ephemeral=True)
-            return
-        msg = await ctx.send("Hold on, this may take a while...")
-        start = time.time()
-        data = await self.get_messages_list()
-        model = await train_model(data)
-        acc = model.get_external_accuracy(data)
-        elapsed_time = await FormatUtils.time_delta(time.time() - start, lang="en")
-        txt = f"New model has been generated in {elapsed_time}!\nAccuracy of {acc:.3f}"
-        current_acc = self.agent.model.get_external_accuracy(data)
-        if acc > current_acc:
-            self.agent.save_model(model)
-            txt += f"\n✅ This model is better than the current one ({current_acc:.3f}), replacing it!"
-        else:
-            txt += f"\n❌ This model is not better than the current one ({current_acc:.3f})"
-        await msg.edit(content=txt)
-        self.bot.log.info(txt)
 
     async def report_context_menu(self, interaction: discord.Interaction, message: discord.Message):
         "Report a suspicious message to the bot team"

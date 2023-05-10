@@ -8,6 +8,7 @@ import textwrap
 import time
 import traceback
 import typing
+from collections import defaultdict
 from contextlib import redirect_stdout
 
 import discord
@@ -17,11 +18,17 @@ from discord.ext import commands
 from git import Repo, exc
 
 from docs import conf
-from libs.bot_classes import PRIVATE_GUILD_ID, SUPPORT_GUILD_ID, Axobot, MyContext
+from fcts import checks
+from libs.antiscam import update_unicode_map
+from libs.antiscam.training_bayes import train_model
+from libs.bot_classes import (PRIVATE_GUILD_ID, SUPPORT_GUILD_ID, Axobot,
+                              MyContext)
 from libs.enums import RankCardsFlag, UserFlag
+from libs.formatutils import FormatUtils
 from libs.views import ConfirmView
 
-from fcts import checks
+if typing.TYPE_CHECKING:
+    from fcts.antiscam import AntiScam
 
 
 def cleanup_code(content: str):
@@ -354,7 +361,7 @@ class Admin(commands.Cog):
         await self.bot.get_cog("Reloads").reload_cogs(ctx,cogs)
 
     @reload_cog.autocomplete("cog")
-    async def reload_cog_autocom(self, interaction: discord.Interaction, current: str):
+    async def reload_cog_autocom(self, _: discord.Interaction, current: str):
         "Autocompletion for the cog name"
         if " " in current:
             fixed, current = current.rsplit(" ", maxsplit=1)
@@ -455,7 +462,7 @@ class Admin(commands.Cog):
             return [row[0] for row in query_results]
 
     @db_biggest.autocomplete("database")
-    async def db_biggest_autocompl(self, interaction: discord.Interaction, current: str):
+    async def db_biggest_autocompl(self, _: discord.Interaction, current: str):
         "Autocompletion for the database name"
         databases = await self.get_databases_names()
         return [
@@ -480,7 +487,8 @@ class Admin(commands.Cog):
                 user = self.bot.get_user(x)
                 if user.dm_channel is None:
                     await user.create_dm()
-                msg = await user.dm_channel.send("{} La procédure d'urgence vient d'être activée. Si vous souhaitez l'annuler, veuillez cliquer sur la réaction ci-dessous dans les {} secondes qui suivent l'envoi de ce message.".format(self.bot.emojis_manager.customs['red_warning'], time))
+                emoji = self.bot.emojis_manager.customs['red_warning']
+                msg = await user.dm_channel.send(f"{emoji} La procédure d'urgence vient d'être activée. Si vous souhaitez l'annuler, veuillez cliquer sur la réaction ci-dessous dans les {time} secondes qui suivent l'envoi de ce message.")
                 await msg.add_reaction('🛑')
             except Exception as err:
                 self.bot.dispatch("error", err, "Emergency command")
@@ -490,22 +498,23 @@ class Admin(commands.Cog):
         try:
             await self.bot.wait_for('reaction_add', timeout=time, check=check)
         except asyncio.TimeoutError:
-            owners = list()
-            servers = 0
+            owners = set()
+            servers_count = 0
             for guild in self.bot.guilds:
                 if guild.id == 500648624204808193:
                     continue
                 try:
                     if guild.owner not in owners:
                         await guild.owner.send(await self.bot._(guild,"admin.emergency"))
-                        owners.append(guild.owner)
+                        owners.add(guild.owner)
                     await guild.leave()
-                    servers +=1
+                    servers_count +=1
                 except discord.HTTPException:
                     continue
             chan = await self.bot.get_channel(500674177548812306)
-            await chan.send("{} Prodédure d'urgence déclenchée : {} serveurs quittés - {} propriétaires prévenus".format(self.bot.emojis_manager.customs['red_alert'],servers,len(owners)))
-            return "{}  {} propriétaires de serveurs ont été prévenu ({} serveurs)".format(self.bot.emojis_manager.customs['red_alert'],len(owners),servers)
+            emoji = self.bot.emojis_manager.customs['red_alert']
+            await chan.send(f"{emoji} Prodédure d'urgence déclenchée : {servers_count} serveurs quittés - {len(owners)} propriétaires prévenus")
+            return f"{emoji}  {len(owners)} propriétaires de serveurs ont été prévenu ({servers_count} serveurs)"
         for x in checks.admins_id:
             try:
                 user = self.bot.get_user(x)
@@ -865,6 +874,90 @@ Cette option affecte tous les serveurs"""
         else:
             result = getattr(s.results, method)()
             await msg.edit(content=str(result))
+
+    @main_msg.group(name="antiscam")
+    @commands.check(checks.is_bot_admin)
+    async def main_antiscam(self, ctx: MyContext):
+        "Gère le modèle d'anti-scam"
+        if ctx.subcommand_passed is None:
+            await ctx.send_help(ctx.command)
+
+    @main_antiscam.command(name="fetch-unicode")
+    @commands.check(checks.is_bot_admin)
+    async def antiscam_fetch_unicode(self, ctx: MyContext):
+        "Récupérer la table unicode des caractères confusables"
+        if not self.bot.beta:
+            await ctx.send("Not usable in production!", ephemeral=True)
+            return
+        await ctx.defer()
+        await update_unicode_map()
+        await ctx.send("Done!")
+
+    @main_antiscam.command(name="update-table")
+    @commands.check(checks.is_bot_admin)
+    async def antiscam_update_table(self, ctx: MyContext):
+        "Met à jour la table des messages enregistrés"
+        if (antiscam := self.bot.get_cog("AntiScam")) is None:
+            await ctx.send("AntiScam cog not found!")
+            return
+        antiscam: "AntiScam"
+        await ctx.defer()
+        msg = await ctx.send("Hold on, I'm on it...")
+        counter = await antiscam.db_update_messages(antiscam.table)
+        await msg.edit(content=f"{counter} messages updated!")
+
+    @main_antiscam.command(name="train")
+    @commands.check(checks.is_bot_admin)
+    async def antiscam_train_model(self, ctx: MyContext):
+        "Ré-entraine le modèle d'anti-scam (ACTION DESTUCTRICE)"
+        if not self.bot.beta:
+            await ctx.send("Not usable in production!", ephemeral=True)
+            return
+        if (antiscam := self.bot.get_cog("AntiScam")) is None:
+            await ctx.send("AntiScam cog not found!")
+            return
+        antiscam: "AntiScam"
+        await ctx.defer()
+        msg = await ctx.send("Hold on, this may take a while...")
+        start = time.time()
+        data = await antiscam.get_messages_list()
+        model = await train_model(data)
+        acc = model.get_external_accuracy(data)
+        elapsed_time = await FormatUtils.time_delta(time.time() - start, lang="en")
+        txt = f"New model has been generated in {elapsed_time}!\nAccuracy of {acc:.3f}"
+        current_acc = antiscam.agent.model.get_external_accuracy(data)
+        if acc > current_acc:
+            antiscam.agent.save_model(model)
+            txt += f"\n✅ This model is better than the current one ({current_acc:.3f}), replacing it!"
+        else:
+            txt += f"\n❌ This model is not better than the current one ({current_acc:.3f})"
+        await msg.edit(content=txt)
+        self.bot.log.info(txt)
+
+    @main_antiscam.command(name="list-words")
+    @commands.check(checks.is_bot_admin)
+    async def antiscam_list_words(self, ctx: MyContext, words_category: typing.Literal["spam-words", "safe-words", "all"]="all", words_count: commands.Range[int, 1, 100]=15):
+        "Liste les mots les plus importants dans la détection de scam"
+        if (antiscam := self.bot.get_cog("AntiScam")) is None:
+            await ctx.send("AntiScam cog not found!")
+            return
+        antiscam: "AntiScam"
+        await ctx.defer()
+        attr_counts: dict[str, int] = defaultdict(int)
+        for tree in antiscam.agent.model.trees:
+            for word, count in tree.attr_counts["spam"].items():
+                attr_counts[word] += count
+            for word, count in tree.attr_counts["ham"].items():
+                attr_counts[word] -= count
+        sorted_words = sorted(attr_counts.items(), key=lambda x: x[1], reverse=True)
+        result: list[str] = []
+        if words_category in {"spam-words", "all"}:
+            result.extend(f"{word} ({score})" for word, score in sorted_words[:words_count])
+        if words_category == "all":
+            result.append("...")
+        if words_category in {"safe-words", "all"}:
+            result.extend(f"{word} ({score})" for word, score in sorted_words[-words_count:])
+        await ctx.send("\n".join(result))
 
 
     @commands.command(name='eval', hidden=True)
