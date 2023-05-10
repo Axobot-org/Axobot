@@ -1,7 +1,6 @@
 import asyncio
 import datetime
 import json
-import marshal
 import random
 import re
 import time
@@ -12,7 +11,7 @@ import discord
 import mysql
 from discord.ext import commands, tasks
 
-from libs.bot_classes import MyContext, Axobot
+from libs.bot_classes import Axobot, MyContext
 from libs.enums import UsernameChangeRecord
 
 
@@ -454,9 +453,9 @@ class Events(commands.Cog):
             rss_feeds,
             active_rss_feeds,
             supportserver_members,
-            marshal.dumps(lang_stats),
-            marshal.dumps(rankcards_stats),
-            marshal.dumps(xptypes_stats),
+            json.dumps(lang_stats),
+            json.dumps(rankcards_stats),
+            json.dumps(xptypes_stats),
             self.bot.entity_id,
         )
         try:
