@@ -7,15 +7,15 @@ import sys
 import textwrap
 import time
 import traceback
-import typing
 from collections import defaultdict
 from contextlib import redirect_stdout
+from typing import TYPE_CHECKING, Literal, Optional, Union
 
 import discord
 import speedtest
 from cachingutils import acached
 from discord.ext import commands
-from git import Repo, exc
+from git import GitCommandError, Repo
 
 from docs import conf
 from fcts import checks
@@ -27,8 +27,11 @@ from libs.enums import RankCardsFlag, UserFlag
 from libs.formatutils import FormatUtils
 from libs.views import ConfirmView
 
-if typing.TYPE_CHECKING:
+if TYPE_CHECKING:
     from fcts.antiscam import AntiScam
+
+
+AvailableGitBranches = Literal["main", "develop", "release-candidate"]
 
 
 def cleanup_code(content: str):
@@ -40,7 +43,7 @@ def cleanup_code(content: str):
     return content.strip('` \n')
 
 class Admin(commands.Cog):
-    """Here are listed all commands related to the internal administration of the bot. Most of them are not accessible to users, but only to the bot administrators."""
+    "All commands related to the internal administration of the bot, only accessible by whitelisted users"
 
     def __init__(self, bot: Axobot):
         self.bot = bot
@@ -75,7 +78,7 @@ class Admin(commands.Cog):
     async def check_if_admin(self, ctx: MyContext):
         return await checks.is_bot_admin(ctx)
 
-    async def check_if_god(self, ctx: typing.Union[discord.User, discord.Guild, MyContext]):
+    async def check_if_god(self, ctx: Union[discord.User, discord.Guild, MyContext]):
         "Check if a user is in God mode for a given context"
         if isinstance(ctx, discord.User):
             return await checks.is_bot_admin(ctx)
@@ -124,7 +127,7 @@ class Admin(commands.Cog):
 
     @main_msg.command(name="sync")
     @commands.check(checks.is_bot_admin)
-    async def sync_app_commands(self, ctx: MyContext, scope: typing.Literal["global", "staff-guild", "support-guild"]):
+    async def sync_app_commands(self, ctx: MyContext, scope: Literal["global", "staff-server", "public-server"]):
         "Sync app commands for either global or staff server scope"
         await ctx.defer()
         if scope == "global":
@@ -135,10 +138,10 @@ class Admin(commands.Cog):
             else:
                 cmds = await self.bot.tree.sync()
                 txt = f"{len(cmds)} global app commands synced"
-        elif scope == "staff-guild":
+        elif scope == "staff-server":
             cmds = await self.bot.tree.sync(guild=PRIVATE_GUILD_ID)
             txt = f"{len(cmds)} app commands synced in staff server"
-        elif scope == "support-guild":
+        elif scope == "public-server":
             cmds = await self.bot.tree.sync(guild=SUPPORT_GUILD_ID)
             txt = f"{len(cmds)} app commands synced in the support server"
         else:
@@ -206,18 +209,18 @@ class Admin(commands.Cog):
         if send:
             await self.send_updates(ctx)
             return
-        def check(m):
-            return m.author == ctx.author and m.channel == ctx.channel
+        def check(message: discord.Message):
+            return message.author == ctx.author and message.channel == ctx.channel
         msg = None
-        for x in self.update.keys():
-            await ctx.send("Message en {} ?".format(x))
+        for language in self.update:
+            await ctx.send(f"Message en {language} ?")
             try:
-                msg = await ctx.bot.wait_for('message', check=check,timeout=60)
+                msg = await ctx.bot.wait_for('message', check=check, timeout=60)
             except asyncio.TimeoutError:
                 return await ctx.send('Trop tard !')
             if msg.content.lower() in ['none','annuler','stop','oups']:
                 return await ctx.send('Annulé !')
-            self.update[x] = msg.content
+            self.update[language] = msg.content
         if msg:
             await self.add_success_reaction(msg)
 
@@ -253,10 +256,10 @@ class Admin(commands.Cog):
             if guild.id == 356067272730607628 and self.bot.entity_id == 0:
                 # The support server should not receive updates from Zbot but only Axobot
                 continue
-            channel: typing.Optional[discord.TextChannel] = await ctx.bot.get_config(guild.id, 'bot_news')
+            channel: Optional[discord.TextChannel] = await ctx.bot.get_config(guild.id, 'bot_news')
             if channel is None:
                 continue
-            lang: typing.Optional[str] = await ctx.bot.get_config(guild.id, 'language')
+            lang: Optional[str] = await ctx.bot.get_config(guild.id, 'language')
             if lang not in self.update:
                 lang = 'en'
             mentions_roles: list[discord.Role] = await self.bot.get_config(guild.id, 'update_mentions') or []
@@ -275,23 +278,26 @@ class Admin(commands.Cog):
                     await fr_chan.send(self.update['fr'] + "\n\n<@&1092557246921179257>", allowed_mentions=allowed_mentions)
                     count += 1
 
-        await ctx.send("Message envoyé dans {} salons !".format(count))
+        await ctx.send(f"Message envoyé dans {count} salons !")
         # add changelog in the database
         query = "INSERT INTO `changelogs` (`version`, `release_date`, `fr`, `en`, `beta`) VALUES (%(v)s, %(r)s, %(fr)s, %(en)s, %(b)s) ON DUPLICATE KEY UPDATE `fr` = %(fr)s, `en` = %(en)s;"
-        args = { 'v': conf.release, 'r': ctx.message.created_at, 'fr': self.update['fr'], 'en': self.update['en'], 'b': self.bot.beta }
+        args = {
+            'v': conf.release, 'r': ctx.message.created_at, 'b': self.bot.beta,
+            'fr': self.update['fr'], 'en': self.update['en']
+        }
         async with self.bot.db_query(query, args):
             pass
-        for k in self.update.keys():
-            self.update[k] = None
+        for language in self.update:
+            self.update[language] = None
 
 
     @main_msg.command(name="cogs")
     @commands.check(checks.is_bot_admin)
     async def cogs_list(self, ctx: MyContext):
         """Voir la liste de tout les cogs"""
-        text = str()
-        for k,v in self.bot.cogs.items():
-            text +="- {} ({}) \n".format(v.file,k)
+        text = ""
+        for cog_name, cog in self.bot.cogs.items():
+            text += f"- {cog.file} ({cog_name}) \n"
         await ctx.send(text)
 
     @main_msg.command(name='shutdown')
@@ -322,18 +328,12 @@ class Admin(commands.Cog):
         """Relance le bot"""
         await ctx.send(content="Redémarrage en cours...")
         await self.cleanup_workspace()
-        args = sys.argv
-        if len(args) == 1:
-            ID = self.bot.user.id
-            args.append('1' if ID==486896267788812288 else '2' if ID==436835675304755200 else '3')
-            args.append('n' if ctx.bot.get_cog('Events').loop.get_task() is None else 'o')
-            args.append('o' if ctx.bot.rss_enabled else 'n')
         self.bot.log.info("Redémarrage du bot")
-        os.execl(sys.executable, sys.executable, *args)
+        os.execl(sys.executable, sys.executable, *sys.argv)
 
     @main_msg.command(name="pull")
     @commands.check(checks.is_bot_admin)
-    async def git_pull(self, ctx: MyContext, branch: typing.Optional[typing.Literal["main", "develop", "release-candidate"]]=None, install_requirements: bool=False):
+    async def git_pull(self, ctx: MyContext, branch: Optional[AvailableGitBranches]=None, install_requirements: bool=False):
         """Pull du code depuis le dépôt git"""
         msg = await ctx.send("Pull en cours...")
         repo = Repo(os.getcwd())
@@ -341,7 +341,7 @@ class Admin(commands.Cog):
         if branch:
             try:
                 repo.git.checkout(branch)
-            except exc.GitCommandError as err:
+            except GitCommandError as err:
                 self.bot.dispatch("command_error", ctx, err)
             else:
                 msg = await msg.edit(content=msg.content+f"\nBranche {branch} correctement sélectionnée")
@@ -394,8 +394,8 @@ class Admin(commands.Cog):
         """Recharge tout ces salons qui contiennent le nombre de membres, pour tout les serveurs"""
         if self.bot.database_online:
             i = 0
-            for x in self.bot.guilds:
-                if await self.bot.get_cog("ServerConfig").update_memberChannel(x):
+            for guild in self.bot.guilds:
+                if await self.bot.get_cog("ServerConfig").update_memberChannel(guild):
                     i += 1
             await ctx.send(f"{i} salons mis à jours !")
         else:
@@ -403,7 +403,7 @@ class Admin(commands.Cog):
 
     @main_msg.command(name="config")
     @commands.check(checks.is_bot_admin)
-    async def admin_sconfig_see(self, ctx: MyContext, guild: discord.Guild, option: typing.Optional[str]=None):
+    async def admin_sconfig_see(self, ctx: MyContext, guild: discord.Guild, option: Optional[str]=None):
         """Affiche les options d'un serveur"""
         if not ctx.bot.database_online:
             await ctx.send("Impossible d'afficher cette commande, la base de donnée est hors ligne :confused:")
@@ -439,7 +439,7 @@ class Admin(commands.Cog):
 
     @admin_db.command(name="biggest-tables")
     @commands.check(checks.is_bot_admin)
-    async def db_biggest(self, ctx: MyContext, database: typing.Optional[str] = None):
+    async def db_biggest(self, ctx: MyContext, database: Optional[str] = None):
         "Affiche les tables les plus lourdes de la base de données"
         query = "SELECT table_name AS \"Table\", ROUND(((data_length + index_length) / 1024 / 1024), 2) AS \"Size (MB)\" FROM information_schema.TABLES"
         if database:
@@ -475,20 +475,25 @@ class Admin(commands.Cog):
     @commands.check(checks.is_bot_admin)
     async def emergency_cmd(self, ctx: MyContext):
         """Déclenche la procédure d'urgence
-        A N'UTILISER QU'EN CAS DE BESOIN ABSOLU ! Le bot quittera tout les serveurs après avoir envoyé un mp à chaque propriétaire"""
+        A N'UTILISER QU'EN CAS DE BESOIN ABSOLU !
+        Le bot quittera tout les serveurs après avoir envoyé un MP à chaque propriétaire"""
         await ctx.send(await self.emergency())
 
     async def emergency(self, level=100):
+        "Trigger the emergency procedure: leave every servers and send a DM to every owner"
         if self.bot.zombie_mode:
             return
-        time = round(self.emergency_time - level/100, 1)
-        for x in checks.admins_id:
+        timeout = round(self.emergency_time - level/100, 1)
+        for user_id in checks.admins_id:
             try:
-                user = self.bot.get_user(x)
+                user = self.bot.get_user(user_id)
                 if user.dm_channel is None:
                     await user.create_dm()
                 emoji = self.bot.emojis_manager.customs['red_warning']
-                msg = await user.dm_channel.send(f"{emoji} La procédure d'urgence vient d'être activée. Si vous souhaitez l'annuler, veuillez cliquer sur la réaction ci-dessous dans les {time} secondes qui suivent l'envoi de ce message.")
+                msg = await user.dm_channel.send(
+                    f"{emoji} La procédure d'urgence vient d'être activée. Si vous souhaitez l'annuler, veuillez \
+                        cliquer sur la réaction ci-dessous dans les {timeout} secondes qui suivent l'envoi de ce message."
+                )
                 await msg.add_reaction('🛑')
             except Exception as err:
                 self.bot.dispatch("error", err, "Emergency command")
@@ -496,10 +501,10 @@ class Admin(commands.Cog):
         def check(_, user: discord.User):
             return user.id in checks.admins_id
         try:
-            await self.bot.wait_for('reaction_add', timeout=time, check=check)
+            await self.bot.wait_for('reaction_add', timeout=timeout, check=check)
         except asyncio.TimeoutError:
             owners = set()
-            servers_count = 0
+            guilds_count = 0
             for guild in self.bot.guilds:
                 if guild.id == 500648624204808193:
                     continue
@@ -508,16 +513,18 @@ class Admin(commands.Cog):
                         await guild.owner.send(await self.bot._(guild,"admin.emergency"))
                         owners.add(guild.owner)
                     await guild.leave()
-                    servers_count +=1
+                    guilds_count +=1
                 except discord.HTTPException:
                     continue
-            chan = await self.bot.get_channel(500674177548812306)
+            chan: discord.TextChannel = await self.bot.get_channel(500674177548812306)
             emoji = self.bot.emojis_manager.customs['red_alert']
-            await chan.send(f"{emoji} Prodédure d'urgence déclenchée : {servers_count} serveurs quittés - {len(owners)} propriétaires prévenus")
-            return f"{emoji}  {len(owners)} propriétaires de serveurs ont été prévenu ({servers_count} serveurs)"
-        for x in checks.admins_id:
+            await chan.send(
+                f"{emoji} Prodédure d'urgence déclenchée : {guilds_count} serveurs quittés - {len(owners)} propriétaires prévenus"
+            )
+            return f"{emoji}  {len(owners)} propriétaires de serveurs ont été prévenu ({guilds_count} serveurs)"
+        for user_id in checks.admins_id:
             try:
-                user = self.bot.get_user(x)
+                user = self.bot.get_user(user_id)
                 await user.send("La procédure a été annulée !")
             except Exception as err:
                 self.bot.dispatch("error", err, None)
@@ -545,55 +552,52 @@ class Admin(commands.Cog):
             if str(target) in servs:
                 servs.remove(str(target))
                 await utils.edit_bot_infos(self.bot.user.id,[('banned_guilds',';'.join(servs))])
-                await ctx.send("Le serveur {} n'est plus blacklisté".format(target.name))
+                await ctx.send(f"Le serveur {target.name} n'est plus blacklisté")
             else:
                 servs.append(str(target.id))
                 await utils.edit_bot_infos(self.bot.user.id,[('banned_guilds',';'.join(servs))])
-                await ctx.send("Le serveur {} a bien été blacklist".format(target.name))
+                await ctx.send(f"Le serveur {target.name} a bien été blacklist")
         else:
             usrs: list[str] = config['banned_users'].split(';')
             if str(target.id) in usrs:
                 usrs.remove(str(target.id))
                 await utils.edit_bot_infos(self.bot.user.id,[('banned_users',';'.join(usrs))])
-                await ctx.send("L'utilisateur {} n'est plus blacklisté".format(target))
+                await ctx.send(f"L'utilisateur {target} n'est plus blacklisté")
             else:
                 usrs.append(str(target.id))
                 await utils.edit_bot_infos(self.bot.user.id,[('banned_users',';'.join(usrs))])
-                await ctx.send("L'utilisateur {} a bien été blacklist".format(target))
+                await ctx.send(f"L'utilisateur {target} a bien été blacklist")
         ctx.bot.get_cog('Utilities').config = None
 
     @main_msg.command(name="logs")
     @commands.check(checks.is_bot_admin)
-    async def show_last_logs(self, ctx: MyContext, lines:typing.Optional[int]=15, *, match=''):
+    async def show_last_logs(self, ctx: MyContext, lines_count: commands.Range[int, 0, 200]=15, *, match=''):
         """Affiche les <lines> derniers logs ayant <match> dedans"""
-        if lines > 1000:
-            match = str(lines)
-            lines = 15
         with open('logs/debug.log','r', encoding='utf-8') as file:
-            text = file.read().split("\n")
-        msg = str()
-        liste = list()
+            lines = file.read().split("\n")
+        msg = ""
+        liste = []
         i = 1
-        while len(liste) < lines and i < min(2000, len(text)):
-            i+=1
-            if (not match in text[-i]) or ctx.message.content in text[-i]:
+        while len(liste) < lines_count and i < min(2000, len(lines)):
+            i += 1
+            if match not in lines[-i] or ctx.message.content in lines[-i]:
                 continue
-            liste.append(text[-i].replace('`',''))
+            liste.append(lines[-i].replace('`',''))
         if len(msg) == 0:
             await ctx.send("No corresponding log found")
             return
         for i in liste:
             if len(msg+i) > 1900:
-                await ctx.send("```css\n{}\n```".format(msg))
+                await ctx.send(f"```css\n{msg}\n```")
                 msg = ""
             if len(i)<1900:
-                msg += "\n"+i.replace('`','')
-        await ctx.send("```css\n{}\n```".format(msg))
+                msg += "\n" + i.replace('`', '')
+        await ctx.send(f"```css\n{msg}\n```")
 
     @main_msg.command(name="module")
     @commands.check(checks.is_bot_admin)
     @discord.app_commands.describe(enable="Should we enable or disable this module")
-    async def enable_module(self, ctx: MyContext, module: typing.Literal["xp", "rss", "alerts"], enable: bool):
+    async def enable_module(self, ctx: MyContext, module: Literal["xp", "rss", "alerts"], enable: bool):
         """Active ou désactive un module (xp/rss/alerts)
 Cette option affecte tous les serveurs"""
         if module=='xp':
@@ -739,10 +743,11 @@ Cette option affecte tous les serveurs"""
     @commands.check(checks.is_bot_admin)
     async def main_botserv(self, ctx: MyContext):
         """Quelques commandes liées au serveur officiel"""
-        if ctx.invoked_subcommand is None or ctx.invoked_subcommand==self.main_botserv:
+        if ctx.invoked_subcommand is None or ctx.invoked_subcommand==self.main_botserv: # pylint: disable=comparison-with-callable
             text = "Liste des commandes disponibles :"
             for cmd in ctx.command.commands:
-                text+="\n- {} *({})*".format(cmd.name,cmd.help)
+                cmd: commands.Command
+                text += f"\n- {cmd.name} *({cmd.help})*"
             await ctx.send(text)
 
     @main_botserv.command(name="owner_reload")
@@ -809,17 +814,17 @@ Cette option affecte tous les serveurs"""
         channel = server.get_channel(488769306524385301 if not self.bot.beta else 929864644678549534)
         if channel is None:
             return await ctx.send("Salon introuvable")
-        liste = await self._get_ideas_list(channel)
-        count = len(liste)
-        liste = liste[:number]
-        title = f"Liste des {len(liste)} meilleures idées (sur {count}) :"
+        ideas_list = await self._get_ideas_list(channel)
+        count = len(ideas_list)
+        ideas_list = ideas_list[:number]
+        title = f"Liste des {len(ideas_list)} meilleures idées (sur {count}) :"
         text = ""
         if ctx.guild is not None:
             color = ctx.guild.me.color
         else:
             color = discord.Colour(8311585)
-        for reaction in liste:
-            text += "\n**[{} - {}]**  {} ".format(reaction[3],reaction[4],reaction[2])
+        for (_, _, content, upvotes, downvotes) in ideas_list:
+            text += f"\n**[{upvotes} - {downvotes}]**  {content}"
         try:
             if ctx.can_send_embed:
                 emb = discord.Embed(title=title, description=text, color=color, timestamp=self.bot.utcnow())
@@ -831,48 +836,50 @@ Cette option affecte tous les serveurs"""
     @main_msg.command(name="activity")
     @commands.check(checks.is_bot_admin)
     @discord.app_commands.rename(activity_type="type")
-    async def change_activity(self, ctx: MyContext, activity_type: typing.Literal["play", "watch", "listen", "stream"], *, text: str):
+    async def change_activity(self, ctx: MyContext, activity_type: Literal["play", "watch", "listen", "stream"], *, text: str):
         """Change l'activité du bot (play, watch, listen, stream)"""
         if activity_type == "play":
-            await self.bot.change_presence(activity=discord.Game(name=text))
+            new_activity = discord.Game(name=text)
         elif activity_type == "watch":
-            await self.bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching,name=text, timestamps={'start':time.time()}))
+            new_activity = discord.Activity(type=discord.ActivityType.watching, name=text, timestamps={'start':time.time()})
         elif activity_type == "listen":
-            await self.bot.change_presence(activity=discord.Activity(type=discord.ActivityType.listening,name=text, timestamps={'start':time.time()}))
+            new_activity = discord.Activity(type=discord.ActivityType.listening, name=text, timestamps={'start':time.time()})
         elif activity_type == "stream":
-            await self.bot.change_presence(activity=discord.Activity(type=discord.ActivityType.streaming,name=text, timestamps={'start':time.time()}))
+            new_activity = discord.Activity(type=discord.ActivityType.streaming, name=text, timestamps={'start':time.time()})
         else:
             await ctx.send("Sélectionnez *play*, *watch*, *listen* ou *stream* suivi du nom")
+            return
+        await self.bot.change_presence(activity=new_activity)
         if not ctx.interaction:
             await ctx.message.delete()
 
     @main_msg.command(name="speedtest")
     @commands.check(checks.is_bot_admin)
-    async def speedtest(self, ctx: MyContext, method: typing.Literal["dict", "csv", "json", "image"] = "image"):
+    async def speedtest(self, ctx: MyContext, method: Literal["dict", "csv", "json", "image"] = "image"):
         """Fais un speedtest du vps
         Les méthodes possibles sont: dict, json, csv"""
         if method != "image" and (not hasattr(speedtest.SpeedtestResults, method)):
             await ctx.send("Méthode invalide")
             return
         msg = await ctx.send("Début de l'analyse...")
-        s = speedtest.Speedtest()
-        s.get_servers()
-        s.get_best_server()
-        s.download()
-        s.upload(pre_allocate=False)
+        test = speedtest.Speedtest()
+        test.get_servers()
+        test.get_best_server()
+        test.download()
+        test.upload(pre_allocate=False)
         if method == "image":
-            s.results.share()
+            test.results.share()
         if method == "image":
-            result = s.results.dict()
+            result = test.results.dict()
             await msg.edit(content=f"{result['server']['sponsor']} - ping {result['server']['latency']}ms\n{result['share']}")
         elif method == "json":
-            result = s.results.json(pretty=True)
+            result = test.results.json(pretty=True)
             await msg.edit(content=f"```json\n{result}\n```")
         elif method == "dict":
-            result = s.results.dict()
+            result = test.results.dict()
             await msg.edit(content=f"```py\n{result}\n```")
         else:
-            result = getattr(s.results, method)()
+            result = getattr(test.results, method)()
             await msg.edit(content=str(result))
 
     @main_msg.group(name="antiscam")
@@ -936,7 +943,10 @@ Cette option affecte tous les serveurs"""
 
     @main_antiscam.command(name="list-words")
     @commands.check(checks.is_bot_admin)
-    async def antiscam_list_words(self, ctx: MyContext, words_category: typing.Literal["spam-words", "safe-words", "all"]="all", words_count: commands.Range[int, 1, 100]=15):
+    async def antiscam_list_words(self, ctx: MyContext,
+                                  words_category: Literal["spam-words", "safe-words", "all"]="all",
+                                  words_count: commands.Range[int, 1, 100]=15
+                                  ):
         "Liste les mots les plus importants dans la détection de scam"
         if (antiscam := self.bot.get_cog("AntiScam")) is None:
             await ctx.send("AntiScam cog not found!")
@@ -1008,7 +1018,7 @@ Cette option affecte tous les serveurs"""
 
     @commands.command(name='execute', hidden=True)
     @commands.check(checks.is_bot_admin)
-    async def sudo(self, ctx: MyContext, who: typing.Union[discord.Member, discord.User], *, command: str):
+    async def sudo(self, ctx: MyContext, who: Union[discord.Member, discord.User], *, command: str):
         """Run a command as another user
         Credits: Rapptz (https://github.com/Rapptz/RoboDanny/blob/rewrite/cogs/admin.py)"""
         msg = copy.copy(ctx.message)
