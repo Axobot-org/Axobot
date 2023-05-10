@@ -67,7 +67,7 @@ class RecreateReminderView(discord.ui.View):
             )
         f_duration = await FormatUtils.time_delta(
             duration,
-            lang=await self.bot._(self.task["guild"], '_used_locale'),
+            lang=await self.bot._(interaction.user, '_used_locale'),
             form='developed'
         )
         await interaction.followup.send(
