@@ -1,6 +1,0 @@
-{
-    "daily": {
-        "got-points": "GG ! Tu as gagné **%{pts} points d'évènement** !",
-        "too-quick": "C'est encore trop tôt xD\n\nTu ne peux récupérer tes points d'évènement qu'une fois par heure."
-    }
-}

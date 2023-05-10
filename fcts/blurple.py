@@ -30,7 +30,8 @@ class Blurplefy(Cog):
         self.bot = bot
         self.file = "blurple"
         self.embed_color = 0x5865F2
-        self.hourly_reward = [4, 20]
+        self.hourly_reward = [2, 15]
+        self.hourly_cooldown = 3600
         try:
             with open("blurple-cache.json", "r", encoding="utf-8") as jsonfile:
                 self.cache: list[int] = json.load(jsonfile)
@@ -77,7 +78,7 @@ Online editor: https://projectblurple.com/paint
         methods_title = "3 methods"
         methods_desc = """`blurplefy` applies a basic blurplefy to your image
         `edge-detect` applies an algorithm to detect the edges of your image to make it easier to see
-        `filter` applies a Halloween filter to your image (very good for images with many colors, also faster, but doesn't support variations)"""
+        `filter` applies a Blurple filter to your image (very good for images with many colors, also faster, but doesn't support variations)"""
         variations_title = "29 variations"
         variations_desc = """`++more-dark-blurple` adds more Dark Blurple
         `++more-blurple` adds more Blurple
@@ -110,22 +111,22 @@ Online editor: https://projectblurple.com/paint
                             who: typing.Optional[TargetConverterType] = None):
         "Change a given image with the given modifier, method and variations"
         if not (ctx.guild is None or ctx.channel.permissions_for(ctx.guild.me).attach_files):
-            await ctx.send(await self.bot._(ctx.channel, "blurple.missing-attachment-perm"))
+            await ctx.send(await self.bot._(ctx.channel, "color-event.missing-attachment-perm"))
             return
 
         url = await get_url_from_ctx(ctx, who)
 
         old_msg = await ctx.send(
-            await ctx.bot._(ctx.channel, 'blurple.blurplefy.starting', name=fmodifier+'fy', user=ctx.author.mention)
-            )
+            await self.bot._(ctx.channel, 'color-event.colorify.starting', name=fmodifier+'fy', user=ctx.author.mention)
+        )
         try:
             async with aiohttp.ClientSession() as session:
                 async with session.get(str(url)) as image:
                     result = await convert_blurple(await image.read(), fmodifier, method, variations or [])
         except RuntimeError as err:
-            await ctx.send(await ctx.bot._(ctx.channel, 'blurple.unknown-err', err=str(err)))
+            await ctx.send(await self.bot._(ctx.channel, 'color-event.unknown-err', err=str(err)))
             return
-        await ctx.reply(await ctx.bot._(ctx.channel, 'blurple.blurplefy.success', user=ctx.author.mention), file=result)
+        await ctx.reply(await self.bot._(ctx.channel, 'color-event.colorify.success', user=ctx.author.mention), file=result)
         if not isinstance(old_msg, discord.InteractionMessage):
             await old_msg.delete()
         if self.bot.database_online:
@@ -155,53 +156,56 @@ Online editor: https://projectblurple.com/paint
     @commands.cooldown(2, 60, commands.BucketType.member)
     @commands.cooldown(30, 40, commands.BucketType.guild)
     @commands.check(is_blurple)
-    async def bp_check(self, ctx: MyContext, who: typing.Optional[TargetConverterType] = None):
+    async def check(self, ctx: MyContext, who: typing.Optional[TargetConverterType] = None):
         """Check an image to know if you're cool enough.
 
-        ..Example halloween check
+        ..Example blurple check
 
-        ..Example halloween check Axobot"""
+        ..Example blurple check Axobot"""
 
         url = await get_url_from_ctx(ctx, who)
 
-        old_msg = await ctx.send(await ctx.bot._(ctx.channel, "blurple.check.intro", user=ctx.author.mention))
+        old_msg = await ctx.send(await ctx.bot._(ctx.channel, "color-event.blurple.check.intro", user=ctx.author.mention))
         async with aiohttp.ClientSession() as session:
             async with session.get(str(url)) as image:
                 result = await check_blurple(await image.read())
-        answer = "\n".join([f"> {color['name']}: {color['ratio']}%" for color in result['colors']])
-        await ctx.send(await self.bot._(ctx.channel, "blurple.check.result", user=ctx.author.mention, results=answer))
+        answer = "\n".join(f"> {color['name']}: {color['ratio']}%" for color in result['colors'])
+        await ctx.reply(await self.bot._(ctx.channel, "color-event.blurple.check.result", user=ctx.author.mention, results=answer))
         if result["passed"] and self.bot.database_online and ctx.author.id not in self.cache:
             reward_points = 40
             await self.bot.get_cog("Utilities").add_user_eventPoint(ctx.author.id, reward_points)
             self.cache.append(ctx.author.id)
             with open("blurple-cache.json", "w", encoding="utf-8") as jsonfile:
                 json.dump(self.cache, jsonfile)
-            await ctx.send(await self.bot._(ctx.channel, "blurple.check.reward", user=ctx.author.mention, amount=reward_points))
+            await ctx.send(await self.bot._(ctx.channel, "color-event.blurple.check.reward", user=ctx.author.mention, amount=reward_points))
         if not isinstance(old_msg, discord.InteractionMessage):
             await old_msg.delete()
 
+
     @blurple_main.command(name="collect")
     @commands.check(checks.database_connected)
-    async def bp_collect(self, ctx: MyContext):
+    async def collect(self, ctx: MyContext):
         """Get some events points every 3 hours"""
         events_cog = self.bot.get_cog("BotEvents")
         if events_cog is None:
             return
-        last_data: typing.Optional[dict] = await events_cog.db_get_dailies(ctx.author.id)
-        cooldown = 3600*3
-        if last_data is None or (self.bot.utcnow() - last_data['last_update']).total_seconds() > cooldown:
+        last_data = await events_cog.db_get_dailies(ctx.author.id)
+        if last_data is None or (self.bot.utcnow() - last_data['last_update']).total_seconds() > self.hourly_cooldown:
             points = randint(*self.hourly_reward)
             await self.bot.get_cog("Utilities").add_user_eventPoint(ctx.author.id, points)
             await events_cog.db_add_dailies(ctx.author.id, points)
-            txt = await self.bot._(ctx.channel, "halloween.daily.got-points", pts=points)
+            if points > 0:
+                txt = await self.bot._(ctx.channel, "color-event.collect.got-points", pts=points)
+            else:
+                txt = await self.bot._(ctx.channel, "color-event.collect.lost-points", pts=points)
         else:
             time_since_available = (self.bot.utcnow() - last_data['last_update']).total_seconds()
-            time_remaining = cooldown - time_since_available
+            time_remaining = self.hourly_cooldown - time_since_available
             lang = await self.bot._(ctx.channel, '_used_locale')
             remaining = await FormatUtils.time_delta(time_remaining, lang=lang)
-            txt = await self.bot._(ctx.channel, "blurple.collect.too-quick", time=remaining)
+            txt = await self.bot._(ctx.channel, "color-event.collect.too-quick", time=remaining)
         if ctx.can_send_embed:
-            title = await self.bot._(ctx.channel, 'blurple.collect.title')
+            title = await self.bot._(ctx.channel, 'color-event.blurple.collect-title')
             emb = discord.Embed(title=title, description=txt, color=self.embed_color)
             await ctx.send(embed=emb)
         else:
