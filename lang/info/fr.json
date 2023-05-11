@@ -1,9 +1,10 @@
 {
-    "about-0": "Mon serveur Discord :",
-    "about-1": "Un lien pour m'inviter dans un autre serveur :",
-    "about-2": "La documentation du bot :",
-    "about-3": "Le compte Twitter de mon créateur :",
-    "about-5": "La Politique de Confidentialité :",
+    "about": {
+        "server": "Mon serveur Discord :",
+        "invite": "Un lien pour m'inviter dans un autre serveur :",
+        "docs": "La documentation du bot :",
+        "privacy": "Notre Politique de Confidentialité :"
+    },
     "about-main": "Bonjour ! Moi c'est %{mention} !\n\nJe suis un bot qui permet de faire *beaucoup* de choses : de la modération, un système d'xp, des statistiques, la gestion de partenaires et plein d'autres commandes plus ou moins utiles ! \nVous pouvez commencer par taper `!help` dans ce tchat pour voir la liste des commandes disponibles, puis `!config see` vous permettra de voir les options de configuration (un site web est en préparation). \n\nPour m'avoir aidé dans la création du bot, mon propriétaire (Z_runner) et moi souhaitons remercier Awhikax pour son soutien apporté lors des différentes crises, Aragorn1202 pour toutes ses idées et ses phrases pleines de bon sens, Adri pour tous ces magnifiques logos, émojis et images de profil, et toute l'équipe de traducteurs pour leur merveilleux travail !\n\n:globe_with_meridians: Quelques liens pourront vous être utiles : %{links}\n\nBonne journée !",
     "admins-list": "Les administrateurs de ce bot sont : %{admins}",
     "bitly_already_shortened": "Cette url est déjà raccourcie !",
