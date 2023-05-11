@@ -15,13 +15,13 @@ class CardGeneration:
                  level: int,
                  rank: int,
                  participants: int,
-                 current_xp: int,
+                 xp_to_current_level: int,
                  xp_to_next_level: int,
                  total_xp: int):
         self.card_name = card_name
         self.avatar = avatar
         self.data = get_card_data(card_name, translation_map, username,
-                                  level, rank, participants, current_xp, xp_to_next_level, total_xp)
+                                  level, rank, participants, xp_to_current_level, xp_to_next_level, total_xp)
         if self.avatar.format == "GIF":
             self.result = [
                 Image.new('RGBA', CARD_SIZE, (255, 255, 255, 0))
@@ -153,7 +153,7 @@ def main():
             level=1,
             rank=4,
             participants=12,
-            current_xp=128,
+            xp_to_current_level=128,
             xp_to_next_level=355,
             total_xp=1364
         )
