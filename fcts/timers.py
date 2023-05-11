@@ -72,6 +72,7 @@ class Timers(commands.Cog):
     @app_commands.describe(duration="The duration to wait, eg. '2d 4h'", message="The message to remind you of")
     @commands.cooldown(5, 30, commands.BucketType.channel)
     @commands.cooldown(5, 60, commands.BucketType.user)
+    @commands.check(checks.database_connected)
     async def remindme(self, ctx: MyContext, duration: commands.Greedy[args.Duration], *, message: str):
         """Create a new reminder
         This is actually an alias of `reminder create`
@@ -141,6 +142,7 @@ class Timers(commands.Cog):
 
     @remind_main.command(name="list")
     @commands.cooldown(5,60,commands.BucketType.user)
+    @commands.check(checks.database_connected)
     async def remind_list(self, ctx: MyContext):
         """List your pending reminders
 
@@ -270,6 +272,7 @@ class Timers(commands.Cog):
 
     @remind_main.command(name="delete", aliases=["remove", "del"])
     @commands.cooldown(5, 30, commands.BucketType.user)
+    @commands.check(checks.database_connected)
     async def remind_del(self, ctx: MyContext, reminder_id: Optional[int] = None):
         """Delete a reminder
         ID can be found with the `reminder list` command.
@@ -296,6 +299,7 @@ class Timers(commands.Cog):
 
     @remind_main.command(name="clear")
     @commands.cooldown(3, 60, commands.BucketType.user)
+    @commands.check(checks.database_connected)
     async def remind_clear(self, ctx: MyContext):
         """Remove every pending reminder
 
