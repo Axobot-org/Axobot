@@ -76,7 +76,12 @@
         "roles-rewards add": "add",
         "roles-rewards list": "list",
         "roles-rewards remove": "remove",
-        "roles-rewards reload": "reload"
+        "roles-rewards reload": "reload",
+        "blurple help": "help",
+        "blurple lightfy": "lightfy",
+        "blurple darkfy": "darkfy",
+        "blurple check": "check",
+        "blurple collect": "collect"
     },
     "group_name": {
         "antiscam": "antiscam",
@@ -90,7 +95,8 @@
         "tickets topic": "topic",
         "twitch": "twitch",
         "profile": "profile",
-        "roles-rewards": "roles-rewards"
+        "roles-rewards": "roles-rewards",
+        "blurple": "blurple"
     },
     "command_description": {
     },
@@ -324,6 +330,19 @@
         },
         "roles-rewards remove": {
             "level": "level"
+        },
+        "blurple lightfy": {
+            "method": "method",
+            "variations": "variations",
+            "who": "who"
+        },
+        "blurple darkfy": {
+            "method": "method",
+            "variations": "variations",
+            "who": "who"
+        },
+        "blurple check": {
+            "who": "who"
         }
     }
 }
