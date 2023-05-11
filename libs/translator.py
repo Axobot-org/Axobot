@@ -23,6 +23,7 @@ class AxobotTranslator(app_commands.Translator):
         self.bot = bot
 
     async def get_lang_from_locale(self, locale: Locale):
+        "Return the closest language to the given locale"
         if locale == Locale.french:
             return "fr"
         if locale == Locale.german:
@@ -31,8 +32,6 @@ class AxobotTranslator(app_commands.Translator):
             return "fi"
         if locale in {Locale.british_english, Locale.american_english}:
             return "en"
-        # elif context.location == TranslationContextLocation.choice_name:
-            # lang = "en"
         return None
 
     async def translate(self, string, locale, context):
@@ -53,11 +52,12 @@ class AxobotTranslator(app_commands.Translator):
                 return None
             cmd_name = context.data.command.qualified_name
             return await self._translate_cmd(lang, f"commands.param_name.{cmd_name}.{string.message}", locale)
+        elif context.location == TranslationContextLocation.choice_name and "default" not in string.extras:
+            return
         elif context.location in {
             TranslationContextLocation.command_description,
             TranslationContextLocation.group_description,
             TranslationContextLocation.parameter_description,
-            TranslationContextLocation.choice_name,
         }:
             return
         else:
