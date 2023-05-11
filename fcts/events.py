@@ -369,8 +369,8 @@ class Events(commands.Cog):
         """Send guilds count to Discord Bots Lists"""
         if self.bot.beta:
             return
-        t = time.time()
-        answers = ['None' for _ in range(3)]
+        start_time = time.time()
+        answers: list[str] = []
         self.bot.log.info("Sending server count to bots lists APIs...")
         try:
             guild_count = await self.bot.get_cog('Info').get_guilds_count()
@@ -385,9 +385,9 @@ class Events(commands.Cog):
             }
             async with session.post(f'https://top.gg/api/bots/{self.bot.user.id}/stats' ,data=payload, headers=headers) as resp:
                 self.bot.log.debug(f'top.gg returned {resp.status} for {payload}')
-                answers[0] = resp.status
+                answers.append(f"top.gg: {resp.status}")
         except Exception as err:
-            answers[0] = "0"
+            answers.append("top.gg: 0")
             self.bot.dispatch("error", err, "Sending server count to top.gg")
         if self.bot.entity_id == 0:
             try: # https://bots.ondiscord.xyz/bots/486896267788812288
@@ -400,9 +400,9 @@ class Events(commands.Cog):
                 }
                 async with session.post(f'https://bots.ondiscord.xyz/bot-api/bots/{self.bot.user.id}/guilds', data=payload, headers=headers) as resp:
                     self.bot.log.debug(f'BotsOnDiscord returned {resp.status} for {payload}')
-                    answers[1] = resp.status
+                    answers.append(f"BotsOnDiscord: {resp.status}")
             except Exception as err:
-                answers[1] = "0"
+                answers.append("BotsOnDiscord: 0")
                 self.bot.dispatch("error", err, "Sending server count to BotsOnDiscord")
             try: # https://api.discordextremelist.xyz/v2/bot/486896267788812288/stats
                 payload = json.dumps({
@@ -414,14 +414,29 @@ class Events(commands.Cog):
                 }
                 async with session.post(f'https://api.discordextremelist.xyz/v2/bot/{self.bot.user.id}/stats', data=payload, headers=headers) as resp:
                     self.bot.log.debug(f'DiscordExtremeList returned {resp.status} for {payload}')
-                    answers[2] = resp.status
+                    answers.append(f"DiscordExtremeList: {resp.status}")
             except Exception as err:
-                answers[2] = "0"
+                answers.append("DiscordExtremeList: 0")
                 self.bot.dispatch("error", err, "Sending server count to DiscordExtremeList")
+        elif self.bot.entity_id == 2:
+            try: # https://discordbotlist.com/api/v1/bots/1048011651145797673/stats
+                payload = json.dumps({
+                    'guilds': guild_count
+                })
+                headers = {
+                    'Authorization': self.bot.others['discordbotlist'],
+                    'Content-Type': 'application/json'
+                }
+                async with session.post(f'https://discordbotlist.com/api/v1/bots/{self.bot.user.id}/stats', data=payload, headers=headers) as resp:
+                    self.bot.log.debug(f'discordbotlist returned {resp.status} for {payload}')
+                    answers.append(f"discordbotlist: {resp.status}")
+            except Exception as err:
+                answers.append("discordbotlist: 0")
+                self.bot.dispatch("error", err, "Sending server count to discordbotlist")
         await session.close()
-        answers = '-'.join(str(x) for x in answers)
-        delta_time = round(time.time()-t, 3)
-        emb = discord.Embed(description=f'**Guilds count updated** in {delta_time}s ({answers})', color=7229109, timestamp=self.bot.utcnow())
+        answers = ' - '.join(answers)
+        delta_time = round(time.time()-start_time, 3)
+        emb = discord.Embed(description=f'**Guilds count updated** in {delta_time}s\n{answers}', color=7229109, timestamp=self.bot.utcnow())
         emb.set_author(name=self.bot.user, icon_url=self.bot.user.display_avatar)
         await self.bot.send_embed(emb, url="loop")
         self.dbl_last_sending = datetime.datetime.now()
