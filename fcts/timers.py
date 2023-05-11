@@ -221,7 +221,7 @@ class Timers(commands.Cog):
                 }
                 # channel name
                 if channel := self.bot.get_channel(reminder["channel"]):
-                    rmd_data["tr_channel"] = "#" + channel.name
+                    rmd_data["tr_channel"] = "DM" if isinstance(channel, discord.abc.PrivateChannel) else ("#" + channel.name)
                 else:
                     rmd_data["tr_channel"] = reminder["channel"]
                 # duration
