@@ -68,7 +68,7 @@ def get_card_data(
         level: int,
         rank: int,
         participants: int,
-        current_xp: int,
+        xp_to_current_level: int,
         xp_to_next_level: int,
         total_xp: int
 ) -> CardData:
@@ -78,7 +78,7 @@ def get_card_data(
     text_values = get_card_texts(translation_map,
                                  username, level,
                                  rank, participants,
-                                 current_xp, xp_to_next_level,
+                                 xp_to_current_level, xp_to_next_level,
                                  total_xp)
     texts: dict[str, TextData] = {}
     for text_key, text_meta in meta["texts"].items():  # type: ignore
@@ -88,6 +88,8 @@ def get_card_data(
             **text_meta,
             "color": tuple(colors["texts"][text_key])
         }
+    xp_from_last_level = total_xp - xp_to_current_level
+    xp_between_last_next_level = xp_to_next_level - xp_to_current_level
     return {
         "type": card_name,
         "avatar_size": (meta["avatar_size"], meta["avatar_size"]),
@@ -95,7 +97,7 @@ def get_card_data(
         "xp_bar_color": tuple(colors["xp_bar"]),
         "xp_bar_position": meta["xp_bar_position"],
         "card_version": 1 if card_name in V1_CARDS else 2,
-        "xp_percent": current_xp / xp_to_next_level,
+        "xp_percent": xp_from_last_level / xp_between_last_next_level,
         "texts": texts
     }
 
@@ -106,11 +108,13 @@ def get_card_texts(
         level: int,
         rank: int,
         participants: int,
-        current_xp: int,
+        xp_to_current_level: int,
         xp_to_next_level: int,
         total_xp: int
 ):
     "Return the texts to be added to the card"
+    xp_from_last_level = total_xp - xp_to_current_level
+    xp_between_last_next_level = xp_to_next_level - xp_to_current_level
     return {
         "username": username,
         "level_label": translation_map.get("LEVEL", "Level"),
@@ -119,7 +123,7 @@ def get_card_texts(
         "rank_and_participants": f"{rank}/{participants}",
         "rank": str(rank),
         "participants": str(participants),
-        "xp_to_next_level_with_text": f"{xp_to_next_level} left to levelup!",
+        "xp_to_next_level_with_text": f"{xp_to_next_level - xp_to_current_level} left to levelup!",
         "total_xp_with_text": f"{total_xp} Total XP",
-        "xp": f"{current_xp}/{xp_to_next_level} ({total_xp}/{total_xp + xp_to_next_level - current_xp})"
+        "xp": f"{xp_from_last_level}/{xp_between_last_next_level} ({total_xp}/{xp_to_next_level})"
     }
