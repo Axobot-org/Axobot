@@ -664,7 +664,7 @@ class Xp(commands.Cog):
             level=levels_info[0],
             rank=rank,
             participants=ranks_nb,
-            current_xp=levels_info[2],
+            xp_to_current_level=levels_info[2],
             xp_to_next_level=levels_info[1],
             total_xp=xp
         )
@@ -737,9 +737,9 @@ class Xp(commands.Cog):
         txts = [await self.bot._(ctx.channel, "xp.card-level"), await self.bot._(ctx.channel, "xp.card-rank")]
         emb = discord.Embed(color=self.embed_color)
         emb.set_author(name=user, icon_url=user.display_avatar)
-        emb.add_field(name='XP', value="{}/{}".format(xp, levels_info[1]))
+        emb.add_field(name='XP', value=f"{xp}/{levels_info[1]}")
         emb.add_field(name=txts[0].title(), value=levels_info[0])
-        emb.add_field(name=txts[1].title(), value="{}/{}".format(rank, ranks_nb))
+        emb.add_field(name=txts[1].title(), value=f"{rank}/{ranks_nb}")
         send_in_private = await self.bot.get_config(ctx.guild.id, "rank_in_dm")
         if ctx.interaction:
             await ctx.send(embed=emb, ephemeral=send_in_private)
