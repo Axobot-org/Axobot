@@ -418,15 +418,13 @@ class Xp(commands.Cog):
             table = await self.get_table_name(guild_id, False)
             if table is None:
                 return 0
-            query = ("SELECT COUNT(*) FROM `{}` WHERE `banned`=0".format(table))
+            query = f"SELECT COUNT(*) FROM `{table}` WHERE `banned`=0"
             cursor = cnx.cursor(dictionary = False)
             cursor.execute(query)
-            liste = list()
-            for x in cursor:
-                liste.append(x)
+            rows = len(cursor)
             cursor.close()
-            if liste is not None and len(liste) == 1:
-                return liste[0][0]
+            if rows is not None and len(rows) == 1:
+                return rows[0][0]
             return 0
         except Exception as err:
             self.bot.dispatch("error", err)
@@ -440,30 +438,27 @@ class Xp(commands.Cog):
             if guild_id is None:
                 self.bot.log.info("[xp] Loading XP cache (global)")
                 cnx = self.bot.cnx_axobot
-                query = ("SELECT `userID`,`xp` FROM `{}` WHERE `banned`=0".format(self.table))
+                query = f"SELECT `userID`,`xp` FROM `{self.table}` WHERE `banned`=0"
             else:
-                self.bot.log.info("[xp] Loading XP cache (guild {})".format(guild_id))
-                table = await self.get_table_name(guild_id,False)
+                self.bot.log.info(f"[xp] Loading XP cache (guild {guild_id})")
+                table = await self.get_table_name(guild_id, False)
                 if table is None:
-                    self.cache[guild_id] = dict()
+                    self.cache[guild_id] = {}
                     return
                 cnx = self.bot.cnx_xp
-                query = ("SELECT `userID`,`xp` FROM `{}` WHERE `banned`=0".format(table))
+                query = f"SELECT `userID`,`xp` FROM `{table}` WHERE `banned`=0"
             cursor = cnx.cursor(dictionary = True)
             cursor.execute(query)
-            liste = list()
-            for x in cursor:
-                liste.append(x)
+            rows = list(cursor)
             if guild_id is None:
-                if len(self.cache['global'].keys()) == 0:
-                    self.cache['global'] = dict()
-                for l in liste:
-                    self.cache['global'][l['userID']] = [round(time.time())-60, int(l['xp'])]
+                self.cache['global'].clear()
+                for row in rows:
+                    self.cache['global'][row['userID']] = [round(time.time())-60, int(row['xp'])]
             else:
-                if guild_id not in self.cache.keys():
-                    self.cache[guild_id] = dict()
-                for l in liste:
-                    self.cache[guild_id][l['userID']] = [round(time.time())-60, int(l['xp'])]
+                if guild_id not in self.cache:
+                    self.cache[guild_id] = {}
+                for row in rows:
+                    self.cache[guild_id][row['userID']] = [round(time.time())-60, int(row['xp'])]
             cursor.close()
             return
         except Exception as err:
