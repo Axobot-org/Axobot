@@ -53,14 +53,14 @@ class Help(commands.Cog):
 ..Doc infos.html#about"""
         urls = ""
         bot_invite = "https://zrunner.me/" + ("invitezbot" if self.bot.entity_id == 0 else "invite-axobot")
-        for i, url in enumerate([
-            'https://discord.gg/N55zY88',
-            bot_invite,
-            'https://axobot.rtfd.io/',
-            'https://twitter.com/z_runnerr',
-            'https://zrunner.me/axobot-privacy.pdf'
-        ]):
-            urls += "\n:arrow_forward: " + await self.bot._(ctx.channel, f"info.about-{i}") + " <" + url + ">"
+        links = {
+            "server": "https://discord.gg/N55zY88",
+            "invite": bot_invite,
+            "docs": "https://axobot.rtfd.io/",
+            "privacy": "https://zrunner.me/axobot-privacy.pdf"
+        }
+        for key, url in links.items():
+            urls += "\n:arrow_forward: " + await self.bot._(ctx.channel, f"info.about.{key}") + " <" + url + ">"
         msg = await self.bot._(ctx.channel, "info.about-main", mention=ctx.bot.user.mention, links=urls)
         if ctx.can_send_embed:
             await ctx.send(embed=discord.Embed(description=msg, color=16298524))
