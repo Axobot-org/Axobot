@@ -8,16 +8,14 @@
             "intro": "%{user}, début de l'analyse blurple (Notez que cela peut prendre un certain temps)",
             "result": "%{user}, voici le résultat de l'analyse Blurple :\n%{results}",
             "reward": "%{user}, tu viens de gagner %{amount} points d'événements grâce à ton œuvre d'art Blurple !"
-        },
-        "collect-title": "Événement Blurple "
+        }
     },
     "halloween": {
         "check": {
             "intro": "%{user}, début de l'analyse d'image Halloween (cela peut prendre un certain temps)",
             "result": "%{user}, voici les résultats de l'analyse Halloween :\n%{results}",
             "reward": "%{user}, tu viens de gagner %{amount} points d'événements grâce à ton œuvre d'art Halloweenesque !"
-        },
-        "collect-title": "Halloween event"
+        }
     },
     "collect": {
         "got-points": "Bravo ! Vous venez de gagner **%{pts} points** d'événement !",

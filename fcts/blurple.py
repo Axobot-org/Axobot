@@ -1,20 +1,17 @@
 import json
 import typing
-from random import randint
 
 import aiohttp
 import discord
 from discord.ext import commands
 from discord.ext.commands import Cog
 
-from fcts import checks
 from libs.bot_classes import (PRIVATE_GUILD_ID, SUPPORT_GUILD_ID, Axobot,
                               MyContext)
 from libs.colors_events import (BlurpleVariationFlagType, ColorVariation,
                                 TargetConverterType, check_blurple,
                                 convert_blurple, get_url_from_ctx)
 from libs.errors import NotDuringEventError
-from libs.formatutils import FormatUtils
 
 
 async def is_blurple(ctx: MyContext):
@@ -30,8 +27,6 @@ class Blurplefy(Cog):
         self.bot = bot
         self.file = "blurple"
         self.embed_color = 0x5865F2
-        self.hourly_reward = [2, 15]
-        self.hourly_cooldown = 3600
         try:
             with open("blurple-cache.json", "r", encoding="utf-8") as jsonfile:
                 self.cache: list[int] = json.load(jsonfile)
@@ -180,36 +175,6 @@ Online editor: https://projectblurple.com/paint
             await ctx.send(await self.bot._(ctx.channel, "color-event.blurple.check.reward", user=ctx.author.mention, amount=reward_points))
         if not isinstance(old_msg, discord.InteractionMessage):
             await old_msg.delete()
-
-
-    @blurple_main.command(name="collect")
-    @commands.check(checks.database_connected)
-    async def collect(self, ctx: MyContext):
-        """Get some events points every 3 hours"""
-        events_cog = self.bot.get_cog("BotEvents")
-        if events_cog is None:
-            return
-        last_data = await events_cog.db_get_dailies(ctx.author.id)
-        if last_data is None or (self.bot.utcnow() - last_data['last_update']).total_seconds() > self.hourly_cooldown:
-            points = randint(*self.hourly_reward)
-            await self.bot.get_cog("Utilities").add_user_eventPoint(ctx.author.id, points)
-            await events_cog.db_add_dailies(ctx.author.id, points)
-            if points > 0:
-                txt = await self.bot._(ctx.channel, "color-event.collect.got-points", pts=points)
-            else:
-                txt = await self.bot._(ctx.channel, "color-event.collect.lost-points", pts=points)
-        else:
-            time_since_available = (self.bot.utcnow() - last_data['last_update']).total_seconds()
-            time_remaining = self.hourly_cooldown - time_since_available
-            lang = await self.bot._(ctx.channel, '_used_locale')
-            remaining = await FormatUtils.time_delta(time_remaining, lang=lang)
-            txt = await self.bot._(ctx.channel, "color-event.collect.too-quick", time=remaining)
-        if ctx.can_send_embed:
-            title = await self.bot._(ctx.channel, 'color-event.blurple.collect-title')
-            emb = discord.Embed(title=title, description=txt, color=self.embed_color)
-            await ctx.send(embed=emb)
-        else:
-            await ctx.send(txt)
 
 
 async def setup(bot):
