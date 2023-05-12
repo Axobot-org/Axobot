@@ -48,17 +48,14 @@ Slowmode works up to one message every 6h (21600s)
         if seconds == 0:
             await ctx.channel.edit(slowmode_delay=0)
             message = await self.bot._(ctx.guild.id, "moderation.slowmode.disabled")
-            log = await self.bot._(ctx.guild.id, "logs.slowmode-disabled", channel=ctx.channel.mention)
-            await self.bot.get_cog("Events").send_logs_per_server(ctx.guild, "slowmode", log, ctx.author)
         elif seconds > 21600:
             message = await self.bot._(ctx.guild.id, "moderation.slowmode.too-long")
         else:
             await ctx.channel.edit(slowmode_delay=seconds)
             duration = await FormatUtils.time_delta(seconds, lang=await self.bot._(ctx, "_used_locale"))
             message = await self.bot._(ctx.guild.id, "moderation.slowmode.enabled", channel=ctx.channel.mention, s=duration)
-            log = await self.bot._(ctx.guild.id, "logs.slowmode-enabled", channel=ctx.channel.mention, seconds=duration)
-            await self.bot.get_cog("Events").send_logs_per_server(ctx.guild, "slowmode", log, ctx.author)
         await ctx.send(message)
+        self.bot.dispatch("moderation_slowmode", ctx.channel, ctx.author, seconds)
 
 
     @commands.hybrid_command(name="clear")
@@ -132,8 +129,7 @@ Slowmode works up to one message every 6h (21600s)
         deleted = await ctx.channel.purge(limit=number, check=check)
         await ctx.send(await self.bot._(ctx.guild, "moderation.clear.done", count=len(deleted)), delete_after=2.0)
         if len(deleted) > 0:
-            log = await self.bot._(ctx.guild.id, "logs.clear", channel=ctx.channel.mention, number=len(deleted))
-            await self.bot.get_cog("Events").send_logs_per_server(ctx.guild, "clear", log, ctx.author)
+            self.bot.dispatch("moderation_clear", ctx.channel, ctx.author, len(deleted))
 
     async def clear_simple(self, ctx: MyContext, number: int):
         def check(msg: discord.Message):
@@ -151,8 +147,7 @@ Slowmode works up to one message every 6h (21600s)
         try:
             deleted = await ctx.channel.purge(limit=number, check=check)
             await ctx.send(await self.bot._(ctx.guild, "moderation.clear.done", count=len(deleted)), delete_after=2.0)
-            log = await self.bot._(ctx.guild.id, "logs.clear", channel=ctx.channel.mention, number=len(deleted))
-            await self.bot.get_cog("Events").send_logs_per_server(ctx.guild,"clear",log,ctx.author)
+            self.bot.dispatch("moderation_clear", ctx.channel, ctx.author, len(deleted))
         except discord.errors.NotFound:
             await ctx.send(await self.bot._(ctx.guild, "moderation.clear.not-found"))
         except Exception as err:
@@ -1363,8 +1358,7 @@ The 'show_reasons' parameter is used to display the mute reasons.
         messages.append(start_message)
         txt = await self.bot._(ctx.guild.id, "moderation.clear.done", count=len(messages))
         await ctx.send(txt, delete_after=2.0)
-        log = await self.bot._(ctx.guild.id,"logs.clear", channel=start_message.channel.mention, number=len(messages))
-        await self.bot.get_cog("Events").send_logs_per_server(ctx.guild, "clear", log, ctx.author)
+        self.bot.dispatch("moderation_clear", ctx.channel, ctx.author, len(messages))
 
 
     async def configure_muted_role(self, guild: discord.Guild, role: discord.Role = None):

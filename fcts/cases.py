@@ -1,3 +1,4 @@
+import copy
 import importlib
 from datetime import datetime
 from math import ceil
@@ -6,17 +7,17 @@ from typing import Optional
 import discord
 from discord.ext import commands
 
+from fcts import args
 from fcts.checks import is_support_staff
-from libs.bot_classes import MyContext, Axobot
+from libs.bot_classes import Axobot, MyContext
 from libs.formatutils import FormatUtils
 from libs.paginator import Paginator
-
-from fcts import args
 
 importlib.reload(args)
 
 
 async def can_edit_case(ctx: MyContext):
+    "Check if the context user can edit or delete a moderation case"
     if await ctx.bot.get_cog('Admin').check_if_admin(ctx.author):
         return True
     if ctx.bot.database_online:
@@ -24,6 +25,8 @@ async def can_edit_case(ctx: MyContext):
     return False
 
 class Case:
+    "Represents a moderation case"
+
     def __init__(self, bot: Axobot, guild_id: int, member_id: int, case_type: str, mod_id: int, reason: str, date: datetime, duration: Optional[int]=None, case_id: Optional[int]=None):
         self.bot = bot
         self.guild = guild_id
@@ -38,7 +41,8 @@ class Case:
         else:
             self.date = date
 
-    async def display(self, display_guild: bool=False) -> str:
+    async def display(self, display_guild: bool=False):
+        "Format a case to be human readable"
         u = self.bot.get_user(self.user)
         if u is None:
             u = self.user
@@ -82,10 +86,10 @@ class Cases(commands.Cog):
     async def on_ready(self):
         self.table = 'cases_beta' if self.bot.beta else 'cases'
 
-    async def get_case(self, columns=None, criters=None, relation="AND") -> Optional[list[Case]]:
+    async def get_case(self, columns=None, criters=None, relation="AND") -> list[Case]:
         """return every cases"""
         if not self.bot.database_online:
-            return None
+            return []
         if columns is None:
             columns = []
         if criters is None:
@@ -98,7 +102,7 @@ class Cases(commands.Cog):
             cl = "`"+"`,`".join(columns)+"`"
         relation = " "+relation+" "
         query = ("SELECT {} FROM `{}` WHERE {}".format(cl,self.table,relation.join(criters)))
-        liste = list()
+        liste = []
         async with self.bot.db_query(query) as query_results:
             if len(columns) == 0:
                 for elem in query_results:
@@ -147,20 +151,18 @@ class Cases(commands.Cog):
             return False
         if not isinstance(case, Case):
             raise ValueError
-        query = "INSERT INTO `{}` (`guild`, `user`, `type`, `mod`, `reason`,`duration`) VALUES (%(g)s, %(u)s, %(t)s, %(m)s, %(r)s, %(d)s)".format(self.table)
+        query = f"INSERT INTO `{self.table}` (`guild`, `user`, `type`, `mod`, `reason`,`duration`) VALUES (%(g)s, %(u)s, %(t)s, %(m)s, %(r)s, %(d)s)"
         query_args = { 'g': case.guild, 'u': case.user, 't': case.type, 'm': case.mod, 'r': case.reason, 'd': case.duration }
         async with self.bot.db_query(query, query_args) as last_row_id:
             case.id = last_row_id
         return True
 
-    async def update_reason(self, case):
+    async def update_reason(self, case_id: int, new_reason: str):
         """update infos of a case"""
         if not self.bot.database_online:
             return False
-        if not isinstance(case, Case):
-            raise ValueError
-        query = ("UPDATE `{}` SET `reason` = %s WHERE `ID` = %s".format(self.table))
-        async with self.bot.db_query(query, (case.reason, case.id)):
+        query = f"UPDATE `{self.table}` SET `reason` = %s WHERE `ID` = %s"
+        async with self.bot.db_query(query, (new_reason, case_id)):
             pass
         return True
 
@@ -279,9 +281,9 @@ class Cases(commands.Cog):
             self.bot.dispatch("command_error", ctx, err)
 
 
-    @case_main.command(name="reason",aliases=['edit'])
+    @case_main.command(name="edit-reason", aliases=["edit"])
     @commands.guild_only()
-    async def reason(self, ctx: MyContext, case:int, *, reason):
+    async def reason(self, ctx: MyContext, case_id: int, *, new_reason):
         """Edit the reason of a case
 
         ..Example cases reason 95 Was too dumb
@@ -290,23 +292,21 @@ class Cases(commands.Cog):
         if not self.bot.database_online:
             return await ctx.send(await self.bot._(ctx.guild.id,'cases.no_database'))
         try:
-            c = ["ID="+str(case)]
+            c = ["ID="+str(case_id)]
             if not await self.bot.get_cog('Admin').check_if_admin(ctx.author):
                 c.append("guild="+str(ctx.guild.id))
             cases = await self.get_case(criters=c)
         except Exception as err:
             self.bot.dispatch("command_error", ctx, err)
             return
-        if len(cases)!=1:
+        if len(cases) !=1 :
             await ctx.send(await self.bot._(ctx.guild.id,"cases.not-found"))
             return
-        case = cases[0]
-        old_reason = case.reason
-        case.reason = reason
-        await self.update_reason(case)
-        await ctx.send(await self.bot._(ctx.guild.id,"cases.reason-edited", ID=case.id))
-        log = await self.bot._(ctx.guild.id,"logs.case-reason",old=old_reason,new=case.reason,id=case.id)
-        await self.bot.get_cog("Events").send_logs_per_server(ctx.guild,"case-edit",log,ctx.author)
+        old_case = cases[0]
+        new_case = copy.deepcopy(old_case)
+        await self.update_reason(case_id, new_reason)
+        await ctx.send(await self.bot._(ctx.guild.id,"cases.reason-edited", ID=case_id))
+        self.bot.dispatch("case_edit", ctx.guild, old_case, new_case)
 
     @case_main.command(name="search")
     @commands.guild_only()
@@ -363,9 +363,9 @@ class Cases(commands.Cog):
             self.bot.dispatch("command_error", ctx, err)
 
 
-    @case_main.command(name="remove", aliases=["clear", "delete"])
+    @case_main.command(name="remove", aliases=["delete"])
     @commands.guild_only()
-    async def remove(self, ctx: MyContext, case:int):
+    async def remove(self, ctx: MyContext, case_id: int):
         """Delete a case forever
         Warning: "Forever", it's very long. And no backups are done
 
@@ -375,7 +375,7 @@ class Cases(commands.Cog):
         if not self.bot.database_online:
             return await ctx.send(await self.bot._(ctx.guild.id,'cases.no_database'))
         try:
-            c = ["ID="+str(case)]
+            c = ["ID="+str(case_id)]
             if not await self.bot.get_cog('Admin').check_if_admin(ctx.author):
                 c.append("guild="+str(ctx.guild.id))
             cases = await self.get_case(columns=['ID','user'],criters=c)
@@ -386,13 +386,9 @@ class Cases(commands.Cog):
             await ctx.send(await self.bot._(ctx.guild.id,"cases.not-found"))
             return
         case = cases[0]
-        await self.delete_case(case['ID'])
-        await ctx.send(await self.bot._(ctx.guild.id,"cases.deleted", ID=case['ID']))
-        user = ctx.bot.get_user(case['user'])
-        if user is None:
-            user = case['user']
-        log = await self.bot._(ctx.guild.id,"logs.case-del",id=case['ID'],user=str(user))
-        await self.bot.get_cog("Events").send_logs_per_server(ctx.guild,"case-edit",log,ctx.author)
+        await self.delete_case(case.id)
+        await ctx.send(await self.bot._(ctx.guild.id,"cases.deleted", ID=case.id))
+        self.bot.dispatch("case_delete", ctx.guild, case)
 
 
 async def setup(bot):
