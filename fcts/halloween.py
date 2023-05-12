@@ -123,7 +123,7 @@ A BIG thanks to the Project Blurple and their original code for the colorization
         if not isinstance(old_msg, discord.InteractionMessage):
             await old_msg.delete()
         if self.bot.database_online:
-            await ctx.bot.get_cog("Utilities").add_user_eventPoint(ctx.author.id, 1)
+            await ctx.bot.get_cog("BotEvents").db_add_user_points(ctx.author.id, 1)
 
     @hallow_main.command("lightfy")
     @commands.cooldown(6, 120, commands.BucketType.member)
@@ -166,7 +166,7 @@ A BIG thanks to the Project Blurple and their original code for the colorization
         await ctx.reply(await self.bot._(ctx.channel, "color-event.halloween.check.result", user=ctx.author.mention, results=answer))
         if result["passed"] and self.bot.database_online and ctx.author.id not in self.cache:
             reward_points = 40
-            await ctx.bot.get_cog("Utilities").add_user_eventPoint(ctx.author.id, reward_points)
+            await ctx.bot.get_cog("BotEvents").db_add_user_points(ctx.author.id, reward_points)
             self.cache.append(ctx.author.id)
             with open("halloween-cache.json", "w", encoding="utf-8") as file:
                 json.dump(self.cache, file)
