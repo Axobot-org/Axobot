@@ -1,7 +1,7 @@
 import asyncio
 import datetime
 import re
-from typing import Any, Callable, Optional
+from typing import Any, Callable, Optional, TYPE_CHECKING
 
 import discord
 from cachingutils import LRUCache
@@ -18,6 +18,9 @@ from libs.formatutils import FormatUtils
 
 DISCORD_INVITE = re.compile(r'(?:https?://)?(?:www[.\s])?((?:discord[.\s](?:gg|io|me|li(?:nk)?)|discordapp\.com/invite|discord\.com/invite|dsc\.gg)[/\s]{1,3}[\w-]{1,25}(?!\w))')
 
+if TYPE_CHECKING:
+    from fcts.cases import Case
+
 
 class ServerLogs(commands.Cog):
     """Handle any kind of server log"""
@@ -26,7 +29,7 @@ class ServerLogs(commands.Cog):
         "automod": {"antiraid", "antiscam"},
         "bot": {"bot_warnings"},
         "members": {"member_roles", "member_nick", "member_avatar", "member_join", "member_leave", "member_verification", "user_update"},
-        "moderation": {"member_ban", "member_unban", "member_timeout", "member_kick"},
+        "moderation": {"clear", "member_ban", "member_unban", "member_timeout", "member_kick", "moderation_case", "slowmode"},
         "messages": {"message_update", "message_delete", "discord_invite", "ghost_ping"},
         "other": {"server_update"},
         "roles": {"role_creation", "role_update", "role_deletion"},
@@ -1062,6 +1065,82 @@ Minimum age required by anti-raid: {min_age}"
             else:
                 emb.add_field(name="New owner", value=f"{after.owner.mention} ({after.owner.id})")
             await self.validate_logs(after, channel_ids, emb, "server_update")
+
+    @commands.Cog.listener()
+    async def on_moderation_slowmode(self, channel: discord.abc.GuildChannel, author: discord.Member, duration: int):
+        """Triggered when someone uses the slowmode command
+        Corresponding log: slowmode"""
+        if channel_ids := await self.is_log_enabled(channel.guild.id, "slowmode"):
+            if duration == 0:
+                emb = discord.Embed(
+                    description=f"**Slowmode disabled** in {channel.mention}",
+                    colour=discord.Color.greyple()
+                )
+            else:
+                emb = discord.Embed(
+                    description=f"**Slowmode activated** in {channel.mention}",
+                    colour=discord.Color.orange()
+                )
+                lang = await self.bot._(channel.guild.id, "_used_locale")
+                f_duration = FormatUtils.time_delta(duration, lang=lang)
+                emb.add_field(name="Duration", value=f_duration)
+            emb.add_field(name="Moderator", value=author.mention)
+            emb.set_author(name=author, icon_url=author.display_avatar)
+            await self.validate_logs(channel.guild, channel_ids, emb, "slowmode")
+
+    @commands.Cog.listener()
+    async def on_moderation_clear(self, channel: discord.abc.GuildChannel, author: discord.Member, messages_count: int):
+        """Triggered when someone uses the clear command
+        Corresponding log: clear"""
+        if channel_ids := await self.is_log_enabled(channel.guild.id, "clear"):
+            emb = discord.Embed(
+                description=f"**{messages_count} messages deleted** in {channel.mention}",
+                colour=discord.Color.red()
+            )
+            emb.add_field(name="Moderator", value=author.mention)
+            emb.set_author(name=author, icon_url=author.display_avatar)
+            await self.validate_logs(channel.guild, channel_ids, emb, "clear")
+
+    @commands.Cog.listener()
+    async def on_case_edit(self, guild: discord.Guild, before: "Case", after: "Case"):
+        """Triggered when a case is edited
+        Corresponding log: moderation_case"""
+        if channel_ids := await self.is_log_enabled(guild.id, "moderation_case"):
+            emb = discord.Embed(
+                description=f"**Case #{after.id} edited**",
+                colour=discord.Color.orange()
+            )
+            if moderator := self.bot.get_user(after.mod):
+                emb.add_field(name="Moderator", value=f"{moderator.mention} ({moderator.id})")
+            else:
+                emb.add_field(name="Moderator", value=f"Unknown ({after.mod})")
+            emb.add_field(name="Old reason", value=before.reason)
+            emb.add_field(name="New reason", value=after.reason)
+            if moderator:
+                emb.set_author(name=moderator, icon_url=moderator.display_avatar)
+            await self.validate_logs(guild, channel_ids, emb, "case_edit")
+
+    @commands.Cog.listener()
+    async def on_case_delete(self, guild: discord.Guild, case: "Case"):
+        """Triggered when a case is deleted
+        Corresponding log: moderation_case"""
+        if channel_ids := await self.is_log_enabled(guild.id, "moderation_case"):
+            emb = discord.Embed(
+                description=f"**Case #{case.id} deleted**",
+                colour=discord.Color.red()
+            )
+            if moderator := self.bot.get_user(case.mod):
+                emb.add_field(name="Moderator", value=f"{moderator.mention} ({moderator.id})")
+            else:
+                emb.add_field(name="Moderator", value=f"Unknown ({case.mod})")
+            if user := self.bot.get_user(case.user):
+                emb.add_field(name="User", value=f"{user.mention} ({user.id})")
+            else:
+                emb.add_field(name="User", value=f"Unknown ({case.user})")
+            emb.add_field(name="Reason", value=case.reason)
+            if moderator:
+                emb.set_author(name=moderator, icon_url=moderator.display_avatar)
+            await self.validate_logs(guild, channel_ids, emb, "case_delete")
 
     @commands.Cog.listener()
     async def on_server_warning(self, warning_type: ServerWarningType, guild: discord.Guild, **kwargs):
