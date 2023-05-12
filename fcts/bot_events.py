@@ -7,7 +7,7 @@ from typing import Optional
 import discord
 from discord.ext import commands
 
-from fcts.checks import is_fun_enabled
+from fcts.checks import is_fun_enabled, database_connected
 from libs.bot_classes import Axobot, MyContext
 from libs.bot_events import EventData, EventType
 from libs.formatutils import FormatUtils
@@ -90,7 +90,8 @@ class BotEvents(commands.Cog):
     def __init__(self, bot: Axobot):
         self.bot = bot
         self.file = "bot_events"
-        self.hourly_reward = [-10, 60]
+        self.hourly_reward = [-10, 50]
+        self.hourly_cooldown = 3600
         self.current_event: Optional[EventType] = None
         self.current_event_data: EventData = {}
         self.current_event_id: Optional[str] = None
@@ -162,12 +163,14 @@ class BotEvents(commands.Cog):
                 await msg.add_reaction(react)
 
     @commands.group(name="events", aliases=["botevents", "botevent", "event"])
+    @commands.check(database_connected)
     async def events_main(self, ctx: MyContext):
         """When I'm organizing some events"""
         if ctx.subcommand_passed is None:
             await ctx.send_help(ctx.command)
 
     @events_main.command(name="info")
+    @commands.check(database_connected)
     async def event_info(self, ctx: MyContext):
         """Get info about the current event"""
         current_event = self.current_event_id
@@ -225,6 +228,7 @@ class BotEvents(commands.Cog):
                 self.bot.dispatch("error", ValueError(f"'{current_event}' has no event description"), ctx)
 
     @events_main.command(name="rank")
+    @commands.check(database_connected)
     async def events_rank(self, ctx: MyContext, user: discord.User = None):
         """Watch how many xp you already have
         Events points are reset after each event"""
@@ -301,21 +305,51 @@ class BotEvents(commands.Cog):
                 msg += f"\n\n__{_rank_total}:__ {points}\n__{_rank_global}:__ {user_rank}"
             await ctx.send(msg)
 
-    @events_main.command(name="collect", enabled=False)
+    @events_main.command(name="collect")
+    @commands.check(database_connected)
     @commands.cooldown(3, 60, commands.BucketType.user)
     async def event_collect(self, ctx: MyContext):
-        "Collect your Christmas present!"
-        if self.current_event_id != "christmas-2022":
+        "Get some event points every hour"
+        current_event = self.current_event_id
+        lang = await self.bot._(ctx.channel, '_used_locale')
+        lang = 'en' if lang not in ('en', 'fr') else lang
+        events_desc = translations_data[lang]['events-desc']
+        # if no event
+        if not current_event in events_desc:
             await ctx.send(await self.bot._(ctx.channel, "bot_events.nothing-desc"))
+            if current_event:
+                self.bot.dispatch("error", ValueError(f"'{current_event}' has no event description"), ctx)
             return
-        if (users_cog := self.bot.get_cog("Users")) is None:
-            raise RuntimeError("Users cog not found")
-        if await users_cog.has_rankcard(ctx.author, "christmas22"):
-            await ctx.send(await self.bot._(ctx.channel, "bot_events.christmas.already-collected"))
+        # if current event has no objectives
+        if not self.current_event_data["objectives"]:
+            cmd_mention = await self.bot.get_command_mention("event info")
+            await ctx.send(await self.bot._(ctx.channel, "bot_events.no-objectives", cmd=cmd_mention))
             return
-        await users_cog.set_rankcard(ctx.author, "christmas22")
-        profile_cmd = await self.bot.get_command_mention("profile card")
-        await ctx.send(await self.bot._(ctx.channel, "bot_events.christmas.collected", cmd=profile_cmd))
+        # check last collect from this user
+        last_data = await self.db_get_dailies(ctx.author.id)
+        if last_data is None or (self.bot.utcnow() - last_data['last_update']).total_seconds() > self.hourly_cooldown:
+            # grant points
+            points = randint(*self.hourly_reward)
+            await self.bot.get_cog("Utilities").add_user_eventPoint(ctx.author.id, points)
+            await self.db_add_dailies(ctx.author.id, points)
+            if points > 0:
+                txt = await self.bot._(ctx.channel, "bot_events.collect.got-points", pts=points)
+            else:
+                txt = await self.bot._(ctx.channel, "bot_events.collect.lost-points", pts=points)
+        else:
+            # cooldown error
+            time_since_available = (self.bot.utcnow() - last_data['last_update']).total_seconds()
+            time_remaining = self.hourly_cooldown - time_since_available
+            lang = await self.bot._(ctx.channel, '_used_locale')
+            remaining = await FormatUtils.time_delta(time_remaining, lang=lang)
+            txt = await self.bot._(ctx.channel, "bot_events.collect.too-quick", time=remaining)
+        # send result
+        if ctx.can_send_embed:
+            title = translations_data[lang]['events-title'][current_event]
+            emb = discord.Embed(title=title, description=txt, color=self.current_event_data["color"])
+            await ctx.send(embed=emb)
+        else:
+            await ctx.send(txt)
 
     async def get_top_5(self) -> str:
         "Get the list of the 5 users with the most event points"
@@ -350,35 +384,6 @@ class BotEvents(commands.Cog):
             result['first_update'] = result['first_update'].replace(tzinfo=datetime.timezone.utc)
             result['last_update'] = result['last_update'].replace(tzinfo=datetime.timezone.utc)
             return query_results[0] if len(query_results) > 0 else None
-
-    @commands.command(name="fish", enabled=False)
-    async def fish(self, ctx: MyContext):
-        "Try to catch a fish and get some event points!"
-        if not self.current_event or self.current_event_data['type'] != "fish":
-            await ctx.send(await self.bot._(ctx.channel, "bot_events.nothing-desc"))
-            return
-        last_data = await self.db_get_dailies(ctx.author.id)
-        cooldown = 3600/2 # 30min
-        time_since_available: int = 0 if last_data is None else (
-            self.bot.utcnow() - last_data['last_update']).total_seconds() - cooldown
-        if time_since_available >= 0:
-            points = randint(*self.hourly_reward)
-            await self.bot.get_cog("Utilities").add_user_eventPoint(ctx.author.id, points)
-            await self.db_add_dailies(ctx.author.id, points)
-            if points >= 0:
-                txt = await self.bot._(ctx.channel, "halloween.daily.got-points", pts=points)
-            else:
-                txt = await self.bot._(ctx.channel, "halloween.daily.lost-points", pts=points)
-        else:
-            lang = await self.bot._(ctx.channel, '_used_locale')
-            remaining = await FormatUtils.time_delta(-time_since_available, lang=lang)
-            txt = await self.bot._(ctx.channel, "blurple.collect.too-quick", time=remaining)
-        if ctx.can_send_embed:
-            title = "Fish event"
-            emb = discord.Embed(title=title, description=txt, color=16733391)
-            await ctx.send(embed=emb)
-        else:
-            await ctx.send(txt)
 
 
 async def setup(bot):

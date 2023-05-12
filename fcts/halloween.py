@@ -1,7 +1,5 @@
-import datetime
 import json
 import typing
-from random import randint
 
 import aiohttp
 import discord
@@ -14,7 +12,6 @@ from libs.colors_events import (ColorVariation, HalloweenVariationFlagType,
                                 TargetConverterType, check_halloween,
                                 convert_halloween, get_url_from_ctx)
 from libs.errors import NotDuringEventError
-from libs.formatutils import FormatUtils
 
 
 async def is_halloween(ctx: MyContext):
@@ -31,8 +28,6 @@ class Halloween(Cog):
         self.bot = bot
         self.file = "halloween"
         self.embed_color = discord.Color.orange()
-        self.hourly_reward = [2, 15]
-        self.hourly_cooldown = 3600
         try:
             with open("halloween-cache.json", "r", encoding="utf-8") as file:
                 self.cache = json.load(file)
@@ -58,9 +53,7 @@ A BIG thanks to the Project Blurple and their original code for the colorization
 
 ..Example halloween check light Axobot
 
-..Example halloween check dark
-
-..Example halloween collect"""
+..Example halloween check dark"""
         if ctx.subcommand_passed is None:
             await ctx.send_help(ctx.command)
 
@@ -180,36 +173,6 @@ A BIG thanks to the Project Blurple and their original code for the colorization
             await ctx.send(await self.bot._(ctx.channel, "color-event.halloween.check.reward", user=ctx.author.mention, amount=reward_points))
         if not isinstance(old_msg, discord.InteractionMessage):
             await old_msg.delete()
-
-
-    @hallow_main.command(name="collect")
-    @commands.check(is_halloween)
-    async def collect(self, ctx: MyContext):
-        """Get some events points every hour"""
-        events_cog = self.bot.get_cog("BotEvents")
-        if events_cog is None:
-            return
-        last_data = await events_cog.db_get_dailies(ctx.author.id)
-        if last_data is None or (self.bot.utcnow() - last_data['last_update']).total_seconds() > self.hourly_cooldown:
-            points = randint(*self.hourly_reward)
-            await self.bot.get_cog("Utilities").add_user_eventPoint(ctx.author.id, points)
-            await events_cog.db_add_dailies(ctx.author.id, points)
-            if points > 0:
-                txt = await self.bot._(ctx.channel, "color-event.collect.got-points", pts=points)
-            else:
-                txt = await self.bot._(ctx.channel, "color-event.collect.lost-points", pts=points)
-        else:
-            time_since_available = (self.bot.utcnow() - last_data['last_update']).total_seconds()
-            time_remaining = self.hourly_cooldown - time_since_available
-            lang = await self.bot._(ctx.channel, '_used_locale')
-            remaining = await FormatUtils.time_delta(time_remaining, lang=lang)
-            txt = await self.bot._(ctx.channel, "color-event.collect.too-quick", time=remaining)
-        if ctx.can_send_embed:
-            title = await self.bot._(ctx.channel, "color-event.halloween.collect-title")
-            emb = discord.Embed(title=title, description=txt, color=self.embed_color)
-            await ctx.send(embed=emb)
-        else:
-            await ctx.send(txt)
 
 
 async def setup(bot):
