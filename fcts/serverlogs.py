@@ -990,6 +990,8 @@ Minimum age required by anti-raid: {min_age}"
                 await self.handle_guild_name(before, after, channel_ids)
             if before.name != after.name:
                 await self.handle_guild_icon(before, after, channel_ids)
+            if before.owner != after.owner:
+                await self.handle_guild_owner(before, after, channel_ids)
 
     async def handle_guild_features(self, before: discord.Guild, after: discord.Guild, channel_ids: list[int]):
         """Handle when guild receives or loses perks"""
@@ -1042,6 +1044,23 @@ Minimum age required by anti-raid: {min_age}"
             )
             emb.add_field(name="Previous name", value=before.name)
             emb.add_field(name="New name", value=after.name)
+            await self.validate_logs(after, channel_ids, emb, "server_update")
+
+    async def handle_guild_owner(self, before: discord.Guild, after: discord.Guild, channel_ids: list[int]):
+        """Handle the guild owner update log"""
+        if before.owner != after.owner:
+            emb = discord.Embed(
+                description="**Server owner updated**",
+                colour=discord.Color.blurple(),
+            )
+            if before.owner is None:
+                emb.add_field(name="Previous owner", value="Unknown")
+            else:
+                emb.add_field(name="Previous owner", value=f"{before.owner.mention} ({before.owner.id})")
+            if after.owner is None:
+                emb.add_field(name="New owner", value="Unknown")
+            else:
+                emb.add_field(name="New owner", value=f"{after.owner.mention} ({after.owner.id})")
             await self.validate_logs(after, channel_ids, emb, "server_update")
 
     @commands.Cog.listener()
