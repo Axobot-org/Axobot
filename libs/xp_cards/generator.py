@@ -1,3 +1,4 @@
+from cachingutils import cached
 from PIL import Image, ImageDraw, ImageFont, ImageSequence
 
 from libs.xp_cards.cards_metadata import get_card_data
@@ -44,43 +45,51 @@ class CardGeneration:
                 self.avatar = self.avatar.resize(self.data["avatar_size"], resample=Image.Resampling.LANCZOS)
             self.result.paste(self.avatar, self.data["avatar_position"])
 
+    @cached(include_posargs=[0, 1, 3, 4])
+    def _find_max_text_size(self, text: str, rect: tuple[tuple[int, int], tuple[int, int]], font_name: str, font_size: str):
+        fonts_cache: dict[tuple[str, int], ImageFont.FreeTypeFont] = {}
+        while True:
+            if (font_name, font_size) in fonts_cache:
+                font = fonts_cache[(font_name, font_size)]
+            else:
+                try:
+                    font = ImageFont.truetype(font_name, font_size)
+                except OSError:
+                    raise ValueError(f"Font {font_name} not found") from None
+                fonts_cache[(font_name, font_size)] = font
+            # Measure the size of the text when rendered with the current font
+            text_box = font.getbbox(text)
+            text_width, text_height = text_box[2] - text_box[0], text_box[3] - text_box[1]
+            # If the text fits within the rectangle, we're done
+            if text_width <= (rect[1][0] - rect[0][0]) and text_height <= (rect[1][1] - rect[0][1]):
+                break
+            # Otherwise, reduce the font size and try again
+            font_size = round(font_size*0.8)
+        return font, font_size
+
     def _add_text(self):
         """Add text to the destination image"""
         rendered_texts = []
-        for text, data in self.data["texts"].items():
+        for data in self.data["texts"].values():
+            text = data['label']
             alignment = data['alignment']
             rect = data['position']
             font_name = "./assets/fonts/" + data['font']
             font_size = data['font_size']
             color = data['color']
-            fonts_cache: dict[tuple[str, int], ImageFont.FreeTypeFont] = {}
             # Find idea font size
-            while True:
-                if (font_name, font_size) in fonts_cache:
-                    font = fonts_cache[(font_name, font_size)]
-                else:
-                    try:
-                        font = ImageFont.truetype(font_name, font_size)
-                    except OSError:
-                        raise ValueError(f"Font {font_name} not found") from None
-                    fonts_cache[(font_name, font_size)] = font
-                # Measure the size of the text when rendered with the current font
-                text_box = font.getbbox(text)
-                text_width, text_height = text_box[2] - text_box[0], text_box[3] - text_box[1]
-                # If the text fits within the rectangle, we're done
-                if text_width <= (rect[1][0] - rect[0][0]) and text_height <= (rect[1][1] - rect[0][1]):
-                    break
-                # Otherwise, reduce the font size and try again
-                font_size = round(font_size*0.8)
-            h_pos = round(rect[0][1] + (rect[1][1] - rect[0][1] - text_height)/2)
+            font, font_size = self._find_max_text_size(text, rect, font_name, font_size)
+            h_pos = round(rect[0][1] + (rect[1][1] - rect[0][1])/2)
             if alignment == 'left':
                 pos = rect[0][0], h_pos
+                anchor = "lm"
             elif alignment == 'right':
-                w_pow = rect[1][0] - text_width
-                pos = w_pow, h_pos
+                pos = rect[1][0], h_pos
+                anchor = "rm"
             elif alignment == 'center':
-                w_pow = round(rect[0][0] + (rect[1][0] - rect[0][0])/2 - text_width/2)
+                w_pow = round(rect[0][0] + (rect[1][0] - rect[0][0])/2)
                 pos = w_pow, h_pos
+                anchor = "mm"
             else:
                 continue
             rendered_texts.append({
@@ -88,7 +97,7 @@ class CardGeneration:
                 "text": text,
                 "fill": color,
                 "font": font,
-                "anchor": "lt",
+                "anchor": anchor,
             })
         if isinstance(self.result, list):
             for frame in self.result:

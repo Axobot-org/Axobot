@@ -25,6 +25,7 @@ class ColorsData(TypedDict):
 
 class TextData(TextMetaData):
     "Contains info about a text ready to be rendered"
+    label: str
     color: RgbColor
 
 class CardData(TypedDict):
