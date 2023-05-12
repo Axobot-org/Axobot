@@ -291,7 +291,8 @@ class BotEvents(commands.Cog):
                     emb.add_field(name=objectives_title, value=prices, inline=False)
                 emb.add_field(name=_rank_total, value=str(points))
                 emb.add_field(name=_position_global, value=user_rank)
-                emb.add_field(name=_rank_global, value=await self.get_top_5(), inline=False)
+                if top_5 := await self.get_top_5():
+                    emb.add_field(name=_rank_global, value=top_5, inline=False)
             else:
                 lang = await self.bot._(ctx.channel, '_used_locale')
                 reason = OUTAGE_REASON.get(lang, OUTAGE_REASON['en'])
