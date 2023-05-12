@@ -84,8 +84,9 @@ def get_card_data(
     for text_key, text_meta in meta["texts"].items():  # type: ignore
         text_meta: TextMetaData
         label = text_values[text_key]
-        texts[label] = {
+        texts[text_key] = {
             **text_meta,
+            "label": label,
             "color": tuple(colors["texts"][text_key])
         }
     xp_from_last_level = total_xp - xp_to_current_level
