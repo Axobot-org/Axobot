@@ -1,7 +1,8 @@
 {
-    "christmas": {
-        "already-collected": "Vous avez déjà reçu votre cadeau de Noël ! Profitez de vos cadeaux et prenez soin de vous !",
-        "collected": "Tu as récupéré ta carte de Noël 2022!\nEssaie la commande %{cmd} (style \"christmas22\") pour commencer à l'utiliser !"
+    "collect": {
+        "got-points": "Bravo ! Vous venez de gagner **%{pts} points** d'événement !",
+        "lost-points": "Oh non ! Tu viens de perdre **%{pts} points**",
+        "too-quick": "Il est encore trop tôt ! Vous ne pourrez récupérer des points d'événement que dans %{time} !"
     },
     "events-price-title": "Prix à gagner",
     "nothing-desc": "Il n'y a actuellement aucun événement. Suivez les news du bot pour connaître la date du prochain !",

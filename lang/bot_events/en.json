@@ -1,7 +1,8 @@
 {
-    "christmas": {
-        "already-collected": "You have already collected your Christmas present! Enjoy your gifts and take care!",
-        "collected": "You have collected your Christmas 2022 card!\nTry the %{cmd} command (style \"christmas22\") to start using it!"
+    "collect": {
+        "got-points": "Congratulations! You just won **%{pts} event points**!",
+        "lost-points": "Oh no, you just lost **%{pts} event points**!",
+        "too-quick": "It's still too early! You will only be able to collect event points in %{time}!"
     },
     "events-price-title": "Prizes to win",
     "nothing-desc": "There are currently no events. Follow the bot news to know the date of the next one!",
