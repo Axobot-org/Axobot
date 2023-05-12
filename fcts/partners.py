@@ -12,7 +12,7 @@ from fcts import args, checks
 
 importlib.reload(args)
 importlib.reload(checks)
-from libs.bot_classes import Axobot, MyContext
+from libs.bot_classes import SUPPORT_GUILD_ID, Axobot, MyContext
 
 utc = datetime.timezone.utc
 
@@ -292,7 +292,7 @@ class Partners(commands.Cog):
         """Give a role to admins of partners"""
         if not isinstance(invite.guild,discord.Guild):
             return
-        if guild.id == 356067272730607628 and self.bot.beta:
+        if guild.id == SUPPORT_GUILD_ID.id and self.bot.beta:
             return
         role = await self.bot.get_config(guild.id, 'partner_role')
         if role is None:

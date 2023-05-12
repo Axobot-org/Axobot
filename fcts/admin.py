@@ -179,7 +179,7 @@ class Admin(commands.Cog):
     async def send_faq(self, ctx: MyContext):
         "Update the FAQ channels from the private preparation channels"
         msg = await ctx.send("Suppression des salons...")
-        guild = self.bot.get_guild(356067272730607628)
+        guild = self.bot.get_guild(SUPPORT_GUILD_ID.id)
         destination_fr = guild.get_channel(508028818154323980)
         destination_en = guild.get_channel(541599345972346881)
         chan_fr = guild.get_channel(541228784456695818)
@@ -253,7 +253,7 @@ class Admin(commands.Cog):
             return
         count = 0
         for guild in ctx.bot.guilds:
-            if guild.id == 356067272730607628 and self.bot.entity_id == 0:
+            if guild.id == SUPPORT_GUILD_ID.id and self.bot.entity_id == 0:
                 # The support server should not receive updates from Zbot but only Axobot
                 continue
             channel: Optional[discord.TextChannel] = await ctx.bot.get_config(guild.id, 'bot_news')
@@ -271,7 +271,7 @@ class Admin(commands.Cog):
                 self.bot.dispatch("error", err, ctx)
             else:
                 count += 1
-            if guild.id == 356067272730607628:
+            if guild.id == SUPPORT_GUILD_ID.id:
                 fr_chan = guild.get_channel(494870602146906113)
                 if fr_chan != channel:
                     # special treatment for the French channel in the bot support server
@@ -755,7 +755,7 @@ Cette option affecte tous les serveurs"""
     async def owner_reload(self, ctx: MyContext):
         """Ajoute le rôle Owner à tout les membres possédant un serveur avec le bot
         Il est nécessaire d'avoir au moins 10 membres pour que le rôle soit ajouté"""
-        server = self.bot.get_guild(356067272730607628)
+        server = self.bot.get_guild(SUPPORT_GUILD_ID.id)
         if server is None:
             await ctx.send("Serveur de support introuvable")
             return
@@ -808,7 +808,7 @@ Cette option affecte tous les serveurs"""
     async def best_ideas(self, ctx: MyContext, number:int=10):
         """Donne la liste des 10 meilleures idées"""
         bot_msg = await ctx.send("Chargement des idées...")
-        server = self.bot.get_guild(356067272730607628 if not self.bot.beta else 625316773771608074)
+        server = self.bot.get_guild(SUPPORT_GUILD_ID.id if not self.bot.beta else PRIVATE_GUILD_ID.id)
         if server is None:
             return await ctx.send("Serveur introuvable")
         channel = server.get_channel(488769306524385301 if not self.bot.beta else 929864644678549534)

@@ -15,7 +15,7 @@ import geocoder
 from discord.ext import commands
 from pytz import timezone
 from timezonefinder import TimezoneFinder
-from libs.bot_classes import MyContext, Axobot
+from libs.bot_classes import SUPPORT_GUILD_ID, MyContext, Axobot
 from libs.formatutils import FormatUtils
 from libs.paginator import Paginator
 from utils import flatten_list
@@ -253,21 +253,21 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         if name in l1:
             await ctx.send(file=await self.utilities.find_img('blame-{}.png'.format(name)))
         elif name in l2:
-            if await self.is_on_guild(ctx.author,391968999098810388): # fr-minecraft
+            if await self.is_on_guild(ctx.author, 391968999098810388): # fr-minecraft
                 await ctx.send(file=await self.utilities.find_img('blame-{}.png'.format(name)))
         elif name in l3:
-            if await self.is_on_guild(ctx.author,356067272730607628): # Axobot server
+            if await self.is_on_guild(ctx.author, SUPPORT_GUILD_ID.id): # Axobot server
                 await ctx.send(file=await self.utilities.find_img('blame-{}.png'.format(name)))
         elif name in l4:
-            if await self.is_on_guild(ctx.author,523525264517496834): # Benny Support
+            if await self.is_on_guild(ctx.author, 523525264517496834): # Benny Support
                 await ctx.send(file=await self.utilities.find_img('blame-{}.png'.format(name)))
         elif name in ['help','list']:
             liste = l1
-            if await self.is_on_guild(ctx.author,391968999098810388): # fr-minecraft
+            if await self.is_on_guild(ctx.author, 391968999098810388): # fr-minecraft
                 liste += l2
-            if await self.is_on_guild(ctx.author,356067272730607628): # Axobot server
+            if await self.is_on_guild(ctx.author, SUPPORT_GUILD_ID.id): # Axobot server
                 liste += l3
-            if await self.is_on_guild(ctx.author,523525264517496834): # Benny Support
+            if await self.is_on_guild(ctx.author, 523525264517496834): # Benny Support
                 liste += l4
             txt = "- "+"\n- ".join(sorted(liste))
             title = await self.bot._(ctx.channel, "fun.blame-0", user=ctx.author)

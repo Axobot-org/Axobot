@@ -11,7 +11,7 @@ import discord
 import mysql
 from discord.ext import commands, tasks
 
-from libs.bot_classes import Axobot, MyContext
+from libs.bot_classes import SUPPORT_GUILD_ID, Axobot, MyContext
 from libs.enums import UsernameChangeRecord
 
 
@@ -238,7 +238,7 @@ class Events(commands.Cog):
 
     async def check_owner_server(self, owner: discord.User):
         """Check if a server owner should get/loose the server owner role in support server"""
-        guild = self.bot.get_guild(356067272730607628)
+        guild = self.bot.get_guild(SUPPORT_GUILD_ID.id)
         if not guild:
             return
         member = guild.get_member(owner.id)
@@ -456,7 +456,7 @@ class Events(commands.Cog):
         lang_stats = await self.bot.get_cog('ServerConfig').get_languages([])
         rankcards_stats = await self.bot.get_cog('Users').get_rankcards_stats()
         xptypes_stats = await self.bot.get_cog('ServerConfig').get_xp_types([])
-        supportserver_members = self.bot.get_guild(356067272730607628).member_count
+        supportserver_members = self.bot.get_guild(SUPPORT_GUILD_ID.id).member_count
         query = "INSERT INTO `log_stats` (`servers_count`, `members_count`, `bots_count`, `dapi_heartbeat`, `codelines_count`, `earned_xp_total`, `rss_feeds`, `active_rss_feeds`, `supportserver_members`, `languages_json`, `used_rankcards_json`, `xp_types_json`, `entity_id`) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
         data = (
             len(self.bot.guilds),
