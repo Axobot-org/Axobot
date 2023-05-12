@@ -665,9 +665,12 @@ class Xp(commands.Cog):
         )
         generated_card = card_generator.draw_card()
         if isinstance(generated_card, list):
+            duration = user_avatar.info['duration']
+            if card_generator.skip_second_frames:
+                duration *= 2
             generated_card[0].save(
                 filepath,
-                save_all=True, append_images=generated_card[1:], duration=user_avatar.info['duration'], loop=0, disposal=2
+                save_all=True, append_images=generated_card[1:], duration=duration, loop=0, disposal=2
             )
         else:
             generated_card.save(filepath)

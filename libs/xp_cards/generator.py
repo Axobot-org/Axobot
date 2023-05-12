@@ -24,19 +24,26 @@ class CardGeneration:
         self.data = get_card_data(card_name, translation_map, username,
                                   level, rank, participants, xp_to_current_level, xp_to_next_level, total_xp)
         if self.avatar.format == "GIF":
+            self.skip_second_frames = self.avatar.n_frames > 60 and self.avatar.info['duration'] < 30
             self.result = [
                 Image.new('RGBA', CARD_SIZE, (255, 255, 255, 0))
-                for _ in range(self.avatar.n_frames)
+                for i in range(self.avatar.n_frames)
+                if not self.skip_second_frames or i%2==0
             ]
         else:
             self.result = Image.new('RGBA', CARD_SIZE, (255, 255, 255, 0))
+            self.skip_second_frames = False
 
 
     def _paste_avatar(self):
         """Paste the avatar onto the destination image"""
         should_resize = self.avatar.size != self.data["avatar_size"]
+        avatar_iterator = ImageSequence.Iterator(self.avatar)
         if isinstance(self.result, list):
-            for (avatar_frame, result_frame) in zip(ImageSequence.Iterator(self.avatar), self.result):
+            for i, result_frame in enumerate(self.result):
+                avatar_frame = next(avatar_iterator)
+                if self.skip_second_frames and i%2 == 1:
+                    avatar_frame = next(avatar_iterator)
                 if should_resize:
                     avatar_frame = avatar_frame.resize(self.data["avatar_size"], resample=Image.Resampling.LANCZOS)
                 result_frame.paste(avatar_frame, self.data["avatar_position"])
