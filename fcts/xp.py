@@ -421,7 +421,7 @@ class Xp(commands.Cog):
             query = f"SELECT COUNT(*) FROM `{table}` WHERE `banned`=0"
             cursor = cnx.cursor(dictionary = False)
             cursor.execute(query)
-            rows = len(cursor)
+            rows = list(cursor)
             cursor.close()
             if rows is not None and len(rows) == 1:
                 return rows[0][0]
