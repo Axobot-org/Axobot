@@ -8,21 +8,14 @@
             "intro": "%{user}, starting blurple img analys (Plz note dat this may take one or two while)",
             "result": "%{user}, here'z what I found about ur img:\n%{results}",
             "reward": "Hey %{user}, ur img is so amazing i've decided 2 give u %{amount} event xp!"
-        },
-        "collect-title": "Blurple thingy"
+        }
     },
     "halloween": {
         "check": {
             "intro": "%{user}, starting pumpkin img analys (Plz note dat this may take one or two while)",
             "result": "%{user}, here'z what I found about ur super-creepy img:\n%{results}",
             "reward": "Hey %{user}, ur img is so epic i've decided 2 give u %{amount} bat-points!"
-        },
-        "collect-title": "Pumpkins-and-bats era"
-    },
-    "collect": {
-        "got-points": "GG, u just got **%{pts}** points!",
-        "lost-points": "Oh no, u just lost **%{pts}** points :(",
-        "too-quick": "Wait no, ur too soon! Please wait %{time} again k thx"
+        }
     },
     "missing-attachment-perm": "Oh no, i cant send images here :/",
     "unknown-err": "Oops, something went terriby wrong :eyes: %{err}"
