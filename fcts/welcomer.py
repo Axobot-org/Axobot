@@ -198,13 +198,14 @@ class Welcomer(commands.Cog):
                 return
             for role in roles:
                 try:
-                    await member.add_roles(role,reason=await self.bot._(member.guild.id,"logs.reason.welcome_roles"))
+                    await member.add_roles(role, reason=await self.bot._(member.guild.id,"logs.reason.welcome_roles"))
                 except discord.errors.Forbidden:
-                    await self.bot.get_cog('Events').send_logs_per_server(
+                    self.bot.dispatch(
+                        "server_warning",
+                        ServerWarningType.WELCOME_ROLE_MISSING_PERMISSIONS,
                         member.guild,
-                        "error",
-                        await self.bot._(member.guild, "welcome.error-give-roles", r=role.name, u=str(member)),
-                        member.guild.me
+                        role=role,
+                        user=member
                     )
         except discord.errors.NotFound:
             pass
