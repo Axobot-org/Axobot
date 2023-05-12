@@ -7,7 +7,6 @@ from cachingutils import Cache
 from discord.ext import commands, tasks
 
 from libs.bot_classes import Axobot
-from libs.formatutils import FormatUtils
 from libs.serverconfig.options_list import options
 
 
@@ -129,8 +128,6 @@ class AntiRaid(commands.Cog):
             await member.guild.kick(member, reason=reason)
         except (discord.Forbidden, discord.HTTPException):
             return False
-        if mod_cog := self.bot.get_cog("Moderation"):
-            await mod_cog.send_modlogs("kick", member, self.bot.user, member.guild, reason=reason)
         return True
 
     async def ban(self, member: discord.Member, reason: str, duration: Optional[timedelta] = None):
@@ -152,16 +149,6 @@ class AntiRaid(commands.Cog):
             return False
         if duration:
             await self.bot.task_handler.add_task('ban', duration.total_seconds(), member.id, member.guild.id)
-        if mod_cog := self.bot.get_cog("Moderation"):
-            if duration is None:
-                f_duration = None
-            else:
-                f_duration = await FormatUtils.time_delta(
-                    duration.total_seconds(),
-                    lang=await self.bot._(member.guild, '_used_locale'),
-                    form="short"
-                )
-            await mod_cog.send_modlogs("ban", member, self.bot.user, member.guild, reason=reason, duration=f_duration)
         return True
 
     async def timeout(self, member: discord.Member, reason: str, duration: timedelta):
@@ -176,13 +163,6 @@ class AntiRaid(commands.Cog):
             await member.timeout(duration, reason=reason)
         except (discord.Forbidden, discord.HTTPException):
             return False
-        if mod_cog := self.bot.get_cog("Moderation"):
-            f_duration = await FormatUtils.time_delta(
-                duration.total_seconds(),
-                lang=await self.bot._(member.guild, '_used_locale'),
-                form="short"
-            )
-            await mod_cog.send_modlogs("mute", member, self.bot.user, member.guild, reason=reason, duration=f_duration)
         return True
 
 

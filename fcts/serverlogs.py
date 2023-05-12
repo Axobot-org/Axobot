@@ -917,6 +917,29 @@ class ServerLogs(commands.Cog):
         emb.set_author(name=f"{message.author} ({message.author.id})", icon_url=message.author.display_avatar)
 
     @commands.Cog.listener()
+    async def on_antiraid_timeout(self, member: discord.Member, data: dict[str, Any]):
+        """Triggered when the antiraid system timeouts a member
+        Corresponding log: antiraid"""
+        if channel_ids := await self.is_log_enabled(member.guild.id, "antiraid"):
+            emb = discord.Embed(
+                description=f"**{member.mention} ({member.id}) set in timeout by anti-raid**",
+                colour=discord.Color.orange()
+            )
+            doc = "https://axobot.rtfd.io/en/latest/moderator.html#anti-raid"
+            emb.set_author(name=str(member), url=doc, icon_url=member.display_avatar)
+            # duration
+            if duration := data.get("duration"):
+                lang = await self.bot._(member.guild.id, "_used_locale")
+                f_duration = await FormatUtils.time_delta(duration, lang=lang)
+                emb.add_field(name="Duration", value=f_duration)
+            # mentions treshold
+            if mentions_treshold := data.get("mentions_treshold"):
+                emb.add_field(name="Mentions treshold", value=mentions_treshold)
+            # account creation date
+            emb.add_field(name="Account created at", value=f"<t:{member.created_at.timestamp():.0f}>")
+            await self.validate_logs(member.guild, channel_ids, emb, "antiraid")
+
+    @commands.Cog.listener()
     async def on_antiraid_kick(self, member: discord.Member, data: dict[str, Any]):
         """Triggered when the antiraid system kicks a member
         Corresponding log: antiraid"""
@@ -1157,6 +1180,12 @@ Minimum age required by anti-raid: {min_age}"
                 emb.add_field(
                     name="Missing permission",
                     value=await self.bot._(guild.id, "permissions.list.send_messages")
+                )
+            elif warning_type == ServerWarningType.WELCOME_ROLE_MISSING_PERMISSIONS:
+                emb.description = f"**Could not give welcome role** to user {kwargs.get('member').mention}"
+                emb.add_field(
+                    name="Role to give",
+                    value=kwargs.get('role').mention
                 )
             elif warning_type in {ServerWarningType.RSS_MISSING_TXT_PERMISSION, ServerWarningType.RSS_MISSING_EMBED_PERMISSION}:
                 emb.description = f"**Could not send RSS message** in channel {kwargs.get('channel').mention}"
