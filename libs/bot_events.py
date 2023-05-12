@@ -16,7 +16,7 @@ class EventData(TypedDict):
     type: EventType
     icon: Optional[str]
     color: int
-    objectives: list[Union["EventRewardCard", "EventRewardCustom"]]
+    objectives: list[Union["EventRewardCard", "EventRewardCustom", "EventRewardRole"]]
     emojis: Optional[EventEmojis]
 
 class EventRewardCard(TypedDict):
@@ -24,6 +24,12 @@ class EventRewardCard(TypedDict):
     points: int
     reward_type: Literal["rankcard"]
     rank_card: str
+
+class EventRewardRole(TypedDict):
+    "Represents the special role reward for an event"
+    points: int
+    reward_type: Literal["role"]
+    role_id: int
 
 class EventRewardCustom(TypedDict):
     "Represents a custom reward for an event"

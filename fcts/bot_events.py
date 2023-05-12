@@ -2,14 +2,14 @@ import datetime
 import json
 import random
 from random import randint
-from typing import Optional, Union
+from typing import Literal, Optional, Union
 
 import discord
 from discord.ext import commands
 
-from fcts.checks import is_fun_enabled, database_connected
-from libs.bot_classes import Axobot, MyContext
-from libs.bot_events import EventData, EventType
+from fcts.checks import database_connected, is_fun_enabled
+from libs.bot_classes import SUPPORT_GUILD_ID, Axobot, MyContext
+from libs.bot_events import EventData, EventRewardRole, EventType
 from libs.formatutils import FormatUtils
 from utils import OUTAGE_REASON
 
@@ -132,7 +132,7 @@ class BotEvents(commands.Cog):
                 self.coming_event_data = ev_data
                 self.coming_event_id = ev_id
 
-    async def get_specific_objectives(self, reward_type: str):
+    async def get_specific_objectives(self, reward_type: Literal["rankcard", "role", "custom"]):
         "Get all objectives matching a certain reward type"
         if self.current_event_id is None:
             return []
@@ -387,6 +387,23 @@ class BotEvents(commands.Cog):
             if reward["rank_card"] not in cards and points >= reward["points"]:
                 await users_cog.set_rankcard(user, reward["rank_card"], True)
 
+    async def reload_event_special_role(self, user: Union[discord.User, int], points: int = None):
+        """Grant the current event special role to the provided user, if they have enough points
+        'points' argument can be provided to avoid re-fetching the database"""
+        if self.current_event is None or len(rewards := await self.get_specific_objectives("role")) == 0:
+            return
+        rewards: list[EventRewardRole]
+        if (support_guild := self.bot.get_guild(SUPPORT_GUILD_ID.id)) is None:
+            return
+        if (member := support_guild.get_member(user.id)) is None:
+            return
+        if points is None:
+            points = await self.db_get_event_rank(user.id)
+            points = 0 if (points is None) else points["events_points"]
+        for reward in rewards:
+            if points >= reward["points"]:
+                await member.add_roles(discord.Object(reward["role_id"]))
+
     async def db_add_dailies(self, userid: int, points: int):
         "Add dailies points to a user"
         query = "INSERT INTO `dailies` (`userID`,`points`) VALUES (%(u)s,%(p)s) ON DUPLICATE KEY UPDATE points = points + %(p)s;"
@@ -441,6 +458,7 @@ class BotEvents(commands.Cog):
                 pass
             try:
                 await self.reload_event_rankcard(user_id)
+                await self.reload_event_special_role(user_id)
             except Exception as err:
                 self.bot.dispatch("error", err)
             return True
@@ -460,6 +478,7 @@ class BotEvents(commands.Cog):
                 pass
             try:
                 await self.reload_event_rankcard(user_id)
+                await self.reload_event_special_role(user_id)
             except Exception as err:
                 self.bot.dispatch("error", err)
             return True
