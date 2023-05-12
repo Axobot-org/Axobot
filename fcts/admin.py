@@ -632,7 +632,7 @@ Cette option affecte tous les serveurs"""
     @commands.check(checks.is_bot_admin)
     async def admin_flag_list(self, ctx: MyContext, user: discord.User):
         "Liste les flags d'un utilisateur"
-        userflags: list[str] = await self.bot.get_cog("Users").get_userflags(user)
+        userflags: list[str] = sorted(await self.bot.get_cog("Users").get_userflags(user))
         if userflags:
             await ctx.send(f"Liste des flags de {user} : {', '.join(userflags)}")
         else:
@@ -688,7 +688,7 @@ Cette option affecte tous les serveurs"""
     @commands.check(checks.is_bot_admin)
     async def admin_card_list(self, ctx: MyContext, user: discord.User):
         "Liste les cartes d'xp d'un utilisateur"
-        rankcards: list[str] = await self.bot.get_cog("Users").get_rankcards(user)
+        rankcards: list[str] = sorted(await self.bot.get_cog("Users").get_rankcards(user))
         if rankcards:
             await ctx.send(f"Liste des cartes d'xp de {user} : {', '.join(rankcards)}")
         else:
