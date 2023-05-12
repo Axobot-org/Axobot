@@ -2,7 +2,7 @@ import datetime
 import json
 import random
 from random import randint
-from typing import Optional
+from typing import Optional, Union
 
 import discord
 from discord.ext import commands
@@ -253,12 +253,12 @@ class BotEvents(commands.Cog):
             user = ctx.author
 
         if self.bot.database_online:
-            user_rank_query = await self.bot.get_cog("Utilities").get_eventsPoints_rank(user.id)
+            user_rank_query = await self.db_get_event_rank(user.id)
             if user_rank_query is None:
                 user_rank = await self.bot._(ctx.channel, "bot_events.unclassed")
                 points = 0
             else:
-                total_ranked = await self.bot.get_cog("Utilities").get_eventsPoints_nbr()
+                total_ranked = await self.db_get_participants_count()
                 if user_rank_query['rank'] <= total_ranked:
                     user_rank = f"{user_rank_query['rank']}/{total_ranked}"
                 else:
@@ -331,7 +331,7 @@ class BotEvents(commands.Cog):
         if last_data is None or (self.bot.utcnow() - last_data['last_update']).total_seconds() > self.hourly_cooldown:
             # grant points
             points = randint(*self.hourly_reward)
-            await self.bot.get_cog("Utilities").add_user_eventPoint(ctx.author.id, points)
+            await self.db_add_user_points(ctx.author.id, points)
             await self.db_add_dailies(ctx.author.id, points)
             if points > 0:
                 txt = await self.bot._(ctx.channel, "bot_events.collect.got-points", pts=points)
@@ -354,7 +354,7 @@ class BotEvents(commands.Cog):
 
     async def get_top_5(self) -> str:
         "Get the list of the 5 users with the most event points"
-        top_5 = await self.bot.get_cog("Utilities").get_eventsPoints_top(number=5)
+        top_5 = await self.db_get_event_top(number=5)
         if top_5 is None:
             return await self.bot._(self.bot.get_channel(0), "bot_events.nothing-desc")
         top_5_f: list[str] = []
@@ -367,6 +367,25 @@ class BotEvents(commands.Cog):
                 username = f"user {row['userID']}"
             top_5_f.append(f"{i+1}. {username} ({row['events_points']} points)")
         return "\n".join(top_5_f)
+
+    async def reload_event_rankcard(self, user: Union[discord.User, int], points: int = None):
+        """Grant the current event rank card to the provided user, if they have enough points
+        'points' argument can be provided to avoid re-fetching the database"""
+        if (users_cog := self.bot.get_cog("Users")) is None:
+            return
+        if self.current_event is None or len(rewards := await self.get_specific_objectives("rankcard")) == 0:
+            return
+        if isinstance(user, int):
+            user = self.bot.get_user(user)
+            if user is None:
+                return
+        cards = await users_cog.get_rankcards(user)
+        if points is None:
+            points = await self.db_get_event_rank(user.id)
+            points = 0 if (points is None) else points["events_points"]
+        for reward in rewards:
+            if reward["rank_card"] not in cards and points >= reward["points"]:
+                await users_cog.set_rankcard(user, reward["rank_card"], True)
 
     async def db_add_dailies(self, userid: int, points: int):
         "Add dailies points to a user"
@@ -385,6 +404,68 @@ class BotEvents(commands.Cog):
             result['first_update'] = result['first_update'].replace(tzinfo=datetime.timezone.utc)
             result['last_update'] = result['last_update'].replace(tzinfo=datetime.timezone.utc)
             return query_results[0] if len(query_results) > 0 else None
+
+    async def db_get_event_rank(self, user_id: int):
+        "Get the ranking of a user"
+        if not self.bot.database_online:
+            return None
+        query = (
+            "SELECT `userID`, `events_points`, FIND_IN_SET( `events_points`, ( SELECT GROUP_CONCAT( `events_points` ORDER BY `events_points` DESC ) FROM `users` ) ) AS rank FROM `users` WHERE `userID` = %s")
+        async with self.bot.db_query(query, (user_id,), fetchone=True) as query_results:
+            return query_results
+
+    async def db_get_event_top(self, number: int):
+        "Get the event points leaderboard containing at max the given number of users"
+        if not self.bot.database_online:
+            return None
+        query = "SELECT `userID`, `events_points` FROM `users` WHERE `events_points` != 0 ORDER BY `events_points` DESC LIMIT %s"
+        async with self.bot.db_query(query, (number,)) as query_results:
+            return query_results
+
+    async def db_get_participants_count(self) -> int:
+        if not self.bot.database_online:
+            return 0
+        query = "SELECT COUNT(*) as count FROM `users` WHERE events_points > 0"
+        async with self.bot.db_query(query, fetchone=True) as query_results:
+            return query_results['count']
+
+    async def db_add_user_points(self, user_id: int, points: int, check_event: bool = True):
+        "Add some events points to a user"
+        try:
+            if not self.bot.database_online:
+                return True
+            if check_event and self.bot.current_event is None:
+                return True
+            query = "INSERT INTO `users` (`userID`,`events_points`) VALUES (%s, %s) ON DUPLICATE KEY UPDATE events_points = events_points + VALUE(`events_points`);"
+            async with self.bot.db_query(query, (user_id, points)):
+                pass
+            try:
+                await self.reload_event_rankcard(user_id)
+            except Exception as err:
+                self.bot.dispatch("error", err)
+            return True
+        except Exception as err:
+            self.bot.dispatch("error", err)
+            return False
+
+    async def db_set_user_points(self, user_id: int, points: int, check_event: bool = True):
+        "Set the events points of a user"
+        try:
+            if not self.bot.database_online:
+                return True
+            if check_event and self.bot.current_event is None:
+                return True
+            query = "INSERT INTO `users` (`userID`,`events_points`) VALUES (%s, %s) ON DUPLICATE KEY UPDATE events_points = VALUE(`event_points`);"
+            async with self.bot.db_query(query, (user_id, points)):
+                pass
+            try:
+                await self.reload_event_rankcard(user_id)
+            except Exception as err:
+                self.bot.dispatch("error", err)
+            return True
+        except Exception as err:
+            self.bot.dispatch("error", err)
+            return False
 
 
 async def setup(bot):
