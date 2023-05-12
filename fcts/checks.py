@@ -2,7 +2,7 @@ import typing
 
 import discord
 from discord.ext import commands
-from libs.bot_classes import MyContext
+from libs.bot_classes import SUPPORT_GUILD_ID, MyContext
 
 admins_id = {279568324260528128,281404141841022976,552273019020771358}
 
@@ -28,7 +28,7 @@ async def is_support_staff(ctx: typing.Union[MyContext, discord.Interaction]) ->
     bot = ctx.bot if isinstance(ctx, commands.Context) else ctx.client
     if UsersCog := bot.get_cog('Users'):
         return await UsersCog.has_userflag(user, 'support')
-    server = bot.get_guild(356067272730607628)
+    server = bot.get_guild(SUPPORT_GUILD_ID.id)
     if server is not None:
         member = server.get_member(user.id)
         role = server.get_role(412340503229497361)

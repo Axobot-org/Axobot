@@ -427,7 +427,7 @@ class Axobot(commands.bot.AutoShardedBot):
         axo_member = guild.get_member(1048011651145797673)
         if axo_member is None:
             return False
-        if guild.id in {625316773771608074, 356067272730607628} and channel:
+        if guild.id in {PRIVATE_GUILD_ID.id, SUPPORT_GUILD_ID.id} and channel:
             # if we're in the staff or support server, check by channel instead
             return channel.permissions_for(axo_member).read_messages
         # else, don't bother and just return True
