@@ -76,6 +76,8 @@ class ServerWarningType(Enum):
     TICKET_CREATION_FAILED = 7
     # channel, topic_name
     TICKET_INIT_FAILED = 8
+    # role, user
+    WELCOME_ROLE_MISSING_PERMISSIONS = 9
 
 class UsernameChangeRecord:
     "Record of a username change, mainly used for logs"
