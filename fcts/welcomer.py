@@ -5,7 +5,7 @@ import discord
 from cachingutils import Cache
 from discord.ext import commands
 
-from libs.bot_classes import Axobot
+from libs.bot_classes import SUPPORT_GUILD_ID, Axobot
 from libs.enums import ServerWarningType
 
 
@@ -34,7 +34,7 @@ class Welcomer(commands.Cog):
                 self.bot.loop.create_task(self.give_roles(member))
                 await self.give_roles_back(member)
                 await self.check_muted(member)
-                if member.guild.id==356067272730607628:
+                if member.guild.id == SUPPORT_GUILD_ID.id:
                     await self.check_owner_server(member)
                     await self.check_support(member)
                     await self.check_contributor(member)

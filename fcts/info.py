@@ -32,7 +32,7 @@ importlib.reload(bitly_api)
 
 
 async def in_support_server(ctx):
-    return ctx.guild is not None and ctx.guild.id == 625316773771608074
+    return ctx.guild is not None and ctx.guild.id == PRIVATE_GUILD_ID.id
 
 class Info(commands.Cog):
     "Here you will find various useful commands to get information about anything"
