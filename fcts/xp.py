@@ -577,8 +577,8 @@ class Xp(commands.Cog):
     @commands.bot_has_permissions(send_messages=True)
     @commands.cooldown(1, 20, commands.BucketType.user)
     async def rank(self, ctx: MyContext, *, user: Optional[discord.User]=None):
-        """Display a user XP.
-        If you don't send any user, I'll display your own XP
+        """Check how many xp you got
+        If you don't specify any user, I'll send you your own XP
 
         ..Example rank
 
