@@ -201,55 +201,6 @@ class Utilities(commands.Cog):
             return disp_lang
         return disp_lang[:limit]
 
-    async def add_user_eventPoint(self, user_id: int, points: int, override: bool = False, check_event: bool = True):
-        """Add some events points to a user
-        if override is True, then the number of points will override the old score"""
-        try:
-            if not self.bot.database_online:
-                return True
-            if check_event and self.bot.current_event is None:
-                return True
-            if override:
-                query = ("INSERT INTO `{t}` (`userID`,`events_points`) VALUES ('{u}',{p}) ON DUPLICATE KEY UPDATE events_points = '{p}';".format(
-                    t=self.table, u=user_id, p=points))
-            else:
-                query = ("INSERT INTO `{t}` (`userID`,`events_points`) VALUES ('{u}',{p}) ON DUPLICATE KEY UPDATE events_points = events_points + '{p}';".format(
-                    t=self.table, u=user_id, p=points))
-            async with self.bot.db_query(query):
-                pass
-            try:
-                await self.bot.get_cog("Users").reload_event_rankcard(user_id)
-            except Exception as err:
-                self.bot.dispatch("error", err)
-            return True
-        except Exception as err:
-            self.bot.dispatch("error", err)
-            return False
-
-    async def get_eventsPoints_rank(self, user_id: int):
-        "Get the ranking of an user"
-        if not self.bot.database_online:
-            return None
-        query = (
-            f"SELECT `userID`, `events_points`, FIND_IN_SET( `events_points`, ( SELECT GROUP_CONCAT( `events_points` ORDER BY `events_points` DESC ) FROM {self.table} ) ) AS rank FROM {self.table} WHERE `userID` = {user_id}")
-        async with self.bot.db_query(query, fetchone=True) as query_results:
-            return query_results
-
-    async def get_eventsPoints_top(self, number: int):
-        "Get the event points leaderboard containing at max the given number of users"
-        if not self.bot.database_online:
-            return None
-        query = f"SELECT `userID`, `events_points` FROM {self.table} WHERE `events_points` != 0 ORDER BY `events_points` DESC LIMIT {number}"
-        async with self.bot.db_query(query) as query_results:
-            return query_results
-
-    async def get_eventsPoints_nbr(self) -> int:
-        if not self.bot.database_online:
-            return 0
-        query = f"SELECT COUNT(*) as count FROM {self.table} WHERE events_points > 0"
-        async with self.bot.db_query(query, fetchone=True) as query_results:
-            return query_results['count']
-
     async def check_votes(self, userid: int) -> list[tuple[str, str]]:
         """check if a user voted on any bots list website"""
         votes = list()

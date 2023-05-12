@@ -150,26 +150,6 @@ class Users(commands.Cog):
             result['default'] = result.pop('')
         return result
 
-    async def reload_event_rankcard(self, user: Union[discord.User, int], cards: list = None, points: int = None):
-        """Grant the current event rank card to the provided user, if they have enough points
-        'cards' and 'points' arguments can be provided to avoid re-fetching the database"""
-        if (events_cog := self.bot.get_cog("BotEvents")) is None:
-            return
-        if events_cog.current_event is None or len(rewards := await events_cog.get_specific_objectives("rankcard")) == 0:
-            return
-        if isinstance(user, int):
-            user = self.bot.get_user(user)
-            if user is None:
-                return
-        if cards is None:
-            cards = await self.get_rankcards(user)
-        if points is None:
-            points = await self.bot.get_cog("Utilities").get_eventsPoints_rank(user.id)
-            points = 0 if (points is None) else points["events_points"]
-        for reward in rewards:
-            if reward["rank_card"] not in cards and points >= reward["points"]:
-                await self.set_rankcard(user, reward["rank_card"], True)
-
     async def card_style_autocomplete(self, user: discord.User, current: str):
         "Autocompletion for a card style name"
         styles_list: list[str] = await self.bot.get_cog('Utilities').allowed_card_styles(user)
@@ -233,7 +213,7 @@ class Users(commands.Cog):
             available_cards = ', '.join(await ctx.bot.get_cog('Utilities').allowed_card_styles(ctx.author))
             if ctx.view.buffer.split(' ')[2] == 'list':
                 try:
-                    await self.reload_event_rankcard(ctx.author.id)
+                    await self.bot.get_cog("BotEvents").reload_event_rankcard(ctx.author.id)
                 except Exception as err:
                     self.bot.dispatch("error", err)
                 await ctx.send(await self.bot._(ctx.channel, 'users.list-cards', cards=available_cards))
@@ -245,9 +225,9 @@ class Users(commands.Cog):
         await ctx.send(await self.bot._(ctx.channel, 'users.changed-card', style=style))
         last_update = self.get_last_rankcard_update(ctx.author.id)
         if last_update is None:
-            await self.bot.get_cog("Utilities").add_user_eventPoint(ctx.author.id, 15)
+            await self.bot.get_cog("BotEvents").db_add_user_points(ctx.author.id, 15)
         elif last_update < time.time()-86400:
-            await self.bot.get_cog("Utilities").add_user_eventPoint(ctx.author.id, 2)
+            await self.bot.get_cog("BotEvents").db_add_user_points(ctx.author.id, 2)
         self.set_last_rankcard_update(ctx.author.id)
 
     @profile_card.autocomplete("style")

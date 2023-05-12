@@ -125,7 +125,7 @@ Online editor: https://projectblurple.com/paint
         if not isinstance(old_msg, discord.InteractionMessage):
             await old_msg.delete()
         if self.bot.database_online:
-            await self.bot.get_cog("Utilities").add_user_eventPoint(ctx.author.id, 3)
+            await self.bot.get_cog("BotEvents").db_add_user_points(ctx.author.id, 3)
 
     @blurple_main.command("lightfy")
     @commands.cooldown(6, 120, commands.BucketType.member)
@@ -168,7 +168,7 @@ Online editor: https://projectblurple.com/paint
         await ctx.reply(await self.bot._(ctx.channel, "color-event.blurple.check.result", user=ctx.author.mention, results=answer))
         if result["passed"] and self.bot.database_online and ctx.author.id not in self.cache:
             reward_points = 40
-            await self.bot.get_cog("Utilities").add_user_eventPoint(ctx.author.id, reward_points)
+            await self.bot.get_cog("BotEvents").db_add_user_points(ctx.author.id, reward_points)
             self.cache.append(ctx.author.id)
             with open("blurple-cache.json", "w", encoding="utf-8") as jsonfile:
                 json.dump(self.cache, jsonfile)
