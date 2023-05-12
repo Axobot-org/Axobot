@@ -843,6 +843,9 @@ class ServerLogs(commands.Cog):
                     emb.add_field(name="Revoked permissions", value=", ".join(revoked_perms), inline=False)
                 if granted_perms:
                     emb.add_field(name="Granted permissions", value=", ".join(granted_perms), inline=False)
+            if len(emb.fields) == 0:
+                # nothing we care about was edited
+                return
             # try to find who edited the role
             if entry := await self.search_audit_logs(before.guild, discord.AuditLogAction.role_update,
                                                      check=lambda entry: entry.target.id == after.id):
