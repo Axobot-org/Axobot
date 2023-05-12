@@ -12,10 +12,14 @@ def check_message(message: str, websites_reference: dict[str, bool]) -> int:
     "Check every URL in a message and return the sum of each URL's score"
     score = 0
     message = normalize_unicode(message)
+    # replace discord dot gg to discord.gg
     message = sub(r'(\S)\(dot\)(\S)', r'\1.\2', message, flags=IGNORECASE)
+    # check for domain scam-likelihood and update score
     for link in search_links(message):
         link = ".".join(link.split('.')[-2:])
         score += check_url_similarity(link, websites_reference)
+    # lower score for every http:// in the message
+    score -= message.count("http://")
     return max(score, 0)
 
 def check_url_similarity(url: str, websites_reference: dict[str, bool]):
