@@ -8,5 +8,7 @@
             "Le saviez-vous ?"
         ]
     },
-    "rank_card_personalisation": "Vous pouvez modifier l'arrière-plan de votre carte à l'aide de la commande %{profile_cmd} !"
+    "rank_card_personalisation": "Vous pouvez modifier l'arrière-plan de votre carte à l'aide de la commande %{profile_cmd} !",
+    "serverlog_enable_antiscam": "Les logs d'antiscam sont désormais activés, mais le système de protection anti-scam n'est pas actif sur ce serveur. Vous devriez peut-être l'activer avec la commande %{antiscam_enable_cmd}.",
+    "serverlog_enable_antiraid": "Les logs d'antiraid sont désormais activés, mais le système de protection anti-raid n'est pas actif sur ce serveur. Vous devriez peut-être l'activer avec la commande %{config_set_cmd}."
 }

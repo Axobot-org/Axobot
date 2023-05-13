@@ -15,6 +15,7 @@ from libs.antiscam.classes import PredictionResult
 from libs.bot_classes import Axobot, MyContext
 from libs.enums import ServerWarningType
 from libs.formatutils import FormatUtils
+from libs.tips import GuildTip
 
 DISCORD_INVITE = re.compile(r'(?:https?://)?(?:www[.\s])?((?:discord[.\s](?:gg|io|me|li(?:nk)?)|discordapp\.com/invite|discord\.com/invite|dsc\.gg)[/\s]{1,3}[\w-]{1,25}(?!\w))')
 
@@ -227,15 +228,20 @@ class ServerLogs(commands.Cog):
             if await self.db_add(ctx.guild.id, dest_channel.id, log):
                 actually_added.append(log)
         if actually_added:
+            added = ', '.join(actually_added)
             if dest_channel == ctx.channel:
-                msg = await self.bot._(ctx.guild.id, "serverlogs.enabled.current", kind=', '.join(actually_added))
+                msg = await self.bot._(ctx.guild.id, "serverlogs.enabled.current", kind=added)
             else:
-                msg = await self.bot._(ctx.guild.id, "serverlogs.enabled.other", kind=', '.join(actually_added), channel=dest_channel.mention)
+                msg = await self.bot._(ctx.guild.id, "serverlogs.enabled.other", kind=added, channel=dest_channel.mention)
             if not dest_channel.permissions_for(ctx.guild.me).embed_links:
                 msg += "\n:warning: " + await self.bot._(ctx.guild.id, "serverlogs.embed-warning")
         else:
             msg = await self.bot._(ctx.guild.id, "serverlogs.none-added")
         await ctx.send(msg)
+        if "antiscam" in actually_added:
+            await self.send_antiscam_tip(ctx)
+        if "antiraid" in actually_added:
+            await self.send_antiraid_tip(ctx)
 
     @modlogs_enable.autocomplete("logs")
     async def _modlogs_enable_autocomplete(self, interaction: discord.Interaction, current: str):
@@ -269,10 +275,11 @@ class ServerLogs(commands.Cog):
             if await self.db_remove(ctx.guild.id, dest_channel.id, log):
                 actually_removed.append(log)
         if actually_removed:
+            removed = ', '.join(actually_removed)
             if dest_channel == ctx.channel:
-                msg = await self.bot._(ctx.guild.id, "serverlogs.disabled.current", kind=', '.join(actually_removed))
+                msg = await self.bot._(ctx.guild.id, "serverlogs.disabled.current", kind=removed)
             else:
-                msg = await self.bot._(ctx.guild.id, "serverlogs.disabled.other", kind=', '.join(actually_removed), channel=dest_channel.mention)
+                msg = await self.bot._(ctx.guild.id, "serverlogs.disabled.other", kind=removed, channel=dest_channel.mention)
         else:
             msg = await self.bot._(ctx.guild.id, "serverlogs.none-removed")
         await ctx.send(msg)
@@ -298,6 +305,24 @@ class ServerLogs(commands.Cog):
             app_commands.Choice(name=value[1], value=value[1])
             for value in filtered
         ][:25]
+
+    async def send_antiscam_tip(self, ctx: MyContext):
+        "Send a tip if antiscam log is enabled but not the antiscam system"
+        antiscam_enabled: bool = await self.bot.get_config(ctx.guild.id, "anti_scam")
+        if antiscam_enabled:
+            return
+        if await self.bot.tips_manager.should_show_guild_tip(ctx.guild.id, GuildTip.SERVERLOG_ENABLE_ANTISCAM):
+            antiscam_enable_cmd = await self.bot.get_command_mention("antiscam enable")
+            await self.bot.tips_manager.send_guild_tip(ctx, GuildTip.SERVERLOG_ENABLE_ANTISCAM, antiscam_enable_cmd=antiscam_enable_cmd)
+
+    async def send_antiraid_tip(self, ctx: MyContext):
+        "Send a tip if antiraid log is enabled but not the antiscam system"
+        antiraid_level: str = await self.bot.get_config(ctx.guild.id, "anti_raid")
+        if antiraid_level != "none":
+            return
+        if await self.bot.tips_manager.should_show_guild_tip(ctx.guild.id, GuildTip.SERVERLOG_ENABLE_ANTIRAID):
+            config_set_cmd = await self.bot.get_command_mention("config set")
+            await self.bot.tips_manager.send_guild_tip(ctx, GuildTip.SERVERLOG_ENABLE_ANTIRAID, config_set_cmd=config_set_cmd)
 
     async def search_audit_logs(self, guild: discord.Guild, action: discord.AuditLogAction, check: Callable[[discord.AuditLogEntry], bool]=None):
         """Search for a specific audit log entry in a given guild"""

@@ -1,11 +1,8 @@
-import time
 import typing
 
 import discord
 from discord import app_commands
 from discord.ext import commands
-
-from fcts import checks
 from libs.antiscam import AntiScamAgent, Message
 from libs.antiscam.classes import (EMBED_COLORS, MsgReportView,
                                    PredictionResult, get_avg_word_len,
@@ -15,6 +12,8 @@ from libs.antiscam.normalization import normalize
 from libs.antiscam.similarities import check_message
 from libs.antiscam.training_bayes import train_model
 from libs.bot_classes import Axobot, MyContext
+
+from fcts import checks
 
 
 def is_immune(member: discord.Member) -> bool:
