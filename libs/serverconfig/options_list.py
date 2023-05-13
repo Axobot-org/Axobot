@@ -219,7 +219,7 @@ options: dict[str, "AllRepresentation"] = {
         "type": "int",
         "min": 0,
         "max": math.inf,
-        "default": 7,
+        "default": 10,
         "is_listed": False,
     },
     "rss_max_number": {
