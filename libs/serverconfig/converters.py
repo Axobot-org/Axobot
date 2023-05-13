@@ -293,8 +293,8 @@ class BooleanOption(OptionConverter):
 
     @staticmethod
     async def from_input(raw: str, repr: BooleanOptionRepresentation, guild: discord.Guild, ctx: MyContext):
-        true_ish = {"1", "true", "yes", "on"}
-        false_ish = {"0", "false", "no", "off"}
+        true_ish = {"1", "true", "yes", "on", "oui"}
+        false_ish = {"0", "false", "no", "off", "non"}
         if raw.lower() not in true_ish | false_ish:
             raise ValueError("Invalid boolean value", "BOOLEAN_INVALID", repr)
         return raw.lower() in true_ish
