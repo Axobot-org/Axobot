@@ -5,7 +5,7 @@
         "date": "**Date :** %{data}",
         "duration": "**Durée :** %{data}",
         "guild": "**Serveur :** %{data}",
-        "moderator": "**Moderateur :** %{data}",
+        "moderator": "**Modérateur :** %{data}",
         "reason": "**Reason :** %{data}",
         "title": "Casier de %{user} (%{user_id})",
         "type": "**Type :** %{data}",
@@ -18,7 +18,7 @@
     "no_database": "En raison d'une panne temporaire de la base de donnée, cette commande a été désactivée",
     "not-found": "Ce casier n'a pas été trouvé :confused:",
     "reason-edited": "La raison du casier n°%{ID} a bien été modifiée !",
-    "search-0": "**Membre:** {U}\n**Type:** {T}\n**Moderateur:** {M}\n**Date:** {D}\n**Raison:** *{R}*",
-    "search-1": "**Membre:** {U}\n**Serveur:** {G}\n**Type:** {T}\n**Moderateur:** {M}\n**Date:** {D}\n**Raison:** *{R}*",
+    "search-0": "**Membre:** {U}\n**Type:** {T}\n**Modérateur:** {M}\n**Date:** {D}\n**Raison:** *{R}*",
+    "search-1": "**Membre:** {U}\n**Serveur:** {G}\n**Type:** {T}\n**Modérateur:** {M}\n**Date:** {D}\n**Raison:** *{R}*",
     "title-search": "Casier #%{ID}"
 }
