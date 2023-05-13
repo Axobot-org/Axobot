@@ -457,7 +457,7 @@ class ServerConfig(commands.Cog):
         str_value = await to_display(option_name, value, ctx.guild, self.bot)
         return await self.bot._(ctx.guild.id, f"server.set_success.{option_type}", opt=option_name, val=str_value)
 
-    async def _get_set_error_message(self, ctx: MyContext, _option_name: str, error: ValueError, _value: Any):
+    async def _get_set_error_message(self, ctx: MyContext, option_name: str, error: ValueError, _value: Any):
         "Generate a proper error message for an invalid value"
         option_data: AllRepresentation = error.args[2]
         if option_data["type"] in {"int", "float"}:
@@ -465,7 +465,11 @@ class ServerConfig(commands.Cog):
                                     f"server.set_error.{option_data['type']}_err",
                                     min=option_data["min"], max=option_data["max"])
         if option_data["type"] == "enum":
-            return await self.bot._(ctx.guild.id, "server.set_error.ENUM_INVALID", list=', '.join(option_data["values"]))
+            translated_values = [
+                await self.bot._(ctx.guild.id, f"server.enum.{option_name}.{value}")
+                for value in option_data["values"]
+            ]
+            return await self.bot._(ctx.guild.id, "server.set_error.ENUM_INVALID", list=', '.join(translated_values))
         if option_data["type"] == "text":
             return await self.bot._(ctx.guild.id,
                                     "server.set_error.text_err",
