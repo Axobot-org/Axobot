@@ -728,7 +728,7 @@ class Xp(commands.Cog):
         if await self.bot.tips_manager.should_show_user_tip(ctx.author.id, UserTip.RANK_CARD_PERSONALISATION):
             # user has not seen this tip yet
             profile_cmd = await self.bot.get_command_mention("profile card")
-            await self.bot.tips_manager.send_tip(ctx, UserTip.RANK_CARD_PERSONALISATION, profile_cmd=profile_cmd)
+            await self.bot.tips_manager.send_user_tip(ctx, UserTip.RANK_CARD_PERSONALISATION, profile_cmd=profile_cmd)
 
     async def send_embed(self, ctx: MyContext, user: discord.User, xp, rank, ranks_nb,  levels_info: tuple[int, int, int]):
         "Send the user rank as an embed (fallback from card generation)"

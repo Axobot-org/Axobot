@@ -15,11 +15,14 @@ class UserTip(str, Enum):
 
 
 class GuildTip(str, Enum):
-    ...
+    SERVERLOG_ENABLE_ANTISCAM = "serverlog_enable_antiscam"
+    SERVERLOG_ENABLE_ANTIRAID = "serverlog_enable_antiraid"
 
 
 minTimeBetweenTips: dict[Union[UserTip, GuildTip], datetime.timedelta] = {
     UserTip.RANK_CARD_PERSONALISATION: datetime.timedelta(days=60),
+    GuildTip.SERVERLOG_ENABLE_ANTISCAM: datetime.timedelta(days=14),
+    GuildTip.SERVERLOG_ENABLE_ANTIRAID: datetime.timedelta(days=14),
 }
 
 
@@ -99,7 +102,14 @@ class TipsManager:
             return True
         return self.bot.utcnow() - last_tip > minTimeBetweenTips[tip]
 
-    async def send_tip(self, ctx: "MyContext", tip: UserTip, **variables: dict[str, str]):
+    async def should_show_guild_tip(self, guild_id: int, tip: GuildTip) -> bool:
+        "Check if a tip should be shown into a guild"
+        last_tip = await self.db_get_last_guild_tip_shown(guild_id, tip)
+        if last_tip is None:
+            return True
+        return self.bot.utcnow() - last_tip > minTimeBetweenTips[tip]
+
+    async def send_user_tip(self, ctx: "MyContext", tip: UserTip, **variables: dict[str, str]):
         "Send a tip to a user"
         possible_titles = await self.bot._(ctx, "tips.embed.title")
         text = await self.bot._(ctx, f"tips.{tip.value}", **variables)
@@ -110,3 +120,15 @@ class TipsManager:
         )
         await ctx.send(embed=embed)
         await self.db_register_user_tip(ctx.author.id, tip)
+
+    async def send_guild_tip(self, ctx: "MyContext", tip: GuildTip, **variables: dict[str, str]):
+        "Send a tip into a guild"
+        possible_titles = await self.bot._(ctx, "tips.embed.title")
+        text = await self.bot._(ctx, f"tips.{tip.value}", **variables)
+        embed = discord.Embed(
+            title=random.choice(possible_titles),
+            description=text,
+            color=discord.Color.blurple(),
+        )
+        await ctx.send(embed=embed)
+        await self.db_register_guild_tip(ctx.guild.id, tip)
