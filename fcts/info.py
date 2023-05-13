@@ -451,7 +451,7 @@ Available types: member, role, user, emoji, channel, server, invite, category
         embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.member-6"), value = admin.capitalize(),inline=True)
         # Infractions count
         if critical_info and not member.bot and self.bot.database_online:
-            embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.member-7"), value = await self.bot.get_cog('Cases').get_nber(member.id,ctx.guild.id),inline=True)
+            embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.member-7"), value = await self.bot.get_cog('Cases').db_get_user_cases_count_from_guild(member.id,ctx.guild.id),inline=True)
         # Guilds count
         if member.bot:
             async with aiohttp.ClientSession(loop=self.bot.loop) as session:

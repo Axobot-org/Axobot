@@ -194,7 +194,7 @@ Slowmode works up to one message every 6h (21600s)
                 Cases = self.bot.get_cog('Cases')
                 case = Case(bot=self.bot,guild_id=ctx.guild.id,member_id=user.id,case_type="kick",mod_id=ctx.author.id,reason=reason,date=ctx.bot.utcnow())
                 try:
-                    await Cases.add_case(case)
+                    await Cases.db_add_case(case)
                     caseID = case.id
                 except Exception as err:
                     self.bot.dispatch("error", err, ctx)
@@ -254,7 +254,7 @@ Slowmode works up to one message every 6h (21600s)
             if self.bot.database_online:
                 if cases_cog := self.bot.get_cog('Cases'):
                     case = Case(bot=self.bot,guild_id=ctx.guild.id,member_id=user.id,case_type="warn",mod_id=ctx.author.id,reason=message,date=ctx.bot.utcnow())
-                    await cases_cog.add_case(case)
+                    await cases_cog.db_add_case(case)
                     caseID = case.id
             else:
                 await ctx.send(await self.bot._(ctx.guild.id,"moderation.warn.warn-but-db"))
@@ -379,7 +379,7 @@ You can also mute this member for a defined duration, then use the following for
                     case = Case(bot=self.bot,guild_id=ctx.guild.id,member_id=user.id,case_type="tempmute",mod_id=ctx.author.id,reason=reason,date=ctx.bot.utcnow(),duration=duration)
                     await self.bot.task_handler.add_task('mute',duration,user.id,ctx.guild.id)
                 try:
-                    await Cases.add_case(case)
+                    await Cases.db_add_case(case)
                     caseID = case.id
                 except Exception as err:
                     self.bot.dispatch("command_error", ctx, err)
@@ -598,7 +598,7 @@ The 'days_to_delete' option represents the number of days worth of messages to d
                     case = Case(bot=self.bot,guild_id=ctx.guild.id,member_id=user.id,case_type="tempban",mod_id=ctx.author.id,reason=reason,date=ctx.bot.utcnow(),duration=duration)
                     await self.bot.task_handler.add_task('ban',duration,user.id,ctx.guild.id)
                 try:
-                    await cases_cog.add_case(case)
+                    await cases_cog.db_add_case(case)
                     case_id = case.id
                 except Exception as err:
                     self.bot.dispatch("error", err, ctx)
@@ -670,7 +670,7 @@ The 'days_to_delete' option represents the number of days worth of messages to d
                 cases_cog = self.bot.get_cog('Cases')
                 case = Case(bot=self.bot,guild_id=ctx.guild.id,member_id=user.id,case_type="unban",mod_id=ctx.author.id,reason=reason,date=ctx.bot.utcnow())
                 try:
-                    await cases_cog.add_case(case)
+                    await cases_cog.db_add_case(case)
                     case_id = case.id
                 except Exception as err:
                     self.bot.dispatch("error", err, ctx)
@@ -729,7 +729,7 @@ Permissions for using this command are the same as for the kick
                 Cases = self.bot.get_cog('Cases')
                 case = Case(bot=self.bot,guild_id=ctx.guild.id,member_id=user.id,case_type="softban",mod_id=ctx.author.id,reason=reason,date=ctx.bot.utcnow())
                 try:
-                    await Cases.add_case(case)
+                    await Cases.db_add_case(case)
                     caseID = case.id
                 except Exception as err:
                     self.bot.dispatch("error", err, ctx)
