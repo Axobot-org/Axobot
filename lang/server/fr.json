@@ -46,7 +46,7 @@
     "see-0": "Entrez `!config help` pour plus de détails",
     "see-title": "Configuration du serveur %{guild}",
     "set_error": {
-        "BOOLEAN_INVALID": "La valeur doit être \"true\" (activé) ou \"false\" (désactivé)",
+        "BOOLEAN_INVALID": "La valeur doit être \"oui\" (activé) ou \"non\" (désactivé)",
         "CATEGORY_INVALID": "Vous devez fournir une catégorie valide pour cette option",
         "channels_list": "Vous devez fournir entre %{min} et %{max} salons pour cette option",
         "CHANNEL_ANNOUNCEMENT": "Les salons d'annonces ne sont pas acceptés pour cette option",
