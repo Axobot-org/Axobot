@@ -8,5 +8,7 @@
             "Have u tried that?"
         ]
     },
-    "rank_card_personalisation": "U can change ur xp card with teh %{profile_cmd} cmd!"
+    "rank_card_personalisation": "U can change ur xp card with teh %{profile_cmd} cmd!",
+    "serverlog_enable_antiscam": "Enabling anti-scam logs while keeping teh anti-scam feature disabld wont be really helpful, u know... maybe u should try %{antiscam_enable_cmd} lol",
+    "serverlog_enable_antiraid": "yeah so uh, theres this thing... uve just enabled antiraid modlogs but didnt enable teh actual anti-raid feature on dis server... dat wont go far, u know? check out %{config_set_cmd} lol."
 }
