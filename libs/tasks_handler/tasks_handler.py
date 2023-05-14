@@ -43,6 +43,8 @@ class TaskHandler:
     async def check_tasks(self):
         "Fetch and execute pending tasks"
         await self.bot.wait_until_ready()
+        if not self.bot.database_online:
+            return
         tasks_list = await self.get_events_from_db()
         if len(tasks_list) == 0:
             return
