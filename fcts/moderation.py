@@ -18,6 +18,8 @@ from fcts.cases import Case
 importlib.reload(checks)
 importlib.reload(args)
 
+CLEAR_MAX_MESSAGES = 10_000
+
 class Moderation(commands.Cog):
     """Here you will find everything you need to moderate your server.
     Please note that most of the commands are reserved for certain members only."""
@@ -69,7 +71,7 @@ Slowmode works up to one message every 6h (21600s)
     @commands.cooldown(4, 30, commands.BucketType.guild)
     @commands.guild_only()
     @commands.check(checks.can_clear)
-    async def clear(self, ctx: MyContext, number:int, users: commands.Greedy[discord.User]=None, *, contains_file: Optional[bool]=None, contains_url: Optional[bool]=None, contains_invite: Optional[bool]=None, is_pinned: Optional[bool]=None):
+    async def clear(self, ctx: MyContext, number: commands.Range[int, 1, CLEAR_MAX_MESSAGES], users: commands.Greedy[discord.User]=None, *, contains_file: Optional[bool]=None, contains_url: Optional[bool]=None, contains_invite: Optional[bool]=None, is_pinned: Optional[bool]=None):
         """Keep your chat clean
         <number>: number of messages to check
         [users]: list of user IDs or mentions to delete messages from
@@ -1332,7 +1334,7 @@ The 'show_reasons' parameter is used to display the mute reasons.
     @commands.guild_only()
     @commands.check(checks.can_clear)
     @commands.cooldown(2, 30, commands.BucketType.channel)
-    async def destop(self, ctx:MyContext, start_message:discord.Message):
+    async def destop(self, ctx: MyContext, start_message: discord.Message):
         """Clear every message between now and an older message
         Message can be either ID or url
         Limited to 1,000 messages
@@ -1353,7 +1355,7 @@ The 'show_reasons' parameter is used to display the mute reasons.
             await ctx.send(await self.bot._(ctx.guild.id, "moderation.destop.too-old", days=21))
             return
         await ctx.defer()
-        messages = await start_message.channel.purge(after=start_message, before=ctx.message, limit=1000, oldest_first=False)
+        messages = await start_message.channel.purge(after=start_message, before=ctx.message, limit=CLEAR_MAX_MESSAGES, oldest_first=False)
         await start_message.delete()
         messages.append(start_message)
         txt = await self.bot._(ctx.guild.id, "moderation.clear.done", count=len(messages))
