@@ -460,7 +460,7 @@ class BotStats(commands.Cog):
 
     @tasks.loop(minutes=4)
     async def status_loop(self):
-        "Send average latency to zbot.statuspage.io every 4min"
+        "Send average latency to axobot.statuspage.io every 4min"
         if self.bot.user.id != 486896267788812288 or not self.bot.internal_loop_enabled:
             return
         now = self.bot.utcnow()

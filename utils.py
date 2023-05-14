@@ -16,8 +16,8 @@ if TYPE_CHECKING:
     from libs.bot_classes import Axobot
 
 OUTAGE_REASON = {
-    'fr': "Nous faisons de notre mieux pour rétablir nos services dans les plus brefs délais, mais la panne peut être hors de notre contrôle. Plus d'informations sur https://zbot.statuspage.io/ ou sur notre serveur Discord.",
-    'en': "We're doing our best to restore our services as soon as possible, but the failure may be beyond our control. More information on https://zbot.statuspage.io/ or in our Discord server."
+    'fr': "Nous faisons de notre mieux pour rétablir nos services dans les plus brefs délais, mais la panne peut être hors de notre contrôle. Plus d'informations sur https://axobot.statuspage.io/ ou sur notre serveur Discord.",
+    'en': "We're doing our best to restore our services as soon as possible, but the failure may be beyond our control. More information on https://axobot.statuspage.io/ or in our Discord server."
 }
 
 async def get_prefix(bot:"Axobot", msg: discord.Message) -> list:
