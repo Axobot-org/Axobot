@@ -161,61 +161,62 @@ Slowmode works up to one message every 6h (21600s)
     @commands.cooldown(5, 20, commands.BucketType.guild)
     @commands.guild_only()
     @commands.check(checks.can_kick)
-    async def kick(self, ctx: MyContext, user:discord.Member, *, reason="Unspecified"):
+    async def kick(self, ctx: MyContext, user:discord.Member, *, reason: Optional[str]=None):
         """Kick a member from this server
 
 ..Example kick @someone Not nice enough to stay here
 
 ..Doc moderator.html#kick"""
-        try:
-            if not ctx.channel.permissions_for(ctx.guild.me).kick_members:
-                await ctx.send(await self.bot._(ctx.guild.id, "moderation.kick.no-perm"))
-                return
-            await ctx.defer()
+        if not ctx.channel.permissions_for(ctx.guild.me).kick_members:
+            await ctx.send(await self.bot._(ctx.guild.id, "moderation.kick.no-perm"))
+            return
+        await ctx.defer()
 
-            async def user_can_kick(user):
-                try:
-                    return await self.bot.get_cog("ServerConfig").check_member_config_permission(user, "kick_allowed_roles")
-                except commands.errors.CommandError:
-                    pass
-                return False
-
-            if user == ctx.guild.me or (self.bot.database_online and await user_can_kick(user)):
-                return await ctx.send(await self.bot._(ctx.guild.id, "moderation.kick.cant-staff"))
-            elif not self.bot.database_online and ctx.channel.permissions_for(user).kick_members:
-                return await ctx.send(await self.bot._(ctx.guild.id, "moderation.kick.cant-staff"))
-            if user.roles[-1].position >= ctx.guild.me.roles[-1].position:
-                await ctx.send(await self.bot._(ctx.guild.id, "moderation.kick.too-high"))
-                return
-            # send DM
-            await self.dm_user(user, "kick", ctx, reason = None if reason=="Unspecified" else reason)
-            reason = await self.bot.get_cog("Utilities").clear_msg(reason, everyone = not ctx.channel.permissions_for(ctx.author).mention_everyone)
-            await ctx.guild.kick(user,reason=reason[:512])
-            caseID = "'Unsaved'"
-            if self.bot.database_online:
-                Cases = self.bot.get_cog('Cases')
-                case = Case(bot=self.bot,guild_id=ctx.guild.id,member_id=user.id,case_type="kick",mod_id=ctx.author.id,reason=reason,date=ctx.bot.utcnow())
-                try:
-                    await Cases.db_add_case(case)
-                    caseID = case.id
-                except Exception as err:
-                    self.bot.dispatch("error", err, ctx)
+        async def user_can_kick(user):
             try:
-                await ctx.message.delete()
-            except (discord.Forbidden, discord.NotFound):
+                return await self.bot.get_cog("ServerConfig").check_member_config_permission(user, "kick_allowed_roles")
+            except commands.errors.CommandError:
                 pass
-            # optional values
-            opt_case = None if caseID=="'Unsaved'" else caseID
-            opt_reason = None if reason=="Unspecified" else reason
-            # send in chat
-            await self.send_chat_answer("kick", user, ctx, opt_case)
-            # send in modlogs
-            await self.send_modlogs("kick", user, ctx.author, ctx.guild, opt_case, opt_reason)
+            return False
+
+        if user == ctx.guild.me or (self.bot.database_online and await user_can_kick(user)):
+            return await ctx.send(await self.bot._(ctx.guild.id, "moderation.kick.cant-staff"))
+        elif not self.bot.database_online and ctx.channel.permissions_for(user).kick_members:
+            return await ctx.send(await self.bot._(ctx.guild.id, "moderation.kick.cant-staff"))
+        if user.roles[-1].position >= ctx.guild.me.roles[-1].position:
+            await ctx.send(await self.bot._(ctx.guild.id, "moderation.kick.too-high"))
+            return
+        # send DM
+        await self.dm_user(user, "kick", ctx, reason=reason)
+        if reason is None:
+            f_reason = "Unspecified"
+        else:
+            f_reason = await self.bot.get_cog("Utilities").clear_msg(
+                reason,
+                everyone = not ctx.channel.permissions_for(ctx.author).mention_everyone
+            )
+        try:
+            await ctx.guild.kick(user, reason=f_reason[:512]+self.bot.zws)
         except discord.errors.Forbidden:
             await ctx.send(await self.bot._(ctx.guild.id, "moderation.kick.too-high"))
-        except Exception as err:
-            await ctx.send(await self.bot._(ctx.guild.id, "moderation.error"))
-            self.bot.dispatch("error", err, ctx)
+        case_id = None
+        if self.bot.database_online:
+            cases_cog = self.bot.get_cog('Cases')
+            case = Case(bot=self.bot, guild_id=ctx.guild.id, member_id=user.id, case_type="kick",
+                        mod_id=ctx.author.id, reason=f_reason, date=ctx.bot.utcnow())
+            try:
+                await cases_cog.db_add_case(case)
+                case_id = case.id
+            except Exception as err:
+                self.bot.dispatch("error", err, ctx)
+        try:
+            await ctx.message.delete()
+        except (discord.Forbidden, discord.NotFound):
+            pass
+        # send in chat
+        await self.send_chat_answer("kick", user, ctx, case_id)
+        # send in modlogs
+        self.bot.dispatch("moderation_kick", ctx.guild, ctx.author, user, case_id, reason)
         await self.bot.get_cog('Events').add_event('kick')
 
 
