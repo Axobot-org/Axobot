@@ -78,7 +78,12 @@ class TaskHandler:
                         user = await self.bot.fetch_user(task['user'])
                     except discord.DiscordException:
                         continue
-                    await self.bot.get_cog('Moderation').unban_event(guild, user, guild.me)
+                    try:
+                        await guild.unban(user, reason="Temp ban expired"+self.bot.zws)
+                    except discord.Forbidden:
+                        await self.remove_task(task['ID'])
+                        continue
+                    self.bot.dispatch("tempban_expiration", guild, user, task['begin'])
                     await self.remove_task(task['ID'])
                 except discord.errors.NotFound:
                     await self.remove_task(task['ID'])
