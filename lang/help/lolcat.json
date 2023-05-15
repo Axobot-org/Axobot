@@ -112,6 +112,10 @@
             "U're in teh bot supprt server",
             "U can only use dat command in deh support server"
         ],
+        "is_blurple": [
+            "Happy bday discoword!",
+            "Err: Discord birthday not detected"
+        ],
         "is_bot_admin": [
             "You need 2B one of the bot Admins",
             "U are not a bot Admin"
@@ -122,7 +126,7 @@
         ],
         "is_halloween": [
             "The :ghost: season is therr!",
-            "There are no ghosts at the moment"
+            "Err: pumpkin theme not found"
         ],
         "is_owner": [
             "You must be the owner of the bot",

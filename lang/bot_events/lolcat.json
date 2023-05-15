@@ -1,7 +1,8 @@
 {
-    "christmas": {
-        "already-collected": "Eh oh, u already got ur Christmas gift! Dont try 2 steal me!",
-        "collected": "Here's ur xmas 2022 card! U can use %{cmd} with \"christmas22\" 2 start usin' it right naw!!!"
+    "collect": {
+        "got-points": "GG, u just got **%{pts}** points!",
+        "lost-points": "Oh no, u just lost **%{pts}** points :(",
+        "too-quick": "Wait no, ur too soon! Please wait %{time} again k thx"
     },
     "events-price-title": "Prizes 2 win",
     "nothing-desc": "There'r no events rn. Follow my bot news 2 know teh date of the next one!",

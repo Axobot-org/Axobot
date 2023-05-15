@@ -140,6 +140,7 @@
     "no-rank": "Noon haz gotz any xp yetz, try agin l8r!",
     "no-rr": "None role is configured for this level",
     "no-rr-2": "U didn't set any role reward yet LOL!",
+    "no-rr-list": "Uh, dat's weird... i cant find any role-reward here :eyes:\nMaybe u should add some with %{add}.",
     "rr-added": "Role `%{role}` haz been added 4 level %{level} !",
     "rr-reload": "%{role_count} updated roles / %{member_count} members",
     "rr-removed": "None role will be givn anymore for level #%{level}",
