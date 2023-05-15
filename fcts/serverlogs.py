@@ -28,11 +28,10 @@ class ServerLogs(commands.Cog):
 
     logs_categories = {
         "automod": {"antiraid", "antiscam"},
-        "bot": {"bot_warnings"},
         "members": {"member_roles", "member_nick", "member_avatar", "member_join", "member_leave", "member_verification", "user_update"},
         "moderation": {"clear", "member_ban", "member_unban", "member_timeout", "member_kick", "moderation_case", "slowmode"},
         "messages": {"message_update", "message_delete", "discord_invite", "ghost_ping"},
-        "other": {"server_update"},
+        "other": {"bot_warnings", "server_update"},
         "roles": {"role_creation", "role_update", "role_deletion"},
         "tickets": {"ticket_creation"},
     }
@@ -755,7 +754,10 @@ class ServerLogs(commands.Cog):
             # try to get more info from audit logs
             if entry := await self.search_audit_logs(guild, discord.AuditLogAction.ban,
                                                      check=lambda entry: entry.target.id == user.id):
-                emb.add_field(name="Banned by", value=f"**{entry.user.mention}** ({entry.user.id})")
+                if entry.reason and entry.reason.endswith(self.bot.zws):
+                    # banned from the /ban command, so we ignore this event
+                    return
+                emb.add_field(name="Banned by", value=f"**{entry.user.mention}** ({entry.user.id})", inline=False)
                 emb.add_field(name="With reason", value=entry.reason or "No reason specified")
             await self.validate_logs(guild, channel_ids, emb, "member_ban")
 
@@ -772,7 +774,10 @@ class ServerLogs(commands.Cog):
             # try to get more info from audit logs
             if entry := await self.search_audit_logs(guild, discord.AuditLogAction.unban,
                                                      check=lambda entry: entry.target.id == user.id):
-                emb.add_field(name="Unbanned by", value=f"**{entry.user.mention}** ({entry.user.id})")
+                if entry.reason and entry.reason.endswith(self.bot.zws):
+                    # unbanned from the /unban command or after a tempban, so we ignore this event
+                    return
+                emb.add_field(name="Unbanned by", value=f"**{entry.user.mention}** ({entry.user.id})", inline=False)
                 emb.add_field(name="With reason", value=entry.reason or "No reason specified")
             await self.validate_logs(guild, channel_ids, emb, "member_unban")
 
@@ -1148,6 +1153,57 @@ Minimum age required by anti-raid: {min_age}"
             emb.add_field(name="Moderator", value=author.mention)
             emb.set_author(name=author, icon_url=author.display_avatar)
             await self.validate_logs(channel.guild, channel_ids, emb, "clear")
+
+    @commands.Cog.listener()
+    async def on_moderation_ban(self, guild: discord.Guild, author: discord.Member, user: discord.User,
+                                case_id: int, reason: Optional[str], duration: Optional[int]):
+        """Triggered when someone uses the ban command
+        Corresponding log: member_ban"""
+        if channel_ids := await self.is_log_enabled(guild.id, "member_ban"):
+            emb = discord.Embed(
+                description=f"**{user.mention} ({user.id}) has been banned**",
+                colour=discord.Color.red()
+            )
+            emb.set_author(name=user, icon_url=user.display_avatar)
+            emb.add_field(name="Banned by", value=f"**{author.mention}** ({author.id})", inline=False)
+            emb.add_field(name="With reason", value=reason or "No reason specified")
+            emb.add_field(name="Case ID", value=case_id)
+            if duration:
+                lang = await self.bot._(guild.id, "_used_locale")
+                f_duration = await FormatUtils.time_delta(duration, lang=lang)
+                emb.add_field(name="Ban duration", value=f_duration)
+            await self.validate_logs(guild, channel_ids, emb, "member_ban")
+
+    @commands.Cog.listener()
+    async def on_moderation_unban(self, guild: discord.Guild, author: discord.Member, user: discord.user,
+                                  case_id: int, reason: Optional[str]):
+        """Triggered when someone uses the unban command
+        Corresponding log: member_unban"""
+        if channel_ids := await self.is_log_enabled(guild.id, "member_unban"):
+            emb = discord.Embed(
+                description=f"**{user.mention} ({user.id}) has been unbanned**",
+                colour=discord.Color.green()
+            )
+            emb.set_author(name=user, icon_url=user.display_avatar)
+            emb.add_field(name="Unbanned by", value=f"**{author.mention}** ({author.id})", inline=False)
+            emb.add_field(name="With reason", value=reason or "No reason specified")
+            emb.add_field(name="Case ID", value=case_id)
+            await self.validate_logs(guild, channel_ids, emb, "member_unban")
+
+    @commands.Cog.listener()
+    async def on_tempban_expiration(self, guild: discord.Guild, user: discord.User, ban_date: datetime.datetime):
+        """Triggered when a tempban expires
+        Corresponding log: member_unban"""
+        if channel_ids := await self.is_log_enabled(guild.id, "member_unban"):
+            emb = discord.Embed(
+                description=f"**{user.mention} ({user.id}) has been unbanned** after a tempban",
+                colour=discord.Color.green()
+            )
+            emb.set_author(name=user, icon_url=user.display_avatar)
+            f_date = f"<t:{ban_date.timestamp():.0f}>"
+            emb.add_field(name="Ban date", value=f_date)
+            await self.validate_logs(guild, channel_ids, emb, "member_unban")
+
 
     @commands.Cog.listener()
     async def on_case_edit(self, guild: discord.Guild, before: "Case", after: "Case"):

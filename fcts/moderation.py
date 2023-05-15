@@ -543,7 +543,8 @@ This will remove the role 'muted' for the targeted member
     @commands.cooldown(5,20, commands.BucketType.guild)
     @commands.guild_only()
     @commands.check(checks.can_ban)
-    async def ban(self, ctx:MyContext, user:args.AnyUser, time:commands.Greedy[args.Duration]=None, days_to_delete:Optional[int]=0, *, reason="Unspecified"):
+    async def ban(self, ctx:MyContext, user: discord.User, time: commands.Greedy[args.Duration]=None,
+                  days_to_delete: commands.Range[int, 0, 7]=0, *, reason: Optional[str]=None):
         """Ban someone
 The 'days_to_delete' option represents the number of days worth of messages to delete from the user in the guild, bewteen 0 and 7
 
@@ -555,79 +556,73 @@ The 'days_to_delete' option represents the number of days worth of messages to d
 
 ..Doc moderator.html#ban-unban
         """
-        try:
-            duration = sum(time) if time else 0
-            if duration > 0:
-                if duration > 60*60*24*365*20: # max 20 years
-                    await ctx.send(await self.bot._(ctx.channel, "timers.rmd.too-long"))
-                    return
-                f_duration = await FormatUtils.time_delta(duration,lang=await self.bot._(ctx.guild,'_used_locale'),form="short")
-            else:
-                f_duration = None
-            if not ctx.channel.permissions_for(ctx.guild.me).ban_members:
-                await ctx.send(await self.bot._(ctx.guild.id, "moderation.ban.cant-ban"))
+        duration = sum(time) if time else 0
+        if duration > 0:
+            if duration > 60*60*24*365*20: # max 20 years
+                await ctx.send(await self.bot._(ctx.channel, "timers.rmd.too-long"))
                 return
-            if user in ctx.guild.members:
-                member = ctx.guild.get_member(user.id)
-                async def user_can_ban(user):
-                    try:
-                        return await self.bot.get_cog("ServerConfig").check_member_config_permission(user, "ban_allowed_roles")
-                    except commands.errors.CommandError:
-                        pass
-                    return False
-                if user==ctx.guild.me or (self.bot.database_online and await user_can_ban(member)):
-                    await ctx.send(await self.bot._(ctx.guild.id, "moderation.ban.staff-ban"))
-                    return
-                elif not self.bot.database_online and (ctx.channel.permissions_for(member).ban_members or user==ctx.guild.me):
-                    await ctx.send(await self.bot._(ctx.guild.id, "moderation.ban.staff-ban"))
-                    return
-                if member.roles[-1].position >= ctx.guild.me.roles[-1].position:
-                    await ctx.send(await self.bot._(ctx.guild.id, "moderation.ban.too-high"))
-                    return
-                # send DM only if the user is still in the server
-                await self.dm_user(user, "ban", ctx, reason = None if reason=="Unspecified" else reason)
-            if days_to_delete not in range(8):
-                days_to_delete = 0
-            reason = await self.bot.get_cog("Utilities").clear_msg(reason,everyone = not ctx.channel.permissions_for(ctx.author).mention_everyone)
-            await ctx.guild.ban(user, reason=reason[:512], delete_message_seconds=days_to_delete * 86400)
-            await self.bot.get_cog('Events').add_event('ban')
-            case_id = "'Unsaved'"
-            if self.bot.database_online:
-                cases_cog = self.bot.get_cog('Cases')
-                if f_duration is None:
-                    case = Case(bot=self.bot,guild_id=ctx.guild.id,member_id=user.id,case_type="ban",mod_id=ctx.author.id,reason=reason,date=ctx.bot.utcnow())
-                else:
-                    case = Case(bot=self.bot,guild_id=ctx.guild.id,member_id=user.id,case_type="tempban",mod_id=ctx.author.id,reason=reason,date=ctx.bot.utcnow(),duration=duration)
-                    await self.bot.task_handler.add_task('ban',duration,user.id,ctx.guild.id)
+            f_duration = await FormatUtils.time_delta(duration,lang=await self.bot._(ctx.guild,'_used_locale'),form="short")
+        else:
+            f_duration = None
+        if not ctx.channel.permissions_for(ctx.guild.me).ban_members:
+            await ctx.send(await self.bot._(ctx.guild.id, "moderation.ban.cant-ban"))
+            return
+        if user in ctx.guild.members:
+            member = ctx.guild.get_member(user.id)
+            async def user_can_ban(user):
                 try:
-                    await cases_cog.db_add_case(case)
-                    case_id = case.id
-                except Exception as err:
-                    self.bot.dispatch("error", err, ctx)
-            try:
-                await ctx.message.delete()
-            except (discord.Forbidden, discord.NotFound):
-                pass
-            # optional values
-            opt_case = None if case_id=="'Unsaved'" else case_id
-            opt_reason = None if reason=="Unspecified" else reason
-            # send message in chat
-            await self.send_chat_answer("ban", user, ctx, opt_case)
-            # send in modlogs
-            await self.send_modlogs("ban", user, ctx.author, ctx.guild, opt_case, opt_reason, f_duration)
+                    return await self.bot.get_cog("ServerConfig").check_member_config_permission(user, "ban_allowed_roles")
+                except commands.errors.CommandError:
+                    pass
+                return False
+            if user==ctx.guild.me or (self.bot.database_online and await user_can_ban(member)):
+                await ctx.send(await self.bot._(ctx.guild.id, "moderation.ban.staff-ban"))
+                return
+            elif not self.bot.database_online and (ctx.channel.permissions_for(member).ban_members or user==ctx.guild.me):
+                await ctx.send(await self.bot._(ctx.guild.id, "moderation.ban.staff-ban"))
+                return
+            if member.roles[-1].position >= ctx.guild.me.roles[-1].position:
+                await ctx.send(await self.bot._(ctx.guild.id, "moderation.ban.too-high"))
+                return
+            # send DM only if the user is still in the server
+            await self.dm_user(user, "ban", ctx, reason=reason)
+        if days_to_delete not in range(8):
+            days_to_delete = 0
+        if reason is None:
+            f_reason = "Unspecified"
+        else:
+            f_reason = await self.bot.get_cog("Utilities").clear_msg(
+                reason,
+                everyone = not ctx.channel.permissions_for(ctx.author).mention_everyone
+            )
+        try:
+            await ctx.guild.ban(user, reason=f_reason[:512]+self.bot.zws, delete_message_seconds=days_to_delete * 86400)
         except discord.errors.Forbidden:
             await ctx.send(await self.bot._(ctx.guild.id, "moderation.ban.too-high"))
-        except Exception as err:
-            await ctx.send(await self.bot._(ctx.guild.id, "moderation.error"))
-            self.bot.dispatch("error", err, ctx)
-
-    async def unban_event(self, guild: discord.Guild, user: discord.User, author: discord.User):
-        if not guild.me.guild_permissions.ban_members:
-            return
-        reason = await self.bot._(guild.id,"logs.reason.unban", user=author)
-        await guild.unban(user, reason=reason[:512])
+        await self.bot.get_cog('Events').add_event('ban')
+        case_id = None
+        if self.bot.database_online:
+            cases_cog = self.bot.get_cog('Cases')
+            if f_duration is None:
+                case = Case(bot=self.bot, guild_id=ctx.guild.id, member_id=user.id, case_type="ban",
+                            mod_id=ctx.author.id, reason=f_reason, date=ctx.bot.utcnow())
+            else:
+                case = Case(bot=self.bot, guild_id=ctx.guild.id, member_id=user.id, case_type="tempban",
+                            mod_id=ctx.author.id, reason=f_reason, date=ctx.bot.utcnow(), duration=duration)
+                await self.bot.task_handler.add_task('ban',duration,user.id,ctx.guild.id)
+            try:
+                await cases_cog.db_add_case(case)
+                case_id = case.id
+            except Exception as err:
+                self.bot.dispatch("error", err, ctx)
+        try:
+            await ctx.message.delete()
+        except (discord.Forbidden, discord.NotFound):
+            pass
+        # send message in chat
+        await self.send_chat_answer("ban", user, ctx, case_id)
         # send in modlogs
-        await self.send_modlogs("unban", user, author, guild, reason="Automod")
+        self.bot.dispatch("moderation_ban", ctx.guild, ctx.author, user, case_id, reason, duration)
 
     @commands.hybrid_command(name="unban")
     @app_commands.default_permissions(ban_members=True)
@@ -635,61 +630,61 @@ The 'days_to_delete' option represents the number of days worth of messages to d
     @commands.cooldown(5,20, commands.BucketType.guild)
     @commands.guild_only()
     @commands.check(checks.can_ban)
-    async def unban(self, ctx: MyContext, user: str, *, reason="Unspecified"):
+    async def unban(self, ctx: MyContext, user: str, *, reason: Optional[str]=None):
         """Unban someone
 
 ..Example unban 486896267788812288 Nice enough
 
 ..Doc moderator.html#ban-unban"""
+        backup = user
         try:
-            backup = user
-            try:
-                user: discord.User = await commands.UserConverter().convert(ctx,user)
-            except commands.BadArgument:
-                if user.isnumeric():
-                    try:
-                        user: discord.User = await self.bot.fetch_user(int(user))
-                    except discord.NotFound:
-                        await ctx.send(await self.bot._(ctx.guild.id, "moderation.cant-find-user", user=backup))
-                        return
-                    del backup
-                else:
-                    await ctx.send(await self.bot._(ctx.guild.id, "errors.usernotfound", u=user))
-                    return
-            if not ctx.channel.permissions_for(ctx.guild.me).ban_members:
-                await ctx.send(await self.bot._(ctx.guild.id, "moderation.ban.cant-ban"))
-                return
-            await ctx.defer()
-            try:
-                await ctx.guild.fetch_ban(user)
-            except discord.NotFound:
-                await ctx.send(await self.bot._(ctx.guild.id, "moderation.ban.user-not-banned"))
-                return
-            reason = await self.bot.get_cog("Utilities").clear_msg(reason,everyone = not ctx.channel.permissions_for(ctx.author).mention_everyone)
-            await ctx.guild.unban(user,reason=reason[:512])
-            case_id = "'Unsaved'"
-            if self.bot.database_online:
-                cases_cog = self.bot.get_cog('Cases')
-                case = Case(bot=self.bot,guild_id=ctx.guild.id,member_id=user.id,case_type="unban",mod_id=ctx.author.id,reason=reason,date=ctx.bot.utcnow())
+            user: discord.User = await commands.UserConverter().convert(ctx,user)
+        except commands.BadArgument:
+            if user.isnumeric():
                 try:
-                    await cases_cog.db_add_case(case)
-                    case_id = case.id
-                except Exception as err:
-                    self.bot.dispatch("error", err, ctx)
+                    user: discord.User = await self.bot.fetch_user(int(user))
+                except discord.NotFound:
+                    await ctx.send(await self.bot._(ctx.guild.id, "moderation.cant-find-user", user=backup))
+                    return
+                del backup
+            else:
+                await ctx.send(await self.bot._(ctx.guild.id, "errors.usernotfound", u=user))
+                return
+        if not ctx.channel.permissions_for(ctx.guild.me).ban_members:
+            await ctx.send(await self.bot._(ctx.guild.id, "moderation.ban.cant-ban"))
+            return
+        await ctx.defer()
+        try:
+            await ctx.guild.fetch_ban(user)
+        except discord.NotFound:
+            await ctx.send(await self.bot._(ctx.guild.id, "moderation.ban.user-not-banned"))
+            return
+        if reason is None:
+            f_reason = "Unspecified"
+        else:
+            f_reason = await self.bot.get_cog("Utilities").clear_msg(
+                reason,
+                everyone = not ctx.channel.permissions_for(ctx.author).mention_everyone
+            )
+        await ctx.guild.unban(user, reason=f_reason[:512]+self.bot.zws)
+        case_id = None
+        if self.bot.database_online:
+            cases_cog = self.bot.get_cog('Cases')
+            case = Case(bot=self.bot, guild_id=ctx.guild.id, member_id=user.id, case_type="unban",
+                        mod_id=ctx.author.id, reason=f_reason, date=ctx.bot.utcnow())
             try:
-                await ctx.message.delete()
-            except (discord.Forbidden, discord.NotFound):
-                pass
-            # optional values
-            opt_case = None if case_id=="'Unsaved'" else case_id
-            opt_reason = None if reason=="Unspecified" else reason
-            # send in chat
-            await self.send_chat_answer("unban", user, ctx, opt_case)
-            # send in modlogs
-            await self.send_modlogs("unban", user, ctx.author, ctx.guild, opt_case, opt_reason)
-        except Exception as err:
-            await ctx.send(await self.bot._(ctx.guild.id, "moderation.error"))
-            self.bot.dispatch("error", err, ctx)
+                await cases_cog.db_add_case(case)
+                case_id = case.id
+            except Exception as err:
+                self.bot.dispatch("error", err, ctx)
+        try:
+            await ctx.message.delete()
+        except (discord.Forbidden, discord.NotFound):
+            pass
+        # send in chat
+        await self.send_chat_answer("unban", user, ctx, case_id)
+        # send in modlogs
+        self.bot.dispatch("moderation_unban", ctx.guild, ctx.author, user, case_id, reason)
 
     @commands.hybrid_command(name="softban")
     @app_commands.default_permissions(kick_members=True)
