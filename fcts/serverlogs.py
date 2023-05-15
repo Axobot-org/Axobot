@@ -1237,6 +1237,24 @@ Minimum age required by anti-raid: {min_age}"
             await self.validate_logs(guild, channel_ids, emb, "member_unban")
 
     @commands.Cog.listener()
+    async def on_moderation_softban(self, guild: discord.Guild, author: discord.Member, user: discord.User,
+                                    case_id: Optional[int], reason: Optional[str]):
+        """Triggered when someone uses the softban command
+        Corresponding log: member_kick"""
+        if channel_ids := await self.is_log_enabled(guild.id, "member_kick"):
+            emb = discord.Embed(
+                description=f"**{user.mention} ({user.id}) has been softbanned**",
+                colour=discord.Color.orange()
+            )
+            emb.set_author(name=user, icon_url=user.display_avatar)
+            emb.add_field(name="Softbanned by", value=f"**{author.mention}** ({author.id})", inline=False)
+            if reason:
+                emb.add_field(name="With reason", value=reason)
+            if case_id:
+                emb.add_field(name="Case ID", value=f"#{case_id}")
+            await self.validate_logs(guild, channel_ids, emb, "member_kick")
+
+    @commands.Cog.listener()
     async def on_moderation_kick(self, guild: discord.Guild, author: discord.Member, user: discord.User,
                                  case_id: Optional[int], reason: Optional[str]):
         """Triggered when someone uses the kick command
@@ -1244,7 +1262,7 @@ Minimum age required by anti-raid: {min_age}"
         if channel_ids := await self.is_log_enabled(guild.id, "member_kick"):
             emb = discord.Embed(
                 description=f"**{user.mention} ({user.id}) has been kicked**",
-                colour=discord.Color.red()
+                colour=discord.Color.orange()
             )
             emb.set_author(name=user, icon_url=user.display_avatar)
             emb.add_field(name="Kicked by", value=f"**{author.mention}** ({author.id})", inline=False)

@@ -713,7 +713,7 @@ The 'days_to_delete' option represents the number of days worth of messages to d
     @app_commands.describe(reason="The reason of the kick")
     @commands.guild_only()
     @commands.check(checks.can_kick)
-    async def softban(self, ctx: MyContext, user: discord.Member, *, reason="Unspecified"):
+    async def softban(self, ctx: MyContext, user: discord.Member, *, reason: Optional[str]=None):
         """Kick a member and lets Discord delete all his messages up to 7 days old.
 Permissions for using this command are the same as for the kick
 
@@ -740,29 +740,33 @@ Permissions for using this command are the same as for the kick
             # send DM
             await self.dm_user(user, "kick", ctx, reason = None if reason=="Unspecified" else reason)
 
-            reason = await self.bot.get_cog("Utilities").clear_msg(reason,everyone = not ctx.channel.permissions_for(ctx.author).mention_everyone)
-            await ctx.guild.ban(user,reason=reason[:512],delete_message_days=7)
-            await user.unban()
-            caseID = "'Unsaved'"
+            if reason is None:
+                f_reason = "Unspecified"
+            else:
+                f_reason = await self.bot.get_cog("Utilities").clear_msg(
+                    reason,
+                    everyone = not ctx.channel.permissions_for(ctx.author).mention_everyone
+                )
+            await ctx.guild.ban(user, reason=f_reason[:512]+self.bot.zws, delete_message_days=7)
+            await user.unban(reason=self.bot.zws)
+            case_id = None
             if self.bot.database_online:
-                Cases = self.bot.get_cog('Cases')
-                case = Case(bot=self.bot,guild_id=ctx.guild.id,member_id=user.id,case_type="softban",mod_id=ctx.author.id,reason=reason,date=ctx.bot.utcnow())
+                cases_cog = self.bot.get_cog('Cases')
+                case = Case(bot=self.bot, guild_id=ctx.guild.id, member_id=user.id, case_type="softban",
+                            mod_id=ctx.author.id, reason=f_reason, date=ctx.bot.utcnow())
                 try:
-                    await Cases.db_add_case(case)
-                    caseID = case.id
+                    await cases_cog.db_add_case(case)
+                    case_id = case.id
                 except Exception as err:
                     self.bot.dispatch("error", err, ctx)
             try:
                 await ctx.message.delete()
             except (discord.Forbidden, discord.NotFound):
                 pass
-            # optional values
-            opt_case = None if caseID=="'Unsaved'" else caseID
-            opt_reason = None if reason=="Unspecified" else reason
             # send in chat
-            await self.send_chat_answer("kick", user, ctx, opt_case)
+            await self.send_chat_answer("kick", user, ctx, case_id)
             # send in modlogs
-            await self.send_modlogs("softban", user, ctx.author, ctx.guild, opt_case, opt_reason)
+            self.bot.dispatch("moderation_softban", ctx.guild, ctx.author, user, case_id, reason)
         except discord.errors.Forbidden:
             await ctx.send(await self.bot._(ctx.guild.id, "moderation.kick.too-high"))
         except Exception as err:
@@ -770,6 +774,7 @@ Permissions for using this command are the same as for the kick
             self.bot.dispatch("error", err, ctx)
 
     async def dm_user(self, user: discord.User, action: str, ctx: MyContext, reason: str = None, duration: str = None):
+        "DM a user about a moderation action taken against them"
         if user.id in self.bot.get_cog('Welcomer').no_message:
             return
         if action in ('warn', 'mute', 'kick', 'ban'):
@@ -804,6 +809,7 @@ Permissions for using this command are the same as for the kick
             self.bot.dispatch("error", err, ctx)
 
     async def send_chat_answer(self, action: str, user: discord.User, ctx: MyContext, case: int = None):
+        "Send a message in the chat about a moderation action taken"
         if action in ('warn', 'mute', 'unmute', 'kick', 'ban', 'unban'):
             message = await self.bot._(ctx.guild.id, "moderation."+action+"-chat", user=user.mention, userid=user.id)
         else:
