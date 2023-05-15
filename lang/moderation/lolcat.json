@@ -102,6 +102,7 @@
             "one": "-> 1 role removd out of %{m} !",
             "zero": "-> Oopsie doopsie, looks like i failed"
         },
+        "temp-grant-success": "%{user} naw has access 2 %{role} 4 %{time}. enjoy it!",
         "too-high": "Oops, tish role is 2 high for me to change. Move my role above the role `%{r}` be4 trying again, thx"
     },
     "slowmode": {

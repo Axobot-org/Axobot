@@ -1,0 +1,22 @@
+{
+    "colorify": {
+        "starting": "Hey, me is starting %{name} for u %{user} uwu",
+        "success": "Damn uve got a nice pict %{user}!"
+    },
+    "blurple": {
+        "check": {
+            "intro": "%{user}, starting blurple img analys (Plz note dat this may take one or two while)",
+            "result": "%{user}, here'z what I found about ur img:\n%{results}",
+            "reward": "Hey %{user}, ur img is so amazing i've decided 2 give u %{amount} event xp!"
+        }
+    },
+    "halloween": {
+        "check": {
+            "intro": "%{user}, starting pumpkin img analys (Plz note dat this may take one or two while)",
+            "result": "%{user}, here'z what I found about ur super-creepy img:\n%{results}",
+            "reward": "Hey %{user}, ur img is so epic i've decided 2 give u %{amount} bat-points!"
+        }
+    },
+    "missing-attachment-perm": "Oh no, i cant send images here :/",
+    "unknown-err": "Oops, something went terriby wrong :eyes: %{err}"
+}
