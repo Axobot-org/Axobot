@@ -731,6 +731,9 @@ class ServerLogs(commands.Cog):
             return
         if entry := await self.search_audit_logs(guild, discord.AuditLogAction.kick,
                                                  check=lambda entry: entry.target.id == payload.user.id):
+            if entry.reason and entry.reason.endswith(self.bot.zws):
+                # kicked from the /kick command, so we ignore this event
+                return
             emb = discord.Embed(
                 description=f"**{payload.user.mention} ({payload.user.id}) has been kicked**",
                 colour=discord.Color.red()
@@ -1156,7 +1159,7 @@ Minimum age required by anti-raid: {min_age}"
 
     @commands.Cog.listener()
     async def on_moderation_ban(self, guild: discord.Guild, author: discord.Member, user: discord.User,
-                                case_id: int, reason: Optional[str], duration: Optional[int]):
+                                case_id: Optional[int], reason: Optional[str], duration: Optional[int]):
         """Triggered when someone uses the ban command
         Corresponding log: member_ban"""
         if channel_ids := await self.is_log_enabled(guild.id, "member_ban"):
@@ -1167,7 +1170,8 @@ Minimum age required by anti-raid: {min_age}"
             emb.set_author(name=user, icon_url=user.display_avatar)
             emb.add_field(name="Banned by", value=f"**{author.mention}** ({author.id})", inline=False)
             emb.add_field(name="With reason", value=reason or "No reason specified")
-            emb.add_field(name="Case ID", value=case_id)
+            if case_id:
+                emb.add_field(name="Case ID", value=f"#{case_id}")
             if duration:
                 lang = await self.bot._(guild.id, "_used_locale")
                 f_duration = await FormatUtils.time_delta(duration, lang=lang)
@@ -1176,7 +1180,7 @@ Minimum age required by anti-raid: {min_age}"
 
     @commands.Cog.listener()
     async def on_moderation_unban(self, guild: discord.Guild, author: discord.Member, user: discord.user,
-                                  case_id: int, reason: Optional[str]):
+                                  case_id: Optional[int], reason: Optional[str]):
         """Triggered when someone uses the unban command
         Corresponding log: member_unban"""
         if channel_ids := await self.is_log_enabled(guild.id, "member_unban"):
@@ -1187,7 +1191,8 @@ Minimum age required by anti-raid: {min_age}"
             emb.set_author(name=user, icon_url=user.display_avatar)
             emb.add_field(name="Unbanned by", value=f"**{author.mention}** ({author.id})", inline=False)
             emb.add_field(name="With reason", value=reason or "No reason specified")
-            emb.add_field(name="Case ID", value=case_id)
+            if case_id:
+                emb.add_field(name="Case ID", value=f"#{case_id}")
             await self.validate_logs(guild, channel_ids, emb, "member_unban")
 
     @commands.Cog.listener()
@@ -1204,6 +1209,22 @@ Minimum age required by anti-raid: {min_age}"
             emb.add_field(name="Ban date", value=f_date)
             await self.validate_logs(guild, channel_ids, emb, "member_unban")
 
+    @commands.Cog.listener()
+    async def on_moderation_kick(self, guild: discord.Guild, author: discord.Member, user: discord.User,
+                                 case_id: Optional[int], reason: Optional[str]):
+        """Triggered when someone uses the kick command
+        Corresponding log: member_kick"""
+        if channel_ids := await self.is_log_enabled(guild.id, "member_kick"):
+            emb = discord.Embed(
+                description=f"**{user.mention} ({user.id}) has been kicked**",
+                colour=discord.Color.red()
+            )
+            emb.set_author(name=user, icon_url=user.display_avatar)
+            emb.add_field(name="Kicked by", value=f"**{author.mention}** ({author.id})", inline=False)
+            emb.add_field(name="With reason", value=reason or "No reason specified")
+            if case_id:
+                emb.add_field(name="Case ID", value=f"#{case_id}")
+            await self.validate_logs(guild, channel_ids, emb, "member_kick")
 
     @commands.Cog.listener()
     async def on_case_edit(self, guild: discord.Guild, before: "Case", after: "Case"):
