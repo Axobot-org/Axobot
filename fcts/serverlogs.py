@@ -29,7 +29,7 @@ class ServerLogs(commands.Cog):
     logs_categories = {
         "automod": {"antiraid", "antiscam"},
         "members": {"member_roles", "member_nick", "member_avatar", "member_join", "member_leave", "member_verification", "user_update"},
-        "moderation": {"clear", "member_ban", "member_unban", "member_timeout", "member_kick", "moderation_case", "slowmode"},
+        "moderation": {"clear", "member_ban", "member_unban", "member_timeout", "member_kick", "member_warn", "moderation_case", "slowmode"},
         "messages": {"message_update", "message_delete", "discord_invite", "ghost_ping"},
         "other": {"bot_warnings", "server_update"},
         "roles": {"role_creation", "role_update", "role_deletion"},
@@ -256,7 +256,7 @@ class ServerLogs(commands.Cog):
     @app_commands.describe(channel="The channel to remove logs from. Leave empty to select the current channel")
     @commands.guild_only()
     @commands.check(checks.has_manage_guild)
-    async def modlogs_disable(self, ctx: MyContext, logs: commands.Greedy[serverlog], channel: Optional[discord.TextChannel]=None):
+    async def modlogs_disable(self, ctx:MyContext, logs: commands.Greedy[serverlog], channel: Optional[discord.TextChannel]=None):
         """Disable one or more logs in the current channel
 
         ..Example modlogs disable ban message_delete
@@ -312,7 +312,11 @@ class ServerLogs(commands.Cog):
             return
         if await self.bot.tips_manager.should_show_guild_tip(ctx.guild.id, GuildTip.SERVERLOG_ENABLE_ANTISCAM):
             antiscam_enable_cmd = await self.bot.get_command_mention("antiscam enable")
-            await self.bot.tips_manager.send_guild_tip(ctx, GuildTip.SERVERLOG_ENABLE_ANTISCAM, antiscam_enable_cmd=antiscam_enable_cmd)
+            await self.bot.tips_manager.send_guild_tip(
+                ctx,
+                GuildTip.SERVERLOG_ENABLE_ANTISCAM,
+                antiscam_enable_cmd=antiscam_enable_cmd
+            )
 
     async def send_antiraid_tip(self, ctx: MyContext):
         "Send a tip if antiraid log is enabled but not the antiscam system"
@@ -323,7 +327,8 @@ class ServerLogs(commands.Cog):
             config_set_cmd = await self.bot.get_command_mention("config set")
             await self.bot.tips_manager.send_guild_tip(ctx, GuildTip.SERVERLOG_ENABLE_ANTIRAID, config_set_cmd=config_set_cmd)
 
-    async def search_audit_logs(self, guild: discord.Guild, action: discord.AuditLogAction, check: Callable[[discord.AuditLogEntry], bool]=None):
+    async def search_audit_logs(self, guild: discord.Guild, action: discord.AuditLogAction,
+                                check: Callable[[discord.AuditLogEntry], bool]=None):
         """Search for a specific audit log entry in a given guild"""
         if not guild.me.guild_permissions.view_audit_log:
             return None
@@ -443,7 +448,8 @@ class ServerLogs(commands.Cog):
         Corresponding log: discord_invite"""
         if message.guild is None or message.author == self.bot.user:
             return
-        if (invites := DISCORD_INVITE.findall(message.content)) and (channel_ids := await self.is_log_enabled(message.guild.id, "discord_invite")):
+        if (invites := DISCORD_INVITE.findall(message.content)) and (
+                channel_ids := await self.is_log_enabled(message.guild.id, "discord_invite")):
             emb = discord.Embed(
                 description=f"**[Discord invite]({message.jump_url}) detected in {message.channel.mention}**",
                 colour=discord.Color.orange()
@@ -495,10 +501,12 @@ class ServerLogs(commands.Cog):
             ):
             await self.handle_member_untimeout(before, after, channel_ids)
         # member verification
-        if (before.pending and not after.pending) and (channel_ids := await self.is_log_enabled(before.guild.id, "member_verification")):
+        if (before.pending and not after.pending) and (
+                channel_ids := await self.is_log_enabled(before.guild.id, "member_verification")):
             await self.handle_member_verification(before, after, channel_ids)
         # public flags
-        if before.public_flags != after.public_flags and (channel_ids := await self.is_log_enabled(before.guild.id, "user_update")):
+        if before.public_flags != after.public_flags and (
+                channel_ids := await self.is_log_enabled(before.guild.id, "user_update")):
             await self.handle_member_flags(before, after, channel_ids)
 
     async def handle_member_roles(self, before: discord.Member, after: discord.Member, channel_ids: list[int]):
@@ -567,7 +575,7 @@ class ServerLogs(commands.Cog):
         now = self.bot.utcnow() - datetime.timedelta(seconds=1)
         emb = discord.Embed(
             description=f"**Member {before.mention} ({before.id}) set in timeout**",
-            color=discord.Color.orange()
+            color=0x4A4A4A
         )
         duration = await FormatUtils.time_delta(now, after.timed_out_until, lang='en')
         emb.add_field(name="Duration", value=f"{duration} (until <t:{after.timed_out_until.timestamp():.0f}>)", inline=False)
@@ -840,7 +848,8 @@ class ServerLogs(commands.Cog):
             if before.color != after.color:
                 before_color_url = f"https://www.color-hex.com/color/{before.color.value:x}"
                 after_color_url = f"https://www.color-hex.com/color/{after.color.value:x}"
-                emb.add_field(name="Color", value=f"[{before.color}]({before_color_url}) -> [{after.color}]({after_color_url})", inline=False)
+                txt = f"[{before.color}]({before_color_url}) -> [{after.color}]({after_color_url})"
+                emb.add_field(name="Color", value=txt, inline=False)
             # mentionnable
             if before.mentionable != after.mentionable:
                 emb.add_field(name="Mentionnable", value="Enabled" if after.mentionable else "Disabled")
@@ -985,7 +994,8 @@ class ServerLogs(commands.Cog):
             emb.set_author(name=str(member), url=doc, icon_url=member.display_avatar)
             # reason
             if account_creation_treshold := data.get("account_creation_treshold"):
-                min_age = await FormatUtils.time_delta(account_creation_treshold, hour=(account_creation_treshold<86400))
+                show_hour = account_creation_treshold<86400
+                min_age = await FormatUtils.time_delta(account_creation_treshold, hour=show_hour)
                 delta = await FormatUtils.time_delta(member.created_at, self.bot.utcnow(), hour=True)
                 value = f"Account created at <t:{member.created_at.timestamp():.0f}> ({delta})\n\
 Minimum age required by anti-raid: {min_age}"
@@ -1007,8 +1017,8 @@ Minimum age required by anti-raid: {min_age}"
             emb.set_author(name=str(member), url=doc, icon_url=member.display_avatar)
             # reason
             if account_creation_treshold := data.get("account_creation_treshold"):
-                min_age = await FormatUtils.time_delta(
-                    account_creation_treshold, hour=(account_creation_treshold < 86400))
+                show_hour = account_creation_treshold < 86400
+                min_age = await FormatUtils.time_delta(account_creation_treshold, hour=show_hour)
                 delta = await FormatUtils.time_delta(member.created_at, self.bot.utcnow(), hour=True)
                 value = f"Account created at <t:{member.created_at.timestamp():.0f}> ({delta})\n\
 Minimum age required by anti-raid: {min_age}"
@@ -1016,7 +1026,8 @@ Minimum age required by anti-raid: {min_age}"
             if "discord_invite" in data:
                 emb.add_field(name="Contains a Discord invite in their username", value=self.bot.zws, inline=False)
             # duration
-            duration = await FormatUtils.time_delta(data["duration"], hour=(data["duration"] < 86400))
+            show_hour = data["duration"] < 86400
+            duration = await FormatUtils.time_delta(data["duration"], hour=show_hour)
             emb.add_field(name="Duration", value=duration)
             await self.validate_logs(member.guild, channel_ids, emb, "antiraid")
 
@@ -1225,6 +1236,24 @@ Minimum age required by anti-raid: {min_age}"
             if case_id:
                 emb.add_field(name="Case ID", value=f"#{case_id}")
             await self.validate_logs(guild, channel_ids, emb, "member_kick")
+
+
+    @commands.Cog.listener()
+    async def on_moderation_warn(self, guild: discord.Guild, author: discord.Member, user: discord.Member,
+                                 case_id: Optional[int], message: str):
+        """Triggered when someone uses the warn command
+        Corresponding log: member_warn"""
+        if channel_ids := await self.is_log_enabled(guild.id, "member_warn"):
+            emb = discord.Embed(
+                description=f"**{user.mention} ({user.id}) has been warned**",
+                colour=0x8B572A
+            )
+            emb.set_author(name=user, icon_url=user.display_avatar)
+            emb.add_field(name="Warned by", value=f"**{author.mention}** ({author.id})", inline=False)
+            emb.add_field(name="With reason", value=message)
+            if case_id:
+                emb.add_field(name="Case ID", value=f"#{case_id}")
+            await self.validate_logs(guild, channel_ids, emb, "member_warn")
 
     @commands.Cog.listener()
     async def on_case_edit(self, guild: discord.Guild, before: "Case", after: "Case"):
