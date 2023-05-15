@@ -252,11 +252,15 @@ Slowmode works up to one message every 6h (21600s)
         try:
             # send DM
             await self.dm_user(user, "warn", ctx, reason=message)
-            message = await self.bot.get_cog("Utilities").clear_msg(message,everyone = not ctx.channel.permissions_for(ctx.author).mention_everyone)
+            message = await self.bot.get_cog("Utilities").clear_msg(
+                message,
+                everyone = not ctx.channel.permissions_for(ctx.author).mention_everyone
+            )
             case_id = None
             if self.bot.database_online:
                 if cases_cog := self.bot.get_cog('Cases'):
-                    case = Case(bot=self.bot,guild_id=ctx.guild.id,member_id=user.id,case_type="warn",mod_id=ctx.author.id,reason=message,date=ctx.bot.utcnow())
+                    case = Case(bot=self.bot, guild_id=ctx.guild.id, member_id=user.id, case_type="warn",
+                                mod_id=ctx.author.id, reason=message, date=ctx.bot.utcnow())
                     await cases_cog.db_add_case(case)
                     case_id = case.id
             else:
@@ -278,19 +282,16 @@ Slowmode works up to one message every 6h (21600s)
         return await self.bot.get_config(guild.id, "muted_role")
         # return discord.utils.find(lambda x: x.name.lower() == "muted", guild.roles)
 
-    async def mute_event(self, member:discord.Member, author:discord.Member, reason:str, case_id:int, f_duration:str=None, duration: datetime.timedelta=None):
+    async def mute_member(self, member: discord.Member, reason: Optional[str], duration: Optional[datetime.timedelta]=None):
         """Call when someone should be muted in a guild"""
         # add the muted role
         role = await self.get_muted_role(member.guild)
+        f_reason = reason if reason is not None else "Unspecified"
         if role is None:
             duration = duration or datetime.timedelta(days=28)
-            await member.timeout(duration, reason=reason[:512])
+            await member.timeout(duration, reason=f_reason[:512]+self.bot.zws)
         else:
-            await member.add_roles(role, reason=reason[:512])
-        # send in modlogs
-        opt_case = None if case_id == "'Unsaved'" else case_id
-        opt_reason = None if reason == "Unspecified" else reason
-        await self.send_modlogs("mute", member, author, member.guild, opt_case, opt_reason, f_duration)
+            await member.add_roles(role, reason=f_reason[:512])
         # save in database that the user is muted
         if not self.bot.database_online:
             return
@@ -326,7 +327,8 @@ Slowmode works up to one message every 6h (21600s)
     @commands.cooldown(5,20, commands.BucketType.guild)
     @commands.guild_only()
     @commands.check(checks.can_mute)
-    async def mute(self, ctx: MyContext, user: discord.Member, time: commands.Greedy[args.Duration], *, reason="Unspecified"):
+    async def mute(self, ctx: MyContext, user: discord.Member, time: commands.Greedy[args.Duration], *,
+                   reason: Optional[str]=None):
         """Timeout someone.
 You can also mute this member for a defined duration, then use the following format:
 `XXm` : XX minutes
@@ -357,8 +359,15 @@ You can also mute this member for a defined duration, then use the following for
             return False
 
         try:
-            if user==ctx.guild.me or (self.bot.database_online and await user_can_mute(user)):
-                emoji = random.choice([':confused:',':upside_down:',self.bot.emojis_manager.customs['wat'],':no_mouth:',self.bot.emojis_manager.customs['owo'],':thinking:',])
+            if user == ctx.guild.me or (self.bot.database_online and await user_can_mute(user)):
+                emoji = random.choice([
+                    ':confused:',
+                    ':no_mouth:',
+                    ':thinking:',
+                    ':upside_down:',
+                    self.bot.emojis_manager.customs['wat'],
+                    self.bot.emojis_manager.customs['owo'],
+                ])
                 await ctx.send((await self.bot._(ctx.guild.id, "moderation.mute.staff-mute")) + " " + emoji)
                 return
             elif not self.bot.database_online and ctx.channel.permissions_for(user).manage_roles:
@@ -369,30 +378,37 @@ You can also mute this member for a defined duration, then use the following for
         role = await self.get_muted_role(ctx.guild)
         if not await self.check_mute_context(ctx, role, user):
             return
-        caseID = "'Unsaved'"
+        case_id = None
         try:
-            reason = await self.bot.get_cog("Utilities").clear_msg(reason,everyone = not ctx.channel.permissions_for(ctx.author).mention_everyone)
+            if reason is None:
+                f_reason = "Unspecified"
+            else:
+                f_reason = await self.bot.get_cog("Utilities").clear_msg(
+                    reason,
+                    everyone = not ctx.channel.permissions_for(ctx.author).mention_everyone
+                )
             if self.bot.database_online:
-                Cases = self.bot.get_cog('Cases')
+                cases_cog = self.bot.get_cog('Cases')
                 if f_duration is None:
-                    case = Case(bot=self.bot,guild_id=ctx.guild.id,member_id=user.id,case_type="mute",mod_id=ctx.author.id,reason=reason,date=ctx.bot.utcnow())
+                    case = Case(bot=self.bot, guild_id=ctx.guild.id, member_id=user.id, case_type="mute",
+                                mod_id=ctx.author.id, reason=f_reason, date=ctx.bot.utcnow())
                 else:
-                    case = Case(bot=self.bot,guild_id=ctx.guild.id,member_id=user.id,case_type="tempmute",mod_id=ctx.author.id,reason=reason,date=ctx.bot.utcnow(),duration=duration)
-                    await self.bot.task_handler.add_task('mute',duration,user.id,ctx.guild.id)
+                    case = Case(bot=self.bot, guild_id=ctx.guild.id, member_id=user.id, case_type="tempmute",
+                                mod_id=ctx.author.id, reason=f_reason,date=ctx.bot.utcnow(), duration=duration)
+                    await self.bot.task_handler.add_task('mute', duration, user.id, ctx.guild.id)
                 try:
-                    await Cases.db_add_case(case)
-                    caseID = case.id
+                    await cases_cog.db_add_case(case)
+                    case_id = case.id
                 except Exception as err:
                     self.bot.dispatch("command_error", ctx, err)
             # actually mute
-            await self.mute_event(user, ctx.author, reason, caseID, f_duration, datetime.timedelta(seconds=duration) if duration else None)
-            # optional values
-            opt_case = None if caseID=="'Unsaved'" else caseID
-            opt_reason = None if reason=="Unspecified" else reason
+            await self.mute_member(user, reason, datetime.timedelta(seconds=duration) if duration else None)
+            # send log
+            self.bot.dispatch("moderation_mute", ctx.guild, ctx.author, user, case_id, reason, duration)
             # send DM
-            await self.dm_user(user, "mute", ctx, reason=opt_reason, duration=f_duration)
+            await self.dm_user(user, "mute", ctx, reason=reason, duration=f_duration)
             # send in chat
-            await self.send_chat_answer("mute", user, ctx, opt_case)
+            await self.send_chat_answer("mute", user, ctx, case_id)
             try:
                 await ctx.message.delete()
             except (discord.Forbidden, discord.NotFound):
@@ -402,20 +418,18 @@ You can also mute this member for a defined duration, then use the following for
             self.bot.dispatch("command_error", ctx, err)
 
 
-    async def unmute_event(self, guild: discord.Guild, user: discord.Member, author: discord.Member):
+    async def unmute_member(self, guild: discord.Guild, user: discord.Member, author: discord.Member):
         """Call this to unmute someone"""
         # remove the role
         role = await self.get_muted_role(guild)
         if author == guild.me:
             reason = await self.bot._(guild.id,"logs.reason.autounmute")
         else:
-            reason = await self.bot._(guild.id,"logs.reason.unmute", user=author)
+            reason = await self.bot._(guild.id, "logs.reason.unmute", user=author)
         if role is None:
-            await user.timeout(None, reason=reason)
+            await user.timeout(None, reason=reason+self.bot.zws)
         elif role in user.roles:
             await user.remove_roles(role, reason=reason)
-        # send in modlogs
-        await self.send_modlogs("unmute", user, author, guild)
         # remove the muted record in the database
         if not self.bot.database_online:
             return
@@ -434,14 +448,18 @@ You can also mute this member for a defined duration, then use the following for
         query = "SELECT COUNT(*) AS count FROM `mutes` WHERE guildid=%s AND userid=%s"
         async with self.bot.db_query(query, (guild.id, member.id)) as query_results:
             result: int = query_results[0]['count']
-        return bool(result)
+        return result > 0
 
     async def db_get_muted_list(self, guild_id: int, reasons: bool = False) -> Union[Dict[int, str], List[int]]:
         """List muted users for a specific guild
         Set 'reasons' to True if you want the attached reason"""
         if reasons:
             cases_table = "cases_beta" if self.bot.beta else "cases"
-            query = f'SELECT userid, (SELECT reason FROM {cases_table} WHERE {cases_table}.user=userid AND {cases_table}.guild=guildid AND {cases_table}.type LIKE "%mute" ORDER BY `{cases_table}`.`created_at` DESC LIMIT 1) as reason FROM `mutes` WHERE guildid=%s'
+            query = f"""SELECT userid, (
+                        SELECT reason FROM {cases_table}
+                        WHERE {cases_table}.user=userid AND {cases_table}.guild=guildid AND {cases_table}.type LIKE "%mute"
+                        ORDER BY `{cases_table}`.`created_at` DESC LIMIT 1
+                    ) as reason FROM `mutes` WHERE guildid=%s"""
             async with self.bot.db_query(query, (guild_id,)) as query_results:
                 result = {row['userid']: row['reason'] for row in query_results}
         else:
@@ -483,7 +501,10 @@ This will remove the role 'muted' for the targeted member
                 return
         await ctx.defer()
         try:
-            await self.unmute_event(ctx.guild, user, ctx.author)
+            # actually unmute
+            await self.unmute_member(ctx.guild, user, ctx.author)
+            # send log
+            self.bot.dispatch("moderation_unmute", ctx.guild, ctx.author, user)
             # send in chat
             await self.send_chat_answer("unmute", user, ctx)
             try:
@@ -515,7 +536,9 @@ This will remove the role 'muted' for the targeted member
             ephemeral=False)
         await confirm_view.init()
         confirm_txt = await self.bot._(ctx.guild.id, "moderation.mute-config.confirm")
-        confirm_txt += "\n\n" + await self.bot._(ctx.guild.id, "moderation.mute-config.tip", mute=await self.bot.get_command_mention("mute"))
+        confirm_txt += "\n\n"
+        confirm_txt += await self.bot._(ctx.guild.id, "moderation.mute-config.tip",
+                                        mute=await self.bot.get_command_mention("mute"))
         confirm_msg = await ctx.send(confirm_txt, view=confirm_view)
 
         await confirm_view.wait()

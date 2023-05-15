@@ -1,7 +1,8 @@
 import asyncio
 import datetime
 import re
-from typing import Any, Callable, Optional, TYPE_CHECKING
+import time
+from typing import TYPE_CHECKING, Any, Callable, Optional
 
 import discord
 from cachingutils import LRUCache
@@ -28,8 +29,10 @@ class ServerLogs(commands.Cog):
 
     logs_categories = {
         "automod": {"antiraid", "antiscam"},
-        "members": {"member_roles", "member_nick", "member_avatar", "member_join", "member_leave", "member_verification", "user_update"},
-        "moderation": {"clear", "member_ban", "member_unban", "member_timeout", "member_kick", "member_warn", "moderation_case", "slowmode"},
+        "members": {"member_roles", "member_nick", "member_avatar", "member_join", "member_leave",
+                    "member_verification", "user_update"},
+        "moderation": {"clear", "member_ban", "member_unban", "member_timeout", "member_kick", "member_warn",
+                       "moderation_case", "slowmode"},
         "messages": {"message_update", "message_delete", "discord_invite", "ghost_ping"},
         "other": {"bot_warnings", "server_update"},
         "roles": {"role_creation", "role_update", "role_deletion"},
@@ -575,7 +578,7 @@ class ServerLogs(commands.Cog):
         now = self.bot.utcnow() - datetime.timedelta(seconds=1)
         emb = discord.Embed(
             description=f"**Member {before.mention} ({before.id}) set in timeout**",
-            color=0x4A4A4A
+            color=discord.Color.dark_gray()
         )
         duration = await FormatUtils.time_delta(now, after.timed_out_until, lang='en')
         emb.add_field(name="Duration", value=f"{duration} (until <t:{after.timed_out_until.timestamp():.0f}>)", inline=False)
@@ -586,12 +589,16 @@ class ServerLogs(commands.Cog):
                                                                       and entry.after.timed_out_until
                                                                       and (now - entry.created_at).total_seconds() < 5
                                                                       )):
+            if entry.reason and entry.reason.endswith(self.bot.zws):
+                # muted from the /mute command, so we ignore this event
+                return
             emb.add_field(name="Timeout by", value=f"**{entry.user.mention}** ({entry.user.id})")
-            emb.add_field(name="With reason", value=entry.reason or "No reason specified")
+            if entry.reason:
+                emb.add_field(name="With reason", value=entry.reason)
         await self.validate_logs(after.guild, channel_ids, emb, "member_timeout")
 
     async def handle_member_untimeout(self, before: discord.Member, after: discord.Member, channel_ids: list[int]):
-        "Handle member_timeout log at end"
+        "Handle early un-timeout (member_timeout log)"
         now = self.bot.utcnow() - datetime.timedelta(seconds=1)
         emb = discord.Embed(
             description=f"**Member {before.mention} ({before.id}) no longer in timeout**",
@@ -610,6 +617,9 @@ class ServerLogs(commands.Cog):
                                                                       and entry.before.timed_out_until
                                                                       and (now - entry.created_at).total_seconds() < 5
                                                                       )):
+            if entry.reason and entry.reason.endswith(self.bot.zws):
+                # muted from the /mute command, so we ignore this event
+                return
             emb.add_field(name="Revoked by", value=f"**{entry.user.mention}** ({entry.user.id})")
             if entry.reason:
                 emb.add_field(name="With reason", value=entry.reason)
@@ -748,7 +758,8 @@ class ServerLogs(commands.Cog):
             )
             emb.set_author(name=str(payload.user), icon_url=payload.user.display_avatar)
             emb.add_field(name="Kicked by", value=f"**{entry.user.mention}** ({entry.user.id})")
-            emb.add_field(name="With reason", value=entry.reason or "No reason specified")
+            if entry.reason:
+                emb.add_field(name="With reason", value=entry.reason)
             await self.validate_logs(guild, channel_ids, emb, "member_kick")
 
 
@@ -769,7 +780,8 @@ class ServerLogs(commands.Cog):
                     # banned from the /ban command, so we ignore this event
                     return
                 emb.add_field(name="Banned by", value=f"**{entry.user.mention}** ({entry.user.id})", inline=False)
-                emb.add_field(name="With reason", value=entry.reason or "No reason specified")
+                if entry.reason:
+                    emb.add_field(name="With reason", value=entry.reason)
             await self.validate_logs(guild, channel_ids, emb, "member_ban")
 
     @commands.Cog.listener()
@@ -789,7 +801,8 @@ class ServerLogs(commands.Cog):
                     # unbanned from the /unban command or after a tempban, so we ignore this event
                     return
                 emb.add_field(name="Unbanned by", value=f"**{entry.user.mention}** ({entry.user.id})", inline=False)
-                emb.add_field(name="With reason", value=entry.reason or "No reason specified")
+                if entry.reason:
+                    emb.add_field(name="With reason", value=entry.reason)
             await self.validate_logs(guild, channel_ids, emb, "member_unban")
 
 
@@ -1180,13 +1193,15 @@ Minimum age required by anti-raid: {min_age}"
             )
             emb.set_author(name=user, icon_url=user.display_avatar)
             emb.add_field(name="Banned by", value=f"**{author.mention}** ({author.id})", inline=False)
-            emb.add_field(name="With reason", value=reason or "No reason specified")
+            if reason:
+                emb.add_field(name="With reason", value=reason)
             if case_id:
                 emb.add_field(name="Case ID", value=f"#{case_id}")
             if duration:
                 lang = await self.bot._(guild.id, "_used_locale")
                 f_duration = await FormatUtils.time_delta(duration, lang=lang)
-                emb.add_field(name="Ban duration", value=f_duration)
+                planned_unban = time.time() + duration
+                emb.add_field(name="Ban duration", value=f"{f_duration} (until <t:{planned_unban:.0f}>)")
             await self.validate_logs(guild, channel_ids, emb, "member_ban")
 
     @commands.Cog.listener()
@@ -1201,7 +1216,8 @@ Minimum age required by anti-raid: {min_age}"
             )
             emb.set_author(name=user, icon_url=user.display_avatar)
             emb.add_field(name="Unbanned by", value=f"**{author.mention}** ({author.id})", inline=False)
-            emb.add_field(name="With reason", value=reason or "No reason specified")
+            if reason:
+                emb.add_field(name="With reason", value=reason)
             if case_id:
                 emb.add_field(name="Case ID", value=f"#{case_id}")
             await self.validate_logs(guild, channel_ids, emb, "member_unban")
@@ -1232,11 +1248,61 @@ Minimum age required by anti-raid: {min_age}"
             )
             emb.set_author(name=user, icon_url=user.display_avatar)
             emb.add_field(name="Kicked by", value=f"**{author.mention}** ({author.id})", inline=False)
-            emb.add_field(name="With reason", value=reason or "No reason specified")
+            if reason:
+                emb.add_field(name="With reason", value=reason)
             if case_id:
                 emb.add_field(name="Case ID", value=f"#{case_id}")
             await self.validate_logs(guild, channel_ids, emb, "member_kick")
 
+    @commands.Cog.listener()
+    async def on_moderation_mute(self, guild: discord.Guild, author: discord.Member, user: discord.Member,
+                                 case_id: Optional[int], reason: Optional[str], duration: Optional[int]):
+        """Triggered when someone uses the mute command
+        Corresponding log: member_timeout"""
+        if channel_ids := await self.is_log_enabled(guild.id, "member_timeout"):
+            emb = discord.Embed(
+                description=f"**{user.mention} ({user.id}) has been muted**",
+                colour=discord.Color.dark_gray()
+            )
+            emb.set_author(name=user, icon_url=user.display_avatar)
+            emb.add_field(name="Muted by", value=f"**{author.mention}** ({author.id})", inline=False)
+            if reason:
+                emb.add_field(name="With reason", value=reason)
+            if case_id:
+                emb.add_field(name="Case ID", value=f"#{case_id}")
+            if duration:
+                lang = await self.bot._(guild.id, "_used_locale")
+                f_duration = await FormatUtils.time_delta(duration, lang=lang)
+                planned_unmute = time.time() + duration
+                emb.add_field(name="Mute duration", value=f"{f_duration} (until <t:{planned_unmute:.0f}>)")
+            await self.validate_logs(guild, channel_ids, emb, "member_timeout")
+
+    @commands.Cog.listener()
+    async def on_tempmute_expiration(self, guild: discord.Guild, user: discord.Member, mute_date: datetime.datetime):
+        """Triggered when a tempmute expires
+        Corresponding log: member_timeout"""
+        if channel_ids := await self.is_log_enabled(guild.id, "member_timeout"):
+            emb = discord.Embed(
+                description=f"**{user.mention} ({user.id}) has been unmuted** after a tempmute",
+                colour=discord.Color.green()
+            )
+            emb.set_author(name=user, icon_url=user.display_avatar)
+            f_date = f"<t:{mute_date.timestamp():.0f}>"
+            emb.add_field(name="Mute date", value=f_date)
+            await self.validate_logs(guild, channel_ids, emb, "member_timeout")
+
+    @commands.Cog.listener()
+    async def on_moderation_unmute(self, guild: discord.Guild, author: discord.Member, user: discord.Member):
+        """Triggered when someone uses the unmute command
+        Corresponding log: member_timeout"""
+        if channel_ids := await self.is_log_enabled(guild.id, "member_timeout"):
+            emb = discord.Embed(
+                description=f"**{user.mention} ({user.id}) has been unmuted**",
+                colour=discord.Color.green()
+            )
+            emb.set_author(name=user, icon_url=user.display_avatar)
+            emb.add_field(name="Unmuted by", value=f"**{author.mention}** ({author.id})", inline=False)
+            await self.validate_logs(guild, channel_ids, emb, "member_timeout")
 
     @commands.Cog.listener()
     async def on_moderation_warn(self, guild: discord.Guild, author: discord.Member, user: discord.Member,
