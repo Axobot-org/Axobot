@@ -68,7 +68,6 @@ async def main():
     load_sql_connection(client)
     if client.database_online:
         client.connect_database_axobot()
-        client.connect_database_xp()
     elif len(args.token) < 30:
         client.log.fatal("Invalid bot token")
         return
@@ -89,8 +88,12 @@ async def main():
     elif len(args.token) < 30:
         client.log.fatal("Invalid bot token")
         return
+    elif args.entity_id is None:
+        client.log.fatal("No entity ID nor preset-token provided")
+        return
     else:
         token: str = args.token
+        client.entity_id: int = args.entity_id
     # Events loop
     if not args.event_loop:
         client.internal_loop_enabled = False
@@ -99,6 +102,7 @@ async def main():
         client.rss_enabled = False
 
 
+    client.connect_database_xp()
     client.add_listener(on_ready)
 
     async with client:
