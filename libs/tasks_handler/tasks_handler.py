@@ -62,9 +62,10 @@ class TaskHandler:
                     if user is None:
                         continue
                     try:
-                        await self.bot.get_cog('Moderation').unmute_event(guild, user, guild.me)
+                        await self.bot.get_cog('Moderation').unmute_member(guild, user, guild.me)
                     except discord.Forbidden:
                         continue
+                    self.bot.dispatch("tempmute_expiration", guild, user, task['begin'])
                     await self.remove_task(task['ID'])
                 except Exception as err:  # pylint: disable=broad-except
                     self.bot.dispatch("error", err)
