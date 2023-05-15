@@ -226,7 +226,7 @@ Slowmode works up to one message every 6h (21600s)
     @commands.cooldown(5, 20, commands.BucketType.guild)
     @commands.guild_only()
     @commands.check(checks.can_warn)
-    async def warn(self, ctx: MyContext, user:discord.Member, *, message):
+    async def warn(self, ctx: MyContext, user: discord.Member, *, message: str):
         """Send a warning to a member
 
 ..Example warn @someone Please just stop, next one is a mute duh
@@ -239,7 +239,7 @@ Slowmode works up to one message every 6h (21600s)
                 except commands.errors.CommandError:
                     pass
                 return False
-            if user==ctx.guild.me or (self.bot.database_online and await user_can_warn(user)):
+            if user == ctx.guild.me or (self.bot.database_online and await user_can_warn(user)):
                 return await ctx.send(await self.bot._(ctx.guild.id, "moderation.warn.cant-staff"))
             elif not self.bot.database_online and ctx.channel.permissions_for(user).manage_roles:
                 return await ctx.send(await self.bot._(ctx.guild.id, "moderation.warn.cant-staff"))
@@ -253,20 +253,18 @@ Slowmode works up to one message every 6h (21600s)
             # send DM
             await self.dm_user(user, "warn", ctx, reason=message)
             message = await self.bot.get_cog("Utilities").clear_msg(message,everyone = not ctx.channel.permissions_for(ctx.author).mention_everyone)
-            caseID = "'Unsaved'"
+            case_id = None
             if self.bot.database_online:
                 if cases_cog := self.bot.get_cog('Cases'):
                     case = Case(bot=self.bot,guild_id=ctx.guild.id,member_id=user.id,case_type="warn",mod_id=ctx.author.id,reason=message,date=ctx.bot.utcnow())
                     await cases_cog.db_add_case(case)
-                    caseID = case.id
+                    case_id = case.id
             else:
                 await ctx.send(await self.bot._(ctx.guild.id,"moderation.warn.warn-but-db"))
-            # optional values
-            opt_case = None if caseID=="'Unsaved'" else caseID
             # send in chat
-            await self.send_chat_answer("warn", user, ctx, opt_case)
+            await self.send_chat_answer("warn", user, ctx, case_id)
             # send in modlogs
-            await self.send_modlogs("warn", user, ctx.author, ctx.guild, opt_case, message)
+            self.bot.dispatch("moderation_warn", ctx.guild, ctx.author, user, case_id, message)
             try:
                 await ctx.message.delete()
             except (discord.Forbidden, discord.NotFound):
@@ -576,7 +574,7 @@ The 'days_to_delete' option represents the number of days worth of messages to d
                 except commands.errors.CommandError:
                     pass
                 return False
-            if user==ctx.guild.me or (self.bot.database_online and await user_can_ban(member)):
+            if user == ctx.guild.me or (self.bot.database_online and await user_can_ban(member)):
                 await ctx.send(await self.bot._(ctx.guild.id, "moderation.ban.staff-ban"))
                 return
             elif not self.bot.database_online and (ctx.channel.permissions_for(member).ban_members or user==ctx.guild.me):
