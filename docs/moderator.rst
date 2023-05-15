@@ -254,6 +254,7 @@ Types of logs
 * **antiraid:** A new member is kicked or banned by the raid detection system
 * **antiscam:** A message is flagged as a potential scam by the antiscam AI
 * **bot_warnings:** Axobot couldn't do its job due to an external factor (like a missing permission)
+* **clear**: Some messages have been deleted by the :code:`clear` command
 * **discord_invite:** A member just sent a message containing one or more Discord server invite link
 * **ghost_ping:** A member deleted a message containing a user mention right after sending it
 * **member_avatar:** A member changes its guild avatar
@@ -266,12 +267,15 @@ Types of logs
 * **member_timeout:** A member is set on timeout by one of your moderators
 * **member_unban:** A user is unbanned from your server
 * **member_verification:** A user has been verified by the Discord community rules screen (if enabled in your server)
+* **member_warn:** A member has been warned by one of your moderators with the :code:`warn` command
 * **message_update:** A message is edited
 * **message_delete:** A message is deleted
+* **moderation_case:** A moderation case has been edited or deleted with the :code:`case` command
 * **role_creation:** A role is created
 * **role_deletion:** A role is deleted
 * **role_update:** A role has been edited
 * **server_update:** The server has been edited (icon, name, or features)
+* **slowmode:** A channel has been put on slowmode with the :code:`slowmode` command
 * **ticket_creation:** A `ticket <tickets.html>`__ has been opened
 * **user_update:** A user profile has been otherwise edited (usually badges)
 
