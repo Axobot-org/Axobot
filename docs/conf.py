@@ -24,9 +24,9 @@ copyright = '2019 - 2023'
 author = 'ZRunner'
 
 # The short X.Y version
-version = '4.3'
+version = '4.4'
 # The full version, including alpha/beta/rc tags
-release = '4.3.4'
+release = '4.4.0'
 
 _documentation_name = "Axobot Documentation"
 
