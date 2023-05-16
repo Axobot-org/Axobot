@@ -161,7 +161,7 @@ class Info(commands.Cog):
         """List the most used commands
 
         ..Doc infos.html#statistics"""
-        forbidden = ['cmd.eval', 'cmd.admin', 'cmd.test', 'cmd.remindme', 'cmd.bug', 'cmd.idea', 'cmd.send_msg']
+        forbidden = ['cmd.eval', 'cmd.admin', 'cmd.test', 'cmd.bug', 'cmd.idea', 'cmd.send_msg']
         forbidden_where = ', '.join(f"'{elem}'" for elem in forbidden)
         commands_limit = 15
         lang = await self.bot._(ctx.channel, '_used_locale')
