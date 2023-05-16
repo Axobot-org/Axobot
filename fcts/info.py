@@ -715,7 +715,8 @@ Available types: member, role, user, emoji, channel, server, invite, category
         # ID
         embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.role-0"), value=str(guild.id))
         # Owner
-        embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.guild-1"), value=str(guild.owner))
+        if guild.owner:
+            embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.guild-1"), value=str(guild.owner))
         # Created at
         delta = abs(guild.created_at - ctx.bot.utcnow())
         created_date = f"<t:{guild.created_at.timestamp():.0f}>"
@@ -1023,7 +1024,10 @@ Available types: member, role, user, emoji, channel, server, invite, category
         if guild.icon:
             emb.set_thumbnail(url=guild.icon.with_static_format("png"))
         emb.add_field(name="ID", value=guild.id)
-        emb.add_field(name="Owner", value=f"{guild.owner} ({guild.owner_id})", inline=False)
+        if guild.owner:
+            emb.add_field(name="Owner", value=f"{guild.owner} ({guild.owner_id})", inline=False)
+        else:
+            emb.add_field(name="Owner", value="Unknown", inline=False)
         emb.add_field(name="Joined at", value=joined_at, inline=False)
         emb.add_field(name="Members", value=f"{guild.member_count} (including {bots} bots)")
         emb.add_field(name="Language", value=lang)
