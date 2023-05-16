@@ -89,8 +89,8 @@ class Info(commands.Cog):
     @stats_main.command(name="general")
     async def stats_general(self, ctx: MyContext):
         "General statistics about the bot"
-        v = sys.version_info
-        version = str(v.major)+"."+str(v.minor)+"."+str(v.micro)
+        python_version = sys.version_info
+        f_python_version = str(python_version.major)+"."+str(python_version.minor)
         latency = round(self.bot.latency*1000, 2)
         async with ctx.channel.typing():
             # RAM/CPU
@@ -100,19 +100,15 @@ class Info(commands.Cog):
             else:
                 cpu = 0.0
             # Guilds count
-            ignored_guilds = list()
+            ignored_guilds = []
             if self.bot.database_online:
                 ignored_guilds = [int(x) for x in self.bot.get_cog('Utilities').config['banned_guilds'].split(";") if len(x) > 0]
             ignored_guilds += self.bot.get_cog('Reloads').ignored_guilds
             len_servers = await self.get_guilds_count(ignored_guilds)
             # Languages
-            langs_list = [
-                (k, v)
-                for k, v in
-                (await self.bot.get_cog('ServerConfig').get_languages(ignored_guilds)).items()
-            ]
+            langs_list = list((await self.bot.get_cog('ServerConfig').get_languages(ignored_guilds)).items())
             langs_list.sort(reverse=True, key=lambda x: x[1])
-            lang_total = sum([x[1] for x in langs_list])
+            lang_total = sum(x[1] for x in langs_list)
             langs_list = ' | '.join([f"{x[0]}: {x[1]/lang_total*100:.0f}%" for x in langs_list if x[1] > 0])
             del lang_total
             # Users/bots
@@ -129,14 +125,14 @@ class Info(commands.Cog):
             async def n_format(nbr: typing.Union[int, float, None]):
                 return await FormatUtils.format_nbr(nbr, lang) if nbr is not None else "0"
             # Generating message
-            d = ""
+            desc = ""
             for key, var in [
                 ('bot_version', self.bot_version),
                 ('servers_count', await n_format(len_servers)),
                 ('users_count', (await n_format(users), await n_format(bots))),
                 ('codes_lines', await n_format(self.codelines)),
                 ('languages', langs_list),
-                ('python_version', version),
+                ('python_version', f_python_version),
                 ('lib_version', discord.__version__),
                 ('ram_usage', await n_format(ram_usage)),
                 ('cpu_usage', await n_format(cpu)),
@@ -144,15 +140,15 @@ class Info(commands.Cog):
                 ('cmds_24h', await n_format(cmds_24h)),
                 ('total_xp', await n_format(total_xp)+" ")]:
                 str_args = {f'v{i}': var[i] for i in range(len(var))} if isinstance(var, (tuple, list)) else {'v': var}
-                d += await self.bot._(ctx.channel, "info.stats."+key, **str_args) + "\n"
+                desc += await self.bot._(ctx.channel, "info.stats."+key, **str_args) + "\n"
         if ctx.can_send_embed: # if we can use embed
             title = await self.bot._(ctx.channel,"info.stats.title")
             color = ctx.bot.get_cog('Help').help_color
-            embed = discord.Embed(title=title, color=color, description=d)
+            embed = discord.Embed(title=title, color=color, description=desc)
             embed.set_thumbnail(url=self.bot.user.display_avatar.with_static_format("png"))
             await ctx.send(embed=embed)
         else:
-            await ctx.send(d)
+            await ctx.send(desc)
 
     def get_users_nber(self, ignored_guilds: list[int]):
         "Return the amount of members and the amount of bots in every reachable guild, excepted in ignored guilds"
