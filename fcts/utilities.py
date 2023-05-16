@@ -203,12 +203,12 @@ class Utilities(commands.Cog):
 
     async def check_votes(self, userid: int) -> list[tuple[str, str]]:
         """check if a user voted on any bots list website"""
-        votes = list()
+        votes = []
         async with aiohttp.ClientSession() as session:
             try:  # https://top.gg/bot/486896267788812288
                 async with session.get(f'https://top.gg/api/bots/{self.bot.user.id}/check?userId={userid}', headers={'Authorization': str(self.bot.dbl_token)}) as r:
                     json = await r.json()
-                    if json["error"]:
+                    if "error" in json:
                         raise ValueError("Error while checking votes on top.gg: "+json["error"])
                     elif json["voted"]:
                         votes.append(("Discord Bots List", "https://top.gg/"))
