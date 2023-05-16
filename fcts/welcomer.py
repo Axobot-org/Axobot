@@ -100,7 +100,7 @@ class Welcomer(commands.Cog):
                     user_idname=str(member),
                     user_id=str(member.id),
                     server=member.guild.name,
-                    owner=member.guild.owner.name,
+                    owner=member.guild.owner.name if member.guild.owner else "",
                     member_count=member.guild.member_count,
                     type=botormember
                 ))
