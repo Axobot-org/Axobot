@@ -125,6 +125,7 @@
         "muted_role": "Used role to mute members: %{value}",
         "nicknames_history": "Should I remember nickname changes in this server? %{value}",
         "noxp_channels": "Channels where you can't get xp: %{value}",
+        "noxp_roles": "Roles that prevent getting xp: %{value}",
         "partner_channel": "Channel where partners are sent: %{value}",
         "partner_color": "Color of partners embed: %{value}",
         "partner_role": "Role given to partners: %{value}",
