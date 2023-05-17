@@ -240,6 +240,8 @@ class ServerLogs(commands.Cog):
         else:
             msg = await self.bot._(ctx.guild.id, "serverlogs.none-added")
         await ctx.send(msg)
+        if "member_kick" in actually_added:
+            await self.send_member_kick_warning(ctx)
         if "antiscam" in actually_added:
             await self.send_antiscam_tip(ctx)
         if "antiraid" in actually_added:
@@ -329,6 +331,12 @@ class ServerLogs(commands.Cog):
         if await self.bot.tips_manager.should_show_guild_tip(ctx.guild.id, GuildTip.SERVERLOG_ENABLE_ANTIRAID):
             config_set_cmd = await self.bot.get_command_mention("config set")
             await self.bot.tips_manager.send_guild_tip(ctx, GuildTip.SERVERLOG_ENABLE_ANTIRAID, config_set_cmd=config_set_cmd)
+
+    async def send_member_kick_warning(self, ctx: MyContext):
+        "Warn the user if member kick log is enabled but bot has not access to guild audit logs"
+        if ctx.guild.me.guild_permissions.view_audit_log:
+            return
+        await ctx.send(await self.bot._(ctx.guild, "serverlogs.kick-warning"))
 
     async def search_audit_logs(self, guild: discord.Guild, action: discord.AuditLogAction,
                                 check: Callable[[discord.AuditLogEntry], bool]=None):
