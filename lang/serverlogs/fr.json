@@ -1,7 +1,6 @@
 {
     "categories": {
         "automod": "Automod",
-        "bot": "Bot",
         "members": "Membres",
         "messages": "Messages",
         "moderation": "Modération",
@@ -18,6 +17,7 @@
         "current": "Les logs de type %{kind} seront désormais envoyés dans ce salon",
         "other": "Les logs de type %{kind} seront désormais envoyés dans %{channel}"
     },
+    "kick-warning": "Pour détecter les expulsions des membres (kick), le bot a besoin de la permission de \"Voir les logs du serveur\" !",
     "list": {
         "all": "Liste des logs utilisables",
         "channel": "Liste des logs utilisés dans %{channel}",

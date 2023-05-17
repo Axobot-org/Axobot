@@ -1,7 +1,6 @@
 {
     "categories": {
         "automod": "Automod",
-        "bot": "Bot",
         "members": "Members",
         "messages": "Messages",
         "moderation": "Moderation",
@@ -18,6 +17,7 @@
         "current": "Logs of type %{kind} will now be sent to this channel",
         "other": "Logs of type %{kind} will now be sent to %{channel}"
     },
+    "kick-warning": "To detect member kicks, the bot needs the \"View audit log\" permission!",
     "list": {
         "all": "List of available logs",
         "channel": "List of logs used in %{channel}",
