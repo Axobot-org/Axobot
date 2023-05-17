@@ -5,6 +5,7 @@ import random
 import re
 import string
 import time
+from collections import defaultdict
 from io import BytesIO
 from math import ceil
 from typing import Literal, Optional, TypedDict
@@ -18,16 +19,16 @@ from discord.ext import commands
 from PIL import Image, ImageFont
 
 from fcts import args, checks
+from libs.bot_classes import Axobot, MyContext
 from libs.paginator import Paginator
+from libs.serverconfig.options_list import options
 from libs.tips import UserTip
 from libs.xp_cards.generator import CardGeneration
 
 importlib.reload(args)
 importlib.reload(checks)
-from libs.bot_classes import Axobot, MyContext
-from libs.serverconfig.options_list import options
 
-LEADERBOARD_SCOPE = Literal["global", "server"]
+LeaderboardScope = Literal["global", "server"]
 
 
 class Xp(commands.Cog):
@@ -39,7 +40,7 @@ class Xp(commands.Cog):
         self.levels = [0]
         self.embed_color = discord.Colour(0xffcf50)
         self.table = 'xp_beta' if bot.beta else 'xp'
-        self.cooldown = 30
+        self.cooldown = 3
         self.minimal_size = 5
         self.spam_rate = 0.20
         self.xp_per_char = 0.11
@@ -131,15 +132,15 @@ class Xp(commands.Cog):
 
     async def add_xp_1(self, msg:discord.Message, rate: float):
         """MEE6-like xp type"""
-        if msg.guild.id not in self.cache.keys():
+        if msg.guild.id not in self.cache:
             await self.db_load_cache(msg.guild.id)
-        if msg.author.id in self.cache[msg.guild.id].keys():
+        if msg.author.id in self.cache[msg.guild.id]:
             if time.time() - self.cache[msg.guild.id][msg.author.id][0] < 60:
                 return
         if await self.bot.potential_command(msg):
             return
         giv_points = round(random.randint(15,25) * rate)
-        if msg.author.id in self.cache[msg.guild.id].keys():
+        if msg.author.id in self.cache[msg.guild.id]:
             prev_points = self.cache[msg.guild.id][msg.author.id][1]
         else:
             prev_points = await self.db_get_xp(msg.author.id, msg.guild.id) or 0
@@ -156,16 +157,16 @@ class Xp(commands.Cog):
 
     async def add_xp_2(self, msg:discord.Message, rate: float):
         """Local xp type"""
-        if msg.guild.id not in self.cache.keys():
+        if msg.guild.id not in self.cache:
             await self.db_load_cache(msg.guild.id)
-        if msg.author.id in self.cache[msg.guild.id].keys():
+        if msg.author.id in self.cache[msg.guild.id]:
             if time.time() - self.cache[msg.guild.id][msg.author.id][0] < self.cooldown:
                 return
         content = msg.clean_content
         if len(content)<self.minimal_size or await self.check_spam(content) or await self.bot.potential_command(msg):
             return
         giv_points = round(await self.calc_xp(msg) * rate)
-        if msg.author.id in self.cache[msg.guild.id].keys():
+        if msg.author.id in self.cache[msg.guild.id]:
             prev_points = self.cache[msg.guild.id][msg.author.id][1]
         else:
             prev_points = await self.db_get_xp(msg.author.id, msg.guild.id) or 0
@@ -182,11 +183,18 @@ class Xp(commands.Cog):
 
 
     async def check_noxp(self, msg: discord.Message) -> bool:
-        """Check if this channel/user can get xp"""
+        "Returns True if the user cannot get xp in these conditions"
         if msg.guild is None:
             return False
-        chans: Optional[discord.abc.MessageableChannel] = await self.bot.get_config(msg.guild.id, "noxp_channels")
-        return chans is not None and msg.channel in chans
+        chans: Optional[list[discord.abc.MessageableChannel]] = await self.bot.get_config(msg.guild.id, "noxp_channels")
+        if chans is not None and msg.channel in chans:
+            return True
+        roles: Optional[list[discord.Role]] = await self.bot.get_config(msg.guild.id, "noxp_roles")
+        if roles is not None:
+            for role in roles:
+                if role in msg.author.roles:
+                    return True
+        return False
 
 
     async def send_levelup(self, msg: discord.Message, lvl: int):
@@ -227,15 +235,12 @@ class Xp(commands.Cog):
 
     async def check_spam(self, text: str):
         """Vérifie si un text contient du spam"""
-        if len(text)>0 and (text[0] in string.punctuation or text[1] in string.punctuation):
+        if len(text) > 0 and (text[0] in string.punctuation or text[1] in string.punctuation):
             return True
-        d = {}
-        for c in text:
-            if c in d.keys():
-                d[c] += 1
-            else:
-                d[c] = 1
-        for v in d.values():
+        characters_count: dict[str, int] = defaultdict(int)
+        for character in text:
+            characters_count[character] += 1
+        for v in characters_count.values():
             if v/len(text) > self.spam_rate:
                 return True
         return False
@@ -765,7 +770,7 @@ class Xp(commands.Cog):
     class TopPaginator(Paginator):
         "Paginator used to display the leaderboard"
 
-        def __init__(self, client: Axobot, user: discord.User, guild: discord.Guild, scope: LEADERBOARD_SCOPE,
+        def __init__(self, client: Axobot, user: discord.User, guild: discord.Guild, scope: LeaderboardScope,
                      start_page: int, stop_label: str = "Quit", timeout: int = 180):
             super().__init__(client, user, stop_label, timeout)
             class Position(TypedDict):
@@ -917,7 +922,7 @@ class Xp(commands.Cog):
     @app_commands.describe(page="The page number", scope="The scope of the leaderboard (global or server)")
     @commands.bot_has_permissions(send_messages=True)
     @commands.cooldown(5,60,commands.BucketType.user)
-    async def top(self, ctx: MyContext, page: Optional[commands.Range[int, 1]]=1, scope: LEADERBOARD_SCOPE='global'):
+    async def top(self, ctx: MyContext, page: Optional[commands.Range[int, 1]]=1, scope: LeaderboardScope='global'):
         """Get the list of the highest XP users
 
         ..Example top

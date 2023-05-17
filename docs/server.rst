@@ -80,6 +80,7 @@ List of every option
 * mute_allowed_roles: List of roles allowed to use the `mute <moderator.html#mute-unmute>`__ command. By default, none.
 * muted_role: Role used to mute your members. If no role is specified, Axobot will check for any role called "muted", and create one if needed, with basic permissions.
 * noxp_channels: List of text channels where members will not be able to earn any exp. Not necessary if XP is disabled in your server.
+* noxp_roles: List of roles whose members will not be able to earn any exp. Not necessary if XP is disabled in your server.
 * partner_channel: One channel where every partners of the server will be displayed. Default to None.
 * partner_color: The color of the partners embeds. Can be hex, integer or common english names. Default to #a713fe.
 * partner_role: A role given to every administrator of a partner server. Default to None.
@@ -123,7 +124,9 @@ There are several ways to customize your xp system. In particular, you have 4 `c
 
 - **Change the gain rate of xp:** if you find that your members are not earning xp fast enough (or too fast), or if you want to make a special event xp for a limited time, you can add a gain modifier between x0.1 and x3, which will multiply by its value each point of xp earned. Not usable for the global xp system, of course. Option name: :code:`xp_rate`.
 
-- **Prevent xp in some channels:** although Axobot prevents people from earning xp with its commands, it cannot detect commands from other bots. So you can prevent your members from earning xp in certain channels via the :code:`noxp_channels` option, which contains a list of all channels where your users can't have any experience points.
+- **Prevent xp in some channels:** although Axobot prevents people from earning xp with its commands, it cannot detect commands from other bots. So you can prevent your members from earning xp in certain channels via the :code:`noxp_channels` option, which contains a list of all channels where your users can't earn any experience points.
+
+- **Prevent xp for some roles:** you can also prevent some roles from earning xp via the :code:`noxp_roles` option, which contains a list of all roles that can't earn any experience points.
 
 - **Select a channel where to send levelup messages:** sometimes levelup messages can be a bit spammy. So you have an option to select a single channel where to send level up messages. It is also possible to disable these messages via the same option. Enter the command :code:`config set levelup_channel` followed by the name of your channel, or an other special value ("none" to disable the message, "any" to select the current channel, or "dm" to send in the user's Direct Messages).
 

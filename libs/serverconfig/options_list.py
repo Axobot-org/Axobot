@@ -158,6 +158,15 @@ options: dict[str, "AllRepresentation"] = {
         "default": None,
         "is_listed": True,
     },
+    "noxp_roles": {
+        "type": "roles_list",
+        "min_count": 1,
+        "max_count": 100,
+        "allow_integrated_roles": True,
+        "allow_everyone": False,
+        "default": None,
+        "is_listed": True,
+    },
     "partner_channel": {
         "type": "text_channel",
         "allow_threads": True,

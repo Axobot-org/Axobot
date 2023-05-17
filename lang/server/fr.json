@@ -120,6 +120,7 @@
         "muted_role": "Rôle utilisé pour rendre les gens muets : %{value}",
         "nicknames_history": "Dois-je me souvenir des changements de pseudos dans ce serveur ? %{value}",
         "noxp_channels": "Salons où il est impossible d'obtenir de l'xp : %{value}",
+        "noxp_roles": "Rôles qui empêchent d'obtenir de l'xp : %{value}",
         "partner_channel": "Salon dans lequel envoyer les partenaires : %{value}",
         "partner_color": "Couleur de l'embed des partenaires : %{value}",
         "partner_role": "Rôle donné aux partenaires : %{value}",
