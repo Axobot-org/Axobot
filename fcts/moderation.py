@@ -827,29 +827,6 @@ Permissions for using this command are the same as for the kick
         else:
             await ctx.send(f"{message}\n{_case.capitalize()} #{case}")
 
-    async def send_modlogs(self, action: str, user: discord.User, author: discord.User, guild: discord.Guild, case: int = None, reason: str = None, duration: str = None):
-        "Send a log in the modlogs channel of the guild, after a moderation action"
-        if action not in ('warn', 'mute', 'unmute', 'kick', 'ban', 'unban', 'softban'):
-            return
-        message = await self.bot._(guild.id, "logs."+action, user=str(user), userid=user.id)
-        fields = []
-        if case:
-            _case = await self.bot._(guild.id, "misc.case")
-            fields.append({'name': _case.capitalize(),
-                          'value': f"#{case}", 'inline': True})
-        if duration:
-            _duration = await self.bot._(guild.id, "misc.duration")
-            if len(duration) > 1020:
-                duration = duration[:1020] + "..."
-            fields.append({'name': _duration.capitalize(),
-                          'value': duration, 'inline': True})
-        if reason:
-            if len(reason) > 1020:
-                reason = reason[:1020] + "..."
-            _reason = await self.bot._(guild.id, "misc.reason")
-            fields.append({'name': _reason.capitalize(), 'value': reason})
-        await self.bot.get_cog("Events").send_logs_per_server(guild, action, message, author, fields)
-
     @commands.hybrid_command(name="banlist")
     @app_commands.default_permissions(ban_members=True)
     @app_commands.describe(show_reasons="Show or not the bans reasons")

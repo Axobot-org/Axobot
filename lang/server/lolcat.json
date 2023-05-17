@@ -120,7 +120,6 @@
         "levelup_channel": "Chat were lvlup msgs are sent: %{value}",
         "levelup_msg": "Cool text sent when a member gets 1 xp lvl: %{value}",
         "membercounter": "Channel dis-playin nmberz from memberz in iz nayme: %{value}",
-        "modlogs_channel": "Chanel where 2 sent modrashun wOods: %{value}",
         "morpion_emojis": "Images usd 2 play tic-tac-toe: %{value}",
         "mute_allowed_roles": "Lis of roles dat kan us the 'mute' commmand: %{value}",
         "muted_role": "Usd role 2 mute people : %{value}",

@@ -120,7 +120,6 @@
         "levelup_channel": "Channel where levelup messages are sent: %{value}",
         "levelup_msg": "Message sent when a member earns an xp level: %{value}",
         "membercounter": "Channel displaying your member count in its name: %{value}",
-        "modlogs_channel": "Channel where to send moderation logs: %{value}",
         "morpion_emojis": "Emojis used to play tic-tac-toe: %{value}",
         "mute_allowed_roles": "List of roles that can use the \"mute\" command: %{value}",
         "muted_role": "Used role to mute members: %{value}",

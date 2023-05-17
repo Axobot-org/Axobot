@@ -63,7 +63,6 @@
         "levelup_channel": "Kanava, johon tason ylennykset lähetetään: %{value}",
         "levelup_msg": "Viesti joka lähetetään kun jäsen saa uuden tason XP systeemissä: %{value}",
         "membercounter": "Kanava joka näyttää numeron jäsenistä sen nimessä on: %{value}",
-        "modlogs_channel": "Kanava johon laitetaan valvonta lokit: %{value}",
         "morpion_emojis": "Emojit joita käytetään risti-nollassa: %{value}",
         "mute_allowed_roles": "Lista rooleista jotka voivat käyttää komentoa 'mute': %{value}",
         "muted_role": "Käytetty mykistys rooli : %{value}",
