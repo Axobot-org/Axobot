@@ -12,7 +12,7 @@ import pkg_resources
 
 def check_libs():
     """Check if the required libraries are installed and can be imported"""
-    with open("requirements.txt", 'r') as file:
+    with open("requirements.txt", 'r', encoding="utf-8") as file:
         packages = pkg_resources.parse_requirements(file.readlines())
     pkg_resources.working_set.resolve(packages)
 
@@ -56,12 +56,16 @@ async def main():
         with open("status_list.json", 'r', encoding="utf-8") as status_file:
             status_list = json.load(status_file)
         if not client.database_online:
-            activity = discord.Activity(type=discord.ActivityType.listening,name=choice(status_list['no-db']))
+            activity = discord.Activity(type=discord.ActivityType.listening, name=choice(status_list['no-db']))
             await client.change_presence(activity=activity)
-        elif client.beta:
-            await client.change_presence(activity=discord.Game(name=choice(status_list['beta'])))
         else:
-            await client.change_presence(activity=discord.Game(name=choice(status_list['release'])))
+            if client.beta:
+                status = choice(status_list['beta'])
+            elif client.entity_id == 0:
+                status = choice(status_list['zbot'])
+            else:
+                status = choice(status_list['axobot'])
+            await client.change_presence(activity=discord.Game(name=status))
         emb = discord.Embed(description=f"**{client.user.name}** is launching !", color=8311585, timestamp=client.utcnow())
         await client.send_embed(emb)
 

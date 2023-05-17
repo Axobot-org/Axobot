@@ -1,5 +1,31 @@
 {
-    "release": ["now with slash commands!","something","type !help for the win","type !help","minecraft powaaa"],
-    "beta": ["SNAPSHOOT","snapshot day","somethin iz brokn"],
-    "no-db": ["a signal","a sign of life","nothing","a signal","a lost database"]
+    "zbot": [
+        "something",
+        "type !help for the win",
+        "type !help",
+        "minecraft powaaa",
+        "with Wumpus"
+    ],
+    "axobot": [
+        "now with slash commands!",
+        "something",
+        "type / for the win",
+        "minecraft",
+        "tic-tac-toe",
+        "axolotl adventures"
+    ],
+    "beta": [
+        "SNAPSHOOT",
+        "snapshot day",
+        "somethin iz brokn",
+        "bip-bop-bip-bop",
+        "with Discord API"
+    ],
+    "no-db": [
+        "a signal",
+        "a sign of life",
+        "nothing",
+        "a signal",
+        "a lost database"
+    ]
 }
