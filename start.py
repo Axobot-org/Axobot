@@ -45,9 +45,9 @@ async def main():
         print('\nBot connected')
         print("Name : "+client.user.name)
         print("ID : "+str(client.user.id))
-        if len(client.guilds) < 200:
-            serveurs = [x.name for x in client.guilds]
-            print("Connected on ["+str(len(client.guilds))+"] "+", ".join(serveurs))
+        if len(client.guilds) < 50:
+            guild_names = (x.name for x in client.guilds)
+            print("Connected on ["+str(len(client.guilds))+"] "+", ".join(guild_names))
         else:
             print("Connected on "+str(len(client.guilds))+" guilds")
         print(time.strftime("%d/%m  %H:%M:%S"))
