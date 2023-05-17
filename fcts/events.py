@@ -255,33 +255,6 @@ class Events(commands.Cog):
             await member.remove_roles(role, reason="This user doesn't support me anymore")
 
 
-    async def send_logs_per_server(self, guild: discord.Guild, log_type:str, message: str, author: discord.User=None, fields: list[dict]=None):
-        """Send a log in a server. `log_type` is used to define the color of the embed"""
-        if self.bot.zombie_mode:
-            return
-        if not self.bot.database_online:
-            return
-        color = self.embed_colors[log_type.lower()]
-        try:
-            channel: Optional[discord.TextChannel] = await self.bot.get_config(guild.id, "modlogs_channel")
-        except Exception as err:
-            self.bot.dispatch("error", err)
-            return
-        if channel is None:
-            return
-        emb = discord.Embed(description=message, color=color, timestamp=self.bot.utcnow())
-        if fields:
-            for field in fields:
-                emb.add_field(**field)
-        if author is not None:
-            emb.set_author(name=author, icon_url=author.display_avatar)
-        try:
-            await channel.send(embed=emb)
-        except discord.Forbidden:
-            pass
-
-
-
     async def add_points(self, points: int):
         """Ajoute ou enlève un certain nombre de points au score
         La principale utilité de cette fonction est de pouvoir check le nombre de points à chaque changement"""

@@ -53,7 +53,6 @@
         "leave": "Nachricht, die gesendet wird, wenn ein Mitglied den Server verlässt: %{value}",
         "levelup_msg": "Nachricht, die gesendet wird, wenn ein Mitglied ein xp Level aufsteigt: %{value}",
         "membercounter": "Kanal zeigt Mitglieder als Zahlen in seinem Namen an: %{value}",
-        "modlogs_channel": "Kanal, wo der Moderations Log ist: %{value}",
         "mute_allowed_roles": "Liste der Rollen, mit denen man den Befehl \"mute\" ausführen kann: %{value}",
         "muted_role": "Rolle für die muted Mitglieder: %{value}",
         "noxp_channels": "Kanäle, wo man kein xp bekommen kann: %{value}",

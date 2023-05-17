@@ -19,7 +19,7 @@ async def check_config(bot: Axobot, guild: discord.Guild, option: str, value: An
     }:
         if embed := await moderation_commands_check(bot, guild, option, value):
             return embed
-    if option in {"bot_news", "modlogs_channel", "partner_channel", "streaming_channel", "welcome_channel"}:
+    if option in {"bot_news", "partner_channel", "streaming_channel", "welcome_channel"}:
         if embed := await can_write_in_channel_check(bot, guild, option, value):
             return embed
     if option == "xp_rate":

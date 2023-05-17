@@ -120,14 +120,6 @@ options: dict[str, "AllRepresentation"] = {
         "default": None,
         "is_listed": True,
     },
-    "modlogs_channel": {
-        "type": "text_channel",
-        "allow_threads": True,
-        "allow_announcement_channels": True,
-        "allow_non_nsfw_channels": True,
-        "default": None,
-        "is_listed": True,
-    },
     "morpion_emojis": {
         "type": "emojis_list",
         "min_count": 2,

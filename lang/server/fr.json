@@ -115,7 +115,6 @@
         "levelup_channel": "Salon dans lequel sont envoyés les messages de passage de niveau : %{value}",
         "levelup_msg": "Message envoyé lorsqu'un membre gagne un niveau d'xp : %{value}",
         "membercounter": "Salon affichant dans son nom le nombre de membres : %{value}",
-        "modlogs_channel": "Salon dans lequel sont envoyés les logs de modération : %{value}",
         "morpion_emojis": "Emojis utilisé pour jouer au morpion : %{value}",
         "mute_allowed_roles": "Liste des rôles qui peuvent utiliser la commande 'mute' : %{value}",
         "muted_role": "Rôle utilisé pour rendre les gens muets : %{value}",
