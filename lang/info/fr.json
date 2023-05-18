@@ -129,9 +129,16 @@
         "role-1": "Couleur",
         "role-2": "Mentionable",
         "role-3": "Nombre de membres",
-        "role-4": "Affiché séparément",
         "role-5": "Position hiérarchique",
         "role-6": "Unique membre possédant ce rôle",
+        "role-specificities": {
+            "field-name": "Spécificités",
+            "hoist": "Affiché séparément",
+            "purchaseable": "Disponible à l'achat",
+            "bot_managed": "Géré par %{bot}",
+            "guild_connection": "Rôle connecté",
+            "premium_sub": "Rôle booster"
+        },
         "snowflake-0": "Date de création",
         "snowflake-1": "Nombre binaire",
         "snowflake-2": "Horodatage",
