@@ -129,9 +129,16 @@
         "role-1": "Colorr",
         "role-2": "Mentionnable",
         "role-3": "Nmber ov members",
-        "role-4": "Lonely supeR :a:lon roleZ",
         "role-5": "Hierarchical posishun",
         "role-6": "Lonely userz",
+        "role-specificities": {
+            "field-name": "Weird things",
+            "hoist": "Lonely role",
+            "purchaseable": "Moneyable role",
+            "bot_managed": "Handld by %{bot}",
+            "guild_connection": "Gatewayed role",
+            "premium_sub": "Super-nitro-advanced-fancy-boost-role"
+        },
         "snowflake-0": "Cratiun date",
         "snowflake-1": "Bin",
         "snowflake-2": "time",
@@ -160,8 +167,8 @@
     },
     "not-found": "Unable 2 found %{N}",
     "ping": {
-        "found": "Pong! (avg ov %{tps}ms that I send 2 %{url})",
-        "notfound": "UwU I cant ping that"
+        "normal": ":ping_pong:  Gotcha!\nMy running speed: %{bot}ms\nHow slow iz discord: %{api}ms",
+        "pig": "Haha u made a typo! :pig:\nhow fast I run: %{bot}ms\nHow slow iz discord: %{api}ms"
     },
     "prefix": "List ov usable prefiXs:",
     "stats": {
