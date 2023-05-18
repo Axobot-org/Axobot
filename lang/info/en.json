@@ -129,9 +129,16 @@
         "role-1": "Color",
         "role-2": "Mentionable",
         "role-3": "Member count",
-        "role-4": "Displayed separately",
         "role-5": "Hierarchical position",
         "role-6": "Unique member with this role",
+        "role-specificities": {
+            "field-name": "Specificities",
+            "hoist": "Displayed separately",
+            "purchaseable": "Available for purchase",
+            "bot_managed": "Managed by %{bot}",
+            "guild_connection": "Linked role",
+            "premium_sub": "Booster role"
+        },
         "snowflake-0": "Creation date",
         "snowflake-1": "Binary",
         "snowflake-2": "Timestamp",
@@ -160,8 +167,8 @@
     },
     "not-found": "Unable to find %{N}",
     "ping": {
-        "found": "Pong! (average of %{tps}ms per 64 byte, sent at %{url})",
-        "notfound": "Unable to ping this address"
+        "normal": ":ping_pong:  Pong!\nBot ping: %{bot}ms\nDiscord ping: %{api}ms",
+        "pig": ":pig:  Groink!\nBot ping: %{bot}ms\nDiscord ping: %{api}ms"
     },
     "prefix": "List of currently usable prefixes:",
     "stats": {
