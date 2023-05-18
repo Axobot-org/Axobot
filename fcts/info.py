@@ -1,4 +1,3 @@
-import asyncio
 import datetime
 import importlib
 import locale
@@ -6,8 +5,6 @@ import re
 import sys
 import time
 import typing
-from platform import system as system_name  # Returns the system/OS name
-from subprocess import call as system_call  # Execute a shell command
 
 import aiohttp
 import discord
@@ -247,58 +244,35 @@ ORDER BY usages DESC LIMIT %(limit)s"""
         """Get bot latency
         You can also use this command to ping any other server"""
         msg = await ctx.send("Pig...")
-        delta = (msg.created_at - ctx.message.created_at).total_seconds()
-        await msg.edit(content=f":pig:  Groink!\nBot ping: {delta*1000:.0f}ms\nDiscord ping: {self.bot.latency*1000:.0f}ms")
+        bot_delta = (msg.created_at - ctx.message.created_at).total_seconds()
+        try:
+            api_latency = round(self.bot.latency*1000)
+        except OverflowError:
+            api_latency = "∞"
+        await msg.edit(content=await self.bot._(ctx.channel, "info.ping.pig",
+                                                bot=round(bot_delta*1000),
+                                                api=api_latency)
+                       )
 
     @commands.command(name="ping",aliases=['rep'])
     @commands.cooldown(5, 45, commands.BucketType.guild)
-    async def rep(self, ctx: MyContext, ip: typing.Optional[str]=None):
-        """Get bot latency
-        You can also use this command to ping any other server
+    async def rep(self, ctx: MyContext, ):
+        """Get the bot latency
 
         ..Example ping
 
-        ..Example ping google.fr
-
         ..Doc infos.html#ping"""
-        if ip is None:
-            m = await ctx.send("Ping...")
-            t = (m.created_at - ctx.message.created_at).total_seconds()
-            try:
-                p = round(self.bot.latency*1000)
-            except OverflowError:
-                p = "∞"
-            await m.edit(content=":ping_pong:  Pong !\nBot ping: {}ms\nDiscord ping: {}ms".format(round(t*1000),p))
-        else:
-            if ip.startswith("http"):
-                ip = re.sub(r'https?://(www.)?', '', ip)
-            if not (re.match(r'^\d{3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$', ip) or re.match(r'^\w[\w\.]*\w$', ip)):
-                await ctx.send(await self.bot._(ctx.channel, "info.ping.notfound"))
-                return
-            asyncio.run_coroutine_threadsafe(self.ping_address(ctx,ip),asyncio.get_event_loop())
+        msg = await ctx.send("Ping...")
+        bot_delta = (msg.created_at - ctx.message.created_at).total_seconds()
+        try:
+            api_latency = round(self.bot.latency*1000)
+        except OverflowError:
+            api_latency = "∞"
+        await msg.edit(content=await self.bot._(ctx.channel, "info.ping.normal",
+                                                bot=round(bot_delta*1000),
+                                                api=api_latency)
+                       )
 
-    async def ping_address(self, ctx: MyContext, ip: str):
-        packages = 40
-        wait = 0.3
-        try:
-            m = await ctx.send("Ping...",file=await self.bot.get_cog('Utilities').find_img('discord-loading.gif'))
-        except discord.HTTPException:
-            m = None
-        t1 = time.time()
-        try:
-            param = '-n' if system_name().lower()=='windows' else '-c'
-            command = ['ping', param, str(packages), '-i', str(wait), ip, '-q']
-            result = system_call(command) == 0
-        except Exception as err:
-            await ctx.send("`Error:` {}".format(err))
-            return
-        if result:
-            t = (time.time() - t1 - wait*(packages-1))/(packages)*1000
-            await ctx.send(await self.bot._(ctx.channel, "info.ping.found", tps=round(t,2), url=ip))
-        else:
-            await ctx.send(await self.bot._(ctx.channel, "info.ping.notfound"))
-        if m is not None:
-            await m.delete()
 
     @commands.command(name="docs", aliases=['doc','documentation'])
     async def display_doc(self, ctx: MyContext):

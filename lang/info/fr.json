@@ -167,8 +167,8 @@
     },
     "not-found": "Impossible de trouver %{N}",
     "ping": {
-        "found": "Pong ! (moyenne de %{tps}ms par 64 bits, envoyés à %{url})",
-        "notfound": "Impossible de ping cette adresse"
+        "normal": ":ping_pong:  Pong !\nLatence du bot : %{bot}ms\nLatence de l'API Discord : %{api}ms",
+        "pig": ":pig:  Groink !\nLatence du bot : %{bot}ms\nLatence de l'API Discord : %{api}ms"
     },
     "prefix": "Liste des préfixes actuellement utilisables :",
     "stats": {
