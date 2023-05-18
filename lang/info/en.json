@@ -167,8 +167,8 @@
     },
     "not-found": "Unable to find %{N}",
     "ping": {
-        "found": "Pong! (average of %{tps}ms per 64 byte, sent at %{url})",
-        "notfound": "Unable to ping this address"
+        "normal": ":ping_pong:  Pong!\nBot ping: %{bot}ms\nDiscord ping: %{api}ms",
+        "pig": ":pig:  Groink!\nBot ping: %{bot}ms\nDiscord ping: %{api}ms"
     },
     "prefix": "List of currently usable prefixes:",
     "stats": {
