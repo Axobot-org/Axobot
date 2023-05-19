@@ -386,6 +386,12 @@ class BotEvents(commands.Cog):
         for reward in rewards:
             if reward["rank_card"] not in cards and points >= reward["points"]:
                 await users_cog.set_rankcard(user, reward["rank_card"], True)
+                # send internal log
+                embed = discord.Embed(
+                    description=f"{user} ({user.id}) has been granted the rank card **{reward['rank_card']}**",
+                    color=discord.Color.brand_green()
+                )
+                await self.bot.send_embed(embed)
 
     async def reload_event_special_role(self, user: Union[discord.User, int], points: int = None):
         """Grant the current event special role to the provided user, if they have enough points
@@ -426,8 +432,9 @@ class BotEvents(commands.Cog):
         "Get the ranking of a user"
         if not self.bot.database_online:
             return None
-        query = (
-            "SELECT `userID`, `events_points`, FIND_IN_SET( `events_points`, ( SELECT GROUP_CONCAT( `events_points` ORDER BY `events_points` DESC ) FROM `users` ) ) AS rank FROM `users` WHERE `userID` = %s")
+        query = "SELECT `userID`, `events_points`, FIND_IN_SET( `events_points`, \
+            ( SELECT GROUP_CONCAT( `events_points` ORDER BY `events_points` DESC ) FROM `users` ) ) AS rank \
+                FROM `users` WHERE `userID` = %s"
         async with self.bot.db_query(query, (user_id,), fetchone=True) as query_results:
             return query_results
 
@@ -440,6 +447,7 @@ class BotEvents(commands.Cog):
             return query_results
 
     async def db_get_participants_count(self) -> int:
+        "Get the number of users who have at least 1 event point"
         if not self.bot.database_online:
             return 0
         query = "SELECT COUNT(*) as count FROM `users` WHERE events_points > 0"
