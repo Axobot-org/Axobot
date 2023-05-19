@@ -355,7 +355,7 @@ class Axobot(commands.bot.AutoShardedBot):
             return fake_tr
         return cog.tr
 
-    async def send_embed(self, embeds: Union[list[discord.Embed], discord.Embed], url:str=None):
+    async def send_embed(self, embeds: Union[list[discord.Embed], discord.Embed], url: str=None):
         """Send a list of embeds to a discord channel"""
         if isinstance(embeds, discord.Embed):
             embeds = [embeds]
