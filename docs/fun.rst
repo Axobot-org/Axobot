@@ -4,7 +4,7 @@
 🎳 Fun
 ======
 
-This section of the bot contains lots of fun commands, which will be less useful than the other sections, but will add a good atmosphere in your server. Because a server's life is not just about moderation or utilities, ZBot couldn't be without a few moments of fun.
+This section of the bot contains lots of fun commands, which will be less useful than the other sections, but will add a good atmosphere in your server. Because a server's life is not just about moderation or utilities, Axobot couldn't be without a few moments of fun.
 
 However, if too much fun bothers you, this option can be disabled at any time with the `config command <server.html>`__ (`enable_fun` parameter). The choice is yours!
 
@@ -54,7 +54,7 @@ You can access even more names by being on some secret servers! Enter the :code:
 
 .. note:: Currently only a bunch of images exist, but if you have others to propose (that respect the theme), come see us!
 
-.. warning:: ZBot needs "`Attach files <perms.html#attach-files>`__" permission to send its message. You're not gonna ask him to be angry without giving him permission to do it?
+.. warning:: Axobot needs "`Attach files <perms.html#attach-files>`__" permission to send its message. You're not gonna ask him to be angry without giving him permission to do it?
 
 
 Bubble-wrap
@@ -94,7 +94,7 @@ Congrats
 
 This is a nice little gif to use when you want to congratulate your friend. And remember to thank Gilderoy Lockhart for his charming smile!
 
-.. warning:: ZBot needs "`Attach files <perms.html#attach-files>`__" permission to send this nice message.
+.. warning:: Axobot needs "`Attach files <perms.html#attach-files>`__" permission to send this nice message.
 
 
 Kill
@@ -112,7 +112,7 @@ Lmgtfy
 
 Yes, that name is unpronounceable. On the other hand, commands are executed on written channels, not voice, so that's good. And, for use, refer to the website: "For all those people who find it more convenient to bother you with their question rather than search it for themselves."
 
-.. warning:: ZBot needs "`Manage messages <perms.html#manage-messages>`__" permission to delete the invocative message.
+.. warning:: Axobot needs "`Manage messages <perms.html#manage-messages>`__" permission to delete the invocative message.
 
 
 Loading
@@ -122,7 +122,7 @@ Loading
 
 Do you think that the time is long? Or do you just need to express a veeery looooong loading time? Use this command, designed especially for this bot!
 
-.. warning:: ZBot needs "`Attach files <perms.html#attach-files>`__" permission to send this message.
+.. warning:: Axobot needs "`Attach files <perms.html#attach-files>`__" permission to send this message.
 
 
 Me
@@ -139,7 +139,7 @@ Money
 
 This command is perfect if you want to give the impression of literally swimming in piles of money. Can be placed in any discussion that is more or less related to this theme. Fortunately, the use of this command is not overtaxed.
 
-.. warning:: ZBot needs "`Attach files <perms.html#attach-files>`__" permission to send this gif.
+.. warning:: Axobot needs "`Attach files <perms.html#attach-files>`__" permission to send this gif.
 
 
 NASA
@@ -159,7 +159,7 @@ Nope
 
 A small command to use when you do not agree with your interlocutor. Small, but it has the merit to be clear and to quickly cut short the discussion. And even better, if you have permission to use the `say <server.html#list-of-every-option>`__ command, your invocation message will be deleted ! *Camouflage activated!*
 
-.. warning:: ZBot needs "`Attach files <perms.html#attach-files>`__" permission to send its message, and "`Manage messages <perms.html#manage-messages>`__" to delete yours.
+.. warning:: Axobot needs "`Attach files <perms.html#attach-files>`__" permission to send its message, and "`Manage messages <perms.html#manage-messages>`__" to delete yours.
 
 
 Nuke
@@ -169,7 +169,7 @@ Nuke
 
 The conversation's getting hot, do you want to blow it up? Let off some steam with a nice little gif, just to get the point out and calm down negotiations!
 
-.. warning:: ZBot needs "`Attach files <perms.html#attach-files>`__" permission to send this gif.
+.. warning:: Axobot needs "`Attach files <perms.html#attach-files>`__" permission to send this gif.
 
 
 HEEELP
@@ -196,7 +196,7 @@ Pibkac
 
 This is a quite well-known case in IT. To quote the definition of the `Urban Dictionary <https://www.urbandictionary.com/define.php?term=pibkac>`__, *"Problem Is Between Keyboard And Chair. Another term used to refer to an id10t or other person who probably should not own a computer"*.
 
-.. warning:: ZBot needs "`Attach files <perms.html#attach-files>`__" permission to send this gif.
+.. warning:: Axobot needs "`Attach files <perms.html#attach-files>`__" permission to send this gif.
 
 Piece
 -----
@@ -213,7 +213,7 @@ Pikachu
 
 Who doesn't know the world-famous Pokemon, Pikachu, who was for a long time the mascot of the Nintendo-owned company? Thanks to this command you can use gifs from this rabbit-eared Pokemon, randomly drawn from our ever-growing image bank!
 
-.. warning:: ZBot needs "`Attach files <perms.html#attach-files>`__" permission to send any gif.
+.. warning:: Axobot needs "`Attach files <perms.html#attach-files>`__" permission to send any gif.
 
 
 Pizza
@@ -243,7 +243,7 @@ Basically this command was designed for the sole use of the Creator. But since e
 
 .. warning::
     * The bot needs "`Attach files <perms.html#attach-files>`__" permission to send these images.
-    * We do not own the copyright of each of the images used in this command. If you want to design an image specially for ZBot, and are ready to give us all rights, thank you to contact us as soon as possible!
+    * We do not own the copyright of each of the images used in this command. If you want to design an image specially for Axobot, and are ready to give us all rights, thank you to contact us as soon as possible!
 
 
 React
@@ -257,7 +257,7 @@ All reactions work, whether they are Discord or server reactions. All you have t
 
 .. note:: To find out how to find the ID of a message, follow `this link <https://support.discord.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID->`__!
 
-.. warning:: To find the message, ZBot must have "`Read Message History <perms.html#read-message-history>`__" permission, and "`Add Reactions <perms.html#add-reactions>`__" permission to add reactions.
+.. warning:: To find the message, Axobot must have "`Read Message History <perms.html#read-message-history>`__" permission, and "`Add Reactions <perms.html#add-reactions>`__" permission to add reactions.
 
 
 Reverse
@@ -296,7 +296,7 @@ Shrug
 
 Don't know the answer to a question? This is the opportunity to express it with a pretty gif straight out of our image bank! A simple command, but one which can be fun.
 
-.. warning:: ZBot needs "`Attach files <perms.html#attach-files>`__" permission to send any gif.
+.. warning:: Axobot needs "`Attach files <perms.html#attach-files>`__" permission to send any gif.
 
 
 Thanos

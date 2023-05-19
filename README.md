@@ -3,7 +3,7 @@
 [![discord.py](https://img.shields.io/badge/Discord.py-2.2-brightgreen.svg)](https://github.com/Rapptz/discord.py)
 [![Docs status](https://readthedocs.org/projects/axobot/badge/?version=latest)](https://axobot.readthedocs.io)
 [![Crowdin](https://badges.crowdin.net/zbot/localized.svg)](https://translate.zrunner.me)
-![Last commit](https://img.shields.io/github/last-commit/ZRunner/ZBot.svg?label=Last+commit+on+develop)
+![Last commit](https://img.shields.io/github/last-commit/ZRunner/Axobot.svg?label=Last+commit+on+develop)
 
 [![Discord server](https://discord.com/api/v8/guilds/356067272730607628/widget.png)](https://discord.gg/N55zY88)
 [![Discord bot](https://top.gg/api/widget/status/1048011651145797673.svg)](https://zrunner.me/invite-axobot)
@@ -43,7 +43,7 @@ If you can't use Discord and you really need to contact me, you can send me an e
 
 ## LICENSE
 
-This program is subject to a **MIT-type license**, which means that you are free to reuse such content for commercial or non-commercial purposes, provided that "**the copyright notice and the permission notice is included in all copies or substantial portions of the Software**". For more information, refer to the [LICENSE](https://github.com/ZRunner/ZBot/blob/main/LICENSE) file in the source code.
+This program is subject to a **MIT-type license**, which means that you are free to reuse such content for commercial or non-commercial purposes, provided that "**the copyright notice and the permission notice is included in all copies or substantial portions of the Software**". For more information, refer to the [LICENSE](https://github.com/ZRunner/Axobot/blob/main/LICENSE) file in the source code.
 
 
 ## Discord Bots Lists

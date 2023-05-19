@@ -200,7 +200,7 @@ class Cases(commands.Cog):
         """Get every case of a user on a specific guild or on every guilds
         This user can have left the server
 
-        ..Example cases glist "ZBot Staff" someone
+        ..Example cases glist "Axobot Staff" someone
 
         ..Example cases glist someone"""
         if not self.bot.database_online:

@@ -2,7 +2,7 @@
 🔨 Moderation
 =============
 
-Like many Discord bots, ZBot allows you to moderate your server in different ways. You will find the classic commands to delete messages, mute, kick out or ban a member, as well as being able to slow down or freeze a chat completely.
+Like many Discord bots, Axobot allows you to moderate your server in different ways. You will find the classic commands to delete messages, mute, kick out or ban a member, as well as being able to slow down or freeze a chat completely.
 
 Among the features in preparation you will find the members' records as well as the possibility of sending warnings, or a section on automatic moderation.
 
@@ -66,7 +66,7 @@ Be careful, all specified settings must be validated for the message to be delet
 
 If you enter :code:`/clear 25 contains_url: True`, the bot will clear the last 25 messages if they contains a link AND if they're not pinned, no matter the author.
 
-If you enter :code:`/clear 1000 users: @Z_runner#7515 @ZBot beta#4940`, the bot will delete all (not pinned) messages contained in the last 1000 messages of the channel AND written by Z_runner#7515 OR ZBot beta#4940.
+If you enter :code:`/clear 1000 users: @Z_runner#7515 @Axobeta#4940`, the bot will delete all (not pinned) messages contained in the last 1000 messages of the channel AND written by Z_runner#7515 OR Axobeta#4940.
 
 .. warning:: The permissions "`Manage messages <perms.html#manage-messages>`__" and "`Read messages history <perms.html#read-message-history>`__" are required.
 
@@ -151,7 +151,7 @@ Search for a case
 
 **Syntax:** :code:`cases search <case ID>`
 
-This command allows you to search for a case from its identifier. The identifiers are unique for the whole bot, so you can't see them all. However, the ZBot support team has access to all the cases (without being able to modify them)
+This command allows you to search for a case from its identifier. The identifiers are unique for the whole bot, so you can't see them all.
 
 .. warning:: The case is returned in an embed, which means that the bot must have "`Embed Links <perms.html#embed-links>`__" permission to send it correctly.
 
