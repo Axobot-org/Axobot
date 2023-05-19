@@ -2,7 +2,7 @@
 👤 User configuration
 =====================
 
-Users have a very important place in the bot code. Well, after all, without users, no bot, right? That's why we're currently working to give you as much as possible with ZBot, so you can fully enjoy your experience.
+Users have a very important place in the bot code. Well, after all, without users, no bot, right? That's why we're currently working to give you as much as possible with Axobot, so you can fully enjoy your experience.
 
 In this section, you will find the XP module, a classic in Discord bots, as well as a command to change your own preferences, such as the color of your xp card or the language used in your personal messages. Don't worry, other possibilities are planned and will be added later!
 

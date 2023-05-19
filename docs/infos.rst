@@ -2,7 +2,7 @@
 ℹ️ Information
 ==============
 
-ZBot also allows you to retrieve information about the virtual world surrounding you. There you will find a single command that summarizes all the information about a channel/member/role/server/invitation/emoji, as well as a few other commands allowing you to study further.
+Axobot also allows you to retrieve information about the virtual world surrounding you. There you will find a single command that summarizes all the information about a channel/member/role/server/invitation/emoji, as well as a few other commands allowing you to study further.
 
 
 -----
@@ -13,7 +13,7 @@ About
 
 This command sends a short presentation text of the bot, so that you know it a little better. It will also give you some links that may be useful to you (like the one to invite the bot, or to access its Discord server).
 
-.. note:: For this command, ZBot doesn't need any specific permission! Good news, isn't it?
+.. note:: For this command, Axobot doesn't need any specific permission! Good news, isn't it?
 
 ----------
 Bot invite
@@ -111,4 +111,4 @@ Welcome message
 
 **Syntax:** :code:`welcome` or :code:`bvn`
 
-This command helps you to define a message sent automatically by ZBot when a member joins or leaves your server (see the `config <server.html>`_ command). You will find how to select the channel, as well as the variables that can be used in the messages.
+This command helps you to define a message sent automatically by Axobot when a member joins or leaves your server (see the `config <server.html>`_ command). You will find how to select the channel, as well as the variables that can be used in the messages.

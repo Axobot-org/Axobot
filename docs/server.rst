@@ -8,7 +8,7 @@ Config options
 --------------
 
 
-Recently, ZBot has features that can be modified per server, to make each server unique. You will find the language of the bot, the activation of certain options (such as the xp system), the list of roles authorized to use certain commands (ban, clear...), the welcome messages, and many other options.
+Recently, Axobot has features that can be modified per server, to make each server unique. You will find the language of the bot, the activation of certain options (such as the xp system), the list of roles authorized to use certain commands (ban, clear...), the welcome messages, and many other options.
 
 The list of options continues to grow as development progresses, that's why a website is planned to make server configuration easier.
 
@@ -27,7 +27,7 @@ The page number is used because the options are too numerous to be displayed on 
 
 A detailed list of all options is available `below <#list-of-every-option>`__ .
 
-.. warning:: To display this command correctly, ZBot only needs Embed links permission.
+.. warning:: To display this command correctly, Axobot only needs Embed links permission.
 
 
 **Syntax:** :code:`config list`

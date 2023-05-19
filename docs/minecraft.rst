@@ -2,11 +2,11 @@
 🟩 Minecraft
 ============
 
-At the very beginning, ZBot was a single server bot, and focused on the world-famous Minecraft game.
+At the very beginning, Axobot was a single server bot, and focused on the world-famous Minecraft game.
 
 Even after diversifying, the bot has not forgotten its origins and remains very open to this cubic world, offering several commands related to the game. You will find a huge database on all the blocks, entities, items, commands, progress, potion effects, enchantments, and more. As well as a command to obtain the status of a Minecraft server (it is possible to display it permanently so that the information is refreshed regularly). And another one for the state of Mojang's servers. If you find this content is very low, don't worry: other orders are in preparation!
 
-.. note:: The whole database comes from a single Minecraft site (French, like ZBot): `fr-minecraft.net <https://fr-minecraft.net>`__ . The search engine and the information collected are therefore those appearing on this site. If you observe any error in this database, do not hesitate to contact me so that I relay it to the administrator of the site!
+.. note:: The whole database comes from a single Minecraft site (French, like Axobot): `fr-minecraft.net <https://fr-minecraft.net>`__ . The search engine and the information collected are therefore those appearing on this site. If you observe any error in this database, do not hesitate to contact me so that I relay it to the administrator of the site!
 
 .. warning:: Most of these commands are reserved for certain roles only. To allow roles to use a command, see the `config` command
 
