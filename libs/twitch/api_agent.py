@@ -73,6 +73,8 @@ class TwitchApiAgent:
         async with self._session.get(url, params=params, headers=await self._get_headers()) as resp:
             data = await resp.json()
             if not "data" in data:
+                if resp.status == 400:
+                    return None
                 raise ValueError(data["message"])
             try:
                 return data["data"][0]
