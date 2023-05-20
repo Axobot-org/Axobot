@@ -1,6 +1,6 @@
 import time
 from datetime import datetime, timedelta
-from typing import Union
+from typing import Union, Literal
 
 from babel import dates, numbers
 from dateutil.relativedelta import relativedelta
@@ -35,7 +35,7 @@ class FormatUtils:
 
     @staticmethod
     async def time_delta(date1: Union[datetime, int], date2: datetime = None,
-                         lang: str = 'en', year: bool = False, hour: bool = True, form='developed'):
+                         lang: str = 'en', year: bool = False, hour: bool = True, form: Literal["short", "developed"]='developed'):
         """Translates a two time interval datetime into a readable character string
 
         form can be 'short' (3d 6h) or 'developed' (3 jours 6 heures)
