@@ -128,7 +128,6 @@ class Xp(commands.Cog):
         if 0 < ex_lvl < new_lvl:
             await self.send_levelup(msg, new_lvl)
             await self.give_rr(msg.author, new_lvl, await self.rr_list_role(msg.guild.id))
-            await self.bot.get_cog("BotEvents").db_add_user_points(msg.author.id, round(new_lvl/5))
 
     async def add_xp_1(self, msg:discord.Message, rate: float):
         """MEE6-like xp type"""

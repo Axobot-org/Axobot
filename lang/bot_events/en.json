@@ -2,7 +2,8 @@
     "collect": {
         "got-points": "Congratulations! You just won **%{pts} event points**!",
         "lost-points": "Oh no, you just lost **%{pts} event points**!",
-        "too-quick": "It's still too early! You will only be able to collect event points in %{time}!"
+        "too-quick": "It's still too early! You will only be able to collect event points in %{time}!",
+        "strike": "You got a bonus for using this command %{level} times in a row!"
     },
     "events-price-title": "Prizes to win",
     "nothing-desc": "There are currently no events. Follow the bot news to know the date of the next one!",
