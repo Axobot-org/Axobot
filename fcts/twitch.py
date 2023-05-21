@@ -109,7 +109,7 @@ class Twitch(commands.Cog):
     @commands.guild_only()
     @commands.check(checks.has_manage_guild)
     async def twitch(self, ctx: MyContext):
-        """Twitch commands
+        """Manage your Twitch subscriptions
 
 ..Doc streamers.html"""
         if ctx.invoked_subcommand is None:

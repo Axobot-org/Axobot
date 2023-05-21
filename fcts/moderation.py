@@ -967,7 +967,7 @@ The 'show_reasons' parameter is used to display the mute reasons.
     @commands.guild_only()
     @commands.cooldown(5,20, commands.BucketType.guild)
     async def emoji_group(self, ctx: MyContext):
-        """Manage your emoji
+        """Manage your emojis
         Administrator permission is required
 
         ..Doc moderator.html#emoji-manager"""

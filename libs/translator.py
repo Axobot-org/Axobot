@@ -52,11 +52,15 @@ class AxobotTranslator(app_commands.Translator):
                 return None
             cmd_name = context.data.command.qualified_name
             return await self._translate_cmd(lang, f"commands.param_name.{cmd_name}.{string.message}", locale)
+        elif context.location == TranslationContextLocation.group_description:
+            if await is_ignored_command(context.data):
+                return None
+            cmd_name = context.data.qualified_name
+            return await self._translate_cmd(lang, f"commands.group_description.{cmd_name}", locale)
         elif context.location == TranslationContextLocation.choice_name and "default" not in string.extras:
             return
         elif context.location in {
             TranslationContextLocation.command_description,
-            TranslationContextLocation.group_description,
             TranslationContextLocation.parameter_description,
         }:
             return
@@ -67,7 +71,7 @@ class AxobotTranslator(app_commands.Translator):
         try:
             return await self.bot.get_cog("Languages").get_translation(lang, string)
         except KeyError:
-            if locale == Locale.american_english:
+            if locale in {Locale.american_english, Locale.french}:
                 self.bot.log.warning(f"[translator] Missing translation for '{string}' in {locale} ({lang})")
 
     async def _translate_custom(self, lang: str, string: locale_str, locale: Locale) -> Optional[str]:
