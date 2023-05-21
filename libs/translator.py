@@ -7,9 +7,20 @@ from discord.app_commands.translator import TranslationContextLocation
 if TYPE_CHECKING:
     from libs.bot_classes import Axobot
 
+
+LOCALES_MAP = {
+    Locale.french: "fr",
+    Locale.german: "de",
+    Locale.finnish: "fi",
+    Locale.british_english: "en",
+    Locale.american_english: "en",
+}
+
+
 IGNORED_COMMANDS = {"admin", "find"}
 
 async def is_ignored_command(cmd: Union[app_commands.Command, app_commands.Group, app_commands.ContextMenu]):
+    "Check if the given command should be ignored by the translator"
     if isinstance(cmd, app_commands.ContextMenu):
         root = cmd
     else:
@@ -18,24 +29,13 @@ async def is_ignored_command(cmd: Union[app_commands.Command, app_commands.Group
 
 
 class AxobotTranslator(app_commands.Translator):
+    "Subclass of discord.app_commands.Translator to add custom app-commands-related translations"
 
     def __init__(self, bot: "Axobot"):
         self.bot = bot
 
-    async def get_lang_from_locale(self, locale: Locale):
-        "Return the closest language to the given locale"
-        if locale == Locale.french:
-            return "fr"
-        if locale == Locale.german:
-            return "en"
-        if locale == Locale.finnish:
-            return "fi"
-        if locale in {Locale.british_english, Locale.american_english}:
-            return "en"
-        return None
-
     async def translate(self, string, locale, context):
-        if (lang := await self.get_lang_from_locale(locale)) is None:
+        if (lang := LOCALES_MAP.get(locale)) is None:
             return
         if context.location == TranslationContextLocation.group_name:
             if await is_ignored_command(context.data):
