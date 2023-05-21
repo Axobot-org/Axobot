@@ -80,7 +80,8 @@
         "blurple help": "help",
         "blurple lightfy": "lightfy",
         "blurple darkfy": "darkfy",
-        "blurple check": "check"
+        "blurple check": "check",
+        "ping": "ping"
     },
     "group_name": {
         "antiscam": "antiscam",

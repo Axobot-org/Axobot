@@ -254,7 +254,7 @@ ORDER BY usages DESC LIMIT %(limit)s"""
                                                 api=api_latency)
                        )
 
-    @commands.command(name="ping",aliases=['rep'])
+    @commands.hybrid_command(name="ping", aliases=['rep'])
     @commands.cooldown(5, 45, commands.BucketType.guild)
     async def rep(self, ctx: MyContext, ):
         """Get the bot latency
