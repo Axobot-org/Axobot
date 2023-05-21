@@ -89,13 +89,6 @@
     ],
     "piece-1": "Raté, c'est tombé sur la tranche !",
     "react-0": "Impossible de trouver le message correspondant. Il faut rentrer l'ID du message en 1er argument, et l'émoji en 2e :upside_down:\n Vérifie aussi que je possède la perm de lire l'historique des messages !",
-    "reminds-asked": "Hey, %{user} ! Tu m'as demandé de te rappeler ça il y a %{duration} ! Un trou de mémoire ?",
-    "reminds-date": "Date de demande",
-    "reminds-link": "Message original",
-    "reminds-saved": "Oko 😁 ! Je te le rappellerai dans... Environ... 🕰️ %{duration} !\n\n*Si j'oublie pas...*",
-    "reminds-title": "Rappel",
-    "reminds-too-long": "Wolalala 😬 !\n\nJe peux pas te le rappeler dans autant de temps, moi !\n\nTu t'es cru où ?!\n\nJ'ai pas autant de mémoire !",
-    "reminds-too-short": "...\n\nAlors.\n\n\n\n\nÇa, c'est ce qu'on appelle communément **UNE DURÉE INVALIDE !**",
     "say-no-perm": "T'as pas la perm d'envoyer des messages dans %{channel}",
     "thanos": [
         "{0} a été épargné par Thanos le divin...",
