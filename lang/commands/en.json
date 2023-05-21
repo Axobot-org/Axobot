@@ -98,7 +98,7 @@
         "roles-rewards": "roles-rewards",
         "blurple": "blurple"
     },
-    "command_description": {
+    "command_short_description": {
     },
     "group_description": {
         "antiscam": "Everything related to the antiscam feature",

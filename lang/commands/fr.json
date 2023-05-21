@@ -6,6 +6,8 @@
         "antiscam enable": "activer",
         "antiscam disable": "désactiver",
         "antiscam report": "signaler",
+        "slowmode": "mode-lent",
+        "clear": "supprimer",
         "kick": "expulser",
         "warn": "avertir",
         "ban": "bannir",
@@ -90,7 +92,9 @@
         "roles-rewards": "rôles-récompenses",
         "blurple": "blurple"
     },
-    "command_description": {
+    "command_short_description": {
+        "clear": "Supprime des messages du salon",
+        "slowmode": "Ralenti le spam du salon en activant le mode lent"
     },
     "group_description": {
         "antiscam": "Tout ce qui concerne la fonction d'anti-arnaque",
