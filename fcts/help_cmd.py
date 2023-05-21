@@ -21,7 +21,7 @@ class Help(commands.Cog):
 
     def __init__(self, bot: Axobot):
         self.bot = bot
-        self.file = "aide"
+        self.file = "help_cmd"
         self.old_cmd = bot.remove_command("help")
         self.help_color = 0x7ED321
         self.help_color_dm = 0xD6FFA9
