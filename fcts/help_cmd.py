@@ -338,9 +338,9 @@ If the bot can't send the new command format, it will try to send the old one.""
         # Subcommands
         if isinstance(cmd, commands.Group):
             syntax += " ..."
-            if not use_embed:
-                subcmds = "__" + (await self.bot._(ctx.channel, "help.subcmds")).capitalize() + "__"
             subcmds, subs_cant_show = await self._get_subcommands(ctx, cmd)
+            if not use_embed:
+                subcmds = "__" + (await self.bot._(ctx.channel, "help.subcmds")).capitalize() + "__\n" + subcmds
             if subs_cant_show > 0:
                 subcmds += "\n" + await self.bot._(ctx.channel, 'help.more-subcmds', count=subs_cant_show)
         else:
