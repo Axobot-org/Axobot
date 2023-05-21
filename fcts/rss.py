@@ -230,7 +230,7 @@ class Rss(commands.Cog):
     @app_commands.default_permissions(manage_guild=True)
     @commands.cooldown(2, 15, commands.BucketType.channel)
     async def rss_main(self, ctx: MyContext):
-        """Search for recent posts, or manage your server RSS feeds
+        """Subscribe to RSS feeds in your server
 
         ..Doc rss.html#rss"""
         if ctx.subcommand_passed is None:

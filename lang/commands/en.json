@@ -101,6 +101,18 @@
     "command_description": {
     },
     "group_description": {
+        "antiscam": "Everything related to the antiscam feature",
+        "emoji": "Manage your emojis",
+        "role": "A few commands to manage roles",
+        "rss": "Subscribe to RSS feeds in your server",
+        "modlogs": "Enable or disable server logs in specific channels",
+        "config": "Configure the bot for your server",
+        "tickets": "Manage your tickets system",
+        "tickets portal": "Handle how your members are able to open tickets",
+        "tickets topic": "Handle the different ticket topics your members can select",
+        "twitch": "Manage your Twitch subscriptions",
+        "profile": "Configure the bot for your own usage",
+        "roles-rewards": "Give roles to your members when they reach a certain level"
     },
     "param_name": {
         "antiscam test": {
