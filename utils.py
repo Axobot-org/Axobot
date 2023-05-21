@@ -129,7 +129,7 @@ async def load_cogs(bot: "Axobot"):
     initial_extensions = [
         'fcts.languages',
         'fcts.admin',
-        'fcts.aide',
+        'fcts.help_cmd',
         'fcts.antiraid',
         'fcts.antiscam',
         'fcts.bot_events',

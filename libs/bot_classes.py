@@ -25,7 +25,7 @@ from libs.tips import TipsManager
 from utils import get_prefix
 
 if TYPE_CHECKING:
-    from fcts.aide import Help
+    from fcts.help_cmd import Help
     from fcts.antiraid import AntiRaid
     from fcts.bot_events import BotEvents
     from fcts.bot_stats import BotStats
