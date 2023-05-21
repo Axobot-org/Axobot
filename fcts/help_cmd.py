@@ -219,8 +219,10 @@ If the bot can't send the new command format, it will try to send the old one.""
                 else:
                     await destination.send("\n".join(page))
 
-    async def display_cmd(self, cmd: commands.Command):
-        return f"• **{cmd.name}**\t\t*{cmd.short_doc.strip()}*" if len(cmd.short_doc) > 0 else f"• **{cmd.name}**"
+    async def _display_cmd(self, ctx: MyContext, cmd: commands.Command):
+        name = await get_command_name_translation(ctx, cmd)
+        short = await get_command_desc_translation(ctx, cmd) or cmd.short_doc.strip()
+        return f"• **{name}**\t\t*{short}*" if short else f"• **{name}**"
 
     def sort_by_name(self, cmd: commands.Command) -> str:
         return cmd.name
@@ -236,7 +238,7 @@ If the bot can't send the new command format, it will try to send the old one.""
                     continue
             except commands.CommandError:
                 continue
-            temp = await self.display_cmd(cmd)
+            temp = await self._display_cmd(ctx, cmd)
             found = False
             for k, values in self.commands_data.items():
                 if cmd.name in values['commands']:
@@ -298,7 +300,7 @@ If the bot can't send the new command format, it will try to send the old one.""
                     continue
             except commands.CommandError:
                 continue
-            text = await self.display_cmd(cmd)
+            text = await self._display_cmd(ctx, cmd)
             if len(page+text) > 1900:
                 pages.append(form.format(cog_name, description, page))
                 page = text
