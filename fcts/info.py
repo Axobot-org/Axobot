@@ -351,7 +351,7 @@ Available types: member, role, user, emoji, channel, server, invite, category
         if len(emoji.roles) > 0:
             embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.emoji-4"), value=" ".join([x.mention for x in emoji.roles]))
         # uses
-        infos_uses = await self.get_emojis_info(emoji.id)
+        infos_uses = await self.db_get_emojis_info(emoji.id)
         if len(infos_uses) > 0:
             infos_uses = infos_uses[0]
             date = f"<t:{infos_uses['added_at'].timestamp():.0f}:D>"
@@ -920,16 +920,19 @@ Available types: member, role, user, emoji, channel, server, invite, category
         except Exception as err:
             self.bot.dispatch("error", err)
 
-    async def get_emojis_info(self, ID: typing.Union[int,list]):
+    async def db_get_emojis_info(self, emoji_id: typing.Union[int,list]) -> list[dict[str, typing.Any]]:
         """Get info about an emoji"""
         if not self.bot.database_online:
-            return list()
-        if isinstance(ID, int):
-            query = "SELECT * from `{}` WHERE `ID`={}".format(self.emoji_table,ID)
+            return []
+        if isinstance(emoji_id, int):
+            query = f"SELECT * from `{self.emoji_table}` WHERE `ID`=%s"
+            args = (emoji_id,)
         else:
-            query = "SELECT * from `{}` WHERE {}".format(self.emoji_table,"OR".join([f'`ID`={x}' for x in ID]))
-        liste = list()
-        async with self.bot.db_query(query) as query_results:
+            where_cond = "OR".join([f'`ID` = %s' for _ in emoji_id])
+            query = f"SELECT * from `{self.emoji_table}` WHERE {where_cond}"
+            args = (tuple(emoji_id), )
+        liste = []
+        async with self.bot.db_query(query, args) as query_results:
             for x in query_results:
                 x['emoji'] = self.bot.get_emoji(x['ID'])
                 liste.append(x)
