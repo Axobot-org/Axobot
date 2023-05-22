@@ -18,7 +18,7 @@ AFK
 
 **Syntax:** :code:`afk [reason]` or :code:`unafk`
 
-This command will be useful if you are often busy doing something while Discord is open. The principle is to put a tag[AFK] (which means Away From Keyboard) on you and notify anyone who tries to mention you. So there is a command to put you in AFK mode (the reason is optional, it will be indicated to people who are trying to mention you), and another command to exit AFK mode.
+This command will be useful if you are often busy doing something while Discord is open. The principle is to put a tag [AFK] (which means Away From Keyboard) on you and notify anyone who tries to mention you. So there is a command to put you in AFK mode (the reason is optional, it will be indicated to people who are trying to mention you), and another command to exit AFK mode.
 
 .. note:: Note that even if the system is specific to each server (it works with your nickname), the reason is global: if you change the reason in one server, it will be effective on all other servers having you as AFK!
 

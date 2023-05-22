@@ -38,7 +38,7 @@
     "see-title": "%{guild} Server Konfigurationen",
     "server_desc": {
         "anti_caps_lock": "Sollte Zbot eine Nachricht senden, wenn ein Mitglied zu viele Großbuchstaben sendet? %{value}",
-        "anti_raid": "Level der Anti-Raid Schutzes: %{value}\n*([Dokumentation] (https://axobot.rtfd.io/en/latest/moderator.html#anti-raid))*",
+        "anti_raid": "Level der Anti-Raid Schutzes: %{value}\n*([Dokumentation](https://axobot.rtfd.io/en/latest/moderator.html#anti-raid))*",
         "autoremove_xp": "Erfahrungspunkte täglich entfernen von inaktiven Mitgliedern: %{value}",
         "ban_allowed_roles": "Liste der Rollen, mit denen man den Befehl \"ban\" ausführen kann: %{value}",
         "bot_news": "Liste der Kanäle, wo die Zbot news gesendet werden: %{value}",
