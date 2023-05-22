@@ -421,11 +421,13 @@ class Events(commands.Cog):
             return
         rss_feeds = await self.bot.get_cog("Rss").db_get_raws_count(True)
         active_rss_feeds = await self.bot.get_cog("Rss").db_get_raws_count()
-        if infoCog := self.bot.get_cog("Info"):
-            member_count, bot_count = infoCog.get_users_nber(list())
+        if infoCog := self.bot.get_cog("BotInfo"):
+            member_count, bot_count = infoCog.get_users_nber([])
+            codelines: int = infoCog.codelines
         else:
             member_count = len(self.bot.users)
             bot_count = len([1 for x in self.bot.users if x.bot])
+            codelines = 0
         lang_stats = await self.bot.get_cog('ServerConfig').get_languages([])
         rankcards_stats = await self.bot.get_cog('Users').get_rankcards_stats()
         xptypes_stats = await self.bot.get_cog('ServerConfig').get_xp_types([])
@@ -436,7 +438,7 @@ class Events(commands.Cog):
             member_count,
             bot_count,
             10e6 if self.bot.latency == float("inf") else round(self.bot.latency, 3),
-            self.bot.get_cog("Info").codelines,
+            codelines,
             await self.bot.get_cog('Xp').db_get_total_xp(),
             rss_feeds,
             active_rss_feeds,

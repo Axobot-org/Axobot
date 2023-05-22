@@ -350,4 +350,4 @@ ORDER BY usages DESC LIMIT %(limit)s"""
 
 
 async def setup(bot: Axobot):
-    bot.add_cog(BotInfo(bot))
+    await bot.add_cog(BotInfo(bot))
