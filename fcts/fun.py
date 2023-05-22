@@ -907,7 +907,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
 
     @commands.command(name="discordjobs", aliases=['discord_jobs', 'jobs.gg'])
     @commands.cooldown(2, 60, commands.BucketType.channel)
-    async def discordjobs(self, ctx: MyContext, *, query: str = None):
+    async def discord_jobs(self, ctx: MyContext, *, query: str = None):
         """Get the list of available jobs in Discord
 
         ..Example discordjobs
@@ -962,10 +962,23 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         else:
             await ctx.send("\n".join(f_jobs[:20]))
 
+    @commands.command(name="discordlinks",aliases=['discord','discordurls'])
+    async def discord_links(self, ctx: MyContext):
+        """Get some useful links about Discord"""
+        l = await self.bot._(ctx.channel,'info.discordlinks')
+        links = ["https://dis.gd/status","https://dis.gd/tos","https://dis.gd/report","https://dis.gd/feedback","https://support.discord.com/hc/en-us/articles/115002192352","https://discord.com/developers/docs/legal","https://support.discord.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID-","https://support.discord.com/hc/en-us/articles/360040724612", " https://twitter.com/discordapp/status/1060411427616444417", "https://support.discord.com/hc/en-us/articles/360035675191"]
+        if ctx.can_send_embed:
+            txt = "\n".join(['['+l[i]+']('+links[i]+')' for i in range(len(l))])
+            em = discord.Embed(description=txt)
+            em.set_footer(text=ctx.author, icon_url=ctx.author.display_avatar)
+            await ctx.send(embed=em)
+        else:
+            txt = "\n".join([f'• {l[i]}: <{links[i]}>' for i in range(len(l))])
+            await ctx.send(txt)
 
     @commands.command(name="discordstatus", aliases=['discord_status', 'status.gg'])
     @commands.cooldown(2, 60, commands.BucketType.channel)
-    async def discordstatus(self, ctx: MyContext):
+    async def discord_status(self, ctx: MyContext):
         """Know if Discord currently has a technical issue"""
         async with aiohttp.ClientSession() as session:
             async with session.get("https://discordstatus.com/api/v2/incidents.json") as r:
