@@ -1078,9 +1078,9 @@ Minimum age required by anti-raid: {min_age}"
             if before.features != after.features:
                 await self.handle_guild_features(before, after, channel_ids)
             if before.icon != after.icon:
-                await self.handle_guild_name(before, after, channel_ids)
-            if before.name != after.name:
                 await self.handle_guild_icon(before, after, channel_ids)
+            if before.name != after.name:
+                await self.handle_guild_name(before, after, channel_ids)
             if before.owner != after.owner:
                 await self.handle_guild_owner(before, after, channel_ids)
 
