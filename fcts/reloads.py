@@ -51,7 +51,7 @@ class Reloads(commands.Cog):
                 await self.bot.get_cog('Utilities').on_ready()
         if len(reloaded_cogs) > 0:
             await ctx.send("These cogs has successfully reloaded: {}".format(", ".join(reloaded_cogs)))
-            if info_cog := self.bot.get_cog("Info"):
+            if info_cog := self.bot.get_cog("BotInfo"):
                 info_cog.codelines = await count_code_lines()
 
     @commands.command(name="add_cog",hidden=True)
