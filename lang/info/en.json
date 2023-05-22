@@ -67,6 +67,7 @@
             "AUTO_MODERATION": "Auto moderation",
             "BANNER": "Custom server banner",
             "CHANNEL_BANNER": "Channel banner",
+            "CHANNEL_ICON_EMOJIS_GENERATED": "Channel icon generated",
             "COMMERCE": "Commerce features",
             "COMMUNITY": "Community server",
             "CREATOR_ACCEPTED_NEW_TERMS": "Creator accepted new ToS",
