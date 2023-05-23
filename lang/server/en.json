@@ -165,6 +165,7 @@
         "channel_write_permissions": "I need to be able to send messages in %{channel} for this option",
         "moderation_command": "I need the '%{perm}' permission to apply this command",
         "title": "Warning",
+        "xp_should_be_enabled": "This option is dedicated to the XP system. You can enable it with the 'enable_xp' configuration option",
         "xp_should_be_local": "This option only works for local XP system. You can change the server XP system with the 'xp_type' configuration option"
     }
 }
