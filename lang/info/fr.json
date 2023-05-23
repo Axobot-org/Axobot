@@ -41,6 +41,14 @@
         "emoji-4": "Restrictions",
         "emoji-5": "Nombre d'utilisations",
         "emoji-5v": "%{nbr} (premier enregistrement : %{date})",
+        "forum": {
+            "title": "Forum %{name}",
+            "tags": "Post tags",
+            "guidelines": "Guidelines",
+            "sort-order": "Default sort order",
+            "sort-order-latest": "Recent activity",
+            "sort-order-creation": "Creation time"
+        },
         "guild-0": "Serveur",
         "guild-1": "Propriétaire",
         "guild-10": "Temps avant d'être AFK",

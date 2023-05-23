@@ -65,7 +65,7 @@ Available types: member, role, user, emoji, channel, server, invite, category
             # try to convert ourselves because we are obviously a smart bot
             arg = ctx.message.content.replace(ctx.prefix+ctx.invoked_with, "").lstrip()
             # force the conversion order
-            order = ('member', 'role', 'emoji', 'text-channel', 'voice-channel', 'category', 'user', 'invite', 'id')
+            order = ('member', 'role', 'emoji', 'text-channel', 'voice-channel', 'forum', 'category', 'user', 'invite', 'id')
             commands_list: list[commands.Command] = sorted(
                 ctx.command.commands, key=lambda x: order.index(x.name) if x.name in order else 100)
 
@@ -599,7 +599,8 @@ Available types: member, role, user, emoji, channel, server, invite, category
         # Creation date
         if invite.created_at is not None:
             created_at = f"<t:{invite.created_at.timestamp():.0f}>"
-            delta = await FormatUtils.time_delta(invite.created_at,ctx.bot.utcnow(),lang=lang,year=True,hour=False)
+            show_hour = (ctx.bot.utcnow() - invite.created_at).days < 1
+            delta = await FormatUtils.time_delta(invite.created_at, ctx.bot.utcnow(), lang=lang, year=True, hour=show_hour)
             embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.member-1"), value = "{} ({} {})".format(created_at,since,delta), inline=False)
         await ctx.send(embed=embed)
 
@@ -627,8 +628,72 @@ Available types: member, role, user, emoji, channel, server, invite, category
         embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.categ-1"), value="{}/{}".format(category.position+1,len(ctx.guild.categories)))
         embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.guild-6"), value=await self.bot._(ctx.guild.id,"info.info.categ-2", txt=tchan, voc=vchan))
         created_at = f"<t:{category.created_at.timestamp():.0f}>"
-        delta = await FormatUtils.time_delta(category.created_at,ctx.bot.utcnow(),lang=lang,year=True,hour=False)
+        show_hour = (ctx.bot.utcnow() - category.created_at).days < 1
+        delta = await FormatUtils.time_delta(category.created_at, ctx.bot.utcnow(), lang=lang, year=True, hour=show_hour)
         embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.member-1"), value = "{} ({} {})".format(created_at,since,delta), inline=False)
+        await ctx.send(embed=embed)
+
+    @info_main.command(name="forum")
+    async def forum_info(self, ctx: MyContext, forum: discord.ForumChannel):
+        "Get informations about a forum channel"
+        if not forum.permissions_for(ctx.author).view_channel:
+            await ctx.send(await self.bot._(ctx.guild.id, "info.cant-see-channel"))
+            return
+        lang = await self.bot._(ctx.guild.id,"_used_locale")
+        since = await self.bot._(ctx.guild.id,"misc.since")
+        embed = discord.Embed(colour=default_color, timestamp=ctx.message.created_at)
+        icon_url = forum.guild.icon.with_static_format('png') if forum.guild.icon else None
+        title = await self.bot._(ctx.guild.id,"info.info.forum.title", name=forum.name)
+        embed.set_author(name=title, icon_url=icon_url)
+        # Name
+        embed.add_field(name=str(await self.bot._(ctx.guild.id,"misc.name")).capitalize(), value=forum.name,inline=True)
+        # ID
+        embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.role-0"), value=str(forum.id))
+         # Category
+        embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.textchan-0"), value=str(forum.category))
+        # NSFW
+        if forum.nsfw:
+            nsfw = await self.bot._(ctx.guild.id,"misc.yes")
+        else:
+            nsfw = await self.bot._(ctx.guild.id,"misc.no")
+        embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.textchan-2"), value=nsfw.capitalize())
+        # Created at
+        created_at = f"<t:{forum.created_at.timestamp():.0f}>"
+        show_hour = (ctx.bot.utcnow() - forum.created_at).days < 1
+        delta = await FormatUtils.time_delta(forum.created_at, ctx.bot.utcnow(), lang=lang, year=True, hour=show_hour)
+        embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.member-1"), value = "{} ({} {})".format(created_at,since,delta))
+        if forum.permissions_for(ctx.author).read_messages:
+            # Tags
+            if forum.available_tags:
+                tags_list = []
+                for tag in forum.available_tags:
+                    if tag.emoji and tag.emoji.is_unicode_emoji():
+                        tags_list.append(f"`{tag.emoji} {tag.name}`")
+                    else:
+                        tags_list.append(f"`{tag.name}`")
+                tags = ", ".join(tags_list)
+                embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.forum.tags"), value=tags)
+            # Default sort order
+            if hasattr(discord, "ForumOrderType"): # from discord.py 2.3
+                if forum.default_sort_order == discord.ForumOrderType.latest_activity:
+                    sort_order = await self.bot._(ctx.guild.id, "info.info.forum.sort-order-latest")
+                elif forum.default_sort_order == discord.ForumOrderType.creation_date:
+                    sort_order = await self.bot._(ctx.guild.id, "info.info.forum.sort-order-creation")
+                else:
+                    sort_order = None
+                    self.bot.dispatch("error", ValueError(f"Unknown sort order type: {forum.default_sort_order}"))
+                if sort_order:
+                    sort_order_title = await self.bot._(ctx.guild.id, "info.info.forum.sort-order")
+                    embed.add_field(name=sort_order_title, value=sort_order)
+            # Guidelines
+            if forum.topic:
+                if len(forum.topic) > 400:
+                    guidelines = forum.topic[:400] + "..."
+                else:
+                    guidelines = forum.topic
+            else:
+                guidelines = str(await self.bot._(ctx.guild.id, "misc.none")).capitalize()
+            embed.add_field(name=await self.bot._(ctx.guild.id, "info.info.forum.guidelines"), value=guidelines, inline=False)
         await ctx.send(embed=embed)
 
     @info_main.command(name="id", aliases=["snowflake"])
