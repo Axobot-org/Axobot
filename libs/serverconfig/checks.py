@@ -19,8 +19,12 @@ async def check_config(bot: Axobot, guild: discord.Guild, option: str, value: An
     }:
         if embed := await moderation_commands_check(bot, guild, option, value):
             return embed
-    if option in {"bot_news", "partner_channel", "streaming_channel", "welcome_channel"}:
-        if embed := await can_write_in_channel_check(bot, guild, option, value):
+    if option in {"bot_news", "levelup_channel", "partner_channel", "streaming_channel", "welcome_channel"}:
+        levelup_is_channel = option != "levelup_channel" or not isinstance(value, str)
+        if levelup_is_channel and (embed := await can_write_in_channel_check(bot, guild, option, value)):
+            return embed
+    if option in {"levelup_channel", "levelup_msg", "noxp_channels", "noxp_roles", "xp_rate", "xp_type"}:
+        if embed := await xp_is_enabled_check(bot, guild, option, value):
             return embed
     if option == "xp_rate":
         if embed := await xp_is_local_check(bot, guild, option, value):
@@ -127,6 +131,17 @@ async def xp_is_local_check(bot: Axobot, guild: discord.Guild, _option: str, _va
         bot,
         guild,
         await bot._(guild, "server.warnings.xp_should_be_local")
+    )
+
+async def xp_is_enabled_check(bot: Axobot, guild: discord.Guild, _option: str, _value: Any):
+    "Check if the xp is enabled in this server, else warn that it'll be useless"
+    xp_enabled = await bot.get_config(guild.id, "enable_xp")
+    if xp_enabled:
+        return
+    return await _create_warning_embed(
+        bot,
+        guild,
+        await bot._(guild, "server.warnings.xp_should_be_enabled")
     )
 
 

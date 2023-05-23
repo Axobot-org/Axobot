@@ -159,7 +159,8 @@
         "antiraid_ban": "J'ai besoin de la permission 'Bannir des membres' pour appliquer la protection anti-raid",
         "channel_write_permissions": "J'ai besoin de la permission d'envoyer des messages dans %{channel} pour cette option",
         "moderation_command": "J'ai besoin de la permission '%{perm}' pour appliquer cette commande",
-        "title": "Warning",
+        "title": "Avertissement",
+        "xp_should_be_enabled": "Cette option est dédiée au système d'XP. Vous pouvez l'activer avec l'option de configuration 'enable_xp'",
         "xp_should_be_local": "Cette option ne fonctionne qu'avec le système d'XP local. Vous pouvez modifier le système d'XP du serveur avec l'option de configuration 'xp_type'"
     }
 }
