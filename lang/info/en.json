@@ -42,7 +42,7 @@
         "emoji-5": "Amount of uses",
         "emoji-5v": "%{nbr} (1st registered use: %{date})",
         "forum": {
-            "title": "Forum %{name}",
+            "title": "Forum '%{name}'",
             "tags": "Tags de posts",
             "guidelines": "Guide",
             "sort-order": "Ordre de tri par défaut",
@@ -155,6 +155,10 @@
         "snowflake-4": "Internal process ID",
         "snowflake-5": "Increment",
         "snowflake-6": "ID length",
+        "stage": {
+            "title": "Stage channel '%{name}'",
+            "moderators": "Moderators"
+        },
         "textchan-0": "Category",
         "textchan-1": "Description",
         "textchan-2": "NSFW",

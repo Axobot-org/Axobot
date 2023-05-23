@@ -65,7 +65,7 @@ Available types: member, role, user, emoji, channel, server, invite, category
             # try to convert ourselves because we are obviously a smart bot
             arg = ctx.message.content.replace(ctx.prefix+ctx.invoked_with, "").lstrip()
             # force the conversion order
-            order = ('member', 'role', 'emoji', 'text-channel', 'voice-channel', 'forum', 'category', 'user', 'invite', 'id')
+            order = ('member', 'role', 'emoji', 'text-channel', 'voice-channel', 'forum', 'stage-channel', 'category', 'user', 'invite', 'id')
             commands_list: list[commands.Command] = sorted(
                 ctx.command.commands, key=lambda x: order.index(x.name) if x.name in order else 100)
 
@@ -421,11 +421,15 @@ Available types: member, role, user, emoji, channel, server, invite, category
         delta = abs(channel.created_at - ctx.bot.utcnow())
         created_date = f"<t:{channel.created_at.timestamp():.0f}>"
         created_since = await FormatUtils.time_delta(delta.total_seconds(), lang=lang, year=True, hour=delta.total_seconds() < 86400)
-        embed.add_field(name=await self.bot._(ctx.guild.id, "info.info.member-1"), value = "{} ({} {})".format(created_date, since, created_since), inline=False)
+        embed.add_field(name=await self.bot._(ctx.guild.id, "info.info.member-1"), value = "{} ({} {})".format(
+            created_date, since, created_since
+        ), inline=False)
         # Bitrate
         embed.add_field(name="Bitrate",value=str(channel.bitrate/1000)+" kbps")
         # Members count
-        embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.role-3"), value="{}/{}".format(len(channel.members),channel.user_limit if channel.user_limit > 0 else "∞"))
+        embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.role-3"), value="{}/{}".format(
+            len(channel.members), channel.user_limit if channel.user_limit > 0 else "∞"
+        ))
         # Region
         if channel.rtc_region is not None:
             embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.guild-2"), value=str(channel.rtc_region).capitalize())
@@ -696,8 +700,53 @@ Available types: member, role, user, emoji, channel, server, invite, category
             embed.add_field(name=await self.bot._(ctx.guild.id, "info.info.forum.guidelines"), value=guidelines, inline=False)
         await ctx.send(embed=embed)
 
+    @info_main.command(name="stage-channel")
+    async def stage_info(self, ctx: MyContext, stage: discord.StageChannel):
+        "Get information about a stage channel"
+        if not stage.permissions_for(ctx.author).view_channel:
+            await ctx.send(await self.bot._(ctx.guild.id, "info.cant-see-channel"))
+            return
+        lang = await self.bot._(ctx.guild.id,"_used_locale")
+        since = await self.bot._(ctx.guild.id,"misc.since")
+        embed = discord.Embed(colour=default_color, timestamp=ctx.message.created_at)
+        icon_url = stage.guild.icon.with_static_format('png') if stage.guild.icon else None
+        title = await self.bot._(ctx.guild.id,"info.info.stage.title", name=stage.name)
+        embed.set_author(name=title, icon_url=icon_url)
+        # Name
+        embed.add_field(name=str(await self.bot._(ctx.guild.id,"misc.name")).capitalize(), value=stage.name,inline=True)
+        # ID
+        embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.role-0"), value=str(stage.id))
+         # Category
+        embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.textchan-0"), value=str(stage.category))
+        # NSFW
+        if stage.nsfw:
+            nsfw = await self.bot._(ctx.guild.id,"misc.yes")
+        else:
+            nsfw = await self.bot._(ctx.guild.id,"misc.no")
+        embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.textchan-2"), value=nsfw.capitalize())
+        # Created at
+        created_at = f"<t:{stage.created_at.timestamp():.0f}>"
+        show_hour = (ctx.bot.utcnow() - stage.created_at).days < 1
+        delta = await FormatUtils.time_delta(stage.created_at, ctx.bot.utcnow(), lang=lang, year=True, hour=show_hour)
+        embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.member-1"), value = "{} ({} {})".format(created_at,since,delta))
+        # Bitrate
+        embed.add_field(name="Bitrate",value=str(stage.bitrate/1000)+" kbps")
+        # Members count
+        embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.role-3"), value="{}/{}".format(
+            len(stage.members), stage.user_limit if stage.user_limit > 0 else "∞"
+        ))
+        # Region
+        if stage.rtc_region is not None:
+            embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.guild-2"), value=str(stage.rtc_region).capitalize())
+        # Moderators
+        if stage.moderators:
+            embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.stage.moderators"), value=", ".join(str(m) for m in stage.moderators))
+        await ctx.send(embed=embed)
+
+
     @info_main.command(name="id", aliases=["snowflake"])
     async def snowflake_infos(self, ctx: MyContext, snowflake: args.Snowflake):
+        "Get information about any Discord-generated ID"
         date = f"<t:{snowflake.date.timestamp():.0f}>"
         embed = discord.Embed(color=default_color, timestamp=ctx.message.created_at)
         embed.add_field(name=await self.bot._(ctx.channel,"info.info.snowflake-0"), value=date)
