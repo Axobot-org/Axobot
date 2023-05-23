@@ -114,7 +114,7 @@ The xp system is a system for evaluating a person's activity on a server using a
 Configure your server
 ---------------------
 
-There are several ways to customize your xp system. In particular, you have 4 `configuration options <server.html#config-options>`__, each one modifying a characteristic. And more are to come!
+There are several ways to customize your xp system. In particular, you have a few `configuration options <server.html#config-options>`__, each one modifying a characteristic, that you can set with the :code:`/config set <option> <value>` command. And more are to come!
 
 - **Enable/disable xp:** it is possible to enable or disable the entire xp system for your server via the option :code:`enable_xp`. If it is set to 'true' the system is enabled, otherwise it will be 'false'. By default 'false'.
 
