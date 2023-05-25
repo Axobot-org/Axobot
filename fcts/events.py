@@ -4,7 +4,6 @@ import json
 import random
 import re
 import time
-from typing import Optional
 
 import aiohttp
 import discord
@@ -25,7 +24,6 @@ class Events(commands.Cog):
         self.last_eventDay_check = datetime.datetime.utcfromtimestamp(0)
         self.statslogs_last_push = datetime.datetime.utcfromtimestamp(0)
         self.loop_errors = [0,datetime.datetime.utcfromtimestamp(0)]
-        self.last_membercounter = datetime.datetime.utcfromtimestamp(0)
         self.embed_colors = {"welcome":5301186,
             "mute":4868682,
             "unmute":8311585,
@@ -283,9 +281,9 @@ class Events(commands.Cog):
                     break
         except discord.Forbidden:
             pass
-        except Exception as e:
+        except Exception as err:
             if member.guild.id != 264445053596991498:
-                self.bot.log.warning("[check_user_left] {} (user {}/server {})".format(e, member.id, member.guild.id))
+                self.bot.log.warning("[check_user_left] {} (user {}/server {})".format(err, member.id, member.guild.id))
 
     @tasks.loop(seconds=1.0)
     async def loop(self):
@@ -309,10 +307,6 @@ class Events(commands.Cog):
             # Send stats logs - every 1h (start from 0:05 am)
             elif now.minute > 5 and (now.day != self.statslogs_last_push.day or now.hour != self.statslogs_last_push.hour) and self.bot.database_online:
                 await self.send_sql_statslogs()
-            # Refresh needed membercounter channels - every 1min
-            elif abs((self.last_membercounter - now).total_seconds()) > 60 and self.bot.database_online:
-                await self.bot.get_cog('ServerConfig').update_everyMembercounter()
-                self.last_membercounter = now
         except Exception as err:
             self.bot.dispatch("error", err)
             self.loop_errors[0] += 1
