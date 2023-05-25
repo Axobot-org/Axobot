@@ -5,19 +5,21 @@ from typing import Any, Optional
 import discord
 from cachingutils import LRUCache
 from discord import app_commands
-from discord.ext import commands
+from discord.ext import commands, tasks
 
 from fcts import checks
 from libs.bot_classes import Axobot, MyContext
 from libs.serverconfig.autocomplete import autocomplete_main
 from libs.serverconfig.checks import check_config
 from libs.serverconfig.config_paginator import ServerConfigPaginator
-from libs.serverconfig.converters import AllRepresentation, from_input, from_raw, to_display, to_raw
+from libs.serverconfig.converters import (AllRepresentation, from_input,
+                                          from_raw, to_display, to_raw)
 from libs.serverconfig.options_list import options as options_list
 from libs.views import ConfirmView
 
 
 class ServerConfig(commands.Cog):
+    "Commands and events related to the bot configuration on a server"
     def __init__(self, bot: Axobot):
         self.bot = bot
         self.file = "serverconfig"
@@ -27,8 +29,14 @@ class ServerConfig(commands.Cog):
         self.log_color = 0x1b5fb1
         self.max_members_for_nicknames = 3_000
 
+    async def cog_load(self):
+        self.update_every_membercounter.start() # pylint: disable=no-member
+
+    async def cog_unload(self):
+        self.update_every_membercounter.cancel() # pylint: disable=no-member
+
     async def clear_cache(self):
-        self.cache._items.clear()
+        self.cache._items.clear() # pylint: disable=protected-access
 
     # ---- PUBLIC QUERIES ----
 
@@ -167,44 +175,54 @@ class ServerConfig(commands.Cog):
         member_role_ids = {role.id for role in member.roles}
         return any(role in member_role_ids for role in roles_ids)
 
-    async def update_everyMembercounter(self):
+    # ---- MEMBERCOUNTER CHANNELS ----
+
+    @tasks.loop(minutes=1)
+    async def update_every_membercounter(self):
         "Update all pending membercounter channels"
         if not self.bot.database_online:
             return
         i = 0
         now = time.time()
-        for guild in self.bot.guilds:
-            if guild.id in self.membercounter_pending.keys() and self.membercounter_pending[guild.id] < now:
+        for guild_id in await self.db_get_guilds_with_membercounter():
+            if (guild := self.bot.get_guild(guild_id)) is None:
+                continue
+            if guild_id in self.membercounter_pending and self.membercounter_pending[guild_id] < now:
                 del self.membercounter_pending[guild.id]
-                await self.update_memberChannel(guild)
+            if await self.update_memberchannel(guild):
                 i += 1
         if i > 0:
-            emb = discord.Embed(description=f"[MEMBERCOUNTER] {i} channels refreshed", color=5011628, timestamp=self.bot.utcnow())
+            log_text = f"[MEMBERCOUNTER] {i} channels refreshed"
+            emb = discord.Embed(description=log_text, color=5011628, timestamp=self.bot.utcnow())
             emb.set_author(name=self.bot.user, icon_url=self.bot.user.display_avatar)
+            self.bot.log.info(log_text)
             await self.bot.send_embed(emb, url="loop")
 
-    async def update_memberChannel(self, guild: discord.Guild):
+    async def update_memberchannel(self, guild: discord.Guild):
         "Update a membercounter channel for a specific guild"
         # If we already did an update recently: abort
-        if guild.id in self.membercounter_pending.keys():
+        if guild.id in self.membercounter_pending:
             if self.membercounter_pending[guild.id] > time.time():
                 return False
         channel = await self.get_option(guild.id, "membercounter")
         if channel is None:
             return False
         lang = await self.bot._(guild.id, '_used_locale')
-        tr = (await self.bot._(guild.id, "misc.membres")).capitalize()
-        text = "{}{}: {}".format(tr, " " if lang=='fr' else "" , guild.member_count)
+        text = (await self.bot._(guild.id, "misc.membres")).capitalize()
+        if lang == "fr":
+            text += ' '
+        text += ': '
+        text += str(guild.member_count)
         if channel.name == text:
-            return
+            return False
         try:
-            await channel.edit(name=text, reason=await self.bot._(guild.id,"logs.reason.memberchan"))
+            await channel.edit(name=text, reason=await self.bot._(guild.id, "logs.reason.memberchan"))
             self.membercounter_pending[guild.id] = round(time.time()) + 5*60 # cooldown 5min
             return True
         except discord.HTTPException as err:
-            self.bot.log.warning("[UpdateMemberChannel] %s", err)
+            self.bot.log.warning("[MEMBERCOUNTER] %s", err)
         except Exception as err:
-            self.bot.dispatch("error", err)
+            self.bot.dispatch("error", err, f"for guild {guild.id}")
         return False
 
     # ---- DATABASE ACCESS ----
@@ -258,6 +276,14 @@ class ServerConfig(commands.Cog):
         query = "DELETE FROM `serverconfig` WHERE `guild_id` = %s AND `beta` = %s"
         async with self.bot.db_query(query, (guild_id, self.bot.beta), returnrowcount=True) as query_results:
             return query_results > 0
+
+    async def db_get_guilds_with_membercounter(self) -> list[int]:
+        "Get a list of guilds with a membercounter"
+        if not self.bot.database_online:
+            raise RuntimeError("Database is offline")
+        query = "SELECT `guild_id` FROM `serverconfig` WHERE `option_name` = 'membercounter' AND `beta` = %s"
+        async with self.bot.db_query(query, (self.bot.beta,)) as query_results:
+            return [row['guild_id'] for row in query_results]
 
     # ---- COMMANDS ----
 
