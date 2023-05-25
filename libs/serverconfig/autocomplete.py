@@ -187,7 +187,7 @@ async def _autocomplete_voice_channel(_: Axobot, interaction: Interaction, optio
     filtered_channels = (
         channel
         for channel in all_channels
-        if (option["allow_stage"] or not isinstance(channel, discord.StageChannel))
+        if (option["allow_stage_channels"] or not isinstance(channel, discord.StageChannel))
         and (option["allow_non_nsfw_channels"] or channel.is_nsfw())
     )
     if current:
