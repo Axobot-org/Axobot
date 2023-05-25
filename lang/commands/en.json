@@ -81,7 +81,11 @@
         "blurple lightfy": "lightfy",
         "blurple darkfy": "darkfy",
         "blurple check": "check",
-        "ping": "ping"
+        "ping": "ping",
+        "reminders create": "create",
+        "reminders list": "list",
+        "reminders delete": "delete",
+        "reminders clear": "clear"
     },
     "group_name": {
         "antiscam": "antiscam",
@@ -96,7 +100,8 @@
         "twitch": "twitch",
         "profile": "profile",
         "roles-rewards": "roles-rewards",
-        "blurple": "blurple"
+        "blurple": "blurple",
+        "reminders": "reminders"
     },
     "command_short_description": {
     },
@@ -112,7 +117,8 @@
         "tickets topic": "Handle the different ticket topics your members can select",
         "twitch": "Manage your Twitch subscriptions",
         "profile": "Configure the bot for your own usage",
-        "roles-rewards": "Give roles to your members when they reach a certain level"
+        "roles-rewards": "Give roles to your members when they reach a certain level",
+        "reminders": "Manage your pending reminders"
     },
     "param_name": {
         "antiscam test": {
@@ -355,6 +361,13 @@
         },
         "blurple check": {
             "who": "who"
+        },
+        "reminders create": {
+            "duration": "duration",
+            "message": "message"
+        },
+        "reminders delete": {
+            "reminder_id": "reminder-id"
         }
     }
 }

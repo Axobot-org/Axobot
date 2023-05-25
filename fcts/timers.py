@@ -85,9 +85,9 @@ class Timers(commands.Cog):
         await self.remind_create(ctx, duration, message=message)
 
 
-    @commands.group(name="reminder", aliases=["remind", "reminds", "reminders"])
+    @commands.hybrid_group(name="reminders", aliases=["reminds", "reminder"])
     async def remind_main(self, ctx: MyContext):
-        """Ask the bot to remind you of something later
+        """Manage your pending reminders
 
         ..Doc miscellaneous.html#reminders"""
         if ctx.subcommand_passed is None:
@@ -95,8 +95,9 @@ class Timers(commands.Cog):
 
 
     @remind_main.command(name="create", aliases=["add"])
-    @commands.cooldown(5,30,commands.BucketType.channel)
-    @commands.cooldown(5,60,commands.BucketType.user)
+    @app_commands.describe(duration="The duration to wait, eg. '2d 4h'", message="The message to remind you of")
+    @commands.cooldown(5, 30, commands.BucketType.channel)
+    @commands.cooldown(5, 60, commands.BucketType.user)
     @commands.check(checks.database_connected)
     async def remind_create(self, ctx: MyContext, duration: commands.Greedy[args.Duration], *, message: str):
         """Create a new reminder
@@ -108,9 +109,9 @@ class Timers(commands.Cog):
         `XXw` : XX weeks
         `XXm` : XX months
 
-        ..Example reminder create 49d Think about doing my homework
+        ..Example reminders create 49d Think about doing my homework
 
-        ..Example reminder create 3h 5min It's pizza time!
+        ..Example reminders create 3h 5min It's pizza time!
 
         ..Doc miscellaneous.html#create-a-new-reminder
         """
@@ -141,7 +142,7 @@ class Timers(commands.Cog):
 
 
     @remind_main.command(name="list")
-    @commands.cooldown(5,60,commands.BucketType.user)
+    @commands.cooldown(5, 60, commands.BucketType.user)
     @commands.check(checks.database_connected)
     async def remind_list(self, ctx: MyContext):
         """List your pending reminders
@@ -287,8 +288,8 @@ class Timers(commands.Cog):
         if ids is None:
             return
         if await self.db_delete_reminders(ids, ctx.author.id):
-            for reminder_id in ids:
-                await self.bot.task_handler.remove_task(reminder_id)
+            for rmd_id in ids:
+                await self.bot.task_handler.remove_task(rmd_id)
             await ctx.send(await self.bot._(ctx.channel, "timers.rmd.delete.success", count=len(ids)))
         else:
             await ctx.send(await self.bot._(ctx.channel, "timers.rmd.delete.error"))
