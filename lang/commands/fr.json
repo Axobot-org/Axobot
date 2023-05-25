@@ -75,7 +75,11 @@
         "blurple lightfy": "lightfy",
         "blurple darkfy": "darkfy",
         "blurple check": "vérifier",
-        "ping": "ping"
+        "ping": "ping",
+        "reminders create": "ajouter",
+        "reminders list": "liste",
+        "reminders delete": "anuler",
+        "reminders clear": "tout-annuler"
     },
     "group_name": {
         "antiscam": "anti-arnaque",
@@ -90,7 +94,8 @@
         "twitch": "twitch",
         "profile": "profil",
         "roles-rewards": "rôles-récompenses",
-        "blurple": "blurple"
+        "blurple": "blurple",
+        "reminders": "rappels"
     },
     "command_short_description": {
         "clear": "Supprime des messages du salon",
@@ -108,7 +113,8 @@
         "tickets topic": "Gère les différents sujets de tickets",
         "twitch": "Abonne ton serveur à des streamers Twitch",
         "profile": "Configure le bot pour ta propre utilisation",
-        "roles-rewards": "Donne des rôles à tes membres en fonction de leur xp"
+        "roles-rewards": "Donne des rôles à tes membres en fonction de leur xp",
+        "reminders": "Gère tes rappels en attente"
     },
     "param_name": {
         "antiscam test": {
@@ -351,6 +357,13 @@
         },
         "blurple check": {
             "who": "cible"
+        },
+        "reminders create": {
+            "duration": "durée",
+            "message": "message"
+        },
+        "reminders delete": {
+            "reminder_id": "id-du-rappel"
         }
     }
 }

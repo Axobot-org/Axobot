@@ -106,7 +106,7 @@ If you have some issues with your memory like me, I think you should start using
 Create a new reminder
 ---------------------
 
-**Syntax:** :code:`remindme <duration> <message>` or :code:`reminder create <duration> <message>`
+**Syntax:** :code:`remindme <duration> <message>` or :code:`reminders create <duration> <message>`
 
 The duration argument is exactly the same as for tempmute/tempban: use :code:`XXw` for weeks, :code:`XXd` for days, :code:`XXh` for hours and :code:`XXm` for minutes (replacing **XX** by the corresponding number, of course!)
 
@@ -115,7 +115,7 @@ The duration argument is exactly the same as for tempmute/tempban: use :code:`XX
 List your reminders
 -------------------
 
-**Syntax:** :code:`reminder list`
+**Syntax:** :code:`reminders list`
 
 Here you will get the full list of pending reminders, waiting for the end of their timers. Nothing but a list, really.
 
@@ -124,7 +124,7 @@ Here you will get the full list of pending reminders, waiting for the end of the
 Delete one or more reminders
 ----------------------------
 
-**Syntax:** :code:`reminder delete [ID]`
+**Syntax:** :code:`reminders delete [ID]`
 
 Used when you want to stop a reminder, so Axobot will completely forget it. If you don't provide any ID, Axobot will ask you to directly select which reminders you want to delete.
 
