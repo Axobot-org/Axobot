@@ -43,11 +43,11 @@
         "emoji-5v": "%{nbr} (1st registered use: %{date})",
         "forum": {
             "title": "Forum '%{name}'",
-            "tags": "Tags de posts",
-            "guidelines": "Guide",
-            "sort-order": "Ordre de tri par défaut",
-            "sort-order-latest": "Activité récente",
-            "sort-order-creation": "Heure de création"
+            "tags": "Post tags",
+            "guidelines": "Guidelines",
+            "sort-order": "Default sort order",
+            "sort-order-latest": "Recent activity",
+            "sort-order-creation": "Creation time"
         },
         "guild-0": "Guild",
         "guild-1": "Owner",
