@@ -165,6 +165,7 @@
         "channel_write_permissions": "Whoopsie, did u forget 2 allow me 2 send msg in %{channel}?",
         "moderation_command": "I need 2b able 2 %{perm} for dis command hehe",
         "title": "YOUR ATTENTION PLEASE - THIS IS A SERIOUS WARNING - I guess",
+        "xp_should_be_enabled": "Dis opshun is for teh xp system, u might wanna enable it first wiz /config set 'enable_xp'",
         "xp_should_be_local": "Dis opshun is designed 4 local xp, duh. if datz what u want, try teh `xp_type` config opshun"
     }
 }
