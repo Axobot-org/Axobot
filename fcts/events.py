@@ -321,7 +321,7 @@ class Events(commands.Cog):
     async def before_loop(self):
         await self.bot.wait_until_ready()
         await asyncio.sleep(2)
-        self.bot.log.info("[tasks_loop] Lancement de la boucle")
+        self.bot.log.info("[tasks_loop] Starting one loop iteration")
 
     async def botEventLoop(self):
         "Refresh the current bot event every once in a while"
