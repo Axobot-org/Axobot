@@ -41,6 +41,14 @@
         "emoji-4": "Limits",
         "emoji-5": "Uzes nbr",
         "emoji-5v": "%{nbr} (1st registered use: %{date})",
+        "forum": {
+            "title": "forum '%{name}'",
+            "tags": "Availabl post decorashuns",
+            "guidelines": "How-to instructions",
+            "sort-order": "How is dat sorted?",
+            "sort-order-latest": "Most-recent-comment-first",
+            "sort-order-creation": "Most-oldest-post-first"
+        },
         "guild-0": "Guild",
         "guild-1": "Auwner",
         "guild-10": "Tim be4 being AFK",
@@ -67,6 +75,7 @@
             "AUTO_MODERATION": "Auto ban",
             "BANNER": "Custom srv banner",
             "CHANNEL_BANNER": "Cool lounge banners",
+            "CHANNEL_ICON_EMOJIS_GENERATED": "Channel decoration addd",
             "COMMERCE": "Buy-things features",
             "COMMUNITY": "BetterTogether server",
             "CREATOR_ACCEPTED_NEW_TERMS": "Owner got new Discord Rules",
@@ -146,6 +155,10 @@
         "snowflake-4": "Int. proc. iD",
         "snowflake-5": "Random thing",
         "snowflake-6": "How long",
+        "stage": {
+            "title": "Stage '%{name}'",
+            "moderators": "Modz"
+        },
         "textchan-0": "Catègoryz",
         "textchan-1": "Descripshun",
         "textchan-2": "Nut 4 kIdz (NSFVV)",
