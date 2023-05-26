@@ -125,6 +125,7 @@
         "muted_role": "Usd role 2 mute people : %{value}",
         "nicknames_history": "Remembr nick changes happenin here? %{value}",
         "noxp_channels": "Chats where xp is for:b:idden: %{value}",
+        "noxp_roles": "Rolz banned frm getting xp: %{value}",
         "partner_channel": "Channel where partners are sended: %{value}",
         "partner_color": "Coulor of partners box: %{value}",
         "partner_role": "Role givn 2 partners: %{value}",
@@ -164,6 +165,7 @@
         "channel_write_permissions": "Whoopsie, did u forget 2 allow me 2 send msg in %{channel}?",
         "moderation_command": "I need 2b able 2 %{perm} for dis command hehe",
         "title": "YOUR ATTENTION PLEASE - THIS IS A SERIOUS WARNING - I guess",
+        "xp_should_be_enabled": "Dis opshun is for teh xp system, u might wanna enable it first wiz /config set 'enable_xp'",
         "xp_should_be_local": "Dis opshun is designed 4 local xp, duh. if datz what u want, try teh `xp_type` config opshun"
     }
 }

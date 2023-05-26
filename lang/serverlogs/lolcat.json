@@ -1,7 +1,6 @@
 {
     "categories": {
         "automod": "Automod thing",
-        "bot": "BOt",
         "members": "Memberz",
         "messages": "Msgs",
         "moderation": "Moderashun",
@@ -18,6 +17,7 @@
         "current": "Logs of %{kind} will be sent 2 dis channel, yay",
         "other": "Logs of %{kind} will be sent 2 %{channel}, hurray"
     },
+    "kick-warning": "Welp, if u want dis 2 work, u shuld better get me teh \"view audit logs\" perm, duh!",
     "list": {
         "all": "List ov available logs",
         "channel": "List ov logs in %{channel}",

@@ -2,7 +2,8 @@
     "collect": {
         "got-points": "GG, u just got **%{pts}** points!",
         "lost-points": "Oh no, u just lost **%{pts}** points :(",
-        "too-quick": "Wait no, ur too soon! Please wait %{time} again k thx"
+        "too-quick": "Wait no, ur too soon! Please wait %{time} again k thx",
+        "strike": "I gave u extra chances cuz you usd that command %{level} times in a row, just so u know."
     },
     "events-price-title": "Prizes 2 win",
     "nothing-desc": "There'r no events rn. Follow my bot news 2 know teh date of the next one!",
