@@ -41,6 +41,14 @@
         "emoji-4": "Limits",
         "emoji-5": "Uzes nbr",
         "emoji-5v": "%{nbr} (1st registered use: %{date})",
+        "forum": {
+            "title": "forum '%{name}'",
+            "tags": "Availabl post decorashuns",
+            "guidelines": "How-to instructions",
+            "sort-order": "How is dat sorted?",
+            "sort-order-latest": "Most-recent-comment-first",
+            "sort-order-creation": "Most-oldest-post-first"
+        },
         "guild-0": "Guild",
         "guild-1": "Auwner",
         "guild-10": "Tim be4 being AFK",
@@ -67,6 +75,7 @@
             "AUTO_MODERATION": "Auto ban",
             "BANNER": "Custom srv banner",
             "CHANNEL_BANNER": "Cool lounge banners",
+            "CHANNEL_ICON_EMOJIS_GENERATED": "Channel decoration addd",
             "COMMERCE": "Buy-things features",
             "COMMUNITY": "BetterTogether server",
             "CREATOR_ACCEPTED_NEW_TERMS": "Owner got new Discord Rules",
@@ -129,9 +138,16 @@
         "role-1": "Colorr",
         "role-2": "Mentionnable",
         "role-3": "Nmber ov members",
-        "role-4": "Lonely supeR :a:lon roleZ",
         "role-5": "Hierarchical posishun",
         "role-6": "Lonely userz",
+        "role-specificities": {
+            "field-name": "Weird things",
+            "hoist": "Lonely role",
+            "purchaseable": "Moneyable role",
+            "bot_managed": "Handld by %{bot}",
+            "guild_connection": "Gatewayed role",
+            "premium_sub": "Super-nitro-advanced-fancy-boost-role"
+        },
         "snowflake-0": "Cratiun date",
         "snowflake-1": "Bin",
         "snowflake-2": "time",
@@ -139,6 +155,10 @@
         "snowflake-4": "Int. proc. iD",
         "snowflake-5": "Random thing",
         "snowflake-6": "How long",
+        "stage": {
+            "title": "Stage '%{name}'",
+            "moderators": "Modz"
+        },
         "textchan-0": "Catègoryz",
         "textchan-1": "Descripshun",
         "textchan-2": "Nut 4 kIdz (NSFVV)",
@@ -160,8 +180,8 @@
     },
     "not-found": "Unable 2 found %{N}",
     "ping": {
-        "found": "Pong! (avg ov %{tps}ms that I send 2 %{url})",
-        "notfound": "UwU I cant ping that"
+        "normal": ":ping_pong:  Gotcha!\nMy running speed: %{bot}ms\nHow slow iz discord: %{api}ms",
+        "pig": "Haha u made a typo! :pig:\nhow fast I run: %{bot}ms\nHow slow iz discord: %{api}ms"
     },
     "prefix": "List ov usable prefiXs:",
     "stats": {
