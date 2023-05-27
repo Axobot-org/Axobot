@@ -196,7 +196,9 @@ class Users(commands.Cog):
             "LEVEL": await self.bot._(ctx.channel, "xp.card-level"),
             "RANK": await self.bot._(ctx.channel, "xp.card-rank"),
         }
-        card = await self.bot.get_cog('Xp').create_card(translations_map, ctx.author, style, 25, 0, 1, [1, 2, 1])
+        card = await self.bot.get_cog('Xp').create_card(translations_map, ctx.author, style, xp=30, rank=0, ranks_nb=1,
+                                                        levels_info=[1, 85, 0])
+                                                        # current level, xp for next level, xp for current level
         await ctx.send(desc, file=card)
 
     @profile_cardpreview.autocomplete("style")
