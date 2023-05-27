@@ -132,6 +132,7 @@ async def load_cogs(bot: "Axobot"):
         'fcts.help_cmd',
         'fcts.antiraid',
         'fcts.antiscam',
+        'fcts.blurple',
         'fcts.bot_events',
         'fcts.bot_info',
         'fcts.bot_stats',

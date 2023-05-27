@@ -1,0 +1,17 @@
+{
+    "blurplefy": {
+        "starting": "Starting %{name} for %{user}",
+        "success": "%{user}, here's your image!"
+    },
+    "check": {
+        "intro": "%{user}, starting blurple image analysis (Please note that this may take a while)",
+        "result": "%{user}, here are your Blurple analysis results:\n%{results}",
+        "reward": "%{user}, you just won %{amount} event XP thanks to your blurple-liful image!"
+    },
+    "collect": {
+        "title": "Blurple event",
+        "too-quick": "It's still too early! You will only be able to collect event points in %{time}!"
+    },
+    "missing-attachment-perm": "Oops, I'm missing permission to send images!",
+    "unknown-err": "Oops, something went wrong! %{err}"
+}
