@@ -293,13 +293,13 @@ You can specify a verification limit by adding a number in argument (up to 1.000
             victime = name
             ex = name.replace(" ","_")
         author = ctx.author.mention
-        liste = await self.bot._(ctx.channel,"fun.kills-list")
+        liste = await self.bot._(ctx.channel, "fun.kills-list")
         msg = random.choice(liste)
         tries = 0
         while '{0}' in msg and name is None and tries<50:
             msg = random.choice(liste)
             tries += 1
-        await ctx.send(msg.format(author,victime,ex))
+        await ctx.send(msg.format(attacker=author, victim=victime, ex=ex))
 
     @commands.command(name="arapproved",aliases=['arapprouved'],hidden=True)
     @commands.check(lambda ctx: ctx.author.id in [375598088850505728,279568324260528128])
