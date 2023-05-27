@@ -41,7 +41,13 @@
         "Houston, on a un problème. {user} a atteint le niveau {level} !!!",
         "Tu vois, le monde se divise en deux catégories : ceux qui levelup et ceux qui levelup pas. Toi {user}, tu levelup au niveau {level} !!!",
         "Que le niveau {level} soit avec toi, {user}.",
-        "Hey {user}, ton compte banquaire a atteint 50 milliards ! ... Je rigole, en fait il est à peine à {level}."
+        "Hey {user}, ton compte banquaire a atteint 50 milliards ! ... Je rigole, en fait il est à peine à {level}.",
+        "Le pouvoir de {user} est au delà de 9000 ! Ah non, il est seulement **niveau {level}**...",
+        "{user} a utilisé {random} pour passer au **niveau {level}**.",
+        "La carte {user} est désormais **niveau {level}** et dispose de meilleures statistiques.",
+        "En ouvrant ce coffre au trésor, {user} passe au **rang {level}**.",
+        "{user} a éliminé assez de zombies pour monter au **niveau {level}**.",
+        "Avec ce nouveau bâtiment, la base de {user} monte au **niveau {level}**."
     ],
     "del-user": "<deleted user>",
     "high-page": "Il n'y a pas autant de pages !",
