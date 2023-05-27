@@ -208,7 +208,7 @@ class Xp(commands.Cog):
         text: Optional[str] = await self.bot.get_config(msg.guild.id, "levelup_msg")
         if text is None or len(text) == 0:
             text = random.choice(await self.bot._(msg.channel, "xp.default_levelup"))
-            while '{random}' not in text and random.random() < 0.75:
+            while '{random}' not in text and random.random() < 0.7:
                 text = random.choice(await self.bot._(msg.channel, "xp.default_levelup"))
         if '{random}' in text:
             item = random.choice(await self.bot._(msg.channel, "xp.levelup-items"))
