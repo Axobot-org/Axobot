@@ -4,7 +4,6 @@ import os
 from libs.xp_cards.card_types import CardData, CardMetaData, TextData, TextMetaData, ColorsData
 
 V1_CARDS = {
-    "admin",
     "april22",
     "blue",
     "blurple19",
@@ -14,7 +13,6 @@ V1_CARDS = {
     "christmas19",
     "christmas20",
     "christmas22",
-    "contributor",
     "dark",
     "green",
     "grey",
@@ -22,18 +20,20 @@ V1_CARDS = {
     "halloween21",
     "halloween22",
     "orange",
-    "partner",
-    "premium",
     "purple",
     "rainbow",
     "red",
-    "support",
     "turquoise",
     "yellow",
 }
 
 V3_CARDS = {
+    "admin",
     "blurple23",
+    "contributor",
+    "partner",
+    "premium",
+    "support",
 }
 
 JSON_DATA_FILE = os.path.dirname(__file__) + "/cards_data.json"

@@ -120,11 +120,11 @@
                     "position": [
                         [
                             340,
-                            49
+                            46
                         ],
                         [
                             681,
-                            79
+                            78
                         ]
                     ],
                     "font_size": 55,
@@ -239,11 +239,11 @@
             "xp_bar": [230, 0, 0],
             "texts": {
                 "username": [230, 200, 25],
-                "level_label": [230, 25, 40],
                 "level": [252, 32, 46],
-                "rank_label": [215, 0, 0],
-                "rank_and_participants": [230, 0, 0],
-                "xp": [230, 185, 11]
+                "rank": [230, 0, 0],
+                "participants": [230, 0, 0],
+                "xp_to_next_level_with_text": [230, 185, 11],
+                "total_xp_with_text": [230, 185, 11]
             }
         },
         "christmas20": {
@@ -277,6 +277,17 @@
                 "participants": [255, 255, 255],
                 "xp_to_next_level_with_text": [255, 255, 255],
                 "total_xp_with_text": [255, 255, 255]
+            }
+        },
+        "premium": {
+            "xp_bar": [255, 255, 102],
+            "texts": {
+                "username": [255, 255, 102],
+                "level": [255, 212, 128],
+                "rank": [230, 200, 25],
+                "participants": [230, 200, 25],
+                "xp_to_next_level_with_text": [255, 204, 102],
+                "total_xp_with_text": [255, 204, 102]
             }
         }
     }
