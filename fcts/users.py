@@ -181,19 +181,23 @@ class Users(commands.Cog):
         ..Example profile card-preview red
 
         ..Doc user.html#change-your-xp-card"""
-        if ctx.bot_permissions.attach_files:
-            await ctx.defer()
-            if style is None:
-                style = await self.bot.get_cog('Utilities').get_xp_style(ctx.author)
-            desc = await self.bot._(ctx.channel, 'users.card-desc')
-            translations_map = {
-                "LEVEL": await self.bot._(ctx.channel, "xp.card-level"),
-                "RANK": await self.bot._(ctx.channel, "xp.card-rank"),
-            }
-            card = await self.bot.get_cog('Xp').create_card(translations_map, ctx.author, style, 25, 0, 1, [1, 2, 1])
-            await ctx.send(desc, file=card)
-        else:
+        if ctx.current_argument != style:
+            available_cards = ', '.join(await ctx.bot.get_cog('Utilities').allowed_card_styles(ctx.author))
+            await ctx.send(await self.bot._(ctx.channel, 'users.invalid-card', cards=available_cards))
+            return
+        if not ctx.bot_permissions.attach_files:
             await ctx.send(await self.bot._(ctx.channel, 'users.missing-attach-files'))
+            return
+        await ctx.defer()
+        if style is None:
+            style = await self.bot.get_cog('Utilities').get_xp_style(ctx.author)
+        desc = await self.bot._(ctx.channel, 'users.card-desc')
+        translations_map = {
+            "LEVEL": await self.bot._(ctx.channel, "xp.card-level"),
+            "RANK": await self.bot._(ctx.channel, "xp.card-rank"),
+        }
+        card = await self.bot.get_cog('Xp').create_card(translations_map, ctx.author, style, 25, 0, 1, [1, 2, 1])
+        await ctx.send(desc, file=card)
 
     @profile_cardpreview.autocomplete("style")
     async def cardpreview_autocomplete_style(self, inter: discord.Interaction, current: str):
