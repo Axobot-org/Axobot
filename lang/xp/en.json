@@ -41,7 +41,13 @@
         "Houston, we have a problem. {user} has passed level {level}!!!",
         "You see, the world is divided into two categories: those who levelup and those who don't levelup. You {user}, you levelup to level {level}!",
         "*May the level {level} be with you, {user}.*",
-        "Hey {user}, your balance is level 50 billion! ... Just kidding, it's actually barely {level}."
+        "Hey {user}, your balance is level 50 billion! ... Just kidding, it's actually barely {level}.",
+        "{user}'s power level is over 9000 ! Oh, it's only **level {level}**...",
+        "{user} used {random} to reach **level {level}**.",
+        "The {user} card is now at **level {level}** and has improved abilities.",
+        "By opening this treasure chest, {user} moves up to **level {level}**.",
+        "{user} has eliminated enough zombies to reach **level {level}**.",
+        "With this new building, the {user} base rises to **level {level}**."
     ],
     "del-user": "<deleted user>",
     "high-page": "There are not that many pages!",
