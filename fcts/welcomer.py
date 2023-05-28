@@ -28,7 +28,7 @@ class Welcomer(commands.Cog):
             # If axobot is already there, let it handle it
             if await self.bot.check_axobot_presence(guild=member.guild):
                 return
-            await self.bot.get_cog("ServerConfig").update_memberChannel(member.guild)
+            await self.bot.get_cog("ServerConfig").update_memberchannel(member.guild)
             if "MEMBER_VERIFICATION_GATE_ENABLED" not in member.guild.features:
                 await self.send_msg(member, "welcome")
                 self.bot.loop.create_task(self.give_roles(member))
@@ -60,7 +60,7 @@ class Welcomer(commands.Cog):
             # If axobot is already there, let it handle it
             if await self.bot.check_axobot_presence(guild=member.guild):
                 return
-            await self.bot.get_cog("ServerConfig").update_memberChannel(member.guild)
+            await self.bot.get_cog("ServerConfig").update_memberchannel(member.guild)
             if "MEMBER_VERIFICATION_GATE_ENABLED" not in member.guild.features or not member.pending:
                 await self.send_msg(member, "leave")
             await self.bot.get_cog('Events').check_user_left(member)

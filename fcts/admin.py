@@ -395,7 +395,7 @@ class Admin(commands.Cog):
         if self.bot.database_online:
             i = 0
             for guild in self.bot.guilds:
-                if await self.bot.get_cog("ServerConfig").update_memberChannel(guild):
+                if await self.bot.get_cog("ServerConfig").update_memberchannel(guild):
                     i += 1
             await ctx.send(f"{i} salons mis à jours !")
         else:
