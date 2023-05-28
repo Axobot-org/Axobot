@@ -362,7 +362,7 @@ class Events(commands.Cog):
                     'guildCount': guild_count
                 })
                 headers = {
-                    'Authorization': self.bot.others['botsondiscord'],
+                    'Authorization': self.bot.others["botsondiscord"],
                     'Content-Type': 'application/json'
                 }
                 async with session.post(f'https://bots.ondiscord.xyz/bot-api/bots/{self.bot.user.id}/guilds', data=payload, headers=headers) as resp:
@@ -376,7 +376,7 @@ class Events(commands.Cog):
                     'guildCount': guild_count
                 })
                 headers = {
-                    'Authorization': self.bot.others['discordextremelist'],
+                    'Authorization': self.bot.others["discordextremelist"],
                     'Content-Type': 'application/json'
                 }
                 async with session.post(f'https://api.discordextremelist.xyz/v2/bot/{self.bot.user.id}/stats', data=payload, headers=headers) as resp:
@@ -391,7 +391,7 @@ class Events(commands.Cog):
                     'guilds': guild_count
                 })
                 headers = {
-                    'Authorization': self.bot.others['discordbotlist'],
+                    'Authorization': self.bot.others["discordbotlist_axobot"],
                     'Content-Type': 'application/json'
                 }
                 async with session.post(f'https://discordbotlist.com/api/v1/bots/{self.bot.user.id}/stats', data=payload, headers=headers) as resp:
