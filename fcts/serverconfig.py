@@ -219,8 +219,8 @@ class ServerConfig(commands.Cog):
             await channel.edit(name=text, reason=await self.bot._(guild.id, "logs.reason.memberchan"))
             self.membercounter_pending[guild.id] = round(time.time()) + 5*60 # cooldown 5min
             return True
-        except discord.HTTPException as err:
-            self.bot.log.warning("[MEMBERCOUNTER] %s", err)
+        except discord.Forbidden:
+            pass
         except Exception as err:
             self.bot.dispatch("error", err, f"for guild {guild.id}")
         return False
