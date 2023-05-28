@@ -340,7 +340,7 @@ class Events(commands.Cog):
         answers: list[str] = []
         self.bot.log.info("Sending server count to bots lists APIs...")
         try:
-            guild_count = await self.bot.get_cog('Info').get_guilds_count()
+            guild_count = await self.bot.get_cog('BotInfo').get_guilds_count()
         except Exception as err:
             self.bot.dispatch("error", err, "Fetching guild count")
             guild_count = len(self.bot.guilds)
