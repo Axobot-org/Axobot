@@ -65,7 +65,7 @@ You can allow or disallow one of the configuration options via this command, muc
 Option 'animated_card'
 ======================
 
-This option allows you to enable the rendering of your xp card in.gif format if you have an animated profile image. Since the image processing time is much longer, with reduced quality, this option is disabled by default.
+This option allows you to enable the rendering of your xp card in .gif format if you have an animated profile image. Since the image processing time is much longer, with reduced quality, this option is disabled by default.
 
 Option 'auto_unafk'
 ===================
