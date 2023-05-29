@@ -9,8 +9,8 @@
     "missing-attach-files": "Oops, I\"m missing the permission to Attach Files :confused:",
     "set_config": {
         "animated_card": {
-            "false": "You are not currently allowing an animated card. Thanks!",
-            "true": "The animated xp cards can be used for you (slower rendering)"
+            "false": "Your xp card won't be animated even if you use an animated avatar (faster rendering)",
+            "true": "Your xp card will be animated when you have an animated avatar (slower rendering)"
         },
         "auto_unafk": {
             "false": "You must remove the AFK tag yourself",
