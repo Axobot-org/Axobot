@@ -34,7 +34,7 @@
     "fun-list": "Here is the list of available fun commands:",
     "invalid-city": "Invalid city :confused:",
     "kills-list": [
-        "***BOUM!*** {victim} fell into a trap posed by {attacker}!",
+        "***BOUM!*** {victim} fell into a trap placed by {attacker}!",
         "Luckily, the ground has cushioned the fall of {victim}!",
         "{attacker} shouted \"Fus Roh Dah\" while {victim} was next to a cliff...",
         "No, you can't stop bullets with your hands {victim} :shrug:",
