@@ -3,7 +3,7 @@
     "changed-card": "Your xp card now uses the style %{style}",
     "changed-error": "Oops, an internal error occurred during the processing of the request. Try again later or contact support.",
     "config_list": "List of available options: %{options}\n\nUse the `help profile config` command for more details",
-    "config_success": "The %{opt} option has been changed!",
+    "config_success": "The %{opt} option has been edited!",
     "invalid-card": "This style is invalid. Here is the list of styles you can use: %{cards}",
     "list-cards": "Here is the list of available rank cards for you: %{cards}",
     "missing-attach-files": "Oops, I\"m missing the permission to Attach Files :confused:",
