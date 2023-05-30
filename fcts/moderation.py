@@ -1182,7 +1182,7 @@ The 'show_reasons' parameter is used to display the mute reasons.
             return await ctx.send(await self.bot._(ctx.guild.id, "moderation.role.give-roles-higher"))
         await user.add_roles(role, reason=f"Asked by {ctx.author}")
         await self.bot.task_handler.add_task('role-grant', duration, user.id, ctx.guild.id, data={'role': role.id})
-        f_duration = await FormatUtils.time_delta(duration, lang=await self.bot._(ctx.guild,'_used_locale'), form="short")
+        f_duration = await FormatUtils.time_delta(duration, lang=await self.bot._(ctx.guild,'_used_locale'))
         await ctx.send(
             await self.bot._(ctx.guild.id, "moderation.role.temp-grant-success", role=role.name, user=user.mention, time=f_duration),
             allowed_mentions=discord.AllowedMentions.none()
