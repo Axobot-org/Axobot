@@ -420,6 +420,9 @@ class ServerLogs(commands.Cog):
             if msg is not None:
                 emb.set_author(name=str(msg.author), icon_url=msg.author.display_avatar)
                 emb.add_field(name="Message Author", value=f"{msg.author} ({msg.author.id})")
+                if msg.attachments:
+                    field_title = "Attachment" if len(msg.attachments) == 1 else f"Attachments ({len(msg.attachments)})"
+                    emb.add_field(name=field_title, value=" ".join([f"[{a.filename}]({a.url})" for a in msg.attachments]))
             created_at = discord.utils.snowflake_time(payload.message_id)
             emb.add_field(name="Created at", value=f"<t:{created_at.timestamp():.0f}>")
             await self.validate_logs(guild, channel_ids, emb, "message_delete")
