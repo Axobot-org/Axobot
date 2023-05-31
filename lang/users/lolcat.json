@@ -9,8 +9,8 @@
     "missing-attach-files": "Oops, I'm missing the Attach Files perms :upside_down:",
     "set_config": {
         "animated_card": {
-            "false": "Anamited xp cards are naw disabld for you",
-            "true": "Animated xp cards ar naw enabled 4U"
+            "false": "Ur xp card iz now static even w/ animated pfp (faster answer yeaaaah)",
+            "true": "Ur xp card will naw b moving if u have an animatd pfp (may be slawer :/)"
         },
         "auto_unafk": {
             "false": "U do ur own job, okay?",
