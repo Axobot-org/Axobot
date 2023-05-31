@@ -80,7 +80,10 @@
         "{attacker}'s towers arrows found their mark, ending {victim}'s reign.",
         "{victim} got caught in a never-ending loop of portal madness.",
         "{victim} underestimated the power of the turrets.",
-        "Cake was a lie, and so was {victim}'s chance of survival."
+        "Cake was a lie, and so was {victim}'s chance of survival.",
+        "{victim} got caught in an ambush by a group of Sith Lords.",
+        "{victim} ventured into the haunted mansion and never returned.",
+        "{attacker} activated an ancient curse, causing {victim}'s soul to be trapped forever."
     ],
     "markdown": "__**Markdown Rules** on *Discord*__\n\n`*italics*` = *italics*\n`__underline__` = __underline__\n`**bold**` = **bold**\n`***bold italics***` = ***bold italics***\n`~~strikeout~~` = ~~strikeout~~\n`__*underline italics*__` = __*underline italics*__\n`__**underline bold**__` = __**underline bold**__\n`__***underline bold italics***__` = __***underline bold italics***__\n`||spoiler||` = ||spoiler||\n> quote = `> quote`\n\\`code\\` = `code`\n \\ to ignore\n\nFor code blocks, cf <https://discord.gg/DGahTNn>",
     "nasa-none": "Oops, I'm unable to retrieve the information from NASA at the moment. Try again in a few minutes :confused:",
