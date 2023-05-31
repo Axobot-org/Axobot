@@ -189,9 +189,9 @@ class BotStats(commands.Cog):
             unit = match.group(2)
             self.last_backup_size = float(match.group(1))
             if unit == "M":
-                self.last_backup_size *= 1024
+                self.last_backup_size /= 1024
             elif unit == "K":
-                self.last_backup_size *= 1024**2
+                self.last_backup_size /= 1024**2
             self.bot.log.info(f"Last backup size detected: {self.last_backup_size}G")
 
     async def on_serverlogs_audit_search(self, success: bool):
