@@ -17,12 +17,14 @@ class UserTip(str, Enum):
 class GuildTip(str, Enum):
     SERVERLOG_ENABLE_ANTISCAM = "serverlog_enable_antiscam"
     SERVERLOG_ENABLE_ANTIRAID = "serverlog_enable_antiraid"
+    SERVERLOG_ENABLE_BOTWARNING = "serverlog_enable_botwarning"
 
 
 minTimeBetweenTips: dict[Union[UserTip, GuildTip], datetime.timedelta] = {
     UserTip.RANK_CARD_PERSONALISATION: datetime.timedelta(days=60),
     GuildTip.SERVERLOG_ENABLE_ANTISCAM: datetime.timedelta(days=14),
     GuildTip.SERVERLOG_ENABLE_ANTIRAID: datetime.timedelta(days=14),
+    GuildTip.SERVERLOG_ENABLE_BOTWARNING: datetime.timedelta(days=25),
 }
 
 

@@ -258,6 +258,7 @@ class Rss(commands.Cog):
         if is_over:
             await ctx.send(await self.bot._(ctx.guild.id,"rss.flow-limit", limit=feed_limit))
             return
+        await ctx.defer()
         identifiant = await self.youtube_rss.get_channel_by_any_url(link)
         feed_type = None
         if identifiant is not None:
@@ -292,12 +293,15 @@ class Rss(commands.Cog):
         try:
             feed_id = await self.db_add_feed(ctx.guild.id,ctx.channel.id,feed_type,identifiant)
             await ctx.send(await self.bot._(ctx.guild,"rss.success-add", type=display_type, url=link, channel=ctx.channel.mention))
-            self.bot.log.info("RSS feed added into server {} ({} - {})".format(ctx.guild.id,link,feed_id))
-            await self.send_log("Feed added into server {} ({})".format(ctx.guild.id,feed_id),ctx.guild)
+            self.bot.log.info(f"RSS feed added into server {ctx.guild.id} ({link} - {feed_id})")
+            await self.send_log(f"Feed added into server {ctx.guild.id} ({feed_id})", ctx.guild)
         except Exception as err:
             cmd = await self.bot.get_command_mention("about")
             await ctx.send(await self.bot._(ctx.guild, "errors.unknown2", about=cmd))
             self.bot.dispatch("error", err, ctx)
+        else:
+            if serverlogs_cog := self.bot.get_cog("ServerLogs"):
+                await serverlogs_cog.send_botwarning_tip(ctx)
 
     @rss_main.command(name="remove", aliases=["delete"])
     @commands.guild_only()
@@ -309,6 +313,7 @@ class Rss(commands.Cog):
         ..Example rss remove
 
         ..Doc rss.html#delete-a-followed-feed"""
+        await ctx.defer()
         input_feed_id = int(feed) if feed is not None and feed.isnumeric() else None
         feed_ids = await self.ask_rss_id(
             input_feed_id,
