@@ -10,5 +10,6 @@
     },
     "rank_card_personalisation": "You can change your rank card background with the %{profile_cmd} command!",
     "serverlog_enable_antiscam": "You have added anti-scam logs but the anti-scam system isn't enabled in your server. You should probably enable it with the %{antiscam_enable_cmd} command.",
-    "serverlog_enable_antiraid": "You have added anti-raid logs but the anti-raid system isn't enabled in your server. You should probably enable it with the %{config_set_cmd} command."
+    "serverlog_enable_antiraid": "You have added anti-raid logs but the anti-raid system isn't enabled in your server. You should probably enable it with the %{config_set_cmd} command.",
+    "serverlog_enable_botwarning": "You should probably consider enable the bot warning logs with the %{log_add_cmd} command. They will alert you if the bot encounters any malfunctions on your server, such as misconfiguration or lack of permissions"
 }

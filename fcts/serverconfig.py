@@ -536,6 +536,9 @@ class ServerConfig(commands.Cog):
         await self.set_option(ctx.guild.id, option_name, value)
         check_embed = await check_config(self.bot, ctx.guild, option_name, value)
         await ctx.send(await self._get_set_success_message(ctx, option_name, value), embed=check_embed)
+        # send bot_warning tip
+        if option_name in {"welcome_channel", "welcome_roles", "welcome"} and (serverlogs_cog := self.bot.get_cog("ServerLogs")):
+            await serverlogs_cog.send_botwarning_tip(ctx)
         # Send internal log
         msg = f"Changed option in server {ctx.guild.id}: {option_name} = `{to_raw(option_name, value)}`"
         emb = discord.Embed(description=msg, color=self.log_color, timestamp=self.bot.utcnow())
