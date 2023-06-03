@@ -251,16 +251,16 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         l4 = ['benny'] # benny server
         name = name.lower()
         if name in l1:
-            await ctx.send(file=await self.utilities.find_img('blame-{}.png'.format(name)))
+            await ctx.send(file=await self.utilities.find_img(f'blame-{name}.png'))
         elif name in l2:
             if await self.is_on_guild(ctx.author, 391968999098810388): # fr-minecraft
-                await ctx.send(file=await self.utilities.find_img('blame-{}.png'.format(name)))
+                await ctx.send(file=await self.utilities.find_img(f'blame-{name}.png'))
         elif name in l3:
             if await self.is_on_guild(ctx.author, SUPPORT_GUILD_ID.id): # Axobot server
-                await ctx.send(file=await self.utilities.find_img('blame-{}.png'.format(name)))
+                await ctx.send(file=await self.utilities.find_img(f'blame-{name}.png'))
         elif name in l4:
             if await self.is_on_guild(ctx.author, 523525264517496834): # Benny Support
-                await ctx.send(file=await self.utilities.find_img('blame-{}.png'.format(name)))
+                await ctx.send(file=await self.utilities.find_img(f'blame-{name}.png'))
         elif name in ['help','list']:
             liste = l1
             if await self.is_on_guild(ctx.author, 391968999098810388): # fr-minecraft
@@ -275,12 +275,12 @@ You can specify a verification limit by adding a number in argument (up to 1.000
                 emb = discord.Embed(title=title, description=txt, color=self.bot.get_cog("Help").help_color)
                 await ctx.send(embed=emb)
             else:
-                await ctx.send("__{}:__\n\n{}".format(title,txt))
+                await ctx.send(f"__{title}:__\n\n{txt}")
 
     @commands.command(name="kill",hidden=True)
     @commands.guild_only()
     @commands.check(is_fun_enabled)
-    async def kill(self, ctx: MyContext, * , name: str=None):
+    async def kill(self, ctx: MyContext, *, name: typing.Optional[str]=None):
         """Just try to kill someone with a fun message
 
         ..Example kill herobrine
@@ -288,18 +288,17 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         ..Doc fun.html#kill"""
         if name is None:
             victime = ctx.author.display_name
-            ex = ctx.author.display_name.replace(" ","_")
         else:
             victime = name
-            ex = name.replace(" ","_")
+        ex = victime.replace(" ", "_")
         author = ctx.author.mention
-        liste = await self.bot._(ctx.channel,"fun.kills-list")
+        liste = await self.bot._(ctx.channel, "fun.kills-list")
         msg = random.choice(liste)
         tries = 0
-        while '{0}' in msg and name is None and tries<50:
+        while '{attacker}' in msg and name is None and tries<50:
             msg = random.choice(liste)
             tries += 1
-        await ctx.send(msg.format(author,victime,ex))
+        await ctx.send(msg.format(attacker=author, victim=victime, ex=ex))
 
     @commands.command(name="arapproved",aliases=['arapprouved'],hidden=True)
     @commands.check(lambda ctx: ctx.author.id in [375598088850505728,279568324260528128])

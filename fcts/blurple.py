@@ -176,6 +176,5 @@ Online editor: https://projectblurple.com/paint
         if not isinstance(old_msg, discord.InteractionMessage):
             await old_msg.delete()
 
-
 async def setup(bot):
     await bot.add_cog(Blurplefy(bot))

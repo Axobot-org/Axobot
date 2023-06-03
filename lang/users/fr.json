@@ -9,8 +9,8 @@
     "missing-attach-files": "Oups, il me manque la permission d'Attacher des Fichiers :confused:",
     "set_config": {
         "animated_card": {
-            "false": "Vous n'utilisez actuellement pas de carte animée",
-            "true": "Les cartes d'xp animées pourront être utilisée pour vous (rendu plus lent)"
+            "false": "Votre carte d'xp ne sera pas animée, même si vous utilisez un avatar animé (rendu plus rapide)",
+            "true": "Votre carte d'xp sera animée si vous utilisez un avatar animé (rendu plus lent)"
         },
         "auto_unafk": {
             "false": "Vous devez enlever le tag AFK vous-même",

@@ -3,6 +3,7 @@ import datetime
 import re
 import time
 from typing import TYPE_CHECKING, Any, Callable, Optional
+from random import random
 
 import discord
 from cachingutils import LRUCache
@@ -241,11 +242,18 @@ class ServerLogs(commands.Cog):
             msg = await self.bot._(ctx.guild.id, "serverlogs.none-added")
         await ctx.send(msg)
         if "member_kick" in actually_added:
-            await self.send_member_kick_warning(ctx)
+            if await self.send_member_kick_warning(ctx):
+                return
         if "antiscam" in actually_added:
-            await self.send_antiscam_tip(ctx)
+            if await self.send_antiscam_tip(ctx):
+                return
         if "antiraid" in actually_added:
-            await self.send_antiraid_tip(ctx)
+            if await self.send_antiraid_tip(ctx):
+                return
+        if actually_added:
+            if random() < 0.7 and await self.send_botwarning_tip(ctx):
+                return
+
 
     @modlogs_enable.autocomplete("logs")
     async def _modlogs_enable_autocomplete(self, interaction: discord.Interaction, current: str):
@@ -314,7 +322,7 @@ class ServerLogs(commands.Cog):
         "Send a tip if antiscam log is enabled but not the antiscam system"
         antiscam_enabled: bool = await self.bot.get_config(ctx.guild.id, "anti_scam")
         if antiscam_enabled:
-            return
+            return False
         if await self.bot.tips_manager.should_show_guild_tip(ctx.guild.id, GuildTip.SERVERLOG_ENABLE_ANTISCAM):
             antiscam_enable_cmd = await self.bot.get_command_mention("antiscam enable")
             await self.bot.tips_manager.send_guild_tip(
@@ -322,15 +330,29 @@ class ServerLogs(commands.Cog):
                 GuildTip.SERVERLOG_ENABLE_ANTISCAM,
                 antiscam_enable_cmd=antiscam_enable_cmd
             )
+            return True
+        return False
 
     async def send_antiraid_tip(self, ctx: MyContext):
         "Send a tip if antiraid log is enabled but not the antiscam system"
         antiraid_level: str = await self.bot.get_config(ctx.guild.id, "anti_raid")
         if antiraid_level != "none":
-            return
+            return False
         if await self.bot.tips_manager.should_show_guild_tip(ctx.guild.id, GuildTip.SERVERLOG_ENABLE_ANTIRAID):
             config_set_cmd = await self.bot.get_command_mention("config set")
             await self.bot.tips_manager.send_guild_tip(ctx, GuildTip.SERVERLOG_ENABLE_ANTIRAID, config_set_cmd=config_set_cmd)
+            return True
+        return False
+
+    async def send_botwarning_tip(self, ctx: MyContext):
+        "Send a tip if bot_warnings log is not used in this guild"
+        if ctx.guild is None or await self.is_log_enabled(ctx.guild.id, "bot_warnings"):
+            return False
+        if await self.bot.tips_manager.should_show_guild_tip(ctx.guild.id, GuildTip.SERVERLOG_ENABLE_BOTWARNING):
+            log_add_cmd = await self.bot.get_command_mention("modlogs enable")
+            await self.bot.tips_manager.send_guild_tip(ctx, GuildTip.SERVERLOG_ENABLE_BOTWARNING, log_add_cmd=log_add_cmd)
+            return True
+        return False
 
     async def send_member_kick_warning(self, ctx: MyContext):
         "Warn the user if member kick log is enabled but bot has not access to guild audit logs"
@@ -420,6 +442,9 @@ class ServerLogs(commands.Cog):
             if msg is not None:
                 emb.set_author(name=str(msg.author), icon_url=msg.author.display_avatar)
                 emb.add_field(name="Message Author", value=f"{msg.author} ({msg.author.id})")
+                if msg.attachments:
+                    field_title = "Attachment" if len(msg.attachments) == 1 else f"Attachments ({len(msg.attachments)})"
+                    emb.add_field(name=field_title, value=" ".join([f"[{a.filename}]({a.url})" for a in msg.attachments]))
             created_at = discord.utils.snowflake_time(payload.message_id)
             emb.add_field(name="Created at", value=f"<t:{created_at.timestamp():.0f}>")
             await self.validate_logs(guild, channel_ids, emb, "message_delete")
