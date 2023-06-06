@@ -207,6 +207,7 @@ class Users(commands.Cog):
 
     @profile_main.command(name='card')
     @app_commands.describe(style="The name of the card style you want to use")
+    @commands.cooldown(3, 45, commands.BucketType.user)
     @commands.check(checks.database_connected)
     async def profile_card(self, ctx: MyContext, style: args.cardStyle):
         """Change your xp card style.
@@ -239,6 +240,14 @@ class Users(commands.Cog):
     @profile_card.autocomplete("style")
     async def card_autocomplete_style(self, inter: discord.Interaction, current: str):
         return await self.card_style_autocomplete(inter.user, current)
+
+    @profile_main.command(name='list-card-styles')
+    @commands.cooldown(3, 45, commands.BucketType.user)
+    @commands.check(checks.database_connected)
+    async def profile_card_list(self, ctx: MyContext):
+        "List the available card styles for you"
+        available_cards = '\n- ' + '\n- '.join(await ctx.bot.get_cog('Utilities').allowed_card_styles(ctx.author))
+        await ctx.send(await self.bot._(ctx.channel, 'users.list-cards', cards=available_cards))
 
     @profile_main.command(name="config")
     @commands.check(checks.database_connected)
