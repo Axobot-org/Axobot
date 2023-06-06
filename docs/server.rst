@@ -137,15 +137,15 @@ Roles rewards
 
 Roles rewards are roles given to your members when they reach a certain level of xp. These levels are defined by you (or by anyone with "Manage Server" permission), and you can add up to 7 rewards per server.
 
-The main command to manage these roles is :code:`roles_rewards` (or its alias :code:`rr`). Here is the list of commands currently available :
+The main command to manage these roles is :code:`roles-rewards` (or its alias :code:`rr`). Here is the list of commands currently available :
 
-* :code:`roles_rewards add <level> <role>` : allows you to add a new role to the list of roles-rewards. The level is at least 1, without maximum, and to give the role you can provide either the Identifier or the name.
+* :code:`roles-rewards add <level> <role>` : allows you to add a new role to the list of roles-rewards. The level is at least 1, without maximum, and to give the role you can provide either the Identifier or the name.
 
-* :code:`roles_rewards remove <level>` : allows you to delete a role-reward at a certain level, to prevent the next people reaching that level from getting the role. People currently with this role will not lose it, unless you perform a reload via the following command.
+* :code:`roles-rewards remove <level>` : allows you to delete a role-reward at a certain level, to prevent the next people reaching that level from getting the role. People currently with this role will not lose it, unless you perform a reload via the following command.
 
-* :code:`roles_rewards reload` : reload all roles, to check that each member has the right roles. If a member has excess role-reward, they will be removed; similarly, if a member misses certain roles, they will be assigned to them.
+* :code:`roles-rewards reload` : reload all roles, to check that each member has the right roles. If a member has excess role-reward, they will be removed; similarly, if a member misses certain roles, they will be assigned to them.
 
-* :code:`roles_rewards list` : lists all currently configured roles-rewards, with their corresponding level, as well as the maximum number of roles allowed for your server. The bot must have "`Embed Links <perms.html#embed-links>`__" permission.
+* :code:`roles-rewards list` : lists all currently configured roles-rewards, with their corresponding level, as well as the maximum number of roles allowed for your server. The bot must have "`Embed Links <perms.html#embed-links>`__" permission.
 
 .. warning:: For these roles to work properly, the bot **must** have "`Manage roles <perms.html#manage-roles>`__" permission. The roles to be given or removed **must** also be lower than the role of Axobot in your server hierarchy (Server Settings > Roles tab).
 

@@ -1073,7 +1073,7 @@ class Xp(commands.Cog):
         """Remove a role reward
         When a member reaches this level, no role will be given anymore
 
-        ..Example roles_rewards remove 10
+        ..Example roles-rewards remove 10
 
         ..Doc server.html#roles-rewards"""
         try:
