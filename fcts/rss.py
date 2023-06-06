@@ -965,8 +965,6 @@ class Rss(commands.Cog):
             if len(feeds_ids) == 0:
                 cmd = await self.bot.get_command_mention("about")
                 await ctx.send(await self.bot._(ctx.guild, "errors.unknown2", about=cmd))
-                if err is not None:
-                    self.bot.dispatch("error", err, ctx)
                 return
             if arguments is None or len(arguments.keys()) == 0:
                 arguments = None
