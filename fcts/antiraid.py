@@ -175,6 +175,9 @@ class AntiRaid(commands.Cog):
         # if the author is a bot or has permission to moderate memebrs
         if message.author.bot or message.author.guild_permissions.moderate_members:
             return
+        # if the antiraid is disabled
+        if await self._get_raid_level(message.guild) == 0:
+            return
         raw_mentions = [mention for mention in message.raw_mentions if mention != message.author.id]
         if count := len(raw_mentions):
             # add users mentions count to the user score
@@ -263,7 +266,7 @@ class AntiRaid(commands.Cog):
         to_remove: list[int] = []
         for member_id in self.mentions_score:
             self.mentions_score[member_id] -= 2
-            if self.mentions_score[member_id] == 0:
+            if self.mentions_score[member_id] <= 0:
                 to_remove.append(member_id)
         for member_id in to_remove:
             del self.mentions_score[member_id]
