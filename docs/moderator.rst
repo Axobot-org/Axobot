@@ -62,11 +62,11 @@ Clear
 
 This command allows you to efficiently delete messages, with a list of possible parameters for more accuracy. You can thus specify a list of members to check by mentioning them, if it should delete all messages containing files/images, or all containing links or Discord invitations, or even pinned messages. By default, the bot will not delete pinned messages.
 
-Be careful, all specified settings must be validated for the message to be deleted. For example, if you enter :code:`/clear 10 users: @Z_runner#7515 contains_file: True`, the bot will check in the last ten messages if the message comes from Z_runner#7515 AND if the message contains an image.
+Be careful, all specified settings must be validated for the message to be deleted. For example, if you enter :code:`/clear 10 users: @z_runner contains_file: True`, the bot will check in the last ten messages if the message comes from @z_runner AND if the message contains an image.
 
 If you enter :code:`/clear 25 contains_url: True`, the bot will clear the last 25 messages if they contains a link AND if they're not pinned, no matter the author.
 
-If you enter :code:`/clear 1000 users: @Z_runner#7515 @Axobeta#4940`, the bot will delete all (not pinned) messages contained in the last 1000 messages of the channel AND written by Z_runner#7515 OR Axobeta#4940.
+If you enter :code:`/clear 1000 users: @z_runner @Axobeta#4940`, the bot will delete all (not pinned) messages contained in the last 1000 messages of the channel AND written by @z_runner OR Axobeta#4940.
 
 .. warning:: The permissions "`Manage messages <perms.html#manage-messages>`__" and "`Read messages history <perms.html#read-message-history>`__" are required.
 

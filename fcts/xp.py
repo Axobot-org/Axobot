@@ -590,7 +590,7 @@ class Xp(commands.Cog):
 
         ..Example rank
 
-        ..Example rank Z_runner#7515
+        ..Example rank @z_runner
 
         ..Doc user.html#check-the-xp-of-someone
         """
