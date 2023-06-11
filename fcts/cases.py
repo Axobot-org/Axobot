@@ -186,7 +186,7 @@ class Cases(commands.Cog):
         """Get every case of a user
         This user can have left the server
 
-        ..Example cases list someone#7515
+        ..Example cases list @someone
 
         ..Doc moderator.html#view-list"""
         if not self.bot.database_online:
