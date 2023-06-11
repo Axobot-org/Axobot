@@ -951,10 +951,10 @@ class Xp(commands.Cog):
                 await view.disable(msg)
 
 
-    @commands.command(name='set_xp', aliases=["setxp", "set-xp"])
+    @commands.command(name='set-xp', aliases=["setxp"])
     @commands.guild_only()
     @commands.check(checks.has_admin)
-    async def set_xp(self, ctx: MyContext, user: discord.User, xp: int):
+    async def set_xp(self, ctx: MyContext, user: discord.User, xp: commands.Range[int, 0, 10**15]):
         """Set the XP of a user
 
         ..Example set_xp 3000 @someone"""
