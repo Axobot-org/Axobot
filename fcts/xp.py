@@ -40,7 +40,8 @@ class Xp(commands.Cog):
         self.levels = [0]
         self.embed_color = discord.Colour(0xffcf50)
         self.table = 'xp_beta' if bot.beta else 'xp'
-        self.cooldown = 3
+        self.classic_xp_cooldown = 5 # seconds between each xp gain for global/local
+        self.mee6_xp_cooldown = 60 # seconds between each xp gain for mee6-like
         self.minimal_size = 5
         self.spam_rate = 0.20
         self.xp_per_char = 0.11
@@ -67,7 +68,8 @@ class Xp(commands.Cog):
         if not self.bot.database_online:
             await self.bot.unload_extension("fcts.xp")
 
-    async def get_lvlup_chan(self, msg: discord.Message):
+    async def get_lvlup_chan(self, msg: discord.Message) -> discord.abc.MessageableChannel:
+        "Find the channel where to send the levelup message"
         value = await self.bot.get_config(msg.guild.id,"levelup_channel")
         if value == "none":
             return None
@@ -106,7 +108,7 @@ class Xp(commands.Cog):
     async def add_xp_0(self, msg: discord.Message, _rate: float):
         """Global xp type"""
         if msg.author.id in self.cache['global']:
-            if time.time() - self.cache['global'][msg.author.id][0] < self.cooldown:
+            if time.time() - self.cache['global'][msg.author.id][0] < self.classic_xp_cooldown:
                 return
         content = msg.clean_content
         if len(content) < self.minimal_size or await self.check_spam(content) or await self.bot.potential_command(msg):
@@ -136,7 +138,7 @@ class Xp(commands.Cog):
         if msg.guild.id not in self.cache:
             await self.db_load_cache(msg.guild.id)
         if msg.author.id in self.cache[msg.guild.id]:
-            if time.time() - self.cache[msg.guild.id][msg.author.id][0] < 60:
+            if time.time() - self.cache[msg.guild.id][msg.author.id][0] < self.mee6_xp_cooldown:
                 return
         if await self.bot.potential_command(msg):
             return
@@ -161,7 +163,7 @@ class Xp(commands.Cog):
         if msg.guild.id not in self.cache:
             await self.db_load_cache(msg.guild.id)
         if msg.author.id in self.cache[msg.guild.id]:
-            if time.time() - self.cache[msg.guild.id][msg.author.id][0] < self.cooldown:
+            if time.time() - self.cache[msg.guild.id][msg.author.id][0] < self.classic_xp_cooldown:
                 return
         content = msg.clean_content
         if len(content) < self.minimal_size or await self.check_spam(content) or await self.bot.potential_command(msg):
