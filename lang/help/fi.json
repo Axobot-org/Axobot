@@ -84,7 +84,7 @@
             "Sinulla on 'Hallinnoi kanavia' käyttöoikeus",
             "'Hallinnoi kanavia' käyttooikeus puuttuu"
         ],
-        "has_manage_emojis": [
+        "has_manage_expressions": [
             "Sinulla on 'Hallinnoi emojeja ja tarroja' käyttöoikeus",
             "Sinulla täytyy olla 'Hallinnoi emojeja ja tarroja' käyttöoikeus"
         ],

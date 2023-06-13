@@ -555,7 +555,7 @@ Arguments are:
                         logs.append("  "+symb[2]+" Updated {} for user {}".format("and".join(edition),member))
 
         async def load_emojis(self, ctx:MyContext, problems: list, logs:list, symb:list, data:dict, args:tuple, roles_list:dict):
-            if not ctx.guild.me.guild_permissions.manage_emojis:
+            if not ctx.guild.me.guild_permissions.manage_expressions:
                 logs.append("  "+symb[0]+" Unable to create or update emojis: missing permissions")
                 problems[0] += 1
             else:
