@@ -28,10 +28,10 @@ class Partners(commands.Cog):
         self.table = 'partners_beta' if self.bot.beta else 'partners'
 
     async def cog_load(self):
-        self.refresh_loop.start()
+        self.refresh_loop.start() # pylint: disable=no-member
 
     async def cog_unload(self):
-        self.refresh_loop.cancel()
+        self.refresh_loop.cancel() # pylint: disable=no-member
 
     @tasks.loop(time=[
         datetime.time(hour=7, tzinfo=utc),
@@ -238,7 +238,7 @@ class Partners(commands.Cog):
         """Update a bot partner embed"""
         image = ""
         title = "**{}** ".format(tr_bot.capitalize())
-        fields = list()
+        fields = []
         try:
             title += str(await self.bot.fetch_user(int(partner['target'])))
             # guild count field

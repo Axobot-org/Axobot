@@ -87,7 +87,7 @@ class Fun(commands.Cog):
         title = await self.bot._(ctx.channel,"fun.fun-list")
         if self.bot.current_event=="fish":
             title = ":fish: "+title
-        text = str()
+        text = ""
         for cmd in sorted(self.get_commands(),key=operator.attrgetter('name')):
             if cmd.name in cmds_list and cmd.enabled:
                 if cmd.help is not None:
@@ -164,9 +164,6 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         if not channel.permissions_for(ctx.author).read_message_history:
             await ctx.send(await self.bot._(ctx.channel,"fun.count.forbidden"))
             return
-        if user is not None and user.name.isnumeric() and limit==1000:
-            limit = int(user.name)
-            user = None
         if limit > MAX:
             await ctx.send(await self.bot._(ctx.channel,"fun.count.too-much",l=MAX,e=self.bot.emojis_manager.customs['wat']))
             return
@@ -390,10 +387,10 @@ You can specify a verification limit by adding a number in argument (up to 1.000
                     item = discord.utils.get(ctx.bot.emojis,id=Em.chars[l])
                 except KeyError:
                     item = l
-            text += str(item)+'¬'
+            text += str(item) + '¬'
         text = text.replace("¬¬","\n")
         for m in mentions:
-            text = text.replace('¤¬¤',m,1)
+            text = text.replace('¤¬¤', m, 1)
         text = text.split('¬')[:-1]
         text1 = list()
         for line in text:

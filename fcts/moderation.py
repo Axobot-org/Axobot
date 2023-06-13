@@ -280,7 +280,6 @@ Slowmode works up to one message every 6h (21600s)
     async def get_muted_role(self, guild: discord.Guild) -> Optional[discord.Role]:
         "Find the muted role from the guild config option"
         return await self.bot.get_config(guild.id, "muted_role")
-        # return discord.utils.find(lambda x: x.name.lower() == "muted", guild.roles)
 
     async def mute_member(self, member: discord.Member, reason: Optional[str], duration: Optional[datetime.timedelta]=None):
         """Call when someone should be muted in a guild"""
@@ -1050,8 +1049,6 @@ The 'show_reasons' parameter is used to display the mute reasons.
 
         ..Example emojis list
 
-        ..Example emojis list 2
-
         ..Doc moderator.html#emoji-manager"""
         structure = await self.bot._(ctx.guild.id, "moderation.emoji.list")
         priv = "**"+await self.bot._(ctx.guild.id, "moderation.emoji.private")+"**"
@@ -1142,7 +1139,7 @@ The 'show_reasons' parameter is used to display the mute reasons.
             return await ctx.send(await self.bot._(ctx.guild.id,"fun.no-embed-perm"))
         tr_nbr = await self.bot._(ctx.guild.id,'info.info.role-3')
         tr_mbr = await self.bot._(ctx.guild.id,"misc.membres")
-        txt = str()
+        txt = ""
         emb = discord.Embed(title=role.name, color=role.color, timestamp=ctx.message.created_at)
         emb.add_field(name=tr_nbr.capitalize(), value=len(role.members), inline=False)
         nbr = len(role.members)
@@ -1151,7 +1148,7 @@ The 'show_reasons' parameter is used to display the mute reasons.
                 txt += role.members[i].mention+" "
                 if i<nbr-1 and len(txt+role.members[i+1].mention) > 1000:
                     emb.add_field(name=tr_mbr.capitalize(), value=txt)
-                    txt = str()
+                    txt = ""
             if len(txt) > 0:
                 emb.add_field(name=tr_mbr.capitalize(), value=txt)
         emb.set_footer(text=ctx.author, icon_url=ctx.author.display_avatar)
