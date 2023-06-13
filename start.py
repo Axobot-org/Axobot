@@ -43,8 +43,8 @@ async def main():
 
     async def on_ready():
         print('\nBot connected')
-        print("Name : "+client.user.name)
-        print("ID : "+str(client.user.id))
+        print("Name:", client.user.name)
+        print("ID:", client.user.id)
         if len(client.guilds) < 50:
             guild_names = (x.name for x in client.guilds)
             print("Connected on ["+str(len(client.guilds))+"] "+", ".join(guild_names))
