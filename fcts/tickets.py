@@ -28,7 +28,7 @@ class Tickets(commands.Cog):
         self.bot = bot
         self.file = "tickets"
         self.cooldowns: dict[discord.User, float] = {}
-        self.default_name_format = "{username}-{usertag}"
+        self.default_name_format = "{username}-{topic}"
         self.max_format_length = 70
 
     @commands.Cog.listener()
@@ -257,7 +257,7 @@ class Tickets(commands.Cog):
         else:
             emoji = topic['topic_emoji']
         return channel_name.format_map(self.bot.SafeDict({
-            "username": interaction.user.display_name,
+            "username": interaction.user.global_name or interaction.user.name,
             "userid": interaction.user.id,
             "topic": topic["topic"],
             "topic_emoji": emoji,
@@ -496,7 +496,7 @@ class Tickets(commands.Cog):
     @commands.check(checks.has_manage_channels)
     async def portal_set_format(self, ctx: MyContext, name_format: str):
         """Set the format used to generate the channel/thread name
-        You can use the following placeholders: username, usertag, userid, topic, topic_emoji, ticket_name
+        You can use the following placeholders: username, userid, topic, topic_emoji, ticket_name
         Use "none" to reset the format to the default one
         Spaces and non-ascii characters will be removed or replaced by dashes
 
@@ -683,7 +683,7 @@ If that still doesn't work, please create your ticket
     @commands.check(checks.has_manage_channels)
     async def topic_set_format(self, ctx: MyContext, topic_id: Optional[int], name_format: str):
         """Set the format used to generate the channel/thread name
-        You can use the following placeholders: username, usertag, userid, topic, topic_emoji, ticket_name
+        You can use the following placeholders: username, userid, topic, topic_emoji, ticket_name
         Use "none" to reset the format to the default one
         Spaces and non-ascii characters will be removed or replaced by dashes
 
