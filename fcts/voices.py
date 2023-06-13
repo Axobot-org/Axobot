@@ -140,7 +140,7 @@ class VoiceChannels(commands.Cog):
         # build channel name from config and random
         chan_name: str = await self.bot.get_config(member.guild.id, "voice_channel_format")
         args = {
-            'user': str(member),
+            'user': member.global_name or member.name,
             'number': random.randint(0, 1000)
         }
         if "{random}" in chan_name:

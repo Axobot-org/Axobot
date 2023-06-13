@@ -44,10 +44,13 @@
         "forum": {
             "title": "Forum '%{name}'",
             "tags": "Tags de posts",
+            "default-emoji": "Réaction par défaut",
             "guidelines": "Guide",
+            "slowmode": "Mode lent de posts",
             "sort-order": "Ordre de tri par défaut",
             "sort-order-latest": "Activité récente",
-            "sort-order-creation": "Heure de création"
+            "sort-order-creation": "Heure de création",
+            "sort-order-none": "Indéfini"
         },
         "guild-0": "Serveur",
         "guild-1": "Propriétaire",

@@ -153,7 +153,7 @@ If the bot can't send the new command format, it will try to send the old one.""
                 if ctx.guild is None:
                     title = await self.bot._(ctx.channel, "help.embed_title_dm")
                 else:
-                    title = await self.bot._(ctx.channel, "help.embed_title", u=str(ctx.author))
+                    title = await self.bot._(ctx.channel, "help.embed_title", u=ctx.author.display_name)
             elif len(commands_arg) == 1:  # Unique command name?
                 name = commands_arg[0]
                 command = None

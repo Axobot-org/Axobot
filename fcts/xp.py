@@ -68,9 +68,9 @@ class Xp(commands.Cog):
         if not self.bot.database_online:
             await self.bot.unload_extension("fcts.xp")
 
-    async def get_lvlup_chan(self, msg: discord.Message) -> discord.abc.MessageableChannel:
+    async def get_lvlup_chan(self, msg: discord.Message) -> discord.abc.Messageable:
         "Find the channel where to send the levelup message"
-        value = await self.bot.get_config(msg.guild.id,"levelup_channel")
+        value = await self.bot.get_config(msg.guild.id, "levelup_channel")
         if value == "none":
             return None
         if value == "any":
@@ -191,7 +191,7 @@ class Xp(commands.Cog):
         "Returns True if the user cannot get xp in these conditions"
         if msg.guild is None:
             return False
-        chans: Optional[list[discord.abc.MessageableChannel]] = await self.bot.get_config(msg.guild.id, "noxp_channels")
+        chans: Optional[list[discord.abc.Messageable]] = await self.bot.get_config(msg.guild.id, "noxp_channels")
         if chans is not None and msg.channel in chans:
             return True
         roles: Optional[list[discord.Role]] = await self.bot.get_config(msg.guild.id, "noxp_roles")
@@ -337,7 +337,9 @@ class Xp(commands.Cog):
         emb = discord.Embed(
             title=f"#{msg.channel.name} | {msg.guild.name} | {msg.guild.id}",
             description=msg.content
-        ).set_footer(text=str(msg.author.id)).set_author(name=str(msg.author), icon_url=msg.author.display_avatar.url).add_field(name="XP given", value=str(xp))
+        ).set_footer(text=str(msg.author.id)).set_author(
+            name=str(msg.author),
+            icon_url=msg.author.display_avatar.url).add_field(name="XP given", value=str(xp))
         await chan.send(embed=emb)
 
 
@@ -744,7 +746,7 @@ class Xp(commands.Cog):
         "Send the user rank as an embed (fallback from card generation)"
         txts = [await self.bot._(ctx.channel, "xp.card-level"), await self.bot._(ctx.channel, "xp.card-rank")]
         emb = discord.Embed(color=self.embed_color)
-        emb.set_author(name=user, icon_url=user.display_avatar)
+        emb.set_author(name=user.display_name, icon_url=user.display_avatar)
         emb.add_field(name='XP', value=f"{xp}/{levels_info[1]}")
         emb.add_field(name=txts[0].title(), value=levels_info[0])
         emb.add_field(name=txts[1].title(), value=f"{rank}/{ranks_nb}")
@@ -762,7 +764,7 @@ class Xp(commands.Cog):
         msg = """__**{}**__
 **XP** {}/{}
 **{}** {}
-**{}** {}/{}""".format(user.name, xp, levels_info[1], txts[0].title(), levels_info[0], txts[1].title(), rank, ranks_nb)
+**{}** {}/{}""".format(user.display_name, xp, levels_info[1], txts[0].title(), levels_info[0], txts[1].title(), rank, ranks_nb)
         send_in_private = await self.bot.get_config(ctx.guild.id, "rank_in_dm")
         if ctx.interaction:
             await ctx.send(msg, ephemeral=send_in_private)
@@ -875,7 +877,7 @@ class Xp(commands.Cog):
                     except discord.NotFound:
                         user = await self.client._(self.guild, "xp.del-user")
                 if isinstance(user, discord.User):
-                    user_name = discord.utils.escape_markdown(user.name)
+                    user_name = discord.utils.escape_markdown(user.display_name)
                     if len(user_name) > 18:
                         user_name = user_name[:15]+'...'
                     if user == self.user:
