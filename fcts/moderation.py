@@ -962,7 +962,7 @@ The 'show_reasons' parameter is used to display the mute reasons.
 
 
     @commands.hybrid_group(name="emoji",aliases=['emojis', 'emote'])
-    @app_commands.default_permissions(manage_emojis=True)
+    @app_commands.default_permissions(manage_expressions=True)
     @commands.guild_only()
     @commands.cooldown(5,20, commands.BucketType.guild)
     async def emoji_group(self, ctx: MyContext):
@@ -976,7 +976,7 @@ The 'show_reasons' parameter is used to display the mute reasons.
     @emoji_group.command(name="rename")
     @app_commands.describe(emoji="The emoji to rename", name="The new name")
     @commands.guild_only()
-    @commands.check(checks.has_manage_emojis)
+    @commands.check(checks.has_manage_expressions)
     async def emoji_rename(self, ctx: MyContext, emoji: discord.Emoji, name: str):
         """Rename an emoji
 
@@ -986,7 +986,7 @@ The 'show_reasons' parameter is used to display the mute reasons.
         if emoji.guild != ctx.guild:
             await ctx.send(await self.bot._(ctx.guild.id, "moderation.emoji.wrong-guild"))
             return
-        if not ctx.channel.permissions_for(ctx.guild.me).manage_emojis:
+        if not ctx.channel.permissions_for(ctx.guild.me).manage_expressions:
             await ctx.send(await self.bot._(ctx.guild.id, "moderation.emoji.cant-emoji"))
             return
         await emoji.edit(name=name)
@@ -995,7 +995,7 @@ The 'show_reasons' parameter is used to display the mute reasons.
     @emoji_group.command(name="restrict")
     @app_commands.describe(emoji="The emoji to restrict", roles="The roles allowed to use this emoji (separated by spaces), or 'everyone'")
     @commands.guild_only()
-    @commands.check(checks.has_manage_emojis)
+    @commands.check(checks.has_manage_expressions)
     async def emoji_restrict(self, ctx: MyContext, emoji: discord.Emoji, roles: commands.Greedy[Union[discord.Role, Literal['everyone']]]):
         """Restrict the use of an emoji to certain roles
 
@@ -1007,7 +1007,7 @@ The 'show_reasons' parameter is used to display the mute reasons.
         if emoji.guild != ctx.guild:
             await ctx.send(await self.bot._(ctx.guild.id, "moderation.emoji.wrong-guild"))
             return
-        if not ctx.guild.me.guild_permissions.manage_emojis:
+        if not ctx.guild.me.guild_permissions.manage_expressions:
             await ctx.send(await self.bot._(ctx.guild.id, "moderation.emoji.cant-emoji"))
             return
         for e, role in enumerate(roles):
