@@ -774,10 +774,10 @@ Cette option affecte tous les serveurs"""
         text: list[str] = []
         for member in server.members:
             if member.id in owner_list and role not in member.roles:
-                text.append("Rôle ajouté à "+str(member))
+                text.append("Rôle ajouté à " + (member.global_name or member.name))
                 await member.add_roles(role,reason="This user support me")
             elif (member.id not in owner_list) and role in member.roles:
-                text.append("Rôle supprimé à "+str(member))
+                text.append("Rôle supprimé à " + (member.global_name or member.name))
                 await member.remove_roles(role,reason="This user doesn't support me anymore")
         await ctx.send("\n".join(text))
 

@@ -84,7 +84,7 @@ class AntiRaid(commands.Cog):
         # Level 3 or more
         if level >= 3 and can_ban:
             # ban (1w) members with invitations in their nickname
-            if self.bot.get_cog('Utilities').sync_check_discord_invite(member.name) is not None:
+            if self.bot.get_cog('Utilities').sync_check_discord_invite(member.display_name) is not None:
                 duration = timedelta(days=7)
                 if await self.ban(member, await self.bot._(member.guild.id,"logs.reason.invite"), duration):
                     self.bot.dispatch("antiraid_ban", member, {
@@ -104,7 +104,7 @@ class AntiRaid(commands.Cog):
                     return True
         # Level 1 or more
         if level >= 1: # kick members with invitations in their nickname
-            if self.bot.get_cog('Utilities').sync_check_discord_invite(member.name) is not None:
+            if self.bot.get_cog('Utilities').sync_check_discord_invite(member.display_name) is not None:
                 if await self.kick(member, await self.bot._(member.guild.id,"logs.reason.invite")):
                     self.bot.dispatch("antiraid_kick", member, {"discord_invite": True})
                     return True

@@ -371,9 +371,9 @@ class BotEvents(commands.Cog):
         top_5_f: list[str] = []
         for i, row in enumerate(top_5):
             if user := self.bot.get_user(row['user_id']):
-                username = user.name
+                username = user.display_name
             elif user := await self.bot.fetch_user(row['user_id']):
-                username = user.name
+                username = user.display_name
             else:
                 username = f"user {row['user_id']}"
             top_5_f.append(f"{i+1}. {username} ({row['points']} points)")

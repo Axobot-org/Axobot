@@ -257,8 +257,7 @@ class Tickets(commands.Cog):
         else:
             emoji = topic['topic_emoji']
         return channel_name.format_map(self.bot.SafeDict({
-            "username": interaction.user.name,
-            "usertag": interaction.user.discriminator,
+            "username": interaction.user.display_name,
             "userid": interaction.user.id,
             "topic": topic["topic"],
             "topic_emoji": emoji,

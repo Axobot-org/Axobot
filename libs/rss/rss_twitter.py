@@ -54,7 +54,7 @@ class TwitterRSS:
         except twitter.TwitterError:
             return None
 
-    async def remove_image(self, channel: discord.abc.MessageableChannel, text: str):
+    async def remove_image(self, channel: discord.abc.Messageable, text: str):
         "Remove images links from a tweet if needed"
         if channel.guild is None or channel.permissions_for(channel.guild.me).embed_links:
             find_url = self.bot.get_cog("Utilities").find_url_redirection
