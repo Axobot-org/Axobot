@@ -227,7 +227,7 @@ This backup will avoid the most important damage, those little mistakes that can
 
 When you load the backup, the bot may not be able to apply some changes. However, it will give you a complete list of what has and hasn't been changed so that you can fix it yourself.
 
-.. warning:: The bot will need as many permissions as possible, which includes: `Manage roles <perms.html#manage-roles>`__, `Manage channels <perms.html#manage-channels>`__, `Manage webhooks <perms.html#manage-webhooks>`__, `Ban members <perms.html#ban-members>`__, `Manage emojis <perms.html#manage-emojis>`__.
+.. warning:: The bot will need as many permissions as possible, which includes: `Manage roles <perms.html#manage-roles>`__, `Manage channels <perms.html#manage-channels>`__, `Manage webhooks <perms.html#manage-webhooks>`__, `Ban members <perms.html#ban-members>`__, `Manage expressions <perms.html#manage-expressions>`__.
 
 Create a backup
 ---------------
