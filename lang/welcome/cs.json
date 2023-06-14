@@ -1,0 +1,4 @@
+{
+    "error-give-roles": "Nelze přidělit roli „%{r}“ novému členovi %{u}: nedostatečná oprávnění\nZkontrolujte prosím hierarchii rolí a moje oprávnění 'Správa rolí'",
+    "help": "__**Vítejte v modulu zpráv join & leave**__\n\nTento modul slouží ke konfiguraci automatické zprávy pokaždé, když člen vstoupí nebo ukončí váš server.\n\n__** Nastavení**__\n\n`1-` Pro konfiguraci místnosti, kam se tyto zprávy zapisují, použijte %{config_cmd} s volbou `welcome_channel` a kanál, který se má použít.\n`2-` Pro konfiguraci zprávy použijte %{config_cmd} s volbou `welcome` nebo `leave` a šablonu zprávy, která se má použít. Pro tuto zprávu můžete použít některé proměnné:\n- `{user}` zmíní člena\n- `{user_idname}` zobrazí uživatelské jméno a značku (Axobot#3022)\n- `{user_id}` zobrazí uživatelské číselné ID\n- `{server}` zobrazí název serveru\n- `{owner}` zobrazí jméno vlastníka serveru\n- `{member_count}` zobrazí aktuální počet členů\n- `{type}` return 'member' nebo 'bot'"
+}
