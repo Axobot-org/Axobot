@@ -28,7 +28,7 @@
         "too-old": "I can't delete messages older than %{days} days!"
     },
     "emoji": {
-        "cant-emoji": "Oops, I'm missing the permission `Manage expressions` :confused:",
+        "cant-emoji": "Oops, I'm missing the permission `Manage emojis` :confused:",
         "emoji-valid": "The emoji %{name} has been modified to allow only the roles %{roles}",
         "list": "{} (`:{}:`) added on {} {}",
         "list-title": "Emojis of the server %{guild}",
