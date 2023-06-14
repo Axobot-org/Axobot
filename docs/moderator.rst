@@ -300,7 +300,7 @@ With this command, you can become the undisputed master of the Emojis and handle
 
 
 
-.. warning:: The bot needs the `Manage Emojis <perms.html#manage-emojis>`__ permission to edit these pretty little pictures. And you, you need the "Manage emojis" permission to use these commands.
+.. warning:: The bot needs the `Manage expressions <perms.html#manage-expressions>`__ permission to edit these pretty little pictures. And you, you need the "Manage expressions" permission to use these commands.
 
 
 Role Manager

@@ -21,7 +21,7 @@
         "too-few": "Ich kann nicht so wenige Nachrichten löschen"
     },
     "emoji": {
-        "cant-emoji": "Mir fehlt die `Manage emojis` Berechtigung :confused:",
+        "cant-emoji": "Mir fehlt die `Manage expressions` Berechtigung :confused:",
         "emoji-valid": "Der Emoji %{name} wurde modifiziert, sodass ihn nur noch die Rolle `%{roles}` benutzen kann",
         "list": "{} (`:{}:`) hinzugefüg am {} {}",
         "list-title": "Emojis auf diesem Server %{guild}",
