@@ -85,8 +85,8 @@
             "'Manage channels' permission missing"
         ],
         "has_manage_expressions": [
-            "You have the 'Manage expressions' permission",
-            "You need to have the 'Manage expressions' permission"
+            "You have the 'Manage emojis' permission",
+            "You need to have the 'Manage emojis' permission"
         ],
         "has_manage_guild": [
             "You have 'Manage Server' permission",
