@@ -86,7 +86,7 @@
         ],
         "has_manage_expressions": [
             "U haz 'Manage smol pictures' permission",
-            "Oops, U need to have the 'Manage smol chat pictures' perm for that"
+            "Oops, U need to have the 'Manage smol pictures' perm for that"
         ],
         "has_manage_guild": [
             "U have 'Manage Server' permission",
