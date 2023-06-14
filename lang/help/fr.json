@@ -84,7 +84,7 @@
             "Vous avez la permission de 'Gérer les salons'",
             "Permission 'Gérer les salons' manquante"
         ],
-        "has_manage_emojis": [
+        "has_manage_expressions": [
             "Vous avez la permission de 'Gérer les émojis'",
             "Permission 'Gérer les émojis' manquante"
         ],

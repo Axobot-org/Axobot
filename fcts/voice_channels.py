@@ -16,7 +16,7 @@ class VoiceChannels(commands.Cog):
 
     def __init__(self, bot: Axobot):
         self.bot = bot
-        self.file = "voices"
+        self.file = "voice_channels"
         self.names: dict[str, list[str]] = {'random': [], 'minecraft': []}
         self.channels: dict[int, list[int]] = {}
         self.table = 'voices_chats'
@@ -28,7 +28,7 @@ class VoiceChannels(commands.Cog):
     async def on_ready(self):
         "if the database is still offline when the bot is ready, remove that cog"
         if not self.bot.database_online:
-            await self.bot.unload_extension("fcts.voices")
+            await self.bot.unload_extension("fcts.voice_channels")
 
     async def db_get_channels(self):
         "Refresh the channels cache"
@@ -140,7 +140,7 @@ class VoiceChannels(commands.Cog):
         # build channel name from config and random
         chan_name: str = await self.bot.get_config(member.guild.id, "voice_channel_format")
         args = {
-            'user': str(member),
+            'user': member.global_name or member.name,
             'number': random.randint(0, 1000)
         }
         if "{random}" in chan_name:
@@ -202,7 +202,7 @@ class VoiceChannels(commands.Cog):
 
         ..Doc server.html#voice-channels-managment"""
         if not ctx.guild.id in self.channels or len(self.channels[ctx.guild.id]) == 0:
-            await ctx.send(await self.bot._(ctx.guild.id, "voices.no-channel"))
+            await ctx.send(await self.bot._(ctx.guild.id, "voice_channels.no-channel"))
             return
         i = 0
         temp = []
@@ -214,7 +214,7 @@ class VoiceChannels(commands.Cog):
                 i += 1
         for chan in temp:
             await self.db_delete_channel(chan)
-        await ctx.send(await self.bot._(ctx.guild.id, "voices.deleted", count=i))
+        await ctx.send(await self.bot._(ctx.guild.id, "voice_channels.deleted", count=i))
 
 
 async def setup(bot: Axobot):

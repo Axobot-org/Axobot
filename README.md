@@ -34,7 +34,7 @@ Current available languages are French, English, German, Finnish and Lolcat.
 
 ## Support and contact
 
-You can contact me through my profile `Z_runner#7515`, or through the Discord server.
+You can contact me through my profile `@z_runner`, or through the Discord server.
 This server is used to follow the bot's news, test it, ask questions, submit suggestions... You can access it with the [Discord invite](https://discord.gg/N55zY88). Our @Support team will be delighted to welcome you, in French as in English!
 
 A configuration website is also in preparation

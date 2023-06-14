@@ -1,4 +1,4 @@
-discord.py~=2.2.0
+discord.py~=2.3.0
 aiohttp
 mysql-connector-python>=8.0
 frmc-lib @ git+https://github.com/ZRunner/fr-mc-python-lib.git@v1.0.6
@@ -28,3 +28,6 @@ Pillow~=9.4.0
 # Antiscam training
 pandas
 scikit-learn
+
+# Voice message SST
+openai-whisper

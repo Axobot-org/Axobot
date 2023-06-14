@@ -109,13 +109,7 @@ class Admin(commands.Cog):
     async def main_msg(self, ctx: MyContext):
         """Commandes réservées aux administrateurs du bot"""
         if ctx.subcommand_passed is None:
-            text = "Liste des commandes disponibles :"
-            for cmd in sorted(ctx.command.commands, key=lambda x:x.name):
-                text+="\n- {} *({})*".format(cmd.name,'...' if cmd.help is None else cmd.help.split('\n')[0])
-                if isinstance(cmd, commands.core.Group):
-                    for cmds in cmd.commands:
-                        text+="\n        - {} *({})*".format(cmds.name,cmds.help.split('\n')[0])
-            await ctx.send(text)
+            await ctx.send_help("admin")
 
     @main_msg.command(name="send-msg")
     @discord.app_commands.check(checks.is_bot_admin)
@@ -774,10 +768,10 @@ Cette option affecte tous les serveurs"""
         text: list[str] = []
         for member in server.members:
             if member.id in owner_list and role not in member.roles:
-                text.append("Rôle ajouté à "+str(member))
+                text.append("Rôle ajouté à " + (member.global_name or member.name))
                 await member.add_roles(role,reason="This user support me")
             elif (member.id not in owner_list) and role in member.roles:
-                text.append("Rôle supprimé à "+str(member))
+                text.append("Rôle supprimé à " + (member.global_name or member.name))
                 await member.remove_roles(role,reason="This user doesn't support me anymore")
         await ctx.send("\n".join(text))
 

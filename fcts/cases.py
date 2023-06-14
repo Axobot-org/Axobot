@@ -186,7 +186,7 @@ class Cases(commands.Cog):
         """Get every case of a user
         This user can have left the server
 
-        ..Example cases list someone#7515
+        ..Example cases list @someone
 
         ..Doc moderator.html#view-list"""
         if not self.bot.database_online:
@@ -220,7 +220,7 @@ class Cases(commands.Cog):
             await ctx.send(await self.bot._(ctx.guild.id, "cases.no-case"))
             return
         if ctx.can_send_embed:
-            author_text = await self.bot._(ctx.guild.id, "cases.display.title", user=str(user), user_id=user.id)
+            author_text = await self.bot._(ctx.guild.id, "cases.display.title", user=user.display_name, user_id=user.id)
             title = await self.bot._(ctx.guild.id,"cases.records_number", nbr=len(cases))
             lang = await self.bot._(ctx.guild.id,'_used_locale')
 
@@ -238,7 +238,7 @@ class Cases(commands.Cog):
                     "Create one page"
                     embed_color = self.client.get_cog("ServerConfig").embed_color
                     embed = discord.Embed(title=title, colour=embed_color, timestamp=ctx.message.created_at)
-                    embed.set_author(name=author_text, icon_url=str(user.display_avatar.with_format("png")))
+                    embed.set_author(name=author_text, icon_url=user.display_avatar.with_format("png").url)
                     page_start, page_end = (page-1)*21, page*21
                     for case in cases[page_start:page_end]:
                         guild = self.client.get_guild(case.guild)

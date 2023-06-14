@@ -28,7 +28,7 @@
         "too-old": "I can't delete messages that old! ur crazy duh"
     },
     "emoji": {
-        "cant-emoji": "Oooops, I'm missng teh perm `Manage emojis` <:owo:499661437589913621>",
+        "cant-emoji": "Oooops, I'm missng teh perm `Manage expressions` <:owo:499661437589913621>",
         "emoji-valid": "Mkay, naw only %{roles} can use dat emoji %{name}",
         "list": "{} (`:{}:`) addd on {} {}",
         "list-title": "Emojis of the super server %{guild}",

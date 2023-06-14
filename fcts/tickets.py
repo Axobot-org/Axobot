@@ -28,7 +28,7 @@ class Tickets(commands.Cog):
         self.bot = bot
         self.file = "tickets"
         self.cooldowns: dict[discord.User, float] = {}
-        self.default_name_format = "{username}-{usertag}"
+        self.default_name_format = "{username}-{topic}"
         self.max_format_length = 70
 
     @commands.Cog.listener()
@@ -54,7 +54,7 @@ class Tickets(commands.Cog):
                     topic = await self.db_get_topic_with_defaults(interaction.guild_id, topic_id)
             if topic is None:
                 await interaction.response.send_message(await self.bot._(interaction.guild_id, "errors.unknown"), ephemeral=True)
-                raise Exception(f"No topic found on guild {interaction.guild_id} with interaction {topic_id}")
+                raise RuntimeError(f"No topic found on guild {interaction.guild_id} with interaction {topic_id}")
             if topic['category'] is None:
                 cmd = await self.bot.get_command_mention("tickets portal set-category")
                 await interaction.response.send_message(await self.bot._(interaction.guild_id, "tickets.missing-category-config", set_category=cmd), ephemeral=True)
@@ -169,10 +169,10 @@ class Tickets(commands.Cog):
         async with self.bot.db_query(query, (category, guild_id, topic_id, self.bot.beta), returnrowcount=True) as db_query:
             return db_query > 0
 
-    async def db_edit_topic_format(self, guild_id: int, topic_id: int, format: Optional[str]) -> bool:
+    async def db_edit_topic_format(self, guild_id: int, topic_id: int, name_format: Optional[str]) -> bool:
         "Edit a topic channel/thread name format"
         query = "UPDATE `tickets` SET `name_format` = %s WHERE `guild_id` = %s AND `id` = %s AND `beta` = %s"
-        async with self.bot.db_query(query, (format, guild_id, topic_id, self.bot.beta), returnrowcount=True) as db_query:
+        async with self.bot.db_query(query, (name_format, guild_id, topic_id, self.bot.beta), returnrowcount=True) as db_query:
             return db_query > 0
 
     async def db_edit_prompt(self, guild_id: int, message: str):
@@ -181,7 +181,7 @@ class Tickets(commands.Cog):
         async with self.bot.db_query(query, (message, guild_id, self.bot.beta)) as _:
             pass
 
-    async def ask_user_topic(self, ctx: MyContext, multiple = False, message: Optional[str] = None) -> Union[int, list[int], None]:
+    async def ask_user_topic(self, ctx: MyContext, multiple = False, message: Optional[str] = None):
         "Ask a user which topic they want to edit"
         placeholder = await self.bot._(ctx.guild.id, "tickets.selection-placeholder")
         view = AskTopicSelect(ctx.author.id, await self.db_get_topics(ctx.guild.id), placeholder, 25 if multiple else 1)
@@ -199,7 +199,7 @@ class Tickets(commands.Cog):
         except (ValueError, IndexError):
             return None
 
-    async def create_channel_first_message(self, interaction: discord.Interaction, topic: dict, ticket_name: str) -> discord.Embed:
+    async def create_channel_first_message(self, interaction: discord.Interaction, topic: dict, ticket_name: str):
         "Create the introduction message at the beginning of the ticket"
         title = await self.bot._(interaction.guild_id, "tickets.ticket-introduction.title")
         desc = await self.bot._(interaction.guild_id, "tickets.ticket-introduction.description",
@@ -250,14 +250,14 @@ class Tickets(commands.Cog):
 
     async def get_channel_name(self, name_format: Optional[str], interaction: discord.Interaction,
                                topic: dict, ticket_name: str) -> str:
+        "Build the correct channel name for a new ticket"
         channel_name = name_format or self.default_name_format
         if isinstance(topic['topic_emoji'], str) and ':' in topic['topic_emoji']:
             emoji: str = topic["topic_emoji"].split(':')[0]
         else:
             emoji = topic['topic_emoji']
         return channel_name.format_map(self.bot.SafeDict({
-            "username": interaction.user.name,
-            "usertag": interaction.user.discriminator,
+            "username": interaction.user.global_name or interaction.user.name,
             "userid": interaction.user.id,
             "topic": topic["topic"],
             "topic_emoji": emoji,
@@ -275,7 +275,7 @@ class Tickets(commands.Cog):
                 channel_id=topic['category'],
                 topic_name=topic['topic']
             )
-            raise Exception(f"No category configured for guild {interaction.guild_id} and topic {topic['topic']}")
+            raise RuntimeError(f"No category configured for guild {interaction.guild_id} and topic {topic['topic']}")
         sent_error = False
         channel_name = await self.get_channel_name(topic["name_format"], interaction, topic, ticket_name)
         if isinstance(category, discord.CategoryChannel):
@@ -496,7 +496,7 @@ class Tickets(commands.Cog):
     @commands.check(checks.has_manage_channels)
     async def portal_set_format(self, ctx: MyContext, name_format: str):
         """Set the format used to generate the channel/thread name
-        You can use the following placeholders: username, usertag, userid, topic, topic_emoji, ticket_name
+        You can use the following placeholders: username, userid, topic, topic_emoji, ticket_name
         Use "none" to reset the format to the default one
         Spaces and non-ascii characters will be removed or replaced by dashes
 
@@ -683,7 +683,7 @@ If that still doesn't work, please create your ticket
     @commands.check(checks.has_manage_channels)
     async def topic_set_format(self, ctx: MyContext, topic_id: Optional[int], name_format: str):
         """Set the format used to generate the channel/thread name
-        You can use the following placeholders: username, usertag, userid, topic, topic_emoji, ticket_name
+        You can use the following placeholders: username, userid, topic, topic_emoji, ticket_name
         Use "none" to reset the format to the default one
         Spaces and non-ascii characters will be removed or replaced by dashes
 

@@ -68,8 +68,8 @@ Manage Nickname
 
 Allows the bot to change the nickname of any member hierarchically equal or inferior to you. Example of use: `unhoist command <moderator.html#unhoist-members>`__
 
-Manage Emojis / Manage Stickers
--------------------------------
+Manage Expressions
+------------------
 
 Allows the bot to add, rename or delete emojis and stickets from the server. Example of use: `emoji <moderator.html#emoji-manager>`__
 

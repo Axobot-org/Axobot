@@ -122,7 +122,7 @@ class Perms(commands.Cog):
                 perms = channel.permissions_for(target)
             col = target.color
             avatar = target.display_avatar.replace(static_format="png", size=256)
-            name = await self.bot._(ctx, "permissions.target.member", name=str(target))
+            name = await self.bot._(ctx, "permissions.target.member", name=target.display_name)
         elif isinstance(target, discord.Role):
             if channel is None:
                 perms = target.permissions

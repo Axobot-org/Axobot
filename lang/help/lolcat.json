@@ -84,7 +84,7 @@
             "U has 'Manage channels' perm",
             "'Manage channels' required :angrycat:"
         ],
-        "has_manage_emojis": [
+        "has_manage_expressions": [
             "U haz 'Manage smol pictures' permission",
             "Oops, U need to have the 'Manage smol chat pictures' perm for that"
         ],

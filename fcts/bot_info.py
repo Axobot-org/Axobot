@@ -30,7 +30,7 @@ class BotInfo(commands.Cog):
         self.codelines = await count_code_lines()
 
 
-    @commands.command(name='admins')
+    @commands.command(name="admins")
     async def admin_list(self, ctx: MyContext):
         """Get the list of the bot administrators
 
@@ -39,7 +39,7 @@ class BotInfo(commands.Cog):
         for user_id in checks.admins_id:
             if user_id == 552273019020771358:
                 continue
-            users_list.append(str(self.bot.get_user(user_id)))
+            users_list.append(self.bot.get_user(user_id).name)
         await ctx.send(await self.bot._(ctx.channel,"info.admins-list", admins=", ".join(users_list)))
 
     async def get_guilds_count(self, ignored_guilds:list=None) -> int:

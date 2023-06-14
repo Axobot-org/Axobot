@@ -88,8 +88,7 @@ Default channel name format
 **Syntax:** :code:`tickets portal set-format <format or "none">`
 
 At first Axobot will automatically choose the channel name when someones open a new ticket, based on the user nickname and tag. But you can wish for more customized names, and want to compose your own name format based on the available placeholders listed below:
-* `username`: the user name (like "Z_runner" in "Z_runner#7515")
-* `usertag`: the user tag or discriminator (like "7515" in "Z_runner#7515")
+* `username`: the user name (like "Z_runner")
 * `userid`: the internal user ID, which is usually a 18-digits number unique to this user
 * `topic`: the topic name selected by the user
 * `topic_emoji`: the emoji of the topic selected by the user

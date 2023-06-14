@@ -34,7 +34,7 @@
             "mute",
             "modlogs",
             "mutelist",
-            "set_xp",
+            "set-xp",
             "slowmode",
             "softban",
             "unban",
@@ -54,7 +54,7 @@
             "pin",
             "role",
             "roles_react",
-            "roles_rewards",
+            "roles-rewards",
             "tickets",
             "twitch",
             "welcome"
@@ -81,7 +81,7 @@
             "pep8",
             "react",
             "remindme",
-            "reminder"
+            "reminders"
         ]
     },
     "fun": {

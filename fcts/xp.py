@@ -40,7 +40,8 @@ class Xp(commands.Cog):
         self.levels = [0]
         self.embed_color = discord.Colour(0xffcf50)
         self.table = 'xp_beta' if bot.beta else 'xp'
-        self.cooldown = 3
+        self.classic_xp_cooldown = 5 # seconds between each xp gain for global/local
+        self.mee6_xp_cooldown = 60 # seconds between each xp gain for mee6-like
         self.minimal_size = 5
         self.spam_rate = 0.20
         self.xp_per_char = 0.11
@@ -67,8 +68,9 @@ class Xp(commands.Cog):
         if not self.bot.database_online:
             await self.bot.unload_extension("fcts.xp")
 
-    async def get_lvlup_chan(self, msg: discord.Message):
-        value = await self.bot.get_config(msg.guild.id,"levelup_channel")
+    async def get_lvlup_chan(self, msg: discord.Message) -> discord.abc.Messageable:
+        "Find the channel where to send the levelup message"
+        value = await self.bot.get_config(msg.guild.id, "levelup_channel")
         if value == "none":
             return None
         if value == "any":
@@ -106,14 +108,16 @@ class Xp(commands.Cog):
     async def add_xp_0(self, msg: discord.Message, _rate: float):
         """Global xp type"""
         if msg.author.id in self.cache['global']:
-            if time.time() - self.cache['global'][msg.author.id][0] < self.cooldown:
+            if time.time() - self.cache['global'][msg.author.id][0] < self.classic_xp_cooldown:
                 return
         content = msg.clean_content
-        if len(content)<self.minimal_size or await self.check_spam(content) or await self.bot.potential_command(msg):
+        if len(content) < self.minimal_size or await self.check_spam(content) or await self.bot.potential_command(msg):
             return
         if len(self.cache["global"]) == 0:
             await self.db_load_cache(None)
         giv_points = await self.calc_xp(msg)
+        if giv_points == 0:
+            return
         if msg.author.id in self.cache['global']:
             prev_points = self.cache['global'][msg.author.id][1]
         else:
@@ -134,7 +138,7 @@ class Xp(commands.Cog):
         if msg.guild.id not in self.cache:
             await self.db_load_cache(msg.guild.id)
         if msg.author.id in self.cache[msg.guild.id]:
-            if time.time() - self.cache[msg.guild.id][msg.author.id][0] < 60:
+            if time.time() - self.cache[msg.guild.id][msg.author.id][0] < self.mee6_xp_cooldown:
                 return
         if await self.bot.potential_command(msg):
             return
@@ -159,12 +163,14 @@ class Xp(commands.Cog):
         if msg.guild.id not in self.cache:
             await self.db_load_cache(msg.guild.id)
         if msg.author.id in self.cache[msg.guild.id]:
-            if time.time() - self.cache[msg.guild.id][msg.author.id][0] < self.cooldown:
+            if time.time() - self.cache[msg.guild.id][msg.author.id][0] < self.classic_xp_cooldown:
                 return
         content = msg.clean_content
-        if len(content)<self.minimal_size or await self.check_spam(content) or await self.bot.potential_command(msg):
+        if len(content) < self.minimal_size or await self.check_spam(content) or await self.bot.potential_command(msg):
             return
         giv_points = round(await self.calc_xp(msg) * rate)
+        if giv_points == 0:
+            return
         if msg.author.id in self.cache[msg.guild.id]:
             prev_points = self.cache[msg.guild.id][msg.author.id][1]
         else:
@@ -185,7 +191,7 @@ class Xp(commands.Cog):
         "Returns True if the user cannot get xp in these conditions"
         if msg.guild is None:
             return False
-        chans: Optional[list[discord.abc.MessageableChannel]] = await self.bot.get_config(msg.guild.id, "noxp_channels")
+        chans: Optional[list[discord.abc.Messageable]] = await self.bot.get_config(msg.guild.id, "noxp_channels")
         if chans is not None and msg.channel in chans:
             return True
         roles: Optional[list[discord.Role]] = await self.bot.get_config(msg.guild.id, "noxp_roles")
@@ -331,7 +337,9 @@ class Xp(commands.Cog):
         emb = discord.Embed(
             title=f"#{msg.channel.name} | {msg.guild.name} | {msg.guild.id}",
             description=msg.content
-        ).set_footer(text=str(msg.author.id)).set_author(name=str(msg.author), icon_url=msg.author.display_avatar.url).add_field(name="XP given", value=str(xp))
+        ).set_footer(text=str(msg.author.id)).set_author(
+            name=str(msg.author),
+            icon_url=msg.author.display_avatar.url).add_field(name="XP given", value=str(xp))
         await chan.send(embed=emb)
 
 
@@ -586,7 +594,7 @@ class Xp(commands.Cog):
 
         ..Example rank
 
-        ..Example rank Z_runner#7515
+        ..Example rank @z_runner
 
         ..Doc user.html#check-the-xp-of-someone
         """
@@ -738,7 +746,7 @@ class Xp(commands.Cog):
         "Send the user rank as an embed (fallback from card generation)"
         txts = [await self.bot._(ctx.channel, "xp.card-level"), await self.bot._(ctx.channel, "xp.card-rank")]
         emb = discord.Embed(color=self.embed_color)
-        emb.set_author(name=user, icon_url=user.display_avatar)
+        emb.set_author(name=user.display_name, icon_url=user.display_avatar)
         emb.add_field(name='XP', value=f"{xp}/{levels_info[1]}")
         emb.add_field(name=txts[0].title(), value=levels_info[0])
         emb.add_field(name=txts[1].title(), value=f"{rank}/{ranks_nb}")
@@ -756,7 +764,7 @@ class Xp(commands.Cog):
         msg = """__**{}**__
 **XP** {}/{}
 **{}** {}
-**{}** {}/{}""".format(user.name, xp, levels_info[1], txts[0].title(), levels_info[0], txts[1].title(), rank, ranks_nb)
+**{}** {}/{}""".format(user.display_name, xp, levels_info[1], txts[0].title(), levels_info[0], txts[1].title(), rank, ranks_nb)
         send_in_private = await self.bot.get_config(ctx.guild.id, "rank_in_dm")
         if ctx.interaction:
             await ctx.send(msg, ephemeral=send_in_private)
@@ -869,7 +877,7 @@ class Xp(commands.Cog):
                     except discord.NotFound:
                         user = await self.client._(self.guild, "xp.del-user")
                 if isinstance(user, discord.User):
-                    user_name = discord.utils.escape_markdown(user.name)
+                    user_name = discord.utils.escape_markdown(user.display_name)
                     if len(user_name) > 18:
                         user_name = user_name[:15]+'...'
                     if user == self.user:
@@ -947,10 +955,10 @@ class Xp(commands.Cog):
                 await view.disable(msg)
 
 
-    @commands.command(name='set_xp', aliases=["setxp", "set-xp"])
+    @commands.command(name='set-xp', aliases=["setxp"])
     @commands.guild_only()
     @commands.check(checks.has_admin)
-    async def set_xp(self, ctx: MyContext, user: discord.User, xp: int):
+    async def set_xp(self, ctx: MyContext, user: discord.User, xp: commands.Range[int, 0, 10**15]):
         """Set the XP of a user
 
         ..Example set_xp 3000 @someone"""
@@ -1073,7 +1081,7 @@ class Xp(commands.Cog):
         """Remove a role reward
         When a member reaches this level, no role will be given anymore
 
-        ..Example roles_rewards remove 10
+        ..Example roles-rewards remove 10
 
         ..Doc server.html#roles-rewards"""
         try:

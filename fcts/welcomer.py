@@ -81,7 +81,7 @@ class Welcomer(commands.Cog):
         text: Optional[str] = await self.bot.get_config(member.guild.id, event_type)
         if member.id in self.no_message or (event_type == "welcome" and await self._is_raider(member)):
             return
-        if self.bot.get_cog('Utilities').sync_check_any_link(member.name) is not None:
+        if self.bot.get_cog('Utilities').sync_check_any_link(member.display_name) is not None:
             return
         if text:
             channel: Optional[discord.TextChannel] = await self.bot.get_config(member.guild.id, 'welcome_channel')
@@ -96,11 +96,11 @@ class Welcomer(commands.Cog):
             botormember = await self.bot._(member.guild, "misc.bot" if member.bot else "misc.member")
             try:
                 text = text.format_map(self.bot.SafeDict(
-                    user=member.mention if event_type=='welcome' else member.name,
+                    user=member.mention if event_type=='welcome' else member.display_name,
                     user_idname=str(member),
                     user_id=str(member.id),
                     server=member.guild.name,
-                    owner=member.guild.owner.name if member.guild.owner else "",
+                    owner=member.guild.owner.display_name if member.guild.owner else "",
                     member_count=member.guild.member_count,
                     type=botormember
                 ))
