@@ -308,10 +308,12 @@ class Admin(commands.Cog):
     async def cleanup_workspace(self):
         "Delete python cache files and close database connexions"
         for folder_name, _, filenames in os.walk('.'):
+            if folder_name.startswith("./env"):
+                continue
             for filename in filenames:
                 if filename.endswith('.pyc'):
                     os.unlink(folder_name+'/'+filename)
-            if  folder_name.endswith('__pycache__'):
+            if folder_name.endswith('__pycache__'):
                 os.rmdir(folder_name)
         if self.bot.database_online:
             self.bot.close_database_cnx()
