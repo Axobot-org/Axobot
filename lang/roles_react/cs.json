@@ -1,0 +1,19 @@
+{
+    "already-1-rr": "Již máte určenou roli pro tento emoji",
+    "already-dont-have": "Nemáte tuto roli",
+    "already-have": "Tuto roli již máš",
+    "embed-edited": "Embedy a reakce byly úspěšně aktualizovány",
+    "no-rr": "Žádná role nesouvisí s tímto emoji",
+    "not-zbot-embed": "Tato zpráva neobsahuje žádnou rolovou reakci",
+    "not-zbot-msg": "Tato zpráva není od mě!",
+    "reactions-edited": "Reakce byly správně aktualizovány",
+    "role-given": "Role %{r} byla zadána",
+    "role-lost": "Role %{r} byla odstraněna z vašich rolí",
+    "role-not-in-list": "Tato role není součástí přiřaditelných rolí",
+    "rr-added": "Role %{r} byla přidána pro emoji %{e}",
+    "rr-embed": "Převzetí role",
+    "rr-list": "Seznam reakčních rolí (%{n}/%{m})",
+    "rr-removed": "Role %{r} již nemůže být zadána prostřednictvím emoji %{e}",
+    "rr-removed-2": "Emoji %{e} je opět dostupná pro udělení role",
+    "too-many-rr": "Již jste dosáhli limitu %{l} rolí"
+}
