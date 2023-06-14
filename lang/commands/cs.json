@@ -1,0 +1,374 @@
+{
+    "command_name": {
+        "Report a scam": "Nahlásit podvod",
+        "Voice to text": "Převod hlasu na text",
+        "about": "O aplikaci",
+        "antiscam test": "test",
+        "antiscam enable": "povolit",
+        "antiscam disable": "zakázat",
+        "antiscam report": "nahlásit",
+        "slowmode": "pomalý režim",
+        "clear": "vyčistit",
+        "kick": "vyhodit",
+        "warn": "varovat",
+        "mute": "umlčet",
+        "unmute": "zrušit umlčení",
+        "mute-config": "Nastavení \"umlčení\"",
+        "ban": "blokovat",
+        "unban": "odblokovat",
+        "softban": "před banem",
+        "banlist": "seznam blokovaných",
+        "mutelist": "seznam umlčených",
+        "emoji rename": "přejmenovat",
+        "emoji restrict": "omezit",
+        "emoji clear": "vyčistit",
+        "emoji list": "seznam",
+        "role set-color": "nastavit barvu",
+        "role members-list": "seznam členů",
+        "role temporary-grant": "dočasný grant",
+        "role grant": "grant",
+        "role revoke": "odvolat",
+        "unhoist": "odstranit symbolu u uživatelů",
+        "destop": "smazat zprávy",
+        "permissions": "oprávnění",
+        "last-post": "poslední příspěvek",
+        "rss add": "přidat",
+        "rss remove": "odstranit",
+        "rss enable": "povolit",
+        "rss disable": "zakázat",
+        "rss list": "seznam",
+        "rss set-mentions": "nastavit-zmíňky",
+        "rss reload": "znovu načíst",
+        "rss move": "přesun",
+        "rss set-text": "nastavit-text",
+        "rss set-embed": "nastavit-embed",
+        "modlogs list": "seznam",
+        "modlogs enable": "povolit",
+        "modlogs disable": "zakázat",
+        "config set": "nastavit",
+        "config reset": "obnovit",
+        "config reset-all": "Resetovat vše",
+        "config list": "seznam",
+        "config see": "viz",
+        "tickets portal summon": "Otevření tiketu",
+        "tickets portal set-hint": "nastavit nápovědu",
+        "tickets portal set-role": "nastavit roli",
+        "tickets portal set-text": "nastavit-text",
+        "tickets portal set-category": "nastavit-kategorii",
+        "tickets portal set-format": "nastavit-formát",
+        "tickets topic add": "přidat",
+        "tickets topic remove": "odstranit",
+        "tickets topic set-emote": "nastavit-emote",
+        "tickets topic set-hint": "nastavit nápovědu",
+        "tickets topic set-role": "nastavit roli",
+        "tickets topic set-format": "nastavit-formát",
+        "tickets topic list": "seznam",
+        "tickets review-config": "nastavení náhledu",
+        "remindme": "připomenutí",
+        "twitch subscribe": "přihlásit odběr",
+        "twitch unsubscribe": "odhlásit odběr",
+        "twitch list-subscriptions": "seznam odběrů",
+        "twitch check-stream": "zkontrolovat stream",
+        "profile card-preview": "karta náhledů",
+        "profile card": "karta",
+        "profile config": "nastavení",
+        "profile list-card-styles": "seznam stylů karet",
+        "rank": "hodnost",
+        "top": "nahoře",
+        "roles-rewards add": "přidat",
+        "roles-rewards list": "seznam",
+        "roles-rewards remove": "odstranit",
+        "roles-rewards reload": "znovu načíst",
+        "blurple help": "pomoc",
+        "blurple lightfy": "světlý",
+        "blurple darkfy": "tmavý",
+        "blurple check": "zkontrolovat",
+        "ping": "ping",
+        "reminders create": "vytvořit",
+        "reminders list": "seznam",
+        "reminders delete": "smazat",
+        "reminders clear": "vyčistit"
+    },
+    "group_name": {
+        "antiscam": "proti podvodu",
+        "emoji": "emoji",
+        "role": "role",
+        "rss": "rss",
+        "modlogs": "záznam moderátorů",
+        "config": "nastavení",
+        "tickets": "tikety",
+        "tickets portal": "Portál",
+        "tickets topic": "Příspěvek",
+        "twitch": "twitch",
+        "profile": "Profil",
+        "roles-rewards": "Odměny rolí",
+        "blurple": "rozostřit",
+        "reminders": "Připomínky"
+    },
+    "command_short_description": {},
+    "group_description": {
+        "antiscam": "Vše, co souvisí s funkcí antiscam",
+        "emoji": "Spravujte své emoji",
+        "role": "Několik příkazů ke správě rolí",
+        "rss": "Přihlásit se k odběru RSS kanálů na vašem serveru",
+        "modlogs": "Povolit nebo zakázat protokoly serveru v určitých kanálech",
+        "config": "Konfigurace bota pro váš server",
+        "tickets": "Spravovat systém tiketů",
+        "tickets portal": "Nastavte pro vaše členy, jak mohou zpracovávat tikety",
+        "tickets topic": "Nastavte různá témata tiketu, která mohou vaši členové vybrat",
+        "twitch": "Spravujte své twich odběratele",
+        "profile": "Nastavte si bota pro vlastní použití",
+        "roles-rewards": "Dejte role svým členům, když dosáhnou určité úrovně",
+        "reminders": "Spravujte nevyřízené připomínky"
+    },
+    "param_name": {
+        "antiscam test": {
+            "text": "text"
+        },
+        "antiscam report": {
+            "message": "zpráva"
+        },
+        "slowmode": {
+            "seconds": "sekundy"
+        },
+        "clear": {
+            "number": "číslo",
+            "users": "uživatelé",
+            "contains_file": "obsahuje soubor",
+            "contains_url": "obsahuje url",
+            "contains_invite": "obsahuje pozvánku",
+            "is_pinned": "Je připnut"
+        },
+        "kick": {
+            "user": "uživatel",
+            "reason": "důvod"
+        },
+        "warn": {
+            "user": "uživatel",
+            "message": "zpráva"
+        },
+        "mute": {
+            "user": "uživatel",
+            "time": "čas",
+            "reason": "důvod"
+        },
+        "unmute": {
+            "user": "uživatel"
+        },
+        "ban": {
+            "user": "uživatel",
+            "time": "čas",
+            "days_to_delete": "dnů k odstranění",
+            "reason": "důvod"
+        },
+        "unban": {
+            "user": "uživatel",
+            "reason": "důvod"
+        },
+        "softban": {
+            "user": "uživatel",
+            "reason": "důvod"
+        },
+        "banlist": {
+            "show_reasons": "ukázat důvody"
+        },
+        "mutelist": {
+            "show_reasons": "ukázat důvody"
+        },
+        "emoji rename": {
+            "emoji": "emoji",
+            "name": "jméno"
+        },
+        "emoji restrict": {
+            "emoji": "emoji",
+            "roles": "role"
+        },
+        "emoji clear": {
+            "message": "zpráva",
+            "emoji": "emoji"
+        },
+        "role set-color": {
+            "role": "role",
+            "color": "barva"
+        },
+        "role members-list": {
+            "role": "role"
+        },
+        "role temporary-grant": {
+            "role": "role",
+            "user": "uživatel",
+            "time": "čas"
+        },
+        "role grant": {
+            "role": "role",
+            "users": "uživatelé"
+        },
+        "role revoke": {
+            "role": "role",
+            "users": "uživatelé"
+        },
+        "unhoist": {
+            "chars": "Znaky"
+        },
+        "destop": {
+            "start_message": "zpráva od"
+        },
+        "permissions": {
+            "channel": "Kanál",
+            "target": "cíl"
+        },
+        "last-post": {
+            "url": "URL",
+            "type": "zpětný zdroj"
+        },
+        "rss add": {
+            "link": "odkaz"
+        },
+        "rss remove": {
+            "feed": "zdroj"
+        },
+        "rss enable": {
+            "feed": "zdroj"
+        },
+        "rss disable": {
+            "feed": "zdroj"
+        },
+        "rss set-mentions": {
+            "feed": "zdroj",
+            "silent": "ticho",
+            "mentions": "zmínění"
+        },
+        "rss move": {
+            "feed": "zdroj",
+            "channel": "Kanál"
+        },
+        "rss set-text": {
+            "feed": "zdroj",
+            "text": "text"
+        },
+        "rss set-embed": {
+            "feed": "zdroj",
+            "value": "hodnota",
+            "arguments": "argumenty"
+        },
+        "modlogs list": {
+            "channel": "Kanál"
+        },
+        "modlogs enable": {
+            "logs": "Protokoly",
+            "channel": "Kanál"
+        },
+        "modlogs disable": {
+            "logs": "Protokoly",
+            "channel": "Kanál"
+        },
+        "config set": {
+            "option": "Volba",
+            "value": "hodnota"
+        },
+        "config reset": {
+            "option": "Volba"
+        },
+        "config see": {
+            "option": "Volba"
+        },
+        "tickets portal set-hint": {
+            "message": "zpráva"
+        },
+        "tickets portal set-role": {
+            "role": "role"
+        },
+        "tickets portal set-text": {
+            "message": "zpráva"
+        },
+        "tickets portal set-category": {
+            "category_or_channel": "kategorie nebo kanál"
+        },
+        "tickets portal set-format": {
+            "name_format": "Formát jména"
+        },
+        "tickets topic add": {
+            "name": "jméno",
+            "emote": "emote"
+        },
+        "tickets topic remove": {
+            "topic_id": "id téma"
+        },
+        "tickets topic set-emote": {
+            "topic_id": "id téma",
+            "emote": "emote"
+        },
+        "tickets topic set-hint": {
+            "topic_id": "id téma",
+            "message": "zpráva"
+        },
+        "tickets topic set-role": {
+            "topic_id": "id téma",
+            "role": "role"
+        },
+        "tickets topic set-format": {
+            "name_format": "Formát jména",
+            "topic_id": "id téma"
+        },
+        "tickets review-config": {
+            "topic_id": "id téma"
+        },
+        "remindme": {
+            "duration": "doba trvání",
+            "message": "zpráva"
+        },
+        "twitch subscribe": {
+            "streamer": "streamer"
+        },
+        "twitch unsubscribe": {
+            "streamer": "streamer"
+        },
+        "twitch check-stream": {
+            "streamer": "streamer"
+        },
+        "profile card-preview": {
+            "style": "styl"
+        },
+        "profile card": {
+            "style": "styl"
+        },
+        "profile config": {
+            "option": "Volba",
+            "enable": "povolit"
+        },
+        "rank": {
+            "user": "uživatel"
+        },
+        "top": {
+            "page": "stránka",
+            "scope": "rozsah"
+        },
+        "roles-rewards add": {
+            "level": "úroveň",
+            "role": "role"
+        },
+        "roles-rewards remove": {
+            "level": "úroveň"
+        },
+        "blurple lightfy": {
+            "method": "metoda",
+            "variations": "Varianty",
+            "who": "kdo"
+        },
+        "blurple darkfy": {
+            "method": "metoda",
+            "variations": "Varianty",
+            "who": "kdo"
+        },
+        "blurple check": {
+            "who": "kdo"
+        },
+        "reminders create": {
+            "duration": "doba trvání",
+            "message": "zpráva"
+        },
+        "reminders delete": {
+            "reminder_id": "připomenutí-id"
+        }
+    }
+}
