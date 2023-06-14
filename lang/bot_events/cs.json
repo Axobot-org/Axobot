@@ -1,0 +1,21 @@
+{
+    "collect": {
+        "got-points": "Gratulujeme! Právě jste vyhrál/a **%{pts} bodů za akci**!",
+        "lost-points": "Ale ne, právě jste ztratil/a **%{pts} bodů**!\n",
+        "too-quick": "Ještě je příliš brzy! Body za události budete moci sbírat pouze v %{time}!",
+        "strike": "Získali jste bonus za použití tohoto příkazu %{level} krát za sebou!"
+    },
+    "events-price-title": "Ceny k vítězství",
+    "nothing-desc": "V současné době nejsou žádné události. Sledujte novinky bota a dozvíte se datum další události!",
+    "nothing-prices": "Za tuto událost nelze nic získat :confused:",
+    "no-objectives": "Tato událost nemá žádný bodový cíl, není potřeba farmit!\nDalší informace naleznete v příkazu %{cmd} ",
+    "objectives": "Cíle",
+    "points": "Body",
+    "position-global": "Celková pozice",
+    "leaderboard-global": "Globální žebříček (top %{count})",
+    "rank-title": "Body události",
+    "rank-total": "Celkový počet bodů.",
+    "soon": "Událost se blíží! Sledujte informace, protože začne %{date}",
+    "unclassed": "nezařazené",
+    "xp-howto": "Body za akci můžete získat výhrou v hrách s piškvorkami, použitím příkazů pro akci, pokud jsou k dispozici, nebo provedením různých dalších tajných úkolů. Neváhejte a přijďte se zeptat na server podpory!\n"
+}
