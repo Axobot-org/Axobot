@@ -282,10 +282,10 @@
             "message": "zpráva"
         },
         "tickets portal set-category": {
-            "category_or_channel": "kategorie nebo kanál"
+            "category_or_channel": "kategorie-nebo-kanál"
         },
         "tickets portal set-format": {
-            "name_format": "Formát jména"
+            "name_format": "formát-jména"
         },
         "tickets topic add": {
             "name": "jméno",
