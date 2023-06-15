@@ -1,0 +1,7 @@
+{
+    "attachment-too-long": "Z důvodu technických omezení nemohu nakládat s přílohami déle než %{duration}",
+    "no-transcript": "V této hlasové zprávě jsem nezaznamenal jediné slovo :confused:",
+    "not-voice-message": "Tento příkaz je dostupný pouze pro hlasové zprávy",
+    "openai-credits": "Powered by local [OpenAI's Whisper model](%{url})",
+    "title": "Generování přepisu"
+}
