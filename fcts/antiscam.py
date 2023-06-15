@@ -162,8 +162,7 @@ class AntiScam(commands.Cog):
         emb.add_field(name="Status", value=status.title())
         if predicted:
             pred_title = self.agent.categories[predicted.result].title()
-            pred_value = round(
-                predicted.probabilities[predicted.result]*100, 2)
+            pred_value = round(predicted.probabilities[predicted.result]*100, 2)
             emb.add_field(name=f"According to {self.bot.user.display_name}",
                           value=f'{pred_title} ({pred_value}%)')
         return emb
@@ -185,7 +184,9 @@ class AntiScam(commands.Cog):
 
     async def get_messages_list(self):
         "Get the list of messages to train the model, from the database"
-        query = f"SELECT message, normd_message, contains_everyone, url_score, mentions_count, punctuation_count, max_frequency, caps_percentage, avg_word_len, category FROM `spam-detection`.`{self.table}` WHERE category IN (1, 2) GROUP BY message ORDER BY RAND()"
+        query = f"SELECT message, normd_message, contains_everyone, url_score, mentions_count, punctuation_count, max_frequency, \
+            caps_percentage, avg_word_len, category FROM `spam-detection`.`{self.table}` \
+                WHERE category IN (1, 2) GROUP BY message ORDER BY RAND()"
         data: list[Message] = []
         async with self.bot.db_query(query) as query_results:
             for row in query_results:
@@ -224,11 +225,10 @@ class AntiScam(commands.Cog):
         pred = self.agent.predict_bot(data)
         url_score = await self.bot._(ctx.channel, "antiscam.url-score", score=data.url_score)
         probabilities_ = await self.bot._(ctx.channel, "antiscam.probabilities")
-        probas = '\n    - '.join(f'{self.agent.categories[c]}: {round(p*100, 1)}%' for c, p in pred.probabilities.items())
-        answer = f"""{probabilities_}
-    - {probas}
-
-{url_score}"""
+        answer = probabilities_
+        for c, p in pred.probabilities.items():
+            answer += f"\n- {self.agent.categories[c]}: {round(p*100, 1)}%"
+        answer += f"\n\n{url_score}"
         embed = discord.Embed(
             title = await self.bot._(ctx.channel, "antiscam.result") + " " + self.agent.categories[pred.result],
             description = answer,
