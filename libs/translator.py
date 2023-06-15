@@ -14,6 +14,7 @@ LOCALES_MAP = {
     Locale.finnish: "fi",
     Locale.british_english: "en",
     Locale.american_english: "en",
+    Locale.czech: "cs",
 }
 
 

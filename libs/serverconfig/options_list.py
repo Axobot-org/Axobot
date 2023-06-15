@@ -90,7 +90,7 @@ options: dict[str, "AllRepresentation"] = {
     },
     "language": {
         "type": "enum",
-        "values": ('fr', 'en', 'lolcat', 'fi', 'de', 'fr2'),
+        "values": ('fr', 'en', 'lolcat', 'fi', 'de', 'fr2', 'cs'),
         "default": "en",
         "is_listed": True,
     },

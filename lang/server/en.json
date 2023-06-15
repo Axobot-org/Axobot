@@ -17,7 +17,8 @@
             "lolcat": "lolcat",
             "fi": "Finnish",
             "de": "German",
-            "fr2": "Familiar French"
+            "fr2": "Familiar French",
+            "cs": "Czech"
         },
         "levelup_channel": {
             "none": "no message",
