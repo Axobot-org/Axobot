@@ -1,0 +1,170 @@
+{
+    "aliases": "Přezdívky",
+    "categories": {
+        "data": "údaje",
+        "fun": "zábava",
+        "moderation": "moderace",
+        "other": "ostatní",
+        "server-settings": "nastavení serveru",
+        "staff": "bot staff",
+        "translators": "překladatelský tým",
+        "unclassed": "Nezařazené",
+        "users-info": "Informace o uživateli"
+    },
+    "check-desc": {
+        "bot_can_embed": [
+            "Bot má oprávnění odesílat embedy",
+            "Musíte povolit botovi odesílal embedy"
+        ],
+        "bot_has_permissions": [
+            "Bot má dostatečná oprávnění",
+            "Bot nemá dostatečná oprávnění"
+        ],
+        "can_ban": [
+            "Jedna z vašich rolí má oprávnění používat tento příkaz (`Banování`)",
+            "Chybí povolená role (`Banování`)"
+        ],
+        "can_clear": [
+            "Jedna z tvých rolí je oprávněna použít tento příkaz (`vymazání`)",
+            "Chybí povolená role (`vymazání`)"
+        ],
+        "can_edit_case": [
+            "Jedna z vašich rolí je oprávněna použít tento příkaz (`varování uživatele`)",
+            "Chybí povolená role (`varování uživatele`)"
+        ],
+        "can_kick": [
+            "Jedna z tvých rolí je oprávněna použít tento příkaz (`vykopnutí`)",
+            "Chybí povolená role (`vykopnutí`)"
+        ],
+        "can_mute": [
+            "Jedna z tvých rolí je oprávněna použít tento příkaz (`umlčení`)",
+            "Chybí povolená role (`umlčení`)"
+        ],
+        "can_say": [
+            "Jedna z tvých rolí je oprávněna použít tento příkaz (říct`)",
+            "Chybí povolená role (`říct`)"
+        ],
+        "can_slowmode": [
+            "Jedna z vašich rolí je oprávněna použít tento příkaz (`pomalý mód`)",
+            "Chybí povolená role (`pomalý`)"
+        ],
+        "can_use_cookie": [
+            "Jste vybrán z Aragorn1202",
+            "Tento příkaz je na seznamu povolených"
+        ],
+        "can_use_rss": [
+            "Máte oprávnění 'Správa serveru'",
+            "'Správa serveru' je vyžadováno povolení"
+        ],
+        "can_warn": [
+            "Jedna z vašich rolí je oprávněna použít tento příkaz (`varování`)",
+            "Chybí povolená role (`varování`)"
+        ],
+        "database_connected": [
+            "Databáze je online",
+            "Databáze je offline"
+        ],
+        "guild_only": [
+            "Lze použít pouze na serveru",
+            "Lze použít pouze na serveru"
+        ],
+        "has_admin": [
+            "Máte oprávnění Administrátora",
+            "Je vyžadováno Administrátorské oprávnění"
+        ],
+        "has_audit_logs": [
+            "Máte oprávnění \"Zobrazit protokoly auditů\"",
+            "Chybí oprávnění \"Zobrazit protokoly auditu\""
+        ],
+        "has_embed_links": [
+            "Máte oprávnění 'Vložit odkazy embedu'",
+            "Musíte mít oprávnění 'Vložit odkazy embedu'"
+        ],
+        "has_manage_channels": [
+            "Máte oprávnění 'Spravovat kanály'",
+            "Chybí oprávnění 'Správa kanálů'"
+        ],
+        "has_manage_expressions": [
+            "Máte oprávnění 'Správa výrazů'",
+            "Musíte mít oprávnění 'Správa výrazů'"
+        ],
+        "has_manage_guild": [
+            "Máte oprávnění 'Správa serveru'",
+            "Chybí oprávnění 'Správa serveru'"
+        ],
+        "has_manage_msg": [
+            "Máte oprávnění \"Spravovat zprávy\"",
+            "Chybí oprávnění \"Spravovat zprávy\""
+        ],
+        "has_manage_nicknames": [
+            "Máte oprávnění 'Správa přezdívek'",
+            "'Spravovat přezdívky' chybí oprávnění"
+        ],
+        "has_manage_roles": [
+            "Máte oprávnění 'Správa rolí'",
+            "Chybí oprávnění 'Spravovat role'"
+        ],
+        "has_permissions": [
+            "Máš dostatečná Discord oprávnění",
+            "Nemáš správná Discord oprávnění"
+        ],
+        "in_support_server": [
+            "Nacházíte se v serveru podpory bota",
+            "Tento příkaz můžete použít pouze na serveru podpory"
+        ],
+        "is_blurple": [
+            "Discord narozeninové akce probíhá, užijte si to!",
+            "V tuto chvíli není žádná událost rozostření"
+        ],
+        "is_bot_admin": [
+            "Musíš být jedním z Administrátorů bota",
+            "Nejste jedním z Administrátorů bota"
+        ],
+        "is_fun_enabled": [
+            "Zábavné příkazy jsou povoleny",
+            "Zábavné příkazy musí být povoleny"
+        ],
+        "is_halloween": [
+            "Událost Halloweenu probíhá, užijte si to!",
+            "Momentálně není žádná Halloween událost"
+        ],
+        "is_owner": [
+            "Musíš být majitelem bota",
+            "Nejste vlastníkem bota"
+        ],
+        "is_support_staff": [
+            "Jsi členem bota",
+            "Musíš být součástí staff týmu bota"
+        ],
+        "is_translator": [
+            "Jste součástí týmu překladatelů",
+            "Musíte být součástí týmu překladatelů"
+        ],
+        "is_ttt_enabled": [
+            "Hra piškvorky je povolena",
+            "Hra piškvorky musí být povolena na tomto serveru"
+        ]
+    },
+    "cmd-count": {
+        "zero": "Žádný příkaz",
+        "one": "1 příkaz\n`%{p}help %{cog}` pro více informací",
+        "other": "Příkazy %{count}\n`%{p}nápověda %{cog}` pro získání seznamu"
+    },
+    "cmd-not-found": "Neexistuje žádný příkaz s názvem \"%{cmd}\"",
+    "cog-empty-dm": "Žádný příkaz této kategorie není v DM k dispozici!",
+    "description": "Popis",
+    "embed_title": "Dostupné příkazy pro %{u}",
+    "embed_title_dm": "Dostupné příkazy v DM",
+    "footer": "Napište {}help příkaz pro více informací o příkazu",
+    "more-subcmds": {
+        "one": "a další 1",
+        "many": "a %{count} více"
+    },
+    "no-desc-cmd": "Žádný popis pro tento příkaz",
+    "no-desc-cog": "Pro toto kolečko není popis.",
+    "no-subcmd": "Příkaz `%{cmd}` nemá žádný podpříkaz",
+    "not-enabled": ":warning: Tento příkaz je zakázán",
+    "subcmd-not-found": "Tento příkaz nemá žádný příkaz s názvem \"%{name}\"",
+    "subcmds": "Podpříkazy",
+    "warning": "Předpoklady"
+}
