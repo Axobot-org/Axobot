@@ -348,6 +348,37 @@ ORDER BY usages DESC LIMIT %(limit)s"""
         else:
             await ctx.send(txt+"\n"+prefix)
 
+    @commands.command(name="welcome", aliases=['bvn', 'bienvenue', 'leave'])
+    @commands.cooldown(10, 30, commands.BucketType.channel)
+    async def bvn_help(self, ctx: MyContext):
+        """Help on setting up welcome / leave messages
+
+..Doc infos.html#welcome-message"""
+        config_cmd = await self.bot.get_command_mention("config set")
+        await ctx.send(await self.bot._(ctx.guild, "welcome.help", config_cmd=config_cmd))
+
+    @commands.hybrid_command(name="about", aliases=["botinfos", "botinfo"])
+    @commands.cooldown(7, 30, commands.BucketType.user)
+    async def about_cmd(self, ctx: MyContext):
+        """Information about the bot
+
+..Doc infos.html#about"""
+        urls = ""
+        bot_invite = "https://zrunner.me/" + ("invitezbot" if self.bot.entity_id == 0 else "invite-axobot")
+        links = {
+            "server": "https://discord.gg/N55zY88",
+            "invite": bot_invite,
+            "docs": "https://axobot.rtfd.io/",
+            "privacy": "https://zrunner.me/axobot-privacy.pdf"
+        }
+        for key, url in links.items():
+            urls += "\n:arrow_forward: " + await self.bot._(ctx.channel, f"info.about.{key}") + " <" + url + ">"
+        msg = await self.bot._(ctx.channel, "info.about-main", mention=ctx.bot.user.mention, links=urls)
+        if ctx.can_send_embed:
+            await ctx.send(embed=discord.Embed(description=msg, color=16298524))
+        else:
+            await ctx.send(msg)
+
 
 async def setup(bot: Axobot):
     await bot.add_cog(BotInfo(bot))
