@@ -1,0 +1,31 @@
+{
+    "added-partner": "Tento partner byl úspěšně přidán",
+    "already-added": "Již jste přidali tohoto partnera!",
+    "bot-uptime": "Doba provozu",
+    "changed-desc": "Popis byl změněn!",
+    "changed-invite": "Pozvánka byla změněna!",
+    "confirm-bot": "Opravdu chcete odstranit bota `%{bot} z vašich partnerů?",
+    "confirm-server": "Opravdu chcete odstranit server `%{server} z vašich partnerů?",
+    "del-canceled": "Smazání zrušeno",
+    "deleted": "Tento partner byl úspěšně odstraněn z vašeho seznamu",
+    "invalid-bot": "Tohoto bota nelze najít",
+    "invalid-invite": "Neplatná pozvánka",
+    "invalid-partner": "Partner nebyl nalezen",
+    "missing-manage-guild": "Nelze najít pozvánky na server (chybí oprávnění \"Spravovat server\")",
+    "missing-reactions": "Oprávnění \"Přidat reakce\" chybí :confused:",
+    "no-channel": "Nenastavili jste žádný partnerský kanál",
+    "no-partner": "Nemáte žádného partnera",
+    "no-partner-2": "Žádný server s vámi nemá partnerství",
+    "partners-list": [
+        "Partneři serveru",
+        "Seznam vašich partnerů",
+        "Seznam serverů které jsou s vámí jako partneři"
+    ],
+    "reloaded": {
+        "many": "%{count} partneři byli znovu načteni",
+        "one": "1 partner byl znovu načten",
+        "zero": "Zdá se, že nemáte žádného partnera"
+    },
+    "unknown-error": "Došlo k neznámé chybě. Pro více informací kontaktujte podporu",
+    "unknown-server": "Partner serveru nebyl nalezen"
+}
