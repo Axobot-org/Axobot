@@ -1,0 +1,8 @@
+{
+    "backup-done": "Záloha dokončena!",
+    "err": "Došlo k vnitřní chybě... počkejte pár okamžiků nebo kontaktujte podporu (příkaz `about`), pokud se to stane znovu",
+    "finished": "Záloha použita! Zde jsou protokoly",
+    "invalid_file": "Pošlete prosím záložní soubor ve stejné zprávě jako příkaz",
+    "invalid_version": "Neplatná verze zálohy. Soubor je pravděpodobně poškozen",
+    "loading": "Probíhá načítání zálohy... čekejte prosím..."
+}

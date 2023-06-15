@@ -1,0 +1,24 @@
+{
+    "ban": "%{user} (%{userid}) byl zabanován",
+    "case-del": "Případ #.%{id} byl odstraněn (týkající se %{user})",
+    "case-reason": "Případ #.%{id} byl upraven:\n`Starý důvod:` %{old}\n`Nový důvod:` %{new}",
+    "clear": "%{number} smazaných zpráv v %{channel}",
+    "kick": "%{user} (%{userid}) byl vykopnut",
+    "mute": "%{user} (%{userid}) je nyní umlčen",
+    "reason": {
+        "autounmute": "automatické zapnutí ztlumení",
+        "invite": "Automatický (Discord pozvání)",
+        "memberchan": "Automatizovaná akce (konfigurační členský účet)",
+        "mentions": "Automod (příliš mnoho poznámek)",
+        "unban": "odbanován uživatelem %{user}",
+        "unmute": "bylo zrušeno umlčení uživatelem %{user}",
+        "welcome_roles": "Automatizovaná akce (uvítací role)",
+        "young": "Automod (účet byl založen teprve nedávno)"
+    },
+    "slowmode-disabled": "Zpomalený režim zakázán v %{channel}",
+    "slowmode-enabled": "Pomalý režim povolen v %{channel} (%{seconds}s)",
+    "softban": "%{user} (%{userid}) byl \"zabanovaný mírným banem\"",
+    "unban": "%{user} (%{userid}) již není zabanován",
+    "unmute": "%{user} (%{userid}) již není umlčen",
+    "warn": "%{user} (%{userid}) byl varován"
+}

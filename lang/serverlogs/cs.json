@@ -1,0 +1,30 @@
+{
+    "categories": {
+        "automod": "Automod",
+        "members": "Členi",
+        "messages": "Zprávy",
+        "moderation": "Moderace",
+        "other": "Ostatní",
+        "roles": "Role",
+        "tickets": "Tikety"
+    },
+    "disabled": {
+        "current": "Protokoly typu %{kind} již nebudou na tento kanál odeslány",
+        "other": "Protokoly typu %{kind} již nebudou posílány na %{channel}"
+    },
+    "embed-warning": "Pro odesílání logů bota potřebuje oprávnění \"Embed odkazy\"!",
+    "enabled": {
+        "current": "Protokoly typu %{kind} budou nyní odeslány na tento kanál",
+        "other": "Protokoly typu %{kind} budou nyní odeslány na %{channel}"
+    },
+    "kick-warning": "Pro detekci vykopnutých členů bota potřebuje oprávnění \"Zobrazit kontrolní protokol\"!",
+    "list": {
+        "all": "Seznam dostupných logů",
+        "channel": "Seznam logů použitých v %{channel}",
+        "emojis": "%{enabled} jsou povoleny pro modlogy na vašem serveru\n%{disabled} jsou pro ostatní dostupné modlogy",
+        "guild": "Seznam logů použitých na tomto serveru",
+        "none": "Zde není použit žádný záznam. Použij `%{cmd}` k načítání logů"
+    },
+    "none-added": "Tento kanál je již přihlášený ke všem těmto logům!",
+    "none-removed": "Tento kanál již byl přihlášen k odběru žádného z těchto protokolů!"
+}

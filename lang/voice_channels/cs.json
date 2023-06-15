@@ -1,0 +1,7 @@
+{
+    "deleted": {
+        "many": "%{count} smazal kanály",
+        "one": "1 smazaný kanál"
+    },
+    "no-channel": "Na tomto serveru není generován žádný hlasový kanál"
+}

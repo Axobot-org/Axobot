@@ -1,0 +1,14 @@
+{
+    "already-playing": "Již máte hru!",
+    "bot-begin": "Pojďme na to začít!",
+    "game-removed": "Správně jste opustili hru",
+    "not-playing": "Nemáte žádnou hru v procesu",
+    "nul": "Remíza, nikdo nevyhrál...",
+    "pion-1": "Na této buňce je již pěšec!",
+    "pion-2": "Neplatný vstup",
+    "tip": "\n*Chcete-li hrát, zadejte číslo mezi 1 a 9, odpovídající vybranému případu. Hraj %{symb1}, hraješ %{symb2}*",
+    "too-late": "Rozhodovali jste se příliš dlouho. Hra skončila!",
+    "user-begin": "{}, začínáte!",
+    "win-bot": "Vyhrát! Konec hry!",
+    "win-user": "Dobrá práce, %{user} vyhrál!"
+}

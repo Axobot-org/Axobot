@@ -1,0 +1,171 @@
+{
+    "bool": {
+        "true": "Ano",
+        "false": "Ne"
+    },
+    "enum": {
+        "anti_raid": {
+            "none": "žádný",
+            "smooth": "hladký",
+            "careful": "opatrně",
+            "high": "vysoký",
+            "extreme": "extrémní"
+        },
+        "language": {
+            "fr": "Francouzština",
+            "en": "Angličtina",
+            "lolcat": "lolcat",
+            "fi": "Finština",
+            "de": "Němčina",
+            "fr2": "Známá Francouzština"
+        },
+        "levelup_channel": {
+            "none": "žádná zpráva",
+            "any": "jakýkoliv kanál",
+            "dm": "soukromá zpráva"
+        },
+        "ttt_display": {
+            "disabled": "zakázáno",
+            "short": "krátký",
+            "normal": "normální"
+        },
+        "xp_type": {
+            "global": "globální",
+            "mee6-like": "mee6-like",
+            "local": "místní"
+        }
+    },
+    "config-list": "Seznam dostupných možností: %{text}Více informací v %{link}",
+    "deleted-channel": "odstraněný kanál",
+    "deleted-role": "odstraněná role",
+    "internal-error": "Došlo k vnitřní chybě. Pokud problém přetrvává, obraťte se na naši podporu",
+    "need-manage-server": "Ke spuštění tohoto příkazu potřebujete oprávnění \"Spravovat server\".",
+    "not-found": "Server %{guild} ještě nebyl v databázi zaregistrován",
+    "opt_title": "Možnost \"%{opt}\" ze serveru %{guild}",
+    "option-notfound": "Tato možnost neexistuje :confused:",
+    "reset-all": {
+        "confirmation": "Jste si jisti, že chcete vše resetovat? Nebude moci toto vrátit zpět.",
+        "success": "Všechna vaše konfigurace byla resetována!",
+        "error": "Něco se pokazilo! Pokud problém přetrvává, kontaktujte prosím naši podporu"
+    },
+    "see-0": "Zadejte `!config help` pro více informací",
+    "see-title": "%{guild} konfigurace serveru",
+    "set_error": {
+        "BOOLEAN_INVALID": "Hodnota musí být \"true\" nebo \"false\"",
+        "CATEGORY_INVALID": "Musíte zadat platnou kategorii pro tuto možnost",
+        "channels_list": "Pro tuto volbu musíte poskytnout mezi kanály %{min} a %{max}",
+        "CHANNEL_ANNOUNCEMENT": "Oznamovací kanály nejsou pro tuto možnost přijímány",
+        "CHANNEL_INVALID": "%{input} není platný kanál",
+        "CHANNEL_NON_NSFW": "Kanál pro tuto možnost musí být NSFW kanál",
+        "CHANNEL_NOT_TEXT": "Pro tuto možnost musíte zadat textový kanál",
+        "CHANNEL_NOT_VOICE": "Pro tuto možnost musíte zadat hlasový kanál",
+        "CHANNEL_STAGE": "Oznamovací kanály nejsou pro tuto možnost přijímány",
+        "CHANNEL_THREAD": "Hodnota této volby nemůže být kanál vlákna",
+        "COLOR_INVALID": "Musíte zadat platnou barvu pro tuto možnost",
+        "emojis_list": "Musíte poskytnout mezi %{min} a %{max} emoji pro tuto možnost",
+        "emojis_list_exact": "Musíte poskytnout přesně %{count} emoji pro tuto možnost",
+        "EMOJI_INVALID": "Jeden z poskytnutých emoji je neplatný",
+        "ENUM_INVALID": "Hodnota musí být jedna z následujících hodnot: %{list}",
+        "float_err": "Hodnota musí být číslo mezi %{min} a %{max}",
+        "int_err": "Hodnota musí být celé číslo mezi %{min} a %{max}",
+        "LEVELUP_CHANNEL_INVALID": "Úvodní kanál musí být buď textový kanál, nebo hodnota 'any' nebo 'none'",
+        "roles_list": "Musíte poskytnout mezi %{min} a %{max} rolemi",
+        "ROLE_EVERYONE": "Nemůžete použít roli @everyone pro tuto možnost",
+        "ROLE_INTEGRATED": "Pro tuto možnost nelze použít integrovanou roli",
+        "ROLE_INVALID": "%{input} není platná role",
+        "text_err": "Text této volby musí být mezi %{min} a %{max} znaky dlouhé"
+    },
+    "set_success": {
+        "int": "%{opt} byl nastaven na %{val}",
+        "float": "%{opt} byl nastaven na %{val}",
+        "boolean": {
+            "true": "Volba %{opt} byla aktivována",
+            "false": "Volba %{opt} byla deaktivována"
+        },
+        "enum": "Volba %{opt} byla nastavena na %{val}",
+        "text": "Volba textu %{opt} byla nastavena na \"%{val}\"",
+        "role": "Volba %{opt} byla nastavena na roli %{val}",
+        "roles_list": "Volba %{opt} byla nastavena na role %{val}",
+        "text_channel": "Volba %{opt} byla nastavena na %{val}",
+        "text_channels_list": "Volba %{opt} byla nastavena na kanály %{val}",
+        "voice_channel": "Volba %{opt} byla nastavena na hlasový kanál %{val}",
+        "category": "Možnost '%{opt}' byla nastavena na kategorii \"%{val}\"",
+        "emojis_list": "Možnost %{opt} byla nastavena na smajlíky %{val}",
+        "color": "%{opt} nyní použije barvu %{val}",
+        "levelup_channel": {
+            "any": "Levelup zprávy budou nyní odeslány přímo v chatu",
+            "channel": "Levelup zprávy budou nyní odeslány na %{val}",
+            "none": "Úrovně zpráv již nebudou posílány",
+            "dm": "Levelup zprávy budou odeslány v přímých zprávách uživatelů"
+        }
+    },
+    "server_desc": {
+        "anti_caps_lock": "Mám poslat zprávu, když člen pošle příliš mnoho velkých písmen? %{value}",
+        "anti_raid": "Úroveň anti-raid ochrany: %{value} \n*([Documentation](https://axobot.rtfd.io/en/latest/moderator.html#anti-raid))*",
+        "anti_scam": "Mám zkontrolovat škodlivé zprávy a smazat je? %{value}",
+        "autoremove_xp": "Zkušenosti jsou denně odebírány od neaktivních členů: %{value}",
+        "ban_allowed_roles": "Seznam rolí, které mohou použít příkaz \"ban\": %{value}",
+        "bot_news": "Seznam kanálů, kde mají být odeslány zprávy bota: %{value}",
+        "clear_allowed_roles": "Seznam rolí, které mohou použít příkaz \"clear\": %{value}",
+        "compress_help": "Má být zobrazen příkaz `help` komprimován? %{value}",
+        "delete_welcome_on_quick_leave": "Mám odstranit uvítací zprávu, když člen opustí ihned po připojení? %{value}",
+        "description": "Popis serveru:\n %{value}",
+        "enable_fun": "Jsou příkazy uvedené v příkazu `fun` povoleny? %{value}",
+        "enable_xp": "Měl by být povolen xp systém? %{value}",
+        "help_in_dm": "Odeslat zprávu nápovědy v soukromé zprávě? %{value}",
+        "hunter": "Seznam všech chatovacích místností, ve kterých je hra *lovec* aktivní: %{value}",
+        "kick_allowed_roles": "Seznam rolí, které mohou použít příkaz \"Vykopnout\": %{value}",
+        "language": "Aktuální jazyk bota pro tento server: **%{value}**",
+        "leave": "Zpráva odeslána, když člen odejde z funkce: %{value}",
+        "levelup_channel": "Kanál, ve kterém jsou odeslány zprávy o zvýšení úrovně: %{value}",
+        "levelup_msg": "Zpráva odeslána, když člen získá xp úroveň: %{value}",
+        "membercounter": "Kanál zobrazující počet vašich členů v názvu: %{value}",
+        "morpion_emojis": "Emoji používanou k přehrávání tic-takto: %{value}",
+        "mute_allowed_roles": "Seznam rolí, které mohou použít příkaz \"umlčení\": %{value}",
+        "muted_role": "Používá se role k umlčení členů: %{value}",
+        "nicknames_history": "Mám si pamatovat změny přezdívky na tomto serveru? %{value}",
+        "noxp_channels": "Kanály, kde nemůžete získat xp: %{value}",
+        "noxp_roles": "Role zabraňující získání xp: %{value}",
+        "partner_channel": "Kanál, kde jsou odesláni partneři: %{value}",
+        "partner_color": "Barva vložených partnerů: %{value}",
+        "partner_role": "Role přidělená partnerům: %{value}",
+        "poll_channels": "Seznam kanálů, kde budou reakce :thumbsup: a :thumbsdown: automaticky přidány do každé zprávy: %{value}",
+        "prefix": "Aktuální předpona bota: %{value}",
+        "rank_in_dm": "Odeslat žebříčky v soukromých zprávách? %{value}",
+        "save_roles": "Měly by být role uloženy, když člen odejde, v případě, že se vrátí? %{value}",
+        "say_allowed_roles": "Seznam rolí, které mohou použít příkaz \"say\" : %{value}",
+        "slowmode_allowed_roles": "Seznam rolí, které mohou použít příkazy \"slowmode\" a \"zmrazit\": %{value}",
+        "streaming_channel": "Kanál kde odesílat živá oznámení: %{value}",
+        "stream_mention": "Role, kterou je třeba zmínit, když člen začne být live: %{value}",
+        "streaming_role": "Role přidělená autorizovaným členům, kteří streamují: %{value}",
+        "ttt_display": "Použití tic-taku: %{value}",
+        "update_mentions": "Role uvedené v seznamu změn bota: %{value}",
+        "verification_role": "Role odstraněny, když uživatel použije příkaz `verify`: %{value}",
+        "voice_category": "Kategorie, ve které budou vytvořeny automatické hlasové chatovací místnosti: %{value}",
+        "voice_channel": "Kanál, ze kterého budou vytvořeny automatické hlasové chatovací místnosti: %{value}",
+        "voice_channel_format": "Formát automatických názvů hlasových kanálů: %{value}",
+        "voice_roles": "Role přidělené členům v hlasovém kanálu: %{value}",
+        "vote_emojis": "Emojis použitý pro anketní reakce: %{value}",
+        "warn_allowed_roles": "Seznam rolí, které mohou používat příkazy \"varovat\" a \"případy\": %{value}",
+        "welcome": "Zpráva odeslána, když člen dorazí: %{value}",
+        "welcome_channel": "Seznam kanálů pro odesílání uvítání/zanechání zpráv: %{value}",
+        "welcome_roles": "Seznam rolí automaticky zadaných novým členům: %{value}",
+        "xp_rate": "Změna výdělků XP: %{value}",
+        "xp_type": "Použitý XP systém: %{value}"
+    },
+    "tips": {
+        "antiscam_enable_logs": "Logy pro antiscam systém můžete povolit příkazem %{modlogs_enable}",
+        "title": "Pro tip"
+    },
+    "value-deleted": "Hodnota volby \"%{option} byla obnovena na výchozí hodnotu",
+    "warnings": {
+        "antiraid_kick_ban": "Potřebuji oprávnění jak \"Vykopnout uživatele\", tak \"Zabanovat uživatele\", abych mohl uplatnit ochranu proti anti-raid",
+        "antiraid_kick": "Potřebuji povolení „Vykopnout uživatele“, abych mohl použít ochranu anti-raid",
+        "antiraid_ban": "K použití ochrany anti-raid potřebuji povolení „Zabanovat uživatele“",
+        "channel_write_permissions": "Potřebuji mít možnost posílat zprávy v %{channel} pro tuto možnost",
+        "moderation_command": "Potřebuji oprávnění '%{perm}' pro použití tohoto příkazu",
+        "title": "Varování",
+        "xp_should_be_enabled": "Tato volba je určena pro XP systém. Můžete ji povolit s nastavením 'enable_xp'",
+        "xp_should_be_local": "Tato volba funguje pouze pro lokální XP systém. Můžete změnit serverový XP systém s nastavením 'xp_type'"
+    }
+}

@@ -1,0 +1,89 @@
+{
+    "cancelled": "Operace byla zrušena",
+    "category-edited": {
+        "category-permission-warning": "Vypadá to, že nemám oprávnění k vytváření nových kanálů v této kategorii. Prosím opravte situaci udělením oprávnění **'Správa kanálů**, jinak nebudu moci přidávat žádné tikety.",
+        "channel-privacy-warning": "Vypadá to, že v tomto kanálu nemohu vytvořit soukromá vlákna. Ujistěte se, že je **odemčeno** a mám **požadované oprávnění**. Jinak vytvořím tikety jako veřejná vlákna a kdokoliv je může přečíst.",
+        "default-category": "Nově vytvořené tikety budou vytvořeny jako nové kanály v kategorii %{category}!",
+        "default-channel": "Nově vytvořené tikety budou vytvořeny jako nové vlákna v kanálu %{channel}!"
+    },
+    "choose-topic-edition": "Vyberte téma, které chcete upravit",
+    "choose-topics-deletion": "Vyberte, která témata chcete odstranit",
+    "default-topic-prompt": "Vyberte kategorii tiketu",
+    "emote-edited": "Emote pro téma \"%{topic}\" byl upraven!",
+    "format": {
+        "edited": {
+            "default": "Výchozí formát jména byl správně upraven!",
+            "topic": "Formát názvu tématu \"%{topic}\" byl upraven."
+        },
+        "too-long": "Formát názvu vašeho kanálu nesmí přesáhnout %{max} znaků!"
+    },
+    "hint-edited": {
+        "default": "Výchozí nápověda byla správně upravena!",
+        "topic": "Nápověda pro téma \"%{topic}\" byla správně upravena!"
+    },
+    "hint-useful": "Už to nepotřebuji",
+    "hint-useless": "Vytvořit tiket",
+    "missing-category-config": "Nastala chyba, nemohl jsem vytvořit tiket, protože mi nikdo neřekl, kde ho vytvořit. Požádejte prosím moderátora serveru, aby použil příkaz %{set_category}.",
+    "missing-perms-creation": {
+        "channel": "Nastala chyba, nemohl jsem vytvořit nový kanál tiketu. Ujistěte se prosím, že mám požadovaná oprávnění v kategorii \"%{category}\" a zkuste to znovu.",
+        "thread": "Jejda, nemohl jsem vytvořit nové vlákno tiketu. Prosím, ujistěte se, že mám požadovaná oprávnění v %{channel} a zkuste to znovu."
+    },
+    "missing-perms-setup": {
+        "to-member": "Nastala chyba, nemohl jsem správně nastavit váš ticket kanál. Prosím, požádejte moderátora serveru o opravu mých oprávnění, jinak kdokoliv, kdo má přístup ke kategorii ticketů, může být schopen přečíst váš ticket.",
+        "to-staff": "Chyba, nemohl jsem nastavit oprávnění kanálu pro váš tiket. Prosím, ujistěte se, že mám oprávnění 'Správa rolí' v kategorii %{category}, jinak kdokoliv, kdo má přístup do této kategorie, může vidět nové tikety."
+    },
+    "nothing-to-edit": "Nic k úpravě!",
+    "other": "ostatní",
+    "review": {
+        "category": "Kategorie",
+        "channel": "Kanál",
+        "default": "Výchozí konfigurace",
+        "deleted-category": "Kategorie nebo kanál %{id} byl smazán",
+        "deleted-role": "Smazána role %{id}",
+        "embed": {
+            "desc-global": "Zde je celkový přehled konfigurace tiket systém pro tento server",
+            "desc-topic": "Zde je přehled konfigurace systému tiketů pro téma „%{topic}“ konkrétně",
+            "title-global": "Souhrn o globálním nastavení",
+            "title-topic": "Kontrola konfigurace pro téma \"%{topic}\""
+        },
+        "emoji": "Emoji",
+        "format": "Formát jména",
+        "hint": "Zpráva nápovědy",
+        "no-config": "Tento server nepoužívá systém tiketu",
+        "prompt": "Výzva k výběru",
+        "role": "Povolená role",
+        "topic-no-config": "Pro toto téma není žádná konkrétní konfigurace",
+        "topic-not-found": "Nebylo nalezeno žádné téma s tímto ID"
+    },
+    "role-edited": {
+        "default": "Výchozí role povolená pro zobrazení tiketů byla upravena!",
+        "default-reset": "Výchozí role povolená zobrazení tiketů byla obnovena do žádné role!",
+        "topic": "Role povolená k zobrazení tiketů tématu \"%{topic}\" byla upravena!",
+        "topic-reset": "Role pro zobrazení tiketů tématu \"%{topic}\" byla obnovena na výchozí!"
+    },
+    "selection-placeholder": "Vyberte téma",
+    "text-edited": "Zpráva v tiketu byla upravena",
+    "ticket-created": "Tiket otevřen v %{channel} s tématem \"%{topic}\"!",
+    "ticket-introduction": {
+        "description": "Vítej %{user} tvůj tiket týkající se '%{ticket_name}'! Někdo by měl rychle odpovědět na váš tiket právě zde.\n\nPro připomenutí, vybrali jste téma **'%{topic_name}'**",
+        "title": "Nový tiket vytvořen!"
+    },
+    "title-modal": {
+        "label": "Tvůj předmět",
+        "placeholder": "Zde napište smysluplný název tiketu",
+        "title": "Váš tiket"
+    },
+    "too-quick": "Zakládáte tikety příliš rychle! Prosím počkejte několik minut před založením druhého tiketu",
+    "topic": {
+        "cant-create": "Nastala chyba, nelze vytvořit toto téma. Ujistěte se, že již nemáte téma s tímto názvem, a v případě potřeby kontaktujte podporu",
+        "created": "Téma \"%{name} bylo úspěšně vytvořeno",
+        "deleted": {
+            "one": "Téma \"%{name}\" bylo odstraněno",
+            "many": "Bylo odstraněno %{count} témat"
+        },
+        "list": "Témata vašeho serveru:",
+        "other-already-exists": "Ve výchozím nastavení je již navrženo „jiné“ téma, není třeba přidávat další :innocent:",
+        "too-long": "Název tématu nesmí překročit 100 znaků",
+        "too-many": "Jejda, dosáhl jsi limitu povolených témat! Kvůli Discordu nemůžeš mít více než %{max} témat zároveň."
+    }
+}
