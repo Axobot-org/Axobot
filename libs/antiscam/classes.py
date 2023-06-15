@@ -122,7 +122,7 @@ class PredictionResult:
     def to_string(self, categories: dict):
         text = f"Result: {categories[self.result]}\n\nProbabilities:\n"
         for category, proba in self.probabilities.items():
-            text += f"    - {categories[category]}: {round(proba*100, 1)}%\n"
+            text += f"- {categories[category]}: {round(proba*100, 1)}%\n"
         return text
 
 class MsgReportView(discord.ui.View):
