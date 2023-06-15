@@ -1,0 +1,131 @@
+{
+    "ban": {
+        "cant-ban": "Oprávnění \"Banovat členy\" vyžaduje :confused:",
+        "list-error": "Ale né, zdá se, že je příliš mnoho uživatelů k zobrazení :confused:",
+        "list-title-0": "Seznam zabanovaných členů serveru \"{}\"",
+        "list-title-1": "Seznam 45 zabanovaných členů serveru \"{}\"",
+        "list-title-2": "Seznam 60 zabanovaných členů serveru \"{}\"",
+        "no-bans": "Žádnému členovi zde zřejmě není zabanován vstup",
+        "staff-ban": "Nemůžeš zabanovat jiné členy týmu!",
+        "too-high": "Zdá se, že tento člen má vyšší funkcni, nemohu ho tedy zabanovat. :thinking:",
+        "user-not-banned": "Tato osoba není součástí seznamu zabanovaných členů :upside_down:"
+    },
+    "ban-chat": "Člen %{user} (%{userid}) je nyní zabanován",
+    "ban-dm": "Právě jste byli zabanováni na serveru %{guild} :confused:",
+    "cant-find-user": "Ale né, žádný způsob, jak najít uživatele **%{user}**",
+    "cant-pin": "Jejda, nemám oprávnění k připnutí zpráv",
+    "caps-lock": "Ahoj %{user}, dávej pozor na zapnutý caps lock!",
+    "clear": {
+        "done": {
+            "many": "%{count} zpráv bylo smazáno!",
+            "one": "%{count} zpráva smazána!"
+        },
+        "not-found": "Hmm... nelze odstranit tyto zprávy. Discord mi říká, že neexistuje :thinking:",
+        "too-few": "Nemohu odstranit tak málo zpráv"
+    },
+    "destop": {
+        "no-guild": "Tato zpráva nepatří k tomuto serveru",
+        "too-old": "Nemohu odstranit zprávy starší než %{days} dní!"
+    },
+    "emoji": {
+        "cant-emoji": "Ale né, chybí mi oprávnění `Správa výrazů` :confused:",
+        "emoji-valid": "Emoji %{name} byla upraven tak, aby povolovala pouze role %{roles}",
+        "list": "{} (`:{}:`) přidáno {} {}",
+        "list-title": "Emoji ze serveru %{guild}",
+        "private": "[Restricted]",
+        "renamed": "Emoji %{emoji} byla přejmenována!",
+        "wrong-guild": "Jejda, zdá se, že tento emoji nepatří k tomuto serveru :thinking:"
+    },
+    "error": "Jejda, došlo k neznámé chybě. Zkuste to znovu později nebo kontaktujte podporu",
+    "kick": {
+        "cant-staff": "Nemůžeš vykopnout jiného člena týmu!",
+        "no-perm": "Oprávnění \"Vykopnout členy\" vyžaduje :confused:",
+        "too-high": "Zdá se, že tento člen má vyšší oprávnění než já, nemohu ho vykopnout :thinking:"
+    },
+    "kick-chat": "Člen %{user} (%{userid}) byl vykopnut z tohoto serveru",
+    "kick-dm": "Právě jste byli vykopnuti ze serveru %{guild} :confused:",
+    "missing-manage-nick": "Jejda, nemám oprávnění \"Spravovat přezdívky\"!",
+    "missing-user-perms": "Jejda, chybí oprávnění (spravujte role, spravujte server nebo spravujte zprávy)",
+    "mute-config": {
+        "confirm": "Opravdu chcete nastavit roli „umlčen“?\nTato akce může narušit některá pokročilá oprávnění na serveru, a to odvoláním přepisu oprávnění „odesílat zprávy“ z některých rolí.",
+        "err": "Není možné to provést. Zkontrolujte prosím moje oprávnění na serveru a zkuste to znovu.",
+        "success": {
+            "other": "Role byla úspěšně vytvořena a nakonfigurována! (%{count} kanály nebylo možné nakonfigurovat kvůli nedostatku oprávnění)",
+            "zero": "Role byla úspěšně vytvořena a nastavena!"
+        },
+        "success2": {
+            "other": "Role byla úspěšně nakonfigurována! (%{count} kanály nebylo možné nakonfigurovat z důvodu nedostatku oprávnění)",
+            "zero": "Role byla úspěšně nakonfigurována!"
+        },
+        "tip": "*Tip: Použití příkazu %{mute} bez nastavené ztlumené role bude používat oficiální timeoutový systém Discord, který by mohl lépe vyhovovat vašim potřebám.*"
+    },
+    "mute": {
+        "already-mute": "Tento člen je již umlčen!",
+        "already-unmute": "Tento člen není umlčen!",
+        "cant-mute": "Jejda, zdá se, že na to nemám dostatečná oprávnění... Prosím, dejte mi oprávnění `Spravovat role` před pokračováním.",
+        "cant-timeout": "Jejda, nemám k tomu oprávnění... Prosím, dej mi oprávnění `Správa členů` před pokračováním, nebo si vytvoř umlčenou roli.",
+        "list-title-0": "Seznam umlčených členů serveru \"%{guild}\"",
+        "list-title-1": "Seznam 45 umlčených členů serveru \"%{guild}\"",
+        "list-title-2": "Seznam 60 umlčených členů serveru \"%{guild}\"",
+        "mute-high": "Jejda, zdá se, že role \"umlčen\" je pro mě příliš vysoká... Opravte tento problém umístěním mé role vyšre než je role `umlčen`.",
+        "no-mute": "Jejda, zdá se, že role `umlčen` neexistuje :confused: Prosím vytvořte ji a přiřaďte oprávnění ručně.",
+        "no-mutes": "Zdá se, že žádný člen není umlčený",
+        "staff-mute": "Nemůžete zabránit jinému členovi týmu v mluvení",
+        "too-high": "Zdá se, že tento člen je pro mě příliš vysoký na to, abych je vypověděl :thinking:"
+    },
+    "mute-chat": "Člen %{user} (%{userid}) byl umlčen",
+    "mute-dm": "Byli jste umlčeni na serveru %{guild}",
+    "need-manage-messages": "Oprávnění \"Spravovat zprávy\" chybí :confused:",
+    "need-read-history": "Jejda, nemám oprávnění k \"Číst historii zpráv\" :confused:",
+    "pin": {
+        "error-notfound": "Jejda, tuto zprávu nemohu najít (Error : `%{err}`)",
+        "error-toomuch": "Jejda, nelze připnout tuto zprávu (máte více než 50 připnutých zpráv?). Chyba : `%{err}`"
+    },
+    "raid-banned": "Byli jste automaticky zabanováni ze serveru %{guild} antiraid systémem.",
+    "raid-kicked": "Byl jste automaticky vykopnut ze serveru %{guild} systémem anti-raid. Zkuste to znovu za několik dní.",
+    "react-clear": "Nemohu najít tuto zprávu :confused:",
+    "role": {
+        "color-success": "Role %{role} změnila barvu!",
+        "give-pending": "Přiřazuji roli k %{n} členům...",
+        "give-roles-higher": "Nemůžete dát nebo odebrat role vyšší než vaše!",
+        "give-success": {
+            "many": "-> %{count} rolí přiřazeno z %{m}!",
+            "one": "-> 1 role přiřazena z %{m}",
+            "zero": "-> Žádná role nemůže být přiřazena z %{m}"
+        },
+        "give-too-high": "Jejda, zdá se, že tato role je pro mě příliš vysoká, než aby mohla někomu dávat nebo odebrat. Prosím, umístěte mou roli nad roli `%{r}",
+        "limit-hit": "Abych se vyhnul spamování Discordu, mohl jsem ovlivnit pouze %{limit} členy. Tento příkaz spusťte znovu za několik sekund, pokud chcete ovlivnit více",
+        "list": "Seznam rolí serveru",
+        "remove-pending": "Zrušení role pro %{n} členy...",
+        "remove-success": {
+            "many": "-> %{count} rolí odebráno z %{m}!",
+            "one": "-> 1 role odebrána z %{m}",
+            "zero": "-> Žádná role nemůže být odebrána z %{m}"
+        },
+        "temp-grant-success": "Role %{role} byla udělena %{user} pro %{time}!",
+        "too-high": "Jejda, tato role je pro mě příliš vysoká. Prosím, přesuňte mou roli nad roli `%{r}` před dalším pokusem :confused:"
+    },
+    "slowmode": {
+        "cant-slowmode": "Jejda, nemám oprávnění k `Spravování tohoto kanálu` :confused:",
+        "disabled": "V tomto kanálu je nyní zakázán pomalý režim.",
+        "enabled": "Kanál %{channel} je nyní v pomalém režimu. Počkejte %{s} sekund před odesláním zprávy.",
+        "info": "Pomalý režim tohoto kanálu je aktuálně {} sekund",
+        "invalid": "Tato hodnota je neplatná",
+        "too-long": "Není možné nastavit frekvenci vyšší než 6 hodin"
+    },
+    "unban-chat": "Člen %{user} (%{userid}) již není na tomto serveru zabanován",
+    "unhoisted": {
+        "many": "%{count} přezdívek bylo upraveno!",
+        "one": "1 přezdívka byla upravena",
+        "zero": "Nebyla upravena žádná přezdívka"
+    },
+    "unhoist-too-many-members": "Jejda, váš server má příliš mnoho členů na to, abych to udělal. Pro více informací kontaktujte náš tým podpory.",
+    "unmute-chat": "Člen %{user} (%{userid}) již není umlčen",
+    "warn": {
+        "cant-bot": "Nemůžu varovat bota ^ ^",
+        "cant-staff": "Nemůžete varovat jiného člena týmu!",
+        "warn-but-db": "Naše databáze je offline, varování nelze uložit. Nicméně člen obdržel varování v DM"
+    },
+    "warn-chat": "Člen %{user} (%{userid}) byl varován",
+    "warn-dm": "Obdrželi jste varování od serveru %{guild}"
+}

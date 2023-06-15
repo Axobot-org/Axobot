@@ -1,0 +1,32 @@
+{
+    "rmd": {
+        "cancelled": "Odstraňování procesu",
+        "cleared": "Vaše připomínky byly smazány!",
+        "confirm": "Jste si jisti, že chcete odstranit všechny vaše připomínky? (%{count} nevyřízeno)",
+        "custom-duration": {
+            "button": "Jiná doba trvání",
+            "title": "Vlastní doba připomenutí",
+            "input": "Zadejte dobu trvání vaší připomínky"
+        },
+        "delete": {
+            "error": "Při odstraňování připomínek došlo k chybě. Zkuste to prosím znovu nebo kontaktujte podporu.",
+            "success": {
+                "one": "Vaše připomínka byla smazána!",
+                "other": "Připomínky %{count} byly úspěšně smazány!"
+            },
+            "title": "Zvolte, které připomenutí(s) chcete smazat"
+        },
+        "embed-asked": "%{user}, požádal jste mě před %{duration} abych vám připomenul toto:",
+        "embed-date": "Datum požadavku",
+        "embed-link": "Původní zpráva",
+        "embed-title": "Připomenutí",
+        "empty": "Bohužel, nemáte žádné nevyřízené připomínky...",
+        "item": "ID: `{id}` | V: {duration} | Kanál: {channel} | Zpráva: {msg}",
+        "recreated": "Byla vytvořena nová připomínka pro %{duration}!",
+        "saved": "Rozumím! Připomenu vám v %{duration}",
+        "select-placeholder": "Vyberte jedno nebo více připomenutí",
+        "title": "Seznam vašich připomenutí",
+        "too-long": "Není možné nastavit tak dlouhou dobu",
+        "too-short": "Zadali jste neplatnou dobu trvání"
+    }
+}

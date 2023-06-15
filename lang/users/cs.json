@@ -1,0 +1,28 @@
+{
+    "card-desc": "Zde je příklad vaší xp karty. Můžete zadat příkaz `profilová karta <style>` pro změnu stylu\n*Vaše xp karta se obnoví pouze tehdy, když vyhrajete xp*",
+    "changed-card": "Vaše xp karta nyní používá styl %{style}",
+    "changed-error": "Jejda, během zpracování požadavku došlo k vnitřní chybě. Zkuste to znovu později nebo kontaktujte podporu.",
+    "config_list": "Seznam dostupných možností: %{options}\n\nPro více informací použijte příkaz `Pomoc s profilovým nastavením`",
+    "config_success": "Možnost %{opt} byla upravena!",
+    "invalid-card": "Tento styl je neplatný. Zde je seznam stylů, které můžete použít: %{cards}",
+    "list-cards": "Zde je seznam dostupných rank karet pro vás: %{cards}",
+    "missing-attach-files": "Ale né, chybí mi oprávnění k přiložení souborů :confused:",
+    "set_config": {
+        "animated_card": {
+            "false": "Vaše xp karta nebude animovaná, ani když použijete animovaného avatara (rychlejší vykreslování)",
+            "true": "Vaše xp karta bude animována, když budete mít animovaný avatar (pomalejší vykreslení)"
+        },
+        "auto_unafk": {
+            "false": "Musíte odebrat samotný AFK tag",
+            "true": "Odstraním značku/tag AFK, jakmile odešlete zprávu"
+        },
+        "show_tips": {
+            "false": "Od bota již nebudete dostávat tipy",
+            "true": "Obdržíte náhodně tipy od bota"
+        },
+        "usernames_log": {
+            "false": "Zakázali jste nahrávání vašich uživatelských jmen a přezdívek",
+            "true": "Autorizovali jste záznam vašich uživatelských jmen a přezdívek"
+        }
+    }
+}

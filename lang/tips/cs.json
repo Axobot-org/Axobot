@@ -1,0 +1,15 @@
+{
+    "embed": {
+        "title": [
+            "Pro-tip",
+            "Věděli jste?",
+            "Věděli jste, že...?",
+            "Šikmá nápověda",
+            "Pokusili jste se...?"
+        ]
+    },
+    "rank_card_personalisation": "Pomocí příkazu %{profile_cmd} můžete změnit pozadí své odpovídající karty!",
+    "serverlog_enable_antiscam": "Přidali jste antivirové záznamy, ale anti-scam systém není na serveru povolen. Pravděpodobně byste jej měli povolit příkazem %{antiscam_enable_cmd}.",
+    "serverlog_enable_antiraid": "Přidali jste anti-raid záznamy, ale anti-rad systém není na serveru povolen. Pravděpodobně byste jej měli povolit příkazem %{config_set_cmd}.",
+    "serverlog_enable_botwarning": "Pravděpodobně byste měli zvážit povolení protokolů varování bota pomocí příkazu %{log_add_cmd}. Upozorní vás, pokud bot narazí na nějaké chybné funkce na vašem serveru, jako je špatná konfigurace nebo nedostatek oprávnění"
+}

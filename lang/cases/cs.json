@@ -1,0 +1,24 @@
+{
+    "records_number": "Nalezeno %{nbr} záznamů",
+    "deleted": "Záznam #%{ID} byl smazán!",
+    "display": {
+        "date": "**Datum:** %{data}",
+        "duration": "**Doba trvání:** %{data}",
+        "guild": "**Server:** %{data}",
+        "moderator": "**Moderátor:** %{data}",
+        "reason": "**Důvod:** %{data}",
+        "title": "Záznam z %{user} (%{user_id})",
+        "type": "**Typ:** %{data}",
+        "user": "**Uživatel:** %{data}"
+    },
+    "list-0": "**Typ:** {T}\n**Moderátor:** {M}\n**Datum:** {D}\n**Důvod:** *{R}*",
+    "list-1": "**Server:** {G}\n**Typ:** {T}\n**Moderátor:** {M}\n**Datum:** {D}\n**Důvod:** *{R}*",
+    "no-case": "Tento uživatel nemá žádný report!",
+    "no-user": "Nelze najít tohoto uživatele :eyes:",
+    "no_database": "Z důvodu dočasného výpadku databáze byl tento příkaz zakázán",
+    "not-found": "This report nebyl nalezen :confused:",
+    "reason-edited": "Důvod pro report #%{ID} byl upraven!",
+    "search-0": "**Uživatel:** {U}\n**Typ:** {T}\n**Moderátor:** {M}\n**Datum:** {D}\n**Důvod:** *{R}*",
+    "search-1": "**Uživatel:** {U}\n**Cech/klan:** {G}\n**Typ:** {T}\n**Moderátor:** {M}\n**Datum:** {D}\n**Důvod:** *{R}*",
+    "title-search": "Report #%{ID}"
+}

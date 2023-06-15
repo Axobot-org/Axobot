@@ -1,0 +1,93 @@
+{
+    "ask-roles-hint": {
+        "one": "Zadejte role pro tento kanál (jména, ID nebo zmínění), oddělené mezerami.",
+        "many": "Zadejte role uvedené pro tyto kanály (jména, ID nebo zmínění), oddělené mezerami."
+    },
+    "ask-roles-hint-example": "Například:\n> Členové \"Super VIP\" @Ping role",
+    "change-txt": "Zadejte prosím text, který bude použit při vytváření nového příspěvku. Můžete použít několik proměnných, z nichž zde je seznam:\n- `{author}`: autor příspěvku\n- `{channel}`: název kanálu (obvykle stejný jako autor)\n- `{date}`: datum příspěvku (UTC)\n- `{link}` nebo `{url}`: odkaz na příspěvek\n- `{logo}`: emoji reprezentující typ příspěvku (web, Twitter, YouTube...)\n- `{mentions}`: seznam zmíněných rolí\n- `{title}`: název příspěvku",
+    "change-txt-previous": "Aktuální zpráva obsahuje  \n```\n%{text}\n```",
+    "choose-delete": "Vyberte prosím kanály k odstranění",
+    "choose-disable": "Prosím vyberte kanály k vypnutí",
+    "choose-enable": "Vyberte prosím kanál, který chcete povolit",
+    "choose-mentions-1": "Vyberte prosím kanály ke změně",
+    "choose-roles": "Jaké role budou zmíněny?",
+    "delete-success": {
+        "many": "Zdroje %{count} byly úspěšně smazány!",
+        "one": "Kanál byl úspěšně smazán!"
+    },
+    "disable-success": {
+        "many": "Kanály %{count} byly úspěšně zakázány!",
+        "one": "Kanál byl úspěšně smazán!"
+    },
+    "enable-success": {
+        "many": "Kanály %{count} byly úspěšně povoleny!",
+        "one": "Kanál byl úspěšně aktivován!"
+    },
+    "deviant": "DeviantArt",
+    "deviant-default-flow": "{logo} | Nová tvorba {author}: **{title}**\nPublikováno dne {date}\nOdkaz: {link}\n{mentions}",
+    "deviant-form-last": "{logo} | Zde je nový výtvor {author}:\n{title}\nPublikováno dne {date}\nOdkaz: {url}",
+    "embed-json-changed": "Vložený embed v kanálu byl upraven",
+    "flow-limit": "Z důvodu výkonu nemůžete sledovat více než %{limit} rss kanálů na server.",
+    "guild-complete": "%{count} rss streamů bylo správně obnoveno, za %{time} sekund!",
+    "guild-error": "Během postupu došlo k chybě: `%{err}`\nPokud si myslíte, že tato chyba není způsobena vámí, můžete ji nahlásit na podporu",
+    "guild-loading": "Reloading %{emoji}",
+    "invalid-flow": "Tato adresa URL je neplatná (prázdná nebo nedostupná RSS kanály) :confused:",
+    "invalid-link": "Dobrý pokus, ale tato adresa url je neplatná nebo nekompletní :confused:",
+    "list": "*Zadejte počet kanálů pro úpravy*\n\n**Odkaz - Typ - Kanál - Zmínky**\n",
+    "list-disabled": "(zakázáno)",
+    "list-result": "{emoji} {link}\nDiscord kanál: {channel}\nZmínky: {roles}\nIdentifikátor: {id}\nPoslední příspěvek: {last_post}",
+    "list-title": "Seznam Rss kanálů ze serveru %{server}",
+    "list2": "*Zadejte počet kanálů, které chcete odstranit*\n\n**Odkaz - Typ - Kanál**\n",
+    "loop-processing": "Kontrola vašich RSS kanálů již probíhá. Počkejte prosím několik minut",
+    "mc": "Minecraft",
+    "move-success": {
+        "many": "%{count} RSS kanály byly přesunuty do kanálu %{channel}!",
+        "one": "Jeden RSS kanál byl přesunut do kanálu %{channel}!"
+    },
+    "no-feed": "Dobrý pokus, ale nemáte žádné rss kanály ke správě!",
+    "no-feed2": "Tento server nemá žádný Rss kanál!",
+    "no-feed-filter": "Pro tento příkaz nelze vybrat žádný kanál!",
+    "no-roles": "Zatím nebyla nastavena žádná role.",
+    "not-a-role": "Tuto roli nelze najít. Zkuste to znovu:",
+    "nothing": "Nenašel jsem nic v tomto hledání :confused:",
+    "picker-placeholder": {
+        "single": "Vyberte RSS kanál",
+        "multi": "Vyberte jeden nebo více RSS kanálů"
+    },
+    "research-timeout": "Stránce na webu trvalo příliš dlouho odpovědět, musel jsem přerušit proces :eyes:",
+    "roles": {
+        "cant-find": "Nemůžu najít tuto roli",
+        "edit-success": {
+            "many": "Tento kanál byl upraven tak, aby uváděl role %{roles}",
+            "one": "Tento kanál byl upraven tak, aby uváděl roli %{roles}",
+            "zero": "Tento kanál byl upraven tak, aby nebyla zmíněna žádná role"
+        },
+        "list": "Zde je seznam rolí, které již byly oznámeny: %{roles}"
+    },
+    "success-add": "Rss kanál typu \"%{type}\" s odkazem <%{url}> byl správně přidán do kanálu %{channel}!",
+    "text-success": {
+        "single": "Text kanálu #%{id} byl změněn!\n Nový text: \n```\n%{text}\n```",
+        "multiple": "Text kanálu byl změněn!\n Nový text: \n```\n%{text}\n```"
+    },
+    "too-long": "Čekal jsi příliš dlouho, omlouváme se :hourglass:",
+    "tw": "Twitter",
+    "tw-default-flow": "{logo}  | Nový tweet {author}! ({date})\n\n{title}\n\nOdkaz: {link}\n\n{mentions}",
+    "tw-form-last": "{logo}  | Zde je poslední tweet {author}:\nPublikováno {date}\n\n{title}\n\nOdkaz: {url}",
+    "tw-no-tweet": "Vypadá to, že tento uživatel nikdy netweetoval :confused:",
+    "twitch": "Twitch",
+    "twitch-default-flow": "{logo}  | Nový tweet {author}! ({date})\n\n{title}\n\nOdkaz: {link}\n\n{mentions}",
+    "twitch-form-last": "{logo} | Zde je poslední video {author}:\n{title}\nPublikováno dne {date}\nOdkaz: {url}\n",
+    "twitch-invalid": "Ale ne, nemohl jsem najít žádný Twitch kanál s tímto jménem!",
+    "use_embed-same": "Použití embedu pro tento kanál se nezměnilo",
+    "use_embed-success": "Hodnota byla upravena na %{v} pro kanál n°%{id}!",
+    "use_embed_false": "Tento kanál nepoužívá embed k odeslání. Chcete pro tento kanál použít embed? (true/false)",
+    "use_embed_true": "Tento kanál aktuálně používá embedy k odeslání. Přejete si stále používat embed pro tento kanál? (true/false)",
+    "web": "Web",
+    "web-default-flow": "{logo}  | Nový příspěvek na {channel} ({date}):\n        {title}\n\n{link}\n\n{mentions}",
+    "web-form-last": "{logo} | Zde je poslední příspěvek na {channel}:\n**{title}**\n*Zapsáno dne {date}*\nOdkaz: {link}",
+    "web-invalid": "Dobrý pokus, ale tato adresa url je neplatná :confused:",
+    "yt": "YouTube",
+    "yt-default-flow": "{logo} | Nové video {author}: **{title}**\nPublikováno dne {date}\nOdkaz: {link}\n{mentions}",
+    "yt-form-last": "{logo} | Zde je poslední video {author}:\n{title}\nPublikováno dne {date}\nOdkaz: {url}",
+    "yt-invalid": "Ale né, nemohl jsem najít žádný YouTube kanál s tímto ID!"
+}

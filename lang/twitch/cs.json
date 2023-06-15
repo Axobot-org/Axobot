@@ -1,0 +1,26 @@
+{
+    "check-stream": {
+        "category": "**Kategorie:** %{game}",
+        "no-nsfw": "Tento stream je označen jako pro dospělé a tento kanál není NSFW",
+        "offline": "Tento kanál momentálně nevysílá",
+        "title": "%{streamer} vysílá!"
+    },
+    "invalid-streamer-name": "Tento název není platný název streameru Twitch",
+    "on-live-indication": "na živém",
+    "stream-alerts": "%{streamer} vysílá!",
+    "subscribe": {
+        "success": "Váš server se přihlásil k odběru oznámení streameru %{streamer}!",
+        "limit-reached": "Nemůžete odebírat více než %{limit} streamerů!",
+        "already-subscribed": "Server je již přihlášený k odběru %{streamer} streamů!"
+    },
+    "subs-list": {
+        "title": "Seznam předplatného (%{current}/%{max}):",
+        "empty": "Tento server není přihlášený k žádnému streameru!",
+        "empty-tip": "Použijte příkaz %{cmd} k odběru až %{max} streamerů."
+    },
+    "unknown-streamer": "Neznámý streamer",
+    "unsubscribe": {
+        "success": "Server byl odhlášen z %{streamer} streamů",
+        "not-subscribed": "Server není přihlášený k odběru %{streamer} oznámení"
+    }
+}

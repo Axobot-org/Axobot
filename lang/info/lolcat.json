@@ -44,10 +44,13 @@
         "forum": {
             "title": "forum '%{name}'",
             "tags": "Availabl post decorashuns",
+            "default-emoji": "Un-random reaction emojeez",
             "guidelines": "How-to instructions",
+            "slowmode": "Post snail-mode durashun",
             "sort-order": "How is dat sorted?",
             "sort-order-latest": "Most-recent-comment-first",
-            "sort-order-creation": "Most-oldest-post-first"
+            "sort-order-creation": "Most-oldest-post-first",
+            "sort-order-none": "I dunno"
         },
         "guild-0": "Guild",
         "guild-1": "Auwner",

@@ -1,0 +1,62 @@
+{
+    "activity": {
+        "listen": "poslouchám",
+        "nothing": "lenoším",
+        "play": "hraju",
+        "stream": "streamuji",
+        "watch": "sleduji"
+    },
+    "added_at": "Přidán na",
+    "beginning": "začátek",
+    "bot": "bot",
+    "btn": {
+        "cancel": {
+            "answer": "Zrušeno",
+            "label": "Zrušit"
+        },
+        "confirm": {
+            "answer": "Potvrzeno",
+            "label": "Potvrdit"
+        },
+        "delete": {
+            "answer": "Odstraněno!",
+            "label": "Vymazat"
+        }
+    },
+    "case": "případ",
+    "category": "Kategorie",
+    "click_here": "Klikněte zde",
+    "dnd": "nerušit",
+    "doc": "Dokumentace",
+    "done!": "Hotovo!",
+    "duration": "doba trvání",
+    "end": "konec",
+    "example": {
+        "one": "příklad",
+        "other": "příklady"
+    },
+    "extreme": "extrémní",
+    "ghost": "Duch",
+    "high": "vysoká",
+    "highest": "nejvyšší",
+    "idle": "nečinný",
+    "low": "nízká",
+    "medium": "střední",
+    "member": "člen",
+    "membres": "členi",
+    "name": "jméno",
+    "no": "ne",
+    "none": "žádný",
+    "offline": "offline",
+    "online": "online",
+    "quit": "ukončit",
+    "reason": "důvod",
+    "request_by": "Požadováno uživatelem %{user}",
+    "server": "server",
+    "servers": "servery",
+    "since": "od",
+    "unknown": "Neznámý",
+    "verified": "ověřeno",
+    "version": "verze",
+    "yes": "ano"
+}

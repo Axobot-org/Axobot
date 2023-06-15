@@ -1,0 +1,22 @@
+{
+    "colorify": {
+        "starting": "Začíná %{name} pro %{user}",
+        "success": "%{user}, tady je tvůj obrázek!"
+    },
+    "blurple": {
+        "check": {
+            "intro": "%{user}, zahájení analýzy rozostřených obrázků (Upozorňujeme, že to může chvíli trvat)",
+            "result": "%{user}, zde jsou výsledky analýzy rozostření:\n%{results}",
+            "reward": "%{user}, právě jsi vyhrál %{amount} událostních XP díky tvému rozostřenému obrázku!"
+        }
+    },
+    "halloween": {
+        "check": {
+            "intro": "%{user}, začínáme s halloweenovou analýzou obrázků (Upozorňujeme, že to může chvíli trvat)",
+            "result": "%{user}, zde jsou výsledky vaší halloweenské analýzy:\n%{results}",
+            "reward": "%{user}, právě jste vyhráli %{amount} událostních XP díky vašemu hallowenského obrázku!"
+        }
+    },
+    "missing-attachment-perm": "Ale né, chybí mi oprávnění posílat obrázky!",
+    "unknown-err": "Ale né, něco se pokazilo! %{err}"
+}
