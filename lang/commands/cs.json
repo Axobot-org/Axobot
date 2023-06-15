@@ -101,7 +101,7 @@
         "tickets topic": "Příspěvek",
         "twitch": "twitch",
         "profile": "Profil",
-        "roles-rewards": "Odměny rolí",
+        "roles-rewards": "odměny-rolí",
         "blurple": "rozostřit",
         "reminders": "Připomínky"
     },
@@ -219,7 +219,7 @@
         },
         "last-post": {
             "url": "URL",
-            "type": "zpětný zdroj"
+            "type": "zpětný-zdroj"
         },
         "rss add": {
             "link": "odkaz"
@@ -292,26 +292,26 @@
             "emote": "emote"
         },
         "tickets topic remove": {
-            "topic_id": "id téma"
+            "topic_id": "id-téma"
         },
         "tickets topic set-emote": {
-            "topic_id": "id téma",
+            "topic_id": "id-téma",
             "emote": "emote"
         },
         "tickets topic set-hint": {
-            "topic_id": "id téma",
+            "topic_id": "id-téma",
             "message": "zpráva"
         },
         "tickets topic set-role": {
-            "topic_id": "id téma",
+            "topic_id": "id-téma",
             "role": "role"
         },
         "tickets topic set-format": {
             "name_format": "Formát jména",
-            "topic_id": "id téma"
+            "topic_id": "id-téma"
         },
         "tickets review-config": {
-            "topic_id": "id téma"
+            "topic_id": "id-téma"
         },
         "remindme": {
             "duration": "doba trvání",
