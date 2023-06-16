@@ -1,44 +1,44 @@
 {
     "command_name": {
-        "Report a scam": "Nahlásit podvod",
-        "Voice to text": "Převod hlasu na text",
-        "about": "O aplikaci",
+        "Report a scam": "Nahlásit-podvod",
+        "Voice to text": "Převod-hlasu-na-text",
+        "about": "o-aplikaci",
         "antiscam test": "test",
         "antiscam enable": "povolit",
         "antiscam disable": "zakázat",
         "antiscam report": "nahlásit",
-        "slowmode": "pomalý režim",
+        "slowmode": "pomalý-režim",
         "clear": "vyčistit",
         "kick": "vyhodit",
         "warn": "varovat",
         "mute": "umlčet",
-        "unmute": "zrušit umlčení",
-        "mute-config": "Nastavení \"umlčení\"",
+        "unmute": "zrušit-umlčení",
+        "mute-config": "nastavení-umlčení",
         "ban": "blokovat",
         "unban": "odblokovat",
-        "softban": "před banem",
-        "banlist": "seznam blokovaných",
-        "mutelist": "seznam umlčených",
+        "softban": "před-banem",
+        "banlist": "seznam-blokovaných",
+        "mutelist": "seznam-umlčených",
         "emoji rename": "přejmenovat",
         "emoji restrict": "omezit",
         "emoji clear": "vyčistit",
         "emoji list": "seznam",
-        "role set-color": "nastavit barvu",
-        "role members-list": "seznam členů",
-        "role temporary-grant": "dočasný grant",
+        "role set-color": "nastavit-barvu",
+        "role members-list": "seznam-členů",
+        "role temporary-grant": "dočasný-grant",
         "role grant": "grant",
         "role revoke": "odvolat",
-        "unhoist": "odstranit symbolu u uživatelů",
-        "destop": "smazat zprávy",
+        "unhoist": "odstranit-symbolu-u-uživatelů",
+        "destop": "smazat-zprávy",
         "permissions": "oprávnění",
-        "last-post": "poslední příspěvek",
+        "last-post": "poslední-příspěvek",
         "rss add": "přidat",
         "rss remove": "odstranit",
         "rss enable": "povolit",
         "rss disable": "zakázat",
         "rss list": "seznam",
         "rss set-mentions": "nastavit-zmíňky",
-        "rss reload": "znovu načíst",
+        "rss reload": "znovu-načíst",
         "rss move": "přesun",
         "rss set-text": "nastavit-text",
         "rss set-embed": "nastavit-embed",
@@ -47,12 +47,12 @@
         "modlogs disable": "zakázat",
         "config set": "nastavit",
         "config reset": "obnovit",
-        "config reset-all": "Resetovat vše",
+        "config reset-all": "resetovat-vše",
         "config list": "seznam",
         "config see": "viz",
-        "tickets portal summon": "Otevření tiketu",
+        "tickets portal summon": "otevření-tiketu",
         "tickets portal set-hint": "nastavit-nápovědu",
-        "tickets portal set-role": "nastavit roli",
+        "tickets portal set-role": "nastavit-roli",
         "tickets portal set-text": "nastavit-text",
         "tickets portal set-category": "nastavit-kategorii",
         "tickets portal set-format": "nastavit-formát",
@@ -65,8 +65,8 @@
         "tickets topic list": "seznam",
         "tickets review-config": "nastavení-náhledu",
         "remindme": "připomenutí",
-        "twitch subscribe": "přihlásit odběr",
-        "twitch unsubscribe": "odhlásit odběr",
+        "twitch subscribe": "přihlásit-odběr",
+        "twitch unsubscribe": "odhlásit-odběr",
         "twitch list-subscriptions": "seznam-odběrů",
         "twitch check-stream": "zkontrolova-stream",
         "profile card-preview": "karta-náhledů",
@@ -78,7 +78,7 @@
         "roles-rewards add": "přidat",
         "roles-rewards list": "seznam",
         "roles-rewards remove": "odstranit",
-        "roles-rewards reload": "znovu načíst",
+        "roles-rewards reload": "znovu-načíst",
         "blurple help": "pomoc",
         "blurple lightfy": "světlý",
         "blurple darkfy": "tmavý",
@@ -90,20 +90,20 @@
         "reminders clear": "vyčistit"
     },
     "group_name": {
-        "antiscam": "proti podvodu",
+        "antiscam": "proti-podvodu",
         "emoji": "emoji",
         "role": "role",
         "rss": "rss",
-        "modlogs": "záznam moderátorů",
+        "modlogs": "záznam-moderátorů",
         "config": "nastavení",
         "tickets": "tikety",
-        "tickets portal": "Portál",
-        "tickets topic": "Příspěvek",
+        "tickets portal": "portál",
+        "tickets topic": "příspěvek",
         "twitch": "twitch",
-        "profile": "Profil",
+        "profile": "profil",
         "roles-rewards": "odměny-rolí",
         "blurple": "rozostřit",
-        "reminders": "Připomínky"
+        "reminders": "připomínky"
     },
     "command_short_description": {},
     "group_description": {
@@ -134,10 +134,10 @@
         "clear": {
             "number": "číslo",
             "users": "uživatelé",
-            "contains_file": "obsahuje soubor",
-            "contains_url": "obsahuje url",
-            "contains_invite": "obsahuje pozvánku",
-            "is_pinned": "Je připnut"
+            "contains_file": "obsahuje-soubor",
+            "contains_url": "obsahuje-url",
+            "contains_invite": "obsahuje-pozvánku",
+            "is_pinned": "je-připnut"
         },
         "kick": {
             "user": "uživatel",
@@ -158,7 +158,7 @@
         "ban": {
             "user": "uživatel",
             "time": "čas",
-            "days_to_delete": "dnů k odstranění",
+            "days_to_delete": "dnů-k-odstranění",
             "reason": "důvod"
         },
         "unban": {
@@ -170,10 +170,10 @@
             "reason": "důvod"
         },
         "banlist": {
-            "show_reasons": "ukázat důvody"
+            "show_reasons": "ukázat-důvody"
         },
         "mutelist": {
-            "show_reasons": "ukázat důvody"
+            "show_reasons": "ukázat-důvody"
         },
         "emoji rename": {
             "emoji": "emoji",
@@ -208,17 +208,17 @@
             "users": "uživatelé"
         },
         "unhoist": {
-            "chars": "Znaky"
+            "chars": "znaky"
         },
         "destop": {
-            "start_message": "zpráva od"
+            "start_message": "zpráva-od"
         },
         "permissions": {
-            "channel": "Kanál",
+            "channel": "kanál",
             "target": "cíl"
         },
         "last-post": {
-            "url": "URL",
+            "url": "url",
             "type": "zpětný-zdroj"
         },
         "rss add": {
@@ -240,7 +240,7 @@
         },
         "rss move": {
             "feed": "zdroj",
-            "channel": "Kanál"
+            "channel": "kanál"
         },
         "rss set-text": {
             "feed": "zdroj",
@@ -252,25 +252,25 @@
             "arguments": "argumenty"
         },
         "modlogs list": {
-            "channel": "Kanál"
+            "channel": "kanál"
         },
         "modlogs enable": {
-            "logs": "Protokoly",
-            "channel": "Kanál"
+            "logs": "protokoly",
+            "channel": "kanál"
         },
         "modlogs disable": {
-            "logs": "Protokoly",
-            "channel": "Kanál"
+            "logs": "protokoly",
+            "channel": "kanál"
         },
         "config set": {
-            "option": "Volba",
+            "option": "volba",
             "value": "hodnota"
         },
         "config reset": {
-            "option": "Volba"
+            "option": "volba"
         },
         "config see": {
-            "option": "Volba"
+            "option": "volba"
         },
         "tickets portal set-hint": {
             "message": "zpráva"
@@ -307,14 +307,14 @@
             "role": "role"
         },
         "tickets topic set-format": {
-            "name_format": "Formát jména",
+            "name_format": "formát-jména",
             "topic_id": "id-téma"
         },
         "tickets review-config": {
             "topic_id": "id-téma"
         },
         "remindme": {
-            "duration": "doba trvání",
+            "duration": "doba-trvání",
             "message": "zpráva"
         },
         "twitch subscribe": {
@@ -333,7 +333,7 @@
             "style": "styl"
         },
         "profile config": {
-            "option": "Volba",
+            "option": "volba",
             "enable": "povolit"
         },
         "rank": {
@@ -352,19 +352,19 @@
         },
         "blurple lightfy": {
             "method": "metoda",
-            "variations": "Varianty",
+            "variations": "varianty",
             "who": "kdo"
         },
         "blurple darkfy": {
             "method": "metoda",
-            "variations": "Varianty",
+            "variations": "varianty",
             "who": "kdo"
         },
         "blurple check": {
             "who": "kdo"
         },
         "reminders create": {
-            "duration": "doba trvání",
+            "duration": "doba-trvání",
             "message": "zpráva"
         },
         "reminders delete": {
