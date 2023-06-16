@@ -17,7 +17,8 @@
             "lolcat": "lolcat",
             "fi": "Finština",
             "de": "Němčina",
-            "fr2": "Známá Francouzština"
+            "fr2": "Známá Francouzština",
+            "cs": "Čeština"
         },
         "levelup_channel": {
             "none": "žádná zpráva",
