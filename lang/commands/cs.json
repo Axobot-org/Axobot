@@ -1,7 +1,7 @@
 {
     "command_name": {
-        "Report a scam": "Nahlásit-podvod",
-        "Voice to text": "Převod-hlasu-na-text",
+        "Report a scam": "Nahlásit podvod",
+        "Voice to text": "Převod hlasu na text",
         "about": "o-aplikaci",
         "antiscam test": "test",
         "antiscam enable": "povolit",
@@ -218,7 +218,7 @@
             "target": "cíl"
         },
         "last-post": {
-            "url": "URL",
+            "url": "url",
             "type": "zpětný-zdroj"
         },
         "rss add": {
