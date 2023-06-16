@@ -1,6 +1,6 @@
 {
     "probabilities": "Pravděpodobnosti:",
-    "report-empty": "Tato zpráva nemá žádný obsah k nahlášení!\n",
+    "report-empty": "Tato zpráva nemá žádný obsah k nahlášení!",
     "report-successful": "Vaši zprávu jsme dobře přijali, děkujeme za Váš příspěvek!",
     "result": "Výsledek detekce antipodvodu:",
     "url-score": "Riziko URL: %{score}"

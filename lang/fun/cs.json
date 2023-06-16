@@ -29,7 +29,7 @@
     },
     "discordstatus-nothing": "V tuto chvíli není co hlásit!\nPoslední známý problému byl dne %{date}",
     "embed-invalid-channel": "Nelze odeslat zprávy do tohoto kanálu",
-    "embed-invalid-image": "Adresa obrátku URL je neplatná",
+    "embed-invalid-image": "Adresa obrátku url je neplatná",
     "error": "Došlo k chybě: `%{err}`",
     "fun-list": "Zde je seznam dostupných zábavných příkazů:",
     "invalid-city": "Neplatné město :confused:",
@@ -86,7 +86,7 @@
         "{attacker} aktivoval starověkou kletbu, která způsobila, že duše {victim} byla uvězněna navždy."
     ],
     "markdown": "__**Markdown Rules** on *Discord*__\n\n`*italics*` = *italics*\n`__underline__` = __underline__\n`**bold**` = **bold**\n`***bold italics***` = ***bold italics***\n`~~strikeout~~` = ~~strikeout~~\n`__*underline italics*__` = __*underline italics*__\n`__**underline bold**__` = __**underline bold**__\n`__***underline bold italics***__` = __***underline bold italics***__\n`||spoiler||` = ||spoiler||\n> quote = `> quote`\n\\`code\\` = `code`\n \\ to ignore\n\nFor code blocks, cf <https://discord.gg/DGahTNn>",
-    "nasa-none": "Ake bbí, momentálně nejsem schopen získat informace z NASA. Zkuste to znovu za pár minut :confused:",
+    "nasa-none": "Ale né, momentálně nejsem schopen získat informace z NASA. Zkuste to znovu za pár minut :confused:",
     "no-database": "Jelikož je naše databáze offline, přístup k zábavným příkazům je omezen na osoby s oprávněním \"Spravovat server\"",
     "no-embed-perm": "Nemám oprávnění k \"Vložit odkazy\" :confused:",
     "no-emoji": "Nelze najít tento emoji!",

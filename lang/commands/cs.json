@@ -51,7 +51,7 @@
         "config list": "seznam",
         "config see": "viz",
         "tickets portal summon": "Otevření tiketu",
-        "tickets portal set-hint": "nastavit nápovědu",
+        "tickets portal set-hint": "nastavit-nápovědu",
         "tickets portal set-role": "nastavit roli",
         "tickets portal set-text": "nastavit-text",
         "tickets portal set-category": "nastavit-kategorii",
@@ -59,20 +59,20 @@
         "tickets topic add": "přidat",
         "tickets topic remove": "odstranit",
         "tickets topic set-emote": "nastavit-emote",
-        "tickets topic set-hint": "nastavit nápovědu",
-        "tickets topic set-role": "nastavit roli",
+        "tickets topic set-hint": "nastavit-nápovědu",
+        "tickets topic set-role": "nastavit-roli",
         "tickets topic set-format": "nastavit-formát",
         "tickets topic list": "seznam",
-        "tickets review-config": "nastavení náhledu",
+        "tickets review-config": "nastavení-náhledu",
         "remindme": "připomenutí",
         "twitch subscribe": "přihlásit odběr",
         "twitch unsubscribe": "odhlásit odběr",
-        "twitch list-subscriptions": "seznam odběrů",
-        "twitch check-stream": "zkontrolovat stream",
-        "profile card-preview": "karta náhledů",
+        "twitch list-subscriptions": "seznam-odběrů",
+        "twitch check-stream": "zkontrolova-stream",
+        "profile card-preview": "karta-náhledů",
         "profile card": "karta",
         "profile config": "nastavení",
-        "profile list-card-styles": "seznam stylů karet",
+        "profile list-card-styles": "seznam-stylů-karet",
         "rank": "hodnost",
         "top": "nahoře",
         "roles-rewards add": "přidat",
@@ -101,7 +101,7 @@
         "tickets topic": "Příspěvek",
         "twitch": "twitch",
         "profile": "Profil",
-        "roles-rewards": "Odměny rolí",
+        "roles-rewards": "odměny-rolí",
         "blurple": "rozostřit",
         "reminders": "Připomínky"
     },
@@ -219,7 +219,7 @@
         },
         "last-post": {
             "url": "URL",
-            "type": "zpětný zdroj"
+            "type": "zpětný-zdroj"
         },
         "rss add": {
             "link": "odkaz"
@@ -282,36 +282,36 @@
             "message": "zpráva"
         },
         "tickets portal set-category": {
-            "category_or_channel": "kategorie nebo kanál"
+            "category_or_channel": "kategorie-nebo-kanál"
         },
         "tickets portal set-format": {
-            "name_format": "Formát jména"
+            "name_format": "formát-jména"
         },
         "tickets topic add": {
             "name": "jméno",
             "emote": "emote"
         },
         "tickets topic remove": {
-            "topic_id": "id téma"
+            "topic_id": "id-téma"
         },
         "tickets topic set-emote": {
-            "topic_id": "id téma",
+            "topic_id": "id-téma",
             "emote": "emote"
         },
         "tickets topic set-hint": {
-            "topic_id": "id téma",
+            "topic_id": "id-téma",
             "message": "zpráva"
         },
         "tickets topic set-role": {
-            "topic_id": "id téma",
+            "topic_id": "id-téma",
             "role": "role"
         },
         "tickets topic set-format": {
             "name_format": "Formát jména",
-            "topic_id": "id téma"
+            "topic_id": "id-téma"
         },
         "tickets review-config": {
-            "topic_id": "id téma"
+            "topic_id": "id-téma"
         },
         "remindme": {
             "duration": "doba trvání",
