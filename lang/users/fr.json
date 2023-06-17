@@ -1,5 +1,5 @@
 {
-    "card-desc": "Voici un exemple de votre carte d'xp. Vous pouvez entrer la commande `profile card <style>` pour changer le style\n*Votre carte d'xp ne se réactualisera que lorsque vous aurez gagné de l'xp*",
+    "card-desc": "Voici un exemple de votre carte xp. Vous pouvez entrer la commande %{profile_cmd} pour changer son style parmi une multitude de thèmes disponibles.",
     "changed-card": "Votre carte d'xp utilise maintenant le style %{style}",
     "changed-error": "Oups, une erreur interne est survenue pendant le traitement de la requête. Réessayez plus tard ou contactez le support.",
     "config_list": "Liste des options possibles : %{options}\n\nUtilisez la commande `help profile config` pour plus de détails",
