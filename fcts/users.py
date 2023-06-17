@@ -191,7 +191,8 @@ class Users(commands.Cog):
         await ctx.defer()
         if style is None:
             style = await self.bot.get_cog('Utilities').get_xp_style(ctx.author)
-        desc = await self.bot._(ctx.channel, 'users.card-desc')
+        profile_card_cmd = await self.bot.get_command_mention("profile card")
+        desc = await self.bot._(ctx.channel, "users.card-desc", profile_cmd=profile_card_cmd)
         translations_map = {
             "LEVEL": await self.bot._(ctx.channel, "xp.card-level"),
             "RANK": await self.bot._(ctx.channel, "xp.card-rank"),
