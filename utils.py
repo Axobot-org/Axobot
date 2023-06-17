@@ -159,7 +159,7 @@ async def load_cogs(bot: "Axobot"):
         'fcts.users',
         'fcts.utilities',
         'fcts.voice_channels',
-        'fcts.voice_msg',
+        # 'fcts.voice_msg',
         'fcts.welcomer',
         'fcts.xp'
     ]
