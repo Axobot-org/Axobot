@@ -1,5 +1,5 @@
 {
-    "card-desc": "Zde je příklad vaší xp karty. Můžete zadat příkaz `profilová karta <style>` pro změnu stylu\n*Vaše xp karta se obnoví pouze tehdy, když vyhrajete xp*",
+    "card-desc": "Zde je příklad vaší xp karty. Můžete zadat příkaz %{profile_cmd} pro změnu jeho stylu, mezi množstvím dostupných pozadí.",
     "changed-card": "Vaše xp karta nyní používá styl %{style}",
     "changed-error": "Jejda, během zpracování požadavku došlo k vnitřní chybě. Zkuste to znovu později nebo kontaktujte podporu.",
     "config_list": "Seznam dostupných možností: %{options}\n\nPro více informací použijte příkaz `Pomoc s profilovým nastavením`",
