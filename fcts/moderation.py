@@ -202,7 +202,7 @@ Slowmode works up to one message every 6h (21600s)
         case_id = None
         if self.bot.database_online:
             cases_cog = self.bot.get_cog('Cases')
-            case = Case(bot=self.bot, guild_id=ctx.guild.id, member_id=user.id, case_type="kick",
+            case = Case(bot=self.bot, guild_id=ctx.guild.id, user_id=user.id, case_type="kick",
                         mod_id=ctx.author.id, reason=f_reason, date=ctx.bot.utcnow())
             try:
                 await cases_cog.db_add_case(case)
@@ -259,7 +259,7 @@ Slowmode works up to one message every 6h (21600s)
             case_id = None
             if self.bot.database_online:
                 if cases_cog := self.bot.get_cog('Cases'):
-                    case = Case(bot=self.bot, guild_id=ctx.guild.id, member_id=user.id, case_type="warn",
+                    case = Case(bot=self.bot, guild_id=ctx.guild.id, user_id=user.id, case_type="warn",
                                 mod_id=ctx.author.id, reason=message, date=ctx.bot.utcnow())
                     await cases_cog.db_add_case(case)
                     case_id = case.id
@@ -389,10 +389,10 @@ You can also mute this member for a defined duration, then use the following for
             if self.bot.database_online:
                 cases_cog = self.bot.get_cog('Cases')
                 if f_duration is None:
-                    case = Case(bot=self.bot, guild_id=ctx.guild.id, member_id=user.id, case_type="mute",
+                    case = Case(bot=self.bot, guild_id=ctx.guild.id, user_id=user.id, case_type="mute",
                                 mod_id=ctx.author.id, reason=f_reason, date=ctx.bot.utcnow())
                 else:
-                    case = Case(bot=self.bot, guild_id=ctx.guild.id, member_id=user.id, case_type="tempmute",
+                    case = Case(bot=self.bot, guild_id=ctx.guild.id, user_id=user.id, case_type="tempmute",
                                 mod_id=ctx.author.id, reason=f_reason,date=ctx.bot.utcnow(), duration=duration)
                     await self.bot.task_handler.add_task('mute', duration, user.id, ctx.guild.id)
                 try:
@@ -625,10 +625,10 @@ The 'days_to_delete' option represents the number of days worth of messages to d
         if self.bot.database_online:
             cases_cog = self.bot.get_cog('Cases')
             if f_duration is None:
-                case = Case(bot=self.bot, guild_id=ctx.guild.id, member_id=user.id, case_type="ban",
+                case = Case(bot=self.bot, guild_id=ctx.guild.id, user_id=user.id, case_type="ban",
                             mod_id=ctx.author.id, reason=f_reason, date=ctx.bot.utcnow())
             else:
-                case = Case(bot=self.bot, guild_id=ctx.guild.id, member_id=user.id, case_type="tempban",
+                case = Case(bot=self.bot, guild_id=ctx.guild.id, user_id=user.id, case_type="tempban",
                             mod_id=ctx.author.id, reason=f_reason, date=ctx.bot.utcnow(), duration=duration)
                 await self.bot.task_handler.add_task('ban',duration,user.id,ctx.guild.id)
             try:
@@ -691,7 +691,7 @@ The 'days_to_delete' option represents the number of days worth of messages to d
         case_id = None
         if self.bot.database_online:
             cases_cog = self.bot.get_cog('Cases')
-            case = Case(bot=self.bot, guild_id=ctx.guild.id, member_id=user.id, case_type="unban",
+            case = Case(bot=self.bot, guild_id=ctx.guild.id, user_id=user.id, case_type="unban",
                         mod_id=ctx.author.id, reason=f_reason, date=ctx.bot.utcnow())
             try:
                 await cases_cog.db_add_case(case)
@@ -751,7 +751,7 @@ Permissions for using this command are the same as for the kick
             case_id = None
             if self.bot.database_online:
                 cases_cog = self.bot.get_cog('Cases')
-                case = Case(bot=self.bot, guild_id=ctx.guild.id, member_id=user.id, case_type="softban",
+                case = Case(bot=self.bot, guild_id=ctx.guild.id, user_id=user.id, case_type="softban",
                             mod_id=ctx.author.id, reason=f_reason, date=ctx.bot.utcnow())
                 try:
                     await cases_cog.db_add_case(case)

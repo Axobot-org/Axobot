@@ -1381,10 +1381,10 @@ Minimum age required by anti-raid: {min_age}"
                 description=f"**Case #{after.id} edited**",
                 colour=discord.Color.orange()
             )
-            if moderator := self.bot.get_user(after.mod):
+            if moderator := self.bot.get_user(after.mod_id):
                 emb.add_field(name="Moderator", value=f"{moderator.mention} ({moderator.id})")
             else:
-                emb.add_field(name="Moderator", value=f"Unknown ({after.mod})")
+                emb.add_field(name="Moderator", value=f"Unknown ({after.mod_id})")
             emb.add_field(name="Old reason", value=before.reason)
             emb.add_field(name="New reason", value=after.reason)
             if moderator:
@@ -1400,14 +1400,14 @@ Minimum age required by anti-raid: {min_age}"
                 description=f"**Case #{case.id} deleted**",
                 colour=discord.Color.red()
             )
-            if moderator := self.bot.get_user(case.mod):
+            if moderator := self.bot.get_user(case.mod_id):
                 emb.add_field(name="Moderator", value=f"{moderator.mention} ({moderator.id})")
             else:
-                emb.add_field(name="Moderator", value=f"Unknown ({case.mod})")
-            if user := self.bot.get_user(case.user):
+                emb.add_field(name="Moderator", value=f"Unknown ({case.mod_id})")
+            if user := self.bot.get_user(case.user_id):
                 emb.add_field(name="User", value=f"{user.mention} ({user.id})")
             else:
-                emb.add_field(name="User", value=f"Unknown ({case.user})")
+                emb.add_field(name="User", value=f"Unknown ({case.user_id})")
             emb.add_field(name="Reason", value=case.reason)
             if moderator:
                 emb.set_author(name=moderator, icon_url=moderator.display_avatar)

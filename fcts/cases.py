@@ -1,4 +1,3 @@
-import copy
 import importlib
 from datetime import datetime
 from math import ceil
@@ -27,15 +26,16 @@ async def can_edit_case(ctx: MyContext):
 class Case:
     "Represents a moderation case"
 
-    def __init__(self, bot: Axobot, guild_id: int, member_id: int, case_type: str, mod_id: int, reason: str, date: datetime, duration: Optional[int]=None, case_id: Optional[int]=None):
+    def __init__(self, bot: Axobot, guild_id: int, user_id: int, case_type: str, mod_id: int, reason: str, date: datetime,
+                 duration: Optional[int]=None, case_id: Optional[int]=None):
         self.bot = bot
-        self.guild = guild_id
-        self.id = case_id
-        self.user = member_id
+        self.guild_id = guild_id
+        self.user_id = user_id
         self.type = case_type
-        self.mod = mod_id
+        self.mod_id = mod_id
         self.reason = reason
         self.duration = duration
+        self.id = case_id
         if date is None:
             self.date = "Unknown"
         else:
@@ -43,32 +43,35 @@ class Case:
 
     async def display(self, display_guild: bool=False):
         "Format a case to be human readable"
-        if user := self.bot.get_user(self.user):
+        if user := self.bot.get_user(self.user_id):
             f_user = user.mention
         else:
-            f_user = self.user
-        if guild := self.bot.get_guild(self.guild):
+            f_user = self.user_id
+        if guild := self.bot.get_guild(self.guild_id):
             f_guild = guild.name
         else:
-            f_guild = self.guild
-        text = await self.bot._(self.guild, "cases.title-search", ID=self.id)
+            f_guild = self.guild_id
+        text = await self.bot._(self.guild_id, "cases.title-search", ID=self.id)
         # add guild name if needed
         if display_guild:
-            text += await self.bot._(self.guild, "cases.display.guild", data=f_guild)
+            text += await self.bot._(self.guild_id, "cases.display.guild", data=f_guild)
         # add fields
         for key, value in (
             ("type", self.type),
             ("user", f_user),
-            ("moderator", self.mod),
-            ("date", self.date or self.bot._(self.guild, "misc.unknown")),
+            ("moderator", self.mod_id),
+            ("date", self.date or self.bot._(self.guild_id, "misc.unknown")),
             ("reason", self.reason)):
-            text += await self.bot._(self.guild, "cases.display."+key, data=value)
+            text += await self.bot._(self.guild_id, "cases.display."+key, data=value)
         # add duration if exists
         if self.duration is not None and self.duration > 0:
-            lang = await self.bot._(self.guild, "_used_locale")
+            lang = await self.bot._(self.guild_id, "_used_locale")
             duration_ = await FormatUtils.time_delta(self.duration,lang=lang,form="short")
-            text += await self.bot._(self.guild, "cases.display.duration", data=duration_)
+            text += await self.bot._(self.guild_id, "cases.display.duration", data=duration_)
         return text
+
+    def copy(self):
+        return Case(self.bot, self.guild_id, self.user_id, self.type, self.mod_id, self.reason, self.date, self.duration, self.id)
 
 
 class Cases(commands.Cog):
@@ -87,7 +90,7 @@ class Cases(commands.Cog):
             bot=self.bot,
             guild_id=row['guild'],
             case_id=row['ID'],
-            member_id=row['user'],
+            user_id=row['user'],
             case_type=row['type'],
             mod_id=row['mod'],
             date=row['created_at'],
@@ -152,7 +155,7 @@ class Cases(commands.Cog):
         if not isinstance(case, Case):
             raise ValueError
         query = f"INSERT INTO `{self.table}` (`guild`, `user`, `type`, `mod`, `reason`,`duration`) VALUES (%(g)s, %(u)s, %(t)s, %(m)s, %(r)s, %(d)s)"
-        query_args = { 'g': case.guild, 'u': case.user, 't': case.type, 'm': case.mod, 'r': case.reason, 'd': case.duration }
+        query_args = { 'g': case.guild_id, 'u': case.user_id, 't': case.type, 'm': case.mod_id, 'r': case.reason, 'd': case.duration }
         async with self.bot.db_query(query, query_args) as last_row_id:
             case.id = last_row_id
         return True
@@ -241,14 +244,14 @@ class Cases(commands.Cog):
                     embed.set_author(name=author_text, icon_url=user.display_avatar.with_format("png").url)
                     page_start, page_end = (page-1)*21, page*21
                     for case in cases[page_start:page_end]:
-                        guild = self.client.get_guild(case.guild)
+                        guild = self.client.get_guild(case.guild_id)
                         if guild is None:
-                            guild = case.guild
+                            guild = case.guild_id
                         else:
                             guild = guild.name
-                        mod = self.client.get_user(case.mod)
+                        mod = self.client.get_user(case.mod_id)
                         if mod is None:
-                            mod = case.mod
+                            mod = case.mod_id
                         else:
                             mod = mod.mention
                         date_ = f"<t:{case.date.timestamp():.0f}>"
@@ -297,7 +300,8 @@ class Cases(commands.Cog):
         if old_case is None:
             await ctx.send(await self.bot._(ctx.guild.id,"cases.not-found"))
             return
-        new_case = copy.deepcopy(old_case)
+        new_case = old_case.copy()
+        new_case.reason = new_reason
         await self.db_update_reason(case_id, new_reason)
         await ctx.send(await self.bot._(ctx.guild.id,"cases.reason-edited", ID=case_id))
         self.bot.dispatch("case_edit", ctx.guild, old_case, new_case)
@@ -319,14 +323,14 @@ class Cases(commands.Cog):
         if not ctx.can_send_embed:
             await ctx.send(await self.bot._(ctx.guild.id, "minecraft.cant-embed"))
             return
-        if user := await self.bot.fetch_user(case.user):
+        if user := await self.bot.fetch_user(case.user_id):
             f_user = f"{user} ({user.id})"
         else:
-            f_user = case.user
-        if mod := await self.bot.fetch_user(case.mod):
+            f_user = case.user_id
+        if mod := await self.bot.fetch_user(case.mod_id):
             f_mod = f"{mod} ({mod.id})"
         else:
-            f_mod = case.mod
+            f_mod = case.mod_id
         title = await self.bot._(ctx.guild.id, "cases.title-search", ID=case.id)
         lang = await self.bot._(ctx.guild.id, '_used_locale')
         # main structure
@@ -334,10 +338,10 @@ class Cases(commands.Cog):
             f_guild = ctx.guild.name
             _msg = await self.bot._(ctx.guild.id, 'cases.search-0')
         else: # if support: add guild
-            if guild := self.bot.get_guild(case.guild):
+            if guild := self.bot.get_guild(case.guild_id):
                 f_guild = f"{guild.name} ({guild.id})"
             else:
-                f_guild = case.guild
+                f_guild = case.guild_id
             _msg = await self.bot._(ctx.guild.id, 'cases.search-1')
         # add duration
         if case.duration is not None and case.duration > 0:
