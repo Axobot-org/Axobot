@@ -3,13 +3,12 @@ import time
 from typing import Optional
 
 import discord
-import whisper
+from aiohttp import ClientSession
 from discord import app_commands
 from discord.ext import commands
 
 from libs.bot_classes import Axobot
 from libs.formatutils import FormatUtils
-from libs.voice_to_text import cpu_get_transcript
 
 
 class VoiceMessages(commands.Cog):
@@ -25,14 +24,19 @@ class VoiceMessages(commands.Cog):
         self.bot.tree.add_command(self.stt_ctx_menu)
         self.max_duration = 2*60
         self.cache: dict[int, str] = {}
-        self._model: Optional[whisper.Whisper] = None
+        self._session: Optional[ClientSession] = None
 
     @property
-    def model(self) -> whisper.Whisper:
-        if self._model is None:
-            self.bot.log.info("[VoiceMessage] Loading Whisper model")
-            self._model = whisper.load_model("small")
-        return self._model
+    def session(self):
+        "Get the aiohttp session"
+        if self._session is None:
+            self._session = ClientSession()
+        return self._session
+
+    async def cog_unload(self):
+        "Close the aiohttp session"
+        if self._session is not None:
+            await self._session.close()
 
     async def handle_message_command(self, interaction: discord.Interaction, message: discord.Message):
         "Create a transcript of the voice message"
@@ -91,12 +95,17 @@ class VoiceMessages(commands.Cog):
         )
         await interaction.followup.send(embed=emb, ephemeral=True)
 
-    async def _get_transcript(self, attachment: discord.Attachment):
-        # get the event loop
-        loop = asyncio.get_running_loop()
-        # schedule the function to run
-        result = await loop.run_in_executor(None, cpu_get_transcript, self.model, await attachment.read())
-        return result
+    async def _get_transcript(self, attachment: discord.Attachment) -> str:
+        "Call the external API to get the audio transcript"
+        headers = {'Authorization': self.bot.others["awhikax-api"]}
+        data = {'status': "default", 'audio': attachment.url}
+        async with self.session.post("https://api.awhikax.com/stt", headers=headers, data=data) as resp:
+            if resp.status != 200:
+                return ""
+            response = await resp.json()
+        if response["success"]:
+            return response["message"]
+        return ""
 
 
 async def setup(bot):
