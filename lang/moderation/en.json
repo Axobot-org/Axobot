@@ -86,7 +86,7 @@
     "react-clear": "I'm unable to find this message :confused:",
     "role": {
         "color-success": "The role %{role} has changed color!",
-        "give-pending": "Assigning the role to %{n} members...",
+        "give-pending": "Assigning the role to %{n} members, it may take a few minutes...",
         "give-roles-higher": "You can't give or remove roles higher than yours!",
         "give-success": {
             "many": "-> %{count} roles assigned out of %{m}!",
@@ -96,7 +96,7 @@
         "give-too-high": "Oops, it seems that this role is too high for me to give or remove to anyone. Please place my role above the `%{r}` role",
         "limit-hit": "To avoid spamming Discord, I could only affect %{limit} members. Re-run this command in a few seconds if you want to affect more",
         "list": "List of server roles",
-        "remove-pending": "Revoking the role to %{n} members...",
+        "remove-pending": "Revoking the role to %{n} members, it may take a few minutes...",
         "remove-success": {
             "many": "-> %{count} roles revoked out of %{m}!",
             "one": "-> 1 role revoked out of %{m}",
