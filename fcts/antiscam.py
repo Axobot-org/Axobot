@@ -86,7 +86,9 @@ class AntiScam(commands.Cog):
     async def db_insert_msg(self, msg: Message) -> int:
         "Insert a new suspicious message into the database"
         await self.bot.wait_until_ready()
-        query = f"INSERT INTO `spam-detection`.`{self.table}` (message, normd_message, contains_everyone, url_score, mentions_count, max_frequency, punctuation_count, caps_percentage, avg_word_len, category) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+        query = f"INSERT INTO `spam-detection`.`{self.table}` (message, normd_message, contains_everyone, url_score, \
+            mentions_count, max_frequency, punctuation_count, caps_percentage, avg_word_len, category) \
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
         async with self.bot.db_query(query, (
             msg.message,
             msg.normd_message,
@@ -141,7 +143,7 @@ class AntiScam(commands.Cog):
                 continue
             edits = {k: v for k, v in edits.items() if v != msg[k]}
             counter += 1
-            query = f"UPDATE `spam-detection`.`{table}` SET {', '.join('{}=%s'.format(k) for k in edits)} WHERE id=%s"
+            query = f"UPDATE `spam-detection`.`{table}` SET {', '.join(f'{k}=%s' for k in edits)} WHERE id=%s"
             params = list(edits.values()) + [msg['id']]
             # print(cur.mogrify(query, params))
             cursor.execute(query, params)
@@ -226,8 +228,8 @@ class AntiScam(commands.Cog):
         url_score = await self.bot._(ctx.channel, "antiscam.url-score", score=data.url_score)
         probabilities_ = await self.bot._(ctx.channel, "antiscam.probabilities")
         answer = probabilities_
-        for c, p in pred.probabilities.items():
-            answer += f"\n- {self.agent.categories[c]}: {round(p*100, 1)}%"
+        for category, proba in pred.probabilities.items():
+            answer += f"\n- {self.agent.categories[category]}: {round(proba*100, 1)}%"
         answer += f"\n\n{url_score}"
         embed = discord.Embed(
             title = await self.bot._(ctx.channel, "antiscam.result") + " " + self.agent.categories[pred.result],
@@ -267,7 +269,8 @@ class AntiScam(commands.Cog):
             )
             return
         await interaction.response.defer(ephemeral=True)
-        await self._report_message(message.author, message.content, len(message.mentions), message.guild.id)
+        await self._report_message(message.author, message.content, len(message.mentions), message.guild.id,
+                                   report_author=interaction.user, source_msg=message)
         await interaction.followup.send(
             await self.bot._(interaction.user, "antiscam.report-successful"),
             ephemeral=True
@@ -289,6 +292,7 @@ class AntiScam(commands.Cog):
             content = message
             mentions_count = 0
             author = ctx.author
+            reporter = None
         else:
             if not src_msg.content:
                 await ctx.send(await self.bot._(ctx, "antiscam.report-empty"), ephemeral=True)
@@ -296,13 +300,16 @@ class AntiScam(commands.Cog):
             content = src_msg.content
             mentions_count = len(src_msg.mentions)
             author = src_msg.author
-        await self._report_message(author, content, mentions_count, ctx.guild.id)
+            reporter = ctx.author
+        await self._report_message(author, content, mentions_count, ctx.guild.id, report_author=reporter, source_msg=src_msg)
         await ctx.reply(
             await self.bot._(ctx.channel, "antiscam.report-successful"),
             allowed_mentions=discord.AllowedMentions.none()
         )
 
-    async def _report_message(self, message_author: discord.User, content: str, mentions_count: int, guild_id: typing.Optional[int]):
+    async def _report_message(self, message_author: discord.User, content: str, mentions_count: int,
+                              guild_id: typing.Optional[int],
+                              report_author: typing.Optional[discord.Member], source_msg: typing.Optional[discord.Message]):
         msg = Message.from_raw(content, mentions_count, self.agent.websites_list)
         if guild_id:
             msg.contains_everyone = f'<@&{guild_id}>' in content or '@everyone' in content
@@ -310,6 +317,9 @@ class AntiScam(commands.Cog):
             msg.contains_everyone = '@everyone' in content
         msg_id = await self.db_insert_msg(msg)
         await self.send_report(message_author, msg_id, msg)
+        if report_author and source_msg:
+            predictions = self.agent.predict_bot(msg)
+            self.bot.dispatch("antiscam_report", source_msg, predictions, report_author)
 
     @commands.Cog.listener()
     async def on_message(self, msg: discord.Message):
