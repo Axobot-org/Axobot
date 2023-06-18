@@ -705,6 +705,8 @@ class Xp(commands.Cog):
         translations_map = {
             "LEVEL": await self.bot._(ctx.channel, "xp.card-level"),
             "RANK": await self.bot._(ctx.channel, "xp.card-rank"),
+            "xp_left": await self.bot._(ctx.channel, "xp.card-xp-left"),
+            "total_xp": await self.bot._(ctx.channel, "xp.card-xp-total"),
         }
         card_image = await self.create_card(translations_map, user, style, xp, rank, ranks_nb, levels_info)
         # check if we should send the card in DM or in the channel
