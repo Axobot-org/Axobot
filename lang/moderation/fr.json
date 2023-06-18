@@ -86,7 +86,7 @@
     "react-clear": "Impossible de retrouver ce message :confused:",
     "role": {
         "color-success": "Le rôle %{role} a changé de couleur !",
-        "give-pending": "Distribution du rôle à %{n} membres...",
+        "give-pending": "Distribution du rôle à %{n} membres, cela peut prendre un certain temps...",
         "give-roles-higher": "Vous ne pouvez pas donner ou enlever des rôles plus hauts que le vôtre !",
         "give-success": {
             "many": "-> %{count} rôles attribués sur %{m} !",
@@ -96,7 +96,7 @@
         "give-too-high": "Oups, il semblerai que ce rôle soit trop haut pour que je puisse le donner ou l'enlever à qui que ce soit. Veuillez placer mon rôle au-dessus du rôle `%{r}`",
         "limit-hit": "Pour éviter d'abuser de Discord, je n'ai pu affecter que %{limit} membres. Réutilisez cette commande dans quelques secondes si vous voulez en affecter plus.",
         "list": "Liste des rôles du serveur",
-        "remove-pending": "Retrait du rôle à %{n} membres...",
+        "remove-pending": "Retrait du rôle à %{n} membres, cela peut prendre un certain temps...",
         "remove-success": {
             "many": "-> %{count} rôles retirés sur %{m} !",
             "one": "-> 1 rôle retiré sur %{m} !",
