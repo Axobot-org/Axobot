@@ -27,6 +27,3 @@ Pillow~=9.4.0
 # Antiscam training
 pandas
 scikit-learn
-
-# Voice message SST
-openai-whisper
