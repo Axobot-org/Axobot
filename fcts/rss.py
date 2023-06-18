@@ -218,7 +218,7 @@ class Rss(commands.Cog):
         if isinstance(text, str):
             await ctx.send(text)
         else:
-            form = await self.bot._(ctx.channel, "rss.deviant-form-last")
+            form = await self.bot._(ctx.channel, "rss.web-form-last")
             obj = await text[0].create_msg(form)
             if isinstance(obj,discord.Embed):
                 await ctx.send(embed=obj)
