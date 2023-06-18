@@ -76,7 +76,6 @@ List of every option
 * levelup_channel: Channel where the bot will send every levelup announcement message. It can be either a text channel, or "none" for no channel (Axobot won't send any levelup channel), or "any" if you want it in the same channel as the message. Default to any.
 * levelup_msg: Message to send when someone reaches a new XP level. You can use :code:`{level}` variable to include the reached level, and :code:`{user}` to mention the user (or `{username}` if you only want the name). Default is a random sentence.
 * membercounter: A voice salon whose name displays the number of members on the server
-* morpion_emojis: List of emojis used to play on tic-tac-toe. Two emojis must be entered: one for the bot, and one for the player. Discord emojis as well as server emojis can work.
 * mute_allowed_roles: List of roles allowed to use the `mute <moderator.html#mute-unmute>`__ command. By default, none.
 * muted_role: Role used to mute your members. If no role is specified, Axobot will check for any role called "muted", and create one if needed, with basic permissions.
 * noxp_channels: List of text channels where members will not be able to earn any exp. Not necessary if XP is disabled in your server.
@@ -90,6 +89,7 @@ List of every option
 * say_allowed_roles: List of roles allowed to use the `say` command. By default, none.
 * slowmode_allowed_roles: List of roles allowed to use the `slowmode <moderator.html#slowmode>`__ and `freeze <moderator.html#freeze>`__ commands. By default, none.
 * ttt_display: How to use the tic-tac-toe game. "Disabled" will prevent your users from playing it, "normal" will use it as usual and "short" will avoid spam messages.
+* ttt_emojis: List of emojis used to play on tic-tac-toe. Two emojis must be entered: one for the bot, and one for the player. Discord emojis as well as server emojis can work.
 * update_mentions: A list of roles which will be mentioned in each update changelog. You can enable those changelogs with the `bot_news` option. Default to None.
 * voice_category: Category used by the automated voice channels system (see `below <server.html#voice-channels-managment>`__)
 * voice_channel: Channel used by the automated voice channels system (see `below <server.html#voice-channels-managment>`__)

@@ -120,13 +120,6 @@ options: dict[str, "AllRepresentation"] = {
         "default": None,
         "is_listed": True,
     },
-    "morpion_emojis": {
-        "type": "emojis_list",
-        "min_count": 2,
-        "max_count": 2,
-        "default": ['🔴', '🔵'],
-        "is_listed": True,
-    },
     "mute_allowed_roles": {
         "type": "roles_list",
         "min_count": 1,
@@ -286,6 +279,13 @@ options: dict[str, "AllRepresentation"] = {
         "type": "enum",
         "values": ["disabled", "short", "normal"],
         "default": "normal",
+        "is_listed": True,
+    },
+    "ttt_emojis": {
+        "type": "emojis_list",
+        "min_count": 2,
+        "max_count": 2,
+        "default": ['🔴', '🔵'],
         "is_listed": True,
     },
     "update_mentions": {
