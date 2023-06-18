@@ -73,7 +73,7 @@ class Morpions(commands.Cog):
             elif self.bot.current_event == 'fish':
                 self.emojis = ("🐟", "🐠")
             elif self.ctx.guild:
-                self.emojis = await self.bot.get_config(self.ctx.guild.id, "morpion_emojis")
+                self.emojis = await self.bot.get_config(self.ctx.guild.id, "ttt_emojis")
             if len(self.emojis) < 2:
                 self.emojis = (':red_circle:', ':blue_circle:')
 
