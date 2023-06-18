@@ -993,6 +993,19 @@ class ServerLogs(commands.Cog):
             await self.prepare_antiscam_embed(message, prediction, emb)
             await self.validate_logs(message.guild, channel_ids, emb, "antiscam")
 
+    @commands.Cog.listener()
+    async def on_antiscam_report(self, message: discord.Message, prediction: PredictionResult, user: discord.Member):
+        """Triggered when someone reports a potential scam message
+        Corresponding log: antiscam"""
+        if channel_ids := await self.is_log_enabled(message.guild.id, "antiscam"):
+            emb = discord.Embed(
+                description=f"**Scam [message]({message.jump_url}) reported** by one of your members",
+                colour=discord.Color.orange()
+            )
+            emb.set_footer(text=f"Reported by {user}", icon_url=user.display_avatar)
+            await self.prepare_antiscam_embed(message, prediction, emb)
+            await self.validate_logs(message.guild, channel_ids, emb, "antiscam")
+
     async def prepare_antiscam_embed(self, message: discord.Message, prediction: PredictionResult, emb: discord.Embed):
         "Prepare the embed for an antiscam alert"
         # probabilities
