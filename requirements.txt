@@ -16,7 +16,6 @@ feedparser>=6.0
 google-api-python-client
 Babel>=2.9
 cachingutils>=1.0
-typing_extensions>=4.0
 nltk>=3.7
 autopep8
 flatten-json
