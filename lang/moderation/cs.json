@@ -86,7 +86,7 @@
     "react-clear": "Nemohu najít tuto zprávu :confused:",
     "role": {
         "color-success": "Role %{role} změnila barvu!",
-        "give-pending": "Přiřazuji roli k %{n} členům...",
+        "give-pending": "Přiřazení role členům %{n} může trvat několik minut...",
         "give-roles-higher": "Nemůžete dát nebo odebrat role vyšší než vaše!",
         "give-success": {
             "many": "-> %{count} rolí přiřazeno z %{m}!",
@@ -96,7 +96,7 @@
         "give-too-high": "Jejda, zdá se, že tato role je pro mě příliš vysoká, než aby mohla někomu dávat nebo odebrat. Prosím, umístěte mou roli nad roli `%{r}",
         "limit-hit": "Abych se vyhnul spamování Discordu, mohl jsem ovlivnit pouze %{limit} členy. Tento příkaz spusťte znovu za několik sekund, pokud chcete ovlivnit více",
         "list": "Seznam rolí serveru",
-        "remove-pending": "Zrušení role pro %{n} členy...",
+        "remove-pending": "Zrušení role na %{n} členy, to může trvat několik minut...",
         "remove-success": {
             "many": "-> %{count} rolí odebráno z %{m}!",
             "one": "-> 1 role odebrána z %{m}",
