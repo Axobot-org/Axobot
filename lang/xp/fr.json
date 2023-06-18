@@ -5,6 +5,8 @@
     "bot-rank": "Les bots ne peuvent pas avoir d'xp",
     "card-level": "NIVEAU",
     "card-rank": "RANG",
+    "card-xp-left": "{xp_left} XP manquantes !",
+    "card-xp-total": "{total_xp} XP Total",
     "card-forbidden": "Oups, je ne peux pas envoyer votre carte en MP. Vérifiez que vos MP avec moi sont ouverts et réessayez !",
     "card-too-large": "Oups, impossible d'envoyer votre carte :eyes: il est possible que le fichier généré soit trop lourd, vous pouvez alors par exemple désactiver l'animation de votre carte (commande `profile config animated_card false`)",
     "change-global-xp": "Impossible d'éditer l'XP du système global !",
