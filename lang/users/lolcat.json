@@ -1,5 +1,5 @@
 {
-    "card-desc": "Here iz example of ur xp card. U can enter teh command `profile card <style>` 2 change the style\n*Ur xp card will only refresh wehn u have won Xp*",
+    "card-desc": "Herz how ur xp card look like. Oh and %{profile_cmd} is 4 chosing which style u wanna use, just in case. Kinda like a free card shop, hehe.",
     "changed-card": "Ur xp card naw use the style %{style}",
     "changed-error": "Oops, a wicked error occurrd during the process ov ur request. Try again later or contact these nice support guys.",
     "config_list": "List ov avaliable opt: %{options}\n\nUse dat `help profile config` cmd 4 + details",
