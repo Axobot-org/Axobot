@@ -6,11 +6,12 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 from libs.bot_classes import MyContext, Axobot
+from libs.checks import checks
 from libs.formatutils import FormatUtils
 from libs.paginator import PaginatedSelectView
 from libs.views import ConfirmView
 
-from fcts import args, checks
+from fcts import args
 
 class Timers(commands.Cog):
     "Reminders system"

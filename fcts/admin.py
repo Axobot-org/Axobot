@@ -18,7 +18,7 @@ from discord.ext import commands
 from git import GitCommandError, Repo
 
 from docs import conf
-from fcts import checks
+from libs.checks import checks
 from libs.antiscam import update_unicode_map
 from libs.antiscam.training_bayes import train_model
 from libs.bot_classes import (PRIVATE_GUILD_ID, SUPPORT_GUILD_ID, Axobot,

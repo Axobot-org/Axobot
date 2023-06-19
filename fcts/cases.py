@@ -7,7 +7,7 @@ import discord
 from discord.ext import commands
 
 from fcts import args
-from fcts.checks import database_connected, is_support_staff
+from libs.checks.checks import database_connected, is_support_staff
 from libs.bot_classes import Axobot, MyContext
 from libs.formatutils import FormatUtils
 from libs.paginator import Paginator

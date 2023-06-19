@@ -12,7 +12,7 @@ from discord.ext import tasks, commands
 from flatten_json import flatten, unflatten_list
 from libs.bot_classes import MyContext, Axobot
 
-from fcts.checks import is_translator, is_bot_admin
+from libs.checks.checks import is_translator, is_bot_admin
 
 FlatennedTranslations = dict[str, typing.Optional[str]]
 ModuleDict = dict[str, FlatennedTranslations]

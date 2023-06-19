@@ -11,7 +11,7 @@ from dateutil.parser import isoparse
 from discord.ext import commands
 from frmc_lib import SearchType
 
-from fcts import checks
+from libs.checks import checks
 from libs.bot_classes import Axobot, MyContext
 from libs.formatutils import FormatUtils
 from libs.rss.rss_general import FeedObject
