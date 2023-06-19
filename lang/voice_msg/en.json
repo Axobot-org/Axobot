@@ -1,7 +1,6 @@
 {
     "attachment-too-long": "Due to technical limitations, I cannot handle attachments longer than %{duration}",
     "no-transcript": "I couldn't detect a single word in this voice message :confused:",
-    "not-voice-message": "This command is only available for voice messages",
     "openai-credits": "Powered by local [OpenAI's Whisper model](%{url})",
     "title": "Transcript generation"
 }

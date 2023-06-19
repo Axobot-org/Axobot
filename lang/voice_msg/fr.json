@@ -1,7 +1,6 @@
 {
     "attachment-too-long": "En raison de limitations techniques, je ne peux pas traiter les messages vocaux de plus de %{duration}",
     "no-transcript": "Je n'ai pas pu détecter un seul mot dans ce message vocal :confused:",
-    "not-voice-message": "Cette commande n'est utilisable que sur des messages vocaux",
     "openai-credits": "Réalisé localement par le [modèle Whisper d'OpenAI](%{url})",
     "title": "Génération de transcription"
 }

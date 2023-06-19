@@ -6,6 +6,7 @@ from aiohttp import ClientSession
 from discord import app_commands
 from discord.ext import commands
 
+from fcts import checks
 from libs.bot_classes import Axobot
 from libs.formatutils import FormatUtils
 
@@ -37,22 +38,11 @@ class VoiceMessages(commands.Cog):
         if self._session is not None:
             await self._session.close()
 
-    @app_commands.checks.cooldown(2, 60)
+    @app_commands.checks.cooldown(2, 90)
+    @app_commands.check(checks.is_voice_message)
     async def handle_message_command(self, interaction: discord.Interaction, message: discord.Message):
         "Create a transcript of the voice message"
-        # check if the message is a voice message
-        if not message.flags.voice:
-            await interaction.response.send_message(
-                await self.bot._(interaction.user, "voice_msg.not-voice-message"),
-                ephemeral=True)
-            return
         attachment = message.attachments[0]
-        # if attachment is somehow not a voice message (just for extra security)
-        if not attachment.is_voice_message():
-            await interaction.response.send_message(
-                await self.bot._(interaction.user, "voice_msg.not-voice-message"),
-                ephemeral=True)
-            return
         # if voice message is too long, abort
         if attachment.duration > self.max_duration:
             lang = await self.bot._(interaction, "_used_locale")
@@ -61,7 +51,7 @@ class VoiceMessages(commands.Cog):
                 await self.bot._(interaction.user, "voice_msg.attachment-too-long", duration=f_max_duration),
                 ephemeral=True)
             return
-        await interaction.response.defer(ephemeral=False)
+        await interaction.response.defer(ephemeral=True)
         if message.id in self.cache:
             # if message is in the cache, use it
             result = self.cache[message.id]
