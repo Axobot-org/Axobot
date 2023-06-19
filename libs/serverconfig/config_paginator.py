@@ -27,7 +27,7 @@ class ServerConfigPaginator(Paginator):
         "Create and send 1st page"
         full_config = await ctx.bot.get_cog("ServerConfig").get_guild_config(self.guild.id, with_defaults=True)
         for option, value in full_config.items():
-            if opt_list.options[option]["is_listed"]:
+            if option in opt_list.options and opt_list.options[option]["is_listed"]:
                 self.server_config[option] = value
         contents = await self.get_page_content(ctx, 1)
         await self._update_buttons()
@@ -52,7 +52,6 @@ class ServerConfigPaginator(Paginator):
         )
         if self.guild.icon:
             embed.set_thumbnail(url=self.guild.icon.with_static_format('png'))
-        replace_mentions = interaction.guild.id != self.guild.id
         for option, value in page_config_map.items():
             if (display := await to_display(option, value, self.guild, self.client)) is None:
                 display = "Ø"
