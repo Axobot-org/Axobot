@@ -63,6 +63,7 @@
         "rss set-mentions": "modifier-mentions",
         "rss set-text": "modifier-texte",
         "slowmode": "mode-lent",
+        "stats": "stats",
         "tickets portal set-category": "modifier-catégorie",
         "tickets portal set-format": "modifier-format",
         "tickets portal set-hint": "modifier-indice",
@@ -368,6 +369,9 @@
         },
         "reminders delete": {
             "reminder_id": "id-du-rappel"
+        },
+        "stats": {
+            "category": "catégorie"
         }
     }
 }

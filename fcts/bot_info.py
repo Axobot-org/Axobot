@@ -1,15 +1,14 @@
 
 import sys
-from typing import Optional, Union
+from typing import Literal, Optional, Union
 
-import aiohttp
 import discord
 import psutil
 from discord.ext import commands
 
 from docs import conf
-from libs.checks import checks
 from libs.bot_classes import Axobot, MyContext
+from libs.checks import checks
 from libs.formatutils import FormatUtils
 from utils import count_code_lines
 
@@ -57,17 +56,18 @@ class BotInfo(commands.Cog):
                 return len(self.bot.guilds)
         return len([x for x in self.bot.guilds if x.id not in ignored_guilds])
 
-    @commands.group(name="stats")
+    @commands.hybrid_command(name="stats")
     @commands.check(checks.database_connected)
     @commands.cooldown(3, 60, commands.BucketType.guild)
-    async def stats_main(self, ctx: MyContext):
+    async def stats_main(self, ctx: MyContext, category: Literal["general", "commands"]="general"):
         """Display some statistics about the bot
 
         ..Doc infos.html#statistics"""
-        if ctx.subcommand_passed is None:
+        if category == "general":
             await self.stats_general(ctx)
+        elif category == "commands":
+            await self.stats_commands(ctx)
 
-    @stats_main.command(name="general")
     async def stats_general(self, ctx: MyContext):
         "General statistics about the bot"
         python_version = sys.version_info
@@ -137,7 +137,6 @@ class BotInfo(commands.Cog):
         members = list(set(x for x in members for x in x)) # filter users
         return len(members), len([x for x in members if x.bot])
 
-    @stats_main.command(name="commands", aliases=["cmds"])
     async def stats_commands(self, ctx: MyContext):
         """List the most used commands
 
@@ -218,6 +217,7 @@ ORDER BY usages DESC LIMIT %(limit)s"""
             await ctx.send(embed=emb)
         else:
             await ctx.send(f"**{title}**\n{desc}\n\n{title_total}:\n{text_total}\n\n{title_24h}:\n{text_24h}")
+
 
     @commands.command(name="pig", hidden=True)
     async def pig(self, ctx: MyContext):
