@@ -219,20 +219,6 @@ ORDER BY usages DESC LIMIT %(limit)s"""
         else:
             await ctx.send(f"**{title}**\n{desc}\n\n{title_total}:\n{text_total}\n\n{title_24h}:\n{text_24h}")
 
-    @commands.command(name="botinvite", aliases=["botinv"])
-    async def botinvite(self, ctx:MyContext):
-        """Get a link to invite me
-
-        ..Doc infos.html#bot-invite"""
-        raw_oauth = "<" + discord.utils.oauth_url(self.bot.user.id) + ">"
-        url = "https://zrunner.me/" + ("invitezbot" if self.bot.entity_id == 0 else "invite-axobot")
-        async with aiohttp.ClientSession() as session:
-            async with session.get(url, timeout=3) as resp:
-                if resp.status >= 400:
-                    url = raw_oauth
-        cmd = await self.bot.get_command_mention("about")
-        await ctx.send(await self.bot._(ctx.channel, "info.botinvite", url=url, about=cmd))
-
     @commands.command(name="pig", hidden=True)
     async def pig(self, ctx: MyContext):
         """Get bot latency

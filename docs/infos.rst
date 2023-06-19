@@ -15,14 +15,6 @@ This command sends a short presentation text of the bot, so that you know it a l
 
 .. note:: For this command, Axobot doesn't need any specific permission! Good news, isn't it?
 
-----------
-Bot invite
-----------
-
-**Syntax:** :code:`botinvite` (alias :code:`botinv`)
-
-Shorter than the 'about' command, this one only send an url to invite the bot. And this url will always be working, even if our web server crashes.
-
 ----
 Help
 ----

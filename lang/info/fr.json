@@ -12,7 +12,6 @@
     "bitly_long": "URL d'origine : %{url}",
     "bitly_nobit": "Cette adresse n'est pas un lien bit.ly !",
     "bitly_short": "URL raccourcie : %{url}",
-    "botinvite": "Voici un lien pour m'inviter dans un autre serveur : %{url}\nN'hésitez pas à tester la commande %{about} pour plus de liens utiles !",
     "cant-see-channel": "Oups, il semble que vous n'avez pas la permission de voir ce salon. Demandez à un modérateur !",
     "changelogs": {
         "index": "Liste des versions indexées",

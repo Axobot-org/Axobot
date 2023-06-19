@@ -12,7 +12,6 @@
     "bitly_long": "Original URL: %{url}",
     "bitly_nobit": "This address is not a bit.ly link!",
     "bitly_short": "Shortened URL: %{url}",
-    "botinvite": "Here is a link to invite me to another server: %{url}\nDon't hesitate to test the %{about} command for more useful links!",
     "cant-see-channel": "Oops, looks like you don't have permission to view this channel. Ask a moderator!",
     "changelogs": {
         "index": "List of indexed versions",

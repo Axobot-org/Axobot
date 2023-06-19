@@ -10,7 +10,6 @@
     "bitly_long": "Alkuperäinen URL: %{url}",
     "bitly_nobit": "Tämä linkki ei ole bit.ly linkki!",
     "bitly_short": "Lyhennetty URL: %{url}",
-    "botinvite": "Tässä on linkki kutsuakseen minut toiseen palvelimeen: {url}\nÄlä unohda testata %{about} komentoa hyödyllisille linkeille!",
     "cant-see-channel": "Ups, näyttää siltä että sinulla ei ole oikeuksia nähdä tätä kanavaa! Kysy järjestyksenvalvojalta!",
     "changelogs": {
         "index": "Lista indeksoiduista versioista",
