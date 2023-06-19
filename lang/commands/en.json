@@ -20,6 +20,7 @@
         "config see": "see",
         "config set": "set",
         "destop": "destop",
+        "documentation": "documentation",
         "emoji clear": "clear",
         "emoji list": "list",
         "emoji rename": "rename",

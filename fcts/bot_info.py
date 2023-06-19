@@ -268,7 +268,7 @@ ORDER BY usages DESC LIMIT %(limit)s"""
                        )
 
 
-    @commands.command(name="docs", aliases=['doc','documentation'])
+    @commands.hybrid_command(name="documentation", aliases=['doc', 'docs'])
     async def display_doc(self, ctx: MyContext):
         """Get the documentation url"""
         text = self.bot.emojis_manager.customs['readthedocs'] + await self.bot._(ctx.channel,"info.docs") + \
