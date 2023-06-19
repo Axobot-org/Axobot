@@ -1,4 +1,3 @@
-import asyncio
 import time
 from typing import Optional
 
@@ -38,6 +37,7 @@ class VoiceMessages(commands.Cog):
         if self._session is not None:
             await self._session.close()
 
+    @app_commands.checks.cooldown(2, 60)
     async def handle_message_command(self, interaction: discord.Interaction, message: discord.Message):
         "Create a transcript of the voice message"
         # check if the message is a voice message
