@@ -5,6 +5,8 @@
     "bot-rank": "Boti nemohou mít žádné Xp",
     "card-level": "ÚROVEŇ",
     "card-rank": "POZICE",
+    "card-xp-left": "{xp_left} XP zbývá do úrovně!",
+    "card-xp-total": "{total_xp} celkem XP",
     "card-forbidden": "Ale né, nemůžu vám poslat vaši kartu v DM. Zkontrolujte, zda jsou vaše DM se mnou otevřené a zkuste to znovu!",
     "card-too-large": "Ale né, nelze poslat vaši kartu :eyes: je možné, že vygenerovaný soubor je příliš velký, můžete pak například vypnout animaci vaší karty (povel `profile config animated_card false`)",
     "change-global-xp": "XP globálního systému nelze upravovat!",

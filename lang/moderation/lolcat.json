@@ -86,7 +86,7 @@
     "react-clear": "I can't find dis message :confused:",
     "role": {
         "color-success": "Teh coulor of role %{role} haz bee'n changd!",
-        "give-pending": "Roger that, %{n} assignations incoming...",
+        "give-pending": "Roger that, %{n} assignations incoming... may take a while tho...",
         "give-roles-higher": "U can't give / remove roles higher than urs LMAO!",
         "give-success": {
             "many": "-> %{count} roles gived out of %{m} !",
@@ -96,7 +96,7 @@
         "give-too-high": "Oops, dat role is 2 high 4 me 2 give or remove 2 anyone. Please place me role above ur `%{r}` :plz:",
         "limit-hit": "Uh, as I don't really wanna annoy discoword, i stopped at %{limit} ppl. Feel free 2 try it again if you really wanna do :)",
         "list": "List of srv roles",
-        "remove-pending": "Deletin dis role to %{n} ppl...",
+        "remove-pending": "Deletin dis role to %{n} ppl... may take a while or 2...",
         "remove-success": {
             "many": "-> %{count} thingy revoked out ov %{m}!",
             "one": "-> 1 role removd out of %{m} !",
