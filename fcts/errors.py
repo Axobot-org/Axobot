@@ -6,10 +6,11 @@ import typing
 
 import discord
 from discord.ext import commands, tasks
-from libs.bot_classes import MyContext, Axobot
-from libs.checks.errors import NotDuringEventError, VerboseCommandError
 
 from fcts import checks
+from libs.bot_classes import Axobot, MyContext
+from libs.checks.errors import (NotAVoiceMessageError, NotDuringEventError,
+                                VerboseCommandError)
 
 AllowedCtx = typing.Union[MyContext, discord.Message, discord.Interaction, str]
 
@@ -242,6 +243,11 @@ class Errors(commands.Cog):
             delay = round(error.retry_after, 2 if error.retry_after < 60 else None)
             await interaction.response.send_message(
                 await self.bot._(interaction, 'errors.cooldown', d=delay),
+                ephemeral=True)
+            return
+        if isinstance(error, NotAVoiceMessageError):
+            await interaction.response.send_message(
+                await self.bot._(interaction, "errors.notavoicemessage"),
                 ephemeral=True)
             return
         if isinstance(error, discord.app_commands.CheckFailure):

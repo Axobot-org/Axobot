@@ -2,7 +2,9 @@ import typing
 
 import discord
 from discord.ext import commands
+
 from libs.bot_classes import SUPPORT_GUILD_ID, MyContext
+from libs.checks.errors import NotAVoiceMessageError
 
 admins_id = {279568324260528128,281404141841022976,552273019020771358}
 
@@ -170,8 +172,23 @@ async def is_a_cmd(msg: discord.Message, bot: commands.Bot) -> bool:
         is_cmd = is_cmd or msg.content.startswith(p)
     return is_cmd
 
-async def is_ttt_enabled(ctx: MyContext, self=None) -> bool:
+async def is_ttt_enabled(ctx: MyContext) -> bool:
     "Check if the tic-tac-toe game is enabled in a given context"
     if ctx.guild is None:
         return True
     return await ctx.bot.get_config(ctx.guild.id, "ttt_display") != "disabled"
+
+
+async def is_voice_message(interaction: discord.Interaction):
+    "Check if the message is a voice message"
+    if "resolved" not in interaction.data or "messages" not in interaction.data["resolved"]:
+        raise NotAVoiceMessageError()
+    messages: dict[str, dict] = interaction.data["resolved"]["messages"]
+    if len(messages) != 1:
+        raise NotAVoiceMessageError()
+    message = list(messages.values())[0]
+    flags = discord.MessageFlags()
+    flags.value = message.get('flags', 0)
+    if not flags.voice:
+        raise NotAVoiceMessageError()
+    return True

@@ -29,6 +29,7 @@
     "msgnotfound": "Message introuvable",
     "nodb-1": "La base de donnée étant actuellement hors ligne, cette fonctionnalité est temporairement désactivée :confused:\nRendez-vous sur discord.gg/N55zY88 pour plus d'informations",
     "nodb-2": "La base de donnée étant actuellement hors ligne, cette fonctionnalité est temporairement désactivée :confused:\n%{reason}",
+    "notavoicemessage": "Cette commande n'est utilisable que sur des messages vocaux",
     "notduringevent": "Cette commande est uniquement disponible lors de certains événements. Utilise %{cmd} pour en savoir plus !",
     "notrightroles": "Vous n'avez pas les rôles nécessaires pour cette commande",
     "quoteserror": "Oups, une erreur de guillemets est survenue. Assurez-vous de bien utiliser les guillemets \", de manière à ce que chaque guillemet ouvert soit fermé plus loin",
