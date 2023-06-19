@@ -4,7 +4,6 @@
         "commands": [
             "about",
             "admins",
-            "botinvite",
             "changelog",
             "discordlinks",
             "docs",

@@ -11,7 +11,6 @@
     "bitly_long": "Původní URL: %{url}",
     "bitly_nobit": "Tato adresa není bit.ly odkaz!",
     "bitly_short": "Zkrácená adresa URL: %{url}",
-    "botinvite": "Zde je odkaz, který mě pozvat na jiný server: %{url}\nNeváhejte otestovat příkaz %{about} pro více užitečných odkazů!",
     "cant-see-channel": "Ale né, vypadá to, že nemáte oprávnění k zobrazení tohoto kanálu. Požádejte moderátora!",
     "changelogs": {
         "index": "Seznam indexovaných verzí",

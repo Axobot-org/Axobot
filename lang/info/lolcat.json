@@ -11,7 +11,6 @@
     "bitly_long": "Slow link: %{url}",
     "bitly_nobit": "HAHA NOPE, dat's not a bit.ly link!",
     "bitly_short": "Quick linq: %{url}",
-    "botinvite": "Here's a link 2 invite me 2 somewhere else: %{url}\nAlso check %{about} 4 more useful links :)",
     "cant-see-channel": "Uhh nope, ur not allowed to see that!",
     "changelogs": {
         "index": "List of indexed versions",
