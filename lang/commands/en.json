@@ -66,6 +66,7 @@
         "rss set-text": "set-text",
         "slowmode": "slowmode",
         "softban": "softban",
+        "stats": "stats",
         "tickets portal set-category": "set-category",
         "tickets portal set-format": "set-format",
         "tickets portal set-hint": "set-hint",
@@ -371,6 +372,9 @@
         },
         "reminders delete": {
             "reminder_id": "reminder-id"
+        },
+        "stats": {
+            "category": "category"
         }
     }
 }
