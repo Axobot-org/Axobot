@@ -23,9 +23,11 @@ class Errors(commands.Cog):
         self.cooldown_pool: dict[int, int] = {}
 
     async def cog_load(self):
+        # pylint: disable=no-member
         self.reduce_cooldown_pool.start()
 
     async def cog_unload(self):
+        # pylint: disable=no-member
         if self.reduce_cooldown_pool.is_running():
             self.reduce_cooldown_pool.cancel()
 
@@ -96,8 +98,8 @@ class Errors(commands.Cog):
                 await ctx.reinvoke()
                 return
             if await self.can_send_cooldown_error(ctx.author.id):
-                d = round(error.retry_after, 2 if error.retry_after < 60 else None)
-                await ctx.send(await self.bot._(ctx.channel, 'errors.cooldown', d=d), ephemeral=True)
+                delay = round(error.retry_after, 2 if error.retry_after < 60 else None)
+                await ctx.send(await self.bot._(ctx.channel, 'errors.cooldown', d=delay), ephemeral=True)
             return
         elif isinstance(error, commands.BadLiteralArgument):
             await ctx.send(await self.bot._(ctx.channel, 'errors.badlitteral'), ephemeral=True)
@@ -208,7 +210,11 @@ class Errors(commands.Cog):
                 return await send_err('errors.invalidsnowflake')
             self.bot.log.warning('Unknown error type -',error)
         elif isinstance(error,commands.errors.MissingRequiredArgument):
-            await ctx.send(await self.bot._(ctx.channel,'errors.missingargument',a=error.param.name,e=random.choice([':eyes:','',':confused:',':thinking:',''])))
+            await ctx.send(await self.bot._(
+                ctx.channel,'errors.missingargument',
+                a=error.param.name,
+                e=random.choice([':eyes:','',':confused:',':thinking:',''])
+            ))
             return
         elif isinstance(error,commands.errors.DisabledCommand):
             await ctx.send(await self.bot._(ctx.channel,'errors.disabled', c=ctx.invoked_with), ephemeral=True)
@@ -232,6 +238,12 @@ class Errors(commands.Cog):
     @commands.Cog.listener()
     async def on_interaction_error(self, interaction: discord.Interaction, error: discord.app_commands.AppCommandError):
         "Called when an error is raised during an interaction"
+        if isinstance(error, discord.app_commands.CommandOnCooldown):
+            delay = round(error.retry_after, 2 if error.retry_after < 60 else None)
+            await interaction.response.send_message(
+                await self.bot._(interaction, 'errors.cooldown', d=delay),
+                ephemeral=True)
+            return
         if isinstance(error, discord.app_commands.CheckFailure):
             help_cmd = await self.bot.get_command_mention("help")
             await interaction.response.send_message(
