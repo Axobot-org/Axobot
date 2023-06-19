@@ -1,6 +1,6 @@
 import importlib
 from discord.ext import commands
-from fcts.checks import is_bot_admin
+from libs.checks.checks import is_bot_admin
 from libs.bot_classes import MyContext, Axobot
 from utils import count_code_lines
 

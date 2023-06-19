@@ -7,7 +7,7 @@ from typing import Literal, Optional, Union
 import discord
 from discord.ext import commands
 
-from fcts.checks import database_connected, is_fun_enabled
+from libs.checks.checks import database_connected, is_fun_enabled
 from libs.bot_classes import SUPPORT_GUILD_ID, Axobot, MyContext
 from libs.bot_events import EventData, EventRewardRole, EventType
 from libs.formatutils import FormatUtils

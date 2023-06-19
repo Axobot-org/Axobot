@@ -13,7 +13,7 @@ from libs.tickets.types import DBTopicRow
 from libs.tickets.views import (AskTitleModal, AskTopicSelect, SelectView,
                                 SendHintText, TicketCreationEvent)
 
-from fcts import checks
+from libs.checks import checks
 
 
 def is_named_other(name: str, other_translated: str):

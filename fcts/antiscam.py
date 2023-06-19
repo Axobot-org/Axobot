@@ -13,7 +13,7 @@ from libs.antiscam.similarities import check_message
 from libs.antiscam.training_bayes import train_model
 from libs.bot_classes import Axobot, MyContext
 
-from fcts import checks
+from libs.checks import checks
 
 
 def is_immune(member: discord.Member) -> bool:

@@ -15,13 +15,14 @@ from aiohttp import ClientSession, client_exceptions
 from discord.ext import commands, tasks
 
 from libs.bot_classes import Axobot, MyContext
+from libs.checks import checks
 from libs.enums import ServerWarningType
 from libs.formatutils import FormatUtils
 from libs.paginator import PaginatedSelectView, Paginator
 from libs.rss import RssMessage, TwitterRSS, YoutubeRSS, feed_parse
 from libs.rss.rss_general import FeedObject, FeedType
 
-from fcts import args, checks
+from fcts import args
 
 importlib.reload(args)
 importlib.reload(checks)

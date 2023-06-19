@@ -9,9 +9,10 @@ from discord import app_commands
 from discord.ext import commands
 
 from libs.bot_classes import Axobot, MyContext
+from libs.checks import checks
 from libs.enums import RankCardsFlag, UserFlag
 
-from fcts import args, checks
+from fcts import args
 
 importlib.reload(args)
 importlib.reload(checks)

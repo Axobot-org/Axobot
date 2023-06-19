@@ -7,7 +7,8 @@ import aiohttp
 import discord
 from discord.ext import commands, tasks
 
-from fcts import args, checks
+from fcts import args
+from libs.checks import checks
 from libs.views import ConfirmView
 
 importlib.reload(args)

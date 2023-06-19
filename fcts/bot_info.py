@@ -8,7 +8,7 @@ import psutil
 from discord.ext import commands
 
 from docs import conf
-from fcts import checks
+from libs.checks import checks
 from libs.bot_classes import Axobot, MyContext
 from libs.formatutils import FormatUtils
 from utils import count_code_lines
