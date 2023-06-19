@@ -369,7 +369,8 @@ ORDER BY usages DESC LIMIT %(limit)s"""
             "server": "https://discord.gg/N55zY88",
             "invite": bot_invite,
             "docs": "https://axobot.rtfd.io/",
-            "privacy": "https://zrunner.me/axobot-privacy.pdf"
+            "privacy": "https://zrunner.me/axobot-privacy.pdf",
+            "sponsor": "https://github.com/sponsors/ZRunner",
         }
         for key, url in links.items():
             urls += "\n:arrow_forward: " + await self.bot._(ctx.channel, f"info.about.{key}") + " <" + url + ">"

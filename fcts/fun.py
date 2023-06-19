@@ -666,6 +666,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
             "event_cmd": await self.bot.get_command_mention("event info"),
             "stats_cmd": await self.bot.get_command_mention("stats"),
             "say_cmd": await self.bot.get_command_mention("say"),
+            "sponsor_url": "https://github.com/sponsors/ZRunner",
         }
         await ctx.send(random.choice(await self.bot._(ctx.guild, "fun.tip-list", **params)))
 
