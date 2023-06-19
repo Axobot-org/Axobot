@@ -11,7 +11,7 @@ from libs.bot_classes import (PRIVATE_GUILD_ID, SUPPORT_GUILD_ID, Axobot,
 from libs.colors_events import (BlurpleVariationFlagType, ColorVariation,
                                 TargetConverterType, check_blurple,
                                 convert_blurple, get_url_from_ctx)
-from libs.errors import NotDuringEventError
+from libs.checks.errors import NotDuringEventError
 
 
 async def is_blurple(ctx: MyContext):

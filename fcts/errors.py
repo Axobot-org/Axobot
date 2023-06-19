@@ -7,7 +7,7 @@ import typing
 import discord
 from discord.ext import commands, tasks
 from libs.bot_classes import MyContext, Axobot
-from libs.errors import NotDuringEventError, VerboseCommandError
+from libs.checks.errors import NotDuringEventError, VerboseCommandError
 
 from fcts import checks
 
