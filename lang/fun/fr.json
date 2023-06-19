@@ -139,7 +139,8 @@
         "Pro-tip : Le bot possède un Discord, où vous pourrez voir les bugs actuels et voter pour les prochaines mises à jour ! Utilisez la commande %{about_cmd} pour en obtenir le lien",
         "Pro-tip : la commande `prefix` permet d'avoir la liste des préfixes actuellement utilisables dans le serveur",
         "Le saviez-vous ? Vous pouvez donner une description de votre serveur qui pourra être utilisée dans d’autres serveurs, via l’option `description` de la commande %{config_cmd}",
-        "Le saviez-vous ? Lors de certains événements spéciaux, il est possible d'obtenir des cartes d'xp collector. N'oubliez pas de suivre les news via le serveur officiel ou avec la commande %{event} !"
+        "Le saviez-vous ? Lors de certains événements spéciaux, il est possible d'obtenir des cartes d'xp collector. N'oubliez pas de suivre les news via le serveur officiel ou avec la commande %{event} !",
+        "Ce bot vous plaît ? N’hésitez pas à faire un don à l’adresse %{sponsor_url} !"
     ],
     "uninhabited-city": "Endroit inhabité",
     "vote-0": "Vous ne pouvez pas mettre plus de 20 choix, encore moins un nombre négatif de choix !"

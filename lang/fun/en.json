@@ -142,7 +142,8 @@
         "Pro-tip: The bot has a Discord, where you can see the current bugs and vote for the next updates! Use the %{about_cmd} command to get the invite",
         "Pro-tip: The `prefix` command allows you to have a list of the prefixes currently usable in the server",
         "Did you know? You can give a description of your server that can be used in other servers, via the `description` option of the %{config_cmd} command",
-        "Did you know? At some special events, it is possible to obtain collector xp cards. Don't forget to follow the news on the official server or with the %{event_cmd} command!"
+        "Did you know? At some special events, it is possible to obtain collector xp cards. Don't forget to follow the news on the official server or with the %{event_cmd} command!",
+        "Do you like this bot? Don't hesitate to make a donation by visiting %{sponsor_url}!"
     ],
     "uninhabited-city": "Uninhabited city :confused:",
     "vote-0": "You can't put more than 20 choices, and even less a negative number of choices!"
