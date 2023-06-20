@@ -699,16 +699,19 @@ class Xp(commands.Cog):
             stats_cog.xp_cards["generated"] += 1
         return card_image
 
+    async def get_card_translations_map(self, source) -> dict[str, str]:
+        return {
+            "LEVEL": await self.bot._(source, "xp.card-level"),
+            "RANK": await self.bot._(source, "xp.card-rank"),
+            "xp_left": await self.bot._(source, "xp.card-xp-left"),
+            "total_xp": await self.bot._(source, "xp.card-xp-total"),
+        }
+
     async def send_card(self, ctx: MyContext, user: discord.User, xp: int, rank: int, ranks_nb: int, levels_info: tuple[int, int, int]):
         """Generate and send a user rank card
         levels_info contains (current level, xp needed for the next level, xp needed for the current level)"""
         style = await self.bot.get_cog('Utilities').get_xp_style(user)
-        translations_map = {
-            "LEVEL": await self.bot._(ctx.channel, "xp.card-level"),
-            "RANK": await self.bot._(ctx.channel, "xp.card-rank"),
-            "xp_left": await self.bot._(ctx.channel, "xp.card-xp-left"),
-            "total_xp": await self.bot._(ctx.channel, "xp.card-xp-total"),
-        }
+        translations_map = await self.get_card_translations_map(ctx.channel)
         card_image = await self.create_card(translations_map, user, style, xp, rank, ranks_nb, levels_info)
         # check if we should send the card in DM or in the channel
         send_in_private = ctx.guild is None or await self.bot.get_config(ctx.guild.id, "rank_in_dm")

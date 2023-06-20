@@ -194,11 +194,9 @@ class Users(commands.Cog):
             style = await self.bot.get_cog('Utilities').get_xp_style(ctx.author)
         profile_card_cmd = await self.bot.get_command_mention("profile card")
         desc = await self.bot._(ctx.channel, "users.card-desc", profile_cmd=profile_card_cmd)
-        translations_map = {
-            "LEVEL": await self.bot._(ctx.channel, "xp.card-level"),
-            "RANK": await self.bot._(ctx.channel, "xp.card-rank"),
-        }
-        card = await self.bot.get_cog('Xp').create_card(translations_map, ctx.author, style, xp=30, rank=0, ranks_nb=1,
+        xp_cog = self.bot.get_cog('Xp')
+        translations_map = await xp_cog.get_card_translations_map(ctx.channel)
+        card = await xp_cog.create_card(translations_map, ctx.author, style, xp=30, rank=0, ranks_nb=1,
                                                         levels_info=[1, 85, 0])
                                                         # current level, xp for next level, xp for current level
         await ctx.send(desc, file=card)
