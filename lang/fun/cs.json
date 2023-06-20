@@ -142,7 +142,8 @@
         "Pro-tip: bot má vlastní Discord server, kde můžete vidět aktuální chyby a hlasovat pro další aktualizace! Použijte příkaz %{about_cmd} pro získání pozvánky",
         "Pro-tip: příkaz `prefix` umožňuje mít seznam prefixů aktuálně použitelných na serveru",
         "Věděli jste to? Popis vašeho serveru, který lze použít na jiných serverech, můžete zadat pomocí volby `description` příkazu %{config_cmd}",
-        "Věděli jste to? Na některých speciálních akcích je možné získat sběratelské xp karty. Nezapomeňte sledovat novinky na oficiálním serveru nebo s příkazem %{event_cmd}!"
+        "Věděli jste to? Na některých speciálních akcích je možné získat sběratelské xp karty. Nezapomeňte sledovat novinky na oficiálním serveru nebo s příkazem %{event_cmd}!",
+        "Líbí se vám tento bot? Neváhejte a přispějte nám návštěvou webu %{sponsor_url}!"
     ],
     "uninhabited-city": "Neobydlené město :confused:",
     "vote-0": "Nemůžete dát více než 20 možností a ještě méně negativního počtu možností!"
