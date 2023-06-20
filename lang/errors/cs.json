@@ -29,6 +29,7 @@
     "msgnotfound": "Nelze najít žádnou zprávu s ID %{msg}",
     "nodb-1": "Jelikož je databáze momentálně offline, je tato funkce dočasně vypnuta :confused:\nVíce informací naleznete na stránce discord.gg/N55zY88",
     "nodb-2": "Vzhledem k tomu, že databáze je momentálně offline, je tato funkce dočasně vypnuta :confused:\n%{reason}",
+    "notavoicemessage": "Tento příkaz je dostupný pouze pro hlasové zprávy",
     "notduringevent": "Tento příkaz je k dispozici pouze při určitých událostech. Více informací najdete na webu %{cmd}!",
     "notrightroles": "Pro tento příkaz nemáte potřebné role",
     "quoteserror": "Ale né, došlo k chybě uvozovek. Ujistěte se, že správně používáte uvozovky \", aby každá otevřená uvozovka byla dále uzavřena",
