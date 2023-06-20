@@ -656,7 +656,8 @@ The 'days_to_delete' option represents the number of days worth of messages to d
 ..Example unban 486896267788812288 Nice enough
 
 ..Doc moderator.html#ban-unban"""
-        backup = user
+        input_user = user
+        await ctx.defer()
         try:
             user: discord.User = await commands.UserConverter().convert(ctx,user)
         except commands.BadArgument:
@@ -664,16 +665,15 @@ The 'days_to_delete' option represents the number of days worth of messages to d
                 try:
                     user: discord.User = await self.bot.fetch_user(int(user))
                 except discord.NotFound:
-                    await ctx.send(await self.bot._(ctx.guild.id, "moderation.cant-find-user", user=backup))
+                    await ctx.send(await self.bot._(ctx.guild.id, "moderation.cant-find-user", user=input_user))
                     return
-                del backup
+                del input_user
             else:
                 await ctx.send(await self.bot._(ctx.guild.id, "errors.usernotfound", u=user))
                 return
         if not ctx.channel.permissions_for(ctx.guild.me).ban_members:
             await ctx.send(await self.bot._(ctx.guild.id, "moderation.ban.cant-ban"))
             return
-        await ctx.defer()
         try:
             await ctx.guild.fetch_ban(user)
         except discord.NotFound:
