@@ -29,6 +29,7 @@
     "msgnotfound": "Unable to find any message with ID %{msg}",
     "nodb-1": "As the database is currently offline, this feature is temporarily disabled :confused:\nPlease visit discord.gg/N55zY88 for more info",
     "nodb-2": "As the database is currently offline, this feature is temporarily disabled :confused:\n%{reason}",
+    "notavoicemessage": "This command is only available for voice messages",
     "notduringevent": "This command is only available during certain events. Check %{cmd} for more info!",
     "notrightroles": "You don't have the necessary roles for this command",
     "quoteserror": "Oops, a quotation mark error has occurred. Be sure to correctly use the quotes \", so that each open quote will be closed further on",
