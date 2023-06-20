@@ -3,7 +3,8 @@
         "server": "Me Discord serv:",
         "invite": "Link to iNVite me to anothr servr:",
         "docs": "The :b:ot documentashun:",
-        "privacy": "How we steal ur data:"
+        "privacy": "How we steal ur data:",
+        "sponsor": "Give money:"
     },
     "about-main": "Ho hi hello! I'm %{mention} !\n\nIm a boat that alow you 2 do a loooooot of tings: modration, a' xp systèm, partnre managmnt, stATIstics & many oder super mega *wow* usefull commandz (and totlly pointlesz wanes)! \nU can strt by tipyng `!help` in dis tchat to se the llst for availabl kommands, then `!config see` wil LEtz you see teh configurashun optionz (a website ar in prePARtion)? \n\nOf helpin me in the creetion of the boat, my ownr Z an I wouLd like to tahnk Awhikax 4 hiz suport durin the variouz cryzes, Aragorn1202 of al hees idees and sentencez full for goob sence, Adri fr all dese beautifool loGoz, èmojiz nd profil picts, and the whole translators tim 4 they woark!\n\n:globe_with_meridians: Sum linqs can bee usefull:%{links}\n\nHas a nice dayz !",
     "admins-list": "My super-cool admins are : %{admins}",

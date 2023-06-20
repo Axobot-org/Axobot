@@ -29,6 +29,7 @@
     "msgnotfound": "NoAble 2 find any msg with ID %{msg}",
     "nodb-1": "As the databaz is auffline, dis feature iz temporarly disabled :confused:\nPlz see discord.gg/N55zY88 4 + info",
     "nodb-2": "As the databaz is auffline, dis feature iz temporarly disabled :confused:\n%{reason}",
+    "notavoicemessage": "Dat command is only 4 voice msg",
     "notduringevent": "Oh uh, dis command can only be usd for special events. Maybe u shuld try %{cmd} first.",
     "notrightroles": "U're not fancy enough to get dat command, GO AWAY DUDE! :reee:",
     "quoteserror": "Oops, u guys did smth wrong with quotes \" Make sur u using tehm correclty",
