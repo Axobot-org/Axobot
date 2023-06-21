@@ -61,6 +61,7 @@ class BotStats(commands.Cog):
         self.last_backup_size: Optional[int] = None
         self.role_reactions = {"added": 0, "removed": 0}
         self.snooze_events: dict[tuple[int, int], int] = defaultdict(int)
+        self.voice_transcript_events: dict[tuple[float, float], int] = defaultdict(int)
 
     async def cog_load(self):
          # pylint: disable=no-member
@@ -178,6 +179,11 @@ class BotStats(commands.Cog):
     async def on_reminder_snooze(self, initial_duration: int, snooze_duration: int):
         "Called when a reminder is snoozed"
         self.snooze_events[(initial_duration, round(snooze_duration))] += 1
+
+    @commands.Cog.listener()
+    async def on_voice_transcript_completed(self, message_duration: float, generation_duration: float):
+        "Called when a voice transcript is completed"
+        self.voice_transcript_events[(message_duration, generation_duration)] += 1
 
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
@@ -390,13 +396,6 @@ class BotStats(commands.Cog):
             if self.ticket_events["creation"]:
                 cursor.execute(query, (now, 'tickets.creation', self.ticket_events["creation"], 0, 'tickets/min', True, self.bot.entity_id))
                 self.ticket_events["creation"] = 0
-            # username changes
-            # cursor.execute(query, (now, 'usernames.guild', self.usernames["guild"], 0, 'nicknames/min', True, self.bot.entity_id))
-            # self.usernames["guild"] = 0
-            # cursor.execute(query, (now, 'usernames.user', self.usernames["user"], 0, 'usernames/min', True, self.bot.entity_id))
-            # self.usernames["user"] = 0
-            # cursor.execute(query, (now, 'usernames.deleted', self.usernames["deleted"], 0, 'usernames/min', True, self.bot.entity_id))
-            # self.usernames["deleted"] = 0
             if self.bot.current_event:
                 # Dailies points
                 await self.db_record_event_collect_values(now)
@@ -418,15 +417,23 @@ class BotStats(commands.Cog):
                 self.last_backup_size = None
             # role reactions
             if self.role_reactions["added"]:
-                cursor.execute(query, (now, 'role_reactions.added', self.role_reactions["added"], 0, 'reactions', True, self.bot.entity_id))
+                cursor.execute(query, (now, 'role_reactions.added', self.role_reactions["added"], 0,
+                                       'reactions', True, self.bot.entity_id))
                 self.role_reactions["added"] = 0
             if self.role_reactions["removed"]:
-                cursor.execute(query, (now, 'role_reactions.removed', self.role_reactions["removed"], 0, 'reactions', True, self.bot.entity_id))
+                cursor.execute(query, (now, 'role_reactions.removed', self.role_reactions["removed"], 0,
+                                       'reactions', True, self.bot.entity_id))
                 self.role_reactions["removed"] = 0
             # snoozed reminders
             for (initial_duration, snooze_duration), count in self.snooze_events.items():
-                cursor.execute(query, (now, f'reminders.snoozed.{initial_duration}.{snooze_duration}', count, 0, 'reminders', True, self.bot.entity_id))
+                cursor.execute(query, (now, f'reminders.snoozed.{initial_duration}.{snooze_duration}', count, 0,
+                                       'reminders',True, self.bot.entity_id))
             self.snooze_events.clear()
+            # voice transcripts
+            for (message_duration, generation_duration), count in self.voice_transcript_events.items():
+                cursor.execute(query, (now, f'voice_transcripts.{message_duration:.0f}.{generation_duration:.0f}', count, 0,
+                                       'transcripts', True, self.bot.entity_id))
+            self.voice_transcript_events.clear()
             # Push everything
             cnx.commit()
         except mysql.connector.errors.IntegrityError as err: # usually duplicate primary key
@@ -448,7 +455,9 @@ class BotStats(commands.Cog):
         """Get the sum of a certain variable in the last X minutes"""
         cnx = self.bot.cnx_axobot
         cursor = cnx.cursor(dictionary=True)
-        cursor.execute('SELECT variable, SUM(value) as value, type FROM `statsbot`.`zbot` WHERE variable = %s AND date BETWEEN (DATE_SUB(UTC_TIMESTAMP(),INTERVAL %s MINUTE)) AND UTC_TIMESTAMP() AND `entity_id`=%s', (variable, minutes, self.bot.entity_id))
+        cursor.execute('SELECT variable, SUM(value) as value, type FROM `statsbot`.`zbot` WHERE variable = %s \
+                       AND date BETWEEN (DATE_SUB(UTC_TIMESTAMP(),INTERVAL %s MINUTE)) AND UTC_TIMESTAMP() AND `entity_id`=%s',
+                       (variable, minutes, self.bot.entity_id))
         result: list[dict] = list(cursor)
         cursor.close()
         if len(result) == 0:

@@ -64,6 +64,7 @@ class VoiceMessages(commands.Cog):
             self.bot.log.info(
                 f"[VoiceMessage] Transcript done in {duration:.1f}s (original duration: {attachment.duration:.1f}s)"
             )
+            self.bot.dispatch("voice_transcript_completed", attachment.duration, duration)
             self.cache[message.id] = result
         # no transcript found, alert the user
         if not result:
