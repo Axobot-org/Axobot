@@ -43,6 +43,7 @@ class VoiceMessages(commands.Cog):
     async def handle_message_command(self, interaction: discord.Interaction, message: discord.Message):
         "Create a transcript of the voice message"
         attachment = message.attachments[0]
+        await interaction.response.defer(ephemeral=True)
         # if voice message is too long, abort
         if attachment.duration > self.max_duration:
             lang = await self.bot._(interaction, "_used_locale")
@@ -51,7 +52,6 @@ class VoiceMessages(commands.Cog):
                 await self.bot._(interaction.user, "voice_msg.attachment-too-long", duration=f_max_duration),
                 ephemeral=True)
             return
-        await interaction.response.defer(ephemeral=True)
         if message.id in self.cache:
             # if message is in the cache, use it
             result = self.cache[message.id]
