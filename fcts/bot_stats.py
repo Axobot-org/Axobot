@@ -187,6 +187,11 @@ class BotStats(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
+        "Collect a few stats from some specific messages"
+        await self._check_backup_msg(message)
+        await self._check_voice_msg(message)
+
+    async def _check_backup_msg(self, message: discord.Message):
         "Collect the last backup size from the logs channel"
         if message.channel.id != 625319946271850537 or len(message.embeds) != 1:
             return
@@ -199,6 +204,11 @@ class BotStats(commands.Cog):
             elif unit == "K":
                 self.last_backup_size /= 1024**2
             self.bot.log.info(f"Last backup size detected: {self.last_backup_size}G")
+
+    async def _check_voice_msg(self, message: discord.Message):
+        "Collect the amount of sent voice messages"
+        if message.flags.voice:
+            self.received_events['VOICE_MSG'] = self.received_events.get('VOICE_MSG', 0) + 1
 
     async def on_serverlogs_audit_search(self, success: bool):
         "Called when a serverlog audit logs search is done"
