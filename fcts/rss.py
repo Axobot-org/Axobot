@@ -1025,6 +1025,9 @@ class Rss(commands.Cog):
         """Test if an rss feed is usable"""
         url = url.replace('<','').replace('>','')
         feeds = await feed_parse(self.bot, url, 8)
+        if feeds is None:
+            await ctx.send("Got a timeout")
+            return
         txt = f"feeds.keys()\n```py\n{feeds.keys()}\n```"
         if 'bozo_exception' in feeds.keys():
             txt += f"\nException ({feeds['bozo']}): {feeds['bozo_exception']}"
@@ -1039,7 +1042,7 @@ class Rss(commands.Cog):
             else:
                 txt += f"feeds.entries[0].keys()\n```py\n{feeds.entries[0].keys()}\n```"
         if arguments is not None and 'feeds' in arguments and 'ctx' not in arguments:
-            txt += "\n{}\n```py\n{}\n```".format(arguments, eval(arguments))
+            txt += f"\n{arguments}\n```py\n{eval(arguments)}\n```" # pylint: disable=eval-used
         try:
             await ctx.send(txt)
         except discord.DiscordException as err:
@@ -1051,18 +1054,21 @@ class Rss(commands.Cog):
             notok = '<:redcheck:513105827817717762>'
             nothing = '<:_nothing:446782476375949323>'
             txt = ['**__Analyse :__**','']
-            yt = await self.youtube_rss.get_channel_by_any_url(feeds.feed['link'])
-            if yt is None:
-                tw = self.twitter_rss.is_twitter_url(feeds.feed['link'])
-                if tw is not None:
-                    txt.append(f"<:twitter:958325391196585984>  {tw}")
-                elif 'link' in feeds.feed.keys():
-                    txt.append(f":newspaper:  <{feeds.feed['link']}>")
-                else:
-                    txt.append(":newspaper:  No 'link' var")
-            else:
+            if feeds.status >= 400:
+                txt.append(f"{notok} Status code: {feeds.status}")
+            if not url.startswith('https://'):
+                txt.append(f"{notok} Not https")
+            if 'link' not in feeds.feed:
+                txt.append(notok+" No 'link' var")
+            elif yt := await self.youtube_rss.get_channel_by_any_url(feeds.feed['link']):
                 txt.append("<:youtube:447459436982960143>  "+yt)
-            txt.append("Entrées : {}".format(len(feeds.entries)))
+            elif tw := self.twitter_rss.is_twitter_url(feeds.feed['link']):
+                    txt.append(f"<:twitter:958325391196585984>  {tw}")
+            elif 'link' in feeds.feed.keys():
+                txt.append(f":newspaper:  <{feeds.feed['link']}>")
+            else:
+                txt.append(":newspaper:  No 'link' var")
+            txt.append(f"Entrées : {len(feeds.entries)}")
             if len(feeds.entries) > 0:
                 entry = feeds.entries[0]
                 if 'title' in entry.keys():
