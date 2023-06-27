@@ -1,0 +1,6 @@
+{
+    "attachment-too-long": "Whoopsie doopsie, look like dis file is too long 4 me! Max duration I can listen to iz %{duration}",
+    "no-transcript": "Oh no, look like dis msg is empty... like emptyness' level empty",
+    "openai-credits": "Courtesy of the Amazin' [OpenAI's Whisper Model](%{url})",
+    "title": "Epic New-Gen Voice Message Converter"
+}
