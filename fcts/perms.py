@@ -48,6 +48,9 @@ class TargetConverter(commands.Converter):
         except commands.BadArgument:
             pass
 
+        if argument == "everyone":
+            return ctx.guild.default_role
+
         raise commands.BadArgument(f"Could not find a member, role or permission value with the name {argument}")
 
 class Perms(commands.Cog):
