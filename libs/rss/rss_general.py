@@ -2,8 +2,9 @@ from __future__ import annotations
 
 import asyncio
 import datetime
+import json
 import time
-from typing import TYPE_CHECKING, Any, Optional, Union, Literal
+from typing import TYPE_CHECKING, Any, Literal, Optional, Union, TypedDict
 
 import discord
 import feedparser
@@ -13,8 +14,8 @@ from feedparser.util import FeedParserDict
 FeedType = Literal['tw', 'yt', 'twitch', 'reddit', 'mc', 'deviant', 'web']
 
 if TYPE_CHECKING:
-    from libs.emojis_manager import EmojisManager
     from libs.bot_classes import Axobot
+    from libs.emojis_manager import EmojisManager
 
 async def feed_parse(bot: Axobot, url: str, timeout: int, session: ClientSession = None) -> Optional[feedparser.FeedParserDict]:
     """Asynchronous parsing using cool methods"""
@@ -96,11 +97,11 @@ class RssMessage:
             'footer': '',
             'title': None
         }
-        if title := self.feed.embed_title:
+        if title := self.feed.embed_data.get("title"):
             self.embed_data['title'] = title[:256]
-        if footer := self.feed.embed_footer:
+        if footer := self.feed.embed_data.get("footer_text"):
             self.embed_data['footer'] = footer[:2048]
-        if color := self.feed.embed_color:
+        if color := self.feed.embed_data.get("color"):
             self.embed_data['color'] = color
 
     async def fill_mention(self, guild: discord.Guild):
@@ -120,24 +121,37 @@ class RssMessage:
             self.mentions = roles
         return self
 
-    async def create_msg(self, msg_format: str=None):
-        "Create a message ready to be sent, either in string or in embed"
-        if msg_format is None:
-            msg_format = self.feed.structure
+    async def _generate_safedict(self):
         if isinstance(self.date, datetime.datetime):
             date = f"<t:{self.date.timestamp():.0f}>"
         else:
             date = self.date
+        _channel = discord.utils.escape_markdown(self.channel) if self.channel else "?"
+        _author = discord.utils.escape_markdown(self.author) if self.author else "?"
+        return self.bot.SafeDict(
+            channel=_channel,
+            title=self.title,
+            date=date,
+            url=self.url,
+            link=self.url,
+            mentions=", ".join(self.mentions),
+            logo=self.logo,
+            author=_author
+        )
+
+    async def create_msg(self, msg_format: str=None):
+        "Create a message ready to be sent, either in string or in embed"
+        if msg_format is None:
+            msg_format = self.feed.structure
         msg_format = msg_format.replace('\\n','\n')
         if self.rt_from is not None:
             self.author = f"{self.author} (retweeted from @{self.rt_from})"
-        _channel = discord.utils.escape_markdown(self.channel) if self.channel else "?"
-        _author = discord.utils.escape_markdown(self.author) if self.author else "?"
-        text = msg_format.format_map(self.bot.SafeDict(channel=_channel, title=self.title, date=date, url=self.url,
-                                                    link=self.url, mentions=", ".join(self.mentions), logo=self.logo,
-                                                    author=_author))
+
+        safedict = await self._generate_safedict()
+        text = msg_format.format_map(safedict)
         if not self.feed.use_embed:
             return text
+
         emb = discord.Embed(description=text, color=self.embed_data['color'])
         emb.set_footer(text=self.embed_data['footer'])
         if self.embed_data['title'] is None:
@@ -146,17 +160,28 @@ class RssMessage:
             else:
                 emb.title = self.author
         else:
-            emb.title = self.embed_data['title']
-        emb.add_field(name='URL', value=self.url)
+            emb.title = self.embed_data['title'].format_map(safedict)
+        if "{url}" not in msg_format and "{link}" not in msg_format:
+            emb.add_field(name='URL', value=self.url)
         if self.image is not None:
             emb.set_thumbnail(url=self.image)
         return emb
+
+class FeedEmbedData(TypedDict):
+    "Embed configuration for an RSS feed"
+    title: Optional[str]
+    footer_text: Optional[str]
+    color: Optional[int]
 
 class FeedObject:
     "A feed record from the database"
     def __init__(self, from_dict: dict):
         self.feed_id: int = from_dict['ID']
-        self.added_at: datetime.datetime = from_dict['added_at'].replace(tzinfo=datetime.timezone.utc) if from_dict['added_at'] else from_dict['added_at']
+        self.added_at: Optional[datetime.datetime] = (
+            from_dict['added_at'].replace(tzinfo=datetime.timezone.utc)
+            if from_dict['added_at']
+            else None
+        )
         self.structure: str = from_dict['structure']
         self.guild_id: int = from_dict['guild']
         self.channel_id: int = from_dict['channel']
@@ -165,16 +190,23 @@ class FeedObject:
         self.date: datetime.datetime = from_dict['date']
         self.role_ids: list[str] = [role for role in from_dict['roles'].split(';') if role.isnumeric()]
         self.use_embed: bool = from_dict['use_embed']
-        self.embed_footer: str = from_dict['embed_footer']
-        self.embed_title: str = from_dict['embed_title']
-        self.embed_color: int = from_dict['embed_color']
+        self.embed_data: FeedEmbedData = json.loads(from_dict['embed'])
         self.silent_mention: bool = from_dict['silent_mention']
-        self.last_update: Optional[datetime.datetime] = from_dict['last_update'].replace(tzinfo=datetime.timezone.utc) if from_dict['last_update'] else from_dict['last_update']
-        self.last_refresh: Optional[datetime.datetime] = from_dict['last_refresh'].replace(tzinfo=datetime.timezone.utc) if from_dict['last_refresh'] else from_dict['last_refresh']
+        self.last_update: Optional[datetime.datetime] = (
+            from_dict['last_update'].replace(tzinfo=datetime.timezone.utc)
+            if from_dict['last_update']
+            else None
+        )
+        self.last_refresh: Optional[datetime.datetime] = (
+            from_dict['last_refresh'].replace(tzinfo=datetime.timezone.utc)
+            if from_dict['last_refresh']
+            else None
+        )
         self.recent_errors: int = from_dict['recent_errors']
         self.enabled: bool = bool(from_dict['enabled'])
 
     def has_recently_been_refreshed(self):
+        "Return True if the feed has been refreshed in the last 7 days"
         if self.last_refresh is None:
             return False
         if self.last_refresh.tzinfo:
@@ -196,9 +228,7 @@ class FeedObject:
             "date": None,
             "roles": "",
             "use_embed": False,
-            "embed_footer": "",
-            "embed_title": "",
-            "embed_color": "",
+            "embed": "{}",
             "silent_mention": False,
             "last_update": None,
             "last_refresh": None,
@@ -211,15 +241,14 @@ class FeedObject:
         "Get the representative emoji of a feed type"
         if self.type == 'tw':
             return cog.get_emoji('twitter')
-        elif self.type == 'yt':
+        if self.type == 'yt':
             return cog.get_emoji('youtube')
-        elif self.type == 'twitch':
+        if self.type == 'twitch':
             return cog.get_emoji('twitch')
-        elif self.type == 'reddit':
+        if self.type == 'reddit':
             return cog.get_emoji('reddit')
-        elif self.type == 'mc':
+        if self.type == 'mc':
             return cog.get_emoji('minecraft')
-        elif self.type == 'deviant':
+        if self.type == 'deviant':
             return cog.get_emoji('deviant')
-        else:
-            return "📰"
+        return "📰"

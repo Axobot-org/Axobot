@@ -1,28 +1,28 @@
 import asyncio
 import datetime
 import importlib
-from math import ceil
+from json import dumps
 import random
 import re
 import time
+from math import ceil
 from typing import Callable, Literal, Optional, Union
 
 import discord
-from cachingutils import acached
-from discord import app_commands
 import twitter
 from aiohttp import ClientSession, client_exceptions
+from cachingutils import acached
+from discord import app_commands
 from discord.ext import commands, tasks
 
+from fcts import args
 from libs.bot_classes import Axobot, MyContext
 from libs.checks import checks
 from libs.enums import ServerWarningType
 from libs.formatutils import FormatUtils
 from libs.paginator import PaginatedSelectView, Paginator
 from libs.rss import RssMessage, TwitterRSS, YoutubeRSS, feed_parse
-from libs.rss.rss_general import FeedObject, FeedType
-
-from fcts import args
+from libs.rss.rss_general import FeedEmbedData, FeedObject, FeedType
 
 importlib.reload(args)
 importlib.reload(checks)
@@ -938,7 +938,16 @@ class Rss(commands.Cog):
     @commands.guild_only()
     @commands.check(can_use_rss)
     @commands.check(checks.database_connected)
-    async def change_use_embed(self, ctx: MyContext, feed: Optional[str] = None, value: bool = None, *, arguments: args.arguments = None):
+    @app_commands.describe(
+        should_use_embed="Use an embed or not for this feed",
+        color="Color of the embed (eg. #FF00FF)",
+        title="Embed title (max 256 characters)",
+        footer_text="Small text displayed at the bottom of the embed (max 2048 characters)",
+    )
+    @app_commands.rename(feed_id="feed")
+    async def change_use_embed(self, ctx: MyContext, feed_id: Optional[str] = None, should_use_embed: Optional[bool] = None,
+                               color: discord.Color = None, title: Optional[str] = None,
+                               footer_text: Optional[str] = None):
         """Use an embed or not for a feed
         You can also provide arguments to change the color/text of the embed. Followed arguments are usable:
         - color: color of the embed (hex or decimal value)
@@ -948,68 +957,60 @@ class Rss(commands.Cog):
         ..Example rss embed 6678466620137 true title="hey u" footer = "Hi \\n i'm a footer"
 
         ..Doc rss.html#setup-a-feed-embed"""
-        input_feed_id = int(feed) if feed is not None and feed.isnumeric() else None
+        input_feed_id = int(feed_id) if feed_id is not None and feed_id.isnumeric() else None
         try:
-            err = None
-            try:
-                feeds_ids = await self.ask_rss_id(
-                    input_feed_id,
-                    ctx,
-                    await self.bot._(ctx.guild.id, "rss.choose-mentions-1"),
-                    feed_filter=lambda f: f.type != "mc",
-                )
-            except Exception as err:
-                feeds_ids = []
-                self.bot.dispatch("error", err, ctx)
-            if feeds_ids is None:
-                return
-            if len(feeds_ids) == 0:
+            feeds_ids = await self.ask_rss_id(
+                input_feed_id,
+                ctx,
+                await self.bot._(ctx.guild.id, "rss.choose-mentions-1"),
+                feed_filter=lambda f: f.type != "mc",
+            )
+        except Exception as err:
+            feeds_ids = []
+            self.bot.dispatch("error", err, ctx)
+        if feeds_ids is None:
+            return
+        if len(feeds_ids) == 0:
+            cmd = await self.bot.get_command_mention("about")
+            await ctx.send(await self.bot._(ctx.guild, "errors.unknown2", about=cmd))
+            return
+        try:
+            feed = await self.db_get_feed(feeds_ids[0])
+            if feed is None:
                 cmd = await self.bot.get_command_mention("about")
                 await ctx.send(await self.bot._(ctx.guild, "errors.unknown2", about=cmd))
                 return
-            if arguments is None or len(arguments.keys()) == 0:
-                arguments = None
-            feed = await self.db_get_feed(feeds_ids[0])
             values_to_update = []
             txt = []
-            if value is None and arguments is None:
-                await ctx.send(await self.bot._(ctx.guild.id,"rss.use_embed_" + ("true" if feed.use_embed else "false")))
-                def check(msg: discord.Message):
-                    try:
-                        commands.converter._convert_to_bool(msg.content)
-                    except commands.BadArgument:
-                        return False
-                    return msg.author==ctx.author and msg.channel==ctx.channel
-                try:
-                    msg: discord.Message = await self.bot.wait_for('message', check=check, timeout=20)
-                except asyncio.TimeoutError:
-                    return await ctx.send(await self.bot._(ctx.guild.id, "rss.too-long"))
-                value = commands.converter._convert_to_bool(msg.content)
-            if value is not None and value != feed.use_embed:
-                values_to_update.append(('use_embed', value))
-                txt.append(await self.bot._(ctx.guild.id, "rss.use_embed-success", v=value, id=feed.feed_id))
-            elif value == feed.use_embed and arguments is None:
-                await ctx.send(await self.bot._(ctx.guild.id, "rss.use_embed-same"))
-                return
-            if arguments is not None:
-                if 'color' in arguments.keys():
-                    c = await args.Color().convert(ctx, arguments['color'])
-                    if c is not None:
-                        values_to_update.append(('embed_color', c))
-                if 'title' in arguments.keys():
-                    values_to_update.append(('embed_title', arguments['title']))
-                if 'footer' in arguments.keys():
-                    values_to_update.append(('embed_footer', arguments['footer']))
+
+            if should_use_embed is not None and should_use_embed != feed.use_embed:
+                values_to_update.append(('use_embed', should_use_embed))
+                txt.append(await self.bot._(ctx.guild.id, "rss.use_embed-success", v=should_use_embed, id=feed.feed_id))
+
+            embed_data: FeedEmbedData = {}
+            if color is not None:
+                embed_data["color"] = color.value
+            if title is not None:
+                embed_data["title"] = title
+            if footer_text is not None:
+                embed_data["footer_text"] = footer_text
+            if embed_data:
+                embed_data = feed.embed_data | embed_data
+                values_to_update.append(('embed', dumps(embed_data)))
                 txt.append(await self.bot._(ctx.guild.id, "rss.embed-json-changed"))
             if len(values_to_update) > 0:
                 await self.db_update_feed(feed.feed_id, values_to_update)
+            else:
+                await ctx.send(await self.bot._(ctx.guild.id, "rss.use_embed-same"))
+                return
             await ctx.send("\n".join(txt))
         except Exception as err:
             await ctx.send(await self.bot._(ctx.guild.id, "rss.guild-error", err=err))
             self.bot.dispatch("error", err, ctx)
 
-    @change_use_embed.autocomplete("feed")
+    @change_use_embed.autocomplete("feed_id")
     async def change_use_embed_autocomplete(self, interaction: discord.Interaction, current: str):
+        """Autocomplete for the feed_id argument"""
         try:
             return await self.get_feeds_choice(
                 interaction.guild.id,
@@ -1617,7 +1618,7 @@ class Rss(commands.Cog):
                 statscog.rss_stats["time"] = elapsed_time
                 statscog.rss_loop_finished = True
             # await self.db_set_active_guilds(set(feed.guild_id for feed in feeds_list))
-            await self.db_set_last_refresh(list(feed.feed_id for feed in feeds_list))
+        await self.db_set_last_refresh(list(feed.feed_id for feed in feeds_list))
         if len(errors_ids) > 0:
             desc.append(f"{len(errors_ids)} errors: {' '.join(str(x) for x in errors_ids)}")
             # update errors count in database
