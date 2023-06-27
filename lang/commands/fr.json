@@ -248,8 +248,10 @@
         },
         "rss set-embed": {
             "feed": "flux",
-            "value": "valeur",
-            "arguments": "arguments"
+            "should_use_embed": "embed-activé",
+            "color": "couleur",
+            "title": "titre",
+            "footer_text": "pied-de-page"
         },
         "modlogs list": {
             "channel": "salon"
