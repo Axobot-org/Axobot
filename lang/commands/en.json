@@ -251,8 +251,10 @@
         },
         "rss set-embed": {
             "feed": "feed",
-            "value": "value",
-            "arguments": "arguments"
+            "should_use_embed": "should-use-embed",
+            "color": "color",
+            "title": "title",
+            "footer_text": "footer-text"
         },
         "modlogs list": {
             "channel": "channel"
