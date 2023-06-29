@@ -869,7 +869,8 @@ class Rss(commands.Cog):
         Available variables:
         - `{author}`: the author of the post
         - `{channel}`: the channel name (usually the same as author)
-        - `{date}`: the post date (UTC)
+        - `{date}`: the post date, using Discord date markdown
+        - `{long_date}`: the post date in UTC, using extended static format
         - `{link}` or `{url}`: a link to the post
         - `{logo}`: an emoji representing the type of post (web, Twitter, YouTube...)
         - `{mentions}`: the list of mentioned roles
@@ -951,13 +952,17 @@ class Rss(commands.Cog):
                                footer_text: Optional[commands.Range[str, 2, 2048]] = None,
                                show_date: Optional[bool] = None):
         """Use an embed or not for a feed
-        You can also provide arguments to change the color/text of the embed. Followed arguments are usable:
-        - color: color of the embed (hex or decimal value)
-        - title: title override, which will disable the default one (max 256 characters)
-        - footer_text: small text displayed at the bottom of the embed
-        - show_date: whether to show the post date in the footer or not
+        You can also provide arguments to change the color/texts of the embed. Followed variables are usable in text arguments:
+        - `{author}`: the author of the post
+        - `{channel}`: the channel name (usually the same as author)
+        - `{date}`: the post date, using Discord date markdown
+        - `{long_date}`: the post date in UTC, using extended static format
+        - `{link}` or `{url}`: a link to the post
+        - `{logo}`: an emoji representing the type of post (web, Twitter, YouTube...)
+        - `{mentions}`: the list of mentioned roles
+        - `{title}`: the title of the post
 
-        ..Example rss embed 6678466620137 true title="hey u" footer = "Hi \\n i'm a footer"
+        ..Example rss embed 6678466620137 true title: "New post from {author}!" color: red
 
         ..Doc rss.html#setup-a-feed-embed"""
         input_feed_id = int(feed_id) if feed_id is not None and feed_id.isnumeric() else None

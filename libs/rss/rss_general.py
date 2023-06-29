@@ -11,6 +11,8 @@ import feedparser
 from aiohttp import ClientSession, client_exceptions
 from feedparser.util import FeedParserDict
 
+from libs.formatutils import FormatUtils
+
 FeedType = Literal['tw', 'yt', 'twitch', 'reddit', 'mc', 'deviant', 'web']
 
 if TYPE_CHECKING:
@@ -127,14 +129,21 @@ class RssMessage:
     async def _generate_safedict(self):
         if isinstance(self.date, datetime.datetime):
             date = f"<t:{self.date.timestamp():.0f}>"
+            lang = await self.bot._(self.feed.guild_id, "_used_locale")
+            long_date = await FormatUtils.date(self.date, lang=lang, year=True, weekday=True, seconds=False)
+        elif self.date is None:
+            date = ""
+            long_date = ""
         else:
             date = self.date
+            long_date = self.date
         _channel = discord.utils.escape_markdown(self.channel) if self.channel else "?"
         _author = discord.utils.escape_markdown(self.author) if self.author else "?"
         return self.bot.SafeDict(
             channel=_channel,
             title=self.title,
             date=date,
+            long_date=long_date,
             url=self.url,
             link=self.url,
             mentions=", ".join(self.mentions),
