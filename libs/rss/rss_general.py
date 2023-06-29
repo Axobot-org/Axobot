@@ -93,16 +93,19 @@ class RssMessage:
     def fill_embed_data(self):
         "Fill any interesting value to send in an embed"
         self.embed_data = {
-            'color': discord.Colour(0).default(),
-            'footer': '',
-            'title': None
+            'color': discord.Colour.light_grey(),
+            'footer_text': None,
+            'title': None,
+            'show_date': True
         }
         if title := self.feed.embed_data.get("title"):
             self.embed_data['title'] = title[:256]
         if footer := self.feed.embed_data.get("footer_text"):
-            self.embed_data['footer'] = footer[:2048]
+            self.embed_data['footer_text'] = footer[:2048]
         if color := self.feed.embed_data.get("color"):
             self.embed_data['color'] = color
+        if show_date := self.feed.embed_data.get("show_date"):
+            self.embed_data['show_date'] = show_date
 
     async def fill_mention(self, guild: discord.Guild):
         "Fill the mentions attribute with required roles mentions"
@@ -153,7 +156,8 @@ class RssMessage:
             return text
 
         emb = discord.Embed(description=text, color=self.embed_data['color'])
-        emb.set_footer(text=self.embed_data['footer'])
+        if self.embed_data['footer_text']:
+            emb.set_footer(text=self.embed_data['footer_text'].format_map(safedict))
         if self.embed_data['title'] is None:
             if self.feed.type != 'tw':
                 emb.title = self.title
@@ -165,6 +169,8 @@ class RssMessage:
             emb.add_field(name='URL', value=self.url)
         if self.image is not None:
             emb.set_thumbnail(url=self.image)
+        if self.embed_data["show_date"] and isinstance(self.date, datetime.datetime):
+            emb.timestamp = self.date
         return emb
 
 class FeedEmbedData(TypedDict):
@@ -172,6 +178,7 @@ class FeedEmbedData(TypedDict):
     title: Optional[str]
     footer_text: Optional[str]
     color: Optional[int]
+    show_date: Optional[bool]
 
 class FeedObject:
     "A feed record from the database"

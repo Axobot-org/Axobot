@@ -254,7 +254,8 @@
             "should_use_embed": "should-use-embed",
             "color": "color",
             "title": "title",
-            "footer_text": "footer-text"
+            "footer_text": "footer-text",
+            "show_date": "show-date"
         },
         "modlogs list": {
             "channel": "channel"

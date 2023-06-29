@@ -943,16 +943,19 @@ class Rss(commands.Cog):
         color="Color of the embed (eg. #FF00FF)",
         title="Embed title (max 256 characters)",
         footer_text="Small text displayed at the bottom of the embed (max 2048 characters)",
+        show_date="Whether to show the post date in the footer or not",
     )
     @app_commands.rename(feed_id="feed")
     async def change_use_embed(self, ctx: MyContext, feed_id: Optional[str] = None, should_use_embed: Optional[bool] = None,
-                               color: discord.Color = None, title: Optional[str] = None,
-                               footer_text: Optional[str] = None):
+                               color: discord.Color = None, title: Optional[commands.Range[str, 2, 256]] = None,
+                               footer_text: Optional[commands.Range[str, 2, 2048]] = None,
+                               show_date: Optional[bool] = None):
         """Use an embed or not for a feed
         You can also provide arguments to change the color/text of the embed. Followed arguments are usable:
         - color: color of the embed (hex or decimal value)
         - title: title override, which will disable the default one (max 256 characters)
-        - footer: small text displayed at the bottom of the embed
+        - footer_text: small text displayed at the bottom of the embed
+        - show_date: whether to show the post date in the footer or not
 
         ..Example rss embed 6678466620137 true title="hey u" footer = "Hi \\n i'm a footer"
 
@@ -974,6 +977,7 @@ class Rss(commands.Cog):
             cmd = await self.bot.get_command_mention("about")
             await ctx.send(await self.bot._(ctx.guild, "errors.unknown2", about=cmd))
             return
+        await ctx.defer()
         try:
             feed = await self.db_get_feed(feeds_ids[0])
             if feed is None:
@@ -994,8 +998,15 @@ class Rss(commands.Cog):
                 embed_data["title"] = title
             if footer_text is not None:
                 embed_data["footer_text"] = footer_text
+            if show_date is not None:
+                embed_data["show_date"] = show_date
+
             if embed_data:
                 embed_data = feed.embed_data | embed_data
+                if embed_data.get("title", "").lower() == "none":
+                    del embed_data["title"]
+                if embed_data.get("footer_text", "").lower() == "none":
+                    del embed_data["footer_text"]
                 values_to_update.append(('embed', dumps(embed_data)))
                 txt.append(await self.bot._(ctx.guild.id, "rss.embed-json-changed"))
             if len(values_to_update) > 0:
