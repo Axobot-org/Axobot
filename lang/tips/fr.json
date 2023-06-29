@@ -11,5 +11,5 @@
     "rank_card_personalisation": "Vous pouvez modifier l'arrière-plan de votre carte à l'aide de la commande %{profile_cmd} !",
     "serverlog_enable_antiscam": "Les logs d'antiscam sont désormais activés, mais le système de protection anti-scam n'est pas actif sur ce serveur. Vous devriez peut-être l'activer avec la commande %{antiscam_enable_cmd}.",
     "serverlog_enable_antiraid": "Les logs d'antiraid sont désormais activés, mais le système de protection anti-raid n'est pas actif sur ce serveur. Vous devriez peut-être l'activer avec la commande %{config_set_cmd}.",
-    "serverlog_enable_botwarning": "Vous devriez probablement envisager d'activer les logs d'avertissement du bot avec la commande %{log_add_cmd}. Ils vous alerteront si le bot rencontre des dysfonctionnements sur votre serveur, tels qu'une mauvaise configuration ou un manque de permissions."
+    "serverlog_enable_botwarning": "Vous devriez probablement envisager d'activer les logs d'avertissement du bot (`bot_warnings`) avec la commande %{log_add_cmd}. Ils vous alerteront si le bot rencontre des dysfonctionnements sur votre serveur, tels qu'une mauvaise configuration ou un manque de permissions."
 }
