@@ -86,8 +86,9 @@ class FormatUtils:
         return result.strip()
 
     @staticmethod
-    async def date(date: Union[datetime, time.struct_time], lang: str = 'fr',
-                   year: bool = False, hour: bool = True, digital: bool = False) -> str:
+    async def date(date: Union[datetime, time.struct_time], lang: str = 'en',
+                   year: bool = False, weekday: bool = False, hour: bool = True, seconds: bool = True, digital: bool = False
+                   ) -> str:
         """Translates a datetime object into a readable string"""
         if isinstance(date, time.struct_time):
             date = datetime(*date[:6])
@@ -103,14 +104,24 @@ class FormatUtils:
             else: # 1/14
                 result = dates.format_skeleton("Md", date, locale=locale)
         else:
-            if hour and year: # Jan 14, 2022, 6:10:23 PM
-                result = dates.format_datetime(date, locale=locale)
-            elif hour and not year: # January 14, 6:10:23 PM
-                result = dates.format_skeleton("MMMMd", date, locale=locale) + ", " + dates.format_time(date, locale=locale)
-            elif not hour and year: # Jan 14, 2022
-                result = dates.format_date(date, locale=locale)
+            def get_day():
+                if year and weekday:
+                    return dates.format_skeleton("yMMMdEEEE, MMMMd", date, locale=locale)
+                if year and not weekday:
+                    return dates.format_skeleton("yMMMMd", date, locale=locale)
+                if weekday and not year:
+                    return dates.format_skeleton("MMMMdE, MMMMd", date, locale=locale)
+                # else: no year and no weekday
+                return dates.format_skeleton("MMMMd", date, locale=locale)
+            def get_hour():
+                if seconds:
+                    return dates.format_time(date, locale=locale)
+                return dates.format_skeleton("Hm", date, locale=locale)
+
+            if hour: # January 14, 2022, 6:10:23 PM
+                result = get_day() + ", " + get_hour()
             else: # January 14
-                result = dates.format_skeleton("MMMMd", date, locale=locale)
+                result = get_day()
 
         return result
 
