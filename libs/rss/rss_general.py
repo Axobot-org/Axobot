@@ -191,7 +191,7 @@ class FeedObject:
         self.role_ids: list[str] = [role for role in from_dict['roles'].split(';') if role.isnumeric()]
         self.use_embed: bool = from_dict['use_embed']
         self.embed_data: FeedEmbedData = json.loads(from_dict['embed'])
-        self.silent_mention: bool = from_dict['silent_mention']
+        self.silent_mention: bool = bool(from_dict['silent_mention'])
         self.last_update: Optional[datetime.datetime] = (
             from_dict['last_update'].replace(tzinfo=datetime.timezone.utc)
             if from_dict['last_update']
