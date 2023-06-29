@@ -3,14 +3,28 @@
         "cancelled": "Je laisse tomber le processus",
         "cleared": "Tous tes rappels ont été supprimés 😁 !",
         "confirm": "T'es sûr de vouloir supprimer tous tes rappels ? *(Il en reste %{count})*",
-        "deleted": "Le rappel #%{id} (avec le message `%{message}`) a été supprimé avec succès !",
+        "custom-duration": {
+            "button": "Durée autre",
+            "title": "Durée custom de rappel",
+            "input": "Entre une durée pour ton rappel juste ici"
+        },
+        "delete": {
+            "error": "Oups, quelque chose a cassé pendant que j'essayais de supprimer tes rappels. Essaie encore ou contacte notre support technique !",
+            "success": {
+                "one": "Ton rappel a bien été supprimé 😁",
+                "other": "%{count} de tes rappels ont bien été supprimés !"
+            },
+            "title": "Choisis quel(s) rappel(s) tu veux supprimer"
+        },
         "embed-asked": "Hey, %{user} ! Tu m'as demandé de te rappeler ça il y a %{duration} ! Un trou de mémoire ?",
         "embed-date": "Date de demande",
         "embed-link": "Message original",
         "embed-title": "Rappel",
         "empty": "Euuuuuh\n\nT'as aucun rappel en suspens !",
         "item": "ID : `{id}` | Dans : `{duration}` | Salon : `{channel}` | Message : `{msg}`",
+        "recreated": "Ton nouveau rappel a bien été créé pour dans %{duration} !",
         "saved": "Oko 😁 ! Je te le rappellerai dans... Environ... 🕰️ %{duration} !\n\n*Si j'oublie pas...*",
+        "select-placeholder": "Choisis le(s) rappel(s)",
         "title": "Liste de tes rappels",
         "too-long": "Wolalala 😬 !\n\nJe peux pas te le rappeler dans autant de temps, moi !\n\nTu t'es cru où ?!\n\nJ'ai pas autant de mémoire !",
         "too-short": "...\n\nAlors.\n\n\n\nÇa, c'est ce qu'on appelle communément **UNE DURÉE INVALIDE !**"
