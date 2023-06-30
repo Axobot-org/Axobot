@@ -135,23 +135,23 @@ If the bot can't send the new command format, it will try to send the old one.""
                         ctx2 = copy.copy(ctx)
                         ctx2.message.content = name
                         name = await discord.ext.commands.clean_content().convert(ctx2, name)
-                        await destination.send(await self.bot._(ctx.channel, "help.cmd-not-found", cmd=name))
+                        await ctx.send(await self.bot._(ctx.channel, "help.cmd-not-found", cmd=name))
                         return
                     pages = await self.cmd_help(ctx, command, destination.permissions_for(bot_usr).embed_links)
             else:  # sub-command name?
                 name = commands_arg[0]
                 command = self.bot.all_commands.get(name)
                 if command is None:
-                    await destination.send(await self.bot._(ctx.channel, "help.cmd-not-found", cmd=name))
+                    await ctx.send(await self.bot._(ctx.channel, "help.cmd-not-found", cmd=name))
                     return
                 for key in commands_arg[1:]:
                     try:
                         command = command.all_commands.get(key)
                         if command is None:
-                            await destination.send(await self.bot._(ctx.channel, "help.subcmd-not-found", name=key))
+                            await ctx.send(await self.bot._(ctx.channel, "help.subcmd-not-found", name=key))
                             return
                     except AttributeError:
-                        await destination.send(await self.bot._(ctx.channel, "help.no-subcmd", cmd=command.name))
+                        await ctx.send(await self.bot._(ctx.channel, "help.no-subcmd", cmd=command.name))
                         return
                 pages = await self.cmd_help(ctx, command, destination.permissions_for(bot_usr).embed_links)
 
@@ -159,7 +159,7 @@ If the bot can't send the new command format, it will try to send the old one.""
             prefix = await self.bot.prefix_manager.get_prefix(ctx.guild)
         if len(pages) == 0:
             self.bot.dispatch("error", ValueError(f"Unable to find help for the command {' '.join(commands_arg)}"))
-            await destination.send(await self.bot._(ctx.channel, "help.cmd-not-found", cmd=" ".join(commands_arg)))
+            await ctx.send(await self.bot._(ctx.channel, "help.cmd-not-found", cmd=" ".join(commands_arg)))
             return
         if destination.permissions_for(bot_usr).embed_links:
             if ctx.guild is not None:
@@ -171,7 +171,7 @@ If the bot can't send the new command format, it will try to send the old one.""
                     embed = discord.Embed(title=title, description=page, color=embed_colour, timestamp=self.bot.utcnow())
                     embed.set_footer(text=ft.format(prefix))
                     title = ""
-                    await destination.send(embed=embed)
+                    await ctx.send(embed=embed)
             else: # use fields
                 embed = discord.Embed(title=title, color=embed_colour, timestamp=self.bot.utcnow())
                 embed.set_footer(text=ft.format(prefix))
@@ -180,13 +180,13 @@ If the bot can't send the new command format, it will try to send the old one.""
                         embed.title = page[0]
                         continue
                     embed.add_field(name=page[0], value=page[1], inline=False)
-                await destination.send(embed=embed)
+                await ctx.send(embed=embed)
         else:
             for page in pages:
                 if isinstance(page, str):
-                    await destination.send(page)
+                    await ctx.send(page)
                 else:
-                    await destination.send("\n".join(page))
+                    await ctx.send("\n".join(page))
 
     async def _display_cmd(self, ctx: MyContext, cmd: commands.Command):
         name = await get_command_name_translation(ctx, cmd)
