@@ -21,7 +21,7 @@ class TwitterRSS:
     def __init__(self, bot: Axobot):
         self.bot = bot
         self.min_time_between_posts = 15
-        self.api = twitter.Api(**bot.others['twitter'], tweet_mode="extended", timeout=15)
+        self.api = twitter.Api(**bot.others['twitter'], tweet_mode="extended", timeout=15, application_only_auth=True)
         self.url_pattern = r'(?:http.*://)?(?:www\.)?(?:twitter\.com/)([^?\s/]+)'
 
     def is_twitter_url(self, string: str):
