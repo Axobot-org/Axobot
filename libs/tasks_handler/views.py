@@ -27,7 +27,7 @@ class RecreateReminderView(discord.ui.View):
             return on_pressed
         identic_duration = await FormatUtils.time_delta(
             self.task['duration'],
-            lang=await self.bot._(self.task["guild"], '_used_locale'),
+            lang=await self.bot._(self._get_translator_context(), '_used_locale'),
             form='developed'
         )
         identic_btn = discord.ui.Button(label="+ " + identic_duration, style=discord.ButtonStyle.blurple, emoji='⏰')
@@ -37,17 +37,20 @@ class RecreateReminderView(discord.ui.View):
         if self.task['duration'] != 60 * 10:
             ten_min_duration = await FormatUtils.time_delta(
                 60 * 10,
-                lang=await self.bot._(self.task["guild"], '_used_locale'),
+                lang=await self.bot._(self._get_translator_context(), '_used_locale'),
                 form='developed'
             )
             ten_min_btn = discord.ui.Button(label="+ " + ten_min_duration, style=discord.ButtonStyle.blurple, emoji='⏰')
             ten_min_btn.callback = on_pressed_decorator(60 * 10)
             self.add_item(ten_min_btn)
         # custom duration button
-        custom_duration_label = await self.bot._(self.task["guild"], "timers.rmd.custom-duration.button")
+        custom_duration_label = await self.bot._(self._get_translator_context(), "timers.rmd.custom-duration.button")
         custom_duration_btn = discord.ui.Button(label=custom_duration_label, style=discord.ButtonStyle.gray, emoji='⏰')
         custom_duration_btn.callback = self.on_custom_duration_pressed
         self.add_item(custom_duration_btn)
+
+    def _get_translator_context(self):
+        return self.task["guild"] or self.bot.get_user(self.task["user"])
 
     async def on_pressed(self, interaction: discord.Interaction, duration):
         "Called when the button is pressed"
