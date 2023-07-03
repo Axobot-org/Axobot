@@ -23,6 +23,7 @@ python-dateutil
 LRFutils==0.1.2
 GitPython
 Pillow~=9.4.0
+beautifulsoup4~=4.12.0
 
 # Antiscam training
 pandas

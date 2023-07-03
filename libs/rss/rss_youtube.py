@@ -10,7 +10,7 @@ from cachingutils import acached, cached
 
 from libs.youtube_search import Service
 
-from .rss_general import FeedObject, RssMessage, feed_parse
+from . import FeedObject, RssMessage, feed_parse, get_text_from_entry
 
 if TYPE_CHECKING:
     from libs.bot_classes import Axobot
@@ -109,6 +109,7 @@ class YoutubeRSS:
             img_url = None
             if 'media_thumbnail' in feed.keys() and len(feed['media_thumbnail']) > 0:
                 img_url = feed['media_thumbnail'][0]['url']
+            post_text = await get_text_from_entry(feed)
             obj = RssMessage(
                 bot=self.bot,
                 feed=FeedObject.unrecorded("yt", channel.guild.id if channel.guild else None, channel.id),
@@ -117,7 +118,8 @@ class YoutubeRSS:
                 date=feed['published_parsed'],
                 author=feed['author'],
                 channel=feed['author'],
-                image=img_url
+                image=img_url,
+                post_text=post_text
             )
             return [obj]
         else:
@@ -130,6 +132,7 @@ class YoutubeRSS:
                 img_url = None
                 if 'media_thumbnail' in feed.keys() and len(feed['media_thumbnail']) > 0:
                     img_url = feed['media_thumbnail'][0]['url']
+                post_text = await get_text_from_entry(feed)
                 obj = RssMessage(
                     bot=self.bot,
                     feed=FeedObject.unrecorded("yt", channel.guild.id if channel.guild else None, channel.id),
@@ -138,7 +141,8 @@ class YoutubeRSS:
                     date=feed['published_parsed'],
                     author=feed['author'],
                     channel=feed['author'],
-                    image=img_url
+                    image=img_url,
+                    post_text=post_text
                 )
                 liste.append(obj)
             liste.reverse()
