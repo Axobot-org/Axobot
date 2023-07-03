@@ -1,9 +1,10 @@
 from math import ceil
 from typing import Any, Optional, Union
 
-from discord import ButtonStyle, Interaction, Message, SelectOption, User, ui
+from discord import (ButtonStyle, Interaction, Message, NotFound, SelectOption,
+                     User, ui)
 
-from libs.bot_classes import MyContext, Axobot
+from libs.bot_classes import Axobot, MyContext
 
 
 def cut_text(lines: list[str], max_length: int = 1024, max_size=100) -> list[str]:
@@ -61,7 +62,10 @@ class Paginator(ui.View):
 
     async def disable(self, interaction: Union[Message, Interaction]):
         "Called when the timeout has expired"
-        await self._update_contents(interaction, stopped=True)
+        try:
+            await self._update_contents(interaction, stopped=True)
+        except NotFound:
+            pass
         self.stop()
 
     async def _set_page(self, interaction: Interaction, page: int):
