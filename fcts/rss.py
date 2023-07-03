@@ -1,10 +1,10 @@
 import asyncio
 import datetime
 import importlib
-from json import dumps
 import random
 import re
 import time
+from json import dumps
 from math import ceil
 from typing import Callable, Literal, Optional, Union
 
@@ -21,8 +21,8 @@ from libs.checks import checks
 from libs.enums import ServerWarningType
 from libs.formatutils import FormatUtils
 from libs.paginator import PaginatedSelectView, Paginator
-from libs.rss import RssMessage, TwitterRSS, YoutubeRSS, feed_parse
-from libs.rss.rss_general import FeedEmbedData, FeedObject, FeedType
+from libs.rss import (FeedEmbedData, FeedObject, FeedType, RssMessage,
+                      TwitterRSS, YoutubeRSS, feed_parse, get_text_from_entry)
 
 importlib.reload(args)
 importlib.reload(checks)
@@ -875,6 +875,7 @@ class Rss(commands.Cog):
         - `{logo}`: an emoji representing the type of post (web, Twitter, YouTube...)
         - `{mentions}`: the list of mentioned roles
         - `{title}`: the title of the post
+        - `{full_text}`: the full text of the post
 
         ..Example rss text 3078731683662
 
@@ -1150,6 +1151,7 @@ class Rss(commands.Cog):
 
 
     async def rss_twitch(self, channel: discord.TextChannel, name: str, date: datetime.datetime=None, session: ClientSession=None):
+        "Get the last rss feed from a given Twitch channel"
         url = 'https://twitchrss.appspot.com/vod/' + name
         feeds = await feed_parse(self.bot, url, 5, session)
         if feeds is None:
@@ -1205,23 +1207,23 @@ class Rss(commands.Cog):
             return await self.bot._(channel, "rss.research-timeout")
         if 'bozo_exception' in feeds.keys() or len(feeds.entries) == 0:
             return await self.bot._(channel, "rss.web-invalid")
-        published = None
+        date_field_key = None
         for i in ['updated_parsed', 'published_parsed', 'published']:
             if i in feeds.entries[0].keys() and feeds.entries[0][i] is not None:
-                published = i
+                date_field_key = i
                 break
-        if published is not None and len(feeds.entries) > 1:
+        if date_field_key is not None and len(feeds.entries) > 1:
             try:
-                while (len(feeds.entries) > 1)  and (feeds.entries[1][published] is not None) and (feeds.entries[0][published] < feeds.entries[1][published]):
+                while (len(feeds.entries) > 1)  and (feeds.entries[1][date_field_key] is not None) and (feeds.entries[0][date_field_key] < feeds.entries[1][date_field_key]):
                     del feeds.entries[0]
             except KeyError:
                 pass
-        if not date or published not in ['published_parsed','updated_parsed']:
+        if not date or date_field_key not in ['published_parsed','updated_parsed']:
             feed = feeds.entries[0]
-            if published is None:
+            if date_field_key is None:
                 datz = 'Unknown'
             else:
-                datz = feed[published]
+                datz = feed[date_field_key]
             if 'link' in feed.keys():
                 l = feed['link']
             elif 'link' in feeds.keys():
@@ -1242,6 +1244,7 @@ class Rss(commands.Cog):
                 title = feeds['title']
             else:
                 title = '?'
+            post_text = await get_text_from_entry(feed)
             img = None
             r = re.search(r'(http(s?):)([/|.\w\s-])*\.(?:jpe?g|gif|png|webp)', str(feed))
             if r is not None:
@@ -1254,7 +1257,9 @@ class Rss(commands.Cog):
                 date=datz,
                 author=author,
                 channel=feeds.feed['title'] if 'title' in feeds.feed.keys() else '?',
-                image=img)
+                image=img,
+                post_text=post_text
+            )
             return [obj]
         else: # published in ['published_parsed','updated_parsed']
             liste = list()
@@ -1262,8 +1267,8 @@ class Rss(commands.Cog):
                 if len(liste)>10:
                     break
                 try:
-                    datz = feed[published]
-                    if feed[published] is None or (datetime.datetime(*feed[published][:6]) - date).total_seconds() < self.min_time_between_posts['web']:
+                    datz = feed[date_field_key]
+                    if feed[date_field_key] is None or (datetime.datetime(*feed[date_field_key][:6]) - date).total_seconds() < self.min_time_between_posts['web']:
                         break
                     if 'link' in feed.keys():
                         l = feed['link']
@@ -1285,6 +1290,7 @@ class Rss(commands.Cog):
                         title = feeds['title']
                     else:
                         title = '?'
+                    post_text = await get_text_from_entry(feed)
                     img = None
                     r = re.search(r'(http(s?):)([/|.\w\s-])*\.(?:jpe?g|gif|png|webp)', str(feed))
                     if r is not None:
@@ -1297,7 +1303,9 @@ class Rss(commands.Cog):
                         date=datz,
                         author=author,
                         channel=feeds.feed['title'] if 'title' in feeds.feed.keys() else '?',
-                        image=img)
+                        image=img,
+                        post_text=post_text
+                    )
                     liste.append(obj)
                 except Exception as err:
                     self.bot.dispatch("error", err)

@@ -80,6 +80,7 @@ If the rss feed ID is not given, the bot will open a menu to select it. And for 
     - :code:`{logo}`: an emoji representing the type of post (web, Twitter, YouTube...)
     - :code:`{mentions}`: the list of mentioned roles
     - :code:`{title}`: the title of the post
+    - :code:`{full_text}`: the full text of the post
 
 .. warning:: Hey guess what? For this command, the bot needs "`Embed Links <perms.html#embed-links>`__" permission!
 

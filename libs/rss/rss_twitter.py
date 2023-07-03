@@ -104,7 +104,8 @@ class TwitterRSS:
                 author=lastpost.user.screen_name,
                 retweeted_from=is_rt,
                 channel=lastpost.user.name,
-                image=img
+                image=img,
+                post_text=getattr(lastpost, 'full_text', lastpost.text)
             )
             return [obj]
         else:
@@ -135,7 +136,8 @@ class TwitterRSS:
                     author=post.user.screen_name,
                     retweeted_from=is_rt,
                     channel=post.user.name,
-                    image=img
+                    image=img,
+                    post_text=getattr(lastpost, 'full_text', lastpost.text)
                 )
                 liste.append(obj)
             liste.reverse()
