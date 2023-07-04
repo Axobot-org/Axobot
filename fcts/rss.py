@@ -948,6 +948,7 @@ class Rss(commands.Cog):
         footer_text="Small text displayed at the bottom of the embed (max 2048 characters)",
         show_date_in_footer="Whether to show the post date in the footer or not",
         enable_link_in_title="Whether to enable the link in the embed title or not",
+        image_location="Where to put the image in the embed (thumbnail, image, or None)",
     )
     @app_commands.rename(feed_id="feed")
     async def change_use_embed(self, ctx: MyContext, feed_id: Optional[str] = None, should_use_embed: Optional[bool] = None,
@@ -956,7 +957,8 @@ class Rss(commands.Cog):
                                title: Optional[commands.Range[str, 2, 256]] = None,
                                footer_text: Optional[commands.Range[str, 2, 2048]] = None,
                                show_date_in_footer: Optional[bool] = None,
-                               enable_link_in_title: Optional[bool] = None):
+                               enable_link_in_title: Optional[bool] = None,
+                               image_location: Optional[Literal["thumbnail", "banner", "none"]] = None):
         """Use an embed or not for a feed
         You can also provide arguments to change the color/texts of the embed. Followed variables are usable in text arguments:
         - `{author}`: the author of the post
@@ -1016,6 +1018,8 @@ class Rss(commands.Cog):
                 embed_data["show_date_in_footer"] = show_date_in_footer
             if enable_link_in_title is not None:
                 embed_data["enable_link_in_title"] = enable_link_in_title
+            if image_location is not None:
+                embed_data["image_location"] = image_location
 
             if embed_data:
                 embed_data = feed.embed_data | embed_data

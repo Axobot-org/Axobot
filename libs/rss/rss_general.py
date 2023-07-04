@@ -102,6 +102,7 @@ class RssMessage:
             'title': None,
             'show_date_in_footer': True,
             'enable_link_in_title': False,
+            'image_location': 'thumbnail',
         }
         if author_text := self.feed.embed_data.get("author_text"):
             self.embed_data['author_text'] = author_text[:256]
@@ -115,6 +116,8 @@ class RssMessage:
             self.embed_data['show_date_in_footer'] = show_date_in_footer
         if enable_link_in_title := self.feed.embed_data.get("enable_link_in_title"):
             self.embed_data['enable_link_in_title'] = enable_link_in_title
+        if image_location := self.feed.embed_data.get("image_location"):
+            self.embed_data['image_location'] = image_location
 
     async def fill_mention(self, guild: discord.Guild):
         "Fill the mentions attribute with required roles mentions"
@@ -189,7 +192,10 @@ class RssMessage:
         if "{url}" not in msg_format and "{link}" not in msg_format:
             emb.add_field(name='URL', value=self.url)
         if self.image is not None:
-            emb.set_thumbnail(url=self.image)
+            if self.embed_data["image_location"] == "thumbnail":
+                emb.set_thumbnail(url=self.image)
+            elif self.embed_data["image_location"] == "banner":
+                emb.set_image(url=self.image)
         if self.embed_data["show_date_in_footer"] and isinstance(self.date, datetime.datetime):
             emb.timestamp = self.date
         if self.embed_data["enable_link_in_title"]:
@@ -204,6 +210,7 @@ class FeedEmbedData(TypedDict):
     color: Optional[int]
     show_date_in_footer: Optional[bool]
     enable_link_in_title: Optional[bool]
+    image_location: Optional[Literal["thumbnail", "banner", "none"]]
 
 class FeedObject:
     "A feed record from the database"
