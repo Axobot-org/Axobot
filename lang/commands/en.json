@@ -257,7 +257,8 @@
             "title": "title",
             "footer_text": "footer-text",
             "show_date_in_footer": "show-date-in-footer",
-            "enable_link_in_title": "enable-link-in-title"
+            "enable_link_in_title": "enable-link-in-title",
+            "image_location": "image-location"
         },
         "modlogs list": {
             "channel": "channel"

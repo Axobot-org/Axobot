@@ -254,7 +254,8 @@
             "title": "titre",
             "footer_text": "pied-de-page",
             "show_date_in_footer": "afficher-date-en-pied-de-page",
-            "enable_link_in_title": "ajouter-lien-dans-titre"
+            "enable_link_in_title": "ajouter-lien-dans-titre",
+            "image_location": "image"
         },
         "modlogs list": {
             "channel": "salon"
