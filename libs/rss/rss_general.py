@@ -100,16 +100,21 @@ class RssMessage:
             'color': discord.Colour.light_grey(),
             'footer_text': None,
             'title': None,
-            'show_date': True
+            'show_date_in_footer': True,
+            'enable_link_in_title': False,
         }
+        if author_text := self.feed.embed_data.get("author_text"):
+            self.embed_data['author_text'] = author_text[:256]
         if title := self.feed.embed_data.get("title"):
             self.embed_data['title'] = title[:256]
         if footer := self.feed.embed_data.get("footer_text"):
             self.embed_data['footer_text'] = footer[:2048]
         if color := self.feed.embed_data.get("color"):
             self.embed_data['color'] = color
-        if show_date := self.feed.embed_data.get("show_date"):
-            self.embed_data['show_date'] = show_date
+        if show_date_in_footer := self.feed.embed_data.get("show_date_in_footer"):
+            self.embed_data['show_date_in_footer'] = show_date_in_footer
+        if enable_link_in_title := self.feed.embed_data.get("enable_link_in_title"):
+            self.embed_data['enable_link_in_title'] = enable_link_in_title
 
     async def fill_mention(self, guild: discord.Guild):
         "Fill the mentions attribute with required roles mentions"
@@ -170,6 +175,8 @@ class RssMessage:
             return text
 
         emb = discord.Embed(description=text, color=self.embed_data['color'])
+        if self.embed_data['author_text']:
+            emb.set_author(name=self.embed_data['author_text'].format_map(safedict))
         if self.embed_data['footer_text']:
             emb.set_footer(text=self.embed_data['footer_text'].format_map(safedict))
         if self.embed_data['title'] is None:
@@ -183,16 +190,20 @@ class RssMessage:
             emb.add_field(name='URL', value=self.url)
         if self.image is not None:
             emb.set_thumbnail(url=self.image)
-        if self.embed_data["show_date"] and isinstance(self.date, datetime.datetime):
+        if self.embed_data["show_date_in_footer"] and isinstance(self.date, datetime.datetime):
             emb.timestamp = self.date
+        if self.embed_data["enable_link_in_title"]:
+            emb.url = self.url
         return emb
 
 class FeedEmbedData(TypedDict):
     "Embed configuration for an RSS feed"
+    author_text: Optional[str]
     title: Optional[str]
     footer_text: Optional[str]
     color: Optional[int]
-    show_date: Optional[bool]
+    show_date_in_footer: Optional[bool]
+    enable_link_in_title: Optional[bool]
 
 class FeedObject:
     "A feed record from the database"
