@@ -253,9 +253,11 @@
             "feed": "feed",
             "should_use_embed": "should-use-embed",
             "color": "color",
+            "author_text": "author-text",
             "title": "title",
             "footer_text": "footer-text",
-            "show_date": "show-date"
+            "show_date_in_footer": "show-date-in-footer",
+            "enable_link_in_title": "enable-link-in-title"
         },
         "modlogs list": {
             "channel": "channel"

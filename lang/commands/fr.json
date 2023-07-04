@@ -250,9 +250,11 @@
             "feed": "flux",
             "should_use_embed": "embed-activé",
             "color": "couleur",
+            "author_text": "texte-en-tête",
             "title": "titre",
             "footer_text": "pied-de-page",
-            "show_date": "afficher-date"
+            "show_date_in_footer": "afficher-date-en-pied-de-page",
+            "enable_link_in_title": "ajouter-lien-dans-titre"
         },
         "modlogs list": {
             "channel": "salon"

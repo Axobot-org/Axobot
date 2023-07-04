@@ -943,15 +943,20 @@ class Rss(commands.Cog):
     @app_commands.describe(
         should_use_embed="Use an embed or not for this feed",
         color="Color of the embed (eg. #FF00FF)",
+        author_text="Text displayed in the author field of the embed (max 256 characters)",
         title="Embed title (max 256 characters)",
         footer_text="Small text displayed at the bottom of the embed (max 2048 characters)",
-        show_date="Whether to show the post date in the footer or not",
+        show_date_in_footer="Whether to show the post date in the footer or not",
+        enable_link_in_title="Whether to enable the link in the embed title or not",
     )
     @app_commands.rename(feed_id="feed")
     async def change_use_embed(self, ctx: MyContext, feed_id: Optional[str] = None, should_use_embed: Optional[bool] = None,
-                               color: discord.Color = None, title: Optional[commands.Range[str, 2, 256]] = None,
+                               color: discord.Color = None,
+                               author_text: Optional[commands.Range[str, 2, 256]] = None,
+                               title: Optional[commands.Range[str, 2, 256]] = None,
                                footer_text: Optional[commands.Range[str, 2, 2048]] = None,
-                               show_date: Optional[bool] = None):
+                               show_date_in_footer: Optional[bool] = None,
+                               enable_link_in_title: Optional[bool] = None):
         """Use an embed or not for a feed
         You can also provide arguments to change the color/texts of the embed. Followed variables are usable in text arguments:
         - `{author}`: the author of the post
@@ -962,6 +967,7 @@ class Rss(commands.Cog):
         - `{logo}`: an emoji representing the type of post (web, Twitter, YouTube...)
         - `{mentions}`: the list of mentioned roles
         - `{title}`: the title of the post
+        - `{full_text}`: the full text of the post
 
         ..Example rss embed 6678466620137 true title: "New post from {author}!" color: red
 
@@ -1000,15 +1006,21 @@ class Rss(commands.Cog):
             embed_data: FeedEmbedData = {}
             if color is not None:
                 embed_data["color"] = color.value
+            if author_text is not None:
+                embed_data["author_text"] = author_text
             if title is not None:
                 embed_data["title"] = title
             if footer_text is not None:
                 embed_data["footer_text"] = footer_text
-            if show_date is not None:
-                embed_data["show_date"] = show_date
+            if show_date_in_footer is not None:
+                embed_data["show_date_in_footer"] = show_date_in_footer
+            if enable_link_in_title is not None:
+                embed_data["enable_link_in_title"] = enable_link_in_title
 
             if embed_data:
                 embed_data = feed.embed_data | embed_data
+                if embed_data.get("author_text", "").lower() == "none":
+                    del embed_data["author_text"]
                 if embed_data.get("title", "").lower() == "none":
                     del embed_data["title"]
                 if embed_data.get("footer_text", "").lower() == "none":
