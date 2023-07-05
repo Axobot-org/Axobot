@@ -1,4 +1,4 @@
-from typing import Annotated, Optional, Union
+from typing import Annotated, Union
 
 import discord
 from discord.ext import commands
