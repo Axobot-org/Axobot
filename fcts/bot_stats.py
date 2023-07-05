@@ -1,8 +1,9 @@
 import math
 import re
+import time
 from collections import defaultdict
 from datetime import datetime
-from typing import Optional, Union, TypedDict
+from typing import Optional, TypedDict, Union
 
 import aiohttp
 import discord
@@ -216,6 +217,23 @@ class BotStats(commands.Cog):
             self.serverlogs_audit_search = (prev[0]+1, prev[1]+success)
         else:
             self.serverlogs_audit_search = (1, success)
+
+    async def get_twitter_api_rate_limits(self) -> dict[str, int]:
+        "Get the Twitter API rate limits from the Rss cog"
+        if (rss := self.bot.get_cog("Rss")) is None:
+            return {}
+        resources: dict[str, dict] = rss.twitter_rss.api.rate_limit.resources
+        results = {}
+        now = time.time()
+        if (statuses := resources.get("statuses")) is not None:
+            if (fetch_timeline := statuses.get("/statuses/user_timeline")) is not None:
+                if fetch_timeline["reset"] > now:
+                    results["fetch_timeline"] = fetch_timeline["remaining"]
+        if (users := resources.get("users")) is not None:
+            if (fetch_user := users.get("/users/show/:id")) is not None:
+                if fetch_user["reset"] > now:
+                    results["fetch_user"] = fetch_user["remaining"]
+        return results
 
     async def db_get_disabled_rss(self) -> int:
         "Count the number of disabled RSS feeds in any guild"
@@ -444,6 +462,9 @@ class BotStats(commands.Cog):
                 cursor.execute(query, (now, f'voice_transcripts.{message_duration:.0f}.{generation_duration:.0f}', count, 0,
                                        'transcripts', True, self.bot.entity_id))
             self.voice_transcript_events.clear()
+            # Twitter API remaining requests
+            for endpoint, count in (await self.get_twitter_api_rate_limits()).items():
+                cursor.execute(query, (now, f'twitter.remaining.{endpoint}', count, 0, 'requests', True, self.bot.entity_id))
             # Push everything
             cnx.commit()
         except mysql.connector.errors.IntegrityError as err: # usually duplicate primary key
