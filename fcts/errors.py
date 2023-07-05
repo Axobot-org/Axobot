@@ -107,11 +107,11 @@ class Errors(commands.Cog):
             await ctx.send(await self.bot._(ctx.channel, 'errors.badlitteral'), ephemeral=True)
             return
         elif isinstance(error,(commands.BadArgument,commands.BadUnionArgument)):
+            allowed_mentions = discord.AllowedMentions(everyone=False, users=False, roles=False)
             async def send_err(tr_key: str, **kwargs):
                 await ctx.send(await self.bot._(ctx.channel, tr_key, **kwargs),
-                               allowed_mentions=ALLOWED, ephemeral=True)
+                               allowed_mentions=allowed_mentions, ephemeral=True)
 
-            ALLOWED = discord.AllowedMentions(everyone=False, users=False, roles=False)
             raw_error = str(error)
             # value must be less than 1 but received -1
             if isinstance(error, commands.RangeError):
@@ -258,8 +258,7 @@ class Errors(commands.Cog):
             # get traceback info
             if isinstance(ctx, discord.Message):
                 ctx = await self.bot.get_context(ctx)
-            tr = traceback.format_exception(type(error), error, error.__traceback__)
-            tr = " ".join(tr)
+            trace = " ".join(traceback.format_exception(type(error), error, error.__traceback__))
             # get context clue
             if ctx is None:
                 context = "Internal Error"
@@ -269,14 +268,15 @@ class Errors(commands.Cog):
                 recipient = await self.bot.get_recipient(ctx.channel)
                 context = f"DM | {recipient}"
             elif isinstance(ctx, discord.Interaction):
-                context = f"Slash command `{ctx.command.qualified_name if ctx.command else None}` | {ctx.guild.name} | {ctx.channel.name}"
+                cmd_name = ctx.command.qualified_name if ctx.command else None
+                context = f"Slash command `{cmd_name}` | {ctx.guild.name} | {ctx.channel.name}"
             else:
                 context = f"{ctx.guild.name} | {ctx.channel.name}"
             # if channel is the private beta channel, send it there
             if isinstance(ctx, (MyContext, discord.Interaction)) and ctx.channel.id == 625319425465384960:
-                await ctx.channel.send(f"{context}\n```py\n{tr[:1950]}\n```")
+                await ctx.channel.send(f"{context}\n```py\n{trace[:1950]}\n```")
             else:
-                await self.send_error_msg_autoformat(context, tr)
+                await self.send_error_msg_autoformat(context, trace)
             self.bot.log.warning(f"[on_error] {error}", exc_info=exc_info)
         except Exception as err: # pylint: disable=broad-except
             self.bot.log.error(f"[on_error] {err}", exc_info=exc_info)
