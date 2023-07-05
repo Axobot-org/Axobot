@@ -15,7 +15,7 @@ from cachingutils import acached
 from discord import app_commands
 from discord.ext import commands, tasks
 
-from fcts import args
+from libs.arguments import args
 from libs.bot_classes import Axobot, MyContext
 from libs.checks import checks
 from libs.enums import ServerWarningType

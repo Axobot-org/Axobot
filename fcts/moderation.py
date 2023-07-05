@@ -7,14 +7,14 @@ from typing import Dict, List, Literal, Optional, Union
 import discord
 from discord import app_commands
 from discord.ext import commands
-from libs.bot_classes import MyContext, Axobot
+
+from fcts.cases import Case
+from libs.arguments import args
+from libs.bot_classes import Axobot, MyContext
 from libs.checks import checks
 from libs.formatutils import FormatUtils
 from libs.paginator import Paginator
 from libs.views import ConfirmView
-
-from fcts import args
-from fcts.cases import Case
 
 importlib.reload(checks)
 importlib.reload(args)

@@ -2,19 +2,19 @@ import asyncio
 import datetime
 import re
 import time
-from typing import TYPE_CHECKING, Any, Callable, Optional
 from random import random
+from typing import TYPE_CHECKING, Any, Callable, Optional
 
 import discord
 from cachingutils import LRUCache
 from discord import app_commands
 from discord.ext import commands, tasks
 
-from libs.checks import checks
-from fcts.args import serverlog
 from fcts.tickets import TicketCreationEvent
 from libs.antiscam.classes import PredictionResult
+from libs.arguments.args import serverlog
 from libs.bot_classes import Axobot, MyContext
+from libs.checks import checks
 from libs.enums import ServerWarningType
 from libs.formatutils import FormatUtils
 from libs.tips import GuildTip

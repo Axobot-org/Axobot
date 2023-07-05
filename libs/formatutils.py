@@ -6,7 +6,7 @@ from babel import dates, numbers
 from dateutil.relativedelta import relativedelta
 from discord.ext import commands
 
-from fcts.args import Duration
+from libs.arguments.args import Duration
 
 
 def get_locale(lang: str):

@@ -18,7 +18,7 @@ from discord import app_commands
 from discord.ext import commands
 from PIL import Image, ImageFont
 
-from fcts import args
+from libs.arguments import args
 from libs.bot_classes import Axobot, MyContext
 from libs.checks import checks
 from libs.paginator import Paginator
