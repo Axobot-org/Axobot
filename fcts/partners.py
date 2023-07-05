@@ -7,10 +7,10 @@ import aiohttp
 import discord
 from discord.ext import commands, tasks
 
-from fcts import args
+from libs.arguments import args
+from libs.bot_classes import SUPPORT_GUILD_ID, Axobot, MyContext
 from libs.checks import checks
 from libs.views import ConfirmView
-from libs.bot_classes import SUPPORT_GUILD_ID, Axobot, MyContext
 
 importlib.reload(args)
 importlib.reload(checks)

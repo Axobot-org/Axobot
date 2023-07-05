@@ -15,14 +15,14 @@ import geocoder
 from discord.ext import commands
 from pytz import timezone
 from timezonefinder import TimezoneFinder
-from libs.bot_classes import SUPPORT_GUILD_ID, MyContext, Axobot
+
+from libs.arguments import args
+from libs.bot_classes import SUPPORT_GUILD_ID, Axobot, MyContext
 from libs.checks import checks
+from libs.checks.checks import is_fun_enabled
 from libs.formatutils import FormatUtils
 from libs.paginator import Paginator
 from utils import flatten_list
-
-from fcts import args
-from libs.checks.checks import is_fun_enabled
 
 importlib.reload(checks)
 importlib.reload(args)

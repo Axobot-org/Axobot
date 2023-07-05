@@ -6,9 +6,9 @@ from typing import Any, Optional
 import discord
 from discord.ext import commands
 
-from fcts import args
-from libs.checks.checks import database_connected, is_support_staff
+from libs.arguments import args
 from libs.bot_classes import Axobot, MyContext
+from libs.checks.checks import database_connected, is_support_staff
 from libs.formatutils import FormatUtils
 from libs.paginator import Paginator
 
