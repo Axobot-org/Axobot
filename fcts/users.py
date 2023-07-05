@@ -173,7 +173,7 @@ class Users(commands.Cog):
     @commands.check(checks.database_connected)
     @commands.cooldown(3, 45, commands.BucketType.user)
     @commands.cooldown(5, 60, commands.BucketType.guild)
-    async def profile_cardpreview(self, ctx: MyContext, style: Optional[args.cardStyle]=None):
+    async def profile_cardpreview(self, ctx: MyContext, style: Optional[args.CardStyle]=None):
         """Get a preview of a card style
 
         ..Example profile card-preview
@@ -208,7 +208,7 @@ class Users(commands.Cog):
     @app_commands.describe(style="The name of the card style you want to use")
     @commands.cooldown(3, 45, commands.BucketType.user)
     @commands.check(checks.database_connected)
-    async def profile_card(self, ctx: MyContext, style: args.cardStyle):
+    async def profile_card(self, ctx: MyContext, style: args.CardStyle):
         """Change your xp card style.
 
         ..Example profile card christmas20

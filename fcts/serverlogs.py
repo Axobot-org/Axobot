@@ -12,7 +12,8 @@ from discord.ext import commands, tasks
 
 from fcts.tickets import TicketCreationEvent
 from libs.antiscam.classes import PredictionResult
-from libs.arguments.args import serverlog
+from libs.arguments.args import ServerLog
+from libs.arguments.errors import InvalidServerLogError
 from libs.bot_classes import Axobot, MyContext
 from libs.checks import checks
 from libs.enums import ServerWarningType
@@ -213,7 +214,7 @@ class ServerLogs(commands.Cog):
     @app_commands.describe(channel="The channel to add logs to. Leave empty to select the current channel")
     @commands.guild_only()
     @commands.check(checks.has_manage_guild)
-    async def modlogs_enable(self, ctx: MyContext, logs: commands.Greedy[serverlog], channel: Optional[discord.TextChannel]=None):
+    async def modlogs_enable(self, ctx: MyContext, logs: commands.Greedy[ServerLog], channel: Optional[discord.TextChannel]=None):
         """Enable one or more logs in the current channel
 
         ..Example modlogs enable ban bot_warnings
@@ -222,7 +223,7 @@ class ServerLogs(commands.Cog):
 
         ..Doc moderator.html#how-to-setup-logs"""
         if len(logs) == 0:
-            raise commands.BadArgument('Invalid server log type')
+            raise InvalidServerLogError("")
         dest_channel = channel or ctx.channel
         if 'all' in logs:
             logs = list(self.available_logs())
@@ -269,7 +270,7 @@ class ServerLogs(commands.Cog):
     @app_commands.describe(channel="The channel to remove logs from. Leave empty to select the current channel")
     @commands.guild_only()
     @commands.check(checks.has_manage_guild)
-    async def modlogs_disable(self, ctx:MyContext, logs: commands.Greedy[serverlog], channel: Optional[discord.TextChannel]=None):
+    async def modlogs_disable(self, ctx:MyContext, logs: commands.Greedy[ServerLog], channel: Optional[discord.TextChannel]=None):
         """Disable one or more logs in the current channel
 
         ..Example modlogs disable ban message_delete
@@ -278,7 +279,7 @@ class ServerLogs(commands.Cog):
 
         ..Doc moderator.html#how-to-setup-logs"""
         if len(logs) == 0:
-            raise commands.BadArgument('Invalid server log type')
+            raise InvalidServerLogError("")
         if 'all' in logs:
             logs = list(self.available_logs())
         dest_channel = channel or ctx.channel

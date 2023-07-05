@@ -803,7 +803,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
                 k[key] = value.replace("\\n", "\n")
             # eval embed color
             elif key == "color":
-                if color := await args.Color().convert(ctx, value):
+                if color := await commands.ColourConverter().convert(ctx, value):
                     k['color'] = color
             # add url and image links
             elif key in {'url', 'image'} and value.startswith("http"):
