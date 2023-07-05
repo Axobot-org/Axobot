@@ -426,7 +426,7 @@ class Rss(commands.Cog):
             # no rss feed
             await ctx.send(await self.bot._(ctx.guild.id, "rss.no-feed2"))
             return
-        feeds_list.sort(key=lambda feed: feed.enabled, reverse=True)
+        feeds_list.sort(key=lambda feed: (feed.enabled, feed.type), reverse=True)
         await self.send_rss_list(ctx, feeds_list)
 
     async def send_rss_list(self, ctx: MyContext, feeds: list[FeedObject]):
