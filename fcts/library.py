@@ -1,21 +1,12 @@
 import html
-import typing
-
+from typing import Optional
 import aiohttp
 import discord
 import isbnlib
 from discord.ext import commands
-from libs.bot_classes import MyContext, Axobot
 
-
-class ISBN(commands.Converter):
-
-    async def convert(self, ctx: MyContext, argument: str) -> int:
-        # if argument.isnumeric() and (len(argument)==10 or len(argument)==13):
-        #     return int(argument)
-        if isbnlib.notisbn(argument):
-            raise commands.errors.BadArgument('Invalid ISBN: '+argument)
-        return isbnlib.get_canonical_isbn(argument)
+from libs.arguments import args
+from libs.bot_classes import Axobot, MyContext
 
 
 class Library(commands.Cog):
@@ -55,7 +46,7 @@ class Library(commands.Cog):
             return await self.search_book(isbn, keywords)
         return None
 
-    async def isbn_from_words(self, keywords: str) -> typing.Optional[str]:
+    async def isbn_from_words(self, keywords: str) -> Optional[str]:
         """Get the ISBN of a book from some keywords"""
         url = "https://www.googleapis.com/books/v1/volumes?maxResults=1&q=" + html.escape(keywords.replace(' ', '+'))
         async with aiohttp.ClientSession() as session:
@@ -65,7 +56,7 @@ class Library(commands.Cog):
             return resp['items'][0]['volumeInfo']['industryIdentifiers'][-1]['identifier']
         return None
 
-    async def search_book_2(self, isbn: str, keywords: str) -> dict:
+    async def search_book_2(self, isbn: Optional[str], keywords: str) -> dict:
         if isbn is None:
             if keywords is None:
                 raise ValueError
@@ -78,7 +69,7 @@ class Library(commands.Cog):
                 isbn = await self.isbn_from_words(keywords)
             if isbn is None:
                 return
-        info = dict()
+        info = {}
         for key in ['wiki', 'default', 'openl', 'goob']:
             try:
                 i = isbnlib.meta(isbn, service=key)
@@ -114,7 +105,7 @@ class Library(commands.Cog):
 
     @book_main.command(name="search", aliases=["book"])
     @commands.cooldown(5, 60, commands.BucketType.guild)
-    async def book_search(self, ctx: MyContext, isbn: typing.Optional[ISBN], *, keywords: str = ''):
+    async def book_search(self, ctx: MyContext, isbn: Optional[args.ISBN], *, keywords: str = ''):
         """Search from a book from its ISBN or search terms
 
         ..Example book search Percy Jackson
@@ -127,7 +118,7 @@ class Library(commands.Cog):
             keywords = keywords.replace('  ', ' ')
         try:
             book = await self.search_book_2(isbn, keywords)
-        except isbnlib.dev._exceptions.ISBNLibHTTPError:
+        except isbnlib.dev.ISBNLibHTTPError:
             await ctx.send(await self.bot._(ctx.channel, "library.rate-limited") + " :confused:")
             return
         if book is None:

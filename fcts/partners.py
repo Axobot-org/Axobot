@@ -333,7 +333,7 @@ class Partners(commands.Cog):
 
     @partner_main.command(name='add')
     @commands.check(checks.database_connected)
-    async def partner_add(self, ctx: MyContext, invite: args.Invite, *, description=''):
+    async def partner_add(self, ctx: MyContext, invite: args.BotOrGuildInvite, *, description=''):
         """Add a partner in your list
 
         ..Example partners add https://discord.com/oauth2/authorize?client_id=486896267788812288&scope=bot
