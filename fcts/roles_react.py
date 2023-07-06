@@ -5,7 +5,7 @@ from typing import Any, Optional, Tuple, Union
 import discord
 from discord.ext import commands
 
-from fcts import args
+from libs.arguments import args
 from libs.bot_classes import Axobot, MyContext
 from libs.checks import checks
 
@@ -116,7 +116,7 @@ class RolesReact(commands.Cog):
             pass
         return True
 
-    @commands.group(name="roles_react", aliases=['role_react'])
+    @commands.group(name="roles-react", aliases=['roles_react'])
     @commands.guild_only()
     async def rr_main(self, ctx: MyContext):
         """Manage your roles reactions
@@ -128,7 +128,8 @@ class RolesReact(commands.Cog):
     @rr_main.command(name="add")
     @commands.check(checks.has_manage_guild)
     @commands.check(checks.database_connected)
-    async def rr_add(self, ctx: MyContext, emoji: args.AnyEmoji, role: discord.Role, *, description: str = ''):
+    async def rr_add(self, ctx: MyContext, emoji: Union[discord.Emoji, args.UnicodeEmoji], role: discord.Role, *,
+                     description: str = ''):
         """Add a role reaction
         This role will be given when a membre click on a specific reaction
         Your description can only be a maximum of 150 characters
@@ -157,7 +158,7 @@ class RolesReact(commands.Cog):
     @rr_main.command(name="remove")
     @commands.check(checks.database_connected)
     @commands.check(checks.has_manage_guild)
-    async def rr_remove(self, ctx: MyContext, emoji):
+    async def rr_remove(self, ctx: MyContext, emoji: str):
         """Remove a role react
 
         ..Example roles_react remove :uwu:
@@ -322,7 +323,8 @@ Opposite is the subcommand 'join'
 
     @rr_main.command(name='update')
     @commands.check(checks.database_connected)
-    async def rr_update(self, ctx: MyContext, embed: discord.Message, change_description: Optional[bool] = True, emojis: commands.Greedy[args.AnyEmoji] = None):
+    async def rr_update(self, ctx: MyContext, embed: discord.Message, change_description: Optional[bool] = True,
+                        emojis: commands.Greedy[Union[discord.Emoji, args.UnicodeEmoji]] = None):
         """Update an Axobot message to refresh roles/reactions
         If you don't want to update the embed content (for example if it's a custom embed) then you can use 'False' as a second argument, and I will only check the reactions
         Specifying a list of emojis will update the embed only for those emojis, and ignore other roles reactions

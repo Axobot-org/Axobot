@@ -6,7 +6,7 @@ import discord
 from discord.app_commands import locale_str as _T
 from discord.ext import commands
 
-from fcts.args import UnicodeEmoji
+from libs.arguments.args import UnicodeEmoji
 from libs.bot_classes import MyContext
 from libs.emojis_manager import EmojisManager
 from libs.bot_classes import Axobot

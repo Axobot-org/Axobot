@@ -3,10 +3,10 @@ import typing
 import discord
 from discord import app_commands
 from discord.ext import commands
-from fcts.args import RawPermissionValue
-from libs.bot_classes import MyContext, Axobot
-from libs.paginator import cut_text
 
+from libs.arguments.args import RawPermissionValue
+from libs.bot_classes import Axobot, MyContext
+from libs.paginator import cut_text
 
 VoiceChannelTypes = typing.Union[
     discord.VoiceChannel,

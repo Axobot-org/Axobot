@@ -7,10 +7,10 @@ import aiohttp
 import discord
 from discord.ext import commands, tasks
 
-from fcts import args
+from libs.arguments import args
+from libs.bot_classes import SUPPORT_GUILD_ID, Axobot, MyContext
 from libs.checks import checks
 from libs.views import ConfirmView
-from libs.bot_classes import SUPPORT_GUILD_ID, Axobot, MyContext
 
 importlib.reload(args)
 importlib.reload(checks)
@@ -333,7 +333,7 @@ class Partners(commands.Cog):
 
     @partner_main.command(name='add')
     @commands.check(checks.database_connected)
-    async def partner_add(self, ctx: MyContext, invite: args.Invite, *, description=''):
+    async def partner_add(self, ctx: MyContext, invite: args.BotOrGuildInvite, *, description=''):
         """Add a partner in your list
 
         ..Example partners add https://discord.com/oauth2/authorize?client_id=486896267788812288&scope=bot

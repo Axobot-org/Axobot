@@ -7,8 +7,9 @@ import typing
 import discord
 from discord.ext import commands, tasks
 
-from libs.checks import checks
+from libs.arguments import errors as arguments_errors
 from libs.bot_classes import Axobot, MyContext
+from libs.checks import checks
 from libs.checks.errors import (NotAVoiceMessageError, NotDuringEventError,
                                 VerboseCommandError)
 
@@ -123,92 +124,56 @@ class Errors(commands.Cog):
             if reason is not None:
                 return await send_err('errors.badarguments', p=reason.group('arg'), t=reason.group('type'))
             # zzz is not a recognised boolean option
-            reason = re.search(r'(?P<arg>[^\"]+) is not a recognised (?P<type>[^.\n]+) option',raw_error)
-            if reason is not None:
-                return await send_err('errors.badarguments-2', p=reason.group('arg'), t=reason.group('type'))
+            if isinstance(error, commands.BadBoolArgument):
+                return await send_err('errors.badboolean', p=error.argument)
             # Member "Z_runner" not found
-            reason = re.search(r'(?<=Member \")(.+)(?=\" not found)',raw_error)
-            if reason is not None:
-                return await send_err('errors.membernotfound', m=reason.group(1))
+            if isinstance(error, commands.MemberNotFound):
+                return await send_err('errors.membernotfound', m=error.argument)
             # User "Z_runner" not found
-            reason = re.search(r'(?<=User \")(.+)(?=\" not found)',raw_error)
-            if reason is not None:
-                return await send_err('errors.usernotfound', u=reason.group(1))
+            if isinstance(error, commands.UserNotFound):
+                return await send_err('errors.usernotfound', u=error.argument)
             # Role "Admin" not found
-            reason = re.search(r'(?<=Role \")(.+)(?=\" not found)',raw_error)
-            if reason is not None:
-                return await send_err('errors.rolenotfound', r=reason.group(1))
+            if isinstance(error, commands.RoleNotFound):
+                return await send_err('errors.rolenotfound', r=error.argument)
             # Emoji ":shock:" not found
-            reason = re.search(r'(?<=Emoji \")(.+)(?=\" not found)',raw_error)
-            if reason is not None:
-                return await send_err('errors.emojinotfound', e=reason.group(1))
+            if isinstance(error, commands.EmojiNotFound):
+                return await send_err('errors.emojinotfound', e=error.argument)
              # Colour "blue" is invalid
-            reason = re.search(r'(?<=Colour \")(.+)(?=\" is invalid)',raw_error)
-            if reason is not None:
-                return await send_err('errors.invalidcolor', c=reason.group(1))
+            if isinstance(error, commands.BadColourArgument):
+                return await send_err('errors.invalidcolor', c=error.argument)
             # Channel "twitter" not found.
-            reason = re.search(r'(?<=Channel \")(.+)(?=\" not found)',raw_error)
-            if reason is not None:
-                return await send_err('errors.channotfound', c=reason.group(1))
+            if isinstance(error, commands.ChannelNotFound):
+                return await send_err('errors.channotfound', c=error.argument)
             # Message "1243" not found.
-            reason = re.search(r'(?<=Message \")(.+)(?=\" not found)',raw_error)
-            if reason is not None:
-                return await send_err('errors.msgnotfound', msg=reason.group(1))
+            if isinstance(error, commands.MessageNotFound):
+                return await send_err('errors.msgnotfound', msg=error.argument)
             # Guild "1243" not found.
-            reason = re.search(r'(?<=Guild \")(.+)(?=\" not found)',raw_error)
-            if reason is not None:
-                return await send_err('errors.guildnotfound', guild=reason.group(1))
-            # Too many text channels
-            if raw_error=='Too many text channels':
-                return await send_err('errors.toomanytxtchan')
-            # Invalid duration: 2d
-            reason = re.search(r'Invalid duration: (\S+)',raw_error)
-            if reason is not None:
-                return await send_err('errors.duration', d=reason.group(1))
-            # Invalid invite: nope
-            reason = re.search(r'Invalid invite: (\S+)',raw_error)
-            if reason is not None:
-                return await send_err('errors.invalidinvite', i=reason.group(1))
-            # Invalid guild: test
-            reason = re.search(r'Invalid guild: (\S+)',raw_error)
-            if reason is not None:
-                return await send_err('errors.invalidguild', g=reason.group(1))
-            # Invalid url: nou
-            reason = re.search(r'Invalid url: (\S+)',raw_error)
-            if reason is not None:
-                return await send_err('errors.invalidurl', u=reason.group(1))
-            # Invalid unicode emoji: lol
-            reason = re.search(r'Invalid Unicode emoji: (\S+)',raw_error)
-            if reason is not None:
-                return await send_err('errors.invalidunicode', u=reason.group(1))
-            # Invalid leaderboard type: lol
-            reason = re.search(r'Invalid leaderboard type: (\S+)',raw_error)
-            if reason is not None:
-                return await send_err('errors.invalidleaderboard')
-            # Invalid ISBN: lol
-            reason = re.search(r'Invalid ISBN: (\S+)',raw_error)
-            if reason is not None:
-                return await send_err('errors.invalidisbn')
-            # Invalid emoji: lmao
-            reason = re.search(r'Invalid emoji: (\S+)',raw_error)
-            if reason is not None:
-                return await send_err('errors.invalidemoji')
-            # Invalid message ID: 007
-            reason = re.search(r'Invalid message ID: (\S+)',raw_error)
-            if reason is not None:
-                return await send_err('errors.invalidmsgid')
-            # Invalid card style: aqua
-            reason = re.search(r'Invalid card style: (\S+)',raw_error)
-            if reason is not None:
-                return await send_err('errors.invalidcardstyle', s=reason.group(1))
-            # Invalid server log type
-            reason = re.search(r'Invalid server log type',raw_error)
-            if reason is not None:
-                return await send_err('errors.invalidserverlog')
-            # Invalid Discord ID
-            reason = re.search(r'Invalid snowflake',raw_error)
-            if reason is not None:
+            if isinstance(error, commands.GuildNotFound):
+                return await send_err('errors.guildnotfound', guild=error.argument)
+            # abc does not follow a valid ID or mention format
+            if isinstance(error, commands.ObjectNotFound):
                 return await send_err('errors.invalidsnowflake')
+            # Invalid duration: 2d
+            if isinstance(error, arguments_errors.InvalidDurationError):
+                return await send_err('errors.duration', d=error.argument)
+            # Invalid invite: nope
+            if isinstance(error, arguments_errors.InvalidBotOrGuildInviteError):
+                return await send_err('errors.invalidinvite', i=error.argument)
+            # Invalid url: nou
+            if isinstance(error, arguments_errors.InvalidUrlError):
+                return await send_err('errors.invalidurl', u=error.argument)
+            # Invalid unicode emoji: lol
+            if isinstance(error, arguments_errors.InvalidUnicodeEmojiError):
+                return await send_err('errors.invalidunicode', u=error.argument)
+            # Invalid ISBN: lol
+            if isinstance(error, arguments_errors.InvalidISBNError):
+                return await send_err('errors.invalidisbn')
+            # Invalid card style: aqua
+            if isinstance(error, arguments_errors.InvalidCardStyleError):
+                return await send_err('errors.invalidcardstyle', s=error.argument)
+            # Invalid server log type
+            if isinstance(error, arguments_errors.InvalidServerLogError):
+                return await send_err('errors.invalidserverlog')
             self.bot.log.warning('Unknown error type -',error)
         elif isinstance(error,commands.errors.MissingRequiredArgument):
             await ctx.send(await self.bot._(

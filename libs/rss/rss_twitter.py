@@ -21,7 +21,7 @@ class TwitterRSS:
     def __init__(self, bot: Axobot):
         self.bot = bot
         self.min_time_between_posts = 15
-        self.api = twitter.Api(**bot.others['twitter'], tweet_mode="extended", timeout=15)
+        self.api = twitter.Api(**bot.others['twitter'], tweet_mode="extended", timeout=15, application_only_auth=True)
         self.url_pattern = r'(?:http.*://)?(?:www\.)?(?:twitter\.com/)([^?\s/]+)'
 
     def is_twitter_url(self, string: str):
@@ -104,7 +104,8 @@ class TwitterRSS:
                 author=lastpost.user.screen_name,
                 retweeted_from=is_rt,
                 channel=lastpost.user.name,
-                image=img
+                image=img,
+                post_text=getattr(lastpost, 'full_text', lastpost.text)
             )
             return [obj]
         else:
@@ -135,7 +136,8 @@ class TwitterRSS:
                     author=post.user.screen_name,
                     retweeted_from=is_rt,
                     channel=post.user.name,
-                    image=img
+                    image=img,
+                    post_text=getattr(lastpost, 'full_text', lastpost.text)
                 )
                 liste.append(obj)
             liste.reverse()

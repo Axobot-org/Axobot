@@ -11,8 +11,8 @@ from discord.ext import commands
 from discord.ext.commands.converter import run_converters
 
 from docs import conf
-from fcts import args
 from libs import bitly_api
+from libs.arguments import args
 from libs.bot_classes import PRIVATE_GUILD_ID, Axobot, MyContext
 from libs.checks import checks
 from libs.formatutils import FormatUtils

@@ -4,7 +4,7 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
-from fcts import args
+from libs.arguments import args
 from libs.bot_classes import Axobot, MyContext
 from libs.checks import checks
 from libs.formatutils import FormatUtils
@@ -118,7 +118,7 @@ class RolesManagement(commands.Cog):
     @commands.cooldown(1, 30, commands.BucketType.guild)
     @commands.guild_only()
     @commands.check(checks.has_manage_roles)
-    async def roles_give(self, ctx: MyContext, role: discord.Role,
+    async def roles_grant(self, ctx: MyContext, role: discord.Role,
                          users: commands.Greedy[Union[discord.Role, discord.Member, Literal['everyone']]]):
         """Give a role to a list of roles/members
         Users list may be either members or roles, or even only one member
@@ -150,6 +150,8 @@ class RolesManagement(commands.Cog):
                         n_users.add(member)
         if len(n_users) > 15:
             await ctx.send(await self.bot._(ctx.guild.id, "moderation.role.give-pending", n=len(n_users)))
+        else:
+            await ctx.defer()
         count = 0
         for user in n_users:
             if count >= self.max_roles_modifications:
@@ -168,7 +170,7 @@ class RolesManagement(commands.Cog):
     @commands.cooldown(1, 30, commands.BucketType.guild)
     @commands.guild_only()
     @commands.check(checks.has_manage_roles)
-    async def roles_remove(self, ctx: MyContext, role: discord.Role,
+    async def roles_revoke(self, ctx: MyContext, role: discord.Role,
                            users: commands.Greedy[Union[discord.Role, discord.Member, Literal['everyone']]]):
         """Remove a role to a list of roles/members
         Users list may be either members or roles, or even only one member
@@ -198,6 +200,8 @@ class RolesManagement(commands.Cog):
                         n_users.add(member)
         if len(n_users) > 15:
             await ctx.send(await self.bot._(ctx.guild.id, "moderation.role.remove-pending", n=len(n_users)))
+        else:
+            await ctx.defer()
         count = 0
         for user in n_users:
             if count >= self.max_roles_modifications:

@@ -1,17 +1,19 @@
 import copy
 import datetime
+import time
 from typing import Optional
 
 import discord
 from discord import app_commands
 from discord.ext import commands
-from libs.bot_classes import MyContext, Axobot
+
+from libs.arguments import args
+from libs.bot_classes import Axobot, MyContext
 from libs.checks import checks
 from libs.formatutils import FormatUtils
 from libs.paginator import PaginatedSelectView
 from libs.views import ConfirmView
 
-from fcts import args
 
 class Timers(commands.Cog):
     "Reminders system"
@@ -139,7 +141,8 @@ class Timers(commands.Cog):
         except Exception as err:
             self.bot.dispatch("command_error", ctx, err)
         else:
-            await ctx.send(await self.bot._(ctx.channel, "timers.rmd.saved", duration=f_duration))
+            timestamp = f"<t:{time.time() + duration:.0f}>"
+            await ctx.send(await self.bot._(ctx.channel, "timers.rmd.saved", duration=f_duration, timestamp=timestamp))
 
 
     @remind_main.command(name="list")

@@ -6,9 +6,9 @@ from typing import Any, Optional
 import discord
 from discord.ext import commands
 
-from fcts import args
-from libs.checks.checks import database_connected, is_support_staff
+from libs.arguments import args
 from libs.bot_classes import Axobot, MyContext
+from libs.checks.checks import database_connected, is_support_staff
 from libs.formatutils import FormatUtils
 from libs.paginator import Paginator
 
@@ -199,7 +199,7 @@ class Cases(commands.Cog):
     @case_main.command(name="glist")
     @commands.guild_only()
     @commands.check(is_support_staff)
-    async def see_case_2(self, ctx: MyContext, guild: Optional[args.Guild], *, user: discord.User):
+    async def see_case_2(self, ctx: MyContext, guild: Optional[discord.Guild], *, user: discord.User):
         """Get every case of a user on a specific guild or on every guilds
         This user can have left the server
 

@@ -6,12 +6,14 @@ import discord
 from dateutil.relativedelta import relativedelta
 from discord.ext import commands
 
+from libs.arguments import errors as arguments_errors
+
 if typing.TYPE_CHECKING:
     from libs.bot_classes import MyContext
 
 
 class Duration(float):
-    "Specific argument converter for durations input"
+    "Argument converter for durations input"
 
     @classmethod
     async def convert(cls, _ctx: typing.Optional["MyContext"], argument: str) -> int:
@@ -40,13 +42,16 @@ class Duration(float):
             duration += (then - now).total_seconds()
             found = True
         if not found:
-            raise commands.errors.BadArgument('Invalid duration: '+argument)
+            raise arguments_errors.InvalidDurationError(argument)
         return duration
 
 
 class AnyUser(discord.User):
+    "Argument converter for any user or member"
+
     @classmethod
     async def convert(cls, ctx: "MyContext", argument: str) -> discord.User:
+        "Converts a string to a user or member"
         res = None
         if argument.isnumeric():
             if ctx.guild is not None:
@@ -69,18 +74,18 @@ class AnyUser(discord.User):
             raise commands.errors.UserNotFound(argument)
 
 
-class cardStyle(str):
+class CardStyle(str):
+    "Converts a string to a valid XP card style"
     @classmethod
-    async def convert(cls, ctx: "MyContext", argument: str) -> str:
+    async def convert(cls, ctx: "MyContext", argument: str):
+        "Do the conversion"
         if argument in await ctx.bot.get_cog('Utilities').allowed_card_styles(ctx.author):
             return argument
-        else:
-            raise commands.errors.BadArgument('Invalid card style: '+argument)
+        raise arguments_errors.InvalidCardStyleError(argument)
 
 
-class Invite(commands.Converter):
-    def __init__(self):
-        pass
+class BotOrGuildInvite(commands.Converter):
+    """Converts a string to a bot invite or a guild invite"""
 
     async def convert(self, _ctx: "MyContext", argument: str) -> typing.Union[str, int]:
         answer = None
@@ -98,18 +103,8 @@ class Invite(commands.Converter):
                 if 'bot' in scopes:
                     answer = int(r_invite.group(1) or r_invite.group(3))
         if r_invite is None or answer is None:
-            raise commands.errors.BadArgument('Invalid invite: '+argument)
+            raise arguments_errors.InvalidBotOrGuildInviteError(argument)
         return answer
-
-
-class Guild(discord.Guild):
-    @classmethod
-    async def convert(cls, ctx: "MyContext", argument: str) -> discord.Guild:
-        if argument.isnumeric():
-            res = ctx.bot.get_guild(int(argument))
-            if res is not None:
-                return res
-        raise commands.errors.BadArgument('Invalid guild: '+argument)
 
 
 class URL:
@@ -130,7 +125,7 @@ class URL:
         r = re.search(
             r'(?P<https>https?)://(?:www\.)?(?P<domain>[^/\s]+)(?:/(?P<path>[\S]+))?', argument)
         if r is None:
-            raise commands.errors.BadArgument('Invalid url: '+argument)
+            raise arguments_errors.InvalidUrlError(argument)
         return cls(r)
 
 class UnicodeEmoji(str):
@@ -141,87 +136,70 @@ class UnicodeEmoji(str):
         unicodes = ctx.bot.emojis_manager.unicode_set
         if all(char in unicodes for char in argument):
             return argument
-        raise commands.errors.BadArgument('Invalid Unicode emoji: '+argument)
-
-class AnyEmoji(commands.Converter):
-    "Convert argument to any emoji, either custom or unicode"
-    async def convert(self, ctx: "MyContext", argument: str) -> typing.Union[str, discord.Emoji]:
-        r = re.search(r'<a?:[^:]+:(\d+)>', argument)
-        if r is None:
-            try:
-                return await UnicodeEmoji.convert(ctx, argument)
-            except commands.errors.BadArgument:
-                pass
-        else:
-            try:
-                return await commands.EmojiConverter().convert(ctx, r.group(1))
-            except discord.DiscordException:
-                return r.group(1)
-        raise commands.errors.BadArgument('Invalid emoji: '+argument)
+        raise arguments_errors.InvalidUnicodeEmojiError(argument)
 
 
 class arguments(commands.Converter):
     "Convert arguments to a foo=bar dictionary"
-    async def convert(self, ctx: "MyContext", argument: str) -> dict[str, str]:
-        answer = dict()
+    async def convert(self, _ctx: "MyContext", argument: str) -> dict[str, str]:
+        answer = {}
         for result in re.finditer(r'(\w+) ?= ?\"((?:[^\"\\]|\\\"|\\)+)\"', argument):
             answer[result.group(1)] = result.group(2).replace('\\"', '"')
         return answer
 
 
-class Color(commands.Converter):
-    "Convert arguments to a valid color (hexa or decimal)"
-    async def convert(self, ctx: "MyContext", argument: str) -> int:
-        if argument.startswith('#') and len(argument) % 3 == 1:
-            arg = argument[1:]
-            rgb = [int(arg[i:i+2], 16)
-                   for i in range(0, len(arg), len(arg)//3)]
-            return discord.Colour(0).from_rgb(rgb[0], rgb[1], rgb[2]).value
-        elif argument.isnumeric():
-            return int(argument)
-        else:
-            return None
-
-
 class Snowflake:
     "Convert arguments to a discord Snowflake"
-    def __init__(self, ID: int):
-        self.id = ID
-        self.binary = bin(ID)
-        self.date = discord.utils.snowflake_time(ID)
+    def __init__(self, object_id: int):
+        self.id = object_id
+        self.binary = bin(object_id)
+        self.date = discord.utils.snowflake_time(object_id)
         self.increment = int(self.binary[-12:])
         self.process_id = int(self.binary[-17:-12])
         self.worker_id = int(self.binary[-22:-17])
 
     @classmethod
-    async def convert(cls, ctx: "MyContext", argument: str) -> int:
+    async def convert(cls, _ctx: "MyContext", argument: str) -> int:
+        "Do the conversion"
         if len(argument) < 17 or len(argument) > 20 or not argument.isnumeric():
-            raise commands.BadArgument("Invalid snowflake")
+            raise commands.ObjectNotFound(argument)
         return cls(int(argument))
 
 
-class serverlog(str):
+class ServerLog(str):
     "Convert arguments to a server log type"
     @classmethod
-    async def convert(cls, ctx: "MyContext", argument: str) -> str:
-        from fcts.serverlogs import ServerLogs  # pylint: disable=import-outside-toplevel
+    async def convert(cls, _ctx: "MyContext", argument: str) -> str:
+        "Do the conversion"
+        from fcts.serverlogs import \
+            ServerLogs  # pylint: disable=import-outside-toplevel
 
         if argument in ServerLogs.available_logs() or argument == 'all':
             return argument
-        raise commands.BadArgument(f'"{argument}" is not a valid server log type')
+        raise arguments_errors.InvalidServerLogError(argument)
 
 class RawPermissionValue(int):
     "Represents a raw permission value, as an integer"
-
-    async def convert(self, ctx: "MyContext", argument: str):
+    @classmethod
+    async def convert(self, _ctx: "MyContext", argument: str):
         if re.match(r'0b[0,1]+', argument):
             return int(argument[2:], 2)
         if not argument.isnumeric():
-            return None
+            raise arguments_errors.InvalidRawPermissionError(argument)
         try:
             value = int(argument, 2 if len(argument) > 13 else 10)
         except ValueError:
             value = int(argument)
         if value > discord.Permissions.all().value:
-            return None
+            raise arguments_errors.InvalidRawPermissionError(argument)
         return value
+
+class ISBN(int):
+    "Convert argument to a valid ISBN"
+    @classmethod
+    async def convert(cls, _ctx: "MyContext", argument: str) -> int:
+        "Convert a string to a proper ISBN, else raise BadArgument"
+        import isbnlib  # pylint: disable=import-outside-toplevel
+        if isbnlib.notisbn(argument):
+            raise arguments_errors.InvalidISBNError(argument)
+        return isbnlib.get_canonical_isbn(argument)

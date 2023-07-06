@@ -11,6 +11,8 @@ import feedparser
 from aiohttp import ClientSession, client_exceptions
 from feedparser.util import FeedParserDict
 
+from libs.formatutils import FormatUtils
+
 FeedType = Literal['tw', 'yt', 'twitch', 'reddit', 'mc', 'deviant', 'web']
 
 if TYPE_CHECKING:
@@ -63,13 +65,15 @@ class RssMessage:
                  author: Optional[str] = None,
                  channel: Optional[str] = None,
                  retweeted_from: Optional[str] = None,
-                 image: Optional[str] = None
+                 image: Optional[str] = None,
+                 post_text: Optional[str] = None,
                  ):
         self.bot = bot
         self.feed = feed
         self.url = url
         self.title = title if len(title) < 300 else title[:299]+'…'
         self.image = image
+        self.post_text = post_text
         if isinstance(date, datetime.datetime):
             self.date = date
         elif isinstance(date, time.struct_time):
@@ -93,16 +97,27 @@ class RssMessage:
     def fill_embed_data(self):
         "Fill any interesting value to send in an embed"
         self.embed_data = {
-            'color': discord.Colour(0).default(),
-            'footer': '',
-            'title': None
+            'color': discord.Colour.light_grey(),
+            'footer_text': None,
+            'title': None,
+            'show_date_in_footer': True,
+            'enable_link_in_title': False,
+            'image_location': 'thumbnail',
         }
+        if author_text := self.feed.embed_data.get("author_text"):
+            self.embed_data['author_text'] = author_text[:256]
         if title := self.feed.embed_data.get("title"):
             self.embed_data['title'] = title[:256]
         if footer := self.feed.embed_data.get("footer_text"):
-            self.embed_data['footer'] = footer[:2048]
+            self.embed_data['footer_text'] = footer[:2048]
         if color := self.feed.embed_data.get("color"):
             self.embed_data['color'] = color
+        if show_date_in_footer := self.feed.embed_data.get("show_date_in_footer"):
+            self.embed_data['show_date_in_footer'] = show_date_in_footer
+        if enable_link_in_title := self.feed.embed_data.get("enable_link_in_title"):
+            self.embed_data['enable_link_in_title'] = enable_link_in_title
+        if image_location := self.feed.embed_data.get("image_location"):
+            self.embed_data['image_location'] = image_location
 
     async def fill_mention(self, guild: discord.Guild):
         "Fill the mentions attribute with required roles mentions"
@@ -124,19 +139,29 @@ class RssMessage:
     async def _generate_safedict(self):
         if isinstance(self.date, datetime.datetime):
             date = f"<t:{self.date.timestamp():.0f}>"
+            lang = await self.bot._(self.feed.guild_id, "_used_locale")
+            long_date = await FormatUtils.date(self.date, lang=lang, year=True, weekday=True, seconds=False)
+        elif self.date is None:
+            date = ""
+            long_date = ""
         else:
             date = self.date
+            long_date = self.date
         _channel = discord.utils.escape_markdown(self.channel) if self.channel else "?"
         _author = discord.utils.escape_markdown(self.author) if self.author else "?"
+        post_text = self.post_text or ""
+        post_text_size_limit = 3800 if self.feed.use_embed else 1800
         return self.bot.SafeDict(
             channel=_channel,
             title=self.title,
             date=date,
+            long_date=long_date,
             url=self.url,
             link=self.url,
             mentions=", ".join(self.mentions),
             logo=self.logo,
-            author=_author
+            author=_author,
+            full_text=post_text[:post_text_size_limit] + '…' if len(post_text) > post_text_size_limit else post_text,
         )
 
     async def create_msg(self, msg_format: str=None):
@@ -153,7 +178,10 @@ class RssMessage:
             return text
 
         emb = discord.Embed(description=text, color=self.embed_data['color'])
-        emb.set_footer(text=self.embed_data['footer'])
+        if self.embed_data['author_text']:
+            emb.set_author(name=self.embed_data['author_text'].format_map(safedict))
+        if self.embed_data['footer_text']:
+            emb.set_footer(text=self.embed_data['footer_text'].format_map(safedict))
         if self.embed_data['title'] is None:
             if self.feed.type != 'tw':
                 emb.title = self.title
@@ -164,14 +192,25 @@ class RssMessage:
         if "{url}" not in msg_format and "{link}" not in msg_format:
             emb.add_field(name='URL', value=self.url)
         if self.image is not None:
-            emb.set_thumbnail(url=self.image)
+            if self.embed_data["image_location"] == "thumbnail":
+                emb.set_thumbnail(url=self.image)
+            elif self.embed_data["image_location"] == "banner":
+                emb.set_image(url=self.image)
+        if self.embed_data["show_date_in_footer"] and isinstance(self.date, datetime.datetime):
+            emb.timestamp = self.date
+        if self.embed_data["enable_link_in_title"]:
+            emb.url = self.url
         return emb
 
 class FeedEmbedData(TypedDict):
     "Embed configuration for an RSS feed"
+    author_text: Optional[str]
     title: Optional[str]
     footer_text: Optional[str]
     color: Optional[int]
+    show_date_in_footer: Optional[bool]
+    enable_link_in_title: Optional[bool]
+    image_location: Optional[Literal["thumbnail", "banner", "none"]]
 
 class FeedObject:
     "A feed record from the database"
@@ -191,7 +230,7 @@ class FeedObject:
         self.role_ids: list[str] = [role for role in from_dict['roles'].split(';') if role.isnumeric()]
         self.use_embed: bool = from_dict['use_embed']
         self.embed_data: FeedEmbedData = json.loads(from_dict['embed'])
-        self.silent_mention: bool = from_dict['silent_mention']
+        self.silent_mention: bool = bool(from_dict['silent_mention'])
         self.last_update: Optional[datetime.datetime] = (
             from_dict['last_update'].replace(tzinfo=datetime.timezone.utc)
             if from_dict['last_update']

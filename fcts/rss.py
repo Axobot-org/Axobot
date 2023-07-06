@@ -1,10 +1,10 @@
 import asyncio
 import datetime
 import importlib
-from json import dumps
 import random
 import re
 import time
+from json import dumps
 from math import ceil
 from typing import Callable, Literal, Optional, Union
 
@@ -15,14 +15,14 @@ from cachingutils import acached
 from discord import app_commands
 from discord.ext import commands, tasks
 
-from fcts import args
+from libs.arguments import args
 from libs.bot_classes import Axobot, MyContext
 from libs.checks import checks
 from libs.enums import ServerWarningType
 from libs.formatutils import FormatUtils
 from libs.paginator import PaginatedSelectView, Paginator
-from libs.rss import RssMessage, TwitterRSS, YoutubeRSS, feed_parse
-from libs.rss.rss_general import FeedEmbedData, FeedObject, FeedType
+from libs.rss import (FeedEmbedData, FeedObject, FeedType, RssMessage,
+                      TwitterRSS, YoutubeRSS, feed_parse, get_text_from_entry)
 
 importlib.reload(args)
 importlib.reload(checks)
@@ -426,7 +426,7 @@ class Rss(commands.Cog):
             # no rss feed
             await ctx.send(await self.bot._(ctx.guild.id, "rss.no-feed2"))
             return
-        feeds_list.sort(key=lambda feed: feed.enabled, reverse=True)
+        feeds_list.sort(key=lambda feed: (feed.enabled, feed.type), reverse=True)
         await self.send_rss_list(ctx, feeds_list)
 
     async def send_rss_list(self, ctx: MyContext, feeds: list[FeedObject]):
@@ -869,11 +869,13 @@ class Rss(commands.Cog):
         Available variables:
         - `{author}`: the author of the post
         - `{channel}`: the channel name (usually the same as author)
-        - `{date}`: the post date (UTC)
+        - `{date}`: the post date, using Discord date markdown
+        - `{long_date}`: the post date in UTC, using extended static format
         - `{link}` or `{url}`: a link to the post
         - `{logo}`: an emoji representing the type of post (web, Twitter, YouTube...)
         - `{mentions}`: the list of mentioned roles
         - `{title}`: the title of the post
+        - `{full_text}`: the full text of the post
 
         ..Example rss text 3078731683662
 
@@ -941,20 +943,35 @@ class Rss(commands.Cog):
     @app_commands.describe(
         should_use_embed="Use an embed or not for this feed",
         color="Color of the embed (eg. #FF00FF)",
+        author_text="Text displayed in the author field of the embed (max 256 characters)",
         title="Embed title (max 256 characters)",
         footer_text="Small text displayed at the bottom of the embed (max 2048 characters)",
+        show_date_in_footer="Whether to show the post date in the footer or not",
+        enable_link_in_title="Whether to enable the link in the embed title or not",
+        image_location="Where to put the image in the embed (thumbnail, image, or None)",
     )
     @app_commands.rename(feed_id="feed")
     async def change_use_embed(self, ctx: MyContext, feed_id: Optional[str] = None, should_use_embed: Optional[bool] = None,
-                               color: discord.Color = None, title: Optional[str] = None,
-                               footer_text: Optional[str] = None):
+                               color: discord.Color = None,
+                               author_text: Optional[commands.Range[str, 2, 256]] = None,
+                               title: Optional[commands.Range[str, 2, 256]] = None,
+                               footer_text: Optional[commands.Range[str, 2, 2048]] = None,
+                               show_date_in_footer: Optional[bool] = None,
+                               enable_link_in_title: Optional[bool] = None,
+                               image_location: Optional[Literal["thumbnail", "banner", "none"]] = None):
         """Use an embed or not for a feed
-        You can also provide arguments to change the color/text of the embed. Followed arguments are usable:
-        - color: color of the embed (hex or decimal value)
-        - title: title override, which will disable the default one (max 256 characters)
-        - footer: small text displayed at the bottom of the embed
+        You can also provide arguments to change the color/texts of the embed. Followed variables are usable in text arguments:
+        - `{author}`: the author of the post
+        - `{channel}`: the channel name (usually the same as author)
+        - `{date}`: the post date, using Discord date markdown
+        - `{long_date}`: the post date in UTC, using extended static format
+        - `{link}` or `{url}`: a link to the post
+        - `{logo}`: an emoji representing the type of post (web, Twitter, YouTube...)
+        - `{mentions}`: the list of mentioned roles
+        - `{title}`: the title of the post
+        - `{full_text}`: the full text of the post
 
-        ..Example rss embed 6678466620137 true title="hey u" footer = "Hi \\n i'm a footer"
+        ..Example rss embed 6678466620137 true title: "New post from {author}!" color: red
 
         ..Doc rss.html#setup-a-feed-embed"""
         input_feed_id = int(feed_id) if feed_id is not None and feed_id.isnumeric() else None
@@ -974,6 +991,7 @@ class Rss(commands.Cog):
             cmd = await self.bot.get_command_mention("about")
             await ctx.send(await self.bot._(ctx.guild, "errors.unknown2", about=cmd))
             return
+        await ctx.defer()
         try:
             feed = await self.db_get_feed(feeds_ids[0])
             if feed is None:
@@ -990,12 +1008,27 @@ class Rss(commands.Cog):
             embed_data: FeedEmbedData = {}
             if color is not None:
                 embed_data["color"] = color.value
+            if author_text is not None:
+                embed_data["author_text"] = author_text
             if title is not None:
                 embed_data["title"] = title
             if footer_text is not None:
                 embed_data["footer_text"] = footer_text
+            if show_date_in_footer is not None:
+                embed_data["show_date_in_footer"] = show_date_in_footer
+            if enable_link_in_title is not None:
+                embed_data["enable_link_in_title"] = enable_link_in_title
+            if image_location is not None:
+                embed_data["image_location"] = image_location
+
             if embed_data:
                 embed_data = feed.embed_data | embed_data
+                if embed_data.get("author_text", "").lower() == "none":
+                    del embed_data["author_text"]
+                if embed_data.get("title", "").lower() == "none":
+                    del embed_data["title"]
+                if embed_data.get("footer_text", "").lower() == "none":
+                    del embed_data["footer_text"]
                 values_to_update.append(('embed', dumps(embed_data)))
                 txt.append(await self.bot._(ctx.guild.id, "rss.embed-json-changed"))
             if len(values_to_update) > 0:
@@ -1134,6 +1167,7 @@ class Rss(commands.Cog):
 
 
     async def rss_twitch(self, channel: discord.TextChannel, name: str, date: datetime.datetime=None, session: ClientSession=None):
+        "Get the last rss feed from a given Twitch channel"
         url = 'https://twitchrss.appspot.com/vod/' + name
         feeds = await feed_parse(self.bot, url, 5, session)
         if feeds is None:
@@ -1189,23 +1223,23 @@ class Rss(commands.Cog):
             return await self.bot._(channel, "rss.research-timeout")
         if 'bozo_exception' in feeds.keys() or len(feeds.entries) == 0:
             return await self.bot._(channel, "rss.web-invalid")
-        published = None
+        date_field_key = None
         for i in ['updated_parsed', 'published_parsed', 'published']:
             if i in feeds.entries[0].keys() and feeds.entries[0][i] is not None:
-                published = i
+                date_field_key = i
                 break
-        if published is not None and len(feeds.entries) > 1:
+        if date_field_key is not None and len(feeds.entries) > 1:
             try:
-                while (len(feeds.entries) > 1)  and (feeds.entries[1][published] is not None) and (feeds.entries[0][published] < feeds.entries[1][published]):
+                while (len(feeds.entries) > 1)  and (feeds.entries[1][date_field_key] is not None) and (feeds.entries[0][date_field_key] < feeds.entries[1][date_field_key]):
                     del feeds.entries[0]
             except KeyError:
                 pass
-        if not date or published not in ['published_parsed','updated_parsed']:
+        if not date or date_field_key not in ['published_parsed','updated_parsed']:
             feed = feeds.entries[0]
-            if published is None:
+            if date_field_key is None:
                 datz = 'Unknown'
             else:
-                datz = feed[published]
+                datz = feed[date_field_key]
             if 'link' in feed.keys():
                 l = feed['link']
             elif 'link' in feeds.keys():
@@ -1226,6 +1260,7 @@ class Rss(commands.Cog):
                 title = feeds['title']
             else:
                 title = '?'
+            post_text = await get_text_from_entry(feed)
             img = None
             r = re.search(r'(http(s?):)([/|.\w\s-])*\.(?:jpe?g|gif|png|webp)', str(feed))
             if r is not None:
@@ -1238,7 +1273,9 @@ class Rss(commands.Cog):
                 date=datz,
                 author=author,
                 channel=feeds.feed['title'] if 'title' in feeds.feed.keys() else '?',
-                image=img)
+                image=img,
+                post_text=post_text
+            )
             return [obj]
         else: # published in ['published_parsed','updated_parsed']
             liste = list()
@@ -1246,8 +1283,8 @@ class Rss(commands.Cog):
                 if len(liste)>10:
                     break
                 try:
-                    datz = feed[published]
-                    if feed[published] is None or (datetime.datetime(*feed[published][:6]) - date).total_seconds() < self.min_time_between_posts['web']:
+                    datz = feed[date_field_key]
+                    if feed[date_field_key] is None or (datetime.datetime(*feed[date_field_key][:6]) - date).total_seconds() < self.min_time_between_posts['web']:
                         break
                     if 'link' in feed.keys():
                         l = feed['link']
@@ -1269,6 +1306,7 @@ class Rss(commands.Cog):
                         title = feeds['title']
                     else:
                         title = '?'
+                    post_text = await get_text_from_entry(feed)
                     img = None
                     r = re.search(r'(http(s?):)([/|.\w\s-])*\.(?:jpe?g|gif|png|webp)', str(feed))
                     if r is not None:
@@ -1281,7 +1319,9 @@ class Rss(commands.Cog):
                         date=datz,
                         author=author,
                         channel=feeds.feed['title'] if 'title' in feeds.feed.keys() else '?',
-                        image=img)
+                        image=img,
+                        post_text=post_text
+                    )
                     liste.append(obj)
                 except Exception as err:
                     self.bot.dispatch("error", err)
