@@ -1,6 +1,7 @@
 {
     "DM": "Dat command isn't enabled in PM",
     "badarguments": "W0ops, unabled 2 convrt teh `%{p}` parameterz to \"%{t}\" tipe :confused:",
+    "badboolean": "Woopsie, ur value `%{p}` cant be convertd 2 a boolean",
     "badlitteral": "Oops, I dunno dat word",
     "cannotembed": "Oops, I need the perm to send rich msg (embeds) for dat command!!",
     "channotfound": "Super chat room %{c} don't want 2 be found",

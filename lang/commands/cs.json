@@ -250,8 +250,14 @@
         },
         "rss set-embed": {
             "feed": "zdroj",
-            "value": "hodnota",
-            "arguments": "argumenty"
+            "should_use_embed": "má-používat-embed",
+            "color": "barva",
+            "author_text": "text-autora",
+            "title": "název",
+            "footer_text": "text-zápatí",
+            "show_date_in_footer": "ukázat-datum-v-zápatí",
+            "enable_link_in_title": "povolit-odkaz-v-názvu",
+            "image_location": "umístění-obrázku"
         },
         "modlogs list": {
             "channel": "kanál"
