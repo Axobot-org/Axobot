@@ -23,7 +23,7 @@
         "empty": "Oops, U don't have any pending reminder lol",
         "item": "ID: `{id}` | In: {duration} | Chan: {channel} | Msg: {msg}",
         "recreated": "Roger that, new reminder created",
-        "saved": "Got it! I'll remind you in %{duration} OwO",
+        "saved": "Got it! reminder plannd for in %{duration} (it mean %{timestamp}) OwO",
         "select-placeholder": "Select 1+ rmd",
         "title": "I'll remind u that becuz ur dumb-dumb :bongocat:",
         "too-long": "Unable 2 set such a long duration .-.",

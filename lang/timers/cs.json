@@ -23,7 +23,7 @@
         "empty": "Bohužel, nemáte žádné nevyřízené připomínky...",
         "item": "ID: `{id}` | V: {duration} | Kanál: {channel} | Zpráva: {msg}",
         "recreated": "Byla vytvořena nová připomínka pro %{duration}!",
-        "saved": "Rozumím! Připomenu vám v %{duration}",
+        "saved": "Rozumím! Připomenu vám v %{duration} (%{timestamp})",
         "select-placeholder": "Vyberte jedno nebo více připomenutí",
         "title": "Seznam vašich připomenutí",
         "too-long": "Není možné nastavit tak dlouhou dobu",
