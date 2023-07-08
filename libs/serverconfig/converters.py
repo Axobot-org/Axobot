@@ -26,7 +26,7 @@ class IntOptionRepresentation(TypedDict):
 class FloatOptionRepresentation(TypedDict):
     type: Literal["float"]
     min: float
-    max: float
+    max: Optional[float]
     default: Optional[float]
     is_listed: bool
 
@@ -249,7 +249,7 @@ class FloatOption(OptionConverter):
             value = float(raw)
             if value < repr["min"]:
                 value = repr["min"]
-            elif value > repr["max"]:
+            elif repr["max"] is not None and value > repr["max"]:
                 value = repr["max"]
             return value
         except ValueError:
@@ -271,7 +271,7 @@ class FloatOption(OptionConverter):
             raise ValueError("Invalid float value", "FLOAT_INVALID", repr)
         if value < repr["min"]:
             raise ValueError("Value is too low", "FLOAT_TOO_LOW", repr)
-        elif value > repr["max"]:
+        elif repr["max"] is not None and value > repr["max"]:
             raise ValueError("Value is too high", "FLOAT_TOO_HIGH", repr)
         return value
 
