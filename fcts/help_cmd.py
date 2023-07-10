@@ -392,15 +392,15 @@ If the bot can't send the new command format, it will try to send the old one.""
             if len(subcmds) > 0:
                 answer += "\n"+subcmds+"\n"
             if len(cmd.aliases) > 0:
-                answer += "\n"+"__" + await self.bot._(ctx.channel, "help.aliases") + "__ " + (" - ".join(cmd.aliases)) + "\n"
+                answer += "\n"+"__" + await self.bot._(ctx.channel, "help.aliases") + "__: " + (" - ".join(cmd.aliases)) + "\n"
             if len(enabled) > 0:
                 answer += enabled[0]
             if len(checks) > 0:
                 answer += "\n" + "__" + await self.bot._(ctx.channel, "help.warning") + "__\n" + '\n'.join(checks) + "\n"
             if doc is not None:
                 doc_url = self.doc_url + doc
-                answer.append(((await self.bot._(ctx.channel, 'misc.doc')).capitalize(), doc_url))
-            answer += "\n\n__{}:__ {}".format((await self.bot._(ctx.channel, 'misc.category')).capitalize(), category)
+                answer += "\n__" + (await self.bot._(ctx.channel, 'misc.doc')).capitalize() + "__: " + doc_url
+            answer += "\n\n__" + (await self.bot._(ctx.channel, 'misc.category')).capitalize() + "__: " + category
             while "\n\n\n" in answer:
                 answer = answer.replace("\n\n\n", "\n\n")
             return [answer]
