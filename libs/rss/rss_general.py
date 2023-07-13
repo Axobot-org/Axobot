@@ -31,7 +31,7 @@ async def feed_parse(bot: Axobot, url: str, timeout: int, session: ClientSession
     except (UnicodeDecodeError, client_exceptions.ClientError):
         if session is None:
             await _session.close()
-        return FeedParserDict(entries=[], feed=FeedParserDict(), status=response.status)
+        return FeedParserDict(entries=[], feed=FeedParserDict(), status=200)
     except asyncio.exceptions.TimeoutError:
         if session is None:
             await _session.close()
@@ -98,6 +98,7 @@ class RssMessage:
         "Fill any interesting value to send in an embed"
         self.embed_data = {
             'color': discord.Colour.light_grey(),
+            'author_text': None,
             'footer_text': None,
             'title': None,
             'show_date_in_footer': True,
