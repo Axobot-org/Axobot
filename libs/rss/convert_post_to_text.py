@@ -10,7 +10,7 @@ async def get_text_from_entry(entry: dict) -> Optional[str]:
         return await convert_post_to_text(entry["content"][0]["value"], entry["content"][0]["type"])
     if "summary" in entry:
         return await convert_post_to_text(entry["summary"], entry["summary_detail"]["type"])
-    log.error("[rss] No content or summary in entry")
+    log.error("[rss] No content or summary in entry for article %s", entry['link'])
     return None
 
 async def convert_post_to_text(post: str, post_type: str) -> Optional[str]:
