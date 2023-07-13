@@ -78,6 +78,8 @@ class ServerWarningType(Enum):
     TICKET_INIT_FAILED = 8
     # role, user
     WELCOME_ROLE_MISSING_PERMISSIONS = 9
+    # channel, feed_id
+    RSS_TWITTER_DISABLED = 10
 
 class UsernameChangeRecord:
     "Record of a username change, mainly used for logs"

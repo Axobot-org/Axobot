@@ -1470,6 +1470,10 @@ Minimum age required by anti-raid: {min_age}"
                 emb.description = f"**Feed has been disabled** in channel <#{kwargs.get('channel_id')}>"
                 emb.add_field(name="Feed ID", value=kwargs.get('feed_id'))
                 emb.add_field(name="Reason", value="Too many recent errors")
+            elif warning_type == ServerWarningType.RSS_TWITTER_DISABLED:
+                emb.description = "Due to a recent Twitter API change, **Twitter feeds are not supported** anymore.\nYou should consider deleting this RSS feed."
+                emb.add_field(name="Feed ID", value=kwargs.get('feed_id'))
+                emb.add_field(name="Reason", value="Withdrawal of the free Twitter API")
             elif warning_type == ServerWarningType.TICKET_CREATION_UNKNOWN_TARGET:
                 emb.description = f"**Could not create ticket** in channel or category {kwargs.get('channel_id')}"
                 emb.add_field(name="Selected topic", value=kwargs.get('topic_name'))
