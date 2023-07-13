@@ -7,7 +7,6 @@ emoji>=2.0
 imageio
 geocoder
 timezonefinder
-python-twitter>=3.5
 isbnlib
 pytz
 psutil>=5.8
