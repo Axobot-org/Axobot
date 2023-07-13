@@ -73,7 +73,7 @@ Enable "Embed Links" permission for better rendering
             return False
         return await self.bot.get_config(context.guild.id, 'help_in_dm')
 
-    async def help_command(self, ctx: MyContext, command_arg: list[str]):
+    async def help_command(self, ctx: MyContext, commands_arg: Optional[list[str]] = None):
         """Main command for the creation of the help message
 If the bot can't send the new command format, it will try to send the old one."""
         # if user entered a category name
