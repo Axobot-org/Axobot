@@ -22,23 +22,32 @@ from libs.enums import ServerWarningType
 from libs.formatutils import FormatUtils
 from libs.paginator import PaginatedSelectView, Paginator
 from libs.rss import (FeedEmbedData, FeedObject, FeedType, RssMessage,
-                      TwitterRSS, YoutubeRSS, feed_parse, get_text_from_entry)
+                       YoutubeRSS, feed_parse, get_text_from_entry)
 
 importlib.reload(args)
 importlib.reload(checks)
 
 
+web_link = {
+    'fr-minecraft': 'https://fr-minecraft.net/rss.php',
+    'frm': 'https://fr-minecraft.net/rss.php',
+    'minecraft.net': 'https://fr-minecraft.net/minecraft_net_rss.xml',
+    'gunivers': 'https://gunivers.net/feed/'
+}
 
-web_link={'fr-minecraft':'https://fr-minecraft.net/rss.php',
-          'frm':'https://fr-minecraft.net/rss.php',
-          'minecraft.net':'https://fr-minecraft.net/minecraft_net_rss.xml',
-          'gunivers':'https://gunivers.net/feed/'
-          }
+reddit_link = {
+    'minecraft': 'https://www.reddit.com/r/Minecraft',
+    'reddit': 'https://www.reddit.com/r/news',
+    'discord': 'https://www.reddit.com/r/discordapp'
+}
 
-reddit_link={'minecraft':'https://www.reddit.com/r/Minecraft',
-             'reddit':'https://www.reddit.com/r/news',
-             'discord':'https://www.reddit.com/r/discordapp'
-             }
+TWITTER_ERROR_MESSAGE = "Due to the latest Twitter API changes, Twitter feeds are no longer supported by Axobot. Join our \
+Discord server (command `/about`) to find out more."
+
+def is_twitter_url(string: str):
+    "Check if an url is a valid Twitter URL"
+    matches = re.match(r'(?:http.*://)?(?:www\.)?(?:twitter\.com/)([^?\s/]+)', string)
+    return bool(matches)
 
 async def can_use_rss(ctx: MyContext):
     "Check if the user can manage its guild rss feeds"
@@ -62,7 +71,6 @@ class Rss(commands.Cog):
         self.errors_treshold = 24 * 3 # max errors allowed before disabling a feed (24h)
 
         self.youtube_rss = YoutubeRSS(self.bot)
-        self.twitter_rss = TwitterRSS(self.bot)
 
         self.twitter_over_capacity = False
         self.min_time_between_posts = {
@@ -106,7 +114,8 @@ class Rss(commands.Cog):
         if feed_type == "youtube":
             await self.last_post_youtube(ctx, url.lower())
         elif feed_type == "twitter":
-            await self.last_post_twitter(ctx, url)
+            await ctx.send(TWITTER_ERROR_MESSAGE)
+            return
         elif feed_type == "twitch":
             await self.last_post_twitch(ctx, url)
         elif feed_type == "deviantart":
@@ -120,7 +129,7 @@ class Rss(commands.Cog):
         "Get the type of a feed from its URL"
         if self.youtube_rss.is_youtube_url(url):
             return "youtube"
-        if self.twitter_rss.is_twitter_url(url):
+        if is_twitter_url(url):
             return "twitter"
         if re.match(r'^https://(www\.)?twitch\.tv/\w+', url):
             return "twitch"
@@ -171,27 +180,6 @@ class Rss(commands.Cog):
                 await ctx.send(embed=obj)
             else:
                 await ctx.send(obj)
-
-    async def last_post_twitter(self, ctx: MyContext, name: str):
-        "Search for the last tweet of a twitter user"
-        if self.twitter_rss.is_twitter_url(name):
-            name = await self.twitter_rss.get_userid_from_url(name)
-        try:
-            text = await self.twitter_rss.get_feed(ctx.channel, name)
-        except Exception as err:
-            return self.bot.dispatch("error", err, ctx)
-        if isinstance(text, str):
-            await ctx.send(text)
-        elif len(text) == 0:
-            await ctx.send(await self.bot._(ctx.channel, "rss.tw-no-tweet"))
-        else:
-            form = await self.bot._(ctx.channel, "rss.tw-form-last")
-            for single in text[:5]:
-                obj = await single.create_msg(form)
-                if isinstance(obj,discord.Embed):
-                    await ctx.send(embed=obj)
-                else:
-                    await ctx.send(obj)
 
     async def request_deviant(self, ctx: MyContext, user: str):
         "Search for the last post of a deviantart user"
@@ -265,11 +253,9 @@ class Rss(commands.Cog):
         if identifiant is not None:
             feed_type = 'yt'
             display_type = 'youtube'
-        if identifiant is None:
-            identifiant = await self.twitter_rss.get_userid_from_url(link)
-            if identifiant is not None:
-                feed_type = 'tw'
-                display_type = 'twitter'
+        if identifiant is None and is_twitter_url(link):
+            await ctx.send(TWITTER_ERROR_MESSAGE)
+            return
         if identifiant is None:
             identifiant = await self.parse_twitch_url(link)
             if identifiant is not None:
@@ -463,10 +449,7 @@ class Rss(commands.Cog):
                             roles += " <:silent:1093658138567245925>"
                     # feed name
                     feed_name: str = feed.link
-                    if feed.type == 'tw' and feed.link.isnumeric():
-                        if tw_user := await rss_cog.twitter_rss.get_user_from_id(int(feed.link)):
-                            feed_name = tw_user.screen_name
-                    elif feed.type == 'yt' and (channel_name := rss_cog.youtube_rss.get_channel_name_by_id(feed.link)):
+                    if feed.type == 'yt' and (channel_name := rss_cog.youtube_rss.get_channel_name_by_id(feed.link)):
                         feed_name = channel_name
                     if feed.enabled and not feed_name.startswith("http"):
                         feed_name = f"**{feed_name}**"
@@ -515,10 +498,7 @@ class Rss(commands.Cog):
 
     async def _get_feed_name(self, feed: FeedObject) -> str:
         name = feed.link
-        if feed.type == 'tw' and feed.link.isnumeric():
-            if user := await self.twitter_rss.get_user_from_id(int(feed.link)):
-                name = user.screen_name
-        elif feed.type == 'yt' and (channel_name := self.youtube_rss.get_channel_name_by_id(feed.link)):
+        if feed.type == 'yt' and (channel_name := self.youtube_rss.get_channel_name_by_id(feed.link)):
             name = channel_name
         elif feed.type == 'mc' and feed.link.endswith(':'):
             name = name[:-1]
@@ -1096,8 +1076,6 @@ class Rss(commands.Cog):
                 txt.append(notok+" No 'link' var")
             elif yt := await self.youtube_rss.get_channel_by_any_url(feeds.feed['link']):
                 txt.append("<:youtube:447459436982960143>  "+yt)
-            elif tw := self.twitter_rss.is_twitter_url(feeds.feed['link']):
-                    txt.append(f"<:twitter:958325391196585984>  {tw}")
             elif 'link' in feeds.feed.keys():
                 txt.append(f":newspaper:  <{feeds.feed['link']}>")
             else:
@@ -1130,9 +1108,6 @@ class Rss(commands.Cog):
     async def check_rss_url(self, url: str):
         "Check if a given URL is a valid rss feed"
         r = self.youtube_rss.is_youtube_url(url)
-        if r is not None:
-            return True
-        r = self.twitter_rss.is_twitter_url(url)
         if r is not None:
             return True
         r = await self.parse_twitch_url(url)
@@ -1542,7 +1517,8 @@ class Rss(commands.Cog):
             chan: Union[discord.TextChannel, discord.Thread, None] = guild.get_channel_or_thread(feed.channel_id)
             if chan is None:
                 self.bot.log.info("[send_rss_msg] Cannot send message on channel %s (unknown channel)", feed.channel_id)
-                self.bot.dispatch("server_warning", ServerWarningType.RSS_UNKNOWN_CHANNEL, guild, channel_id=feed.channel_id, feed_id=feed.feed_id)
+                self.bot.dispatch("server_warning", ServerWarningType.RSS_UNKNOWN_CHANNEL, guild,
+                                  channel_id=feed.channel_id, feed_id=feed.feed_id)
                 return False
             if feed.link in self.cache:
                 objs = self.cache[feed.link]
@@ -1550,7 +1526,9 @@ class Rss(commands.Cog):
                 if feed.type == "yt":
                     objs = await self.youtube_rss.get_feed(chan, feed.link, feed.date, session)
                 elif feed.type == "tw":
-                    objs = await self.twitter_rss.get_feed(chan, feed.link, feed.date)
+                    self.bot.dispatch("server_warning", ServerWarningType.RSS_TWITTER_DISABLED, guild,
+                                      channel_id=feed.channel_id, feed_id=feed.feed_id)
+                    return False
                 else:
                     funct = getattr(self, f"rss_{feed.type}")
                     objs: Union[str, list[RssMessage]] = await funct(chan, feed.link, feed.date, session=session)
