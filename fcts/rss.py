@@ -9,7 +9,6 @@ from math import ceil
 from typing import Callable, Literal, Optional, Union
 
 import discord
-import twitter
 from aiohttp import ClientSession, client_exceptions
 from cachingutils import acached
 from discord import app_commands
@@ -72,7 +71,6 @@ class Rss(commands.Cog):
 
         self.youtube_rss = YoutubeRSS(self.bot)
 
-        self.twitter_over_capacity = False
         self.min_time_between_posts = {
             'web': 120
         }
@@ -101,11 +99,11 @@ class Rss(commands.Cog):
 
         ..Example rss last-post https://www.youtube.com/channel/UCZ5XnGb-3t7jCkXdawN2tkA
 
-        ..Example rss last-post aureliensama twitter
+        ..Example rss last-post aureliensama youtube
 
         ..Example rss last-post https://www.twitch.tv/aureliensama twitch
 
-        ..Example rss last-post https://fr-minecraft.net/rss.php web
+        ..Example rss last-post https://fr-minecraft.net/rss.php
 
         ..Doc rss.html#see-the-last-post"""
         await ctx.defer()
@@ -1532,14 +1530,7 @@ class Rss(commands.Cog):
                 else:
                     funct = getattr(self, f"rss_{feed.type}")
                     objs: Union[str, list[RssMessage]] = await funct(chan, feed.link, feed.date, session=session)
-                if isinstance(objs, twitter.error.TwitterError):
-                    self.twitter_over_capacity = True
-                    self.bot.log.warning("[send_rss_msg] Twitter over capacity detected")
-                    return False
                 self.cache[feed.link] = objs
-            if isinstance(objs, twitter.TwitterError):
-                await self.bot.get_user(279568324260528128).send(f"[send_rss_msg] twitter error dans `await check_feed(): {objs}`")
-                raise objs
             if isinstance(objs, (str, type(None), int)) or len(objs) == 0:
                 return True
             elif isinstance(objs, list):
@@ -1606,8 +1597,6 @@ class Rss(commands.Cog):
             if not feed.enabled:
                 continue
             try:
-                if feed.type == 'tw' and self.twitter_over_capacity:
-                    continue
                 start_time = time.time()
                 checked_count += 1
                 if feed.type == 'mc':
@@ -1651,7 +1640,6 @@ class Rss(commands.Cog):
             self.bot.log.warning("[rss] "+desc[1])
         if guild_id is None:
             self.loop_processing = False
-        self.twitter_over_capacity = False
         self.cache.clear()
 
     @tasks.loop(minutes=20)

@@ -278,8 +278,6 @@ class FeedObject:
 
     def get_emoji(self, cog: "EmojisManager") -> Union[discord.Emoji, str]:
         "Get the representative emoji of a feed type"
-        if self.type == 'tw':
-            return cog.get_emoji('twitter')
         if self.type == 'yt':
             return cog.get_emoji('youtube')
         if self.type == 'twitch':

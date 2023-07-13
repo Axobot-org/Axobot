@@ -4,7 +4,7 @@
 
 More and more bots offer the feature to follow news feeds, sometimes `rss atom feeds <https://en.wikipedia.org/wiki/RSS>`__,but most often Twitter or YouTube profiles. Axobot allows you to track any rss/atom feed, as well as any Twitter/YouTube/Twitch/DeviantArt channel. For Reddit feeds, you can search for the url of the rss feed, but a command will be created to make your life easier!
 
-With this bot you have two possibilities to follow a feed: manually request the last post, or configure an automatic follow-up in a text channel. In the case of automatic tracking, Axobot will scan all feeds every ten minutes to check for new posts, sending them in if there are any. Just be careful: this automatic tracking costs a lot of resources to the bot, so you are limited to a certain number of automatic feeds (same for rss, twitter, youtube or minecraft) !
+With this bot you have two possibilities to follow a feed: manually request the last post, or configure an automatic follow-up in a text channel. In the case of automatic tracking, Axobot will scan all feeds every ten minutes to check for new posts, sending them in if there are any. Just be careful: this automatic tracking costs a lot of resources to the bot, so you are limited to 10 automatic feeds per server!
 
 To manage this plugin (add, edit or remove feeds), you will need at least the Manage Server permission.
 
@@ -12,7 +12,7 @@ To manage this plugin (add, edit or remove feeds), you will need at least the Ma
 See the last post
 -----------------
 
-**Syntax:** :code:`last-post <name|link> [youtube|twitter|twitch|deviant|web]`
+**Syntax:** :code:`last-post <name|link> [youtube|twitch|deviant|web]`
 
 This command allows you to see the last post of a youtube channel, a user on Twitter or Twitch or DeviantArt, or from any valid RSS feed. If you provide a full URL, the bot will automatically detect the type of feed. If you only provide the name of the channel, you will have to specify the type of feed.
 
@@ -141,6 +141,6 @@ Reload every feed
 
 **Syntax:** :code:`rss reload`
 
-If your favorite youtube channel has just posted a new cool video, and the bot takes too long to post it in your specially designed living room, you can force it to refresh the list of your youtube, twitter and other websites, in addition to Minecraft servers. This command will allow you in a few seconds to be again at the top of the latest news!
+If your favorite YouTube channel has just posted a new cool video, and the bot takes too long to post it in your specially designed channel, you can force it to refresh the list of your subscribed feeds, in addition to Minecraft servers. This command will allow you in a few seconds to be again at the top of the latest news!
 
 .. note:: Note that to avoid lags, a 10-minute cooldown is active on this command.
