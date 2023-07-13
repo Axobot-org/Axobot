@@ -216,7 +216,7 @@ class IntOption(OptionConverter):
             value = int(raw)
             if value < repr["min"]:
                 value = repr["min"]
-            elif value > repr["max"]:
+            elif repr["max"] is not None and value > repr["max"]:
                 value = repr["max"]
             return value
         except ValueError:
@@ -238,7 +238,7 @@ class IntOption(OptionConverter):
             raise ValueError("Invalid int value", "INT_INVALID", repr)
         if value < repr["min"]:
             raise ValueError("Value is too low", "INT_TOO_LOW", repr)
-        elif value > repr["max"]:
+        elif repr["max"] is not None and value > repr["max"]:
             raise ValueError("Value is too high", "INT_TOO_HIGH", repr)
         return value
 
