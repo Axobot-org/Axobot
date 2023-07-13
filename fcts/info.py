@@ -983,16 +983,16 @@ Available types: member, role, user, emoji, channel, server, invite, category
         if feed is None:
             await interaction.response.send_message("Unknown RSS feed")
             return
-        channel = self.bot.get_guild(feed.guild_id)
+        guild = self.bot.get_guild(feed.guild_id)
+        if guild is None:
+            g = f"Unknown ({feed.guild_id})"
+        else:
+            g = f"`{guild.name}`\n{guild.id}"
+        channel = self.bot.get_channel(feed.channel_id)
         if channel is None:
-            g = "Unknown ({})".format(feed.guild_id)
+            c = f"Unknown ({feed.channel_id})"
         else:
-            g = "`{}`\n{}".format(channel.name, channel.id)
-            channel = self.bot.get_channel(feed.channel_id)
-        if channel is not None:
-            c = "`{}`\n{}".format(channel.name,channel.id)
-        else:
-            c = "Unknown ({})".format(feed.channel_id)
+            c = f"`{channel.name}`\n{channel.id}"
         if feed.date is None:
             d = "never"
         else:
@@ -1001,6 +1001,15 @@ Available types: member, role, user, emoji, channel, server, invite, category
             color = None
         else:
             color = None if interaction.guild.me.color.value == 0 else interaction.guild.me.color
+        specificities = []
+        if not feed.enabled:
+            specificities.append("Disabled")
+        if feed.use_embed:
+            specificities.append("Use embed")
+        if feed.silent_mention:
+            specificities.append("Silent mention")
+        if feed.role_ids:
+            specificities.append(f"{len(feed.role_ids)} role mention")
         emb = discord.Embed(title=f"RSS #{feed_id}", color=color)
         emb.add_field(name="Server", value=g)
         if isinstance(channel, discord.Thread):
@@ -1010,6 +1019,8 @@ Available types: member, role, user, emoji, channel, server, invite, category
         emb.add_field(name="URL", value=feed.link, inline=False)
         emb.add_field(name="Type", value=feed.type)
         emb.add_field(name="Last post", value=d)
+        if specificities:
+            emb.add_field(name="Specificities", value=" - ".join(specificities))
         await interaction.response.send_message(embed=emb)
 
     @commands.command(name="membercount",aliases=['member_count'])
