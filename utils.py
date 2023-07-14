@@ -157,6 +157,7 @@ async def load_cogs(bot: "Axobot"):
         'fcts.tickets',
         'fcts.timers',
         'fcts.twitch',
+        'fcts.users_cache',
         'fcts.users',
         'fcts.utilities',
         'fcts.voice_channels',
