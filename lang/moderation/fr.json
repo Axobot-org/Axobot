@@ -81,8 +81,8 @@
         "error-notfound": "Oups, je n'arrive pas à retrouver ce message (Erreur : `%{err}`)",
         "error-toomuch": "Oups, impossible d'épingler ce message (Avez-vous plus de 50 messages épinglés ?). Erreur : `%{err}`"
     },
-    "raid-banned": "Vous avez été automatiquement banni du serveur %{guild} par l'antiraid.",
-    "raid-kicked": "Vous avez été automatiquement expulsé du serveur %{guild} par l'antiraid. Réessayez dans quelques jours.",
+    "raid-banned": "Vous avez été automatiquement banni du serveur %{guild} par l'automod.",
+    "raid-kicked": "Vous avez été automatiquement expulsé du serveur %{guild} par l'automod. Réessayez dans quelques jours.",
     "react-clear": "Impossible de retrouver ce message :confused:",
     "role": {
         "color-success": "Le rôle %{role} a changé de couleur !",
