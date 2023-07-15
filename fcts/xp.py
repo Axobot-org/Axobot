@@ -25,6 +25,8 @@ from libs.paginator import Paginator
 from libs.serverconfig.options_list import options
 from libs.tips import UserTip
 from libs.xp_cards.generator import CardGeneration
+from libs.xp_math import (get_level_from_xp_global, get_level_from_xp_mee6,
+                          get_xp_from_level_global, get_xp_from_level_mee6)
 
 importlib.reload(args)
 importlib.reload(checks)
@@ -265,31 +267,22 @@ class Xp(commands.Cog):
     async def calc_level(self, xp: int, system: Literal["global", "mee6-like", "local"]):
         """Calculate the level corresponding to a given xp amount
         Returns the current level, the xp needed for the next level and the xp needed for the current level"""
-        if system != "mee6-like":
-            if xp == 0:
-                xp_for_level_1: int = ceil((1*125/7)**(20/13))
-                return (0, xp_for_level_1, 0)
-            lvl: int = ceil(0.056*xp**0.65)
-            next_step = xp
-            while ceil(0.056*next_step**0.65)==lvl:
-                next_step += 1
-            xp_for_current_lvl: int = ceil(((lvl-1)*125/7)**(20/13))
-            return (lvl, next_step, xp_for_current_lvl)
-        else:
-            def recursive(lvl: int):
-                t = 0
-                for i in range(lvl):
-                    t += 5*pow(i,2) + 50*i + 100
-                return t
-
+        if system == "mee6-like":
             if xp == 0:
                 return (0, 100, 0)
-            lvl = 0
-            total_xp = 0
-            while xp >= total_xp:
-                total_xp += 5*pow(lvl,2) + 50*lvl + 100
-                lvl += 1
-            return (lvl-1, recursive(lvl), recursive(lvl-1))
+            current_level = get_level_from_xp_mee6(xp)
+            xp_for_current_lvl = get_xp_from_level_mee6(current_level)
+            xp_for_next_lvl = get_xp_from_level_mee6(current_level+1)
+            return (current_level, xp_for_next_lvl, xp_for_current_lvl)
+        # global/local system
+        if xp == 0:
+            xp_for_level_2 = await get_xp_from_level_global(2)
+            return (1, xp_for_level_2, 0)
+        current_level = await get_level_from_xp_global(xp)
+        xp_for_current_lvl = get_xp_from_level_global(current_level)
+        xp_for_next_lvl = get_xp_from_level_global(current_level+1)
+        return (current_level, xp_for_next_lvl, xp_for_current_lvl)
+
 
     async def give_rr(self, member: discord.Member, level: int, rr_list: list, remove: bool=False):
         """Give (and remove?) roles rewards to a member"""
