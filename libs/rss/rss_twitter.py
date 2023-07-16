@@ -97,7 +97,7 @@ class TwitterRSS:
                 img = lastpost.media[0].media_url_https
             obj = RssMessage(
                 bot=self.bot,
-                feed=FeedObject.unrecorded("tw", channel.guild.id if channel.guild else None, channel.id),
+                feed=FeedObject.unrecorded("tw", channel.guild.id if channel.guild else None, channel.id, url),
                 url=url,
                 title=text,
                 date=dt.datetime.fromtimestamp(lastpost.created_at_in_seconds),
@@ -129,7 +129,7 @@ class TwitterRSS:
                     img = post.media[0].media_url_https
                 obj = RssMessage(
                     bot=self.bot,
-                    feed=FeedObject.unrecorded("tw", channel.guild.id if channel.guild else None, channel.id),
+                    feed=FeedObject.unrecorded("tw", channel.guild.id if channel.guild else None, channel.id, url),
                     url=url,
                     title=text,
                     date=dt.datetime.fromtimestamp(post.created_at_in_seconds),

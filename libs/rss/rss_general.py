@@ -256,7 +256,7 @@ class FeedObject:
         return self.last_refresh > now - datetime.timedelta(days=7)
 
     @classmethod
-    def unrecorded(cls, from_type: str, guild_id: Optional[int]=None, channel_id: Optional[int]=None):
+    def unrecorded(cls, from_type: str, guild_id: Optional[int]=None, channel_id: Optional[int]=None, link: Optional[str]=None):
         return cls({
             "ID": None,
             "added_at": None,
@@ -264,7 +264,7 @@ class FeedObject:
             "guild": guild_id,
             "channel": channel_id,
             "type": from_type,
-            "link": None,
+            "link": link,
             "date": None,
             "roles": "",
             "use_embed": False,
@@ -289,4 +289,9 @@ class FeedObject:
             return cog.get_emoji('minecraft')
         if self.type == 'deviant':
             return cog.get_emoji('deviant')
+        if self.link is not None:
+            if self.link.startswith("https://github.com/"):
+                return cog.get_emoji('github')
+            if self.link.startswith("https://reddit.com/"):
+                return cog.get_emoji('reddit')
         return "📰"

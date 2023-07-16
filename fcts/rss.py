@@ -1155,7 +1155,7 @@ class Rss(commands.Cog):
                 img_url = r.group(1)
             obj = RssMessage(
                 bot=self.bot,
-                feed=FeedObject.unrecorded("twitch", channel.guild.id if channel.guild else None, channel.id),
+                feed=FeedObject.unrecorded("twitch", channel.guild.id if channel.guild else None, channel.id, url),
                 url=feed['link'],
                 title=feed['title'],
                 date=feed['published_parsed'],
@@ -1177,7 +1177,7 @@ class Rss(commands.Cog):
                     img_url = r.group(1)
                 obj = RssMessage(
                     bot=self.bot,
-                    feed=FeedObject.unrecorded("twitch", channel.guild.id if channel.guild else None, channel.id),
+                    feed=FeedObject.unrecorded("twitch", channel.guild.id if channel.guild else None, channel.id, url),
                     url=feed['link'],
                     title=feed['title'],
                     date=feed['published_parsed'],
@@ -1240,7 +1240,7 @@ class Rss(commands.Cog):
                 img = r.group(0)
             obj = RssMessage(
                 bot=self.bot,
-                feed=FeedObject.unrecorded("web", channel.guild.id if channel.guild else None, channel.id),
+                feed=FeedObject.unrecorded("web", channel.guild.id if channel.guild else None, channel.id, url),
                 url=l,
                 title=title,
                 date=datz,
@@ -1286,7 +1286,7 @@ class Rss(commands.Cog):
                         img = r.group(0)
                     obj = RssMessage(
                         bot=self.bot,
-                        feed=FeedObject.unrecorded("web", channel.guild.id if channel.guild else None, channel.id),
+                        feed=FeedObject.unrecorded("web", channel.guild.id if channel.guild else None, channel.id, url),
                         url=l,
                         title=title,
                         date=datz,
@@ -1315,7 +1315,7 @@ class Rss(commands.Cog):
             title = re.search(r"DeviantArt: ([^ ]+)'s gallery",feeds.feed['title']).group(1)
             obj = RssMessage(
                 bot=self.bot,
-                feed=FeedObject.unrecorded("deviant", guild.id if guild else None),
+                feed=FeedObject.unrecorded("deviant", guild.id if guild else None, link=url),
                 url=feed['link'],
                 title=feed['title'],
                 date=feed['published_parsed'],
@@ -1332,7 +1332,7 @@ class Rss(commands.Cog):
                 title = re.search(r"DeviantArt: ([^ ]+)'s gallery",feeds.feed['title']).group(1)
                 obj = RssMessage(
                     bot=self.bot,
-                    feed=FeedObject.unrecorded("deviant", guild.id if guild else None),
+                    feed=FeedObject.unrecorded("deviant", guild.id if guild else None, link=url),
                     url=feed['link'],
                     title=feed['title'],
                     date=feed['published_parsed'],
