@@ -987,6 +987,8 @@ class EmojisManager:
             "reddit": 447462065204887573,
             "twitch": 544192114440011792,
             "deviant": 626047669948776448,
-            "minecraft": 958305433439834152
+            "minecraft": 958305433439834152,
+            "github": 1130174138267480244,
+            "readthedocs": 484841075001786368,
         }
         return self.bot.get_emoji(ids[name])
