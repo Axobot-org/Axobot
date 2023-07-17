@@ -124,7 +124,7 @@ def get_card_texts(
         "rank_and_participants": f"{rank}/{participants}",
         "rank": str(rank),
         "participants": str(participants),
-        "xp_to_next_level_with_text": translation_map.get("xp_left").format(xp_left=xp_to_next_level - xp_to_current_level),
+        "xp_to_next_level_with_text": translation_map.get("xp_left").format(xp_left=xp_to_next_level - total_xp),
         "total_xp_with_text": translation_map.get("total_xp").format(total_xp=total_xp),
         "xp": f"{xp_from_last_level}/{xp_between_last_next_level} ({total_xp}/{xp_to_next_level})"
     }
