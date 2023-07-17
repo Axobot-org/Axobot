@@ -270,17 +270,17 @@ class Xp(commands.Cog):
         if system == "mee6-like":
             if xp == 0:
                 return (0, 100, 0)
-            current_level = get_level_from_xp_mee6(xp)
-            xp_for_current_lvl = get_xp_from_level_mee6(current_level)
-            xp_for_next_lvl = get_xp_from_level_mee6(current_level+1)
+            current_level = await get_level_from_xp_mee6(xp)
+            xp_for_current_lvl = await get_xp_from_level_mee6(current_level)
+            xp_for_next_lvl = await get_xp_from_level_mee6(current_level+1)
             return (current_level, xp_for_next_lvl, xp_for_current_lvl)
         # global/local system
         if xp == 0:
             xp_for_level_2 = await get_xp_from_level_global(2)
             return (1, xp_for_level_2, 0)
         current_level = await get_level_from_xp_global(xp)
-        xp_for_current_lvl = get_xp_from_level_global(current_level)
-        xp_for_next_lvl = get_xp_from_level_global(current_level+1)
+        xp_for_current_lvl = await get_xp_from_level_global(current_level)
+        xp_for_next_lvl = await get_xp_from_level_global(current_level+1)
         return (current_level, xp_for_next_lvl, xp_for_current_lvl)
 
 
