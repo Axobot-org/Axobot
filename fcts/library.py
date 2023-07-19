@@ -131,7 +131,7 @@ class Library(commands.Cog):
             emb.set_footer(text=ctx.author, icon_url=ctx.author.display_avatar)
 
             if authors:
-                t = await self.bot._(ctx.channel, 'library.author' if len(authors) <= 1 else 'authors')
+                t = await self.bot._(ctx.channel, "library.author" if len(authors) <= 1 else "library.authors")
                 t = t.capitalize()
                 emb.add_field(name=t, value='\n'.join(authors)  )
             # Publisher
