@@ -173,7 +173,7 @@ class AntiRaid(commands.Cog):
     async def on_message(self, message: discord.Message):
         "Check mentions count when a message is sent"
         # if the message is not in a guild or the bot can't see the guild
-        if message.guild is None or message.guild.me is None:
+        if not isinstance(message.author, discord.Member) or message.guild.me is None:
             return
         # if the author is a bot or has permission to moderate memebrs
         if message.author.bot or message.author.guild_permissions.moderate_members:
