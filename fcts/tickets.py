@@ -208,7 +208,7 @@ class Tickets(commands.Cog):
                                 )
         return discord.Embed(title=title, description=desc, color=discord.Color.green())
 
-    async def setup_ticket_channel(self, channel: discord.TextChannel, topic: dict, user: discord.Member):
+    async def get_ticket_channel_perms(self, channel: discord.TextChannel, topic: dict, user: discord.Member):
         "Setup the required permissions for a channel ticket"
         permissions = {}
         # set for everyone
@@ -224,8 +224,7 @@ class Tickets(commands.Cog):
                 manage_messages=True,
                 manage_channels=True
             )
-        # apply everything
-        await channel.edit(overwrites=permissions)
+        return permissions
 
     async def setup_ticket_thread(self, thread: discord.Thread, topic: dict, user: discord.Member):
         "Add the required members to a Discord thread ticket"
@@ -279,8 +278,9 @@ class Tickets(commands.Cog):
         sent_error = False
         channel_name = await self.get_channel_name(topic["name_format"], interaction, topic, ticket_name)
         if isinstance(category, discord.CategoryChannel):
+            perms = await self.get_ticket_channel_perms(category, topic, interaction.user)
             try:
-                channel = await category.create_text_channel(channel_name)
+                channel = await category.create_text_channel(channel_name, overwrites=perms)
             except discord.Forbidden:
                 await interaction.edit_original_response(content=await self.bot._(interaction.guild_id, "tickets.missing-perms-creation.channel", category=category.name))
                 self.bot.dispatch("server_warning", ServerWarningType.TICKET_CREATION_FAILED,
@@ -289,16 +289,16 @@ class Tickets(commands.Cog):
                     topic_name=topic['topic']
                 )
                 return
-            try:
-                await self.setup_ticket_channel(channel, topic, interaction.user)
-            except discord.Forbidden:
-                await self.send_missing_permissions_err(interaction, category.name)
-                self.bot.dispatch("server_warning", ServerWarningType.TICKET_INIT_FAILED,
-                    interaction.guild,
-                    channel=category,
-                    topic_name=topic['topic']
-                )
-                sent_error = True
+            # try:
+            #     await self.get_ticket_channel_perms(channel, topic, interaction.user)
+            # except discord.Forbidden:
+            #     await self.send_missing_permissions_err(interaction, category.name)
+            #     self.bot.dispatch("server_warning", ServerWarningType.TICKET_INIT_FAILED,
+            #         interaction.guild,
+            #         channel=category,
+            #         topic_name=topic['topic']
+            #     )
+            #     sent_error = True
         elif isinstance(category, discord.TextChannel):
             try:
                 if "PRIVATE_THREADS" in interaction.guild.features and category.permissions_for(interaction.guild.me).create_private_threads:
