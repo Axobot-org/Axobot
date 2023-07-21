@@ -294,4 +294,11 @@ class FeedObject:
                 return cog.get_emoji('github')
             if self.link.startswith("https://reddit.com/"):
                 return cog.get_emoji('reddit')
+            if self.link.startswith("https://youtube.com/"):
+                return cog.get_emoji('youtube')
+            if self.link.startswith("https://twitrss.me/"):
+                return cog.get_emoji('twitter')
+            if self.link.startswith("https://minecraft.net/"):
+                return cog.get_emoji('minecraft')
         return "📰"
+
