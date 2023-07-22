@@ -969,7 +969,8 @@ class Rss(commands.Cog):
             cmd = await self.bot.get_command_mention("about")
             await ctx.send(await self.bot._(ctx.guild, "errors.unknown2", about=cmd))
             return
-        await ctx.defer()
+        if ctx.interaction and not ctx.interaction.response.is_done():
+            await ctx.defer()
         try:
             feed = await self.db_get_feed(feeds_ids[0])
             if feed is None:
