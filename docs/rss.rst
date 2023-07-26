@@ -106,7 +106,15 @@ Sometimes people want to have a lot of control over what is happening in the wor
 
 For the first command, if you do not give the feed identifier or a boolean value, the bot will ask you for it. However, you must give it yourself for the second command (you can find it via the `rss list <#see-every-feed>`__ command).
 
-The syntax of the color/text customization parameters is the same as for the `embed <miscellaneous.html#embed>`__ command, i.e. in the form :code:`key = "value"`, with the possible keys "color", "footer" and "title".
+The available parameters are:
+
+- color: The color of the embed (eg. #FF00FF)
+- author-text: Text displayed in the author field of the embed (max 256 characters), or 'none' to disable it
+- title: Embed title (max 256 characters), or 'none' to disable"
+- footer-text: Small text displayed at the bottom of the embed (max 2048 characters), or 'none' to disable"
+- show-date-in-footer: Whether to show the post date in the footer or not
+- enable-link-in-title: Whether to enable the link in the embed title or not
+- image-location: Where to put the image in the embed (thumbnail, image, or None)
 
 
 ----------------------

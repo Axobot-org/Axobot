@@ -921,9 +921,9 @@ class Rss(commands.Cog):
     @app_commands.describe(
         should_use_embed="Use an embed or not for this feed",
         color="Color of the embed (eg. #FF00FF)",
-        author_text="Text displayed in the author field of the embed (max 256 characters)",
-        title="Embed title (max 256 characters)",
-        footer_text="Small text displayed at the bottom of the embed (max 2048 characters)",
+        author_text="Text displayed in the author field of the embed (max 256 characters), 'none' to disable",
+        title="Embed title (max 256 characters), 'none' to disable",
+        footer_text="Small text displayed at the bottom of the embed (max 2048 characters), 'none' to disable",
         show_date_in_footer="Whether to show the post date in the footer or not",
         enable_link_in_title="Whether to enable the link in the embed title or not",
         image_location="Where to put the image in the embed (thumbnail, image, or None)",
