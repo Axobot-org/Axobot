@@ -383,8 +383,8 @@ Every information come from the website www.fr-minecraft.net"""
         title = await self.bot._(ctx.channel, "minecraft.player-skin-title", player=username)
         download = await self.bot._(ctx.channel, "minecraft.player-skin-download")
         emb = discord.Embed(
-            title=title, color=self.embed_color, description=f"[{download}](https://crafatar.com/skins/{uuid})")
-        emb.set_image(url=f"https://crafatar.com/renders/body/{uuid}?overlay")
+            title=title, color=self.embed_color, description=f"[{download}](https://visage.surgeplay.com/skin/{uuid})")
+        emb.set_image(url="https://visage.surgeplay.com/full/384/" + uuid)
         await self.send_embed(ctx, emb)
 
     @mc_main.command(name="server")
