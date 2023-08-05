@@ -1598,7 +1598,7 @@ class Rss(commands.Cog):
             if not feed.enabled:
                 continue
             try:
-                start_time = time.time()
+                # start_time = time.time()
                 checked_count += 1
                 if feed.type == 'mc':
                     if await self.bot.get_cog('Minecraft').check_feed(feed, send_stats=(guild_id is None)):
@@ -1612,8 +1612,8 @@ class Rss(commands.Cog):
                         errors_ids.append(feed.feed_id)
             except Exception as err:
                 self.bot.dispatch("error", err, f"RSS feed {feed.feed_id}")
-            end_time = time.time()
-            await self._log_rss_feed_time(feed.feed_id, round(end_time - start_time, 3))
+            # end_time = time.time()
+            # await self._log_rss_feed_time(feed.feed_id, round(end_time - start_time, 3))
             await asyncio.sleep(self.time_between_feeds_check)
         await session.close()
         self.bot.get_cog('Minecraft').feeds.clear()
