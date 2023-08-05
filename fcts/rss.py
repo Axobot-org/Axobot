@@ -1198,7 +1198,7 @@ class Rss(commands.Cog):
         if 'bozo_exception' in feeds.keys() or len(feeds.entries) == 0:
             return await self.bot._(channel, "rss.web-invalid")
         date_field_key = None
-        for i in ['updated_parsed', 'published_parsed', 'published']:
+        for i in ['published_parsed', 'published', 'updated_parsed']:
             if i in feeds.entries[0].keys() and feeds.entries[0][i] is not None:
                 date_field_key = i
                 break
@@ -1208,7 +1208,7 @@ class Rss(commands.Cog):
                     del feeds.entries[0]
             except KeyError:
                 pass
-        if not date or date_field_key not in ['published_parsed','updated_parsed']:
+        if not date or date_field_key not in ['published_parsed', 'updated_parsed']:
             feed = feeds.entries[0]
             if date_field_key is None:
                 datz = 'Unknown'
