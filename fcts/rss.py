@@ -763,7 +763,7 @@ class Rss(commands.Cog):
     @commands.guild_only()
     @commands.check(can_use_rss)
     @commands.check(checks.database_connected)
-    @commands.cooldown(1,600,commands.BucketType.guild)
+    @commands.cooldown(1, 60*5, commands.BucketType.guild)
     async def reload_guild_feeds(self, ctx: MyContext):
         """Reload every rss feeds from your server
 
