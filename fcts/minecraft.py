@@ -2,6 +2,7 @@ import datetime
 import json
 import re
 import time
+from difflib import SequenceMatcher
 from typing import Any, Union
 
 import aiohttp
@@ -11,11 +12,14 @@ from dateutil.parser import isoparse
 from discord.ext import commands
 from frmc_lib import SearchType
 
-from libs.checks import checks
 from libs.bot_classes import Axobot, MyContext
+from libs.checks import checks
 from libs.formatutils import FormatUtils
 from libs.rss.rss_general import FeedObject
 
+def _similar(input_1: str, input_2: str):
+    "Compare two strings and output the similarity ratio"
+    return SequenceMatcher(None, input_1, input_2).ratio()
 
 class Minecraft(commands.Cog):
     """Cog gathering all commands related to the Minecraft® game.
@@ -49,8 +53,7 @@ Every information come from the website www.fr-minecraft.net"""
             embed.set_footer(text="Requested by {}".format(
                 ctx.author.display_name), icon_url=ctx.author.display_avatar.replace(format="png", size=512))
         else:
-            text = "Mojang Studios - Services Status (requested by {})".format(
-                ctx.author)
+            text = f"Mojang Studios - Services Status (requested by {ctx.author})"
 
         async def get_status(key, value) -> tuple[str]:
             if key == "www.minecraft.net/en-us":
@@ -305,7 +308,32 @@ Every information come from the website www.fr-minecraft.net"""
         if not ctx.can_send_embed:
             await ctx.send(await self.bot._(ctx.channel, "minecraft.no-embed"))
             return
-        url = 'https://api.curseforge.com/v1/mods/search'
+        await ctx.defer()
+        if cf_result := await self.get_mod_from_curseforge(ctx, value):
+            cf_embed, cf_pertinence = cf_result
+            if cf_pertinence > 0.9:
+                await self.send_embed(ctx, cf_embed)
+                return
+        else:
+            cf_embed, cf_pertinence = None, 0
+        if mr_result := await self.get_mod_from_modrinth(ctx, value):
+            mr_embed, mr_pertinence = mr_result
+            if mr_pertinence > 0.9:
+                await self.send_embed(ctx, mr_embed)
+                return
+        else:
+            mr_embed, mr_pertinence = None, 0
+        if cf_pertinence > mr_pertinence and cf_embed is not None:
+            await self.send_embed(ctx, cf_embed)
+            return
+        elif mr_embed is not None:
+            await self.send_embed(ctx, mr_embed)
+            return
+        await ctx.send(await self.bot._(ctx.channel, "minecraft.no-mod"))
+
+    async def get_mod_from_curseforge(self, ctx: MyContext, search_value: str):
+        "Get a mod data from the CurseForge API"
+        url = "https://api.curseforge.com/v1/mods/search"
         header = {
             "x-api-key": self.bot.others["curseforge"]
         }
@@ -314,15 +342,19 @@ Every information come from the website www.fr-minecraft.net"""
             "classId": 6,
             "sortField": 2,
             "sortOrder": "desc",
-            "searchFilter": value
+            "searchFilter": search_value
         }
         async with aiohttp.ClientSession(loop=self.bot.loop, headers=header) as session:
             async with session.get(url, params=params, timeout=10) as resp:
-                search: list[dict[str, Any]] = (await resp.json())["data"]
-        if len(search) == 0:
-            await ctx.send(await self.bot._(ctx.channel, "minecraft.no-mod"))
+                if resp.status >= 400:
+                    raise ValueError(f"CurseForge API returned {resp.status} for {search_value}")
+                api_results: list[dict[str, Any]] = (await resp.json())["data"]
+        if len(api_results) == 0:
             return
-        search = search[0]
+        search = api_results[0]
+        pertinence = _similar(search_value.lower(), search["name"].lower())
+        if pertinence < 0.5:
+            return
         authors = ", ".join([
             f"[{x['name']}]({x['url']})" for x in search['authors']
         ])
@@ -343,15 +375,15 @@ Every information come from the website www.fr-minecraft.net"""
             "summary": search['summary'],
             "versions": versions,
             "downloads": int(search['downloadCount']),
-            "id": search['id']
+            "id-curseforge": str(search['id'])
         }
-        title = "{} - {}".format((await self.bot._(ctx.channel, "minecraft.names"))[5], search['name'])
+        title = (await self.bot._(ctx.channel, "minecraft.names"))[5] + " - " + search['name']
         embed = discord.Embed(
             title=title,
             color=self.embed_color,
             url=search["links"]['websiteUrl'],
-            timestamp=ctx.message.created_at)
-        embed.set_footer(text=ctx.author, icon_url=ctx.author.display_avatar)
+            timestamp=ctx.message.created_at
+        )
         if logo := search['logo']:
             embed.set_thumbnail(url=logo['thumbnailUrl'])
         lang = await self.bot._(ctx.channel, "_used_locale")
@@ -361,9 +393,60 @@ Every information come from the website www.fr-minecraft.net"""
             translation = await self.bot._(ctx.channel, "minecraft.mod-fields."+name)
             if isinstance(data_value, int):
                 data_value = await FormatUtils.format_nbr(data_value, lang)
-            inline = name in {"authors", "release", "downloads", "id"} or name == "categories" and len(data_value) < 100
+            inline = name in {"authors", "release", "downloads", "id-curseforge"} or name == "categories" and len(data_value) < 100
             embed.add_field(name=translation, value=data_value, inline=inline)
-        await self.send_embed(ctx, embed)
+        return embed, pertinence
+
+    async def get_mod_from_modrinth(self, ctx: MyContext, search_value: str):
+        "Get a mod data from the Modrinth API"
+        url = "https://api.modrinth.com/v2/search"
+        params = {
+            "query": search_value,
+            "facets": "[[\"project_type:mod\"]]",
+        }
+        async with aiohttp.ClientSession(loop=self.bot.loop) as session:
+            async with session.get(url, params=params, timeout=10) as resp:
+                if resp.status >= 400:
+                    raise ValueError(f"Modrinth API returned {resp.status} for {search_value}")
+                api_results: list[dict[str, Any]] = (await resp.json())["hits"]
+        if len(api_results) == 0:
+            return
+        search = api_results[0]
+        pertinence = _similar(search_value.lower(), search["title"].lower())
+        if pertinence < 0.5:
+            return
+        date = f"<t:{isoparse(search['date_modified']).timestamp():.0f}>"
+        categories = " - ".join(search["display_categories"]) if "display_categories" in search else ""
+        versions = " - ".join(search["versions"])
+        data = {
+            "name": search["title"],
+            "author": search["author"],
+            "release": date,
+            "categories": categories,
+            "summary": search["description"],
+            "versions": versions,
+            "downloads": int(search['downloads']),
+            "id-modrinth": search["slug"]
+        }
+        title = (await self.bot._(ctx.channel, "minecraft.names"))[5] + " - " + search["title"]
+        embed = discord.Embed(
+            title=title,
+            color=self.embed_color,
+            url="https://modrinth.com/mod/" + search["slug"],
+            timestamp=ctx.message.created_at
+        )
+        if logo := search["icon_url"]:
+            embed.set_thumbnail(url=logo)
+        lang = await self.bot._(ctx.channel, "_used_locale")
+        for name, data_value in data.items():
+            if not data_value:
+                continue
+            translation = await self.bot._(ctx.channel, "minecraft.mod-fields."+name)
+            if isinstance(data_value, int):
+                data_value = await FormatUtils.format_nbr(data_value, lang)
+            inline = name in {"author", "release", "downloads", "id-modrinth"} or name == "categories" and len(data_value) < 100
+            embed.add_field(name=translation, value=data_value, inline=inline)
+        return embed, pertinence
 
     @mc_main.command(name="skin")
     @commands.check(checks.bot_can_embed)
