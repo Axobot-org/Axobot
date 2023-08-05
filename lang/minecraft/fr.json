@@ -53,10 +53,12 @@
     ],
     "item-help": "Cette commande permet d'obtenir des informations sur n'importe quel item de Minecraft. Vous pouvez donner son nom complet ou partiel, en français ou en anglais, ou même son identifiant. Il suffit d'entrer `%{p}mc item <nom>`",
     "mod-fields": {
+        "author": "Auteur",
         "authors": "Auteurs",
         "categories": "Catégories",
         "downloads": "Nombre de téléchargements",
-        "id": "ID CurseForge",
+        "id-curseforge": "ID CurseForge",
+        "id-modrinth": "ID Modrinth",
         "name": "Nom",
         "release": "Dernière mise à jour",
         "summary": "Résumé",
