@@ -75,7 +75,7 @@
     "tw-form-last": "{logo}  | Voici le dernier tweet de {author}:\nÉcrit le {date}\n\n{title}\n\nLien : {url}\n",
     "tw-no-tweet": "Il semble que cet utilisateur n'ait jamais tweeté :confused:",
     "twitch": "Twitch",
-    "twitch-default-flow": "{logo}  | Nouveau live de {author} ! ({date})\n\n{title}\n\nLien : {link}\n\n{mentions}",
+    "twitch-default-flow": "{logo}  | Nouveau clip de {author} ! ({date})\n\n{title}\n\nLien : {link}\n\n{mentions}",
     "twitch-form-last": "{logo}  | Voici la dernière vidéo de {author}:\n{title}\nPubliée le {date}\nLien : {url}\n",
     "twitch-invalid": "Oups, impossible de trouver une chaîne Twitch avec ce nom !",
     "use_embed-same": "L'utilisation d'embeds pour ce flux n'a pas changé",
