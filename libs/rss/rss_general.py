@@ -227,7 +227,7 @@ class FeedObject:
         self.channel_id: int = from_dict['channel']
         self.type: FeedType = from_dict['type']
         self.link: str = from_dict['link']
-        self.date: datetime.datetime = from_dict['date']
+        self.date: Optional[datetime.datetime ]= from_dict['date']
         self.role_ids: list[str] = [role for role in from_dict['roles'].split(';') if role.isnumeric()]
         self.use_embed: bool = from_dict['use_embed']
         self.embed_data: FeedEmbedData = json.loads(from_dict['embed'])
