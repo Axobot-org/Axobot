@@ -130,12 +130,10 @@ class YoutubeRSS:
         if len(entries) == 0:
             return []
         posts_list: list[RssMessage] = []
-        print("new feed")
         for entry in entries:
             if len(posts_list) > 10:
                 break
             entry_date = entry.get("published_parsed")
-            print(dt.datetime(*entry_date[:6]), dt.datetime(*entry_date[:6]) - date)
             # check if the entry is not too close to (or passed) the last post
             if entry_date is None or (
                     dt.datetime(*entry_date[:6]) - date).total_seconds() <= self.min_time_between_posts:

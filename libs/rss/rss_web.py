@@ -44,7 +44,9 @@ class WebRSS:
                 pass
         return feed
 
-    async def _get_feed_date_key(self, entry: FeedParserDict) -> Optional[Literal['published_parsed', 'published', 'updated_parsed']]:
+    async def _get_feed_date_key(self, entry: FeedParserDict) -> Optional[
+        Literal['published_parsed', 'published', 'updated_parsed']
+    ]:
         "Compute which key to use to get the date from a feed"
         for i in ['published_parsed', 'published', 'updated_parsed']:
             if entry.get(i) is not None:
@@ -111,13 +113,11 @@ class WebRSS:
             if isinstance(last_entry, RssMessage):
                 return [last_entry]
             return []
-        print("new feed")
         for entry in feed.entries:
             if len(posts_list) > 10:
                 break
             try:
                 entry_date = entry.get(date_field_key)
-                print(dt.datetime(*entry_date[:6]), dt.datetime(*entry_date[:6]) - date)
                 # check if the entry is not too close to (or passed) the last post
                 if entry_date is None or (
                         dt.datetime(*entry_date[:6]) - date).total_seconds() < self.min_time_between_posts:
