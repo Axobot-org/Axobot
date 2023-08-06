@@ -22,6 +22,7 @@ from libs.formatutils import FormatUtils
 from libs.paginator import PaginatedSelectView, Paginator
 from libs.rss import (FeedEmbedData, FeedObject, FeedType, RssMessage,
                       YoutubeRSS, feed_parse)
+from libs.rss.rss_deviantart import DeviantartRSS
 from libs.rss.rss_web import WebRSS
 
 importlib.reload(args)
@@ -72,6 +73,7 @@ class Rss(commands.Cog):
 
         self.youtube_rss = YoutubeRSS(self.bot)
         self.web_rss = WebRSS(self.bot)
+        self.deviant_rss = DeviantartRSS(self.bot)
 
         self.min_time_between_posts = {
             'web': 120
@@ -133,9 +135,9 @@ class Rss(commands.Cog):
             return "twitter"
         if re.match(r'^https://(www\.)?twitch\.tv/\w+', url):
             return "twitch"
-        if re.match(r'^https://(www\.)?deviantart\.com/w+', url):
+        if self.deviant_rss.is_deviantart_url(url):
             return "deviantart"
-        if re.match(r'^https://', url):
+        if self.web_rss.is_web_url(url):
             return "web"
         return None
 
@@ -157,7 +159,7 @@ class Rss(commands.Cog):
             await ctx.send(text)
         else:
             form = await self.bot._(ctx.channel, "rss.yt-form-last")
-            obj = await text[0].create_msg(form)
+            obj = await text.create_msg(form)
             if isinstance(obj,discord.Embed):
                 await ctx.send(embed=obj)
             else:
@@ -183,14 +185,14 @@ class Rss(commands.Cog):
 
     async def request_deviant(self, ctx: MyContext, user: str):
         "Search for the last post of a deviantart user"
-        if re.match(r'https://(?:www\.)deviantart.com/', user):
-            user = await self.parse_deviant_url(user)
-        text = await self.rss_deviant(ctx.guild,user)
+        if extracted_user := await self.deviant_rss.get_username_by_url(user):
+            user = extracted_user
+        text = await self.deviant_rss.get_last_post(ctx.channel, user)
         if isinstance(text, str):
             await ctx.send(text)
         else:
             form = await self.bot._(ctx.channel, "rss.deviant-form-last")
-            obj = await text[0].create_msg(form)
+            obj = await text.create_msg(form)
             if isinstance(obj,discord.Embed):
                 await ctx.send(embed=obj)
             else:
@@ -208,7 +210,7 @@ class Rss(commands.Cog):
             await ctx.send(text)
         else:
             form = await self.bot._(ctx.channel, "rss.web-form-last")
-            obj = await text[0].create_msg(form)
+            obj = await text.create_msg(form)
             if isinstance(obj,discord.Embed):
                 await ctx.send(embed=obj)
             else:
@@ -262,7 +264,7 @@ class Rss(commands.Cog):
                 feed_type = 'twitch'
                 display_type = 'twitch'
         if identifiant is None:
-            identifiant = await self.parse_deviant_url(link)
+            identifiant = await self.deviant_rss.get_username_by_url(link)
             if identifiant is not None:
                 feed_type = 'deviant'
                 display_type = 'deviantart'
@@ -1108,14 +1110,11 @@ class Rss(commands.Cog):
 
     async def check_rss_url(self, url: str):
         "Check if a given URL is a valid rss feed"
-        r = self.youtube_rss.is_youtube_url(url)
-        if r is not None:
+        if self.youtube_rss.is_youtube_url(url):
             return True
-        r = await self.parse_twitch_url(url)
-        if r is not None:
+        if await self.parse_twitch_url(url) is not None:
             return True
-        r = await self.parse_deviant_url(url)
-        if r is not None:
+        if self.deviant_rss.is_deviantart_url(url):
             return True
         try:
             f = await feed_parse(self.bot, url, 8)
@@ -1124,7 +1123,6 @@ class Rss(commands.Cog):
         except IndexError:
             return False
 
-
     async def parse_twitch_url(self, url):
         r = r'(?:http.*://)?(?:www\.)?(?:twitch\.tv/)([^?\s]+)'
         match = re.search(r,url)
@@ -1132,15 +1130,6 @@ class Rss(commands.Cog):
             return None
         else:
             return match.group(1)
-
-    async def parse_deviant_url(self, url):
-        r = r'(?:http.*://)?(?:www\.)?(?:deviantart\.com/)([^?\s]+)'
-        match = re.search(r,url)
-        if match is None:
-            return None
-        else:
-            return match.group(1)
-
 
     async def rss_twitch(self, channel: discord.TextChannel, name: str, date: datetime.datetime=None, session: ClientSession=None):
         "Get the last rss feed from a given Twitch channel"
@@ -1192,50 +1181,6 @@ class Rss(commands.Cog):
             liste.reverse()
             return liste
 
-
-    async def rss_deviant(self, guild: discord.Guild, nom: str, date: datetime.datetime=None, session: ClientSession=None):
-        url = 'https://backend.deviantart.com/rss.xml?q=gallery%3A'+nom
-        feeds = await feed_parse(self.bot, url, 5, session)
-        if feeds is None:
-            return await self.bot._(guild, "rss.research-timeout")
-        if len(feeds.entries) == 0:
-            return await self.bot._(guild, "rss.nothing")
-        if not date:
-            feed = feeds.entries[0]
-            img_url = feed['media_content'][0]['url'] if "media_content" in feed else None
-            title = re.search(r"DeviantArt: ([^ ]+)'s gallery",feeds.feed['title']).group(1)
-            obj = RssMessage(
-                bot=self.bot,
-                feed=FeedObject.unrecorded("deviant", guild.id if guild else None, link=url),
-                url=feed['link'],
-                title=feed['title'],
-                date=feed['published_parsed'],
-                author=title,
-                image=img_url
-            )
-            return [obj]
-        else:
-            liste = []
-            for feed in feeds.entries:
-                if datetime.datetime(*feed['published_parsed'][:6]) <= date:
-                    break
-                img_url = feed['media_content'][0]['url'] if "media_content" in feed else None
-                title = re.search(r"DeviantArt: ([^ ]+)'s gallery",feeds.feed['title']).group(1)
-                obj = RssMessage(
-                    bot=self.bot,
-                    feed=FeedObject.unrecorded("deviant", guild.id if guild else None, link=url),
-                    url=feed['link'],
-                    title=feed['title'],
-                    date=feed['published_parsed'],
-                    author=title,
-                    image=img_url
-                )
-                liste.append(obj)
-            liste.reverse()
-            return liste
-
-
-
     async def create_id(self, feed_type: FeedType):
         "Create a unique ID for a feed, based on its type"
         numb = str(round(time.time()/2)) + str(random.randint(10,99))
@@ -1276,7 +1221,7 @@ class Rss(commands.Cog):
             form = ''
         else:
             form = await self.bot._(guild_id, f"rss.{_type}-default-flow")
-        query = "INSERT INTO `{}` (`ID`, `guild`, `channel`, `type`, `link`, `structure`) VALUES (%(i)s, %(g)s, %(c)s, %(t)s, %(l)s, %(f)s)".format(self.table)
+        query = f"INSERT INTO `{self.table}` (`ID`, `guild`, `channel`, `type`, `link`, `structure`) VALUES (%(i)s, %(g)s, %(c)s, %(t)s, %(l)s, %(f)s)"
         async with self.bot.db_query(query, { 'i': feed_id, 'g': guild_id, 'c': channel_id, 't': _type, 'l': link, 'f': form }):
             pass
         return feed_id
@@ -1413,16 +1358,31 @@ class Rss(commands.Cog):
                 objs = self.cache[feed.link]
             else:
                 if feed.type == "yt":
-                    objs = await self.youtube_rss.get_new_posts(chan, feed.link, feed.date, session)
+                    if feed.date is None:
+                        objs = await self.youtube_rss.get_last_post(chan, feed.link, session)
+                    else:
+                        objs = await self.youtube_rss.get_new_posts(chan, feed.link, feed.date, session)
                 elif feed.type == "tw":
                     self.bot.dispatch("server_warning", ServerWarningType.RSS_TWITTER_DISABLED, guild,
                                       channel_id=feed.channel_id, feed_id=feed.feed_id)
                     return False
                 elif feed.type == "web":
-                    objs = await self.web_rss.get_new_posts(chan, feed.link, feed.date, session)
+                    if feed.date is None:
+                        objs = await self.web_rss.get_last_post(chan, feed.link, session)
+                    else:
+                        objs = await self.web_rss.get_new_posts(chan, feed.link, feed.date, session)
+                elif feed.type == "deviant":
+                    if feed.date is None:
+                        objs = await self.deviant_rss.get_last_post(chan, feed.link, session)
+                    else:
+                        objs = await self.deviant_rss.get_new_posts(chan, feed.link, feed.date, session)
                 else:
                     funct = getattr(self, f"rss_{feed.type}")
                     objs: Union[str, list[RssMessage]] = await funct(chan, feed.link, feed.date, session=session)
+                # transform single object into list
+                if isinstance(objs, RssMessage):
+                    objs = [objs]
+                # update cache
                 self.cache[feed.link] = objs
             if isinstance(objs, (str, type(None), int)) or len(objs) == 0:
                 return True
