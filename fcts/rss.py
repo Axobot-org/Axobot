@@ -23,6 +23,7 @@ from libs.paginator import PaginatedSelectView, Paginator
 from libs.rss import (FeedEmbedData, FeedObject, FeedType, RssMessage,
                       YoutubeRSS, feed_parse)
 from libs.rss.rss_deviantart import DeviantartRSS
+from libs.rss.rss_twitch import TwitchRSS
 from libs.rss.rss_web import WebRSS
 
 importlib.reload(args)
@@ -74,6 +75,7 @@ class Rss(commands.Cog):
         self.youtube_rss = YoutubeRSS(self.bot)
         self.web_rss = WebRSS(self.bot)
         self.deviant_rss = DeviantartRSS(self.bot)
+        self.twitch_rss = TwitchRSS(self.bot)
 
         self.min_time_between_posts = {
             'web': 120
@@ -121,7 +123,7 @@ class Rss(commands.Cog):
         elif feed_type == "twitch":
             await self.last_post_twitch(ctx, url)
         elif feed_type == "deviantart":
-            await self.request_deviant(ctx, url)
+            await self.last_post_deviant(ctx, url)
         elif feed_type == "web":
             await self.request_web(ctx, url)
         else:
@@ -167,23 +169,24 @@ class Rss(commands.Cog):
 
     async def last_post_twitch(self, ctx: MyContext, channel: str):
         "Search for the last video of a twitch channel"
-        if re.match(r'^https://(www\.)?twitch\.tv/\w+', channel):
-            channel = await self.parse_twitch_url(channel)
-            if channel is None:
+        if self.twitch_rss.is_twitch_url(channel):
+            parsed_channel = await self.twitch_rss.get_username_by_url(channel)
+            if parsed_channel is None:
                 await ctx.send(await self.bot._(ctx.channel, "rss.twitch-invalid"))
                 return
-        text = await self.rss_twitch(ctx.channel, channel)
+            channel = parsed_channel
+        text = await self.twitch_rss.get_last_post(ctx.channel, channel)
         if isinstance(text, str):
             await ctx.send(text)
         else:
             form = await self.bot._(ctx.channel, "rss.twitch-form-last")
-            obj = await text[0].create_msg(form)
-            if isinstance(obj,discord.Embed):
+            obj = await text.create_msg(form)
+            if isinstance(obj, discord.Embed):
                 await ctx.send(embed=obj)
             else:
                 await ctx.send(obj)
 
-    async def request_deviant(self, ctx: MyContext, user: str):
+    async def last_post_deviant(self, ctx: MyContext, user: str):
         "Search for the last post of a deviantart user"
         if extracted_user := await self.deviant_rss.get_username_by_url(user):
             user = extracted_user
@@ -193,7 +196,7 @@ class Rss(commands.Cog):
         else:
             form = await self.bot._(ctx.channel, "rss.deviant-form-last")
             obj = await text.create_msg(form)
-            if isinstance(obj,discord.Embed):
+            if isinstance(obj, discord.Embed):
                 await ctx.send(embed=obj)
             else:
                 await ctx.send(obj)
@@ -259,7 +262,7 @@ class Rss(commands.Cog):
             await ctx.send(TWITTER_ERROR_MESSAGE)
             return
         if identifiant is None:
-            identifiant = await self.parse_twitch_url(link)
+            identifiant = await self.twitch_rss.get_username_by_url(link)
             if identifiant is not None:
                 feed_type = 'twitch'
                 display_type = 'twitch'
@@ -1112,7 +1115,7 @@ class Rss(commands.Cog):
         "Check if a given URL is a valid rss feed"
         if self.youtube_rss.is_youtube_url(url):
             return True
-        if await self.parse_twitch_url(url) is not None:
+        if self.twitch_rss.is_twitch_url(url):
             return True
         if self.deviant_rss.is_deviantart_url(url):
             return True
@@ -1122,64 +1125,6 @@ class Rss(commands.Cog):
             return True
         except IndexError:
             return False
-
-    async def parse_twitch_url(self, url):
-        r = r'(?:http.*://)?(?:www\.)?(?:twitch\.tv/)([^?\s]+)'
-        match = re.search(r,url)
-        if match is None:
-            return None
-        else:
-            return match.group(1)
-
-    async def rss_twitch(self, channel: discord.TextChannel, name: str, date: datetime.datetime=None, session: ClientSession=None):
-        "Get the last rss feed from a given Twitch channel"
-        url = 'https://twitchrss.appspot.com/vod/' + name
-        feeds = await feed_parse(self.bot, url, 5, session)
-        if feeds is None:
-            return await self.bot._(channel, "rss.research-timeout")
-        if len(feeds.entries) == 0:
-            return await self.bot._(channel, "rss.nothing")
-        if not date:
-            feed: dict = feeds.entries[0]
-            r = re.search(r'<img src="([^"]+)" />',feed['summary'])
-            img_url = None
-            if r is not None:
-                img_url = r.group(1)
-            obj = RssMessage(
-                bot=self.bot,
-                feed=FeedObject.unrecorded("twitch", channel.guild.id if channel.guild else None, channel.id, url),
-                url=feed['link'],
-                title=feed['title'],
-                date=feed['published_parsed'],
-                author=feeds.feed['title'].replace("'s Twitch video RSS",""),
-                image=img_url,
-                channel=name
-            )
-            return [obj]
-        else:
-            liste = []
-            for feed in feeds.entries:
-                if len(liste) > 10:
-                    break
-                if datetime.datetime(*feed['published_parsed'][:6]) <= date:
-                    break
-                r = re.search(r'<img src="([^"]+)" />',feed['summary'])
-                img_url = None
-                if r is not None:
-                    img_url = r.group(1)
-                obj = RssMessage(
-                    bot=self.bot,
-                    feed=FeedObject.unrecorded("twitch", channel.guild.id if channel.guild else None, channel.id, url),
-                    url=feed['link'],
-                    title=feed['title'],
-                    date=feed['published_parsed'],
-                    author=feeds.feed['title'].replace("'s Twitch video RSS",""),
-                    image=img_url,
-                    channel=name
-                )
-                liste.append(obj)
-            liste.reverse()
-            return liste
 
     async def create_id(self, feed_type: FeedType):
         "Create a unique ID for a feed, based on its type"
@@ -1376,8 +1321,14 @@ class Rss(commands.Cog):
                         objs = await self.deviant_rss.get_last_post(chan, feed.link, session)
                     else:
                         objs = await self.deviant_rss.get_new_posts(chan, feed.link, feed.date, session)
+                elif feed.type == "twitch":
+                    if feed.date is None:
+                        objs = await self.twitch_rss.get_last_post(chan, feed.link, session)
+                    else:
+                        objs = await self.twitch_rss.get_new_posts(chan, feed.link, feed.date, session)
                 else:
                     funct = getattr(self, f"rss_{feed.type}")
+                    self.bot.dispatch("error", RuntimeError(f"Unknown feed type {feed.type}"))
                     objs: Union[str, list[RssMessage]] = await funct(chan, feed.link, feed.date, session=session)
                 # transform single object into list
                 if isinstance(objs, RssMessage):
