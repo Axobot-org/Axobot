@@ -75,7 +75,6 @@
     "tw-form-last": "{logo}  | Zde je poslední tweet {author}:\nPublikováno {date}\n\n{title}\n\nOdkaz: {url}",
     "tw-no-tweet": "Vypadá to, že tento uživatel nikdy netweetoval :confused:",
     "twitch": "Twitch",
-    "twitch-default-flow": "{logo}  | Nový tweet {author}! ({date})\n\n{title}\n\nOdkaz: {link}\n\n{mentions}",
     "twitch-form-last": "{logo} | Zde je poslední video {author}:\n{title}\nPublikováno dne {date}\nOdkaz: {url}\n",
     "twitch-invalid": "Ale ne, nemohl jsem najít žádný Twitch kanál s tímto jménem!",
     "use_embed-same": "Použití embedu pro tento kanál se nezměnilo",
