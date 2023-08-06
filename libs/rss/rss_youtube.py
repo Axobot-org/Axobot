@@ -2,11 +2,12 @@ from __future__ import annotations
 
 import datetime as dt
 import re
-from typing import TYPE_CHECKING, Union
+from typing import TYPE_CHECKING, Optional
 
 import aiohttp
 import discord
 from cachingutils import acached, cached
+from feedparser.util import FeedParserDict
 
 from libs.youtube_search import Service
 
@@ -21,7 +22,7 @@ class YoutubeRSS:
 
     def __init__(self, bot: Axobot):
         self.bot = bot
-        self.min_time_between_posts = 120
+        self.min_time_between_posts = 120 # seconds
         self.search_service = Service(5, bot.others['google_api'])
         self.url_pattern = re.compile(
             r'(?:https?://)?(?:www.)?(?:youtube.com|youtu.be)/(?:channel/|user/|c/)?@?([^/\s?]+).*$'
@@ -92,58 +93,69 @@ class YoutubeRSS:
     def get_channel_name_by_id(self, channel_id: str):
         return self.search_service.query_channel_title(channel_id)
 
-    async def _get_feed_list(self, identifiant: str, session: aiohttp.ClientSession=None):
+    async def _get_feed_list(self, identifiant: str, session: Optional[aiohttp.ClientSession]=None) -> list[FeedParserDict]:
+        "Get the feed list from a youtube channel"
         url = 'https://www.youtube.com/feeds/videos.xml?channel_id='+identifiant
-        return await feed_parse(self.bot, url, 7, session)
+        feed = await feed_parse(self.bot, url, 7, session)
+        if feed is None or not feed.entries:
+            return []
+        return feed.entries
 
-    async def get_feed(self, channel: discord.TextChannel, identifiant: str, date: dt.datetime=None,
-                       session: aiohttp.ClientSession=None) -> Union[str, list[RssMessage]]:
-        "Get the RSS feed of a youtube channel"
-        feeds = await self._get_feed_list(identifiant, session)
-        if feeds is None:
+    async def get_last_post(self, channel: discord.TextChannel, identifiant: str, session: Optional[aiohttp.ClientSession]=None):
+        "Get the last post from a youtube channel"
+        entries = await self._get_feed_list(identifiant, session)
+        if len(entries) == 0:
             return await self.bot._(channel, "rss.nothing")
-        if not feeds.entries:
-            return await self.bot._(channel, "rss.nothing")
-        if not date:
-            feed = feeds.entries[0]
+        entry = entries[0]
+        img_url = None
+        if 'media_thumbnail' in entry.keys() and len(entry['media_thumbnail']) > 0:
+            img_url = entry['media_thumbnail'][0]['url']
+        post_text = await get_text_from_entry(entry)
+        return RssMessage(
+            bot=self.bot,
+            feed=FeedObject.unrecorded("yt", channel.guild.id if channel.guild else None, channel.id),
+            url=entry['link'],
+            title=entry['title'],
+            date=entry['published_parsed'],
+            author=entry['author'],
+            channel=entry['author'],
+            image=img_url,
+            post_text=post_text
+        )
+
+    async def get_new_posts(self, channel: discord.TextChannel, identifiant: str, date: dt.datetime,
+                            session: Optional[aiohttp.ClientSession]=None) -> list[RssMessage]:
+        "Get new posts from a youtube channels"
+        entries = await self._get_feed_list(identifiant, session)
+        if len(entries) == 0:
+            return []
+        posts_list: list[RssMessage] = []
+        print("new feed")
+        for entry in entries:
+            if len(posts_list) > 10:
+                break
+            entry_date = entry.get("published_parsed")
+            print(dt.datetime(*entry_date[:6]), dt.datetime(*entry_date[:6]) - date)
+            # check if the entry is not too close to (or passed) the last post
+            if entry_date is None or (
+                    dt.datetime(*entry_date[:6]) - date).total_seconds() <= self.min_time_between_posts:
+                # we know we can break because entries are sorted by most recent first
+                break
             img_url = None
-            if 'media_thumbnail' in feed.keys() and len(feed['media_thumbnail']) > 0:
-                img_url = feed['media_thumbnail'][0]['url']
-            post_text = await get_text_from_entry(feed)
+            if 'media_thumbnail' in entry.keys() and len(entry['media_thumbnail']) > 0:
+                img_url = entry['media_thumbnail'][0]['url']
+            post_text = await get_text_from_entry(entry)
             obj = RssMessage(
                 bot=self.bot,
                 feed=FeedObject.unrecorded("yt", channel.guild.id if channel.guild else None, channel.id),
-                url=feed['link'],
-                title=feed['title'],
-                date=feed['published_parsed'],
-                author=feed['author'],
-                channel=feed['author'],
+                url=entry['link'],
+                title=entry['title'],
+                date=entry_date,
+                author=entry['author'],
+                channel=entry['author'],
                 image=img_url,
                 post_text=post_text
             )
-            return [obj]
-        else:
-            liste = []
-            for feed in feeds.entries:
-                if len(liste) > 10:
-                    break
-                if 'published_parsed' not in feed or (dt.datetime(*feed['published_parsed'][:6]) - date).total_seconds() <= self.min_time_between_posts:
-                    break
-                img_url = None
-                if 'media_thumbnail' in feed.keys() and len(feed['media_thumbnail']) > 0:
-                    img_url = feed['media_thumbnail'][0]['url']
-                post_text = await get_text_from_entry(feed)
-                obj = RssMessage(
-                    bot=self.bot,
-                    feed=FeedObject.unrecorded("yt", channel.guild.id if channel.guild else None, channel.id),
-                    url=feed['link'],
-                    title=feed['title'],
-                    date=feed['published_parsed'],
-                    author=feed['author'],
-                    channel=feed['author'],
-                    image=img_url,
-                    post_text=post_text
-                )
-                liste.append(obj)
-            liste.reverse()
-            return liste
+            posts_list.append(obj)
+        posts_list.reverse()
+        return posts_list

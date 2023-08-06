@@ -21,7 +21,8 @@ from libs.enums import ServerWarningType
 from libs.formatutils import FormatUtils
 from libs.paginator import PaginatedSelectView, Paginator
 from libs.rss import (FeedEmbedData, FeedObject, FeedType, RssMessage,
-                       YoutubeRSS, feed_parse, get_text_from_entry)
+                      YoutubeRSS, feed_parse)
+from libs.rss.rss_web import WebRSS
 
 importlib.reload(args)
 importlib.reload(checks)
@@ -70,6 +71,7 @@ class Rss(commands.Cog):
         self.errors_treshold = 24 * 3 # max errors allowed before disabling a feed (24h)
 
         self.youtube_rss = YoutubeRSS(self.bot)
+        self.web_rss = WebRSS(self.bot)
 
         self.min_time_between_posts = {
             'web': 120
@@ -150,7 +152,7 @@ class Rss(commands.Cog):
             # we couldn't get the ID based on user input
             await ctx.send(await self.bot._(ctx.channel, "rss.yt-invalid"))
             return
-        text = await self.youtube_rss.get_feed(ctx.channel, channel)
+        text = await self.youtube_rss.get_last_post(ctx.channel, channel)
         if isinstance(text, str):
             await ctx.send(text)
         else:
@@ -198,7 +200,7 @@ class Rss(commands.Cog):
         "Search for the last post of a web feed"
         link = web_link.get(link, link)
         try:
-            text = await self.rss_web(ctx.channel,link)
+            text = await self.web_rss.get_last_post(ctx.channel, link)
         except client_exceptions.InvalidURL:
             await ctx.send(await self.bot._(ctx.channel, "rss.invalid-link"))
             return
@@ -1190,118 +1192,6 @@ class Rss(commands.Cog):
             liste.reverse()
             return liste
 
-    async def rss_web(self, channel: discord.TextChannel, url: str, date: datetime.datetime=None, session: ClientSession=None):
-        "Get the last rss feed from a given url"
-        feeds = await feed_parse(self.bot, url, 9, session)
-        if feeds is None:
-            return await self.bot._(channel, "rss.research-timeout")
-        if 'bozo_exception' in feeds.keys() or len(feeds.entries) == 0:
-            return await self.bot._(channel, "rss.web-invalid")
-        date_field_key = None
-        for i in ['published_parsed', 'published', 'updated_parsed']:
-            if i in feeds.entries[0].keys() and feeds.entries[0][i] is not None:
-                date_field_key = i
-                break
-        if date_field_key is not None and len(feeds.entries) > 1:
-            try:
-                while (len(feeds.entries) > 1)  and (feeds.entries[1][date_field_key] is not None) and (feeds.entries[0][date_field_key] < feeds.entries[1][date_field_key]):
-                    del feeds.entries[0]
-            except KeyError:
-                pass
-        if not date or date_field_key not in ['published_parsed', 'updated_parsed']:
-            feed = feeds.entries[0]
-            if date_field_key is None:
-                datz = 'Unknown'
-            else:
-                datz = feed[date_field_key]
-            if 'link' in feed.keys():
-                l = feed['link']
-            elif 'link' in feeds.keys():
-                l = feeds['link']
-            else:
-                l = url
-            if 'author' in feed.keys():
-                author = feed['author']
-            elif 'author' in feeds.keys():
-                author = feeds['author']
-            elif 'title' in feeds['feed'].keys():
-                author = feeds['feed']['title']
-            else:
-                author = '?'
-            if 'title' in feed.keys():
-                title = feed['title']
-            elif 'title' in feeds.keys():
-                title = feeds['title']
-            else:
-                title = '?'
-            post_text = await get_text_from_entry(feed)
-            img = None
-            r = re.search(r'(http(s?):)([/|.\w\s-])*\.(?:jpe?g|gif|png|webp)', str(feed))
-            if r is not None:
-                img = r.group(0)
-            obj = RssMessage(
-                bot=self.bot,
-                feed=FeedObject.unrecorded("web", channel.guild.id if channel.guild else None, channel.id, url),
-                url=l,
-                title=title,
-                date=datz,
-                author=author,
-                channel=feeds.feed['title'] if 'title' in feeds.feed.keys() else '?',
-                image=img,
-                post_text=post_text
-            )
-            return [obj]
-        else: # published in ['published_parsed','updated_parsed']
-            liste = list()
-            for feed in feeds.entries:
-                if len(liste)>10:
-                    break
-                try:
-                    datz = feed[date_field_key]
-                    if feed[date_field_key] is None or (datetime.datetime(*feed[date_field_key][:6]) - date).total_seconds() < self.min_time_between_posts['web']:
-                        break
-                    if 'link' in feed.keys():
-                        l = feed['link']
-                    elif 'link' in feeds.keys():
-                        l = feeds['link']
-                    else:
-                        l = url
-                    if 'author' in feed.keys():
-                        author = feed['author']
-                    elif 'author' in feeds.keys():
-                        author = feeds['author']
-                    elif 'title' in feeds['feed'].keys():
-                        author = feeds['feed']['title']
-                    else:
-                        author = '?'
-                    if 'title' in feed.keys():
-                        title = feed['title']
-                    elif 'title' in feeds.keys():
-                        title = feeds['title']
-                    else:
-                        title = '?'
-                    post_text = await get_text_from_entry(feed)
-                    img = None
-                    r = re.search(r'(http(s?):)([/|.\w\s-])*\.(?:jpe?g|gif|png|webp)', str(feed))
-                    if r is not None:
-                        img = r.group(0)
-                    obj = RssMessage(
-                        bot=self.bot,
-                        feed=FeedObject.unrecorded("web", channel.guild.id if channel.guild else None, channel.id, url),
-                        url=l,
-                        title=title,
-                        date=datz,
-                        author=author,
-                        channel=feeds.feed['title'] if 'title' in feeds.feed.keys() else '?',
-                        image=img,
-                        post_text=post_text
-                    )
-                    liste.append(obj)
-                except Exception as err:
-                    self.bot.dispatch("error", err)
-            liste.reverse()
-            return liste
-
 
     async def rss_deviant(self, guild: discord.Guild, nom: str, date: datetime.datetime=None, session: ClientSession=None):
         url = 'https://backend.deviantart.com/rss.xml?q=gallery%3A'+nom
@@ -1523,11 +1413,13 @@ class Rss(commands.Cog):
                 objs = self.cache[feed.link]
             else:
                 if feed.type == "yt":
-                    objs = await self.youtube_rss.get_feed(chan, feed.link, feed.date, session)
+                    objs = await self.youtube_rss.get_new_posts(chan, feed.link, feed.date, session)
                 elif feed.type == "tw":
                     self.bot.dispatch("server_warning", ServerWarningType.RSS_TWITTER_DISABLED, guild,
                                       channel_id=feed.channel_id, feed_id=feed.feed_id)
                     return False
+                elif feed.type == "web":
+                    objs = await self.web_rss.get_new_posts(chan, feed.link, feed.date, session)
                 else:
                     funct = getattr(self, f"rss_{feed.type}")
                     objs: Union[str, list[RssMessage]] = await funct(chan, feed.link, feed.date, session=session)
