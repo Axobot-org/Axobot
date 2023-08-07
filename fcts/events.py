@@ -7,11 +7,9 @@ import time
 
 import aiohttp
 import discord
-import mysql
 from discord.ext import commands, tasks
 
 from libs.bot_classes import SUPPORT_GUILD_ID, Axobot, MyContext
-from libs.enums import UsernameChangeRecord
 
 
 class Events(commands.Cog):
@@ -413,7 +411,7 @@ class Events(commands.Cog):
         await self.bot.wait_until_ready()
         if self.bot.get_cog("Rss") is None:
             return
-        rss_feeds = await self.bot.get_cog("Rss").db_get_raws_count(True)
+        rss_feeds = await self.bot.get_cog("Rss").db_get_raws_count(get_disabled=True)
         active_rss_feeds = await self.bot.get_cog("Rss").db_get_raws_count()
         if infoCog := self.bot.get_cog("BotInfo"):
             member_count, bot_count = infoCog.get_users_nber([])

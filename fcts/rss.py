@@ -37,11 +37,6 @@ web_link = {
     'gunivers': 'https://gunivers.net/feed/'
 }
 
-reddit_link = {
-    'minecraft': 'https://www.reddit.com/r/Minecraft',
-    'reddit': 'https://www.reddit.com/r/news',
-    'discord': 'https://www.reddit.com/r/discordapp'
-}
 
 TWITTER_ERROR_MESSAGE = "Due to the latest Twitter API changes, Twitter feeds are no longer supported by Axobot. Join our \
 Discord server (command `/about`) to find out more."
@@ -59,7 +54,8 @@ async def can_use_rss(ctx: MyContext):
 
 
 class Rss(commands.Cog):
-    """Cog which deals with everything related to rss feeds. Whether it is to add automatic tracking to a stream, or just to see the latest video released by Discord, it is this cog that will be used."""
+    """Cog which deals with everything related to RSS feeds.
+    Whether it is to add automatic tracking to a feed, or just to see the latest post of a feed, this is the right place!"""
 
     def __init__(self, bot: Axobot):
         self.bot = bot
@@ -77,13 +73,9 @@ class Rss(commands.Cog):
         self.deviant_rss = DeviantartRSS(self.bot)
         self.twitch_rss = TwitchRSS(self.bot)
 
-        self.min_time_between_posts = {
-            'web': 120
-        }
-        self.cache = {}
+        self.cache: dict[str, list[RssMessage]] = {}
         # launch rss loop
         self.loop_child.change_interval(minutes=self.time_loop) # pylint: disable=no-member
-
 
     @property
     def table(self):
@@ -125,7 +117,7 @@ class Rss(commands.Cog):
         elif feed_type == "deviantart":
             await self.last_post_deviant(ctx, url)
         elif feed_type == "web":
-            await self.request_web(ctx, url)
+            await self.last_post_web(ctx, url)
         else:
             await ctx.send(await self.bot._(ctx.channel, "rss.invalid-flow"))
 
@@ -201,7 +193,7 @@ class Rss(commands.Cog):
             else:
                 await ctx.send(obj)
 
-    async def request_web(self, ctx: MyContext, link: str):
+    async def last_post_web(self, ctx: MyContext, link: str):
         "Search for the last post of a web feed"
         link = web_link.get(link, link)
         try:
@@ -284,7 +276,9 @@ class Rss(commands.Cog):
             return await ctx.send(await self.bot._(ctx.guild.id, "rss.invalid-flow"))
         try:
             feed_id = await self.db_add_feed(ctx.guild.id,ctx.channel.id,feed_type,identifiant)
-            await ctx.send(await self.bot._(ctx.guild,"rss.success-add", type=display_type, url=link, channel=ctx.channel.mention))
+            await ctx.send(await self.bot._(
+                ctx.guild,"rss.success-add", type=display_type, url=link, channel=ctx.channel.mention
+            ))
             self.bot.log.info(f"RSS feed added into server {ctx.guild.id} ({link} - {feed_id})")
             await self.send_log(f"Feed added into server {ctx.guild.id} ({feed_id})", ctx.guild)
         except Exception as err:
@@ -323,6 +317,7 @@ class Rss(commands.Cog):
 
     @systeme_rm.autocomplete("feed")
     async def systeme_rm_autocomplete(self, interaction: discord.Interaction, current: str):
+        "Autocomplete feed ID for the /rss remove command"
         try:
             return await self.get_feeds_choice(interaction.guild.id, current.lower())
         except Exception as err:
@@ -357,6 +352,7 @@ class Rss(commands.Cog):
 
     @feed_enable.autocomplete("feed")
     async def feed_enable_autocomplete(self, interaction: discord.Interaction, current: str):
+        "Autocomplete feed ID for the /rss enable command"
         try:
             return await self.get_feeds_choice(
                 interaction.guild.id,
@@ -395,6 +391,7 @@ class Rss(commands.Cog):
 
     @feed_disable.autocomplete("feed")
     async def feed_disable_autocomplete(self, interaction: discord.Interaction, current: str):
+        "Autocomplete feed ID for the /rss disable command"
         try:
             return await self.get_feeds_choice(
                 interaction.guild.id,
@@ -542,13 +539,16 @@ class Rss(commands.Cog):
 
     @acached(timeout=30)
     async def _get_feeds_for_choice(self, guild_id: int, feed_filter: Callable[[FeedObject], bool]=None):
+        "Return a list of FeedObject for a given Guild, matching the given filter"
         guild_feeds = await self.db_get_guild_feeds(guild_id)
         if feed_filter:
             return [feed for feed in guild_feeds if feed_filter(feed)]
         return guild_feeds
 
     @acached(timeout=30)
-    async def get_feeds_choice(self, guild_id: int, current: str, feed_filter: Callable[[FeedObject], bool]=None) -> list[app_commands.Choice[str]]:
+    async def get_feeds_choice(self, guild_id: int, current: str, feed_filter: Callable[[FeedObject], bool]=None
+                               ) -> list[app_commands.Choice[str]]:
+        "Return a list of feed Choice for a given Guild, matching the current input and the given filter"
         feeds: list[FeedObject] = await self._get_feeds_for_choice(guild_id, feed_filter)
         if len(feeds) == 0:
             return []
@@ -756,6 +756,7 @@ class Rss(commands.Cog):
 
     @roles_feeds.autocomplete("feed")
     async def roles_feeds_autocomplete(self, interaction: discord.Interaction, current: str):
+        "Autocomplete for the feed ID in the /rss roles-feeds command"
         try:
             return await self.get_feeds_choice(
                 interaction.guild.id,
@@ -836,6 +837,7 @@ class Rss(commands.Cog):
 
     @move_guild_feed.autocomplete("feed")
     async def move_guild_feed_autocomplete(self, interaction: discord.Interaction, current: str):
+        "Autocomplete for the feed ID in the /rss move command"
         try:
             return await self.get_feeds_choice(
                 interaction.guild.id,
@@ -912,6 +914,7 @@ class Rss(commands.Cog):
 
     @change_text_feed.autocomplete("feed")
     async def change_text_feed_autocomplete(self, interaction: discord.Interaction, current: str):
+        """Autocomplete for the feed ID in the /rss set-text command"""
         try:
             return await self.get_feeds_choice(
                 interaction.guild.id,
@@ -1119,12 +1122,9 @@ class Rss(commands.Cog):
             return True
         if self.deviant_rss.is_deviantart_url(url):
             return True
-        try:
-            f = await feed_parse(self.bot, url, 8)
-            _ = f.entries[0]
-            return True
-        except IndexError:
-            return False
+        # check web feed
+        feed = await feed_parse(self.bot, url, 8)
+        return len(feed.get("entries", [])) > 0
 
     async def create_id(self, feed_type: FeedType):
         "Create a unique ID for a feed, based on its type"
@@ -1206,7 +1206,7 @@ class Rss(commands.Cog):
         """Get the number of rss feeds"""
         query = f"SELECT COUNT(*) as count FROM `{self.table}`"
         if not get_disabled:
-            query += " WHERE `guild` in (" + ','.join(["'{}'".format(x.id) for x in self.bot.guilds]) + ")"
+            query += " WHERE `guild` in (" + ','.join([f"'{x.id}'" for x in self.bot.guilds]) + ")"
         async with self.bot.db_query(query, fetchone=True) as query_results:
             t = query_results['count']
         return t
@@ -1217,8 +1217,8 @@ class Rss(commands.Cog):
         if self.bot.zombie_mode:
             return
         set_query = ', '.join('{}=%s'.format(val[0]) for val in values)
-        query = """UPDATE `{t}` SET {v} WHERE `ID`={id}""".format(t=self.table, v=set_query, id=feed_id)
-        async with self.bot.db_query(query, (val[1] for val in values)):
+        query = f"UPDATE `{self.table}` SET {set_query} WHERE `ID`=%s"
+        async with self.bot.db_query(query, [val[1] for val in values] + [feed_id]):
             pass
 
     async def db_increment_errors(self, working_ids: list[int], broken_ids: list[int]) -> int:
@@ -1235,19 +1235,6 @@ class Rss(commands.Cog):
             query = f"UPDATE `{self.table}` SET `recent_errors` = `recent_errors` + 1 WHERE `ID` IN ({broken_ids_list})"
             async with self.bot.db_query(query, returnrowcount=True) as query_results:
                 return query_results
-
-    async def db_set_active_guilds(self, active_guild_ids: list[int]):
-        "DEPRECATED - Mark any guild in the list as an active guild, and every other as inactive (ie. the bot has no access to them anymore)"
-        if self.bot.zombie_mode:
-            return
-        ids_list = ', '.join(map(str, active_guild_ids))
-        query = f"UPDATE `{self.table}` SET `active_guild` = 0 WHERE `guild` NOT IN ({ids_list})"
-        async with self.bot.db_query(query, returnrowcount=True) as query_results:
-            self.bot.log.info("[rss] set guild as inactive for %s feeds", query_results)
-        query = f"UPDATE `{self.table}` SET `active_guild` = 1 WHERE `guild` IN ({ids_list})"
-        async with self.bot.db_query(query, returnrowcount=True) as query_results:
-            if query_results:
-                self.bot.log.info("[rss] set guild as active for %s feeds", query_results)
 
     async def db_set_last_refresh(self, feed_ids: list[int]):
         "Update the last_refresh field for the given feed IDs"
@@ -1333,11 +1320,11 @@ class Rss(commands.Cog):
                 # transform single object into list
                 if isinstance(objs, RssMessage):
                     objs = [objs]
-                # update cache
-                self.cache[feed.link] = objs
             if isinstance(objs, (str, type(None), int)) or len(objs) == 0:
                 return True
             elif isinstance(objs, list):
+                # update cache
+                self.cache[feed.link] = objs
                 latest_post_date = None
                 for obj in objs[:self.max_messages]:
                     # if the guild was marked as inactive (ie the bot wasn't there in the previous loop),
@@ -1404,12 +1391,12 @@ class Rss(commands.Cog):
                 # start_time = time.time()
                 checked_count += 1
                 if feed.type == 'mc':
-                    if await self.bot.get_cog('Minecraft').check_feed(feed, send_stats=(guild_id is None)):
+                    if await self.bot.get_cog('Minecraft').check_feed(feed, send_stats=guild_id is None):
                         success_ids.append(feed.feed_id)
                     else:
                         errors_ids.append(feed.feed_id)
                 else:
-                    if await self.check_feed(feed, session, send_stats=(guild_id is None)):
+                    if await self.check_feed(feed, session, send_stats=guild_id is None):
                         success_ids.append(feed.feed_id)
                     else:
                         errors_ids.append(feed.feed_id)
@@ -1428,7 +1415,6 @@ class Rss(commands.Cog):
                 statscog.rss_stats["errors"] = len(errors_ids)
                 statscog.rss_stats["time"] = elapsed_time
                 statscog.rss_loop_finished = True
-            # await self.db_set_active_guilds(set(feed.guild_id for feed in feeds_list))
         await self.db_set_last_refresh(list(feed.feed_id for feed in feeds_list))
         if len(errors_ids) > 0:
             desc.append(f"{len(errors_ids)} errors: {' '.join(str(x) for x in errors_ids)}")
