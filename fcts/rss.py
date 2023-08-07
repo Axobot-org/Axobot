@@ -79,7 +79,7 @@ class Rss(commands.Cog):
 
     @property
     def table(self):
-        return 'rss_flow_beta' if self.bot.beta else 'rss_flow'
+        return 'rss_feed_beta' if self.bot.beta else 'rss_flow'
 
     async def cog_load(self):
         self.loop_child.start() # pylint: disable=no-member

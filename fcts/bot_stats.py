@@ -221,7 +221,7 @@ class BotStats(commands.Cog):
 
     async def db_get_disabled_rss(self) -> int:
         "Count the number of disabled RSS feeds in any guild"
-        table = 'rss_flow_beta' if self.bot.beta else 'rss_flow'
+        table = 'rss_feed_beta' if self.bot.beta else 'rss_flow'
         query = f"SELECT COUNT(*) FROM {table} WHERE enabled = 0"
         async with self.bot.db_query(query, fetchone=True, astuple=True) as query_result:
             return query_result[0]
