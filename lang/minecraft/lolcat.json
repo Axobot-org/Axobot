@@ -53,10 +53,12 @@
     ],
     "item-help": "Dis command allowz you to earn info 'bout any Minecraft itam. You can gave its full or partial nayme, in French r English, r even its identifier. Just entr `%{p}mc item <name>`",
     "mod-fields": {
+        "author": "Otaur",
         "authors": "Who wrote dis",
         "categories": "Box tags",
         "downloads": "How many ppl got it",
-        "id": "Just a number",
+        "id-curseforge": "CF #",
+        "id-modrinth": "MR #",
         "name": "Name",
         "release": "Howold",
         "summary": "What dat mean",
