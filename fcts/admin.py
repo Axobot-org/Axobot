@@ -25,6 +25,7 @@ from libs.bot_classes import (PRIVATE_GUILD_ID, SUPPORT_GUILD_ID, Axobot,
                               MyContext)
 from libs.enums import RankCardsFlag, UserFlag
 from libs.formatutils import FormatUtils
+from libs.rss.rss_general import feed_parse
 from libs.views import ConfirmView
 
 if TYPE_CHECKING:
@@ -877,6 +878,80 @@ Cette option affecte tous les serveurs"""
         else:
             result = getattr(test.results, method)()
             await msg.edit(content=str(result))
+
+    @main_msg.command(name="test-rss-url")
+    @commands.check(checks.is_bot_admin)
+    async def test_rss_url(self, ctx: MyContext, url: str, *, arguments=None):
+        """Teste une url rss"""
+        await ctx.defer()
+        url = url.replace('<','').replace('>','')
+        feeds = await feed_parse(self.bot, url, 8)
+        if feeds is None:
+            await ctx.send("Got a timeout")
+            return
+        txt = f"feeds.keys()\n```py\n{feeds.keys()}\n```"
+        if 'bozo_exception' in feeds.keys():
+            txt += f"\nException ({feeds['bozo']}): {feeds['bozo_exception']}"
+            return await ctx.send(txt)
+        if len(str(feeds.feed)) < 1400-len(txt):
+            txt += f"feeds.feed\n```py\n{feeds.feed}\n```"
+        else:
+            txt += f"feeds.feed.keys()\n```py\n{feeds.feed.keys()}\n```"
+        if len(feeds.entries) > 0:
+            if len(str(feeds.entries[0])) < 1950-len(txt):
+                txt += f"feeds.entries[0]\n```py\n{feeds.entries[0]}\n```"
+            else:
+                txt += f"feeds.entries[0].keys()\n```py\n{feeds.entries[0].keys()}\n```"
+        if arguments is not None and 'feeds' in arguments and 'ctx' not in arguments:
+            txt += f"\n{arguments}\n```py\n{eval(arguments)}\n```" # pylint: disable=eval-used
+        try:
+            await ctx.send(txt)
+        except discord.DiscordException as err:
+            print("[rss_test] Error:",err)
+            await ctx.send("`Error`: "+str(err))
+            print(txt)
+        if arguments is None:
+            ok_ = '<:greencheck:513105826555363348>'
+            notok_ = '<:redcheck:513105827817717762>'
+            nothing_ = '<:_nothing:446782476375949323>'
+            txt = ['**__Analyse :__**','']
+            if feeds.status >= 400:
+                txt.append(f"{notok_} Status code: {feeds.status}")
+            if not url.startswith('https://'):
+                txt.append(f"{notok_} Not https")
+            youtube_rss = self.bot.get_cog("Rss").youtube_rss
+            if 'link' not in feeds.feed:
+                txt.append(notok_+" No 'link' var")
+            elif yt_account := await youtube_rss.get_channel_by_any_url(feeds.feed['link']):
+                txt.append("<:youtube:447459436982960143>  " + yt_account)
+            elif 'link' in feeds.feed.keys():
+                txt.append(f":newspaper:  <{feeds.feed['link']}>")
+            else:
+                txt.append(":newspaper:  No 'link' var")
+            txt.append(f"Entrées : {len(feeds.entries)}")
+            if len(feeds.entries) > 0:
+                entry = feeds.entries[0]
+                if 'title' in entry.keys():
+                    txt.append(nothing_+ok_+" title: ")
+                    if len(entry['title'].split('\n')) > 1:
+                        txt[-1] += entry['title'].split('\n')[0]+"..."
+                    else:
+                        txt[-1] += entry['title']
+                else:
+                    txt.append(nothing_+notok_+' title')
+                if 'published_parsed' in entry.keys():
+                    txt.append(nothing_+ok_+" published_parsed")
+                elif 'published' in entry.keys():
+                    txt.append(nothing_+ok_+" published")
+                elif 'updated_parsed' in entry.keys():
+                    txt.append(nothing_+ok_+" updated_parsed")
+                else:
+                    txt.append(nothing_+notok_+' date')
+                if 'author' in entry.keys():
+                    txt.append(nothing_+ok_+" author: "+entry['author'])
+                else:
+                    txt.append(nothing_+notok_+' author')
+            await ctx.send("\n".join(txt))
 
     @main_msg.group(name="antiscam")
     @commands.check(checks.is_bot_admin)
