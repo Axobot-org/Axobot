@@ -57,7 +57,7 @@
         "rss enable": "activer",
         "rss list": "liste",
         "rss move": "bouger",
-        "rss reload": "rafraîchir",
+        "rss refresh": "rafraîchir",
         "rss remove": "supprimer",
         "rss set-embed": "modifier-embed",
         "rss set-mentions": "modifier-mentions",

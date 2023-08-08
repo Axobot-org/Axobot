@@ -147,7 +147,7 @@ The "feed ID" argument is the identifier of the feed (found with the command `rs
 Reload every feed
 -----------------
 
-**Syntax:** :code:`rss reload`
+**Syntax:** :code:`rss refresh`
 
 If your favorite YouTube channel has just posted a new cool video, and the bot takes too long to post it in your specially designed channel, you can force it to refresh the list of your subscribed feeds, in addition to Minecraft servers. This command will allow you in a few seconds to be again at the top of the latest news!
 
