@@ -113,9 +113,9 @@ class RssMessage:
             self.embed_data['footer_text'] = footer[:2048]
         if color := self.feed.embed_data.get("color"):
             self.embed_data['color'] = color
-        if show_date_in_footer := self.feed.embed_data.get("show_date_in_footer"):
+        if (show_date_in_footer := self.feed.embed_data.get("show_date_in_footer")) is not None:
             self.embed_data['show_date_in_footer'] = show_date_in_footer
-        if enable_link_in_title := self.feed.embed_data.get("enable_link_in_title"):
+        if (enable_link_in_title := self.feed.embed_data.get("enable_link_in_title")) is not None:
             self.embed_data['enable_link_in_title'] = enable_link_in_title
         if image_location := self.feed.embed_data.get("image_location"):
             self.embed_data['image_location'] = image_location
