@@ -767,13 +767,13 @@ class Rss(commands.Cog):
             self.bot.dispatch("interaction_error", interaction, err)
 
 
-    @rss_main.command(name="reload")
+    @rss_main.command(name="refresh")
     @commands.guild_only()
     @commands.check(can_use_rss)
     @commands.check(checks.database_connected)
     @commands.cooldown(1, 60*5, commands.BucketType.guild)
-    async def reload_guild_feeds(self, ctx: MyContext):
-        """Reload every rss feeds from your server
+    async def refresh_guild_feeds(self, ctx: MyContext):
+        """Refresh all the feeds of your server
 
         ..Doc rss.html#reload-every-feed"""
         try:
