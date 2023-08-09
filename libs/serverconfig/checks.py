@@ -35,7 +35,7 @@ async def antiraid_check(bot: Axobot, guild: discord.Guild, _option: str, value:
     if value == "none":
         return None
     can_kick = guild.me.guild_permissions.kick_members
-    can_ban = guild.me.guild_permissions.ban_members and value in {"high", "extreme"}
+    can_ban = guild.me.guild_permissions.ban_members if value in {"high", "extreme"} else True
     if not can_kick and not can_ban:
         return await _create_warning_embed(
             bot,
