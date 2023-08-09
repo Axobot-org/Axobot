@@ -34,25 +34,30 @@ async def antiraid_check(bot: Axobot, guild: discord.Guild, _option: str, value:
     "Check if bot has permissions to kick and ban, else warn to grant them"
     if value == "none":
         return None
-    can_kick = guild.me.guild_permissions.kick_members
-    can_ban = guild.me.guild_permissions.ban_members if value in {"high", "extreme"} else True
-    if not can_kick and not can_ban:
+    missing_perms: list[str] = []
+    if not guild.me.guild_permissions.kick_members:
+        missing_perms.append(await bot._(guild, "permissions.list.kick_members"))
+    if not guild.me.guild_permissions.moderate_members:
+        missing_perms.append(await bot._(guild, "permissions.list.moderate_members"))
+    if value in {"high", "extreme"} and not guild.me.guild_permissions.ban_members:
+        missing_perms.append(await bot._(guild, "permissions.list.ban_members"))
+    if len(missing_perms) == 1:
         return await _create_warning_embed(
             bot,
             guild,
-            await bot._(guild, "server.warnings.antiraid_kick_ban")
+            await bot._(guild, "server.warnings.antiraid_perms_missing",
+                        count=1,
+                        perm=missing_perms[0]
+                        )
         )
-    if not can_kick:
+    if len(missing_perms) >= 2:
         return await _create_warning_embed(
             bot,
             guild,
-            await bot._(guild, "server.warnings.antiraid_kick")
-        )
-    if not can_ban:
-        return await _create_warning_embed(
-            bot,
-            guild,
-            await bot._(guild, "server.warnings.antiraid_ban")
+            await bot._(guild, "server.warnings.antiraid_perms_missing",
+                        count=3,
+                        list=", ".join(missing_perms)
+                        )
         )
 
 
@@ -109,7 +114,8 @@ async def moderation_commands_check(bot: Axobot, guild: discord.Guild, option: s
         )
 
 
-async def can_write_in_channel_check(bot: Axobot, guild: discord.Guild, _option: str, value: Union[discord.TextChannel, list[discord.TextChannel]]):
+async def can_write_in_channel_check(bot: Axobot, guild: discord.Guild, _option: str,
+                                     value: Union[discord.TextChannel, list[discord.TextChannel]]):
     "Check if bot can write in the channel, else warn to grant permissions"
     if not isinstance(value, list):
         value = [value]

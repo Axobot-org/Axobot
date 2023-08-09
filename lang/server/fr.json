@@ -155,9 +155,10 @@
     },
     "value-deleted": "La valeur de l'option '%{option}' a bien été remise à sa valeur par défaut",
     "warnings": {
-        "antiraid_kick_ban": "J'ai besoin des permissions 'Expulser des membres' et 'Bannir des membres' pour appliquer la protection anti-raid",
-        "antiraid_kick": "J'ai besoin de la permission 'Expulser des membres' pour appliquer la protection anti-raid",
-        "antiraid_ban": "J'ai besoin de la permission 'Bannir des membres' pour appliquer la protection anti-raid",
+        "antiraid_perms_missing": {
+            "one": "J'ai besoin de la permission '**%{perm}**' pour appliquer la protection anti-raid",
+            "other": "Il me manque plusieurs permissions pour appliquer la protection anti-raid : **%{list}**"
+        },
         "channel_write_permissions": "J'ai besoin de la permission d'envoyer des messages dans %{channel} pour cette option",
         "moderation_command": "J'ai besoin de la permission '%{perm}' pour appliquer cette commande",
         "title": "Avertissement",
