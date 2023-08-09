@@ -160,9 +160,10 @@
     },
     "value-deleted": "The \"%{option}\" option value has been reset to its default value",
     "warnings": {
-        "antiraid_kick_ban": "I need both 'Kick members' and 'Ban members' permissions to apply the anti-raid protection",
-        "antiraid_kick": "I need the 'Kick members' permission to apply the anti-raid protection",
-        "antiraid_ban": "I need the 'Ban members' permission to apply the anti-raid protection",
+        "antiraid_perms_missing": {
+            "one": "I need the '**%{perm}**' permission to apply the anti-raid protection",
+            "other": "I'm missing serveral permissions to apply the anti-raid protection: **%{list}**"
+        },
         "channel_write_permissions": "I need to be able to send messages in %{channel} for this option",
         "moderation_command": "I need the '%{perm}' permission to apply this command",
         "title": "Warning",
