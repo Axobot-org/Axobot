@@ -255,10 +255,14 @@ class Tickets(commands.Cog):
             emoji: str = topic["topic_emoji"].split(':')[0]
         else:
             emoji = topic['topic_emoji']
+        if topic["topic"] is None:
+            topic_name = await self.bot._(interaction.guild_id, "tickets.other")
+        else:
+            topic_name = topic["topic"]
         return channel_name.format_map(self.bot.SafeDict({
             "username": interaction.user.global_name or interaction.user.name,
             "userid": interaction.user.id,
-            "topic": topic["topic"],
+            "topic": topic_name,
             "topic_emoji": emoji,
             "ticket_name": ticket_name
         }))[:100]
