@@ -191,7 +191,7 @@ If the bot can't send the new command format, it will try to send the old one.""
     async def _display_cmd(self, ctx: MyContext, cmd: commands.Command):
         name = await get_command_name_translation(ctx, cmd)
         short = await get_command_desc_translation(ctx, cmd) or cmd.short_doc.strip()
-        return f"• **{name}**\t\t*{short}*" if short else f"• **{name}**"
+        return f"• **{name}**" + "  *{short}*" if short else ""
 
     def sort_by_name(self, cmd: commands.Command) -> str:
         return cmd.name
