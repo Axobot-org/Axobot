@@ -1,0 +1,8 @@
+{
+    "foo": "bar",
+    "pizza": [
+        "cheese",
+        "pepperoni",
+        "sauce"
+    ]
+}
