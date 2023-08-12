@@ -75,7 +75,7 @@
     "tw-form-last": "{logo}  |  Hre is teh last twit of {author}:\nWritten on {date}\n\n{title}\n\nZelda : {url}\n",
     "tw-no-tweet": "Oops, looks like dis user has no tweet :confused:",
     "twitch": "Twich",
-    "twitch-default-flow": "{logo}  | Mew live by {author}! ({date})\n\n{title}\n\nLink: {link}\n\n{mentions}",
+    "twitch-default-flow": "{logo}  | Mew video by {author}! ({date})\n\n{title}\n\nLink: {link}\n\n{mentions}",
     "twitch-form-last": "{logo}  | Hir iz the last video ov {author}:\n{title}\nShown on {date}\nLink : {url}\n",
     "twitch-invalid": "Oops, I couldnt find any twich channel with dis näme ._.",
     "use_embed-same": "The use of colorful boxes for dat feed has not changd",

@@ -81,8 +81,8 @@
         "error-notfound": "Oops, I ca't found dat msage (Error~~404~~ : `%{err}`)",
         "error-toomuch": "WoOops, **im**possibl 2 pin dis mesge (doo u hav mor' tahn fYfti pinnd mesages?). Error : `%{err}`"
     },
-    "raid-banned": "You have been automatically banned from the %{guild} server by the antiraid system.",
-    "raid-kicked": "You have been automatically kicked off the %{guild} server by the anti-raid system. Try again in a few days.",
+    "raid-banned": "U've been auto-ban from %{guild} by our shiny-brand-new AuToMod 2k23EpicLimitedGoldEdition.",
+    "raid-kicked": "U've been auto-kicked from %{guild} by our insanely-amazing AuToMod 2k23VeryLimitedEdition. Try again in a few days!",
     "react-clear": "I can't find dis message :confused:",
     "role": {
         "color-success": "Teh coulor of role %{role} haz bee'n changd!",
