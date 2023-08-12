@@ -106,11 +106,11 @@ class RssMessage:
             'image_location': 'thumbnail',
         }
         if author_text := self.feed.embed_data.get("author_text"):
-            self.embed_data['author_text'] = author_text[:256]
+            self.embed_data['author_text'] = author_text
         if title := self.feed.embed_data.get("title"):
-            self.embed_data['title'] = title[:256]
+            self.embed_data['title'] = title
         if footer := self.feed.embed_data.get("footer_text"):
-            self.embed_data['footer_text'] = footer[:2048]
+            self.embed_data['footer_text'] = footer
         if color := self.feed.embed_data.get("color"):
             self.embed_data['color'] = color
         if (show_date_in_footer := self.feed.embed_data.get("show_date_in_footer")) is not None:
@@ -176,22 +176,22 @@ class RssMessage:
         safedict = await self._generate_safedict()
         text = msg_format.format_map(safedict)
         if not self.feed.use_embed:
-            return text
+            return text[:2000]
 
-        emb = discord.Embed(description=text, color=self.embed_data['color'])
+        emb = discord.Embed(description=text[:4096], color=self.embed_data['color'])
         if self.embed_data['author_text']:
-            emb.set_author(name=self.embed_data['author_text'].format_map(safedict))
+            emb.set_author(name=self.embed_data['author_text'].format_map(safedict)[:256])
         if self.embed_data['footer_text']:
-            emb.set_footer(text=self.embed_data['footer_text'].format_map(safedict))
+            emb.set_footer(text=self.embed_data['footer_text'].format_map(safedict)[:2048])
         if self.embed_data['title'] is None:
             if self.feed.type != 'tw':
-                emb.title = self.title
+                emb.title = self.title[:256]
             else:
-                emb.title = self.author
+                emb.title = self.author[:256]
         else:
-            emb.title = self.embed_data['title'].format_map(safedict)
+            emb.title = self.embed_data['title'].format_map(safedict)[:256]
         if "{url}" not in msg_format and "{link}" not in msg_format:
-            emb.add_field(name='URL', value=self.url)
+            emb.add_field(name='URL', value=self.url[:1024])
         if self.image is not None:
             if self.embed_data["image_location"] == "thumbnail":
                 emb.set_thumbnail(url=self.image)
