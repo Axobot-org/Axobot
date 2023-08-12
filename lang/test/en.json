@@ -1,13 +1,9 @@
 {
-    "foo": "bar",
+    "foo": "bar2",
     "pizza": [
-        "cheese",
+        "mozarella",
         "pepperoni",
-        "hot sauce"
+        "burger sauce"
     ],
-    "toppings": {
-        "cheese": "extra",
-        "pepperoni": "none",
-        "hot sauce": "yes"
-    }
+    "bar": "foo2"
 }
