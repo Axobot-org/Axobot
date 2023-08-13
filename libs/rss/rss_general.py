@@ -36,7 +36,7 @@ async def feed_parse(bot: Axobot, url: str, timeout: int, session: ClientSession
         if session is None:
             await _session.close()
         # request was cancelled by timeout
-        bot.log.info("[RSS] feed_parse got a timeout")
+        bot.log.warn("[RSS] feed_parse got a timeout for url %s", url)
         return None
     except Exception as err:
         if session is None:
@@ -45,7 +45,7 @@ async def feed_parse(bot: Axobot, url: str, timeout: int, session: ClientSession
     if session is None:
         await _session.close()
     if response.status >= 400:
-        bot.log.info(f"[RSS] feed_parse got a {response.status} error for URL {url}")
+        bot.log.info("[RSS] feed_parse got a %s error for URL %s", response.status, url)
         return FeedParserDict(entries=[], feed=FeedParserDict(), status=response.status)
     headers = {k.decode("utf-8").lower(): v.decode("utf-8") for k, v in headers}
     result = feedparser.parse(html, response_headers=headers)
