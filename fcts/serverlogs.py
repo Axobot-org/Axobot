@@ -50,7 +50,7 @@ class ServerLogs(commands.Cog):
         self.bot = bot
         self.file = "serverlogs"
         self.cache: LRUCache[int, dict[int, list[str]]] = LRUCache(max_size=10000, timeout=3600*4)
-        self.to_send: dict[discord.TextChannel, list[discord.Embed]] = {}
+        self.to_send: dict[int, list[discord.Embed]] = {}
         self.auditlogs_timeout = 3 # seconds
 
     async def cog_load(self):
@@ -77,12 +77,11 @@ class ServerLogs(commands.Cog):
     async def validate_logs(self, guild: discord.Guild, channel_ids: list[int], embed: discord.Embed, log_type: str):
         "Send a log embed to the corresponding modlogs channels"
         for channel_id in channel_ids:
-            if channel := guild.get_channel_or_thread(channel_id):
-                if channel in self.to_send:
-                    self.to_send[channel].append(embed)
-                else:
-                    self.to_send[channel] = [embed]
-                self.bot.dispatch("serverlog", guild.id, channel.id, log_type)
+            if channel_id in self.to_send:
+                self.to_send[channel_id].append(embed)
+            else:
+                self.to_send[channel_id] = [embed]
+            self.bot.dispatch("serverlog", guild.id, channel_id, log_type)
 
     async def db_get_from_channel(self, guild: int, channel: int, use_cache: bool=True) -> list[str]:
         "Get enabled logs for a channel"
@@ -132,18 +131,19 @@ class ServerLogs(commands.Cog):
     async def send_logs_task(self):
         "Send ready logs every 20s to avoid rate limits"
         try:
-            for channel, embeds in dict(self.to_send).items():
-                if not embeds or channel.guild.me is None:
-                    self.to_send.pop(channel)
+            for channel_id, embeds in dict(self.to_send).items():
+                channel = self.bot.get_channel(channel_id)
+                if not embeds or channel is None or channel.guild.me is None:
+                    self.to_send.pop(channel_id)
                     continue
                 try:
                     perms = channel.permissions_for(channel.guild.me)
                     if perms.send_messages and perms.embed_links:
                         await channel.send(embeds=embeds[:10])
                         if len(embeds) > 10:
-                            self.to_send[channel] = self.to_send[channel][10:]
+                            self.to_send[channel_id] = self.to_send[channel_id][10:]
                         else:
-                            self.to_send.pop(channel)
+                            self.to_send.pop(channel_id)
                 except discord.HTTPException as err:
                     self.bot.dispatch('error', err, None)
         except Exception as err: # pylint: disable=broad-except
