@@ -1021,6 +1021,7 @@ Available types: member, role, user, emoji, channel, server, invite, category
         emb.add_field(name="Last post", value=d)
         if specificities:
             emb.add_field(name="Specificities", value=" - ".join(specificities))
+        emb.add_field(name="Recent errors", value=str(feed.recent_errors))
         await interaction.response.send_message(embed=emb)
 
     @commands.command(name="membercount",aliases=['member_count'])
