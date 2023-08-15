@@ -2,7 +2,7 @@ discord.py~=2.3.0
 aiohttp
 mysql-connector-python>=8.0
 frmc-lib @ git+https://github.com/ZRunner/fr-mc-python-lib.git@v1.0.6
-i18nice~=0.8.0
+i18nice~=0.9.0
 emoji>=2.0
 imageio
 geocoder

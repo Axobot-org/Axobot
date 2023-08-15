@@ -24,7 +24,6 @@ class Languages(discord.ext.commands.Cog):
         i18n.set('fallback', None)
         i18n.set('on_missing_translation', 'error')
         i18n.set('skip_locale_root_data', True)
-        i18n.set('enable_memoization', True)
         i18n.translations.container.clear()
         i18n.load_path.clear()
         i18n.load_path.append('./lang')
