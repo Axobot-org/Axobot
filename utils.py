@@ -38,7 +38,7 @@ def setup_bot_logger():
     # on chope le premier logger
     log = logging.getLogger("runner")
     # on définis un formatteur
-    log_format = logging.Formatter("%(asctime)s %(levelname)s: %(message)s", datefmt="[%d/%m/%Y %H:%M]")
+    log_format = logging.Formatter("%(asctime)s %(levelname)s: %(message)s", datefmt="[%d/%m/%Y %H:%M:%S]")
     # ex du format : [08/11/2018 14:46] WARNING: Rss fetch_rss_flux l.288 : Cannot get the RSS flux because of the following error: (suivi du traceback)
 
     # log vers un fichier
