@@ -1445,14 +1445,13 @@ Minimum age required by anti-raid: {min_age}"
                 if kwargs.get("is_join"):
                     emb.description = f"**Could not send welcome message** in channel {kwargs.get('channel').mention}"
                 else:
-
                     emb.description = f"**Could not send leaving message** in channel {kwargs.get('channel').mention}"
                 emb.add_field(
                     name="Missing permission",
                     value=await self.bot._(guild.id, "permissions.list.send_messages")
                 )
             elif warning_type == ServerWarningType.WELCOME_ROLE_MISSING_PERMISSIONS:
-                emb.description = f"**Could not give welcome role** to user {kwargs.get('member').mention}"
+                emb.description = f"**Could not give welcome role** to user {kwargs.get('user').mention}"
                 emb.add_field(
                     name="Role to give",
                     value=kwargs.get('role').mention
