@@ -1029,14 +1029,14 @@ class ServerLogs(commands.Cog):
             )
             doc = "https://axobot.rtfd.io/en/latest/moderator.html#anti-raid"
             emb.set_author(name=str(member), url=doc, icon_url=member.display_avatar)
+            # mentions treshold
+            if mentions_treshold := data.get("mentions_treshold"):
+                emb.add_field(name="Mentions treshold", value=mentions_treshold)
             # duration
             if duration := data.get("duration"):
                 lang = await self.bot._(member.guild.id, "_used_locale")
                 f_duration = await FormatUtils.time_delta(duration, lang=lang)
                 emb.add_field(name="Duration", value=f_duration)
-            # mentions treshold
-            if mentions_treshold := data.get("mentions_treshold"):
-                emb.add_field(name="Mentions treshold", value=mentions_treshold)
             # account creation date
             emb.add_field(name="Account created at", value=f"<t:{member.created_at.timestamp():.0f}>")
             await self.validate_logs(member.guild, channel_ids, emb, "antiraid")
@@ -1060,6 +1060,10 @@ class ServerLogs(commands.Cog):
                 value = f"Account created at <t:{member.created_at.timestamp():.0f}> ({delta})\n\
 Minimum age required by anti-raid: {min_age}"
                 emb.add_field(name="Account was too recent", value=value, inline=False)
+            # mentions treshold
+            if mentions_treshold := data.get("mentions_treshold"):
+                emb.add_field(name="Mentions treshold", value=mentions_treshold)
+            # discord invite
             if "discord_invite" in data:
                 emb.add_field(name="Contains a Discord invite in their username", value=self.bot.zws, inline=False)
             await self.validate_logs(member.guild, channel_ids, emb, "antiraid")
@@ -1083,6 +1087,10 @@ Minimum age required by anti-raid: {min_age}"
                 value = f"Account created at <t:{member.created_at.timestamp():.0f}> ({delta})\n\
 Minimum age required by anti-raid: {min_age}"
                 emb.add_field(name="Account was too recent", value=value, inline=False)
+            # mentions treshold
+            if mentions_treshold := data.get("mentions_treshold"):
+                emb.add_field(name="Mentions treshold", value=mentions_treshold)
+            # discord invite
             if "discord_invite" in data:
                 emb.add_field(name="Contains a Discord invite in their username", value=self.bot.zws, inline=False)
             # duration
