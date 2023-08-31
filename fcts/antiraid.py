@@ -125,11 +125,11 @@ class AntiRaid(commands.Cog):
         # try to send a DM but don't mind if we can't
         try:
             await member.send(await self.bot._(member, "moderation.raid-kicked", guild=member.guild.name))
-        except (discord.Forbidden, discord.HTTPException):
+        except discord.HTTPException:
             pass
         try:
             await member.guild.kick(member, reason=reason)
-        except (discord.Forbidden, discord.HTTPException):
+        except discord.HTTPException:
             return False
         return True
 
@@ -144,11 +144,11 @@ class AntiRaid(commands.Cog):
         # try to send a DM but don't mind if we can't
         try:
             await member.send(await self.bot._(member, "moderation.raid-banned", guild=member.guild.name))
-        except (discord.Forbidden, discord.HTTPException):
+        except discord.HTTPException:
             pass
         try:
             await member.ban(reason=reason)
-        except (discord.Forbidden, discord.HTTPException):
+        except discord.HTTPException:
             return False
         if duration:
             await self.bot.task_handler.add_task('ban', duration.total_seconds(), member.id, member.guild.id)
@@ -164,7 +164,7 @@ class AntiRaid(commands.Cog):
             return False
         try:
             await member.timeout(duration, reason=reason)
-        except (discord.Forbidden, discord.HTTPException):
+        except discord.HTTPException:
             return False
         return True
 
