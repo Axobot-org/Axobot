@@ -653,7 +653,7 @@ Every information come from the website www.fr-minecraft.net"""
             if self.ping is not None:
                 embed.add_field(name=await translate(guild, "minecraft.serv-3"), value=f'{self.ping} ms')
             if self.desc:
-                embed.add_field(name="Description", value=self.desc, inline=False)
+                embed.add_field(name="Description", value="```\n" + self.desc + "\n```", inline=False)
             return embed
 
     async def send_msg_server(self, obj, channel: discord.abc.Messageable, ip: str):
