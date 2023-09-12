@@ -197,6 +197,7 @@ Here is the list of levels:
     * time-out for 15min users sending 10 mentions in a short time
 * High
     * ban users with invitations in their nickname for a week
+    * ban accounts created less than 1 hour before for a week
     * kick accounts created less than 12h before
     * kick users sending 20 mentions in a short time
     * time-out for 30min users sending 10 mentions in a short time
