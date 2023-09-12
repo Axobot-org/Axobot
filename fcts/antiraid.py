@@ -95,6 +95,14 @@ class AntiRaid(commands.Cog):
                         "duration": duration.total_seconds()
                     })
                     return True
+            if account_created_since <= 3600*1: # ban (1w) accounts created less than 1h before
+                duration = timedelta(days=7)
+                if await self.ban(member, await self.bot._(member.guild.id,"logs.reason.young"), duration):
+                    self.bot.dispatch("antiraid_ban", member, {
+                        "account_creation_treshold": 3600,
+                        "duration": duration.total_seconds()
+                    })
+                    return True
             if account_created_since <= 3600*12: # kick accounts created less than 45min before
                 if await self.kick(member, await self.bot._(member.guild.id,"logs.reason.young")):
                     self.bot.dispatch("antiraid_kick", member, {"account_creation_treshold": 3600*12})
