@@ -1174,23 +1174,19 @@ class Rss(commands.Cog):
         async with self.bot.db_query(query, (datetime.datetime.utcnow(),), returnrowcount=True) as query_results:
             self.bot.log.info("[rss] set last refresh for %s feeds", query_results)
 
-    async def send_rss_msg(self, obj: "RssMessage", channel: Union[discord.TextChannel, discord.Thread], roles: list[str], send_stats):
+    async def send_rss_msg(self, obj: "RssMessage", channel: Union[discord.TextChannel, discord.Thread], send_stats):
         "Send a RSS message into its Discord channel, with the corresponding mentions"
-        t = await obj.create_msg()
-        mentions = []
-        for item in roles:
-            if item == '':
-                continue
-            if role := channel.guild.get_role(int(item)):
-                mentions.append(role)
+        content = await obj.create_msg()
         if self.bot.zombie_mode:
             return
-        allowed_mentions = discord.AllowedMentions(everyone=False, roles=True)
+        allowed_mentions = discord.AllowedMentions(everyone=False, roles=[
+            discord.Object(id=int(role_id)) for role_id in obj.feed.role_ids
+        ])
         try:
-            if isinstance(t, discord.Embed):
-                await channel.send(" ".join(obj.mentions), embed=t, allowed_mentions=allowed_mentions, silent=obj.feed.silent_mention)
+            if isinstance(content, discord.Embed):
+                await channel.send(" ".join(obj.mentions), embed=content, allowed_mentions=allowed_mentions, silent=obj.feed.silent_mention)
             else:
-                await channel.send(t, allowed_mentions=allowed_mentions, silent=obj.feed.silent_mention)
+                await channel.send(content, allowed_mentions=allowed_mentions, silent=obj.feed.silent_mention)
             if send_stats:
                 if statscog := self.bot.get_cog("BotStats"):
                     statscog.rss_stats['messages'] += 1
@@ -1270,7 +1266,7 @@ class Rss(commands.Cog):
                         obj.feed = feed
                         obj.fill_embed_data()
                         await obj.fill_mention(guild)
-                        await self.send_rss_msg(obj, chan, feed.role_ids, send_stats)
+                        await self.send_rss_msg(obj, chan, send_stats)
                     latest_post_date = obj.date
                 if isinstance(latest_post_date, datetime.datetime):
                     await self.db_update_feed(feed.feed_id, [('date', latest_post_date)],)
