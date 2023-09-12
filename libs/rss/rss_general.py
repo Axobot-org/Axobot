@@ -123,17 +123,19 @@ class RssMessage:
     async def fill_mention(self, guild: discord.Guild):
         "Fill the mentions attribute with required roles mentions"
         if len(self.feed.role_ids) == 0:
-            self.mentions = ""
+            self.mentions = []
         else:
             roles = []
             for item in self.feed.role_ids:
                 if len(item) == 0:
                     continue
                 role = discord.utils.get(guild.roles, id=int(item))
-                if role is not None:
-                    roles.append(role.mention)
-                else:
+                if role is None:
                     roles.append(item)
+                elif role.is_default():
+                    roles.append("@everyone")
+                else:
+                    roles.append(role.mention)
             self.mentions = roles
         return self
 
