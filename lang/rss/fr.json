@@ -28,7 +28,10 @@
     "deviant-form-last": "{logo}  | Voici la dernière création de {author}:\n{title}\nPubliée le {date}\nLien : {url}",
     "embed-json-changed": "L'embed de ce flux a bien été modifié",
     "flow-limit": "Pour des raisons de performances, vous ne pouvez pas suivre plus de %{limit} flux rss par serveur.",
-    "guild-complete": "%{count} flux RSS ont correctement été rechargés, en %{time} secondes !",
+    "guild-complete": {
+        "one": "Votre flux RSS a correctement été rechargé, en %{time} secondes !",
+        "many": "%{count} flux RSS ont correctement été rechargés, en %{time} secondes !"
+    },
     "guild-error": "Une erreur est survenue pendant la procédure : `%{err}`\nSi vous pensez que cette erreur ne vient pas de vous, vous pouvez en avertir le support",
     "guild-loading": "Rechargement en cours %{emoji}",
     "invalid-flow": "Cet url est invalide (flux RSS vide ou inaccessible) :confused:",
