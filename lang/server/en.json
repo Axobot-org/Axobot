@@ -162,7 +162,7 @@
     "warnings": {
         "antiraid_perms_missing": {
             "one": "I need the '**%{perm}**' permission to apply the anti-raid protection",
-            "other": "I'm missing serveral permissions to apply the anti-raid protection: **%{list}**"
+            "other": "I'm missing several permissions to apply the anti-raid protection: **%{list}**"
         },
         "channel_write_permissions": "I need to be able to send messages in %{channel} for this option",
         "moderation_command": "I need the '%{perm}' permission to apply this command",
