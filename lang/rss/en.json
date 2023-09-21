@@ -28,7 +28,10 @@
     "deviant-form-last": "{logo}  | Here is the new creation of {author}:\n{title}\nPublished on {date}\nLink: {url}",
     "embed-json-changed": "The embed of this feed has been modified",
     "flow-limit": "For performance reasons, you cannot track more than %{limit} rss feeds per server.",
-    "guild-complete": "%{count} rss streams have been correctly reloaded, in %{time} seconds!",
+    "guild-complete": {
+        "one": "Your rss stream has been correctly reloaded, in %{time} seconds!",
+        "many": "%{count} rss streams have been correctly reloaded, in %{time} seconds!"
+    },
     "guild-error": "An error occurred during the procedure: `%{err}`\nIf you think this error is not your own, you can report it to support",
     "guild-loading": "Reloading %{emoji}",
     "invalid-flow": "This url is invalid (empty or inaccessible RSS feeds) :confused:",
