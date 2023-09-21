@@ -140,7 +140,9 @@
         "Pro-tip : la commande `prefix` permet d'avoir la liste des préfixes actuellement utilisables dans le serveur",
         "Le saviez-vous ? Vous pouvez donner une description de votre serveur qui pourra être utilisée dans d’autres serveurs, via l’option `description` de la commande %{config_cmd}",
         "Le saviez-vous ? Lors de certains événements spéciaux, il est possible d'obtenir des cartes d'xp collector. N'oubliez pas de suivre les news via le serveur officiel ou avec la commande %{event} !",
-        "Ce bot vous plaît ? N’hésitez pas à faire un don à l’adresse %{sponsor_url} !"
+        "Ce bot vous plaît ? N’hésitez pas à faire un don à l’adresse %{sponsor_url} !",
+        "Le saviez-vous ? Si vous êtes fatigués de devoir écouter les centaines de messages vocaux envoyés par vos amis, vous pouvez utiliser la fonction transcription d'Axobot pour en lire le contenu. Cliquez sur un message vocal, puis choisissez \"Apps\" > \"Transcription audio\" !",
+        "Le saviez-vous ? La fonctionnalité de transcription de message vocal respecte votre vie privée, en utilisant un modèle d'IA local au lieu d'envoyer vos messages à un service externe !"
     ],
     "uninhabited-city": "Endroit inhabité",
     "vote-0": "Vous ne pouvez pas mettre plus de 20 choix, encore moins un nombre négatif de choix !"
