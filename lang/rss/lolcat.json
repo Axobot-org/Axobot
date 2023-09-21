@@ -28,7 +28,10 @@
     "deviant-form-last": "{logo}  | Here is da brand new thing of {author}:\n{title}\nDarwn on {date}\nZelda: {url}",
     "embed-json-changed": "The embed ov feed have been modifed",
     "flow-limit": "Fr pirformunce reesons, U can notz track mor than %{limit} rss feeds per srver.",
-    "guild-complete": "%{count} rss streams haz correctly rechargd in %{time} seconds!",
+    "guild-complete": {
+        "one": "Ur rss stream haz correctly reloadd in %{time} seconds!",
+        "many": "%{count} rss streams haz correctly rechargd in %{time} seconds!"
+    },
     "guild-error": "A error occurrd durin teh load: `%{err}`\nIf you think dis err iz not your auwn, u can report it to support staff",
     "guild-loading": "Reloadz %{emoji}",
     "invalid-flow": "I can't add dis url (empty or inaccessible RSS flew) :confused:",
