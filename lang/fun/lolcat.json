@@ -9,7 +9,6 @@
     },
     "bbw-too-many": "Oops, dat grid's too big 4 Discord :upside_down:",
     "blame-0": "Lizt ov availabl namz 4 **%{user}**",
-    "cant-react": "I doan haz enough perms 2 send reactions!",
     "cookie": "%{user} gave <@375598088850505728> a box ov COOKIES! %{emoji}",
     "count": {
         "counting": "Countng in progrez...",
@@ -91,7 +90,6 @@
     "no-embed-perm": "I dont haz permishun 2 \"Embed links\" :confused:",
     "no-emoji": "Unable 2 find tihs emote :eyes:",
     "no-fun": "Fun comands haz beeen disabld on dis server. 2 C their list, look at https://axobot.rtfd.io/en/latest/fun.html",
-    "no-reaction": "Unable 2 add reactions. Plz check mah perms...",
     "no-roll": "Hmm I don't see any choice lol",
     "no-say": "Unable 2 send any message in tish channel",
     "no-voicechan": "Wait, U forgot teh vocal channel? :eyes:",
@@ -147,6 +145,5 @@
         "Did u know? If u'r tiredof listenin' to all dem voicemails yer pals send, u can use Axobot's super cool transcribify thingy 2 read their text! Just tap on a voicemail, den pick \"Apps\" > \"Voice to text\"!",
         "Did u know? Teh voice message transcribify thingy keeps ur personal biz safe, usin' a local AI brain instead of tossin' ur messages to some far-off place! No sneaky business here, just us cool cats!"
     ],
-    "uninhabited-city": "Tish place have 0 inhabitant :upside_down:",
-    "vote-0": "U can't put moar than 20 choicez, an' even lesss negativ numbr of choicesz!"
+    "uninhabited-city": "Tish place have 0 inhabitant :upside_down:"
 }
