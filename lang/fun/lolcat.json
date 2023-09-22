@@ -143,7 +143,9 @@
         "Pro-tip: Teh `prefix` command allows you to have a list of the prefixes currently usable in the server",
         "Did u know? U can give a shiny description 2 ur server that may be usd in other servers, check %{config_cmd} with the `description` option!",
         "Did u know? At some special event, u may be allowd 2 collect super shiny and rare xp cards! Follow the news on our official server or with teh %{event_cmd} command!",
-        "U like what I do? Feel free 2 visit %{sponsor_url} and drop some cents!"
+        "U like what I do? Feel free 2 visit %{sponsor_url} and drop some cents!",
+        "Did u know? If u'r tiredof listenin' to all dem voicemails yer pals send, u can use Axobot's super cool transcribify thingy 2 read their text! Just tap on a voicemail, den pick \"Apps\" > \"Voice to text\"!",
+        "Did u know? Teh voice message transcribify thingy keeps ur personal biz safe, usin' a local AI brain instead of tossin' ur messages to some far-off place! No sneaky business here, just us cool cats!"
     ],
     "uninhabited-city": "Tish place have 0 inhabitant :upside_down:",
     "vote-0": "U can't put moar than 20 choicez, an' even lesss negativ numbr of choicesz!"
