@@ -144,7 +144,7 @@
         "Did you know? You can give a description of your server that can be used in other servers, via the `description` option of the %{config_cmd} command",
         "Did you know? At some special events, it is possible to obtain collector xp cards. Don't forget to follow the news on the official server or with the %{event_cmd} command!",
         "Do you like this bot? Don't hesitate to make a donation by visiting %{sponsor_url}!",
-        "Did you know? If you're tired of having to listen to the hundreds of voicemails sent by your friends, you can use Axobot's transcription function to read out their content. Click on a voicemail, then choose \"Apps\" > \"Voice to text\"!",
+        "Did you know? If you're tired of having to listen to the hundreds of voicemails sent by your friends, you can use Axobot's transcription function to read their text content. Click on a voicemail, then choose \"Apps\" > \"Voice to text\"!",
         "Did you know? The voice message transcription feature respects your privacy, using a local AI model instead of sending your messages to an external service!"
     ],
     "uninhabited-city": "Uninhabited city :confused:",
