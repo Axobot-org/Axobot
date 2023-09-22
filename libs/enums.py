@@ -80,6 +80,8 @@ class ServerWarningType(Enum):
     WELCOME_ROLE_MISSING_PERMISSIONS = 9
     # channel, feed_id
     RSS_TWITTER_DISABLED = 10
+    # role, user
+    TEMP_ROLE_REMOVE_FORBIDDEN = 11
 
 class UsernameChangeRecord:
     "Record of a username change, mainly used for logs"

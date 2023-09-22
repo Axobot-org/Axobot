@@ -1507,6 +1507,11 @@ Minimum age required by anti-raid: {min_age}"
                     name="Missing permission",
                     value=await self.bot._(guild.id, "permissions.list.manage_permissions")
                 )
+            elif warning_type == ServerWarningType.TEMP_ROLE_REMOVE_FORBIDDEN:
+                role = kwargs.get('role')
+                user = kwargs.get('user')
+                emb.description = f"**Could not remove temporary role** {role.mention} from user {user.mention}"
+                emb.add_field(name="Reason", value="Missing permission")
             else:
                 return
             await self.validate_logs(guild, channel_ids, emb, "bot_warnings")
