@@ -163,15 +163,17 @@ By using the *leave* argument you can instantly stop a game. This can be useful 
 
 
 ----
-Vote
+Poll
 ----
 
-**Syntax:** :code:`vote [number] <text>`
+**Syntax:** :code:`poll <number> [channel] [text]`
 
-This command will add a little interactivity in your server by allowing the creation of votes or polls. Axobot will send a message containing your text and then add reactions to it, before deleting your original message.
+This command will add a little interactivity in your server by allowing the creation of polls. Axobot will send a message containing your text and then add reactions to it, so that members can vote.
 
-If no number of choices is given, or if this number is 0, the vote will be a yes/no type. Otherwise, it will be a question of choosing between the choices using numbers. Note that it is not possible at this time to put more than 10 choices.
+If the specified number (the first argument) is 1, the vote will be a yes/no type. Otherwise, it will be a matter of choosing between the choices using numbers (1-20). You can also specify a channel in which the vote will be sent (by default the current channel).
 
-For this command the bot needs "`Add Reactions <perms.html#add-reactions>`__" (add reactions to its message), "`Read message history <perms.html#read-message-history>`__" (find its message in the chat room) and "`Manage Messages <perms.html#manage-messages>`__" (delete your message) permissions.
+If the poll text is a short message with only one line, you can directly enter it as the third argument ("text"). Otherwise, let it empty and Axobot will open a modal window to let you write your message.
 
-.. note:: A big thank to the member Adri, for his emojis specially designed for Axobot!
+For this command the bot needs "`Add Reactions <perms.html#add-reactions>`__" (add reactions to its message) and "`Use external emojis <perms.html#use-external-emojis>`" permissions.
+
+.. note:: A big thank to the member Adri, who designed the 20 emojis used for these votes!
