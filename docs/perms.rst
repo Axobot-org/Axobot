@@ -158,7 +158,7 @@ Allows the bot to edit and delete threads. Not used at this moment.
 Add Reactions
 -------------
 
-Allows the bot you to add reactions to a message, whether they are Discord or server emotions. Examples of use: `react <fun.html#react>`__, `vote command <miscellaneous.html#vote>`__, `poll channels <server.html#list-of-every-option>`__
+Allows the bot you to add reactions to a message, whether they are Discord or server emotions. Examples of use: `react <fun.html#react>`__, `poll command <miscellaneous.html#poll>`__, `poll channels <server.html#list-of-every-option>`__
 
 Use Application Commands
 ------------------------

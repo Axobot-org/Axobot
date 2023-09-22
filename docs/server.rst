@@ -95,7 +95,7 @@ List of every option
 * voice_channel: Channel used by the automated voice channels system (see `below <server.html#voice-channels-managment>`__)
 * voice_channel_format: Name format used by the automated voice channels system (see `below <server.html#voice-channels-managment>`__)
 * voice_roles: List of roles given to people being in a voice channel
-* vote_emojis: List of emojis that the bot will have to use when there is a voting message. This case may occur when using the vote command, or in a poll channel.
+* vote_emojis: List of emojis that the bot will have to use when there is a voting message. This case may occur when using the poll command, or in a poll channel.
 * warn_allowed_roles: List of roles allowed to use the `warn <moderator.html#warn>`__ and `cases <moderator.html#handling-cases>`__ commands. By default, none.
 * welcome: Message sent when a member joins your server. Some variables are usable, enter the `welcome <infos.html#welcome>`__ command to see them.
 * welcome_channel: List of channels where messages when a member joins/leaves the server will be sent. By default, none.
