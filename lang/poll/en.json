@@ -1,0 +1,6 @@
+{
+    "cant-react": "I need the 'Add Reactions' permission in this channel to create a poll.",
+    "created": "Poll created in <%{url}>!",
+    "no-channel": "I can't find the specified channel, please select another one.",
+    "too-many-options": "Due to Discord limitations, I can't use default emojis with more than 10 options. Please allow me to use external emojis, or reduce the number of options to 10 or less."
+}

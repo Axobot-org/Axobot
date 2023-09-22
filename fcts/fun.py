@@ -618,10 +618,10 @@ You can specify a verification limit by adding a number in argument (up to 1.000
 
         ..Doc miscellaneous.html#hour-weather"""
         city = city.replace(" ","%20")
-        async with aiohttp.ClientSession() as session:
-            async with session.get("https://welcomer.glitch.me/weather?city="+city) as r:
-                if r.status == 200:
-                    if r.content_type == 'image/png':
+        async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=30)) as session:
+            async with session.get("https://welcomer.glitch.me/weather?city="+city) as resp:
+                if resp.status == 200:
+                    if resp.content_type == 'image/png':
                         if ctx.channel.permissions_for(ctx.me).embed_links:
                             emb = discord.Embed()
                             emb.set_image(url="https://welcomer.glitch.me/weather?city="+city)
@@ -716,7 +716,6 @@ You can specify a verification limit by adding a number in argument (up to 1.000
     async def on_message(self, msg: discord.Message):
         if msg.guild and not await self.bot.check_axobot_presence(guild=msg.guild):
             await self.check_afk(msg)
-            await self.check_suggestion(msg)
 
     async def check_afk(self, msg: discord.Message):
         """Check if someone pinged is afk"""
@@ -826,17 +825,6 @@ You can specify a verification limit by adding a number in argument (up to 1.000
             except discord.Forbidden:
                 pass
 
-
-    async def add_vote(self, msg: discord.Message):
-        "Add votes emojis as reactions under a message"
-        if self.bot.database_online and msg.guild is not None:
-            emojis_list: list[typing.Union[str, discord.Emoji]] = await self.bot.get_config(msg.guild.id, "vote_emojis")
-        else:
-            await msg.add_reaction('👍')
-            await msg.add_reaction('👎')
-            return
-        for emoji in emojis_list:
-            await msg.add_reaction(emoji)
 
     @commands.command(name="markdown")
     async def markdown(self, ctx: MyContext):
@@ -990,67 +978,6 @@ You can specify a verification limit by adding a number in argument (up to 1.000
             last_date = datetime.datetime.strptime(last_incident['resolved_at'], '%Y-%m-%dT%H:%M:%S.%f%z')
             last_date = f"<t:{round(last_date.timestamp())}:F>"
             await ctx.send(await self.bot._(ctx.channel, "fun.discordstatus-nothing", date=last_date))
-
-
-    @commands.command(name="vote")
-    @commands.cooldown(4, 30, type=commands.BucketType.guild)
-    async def vote(self, ctx: MyContext, number:typing.Optional[int] = 0, *, text):
-        """Send a message on which anyone can vote through reactions.
-        A big thank to Adri for his emojis specially designed for the bot!
-
-        If no number of choices is given, the emojis will be 👍 and 👎. Otherwise, it will be a series of numbers.
-        The text sent by the bot is EXACTLY the one you give, without any more formatting.
-
-        ..Example vote Do you like axolotl?
-
-        ..Example 3 Do you prefer blue, red or green? Answer below!
-
-        ..Doc miscellaneous.html#vote"""
-        text = await ctx.bot.get_cog('Utilities').clear_msg(text,ctx=ctx)
-        if ctx.guild is not None:
-            if not (ctx.channel.permissions_for(ctx.guild.me).read_message_history and ctx.channel.permissions_for(ctx.guild.me).add_reactions):
-                return await ctx.send(await self.bot._(ctx.channel,"fun.cant-react"))
-        if number == 0:
-            msg = await ctx.send(text)
-            try:
-                await self.add_vote(msg)
-            except Exception as err:
-                await ctx.send(await self.bot._(ctx.channel, "fun.no-reaction"))
-                self.bot.dispatch("error", err, ctx)
-                return
-        else:
-            if ctx.bot_permissions.external_emojis:
-                emojis = self.bot.emojis_manager.numbers_names
-            else:
-                emojis = [chr(48+i)+chr(8419) for i in range(10)]
-            if number>20 or number < 0:
-                await ctx.send(await self.bot._(ctx.channel,"fun.vote-0"))
-                return
-            msg = await ctx.send(text)
-            for x in range(1,number+1):
-                try:
-                    await msg.add_reaction(emojis[x])
-                except discord.errors.NotFound:
-                    return
-                except Exception as err:
-                    self.bot.dispatch("command_error", ctx, err)
-        await ctx.message.delete(delay=0)
-
-    async def check_suggestion(self, message: discord.Message):
-        "Check for any message sent in a poll channel, in order to add proper reactions"
-        if message.guild is None or not self.bot.is_ready() or not self.bot.database_online or message.content.startswith('.'):
-            return
-        try:
-            channels: typing.Optional[list[discord.TextChannel]] = await self.bot.get_config(message.guild.id, "poll_channels")
-            if channels is None:
-                return
-            if message.channel in channels and not message.author.bot:
-                try:
-                    await self.add_vote(message)
-                except discord.DiscordException:
-                    pass
-        except Exception as err: # pylint: disable=broad-except
-            self.bot.dispatch("error", err, message)
 
     @commands.command(name="pep8", aliases=['autopep8'])
     @commands.cooldown(3, 30, commands.BucketType.user)
