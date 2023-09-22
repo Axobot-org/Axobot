@@ -6,6 +6,7 @@ from datetime import datetime, timedelta, timezone
 from typing import TYPE_CHECKING, Optional
 
 import discord
+from libs.enums import ServerWarningType
 
 from libs.formatutils import FormatUtils
 
@@ -119,7 +120,14 @@ class TaskHandler:
                         try:
                             await user.remove_roles(role, reason="Temp role expired")
                         except discord.Forbidden:
-                            pass
+                            self.bot.dispatch(
+                                "server_warning",
+                                ServerWarningType.TEMP_ROLE_REMOVE_FORBIDDEN,
+                                guild,
+                                role=role,
+                                user=user
+                            )
+                            self.bot.log.warning("[role-grant_task] Unable to remove temporary role: Forbidden")
                     await self.remove_task(task['ID'])
                 except Exception as err:  # pylint: disable=broad-except
                     self.bot.dispatch("error", err)
