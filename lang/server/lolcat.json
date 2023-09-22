@@ -160,9 +160,10 @@
     },
     "value-deleted": "Teh \"%{option}\" opshun had been reset 2 default sir",
     "warnings": {
-        "antiraid_kick_ban": "Uh, am missing teh 'kick memebrs' and 'ban ppl' perms for dis thing",
-        "antiraid_kick": "Uh no, I need teh 'kick ppl' perm to protect u",
-        "antiraid_ban": "He protec but he also attac- wait no, i need teh 'ban members' perm for that :/",
+        "antiraid_perms_missing": {
+            "one": "He protec but he also attac- wait no, i need teh '**%{perm}**' perm for that :/",
+            "other": "Uh oh, looks like i miss a few perms if u wanna do that: **%{list}**"
+        },
         "channel_write_permissions": "Whoopsie, did u forget 2 allow me 2 send msg in %{channel}?",
         "moderation_command": "I need 2b able 2 %{perm} for dis command hehe",
         "title": "YOUR ATTENTION PLEASE - THIS IS A SERIOUS WARNING - I guess",
