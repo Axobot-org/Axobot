@@ -112,7 +112,7 @@ class Languages(discord.ext.commands.Cog):
     async def msg_not_found(self, string_id: str, lang: str):
         "Signal to the dev that a translation is missing"
         try:
-            err = f"Le message {string_id} n'a pas été trouvé dans la base de donnée! (langue {lang})"
+            err = f"Message {string_id} not found in JSON files (language {lang})"
             await self.bot.get_cog('Errors').senf_err_msg(err)
             self.bot.log.warning(err)
         except Exception: # pylint: disable=broad-except
