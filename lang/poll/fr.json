@@ -1,0 +1,12 @@
+{
+    "cant-react": "J'ai besoin de l'autorisation \"Ajouter des réactions\" dans ce salon pour créer un sondage.",
+    "created": "Sondage créé dans %{url} !",
+    "no-channel": "Je ne trouve pas le salon spécifié, veuillez en sélectionner un autre.",
+    "text-modal": {
+        "title": "Créer un sondage",
+        "label": "Entrez le texte du sondage",
+        "placeholder": "Le texte sera envoyé tel quel, n'hésitez donc pas à utiliser des émojis et du formattage.",
+        "success": "Nous préparons votre message, attendez une seconde..."
+    },
+    "too-many-options": "En raison des limitations de Discord, je ne peux pas utiliser les emojis par défaut avec plus de 10 options. Veuillez m'autoriser à utiliser des emojis externes, ou réduisez le nombre d'options à 10 ou moins."
+}
