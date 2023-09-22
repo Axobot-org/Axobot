@@ -147,6 +147,7 @@ async def load_cogs(bot: "Axobot"):
         'fcts.morpions',
         'fcts.partners',
         'fcts.perms',
+        'fcts.poll',
         'fcts.reloads',
         'fcts.roles_management',
         'fcts.roles_react',

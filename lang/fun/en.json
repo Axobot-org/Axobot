@@ -9,7 +9,6 @@
     },
     "bbw-too-many": "Oops, the grid is too big for Discord :confused:",
     "blame-0": "List of available names for **%{user}**",
-    "cant-react": "I don't have enough permissions to send reactions!",
     "cookie": "%{user} offered a box of cookies to <@375598088850505728>! %{emoji}",
     "count": {
         "counting": "Counting in progress...",
@@ -91,7 +90,6 @@
     "no-embed-perm": "I don't have permission to \"Embed links\" :confused:",
     "no-emoji": "Unable to find this emoji!",
     "no-fun": "Fun commands have been disabled on this server. To see their list, look at https://axobot.rtfd.io/en/latest/fun.html",
-    "no-reaction": "Unable to add reactions. Please check my permissions...",
     "no-roll": "No choice found",
     "no-say": "Unable to send any message in this channel",
     "no-voicechan": "You must be in a vocal channel in order to use this command.",
@@ -147,6 +145,5 @@
         "Did you know? If you're tired of having to listen to the hundreds of voicemails sent by your friends, you can use Axobot's transcription function to read their text content. Click on a voicemail, then choose \"Apps\" > \"Voice to text\"!",
         "Did you know? The voice message transcription feature respects your privacy, using a local AI model instead of sending your messages to an external service!"
     ],
-    "uninhabited-city": "Uninhabited city :confused:",
-    "vote-0": "You can't put more than 20 choices, and even less a negative number of choices!"
+    "uninhabited-city": "Uninhabited city :confused:"
 }

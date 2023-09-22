@@ -9,7 +9,6 @@
     },
     "bbw-too-many": "Oups, la grille est trop grande pour Discord :confused:",
     "blame-0": "Liste des noms disponibles pour **%{user}**",
-    "cant-react": "Je n'ai pas les permissions suffisantes pour envoyer des réactions !",
     "cookie": "%{user} a offert une boîte de cookies à <@375598088850505728> ! %{emoji}",
     "count": {
         "counting": "Comptage en cours...",
@@ -88,7 +87,6 @@
     "no-embed-perm": "Je ne possède pas la permission \"Intégrer des liens\" :confused:",
     "no-emoji": "Impossible de trouver cet emoji !",
     "no-fun": "Les commandes fun ont été désactivées sur ce serveur. Pour voir leur liste, regardez https://axobot.rtfd.io/en/latest/fun.html",
-    "no-reaction": "Impossible d'ajouter les réactions. Vérifiez mes permissions",
     "no-roll": "Aucun élément trouvé",
     "no-say": "Impossible d'envoyer un message dans ce salon",
     "no-voicechan": "Vous devez être connecté à un salon vocal pour utiliser cette commande.",
@@ -144,6 +142,5 @@
         "Le saviez-vous ? Si vous êtes fatigués de devoir écouter les centaines de messages vocaux envoyés par vos amis, vous pouvez utiliser la fonction transcription d'Axobot pour en lire le contenu. Cliquez sur un message vocal, puis choisissez \"Apps\" > \"Transcription audio\" !",
         "Le saviez-vous ? La fonctionnalité de transcription de message vocal respecte votre vie privée, en utilisant un modèle d'IA local au lieu d'envoyer vos messages à un service externe !"
     ],
-    "uninhabited-city": "Endroit inhabité",
-    "vote-0": "Vous ne pouvez pas mettre plus de 20 choix, encore moins un nombre négatif de choix !"
+    "uninhabited-city": "Endroit inhabité"
 }
