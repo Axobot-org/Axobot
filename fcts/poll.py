@@ -5,6 +5,7 @@ from discord import app_commands
 from discord.ext import commands
 
 from libs.bot_classes import Axobot
+from libs.views import TextInputModal
 
 
 class PollCog(commands.Cog):
@@ -48,7 +49,8 @@ class PollCog(commands.Cog):
     @app_commands.checks.cooldown(4, 30)
     async def poll(self, interaction: discord.Interaction,
                    options_count: app_commands.Range[int, 1, 20],
-                   channel: Union[None, discord.TextChannel, discord.VoiceChannel, discord.StageChannel] = None
+                   channel: Union[None, discord.TextChannel, discord.VoiceChannel, discord.StageChannel] = None,
+                   text: Optional[str] = None
                    ):
         """Create a poll in the current channel"""
         destination_channel = channel or interaction.channel
@@ -62,8 +64,22 @@ class PollCog(commands.Cog):
         if options_count > 10 and not bot_perms.external_emojis:
             await interaction.response.send_message(await self.bot._(interaction.channel,"poll.too-many-options"), ephemeral=True)
             return
-        await interaction.response.defer()
-        text = "TO BE IMPLEMENTED"
+        if text is None:
+            text_modal = TextInputModal(
+                title=await self.bot._(interaction.channel, "poll.text-modal.title"),
+                label=await self.bot._(interaction.channel, "poll.text-modal.label"),
+                placeholder=await self.bot._(interaction.channel, "poll.text-modal.placeholder"),
+                max_length=2000,
+                success_message=await self.bot._(interaction.channel, "poll.text-modal.success")
+            )
+            await interaction.response.send_modal(text_modal)
+            if await text_modal.wait():
+                # view timed out -> do nothing
+                return
+            text = text_modal.value
+            interaction = text_modal.response_interaction
+        else:
+            await interaction.response.defer(ephemeral=True)
         if options_count == 1:
             msg = await destination_channel.send(text)
             await self.add_vote(msg)

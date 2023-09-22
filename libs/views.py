@@ -60,6 +60,7 @@ class ConfirmView(discord.ui.View):
             await interaction.edit(content=interaction.content, view=self)
         self.stop()
 
+
 class DeleteView(discord.ui.View):
     "A simple view used to delete a bot message after reading it"
 
@@ -76,4 +77,32 @@ class DeleteView(discord.ui.View):
         if not self.validation(interaction):
             return
         await interaction.message.delete(delay=0)
+        self.stop()
+
+
+class TextInputModal(discord.ui.Modal):
+    "A modular Modal to ask user for text input (as slash commands don't support text with multiple lines)"
+
+    text_input = discord.ui.TextInput(label="", placeholder=None, style=discord.TextStyle.paragraph)
+
+    def __init__(self, title: str, label: str, success_message: str, placeholder: Optional[str]=None, \
+                 default: Optional[str]=None,  min_length: int=1, max_length: int=100, timeout: int=600):
+        super().__init__(title=title, timeout=timeout)
+        self.text_input.label = label
+        self.text_input.placeholder = placeholder
+        self.text_input.min_length = min_length
+        self.text_input.max_length = max_length
+        self.text_input.default = default
+        self.success_message = success_message
+        self.response_interaction: Optional[discord.Interaction] = None
+
+    @property
+    def value(self):
+        return self.text_input.value
+
+    # pylint: disable=arguments-differ
+    async def on_submit(self, interaction: discord.Interaction):
+        "Called when user submits the form"
+        await interaction.response.send_message(self.success_message, ephemeral=True)
+        self.response_interaction = interaction
         self.stop()
