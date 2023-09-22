@@ -46,6 +46,7 @@ class SendHintText(discord.ui.View):
         cancel_btn.callback = self.cancel
         self.add_item(cancel_btn)
 
+    # pylint: disable=arguments-differ
     async def interaction_check(self, interaction: discord.Interaction):
         return interaction.user.id == self.user_id
 
@@ -85,6 +86,7 @@ class AskTitleModal(discord.ui.Modal):
         self.name.label = input_label
         self.name.placeholder = input_placeholder
 
+    # pylint: disable=arguments-differ
     async def on_submit(self, interaction: discord.Interaction):
         try:
             await interaction.response.defer(ephemeral=True, thinking=True)
@@ -104,6 +106,7 @@ class AskTopicSelect(discord.ui.View):
         self.add_item(self.select)
         self.topics: Optional[list[str]] = None
 
+    # pylint: disable=arguments-differ
     async def interaction_check(self, interaction: discord.Interaction):
         return interaction.user.id == self.user_id
 
