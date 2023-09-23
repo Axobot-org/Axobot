@@ -1308,29 +1308,25 @@ class Rss(commands.Cog):
         success_ids: list[int] = []
         errors_ids: list[int] = []
         checked_count = 0
-        session = ClientSession()
-        for feed in feeds_list:
-            if not feed.enabled:
-                continue
-            try:
-                # start_time = time.time()
-                checked_count += 1
-                if feed.type == 'mc':
-                    if await self.bot.get_cog('Minecraft').check_feed(feed, send_stats=guild_id is None):
-                        success_ids.append(feed.feed_id)
+        async with ClientSession() as session:
+            for feed in feeds_list:
+                if not feed.enabled:
+                    continue
+                try:
+                    checked_count += 1
+                    if feed.type == 'mc':
+                        if await self.bot.get_cog('Minecraft').check_feed(feed, send_stats=guild_id is None):
+                            success_ids.append(feed.feed_id)
+                        else:
+                            errors_ids.append(feed.feed_id)
                     else:
-                        errors_ids.append(feed.feed_id)
-                else:
-                    if await self.check_feed(feed, session, send_stats=guild_id is None):
-                        success_ids.append(feed.feed_id)
-                    else:
-                        errors_ids.append(feed.feed_id)
-            except Exception as err:
-                self.bot.dispatch("error", err, f"RSS feed {feed.feed_id}")
-            # end_time = time.time()
-            # await self._log_rss_feed_time(feed.feed_id, round(end_time - start_time, 3))
-            await asyncio.sleep(self.time_between_feeds_check)
-        await session.close()
+                        if await self.check_feed(feed, session, send_stats=guild_id is None):
+                            success_ids.append(feed.feed_id)
+                        else:
+                            errors_ids.append(feed.feed_id)
+                except Exception as err:
+                    self.bot.dispatch("error", err, f"RSS feed {feed.feed_id}")
+                await asyncio.sleep(self.time_between_feeds_check)
         self.bot.get_cog('Minecraft').feeds.clear()
         elapsed_time = round(time.time() - start)
         desc = [f"**RSS loop done** in {elapsed_time}s ({len(success_ids)}/{checked_count} feeds)"]

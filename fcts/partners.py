@@ -219,7 +219,7 @@ class Partners(commands.Cog):
                 if field:
                     emb.add_field(**field)
             if self.bot.zombie_mode:
-                return
+                continue
             try:
                 msg = await channel.fetch_message(partner['messageID'])
                 await msg.edit(embed=emb)

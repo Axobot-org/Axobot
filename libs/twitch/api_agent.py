@@ -29,6 +29,19 @@ class TwitchApiAgent:
         "Check if the HTTP session is still open"
         return self._session is not None and not self._session.closed
 
+    @property
+    def session(self):
+        "Get the aiohttp session"
+        if self._session is None:
+            self._session = aiohttp.ClientSession()
+        return self._session
+
+    async def close_session(self):
+        "Close the HTTP session"
+        if self._session is not None:
+            await self._session.close()
+            self._session = None
+
     @acached(timeout=3600) # 1h
     async def api_login(self, client_id: str, client_secret: str):
         "Request a token for the Twitch API"
@@ -38,19 +51,12 @@ class TwitchApiAgent:
             "client_secret": client_secret,
             "grant_type": "client_credentials"
         }
-        self._session = self._session = aiohttp.ClientSession()
-        async with self._session.post(url, params=params) as resp:
+        async with self.session.post(url, params=params) as resp:
             data: TokenResponse = await resp.json()
             self._token = data["access_token"]
             now = datetime.now(timezone.utc)
             self.token_expires_at = now + timedelta(seconds=data["expires_in"])
             self.client_id = client_id
-
-    async def close_session(self):
-        "Close the HTTP session"
-        if self._session is not None:
-            await self._session.close()
-            self._session = None
 
     async def _get_headers(self):
         "Get the authentication headers for the API"
@@ -66,11 +72,9 @@ class TwitchApiAgent:
         "Get the ID of a user from their username"
         if not self.is_token_valid:
             raise HttpTokenNotSet()
-        if not self._session:
-            self._session = aiohttp.ClientSession()
         url = "https://api.twitch.tv/helix/users"
         params = {"login": username}
-        async with self._session.get(url, params=params, headers=await self._get_headers()) as resp:
+        async with self.session.get(url, params=params, headers=await self._get_headers()) as resp:
             data = await resp.json()
             if not "data" in data:
                 if resp.status == 400:
@@ -86,11 +90,9 @@ class TwitchApiAgent:
         "Get the user object from their ID"
         if not self.is_token_valid:
             raise HttpTokenNotSet()
-        if not self._session:
-            self._session = aiohttp.ClientSession()
         url = "https://api.twitch.tv/helix/users"
         params = {"id": user_id}
-        async with self._session.get(url, headers=await self._get_headers(), params=params) as resp:
+        async with self.session.get(url, headers=await self._get_headers(), params=params) as resp:
             data = await resp.json()
             try:
                 return data["data"][0]
@@ -102,9 +104,7 @@ class TwitchApiAgent:
         "Get the stream of users specified by their IDs"
         if not self.is_token_valid:
             raise HttpTokenNotSet()
-        if not self._session:
-            self._session = aiohttp.ClientSession()
         url = "https://api.twitch.tv/helix/streams"
         params = {"user_id": user_ids}
-        async with self._session.get(url, headers=await self._get_headers(), params=params) as resp:
+        async with self.session.get(url, headers=await self._get_headers(), params=params) as resp:
             return (await resp.json())["data"]
