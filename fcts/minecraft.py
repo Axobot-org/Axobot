@@ -3,7 +3,7 @@ import json
 import re
 import time
 from difflib import SequenceMatcher
-from typing import Any, Union
+from typing import Any, Optional, Union
 
 import aiohttp
 import discord
@@ -16,6 +16,7 @@ from libs.bot_classes import Axobot, MyContext
 from libs.checks import checks
 from libs.formatutils import FormatUtils
 from libs.rss.rss_general import FeedObject
+
 
 def _similar(input_1: str, input_2: str):
     "Compare two strings and output the similarity ratio"
@@ -31,72 +32,20 @@ Every information come from the website www.fr-minecraft.net"""
         self.file = "minecraft"
         self.embed_color = 0x16BD06
         self.uuid_cache: dict[str, str] = {}
+        self._session: Optional[aiohttp.ClientSession] = None
 
-    @commands.command(name="mojang", aliases=['mojang_status'], enabled=False)
-    @commands.cooldown(5, 20, commands.BucketType.user)
-    async def mojang_status(self, ctx: MyContext):
-        """Get Mojang server status
+    @property
+    def session(self):
+        "Get the aiohttp session"
+        if self._session is None:
+            self._session = aiohttp.ClientSession()
+        return self._session
 
-        ..Doc minecraft.html#mojang"""
-        desc = await self.bot._(ctx.channel, "minecraft.mojang_desc")
-        async with aiohttp.ClientSession() as session:
-            # async with session.get('https://api.bowie-co.nz/api/v1/mojang/check') as r:
-            async with session.get('https://status.mojang.com/check') as r:
-                data = await r.json()
-        if ctx.can_send_embed:
-            embed = discord.Embed(color=discord.Colour(
-                0x699bf9), timestamp=ctx.message.created_at)
-            embed.set_thumbnail(
-                url="https://www.minecraft-france.fr/wp-content/uploads/2020/05/mojang-logo-2.gif")
-            embed.set_author(name="Mojang Studios - Services Status", url="https://status.mojang.com/check",
-                             icon_url="https://www.minecraft.net/content/dam/franchise/logos/Mojang-Studios-Logo-Redbox.png")
-            embed.set_footer(text="Requested by {}".format(
-                ctx.author.display_name), icon_url=ctx.author.display_avatar.replace(format="png", size=512))
-        else:
-            text = f"Mojang Studios - Services Status (requested by {ctx.author})"
+    async def cog_unload(self):
+        if self._session is not None:
+            await self._session.close()
+            self._session = None
 
-        async def get_status(key, value) -> tuple[str]:
-            if key == "www.minecraft.net/en-us":
-                key = "minecraft.net"
-            if value == "green":
-                k = self.bot.emojis_manager.customs['green_check'] + key
-            elif value == "red":
-                k = self.bot.emojis_manager.customs['red_cross'] + key
-            elif value == 'yellow':
-                k = self.bot.emojis_manager.customs['neutral_check'] + key
-            else:
-                k = self.bot.emojis_manager.customs['blurple'] + key
-                dm = self.bot.get_user(279568324260528128).dm_channel
-                if dm is None:
-                    await self.bot.get_user(279568324260528128).create_dm()
-                    dm = self.bot.get_user(279568324260528128).dm_channel
-                await dm.send("Status mojang inconnu : " + value + " (serveur " + key + ")")
-            if key in desc.keys():
-                v = desc[key]
-            else:
-                v = ''
-            return k, v
-
-        if isinstance(data, dict):
-            for K, V in data.items():
-                k, v = await get_status(K, V)
-                if ctx.can_send_embed:
-                    embed.add_field(name=k, value=v, inline=False)
-                else:
-                    text += "\n {} *({})*".format(k, v)
-        else:
-            for item in data:
-                if len(item) != 1:
-                    continue
-                k, v = await get_status(*list(item.items())[0])
-                if ctx.can_send_embed:
-                    embed.add_field(name=k, value=v, inline=False)
-                else:
-                    text += "\n {} *({})*".format(k, v)
-        if ctx.can_send_embed:
-            await ctx.send(embed=embed)
-        else:
-            await ctx.send(text)
 
     @commands.group(name="minecraft", aliases=["mc"])
     @commands.cooldown(5, 30, commands.BucketType.user)
@@ -521,40 +470,40 @@ Every information come from the website www.fr-minecraft.net"""
         else:
             url = "https://api.minetools.eu/ping/"+str(ip)+"/"+str(port)
         try:
-            async with aiohttp.ClientSession() as session:
-                async with session.get(url, timeout=5) as resp:
-                    r: dict = await resp.json()
+            async with self.session.get(url, timeout=5) as resp:
+                data: dict = await resp.json()
         except Exception:
             return await self.create_server_2(guild, ip, port)
-        if "error" in r:
-            if r['error'] != 'timed out':
+        if "error" in data:
+            if data['error'] != 'timed out':
                 self.bot.log.warning("(mc-server) Error on: " +
-                                  url+"\n   "+r['error'])
-            return r["error"]
-        players = []
+                                  url+"\n   "+data['error'])
+            return data["error"]
+        players: list[str] = []
         try:
-            for p in r['players']['sample']:
-                players.append(p['name'])
+            for player in data['players']['sample']:
+                players.append(player['name'])
                 if len(players) > 30:
                     break
         except KeyError:
             players = []
         if not players:
-            if r['players']['online'] == 0:
+            if data['players']['online'] == 0:
                 players = [str(await self.bot._(guild, "misc.none")).capitalize()]
             else:
                 players = [await self.bot._(guild, "minecraft.no-player-list")]
         IP = f"{ip}:{port}" if port is not None else str(ip)
-        if r["favicon"] is not None:
+        if data["favicon"] is not None:
             img_url = "https://api.minetools.eu/favicon/" + \
                 str(ip) + str("/"+str(port) if port is not None else '')
         else:
             img_url = None
-        v = r['version']['name']
-        o = r['players']['online']
-        m = r['players']['max']
-        l = r['latency']
-        return await self.MCServer(IP, version=v, online_players=o, max_players=m, players=players, img=img_url, ping=l, desc=r['description'], api='api.minetools.eu').clear_desc()
+        v = data['version']['name']
+        o = data['players']['online']
+        m = data['players']['max']
+        l = data['latency']
+        return await self.MCServer(IP, version=v, online_players=o, max_players=m, players=players, img=img_url, ping=l,
+                                   desc=data['description'], api='api.minetools.eu').clear_desc()
 
     async def create_server_2(self, guild: discord.Guild, ip: str, port: str):
         "Collect and serialize server data from a given IP, using mcsrvstat.us"
@@ -563,9 +512,8 @@ Every information come from the website www.fr-minecraft.net"""
         else:
             url = "https://api.mcsrvstat.us/1/"+str(ip)+"/"+str(port)
         try:
-            async with aiohttp.ClientSession() as session:
-                async with session.get(url, timeout=5) as resp:
-                    r: dict = await resp.json()
+            async with self.session.get(url, timeout=5) as resp:
+                r: dict = await resp.json()
         except aiohttp.ClientConnectorError:
             return await self.bot._(guild, "minecraft.no-api")
         except json.decoder.JSONDecodeError:
@@ -594,7 +542,8 @@ Every information come from the website www.fr-minecraft.net"""
         o = r['players']['online']
         m = r['players']['max']
         l = None
-        return await self.MCServer(IP, version=version, online_players=o, max_players=m, players=players, img=None, ping=l, desc=desc, api="api.mcsrvstat.us").clear_desc()
+        return await self.MCServer(IP, version=version, online_players=o, max_players=m, players=players, img=None, ping=l,
+                                   desc=desc, api="api.mcsrvstat.us").clear_desc()
 
     async def username_to_uuid(self, username: str) -> str:
         """Convert a minecraft username to its uuid"""
