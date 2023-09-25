@@ -2,6 +2,7 @@ import copy
 import datetime
 import time
 from typing import Optional
+from cachingutils import acached
 
 import discord
 from discord import app_commands
@@ -70,6 +71,44 @@ class Timers(commands.Cog):
         query = "INSERT INTO `reminder_snoozes_logs` (`original_duration`, `snooze_duration`, `beta`) VALUES (%s, %s, %s)"
         async with self.bot.db_query(query, (original_duration, new_duration, self.bot.beta)):
             pass
+
+    @acached(timeout=60*60)
+    async def format_duration_left(self, end_date: datetime.datetime, lang: str) -> str:
+        "Format the duration left for a reminder"
+        now = self.bot.utcnow() if end_date.tzinfo else datetime.datetime.utcnow()
+        if now > end_date:
+            return "-" + await FormatUtils.time_delta(
+                end_date, now,
+                lang=lang, year=True, form="short"
+            )
+        return await FormatUtils.time_delta(
+            now, end_date,
+            lang=lang, year=True, form="short"
+        )
+
+    @acached(timeout=30)
+    async def _get_reminders_for_choice(self, user_id: int):
+        "Returns a list of reminders for a given user"
+        return await self.db_get_user_reminders(user_id)
+
+    @acached(timeout=30)
+    async def get_reminders_choice(self, user_id: int, lang: str, current: str) -> list[app_commands.Choice[str]]:
+        "Returns a list of reminders Choice for a guven user, matching the current input"
+        reminders = await self._get_reminders_for_choice(user_id)
+        if len(reminders) == 0:
+            return []
+        choices: list[tuple[bool, int, app_commands.Choice[str]]] = []
+        for reminder in reminders:
+            end_date: datetime.datetime = reminder["begin"] + datetime.timedelta(seconds=reminder['duration'])
+            duration = await self.format_duration_left(end_date, lang)
+            label: str = duration + " - " + reminder["message"]
+            if current not in label:
+                continue
+            choice = app_commands.Choice(value=str(reminder['ID']), name=label)
+            priority = not reminder["message"].lower().startswith(current)
+            choices.append((priority, -end_date.timestamp(), choice))
+        return [choice for _, _, choice in sorted(choices, key=lambda x: x[0:2])]
+
 
     @commands.hybrid_command(name="remindme", aliases=['rmd'])
     @app_commands.describe(duration="The duration to wait, eg. '2d 4h'", message="The message to remind you of")
@@ -168,17 +207,7 @@ class Timers(commands.Cog):
             msg = discord.utils.escape_markdown(msg).replace("\n", " ")
             chan = '<#'+str(item['channel'])+'>'
             end: datetime.datetime = item["begin"] + datetime.timedelta(seconds=item['duration'])
-            now = ctx.bot.utcnow() if end.tzinfo else datetime.datetime.utcnow()
-            if now > end:
-                duration = "-" + await FormatUtils.time_delta(
-                    end, now,
-                    lang=lang, year=True, form="short"
-                )
-            else:
-                duration = await FormatUtils.time_delta(
-                    now, end,
-                    lang=lang, year=True, form="short"
-                )
+            duration = await self.format_duration_left(end, lang)
             item = txt.format(id=item['ID'], duration=duration, channel=chan, msg=msg)
             liste.append(item)
         if ctx.can_send_embed:
@@ -301,6 +330,14 @@ class Timers(commands.Cog):
                 raise ValueError(f"Failed to delete reminders: {ids}")
             except ValueError as err:
                 self.bot.dispatch("error", err, ctx)
+
+    @remind_del.autocomplete("reminder_id")
+    async def remind_del_autocomplete(self, interaction: discord.Interaction, current: str):
+        "Autocomplete for the reminder ID"
+        try:
+            return await self.get_reminders_choice(interaction.user.id, "en", current.lower())
+        except Exception as err:
+            self.bot.dispatch("interaction_error", interaction, err)
 
     @remind_main.command(name="clear")
     @commands.cooldown(3, 60, commands.BucketType.user)
