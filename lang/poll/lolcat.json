@@ -1,0 +1,12 @@
+{
+    "cant-react": "I needs teh 'Add Reactions' purrmission in dis channel to make a poll.",
+    "created": "Poll sent into %{url} !",
+    "no-channel": "I can't find teh specified channel, pls pick anothr one.",
+    "text-modal": {
+        "title": "Creatz a poll",
+        "label": "Enter teh poll text",
+        "placeholder": "Teh text will be sent as u write, so feel free 2 use emojis/markdown/whatever.",
+        "success": "Am preparing yur message, hang on a sec..."
+    },
+    "too-many-options": "Due 2 Discord limitations, I can't use default emojis with more than 10 options. Pls let me use external emojis, or reduce teh numbah of options to 10 or less."
+}
