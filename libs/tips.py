@@ -111,7 +111,7 @@ class TipsManager:
             return True
         return self.bot.utcnow() - last_tip > minTimeBetweenTips[tip]
 
-    async def send_user_tip(self, ctx: "MyContext", tip: UserTip, **variables: dict[str, str]):
+    async def send_user_tip(self, ctx: "MyContext", tip: UserTip, ephemeral: Optional[bool]=None, **variables: dict[str, str]):
         "Send a tip to a user"
         possible_titles = await self.bot._(ctx, "tips.embed.title")
         text = await self.bot._(ctx, f"tips.{tip.value}", **variables)
@@ -120,7 +120,10 @@ class TipsManager:
             description=text,
             color=discord.Color.blurple(),
         )
-        await ctx.send(embed=embed)
+        if ephemeral is not None:
+            await ctx.send(embed=embed, ephemeral=ephemeral)
+        else:
+            await ctx.send(embed=embed)
         await self.db_register_user_tip(ctx.author.id, tip)
 
     async def send_guild_tip(self, ctx: "MyContext", tip: GuildTip, **variables: dict[str, str]):
