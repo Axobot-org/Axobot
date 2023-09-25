@@ -64,6 +64,7 @@
         "rss set-embed": "set-embed",
         "rss set-mentions": "set-mentions",
         "rss set-text": "set-text",
+        "rss test": "test",
         "slowmode": "slowmode",
         "softban": "softban",
         "stats": "stats",
@@ -259,6 +260,9 @@
             "show_date_in_footer": "show-date-in-footer",
             "enable_link_in_title": "enable-link-in-title",
             "image_location": "image-location"
+        },
+        "rss test": {
+            "feed": "feed"
         },
         "modlogs list": {
             "channel": "channel"

@@ -62,6 +62,7 @@
         "rss set-embed": "modifier-embed",
         "rss set-mentions": "modifier-mentions",
         "rss set-text": "modifier-texte",
+        "rss test": "test",
         "slowmode": "mode-lent",
         "stats": "stats",
         "tickets portal set-category": "modifier-catégorie",
@@ -256,6 +257,9 @@
             "show_date_in_footer": "afficher-date-en-pied-de-page",
             "enable_link_in_title": "ajouter-lien-dans-titre",
             "image_location": "image"
+        },
+        "rss test": {
+            "feed": "flux"
         },
         "modlogs list": {
             "channel": "salon"

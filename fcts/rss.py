@@ -397,7 +397,65 @@ class Rss(commands.Cog):
                 interaction.guild.id,
                 current.lower(),
                 feed_filter=lambda f: f.enabled,
-                )
+            )
+        except Exception as err:
+            self.bot.dispatch("interaction_error", interaction, err)
+
+    @rss_main.command(name="test")
+    @commands.guild_only()
+    @commands.check(checks.database_connected)
+    @commands.check(can_use_rss)
+    async def feed_test(self, ctx: MyContext, feed: Optional[str]=None):
+        """Test a RSS feed format
+        This will send the last post of the feed following the format you set up
+
+        ..Example rss test
+
+        ..Doc rss.html#test-a-feed-format"""
+        input_feed_id = int(feed) if feed is not None and feed.isnumeric() else None
+        feed_ids = await self.ask_rss_id(
+            input_feed_id,
+            ctx,
+            await self.bot._(ctx.guild.id, "rss.choose-disable"),
+            max_count=1
+        )
+        if feed_ids is None:
+            return
+        feed_object = await self.db_get_feed(feed_ids[0])
+        if feed_object is None:
+            return
+        if feed_object.type == 'yt':
+            msg = await self.youtube_rss.get_last_post(ctx.channel, feed_object.link)
+        elif feed_object.type == "deviant":
+            msg = await self.deviant_rss.get_last_post(ctx.channel, feed_object.link)
+        elif feed_object.type == "twitch":
+            msg = await self.twitch_rss.get_last_post(ctx.channel, feed_object.link)
+        elif feed_object.type == "web":
+            msg = await self.web_rss.get_last_post(ctx.channel, feed_object.link)
+        else:
+            await ctx.send(await self.bot._(ctx.guild.id, "rss.invalid-flow"))
+            return
+        if isinstance(msg, str):
+            await ctx.send(msg)
+            return
+        msg.feed = feed_object
+        msg.fill_embed_data()
+        await msg.fill_mention(ctx.guild)
+        allowed_mentions = discord.AllowedMentions.none()
+        content = await msg.create_msg()
+        if isinstance(content, discord.Embed):
+            await ctx.send(embed=content, allowed_mentions=allowed_mentions, silent=feed_object.silent_mention)
+        else:
+            await ctx.send(content, allowed_mentions=allowed_mentions, silent=feed_object.silent_mention)
+
+    @feed_test.autocomplete("feed")
+    async def feed_test_autocomplete(self, interaction: discord.Interaction, current: str):
+        "Autocomplete feed ID for the /rss test command"
+        try:
+            return await self.get_feeds_choice(
+                interaction.guild.id,
+                current.lower(),
+            )
         except Exception as err:
             self.bot.dispatch("interaction_error", interaction, err)
 
@@ -587,7 +645,7 @@ class Rss(commands.Cog):
             if len(guild_feeds) == 0:
                 await ctx.send(await self.bot._(ctx.guild.id, "rss.no-feed-filter"))
                 return
-            if max_count:
+            if max_count == 1:
                 form_placeholder = await self.bot._(ctx.channel, 'rss.picker-placeholder.single')
             else:
                 form_placeholder = await self.bot._(ctx.channel, 'rss.picker-placeholder.multi')
@@ -1239,9 +1297,8 @@ class Rss(commands.Cog):
                     else:
                         objs = await self.twitch_rss.get_new_posts(chan, feed.link, feed.date, session)
                 else:
-                    funct = getattr(self, f"rss_{feed.type}")
                     self.bot.dispatch("error", RuntimeError(f"Unknown feed type {feed.type}"))
-                    objs: Union[str, list[RssMessage]] = await funct(chan, feed.link, feed.date, session=session)
+                    return False
                 # transform single object into list
                 if isinstance(objs, RssMessage):
                     objs = [objs]
