@@ -198,7 +198,7 @@ class Timers(commands.Cog):
             return
         txt = await self.bot._(ctx.channel, "timers.rmd.item")
         lang = await self.bot._(ctx.channel, '_used_locale')
-        liste = []
+        reminders_formated_list: list[int, str] = []
         for item in reminders:
             ctx2 = copy.copy(ctx)
             ctx2.message.content = item["message"]
@@ -209,18 +209,20 @@ class Timers(commands.Cog):
             end: datetime.datetime = item["begin"] + datetime.timedelta(seconds=item['duration'])
             duration = await self.format_duration_left(end, lang)
             item = txt.format(id=item['ID'], duration=duration, channel=chan, msg=msg)
-            liste.append(item)
+            reminders_formated_list.append((-end.timestamp(), item))
+        reminders_formated_list.sort()
+        labels = [item[1] for item in reminders_formated_list]
         if ctx.can_send_embed:
             emb = discord.Embed(title=await self.bot._(ctx.channel, "timers.rmd.title"),color=16108042)
-            if len("\n".join(liste)) > 2000:
+            if len("\n".join(labels)) > 2000:
                 step = 5
-                for i in range(0, max(25,len(liste)), step):
-                    emb.add_field(name=self.bot.zws, value="\n".join(liste[i:i+step]), inline=False)
+                for i in range(0, max(25, len(labels)), step):
+                    emb.add_field(name=self.bot.zws, value="\n".join(labels[i:i+step]), inline=False)
             else:
-                emb.description = "\n".join(liste)
+                emb.description = "\n".join(labels)
             await ctx.send(embed=emb)
         else:
-            text = "**"+await self.bot._(ctx.channel, "timers.rmd.title")+"**\n\n".join(liste)
+            text = "**"+await self.bot._(ctx.channel, "timers.rmd.title")+"**\n\n".join(labels)
             await ctx.send(text)
 
     async def transform_reminders_options(self, reminders: list[dict]):
