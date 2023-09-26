@@ -50,11 +50,11 @@
         "confirm": "Êtes-vous sûr de vouloir configurer un rôle \"muted\" ?\nCette action peut casser certaines permissions avancées dans votre serveur, en révoquant la modification de la permission \"envoyer des messages\" de certains rôles.",
         "err": "Impossible de faire cela. Veuillez vérifier mes permissions dans le serveur et réessayer.",
         "success": {
-            "other": "Le rôle a été créé et configuré avec succès ! (%{count} salons n'ont pas pu être configurés, par manque de permissions)",
+            "many": "Le rôle a été créé et configuré avec succès ! (%{count} salons n'ont pas pu être configurés, par manque de permissions)",
             "zero": "Le rôle a été créé et configuré avec succès !"
         },
         "success2": {
-            "other": "Le rôle a été configuré avec succès ! (%{count} salons n'ont pas pu être configurés, par manque de permissions)",
+            "many": "Le rôle a été configuré avec succès ! (%{count} salons n'ont pas pu être configurés, par manque de permissions)",
             "zero": "Le rôle a été configuré avec succès !"
         },
         "tip": "*Remarque : L'utilisation de la commande %{mute} sans qu'aucun rôle muet ne soit configuré utilisera le système officiel d'exclusion de Discord, qui pourrait mieux convenir à vos besoins.*"

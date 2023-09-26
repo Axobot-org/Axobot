@@ -148,7 +148,7 @@
     "cmd-count": {
         "zero": "No command",
         "one": "1 command\n`%{p}help %{cog}` for more info",
-        "other": "%{count} commands\n`%{p}help %{cog}` to get the list"
+        "many": "%{count} commands\n`%{p}help %{cog}` to get the list"
     },
     "cmd-not-found": "There is no command named \"%{cmd}\"",
     "cog-empty-dm": "No command of this category is available in DM!",
