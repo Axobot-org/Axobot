@@ -356,19 +356,19 @@ class Xp(commands.Cog):
                 return None
 
 
-    async def db_set_xp(self, user_id: int, points: int, action: Literal['add', 'set']='add', guild: int=None):
+    async def db_set_xp(self, user_id: int, points: int, action: Literal['add', 'set']='add', guild_id: Optional[int]=None):
         """Ajoute/reset de l'xp à un utilisateur dans la database"""
         try:
             if not self.bot.database_online:
                 await self.bot.unload_extension("fcts.xp")
                 return None
-            if points < 0:
+            if points <= 0:
                 return True
-            if guild is None:
+            if guild_id is None:
                 cnx = self.bot.cnx_axobot
             else:
                 cnx = self.bot.cnx_xp
-            table = await self.get_table_name(guild)
+            table = await self.get_table_name(guild_id)
             cursor = cnx.cursor(dictionary = True)
             if action == 'add':
                 query = f"INSERT INTO `{table}` (`userID`,`xp`) VALUES (%(u)s, %(p)s) ON DUPLICATE KEY UPDATE xp = xp + %(p)s;"
@@ -381,6 +381,22 @@ class Xp(commands.Cog):
         except Exception as err:
             self.bot.dispatch("error", err)
             return False
+
+    async def db_remove_user(self, user_id :int, guild_id: Optional[int]=None):
+        "Removes a user from the xp table"
+        if not self.bot.database_online:
+            await self.bot.unload_extension("fcts.xp")
+            return None
+        if guild_id is None:
+            cnx = self.bot.cnx_axobot
+        else:
+            cnx = self.bot.cnx_xp
+        table = await self.get_table_name(guild_id)
+        cursor = cnx.cursor(dictionary = True)
+        query = f"DELETE FROM `{table}` WHERE `userID`=%(u)s;"
+        cursor.execute(query, {'u': user_id})
+        cnx.commit()
+        cursor.close()
 
     async def db_get_xp(self, user_id: int, guild_id: Optional[int]) -> Optional[int]:
         "Get the xp of a user in a guild"
@@ -963,15 +979,21 @@ class Xp(commands.Cog):
 
         ..Example set_xp 3000 @someone"""
         if user.bot:
-            return await ctx.send(await self.bot._(ctx.guild.id, "xp.no-bot"))
-        if await self.bot.get_config(ctx.guild.id, "xp_type") == "global":
-            return await ctx.send(await self.bot._(ctx.guild.id, "xp.change-global-xp"))
+            await ctx.send(await self.bot._(ctx.guild.id, "xp.no-bot"))
+            return
+        xp_used_type: str = await self.bot.get_config(ctx.guild.id, "xp_type")
+        if xp_used_type == "global":
+            await ctx.send(await self.bot._(ctx.guild.id, "xp.change-global-xp"))
+            return
         if xp < 0:
-            return await ctx.send(await self.bot._(ctx.guild.id, "xp.negative-xp"))
+            await ctx.send(await self.bot._(ctx.guild.id, "xp.negative-xp"))
+            return
         try:
-            xp_used_type: str = await self.bot.get_config(ctx.guild.id, "xp_type")
-            prev_xp = await self.db_get_xp(user.id, None if xp_used_type == "global" else ctx.guild.id)
-            await self.db_set_xp(user.id, xp, action='set', guild=ctx.guild.id)
+            prev_xp = await self.db_get_xp(user.id, ctx.guild.id)
+            if xp == 0:
+                await self.db_remove_user(user.id, ctx.guild.id)
+            else:
+                await self.db_set_xp(user.id, xp, action='set', guild_id=ctx.guild.id)
             await ctx.send(await self.bot._(ctx.guild.id, "xp.change-xp-ok", user=str(user), xp=xp))
         except Exception as err:
             await ctx.send(await self.bot._(ctx.guild.id, "minecraft.serv-error"))
