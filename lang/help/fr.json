@@ -148,7 +148,7 @@
     "cmd-count": {
         "zero": "Aucune commande",
         "one": "1 commande\n`%{p}help %{cog}` pour l'afficher",
-        "other": "%{count} commandes\n`%{p}help %{cog}` pour en afficher la liste"
+        "many": "%{count} commandes\n`%{p}help %{cog}` pour en afficher la liste"
     },
     "cmd-not-found": "Aucune commande nommée \"%{cmd}\"",
     "cog-empty-dm": "Aucune commande de ce module n'est disponible en MP !",

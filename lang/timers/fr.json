@@ -12,7 +12,7 @@
             "error": "Un problème est survenu lors de la suppression de vos rappels. Veuillez réessayer ou contacter notre support.",
             "success": {
                 "one": "Votre rappel a bien été supprimé !",
-                "other": "%{count} de vos rappels ont bien été supprimés !"
+                "many": "%{count} de vos rappels ont bien été supprimés !"
             },
             "title": "Choisissez quel(s) rappel(s) vous souhaitez supprimer"
         },

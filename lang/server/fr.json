@@ -157,7 +157,7 @@
     "warnings": {
         "antiraid_perms_missing": {
             "one": "J'ai besoin de la permission '**%{perm}**' pour appliquer la protection anti-raid",
-            "other": "Il me manque plusieurs permissions pour appliquer la protection anti-raid : **%{list}**"
+            "many": "Il me manque plusieurs permissions pour appliquer la protection anti-raid : **%{list}**"
         },
         "channel_write_permissions": "J'ai besoin de la permission d'envoyer des messages dans %{channel} pour cette option",
         "moderation_command": "J'ai besoin de la permission '%{perm}' pour appliquer cette commande",
