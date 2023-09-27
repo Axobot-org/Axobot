@@ -50,11 +50,11 @@
         "confirm": "Are you sure you want to setup a \"muted\" role?\nThis action may break some advanced permissions in your server, by revoking the 'send messages' permission overwrite from some roles.",
         "err": "Impossible to do that. Please check my permissions on the server and try again.",
         "success": {
-            "other": "The role has been successfully created and configured! (%{count} channels could not be configured, due to lack of permissions)",
+            "many": "The role has been successfully created and configured! (%{count} channels could not be configured, due to lack of permissions)",
             "zero": "The role has been successfully created and configured!"
         },
         "success2": {
-            "other": "The role has been successfully configured! (%{count} channels could not be configured, due to lack of permissions)",
+            "many": "The role has been successfully configured! (%{count} channels could not be configured, due to lack of permissions)",
             "zero": "The role has been successfully configured!"
         },
         "tip": "*Tip: Using the %{mute} command without any muted role configured will use the Discord official timeout system, which might better suit your needs.*"
