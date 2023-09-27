@@ -3,13 +3,14 @@ import re
 from typing import Optional, TypedDict
 
 import discord
+from aiohttp import ClientResponseError
 from dateutil.parser import isoparse
 from discord import app_commands
 from discord.ext import commands, tasks
 from mysql.connector.errors import IntegrityError
 
+from libs.bot_classes import Axobot, MyContext
 from libs.checks import checks
-from libs.bot_classes import MyContext, Axobot
 from libs.twitch.api_agent import TwitchApiAgent
 from libs.twitch.types import (GroupedStreamerDBObject, PlatformId,
                                StreamersDBObject, StreamObject)
@@ -354,12 +355,17 @@ class Twitch(commands.Cog):
 
     @stream_check_task.error
     async def on_stream_check_error(self, error: Exception):
-        self.bot.dispatch("error", error, "When refreshing streamers")
+        self.bot.dispatch("error", error, "<@279568324260528128> Twitch streams loop has crashed")
 
     async def _update_streams(self, streamer_ids: dict[str, _StreamersReadyForNotification]):
         streaming_user_ids: set[str] = set()
+        try:
+            streams = await self.agent.get_user_stream_by_id(*streamer_ids.keys())
+        except ClientResponseError as err:
+            self.bot.dispatch("error", err, "When updating Twitch streams")
+            return
         # Check current streams
-        for stream in await self.agent.get_user_stream_by_id(*streamer_ids.keys()):
+        for stream in streams:
             streamer_data = streamer_ids[stream["user_id"]]
             # mark that this streamer is streaming
             streaming_user_ids.add(stream["user_id"])
