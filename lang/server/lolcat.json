@@ -162,7 +162,7 @@
     "warnings": {
         "antiraid_perms_missing": {
             "one": "He protec but he also attac- wait no, i need teh '**%{perm}**' perm for that :/",
-            "other": "Uh oh, looks like i miss a few perms if u wanna do that: **%{list}**"
+            "many": "Uh oh, looks like i miss a few perms if u wanna do that: **%{list}**"
         },
         "channel_write_permissions": "Whoopsie, did u forget 2 allow me 2 send msg in %{channel}?",
         "moderation_command": "I need 2b able 2 %{perm} for dis command hehe",
