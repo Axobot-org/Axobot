@@ -12,7 +12,7 @@
             "error": "Whoopsie, something unexpected happend. Pls try again later, or contact our super cool support!",
             "success": {
                 "one": "Ur reminder ad ben deleted!",
-                "other": "%{count} reminders had been deletd!"
+                "many": "%{count} reminders had been deletd!"
             },
             "title": "Chose which reminder u want 2 delete"
         },
