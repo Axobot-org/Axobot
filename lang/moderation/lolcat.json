@@ -50,11 +50,11 @@
         "confirm": "Are u sure u wanna setup teh \"muted\" role??\nI dont wanna be annoying, but uh, dat might break some things in ur server. Especially if u playd with teh \"send msg\" perms. Think twice or get bonk.",
         "err": "Oops, cant do that. Plz check me perms on teh server 'nd try again.",
         "success": {
-            "other": "Teh role have been successffully created & configured! (%{count} channels couldnotbeconfigured, cuz I lack of perms)",
+            "many": "Teh role have been successffully created & configured! (%{count} channels couldnotbeconfigured, cuz I lack of perms)",
             "zero": "Teh role have been successffully created & configured!"
         },
         "success2": {
-            "other": "The mouted role iz now correcty setup! (%{count} chats cannut be configured, cuz of a bruh lacking of perms)",
+            "many": "The mouted role iz now correcty setup! (%{count} chats cannut be configured, cuz of a bruh lacking of perms)",
             "zero": "The role iz now correcty setup!"
         },
         "tip": "*Tip: U can also use the \"timeout\" discord feature with teh bot by **not** specifying any muted role in teh config!*"

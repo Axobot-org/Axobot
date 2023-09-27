@@ -148,7 +148,7 @@
     "cmd-count": {
         "zero": "No cmd",
         "one": "1 cmd\n`%{p}help%{cog}` 4 more info",
-        "other": "%{count} cmds\n`%{p}help %{cog}` 2 get teh full list"
+        "many": "%{count} cmds\n`%{p}help %{cog}` 2 get teh full list"
     },
     "cmd-not-found": "Dere are no comand naymme \"%{cmd}\"",
     "cog-empty-dm": "Uhh no, dat box has no cmd for here :/ try in ur serv",
