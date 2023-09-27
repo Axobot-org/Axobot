@@ -12,7 +12,7 @@
             "error": "Something went wrong while deleting your reminders. Please try again or contact support.",
             "success": {
                 "one": "Your reminder has been deleted!",
-                "other": "%{count} reminders have successfully been deleted!"
+                "many": "%{count} reminders have successfully been deleted!"
             },
             "title": "Choose which reminder(s) you want to delete"
         },
