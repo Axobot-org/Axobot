@@ -1,6 +1,5 @@
 import math
 import re
-import time
 from collections import defaultdict
 from datetime import datetime
 from typing import Optional, TypedDict, Union
@@ -62,6 +61,7 @@ class BotStats(commands.Cog):
         self.last_backup_size: Optional[int] = None
         self.role_reactions = {"added": 0, "removed": 0}
         self.snooze_events: dict[tuple[int, int], int] = defaultdict(int)
+        self.stream_events: dict[str, int] = defaultdict(int)
         self.voice_transcript_events: dict[tuple[float, float], int] = defaultdict(int)
 
     async def cog_load(self):
@@ -186,6 +186,16 @@ class BotStats(commands.Cog):
     async def on_voice_transcript_completed(self, message_duration: float, generation_duration: float):
         "Called when a voice transcript is completed"
         self.voice_transcript_events[(message_duration, generation_duration)] += 1
+
+    @commands.Cog.listener()
+    async def on_stream_starts(self, *_args):
+        "Called when a stream starts"
+        self.stream_events["starts"] += 1
+
+    @commands.Cog.listener()
+    async def on_stream_ends(self, *_args):
+        "Called when a stream ends"
+        self.stream_events["ends"] += 1
 
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
@@ -441,6 +451,11 @@ class BotStats(commands.Cog):
                 cursor.execute(query, (now, f'reminders.snoozed.{initial_duration}.{snooze_duration}', count, 0,
                                        'reminders',True, self.bot.entity_id))
             self.snooze_events.clear()
+            # Twitch stream events
+            for event, count in self.stream_events.items():
+                cursor.execute(query, (now, f'streams.{event}', count, 0,
+                                       'streams', True, self.bot.entity_id))
+            self.stream_events.clear()
             # voice transcripts
             for (message_duration, generation_duration), count in self.voice_transcript_events.items():
                 cursor.execute(query, (now, f'voice_transcripts.{message_duration:.0f}.{generation_duration:.0f}', count, 0,
