@@ -107,4 +107,5 @@ class TwitchApiAgent:
         url = "https://api.twitch.tv/helix/streams"
         params = {"user_id": user_ids}
         async with self.session.get(url, headers=await self._get_headers(), params=params) as resp:
+            resp.raise_for_status()
             return (await resp.json())["data"]
