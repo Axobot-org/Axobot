@@ -145,7 +145,7 @@ class ServerLogs(commands.Cog):
                         else:
                             self.to_send.pop(channel_id)
                 except discord.HTTPException as err:
-                    self.bot.dispatch('error', err, None)
+                    self.bot.dispatch('error', err, f"Sending logs to guild {channel.guild.id} | Channel {channel.id}")
         except Exception as err: # pylint: disable=broad-except
             self.bot.dispatch('error', err, None)
 
@@ -445,7 +445,7 @@ class ServerLogs(commands.Cog):
                 emb.add_field(name="Message Author", value=f"{msg.author} ({msg.author.id})")
                 if msg.attachments:
                     field_title = "Attachment" if len(msg.attachments) == 1 else f"Attachments ({len(msg.attachments)})"
-                    emb.add_field(name=field_title, value=" ".join([f"[{a.filename}]({a.url})" for a in msg.attachments]))
+                    emb.add_field(name=field_title, value=" ".join([f"[{a.filename}]({a.url})" for a in msg.attachments[:5]]))
             created_at = discord.utils.snowflake_time(payload.message_id)
             emb.add_field(name="Created at", value=f"<t:{created_at.timestamp():.0f}>")
             await self.validate_logs(guild, channel_ids, emb, "message_delete")
