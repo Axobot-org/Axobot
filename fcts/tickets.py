@@ -54,7 +54,7 @@ class Tickets(commands.Cog):
                     topic = await self.db_get_topic_with_defaults(interaction.guild_id, topic_id)
             if topic is None:
                 await interaction.response.send_message(await self.bot._(interaction.guild_id, "errors.unknown"), ephemeral=True)
-                raise RuntimeError(f"No topic found on guild {interaction.guild_id} with interaction {topic_id}")
+                raise RuntimeError(f"No topic found on guild {interaction.guild_id} with ID {topic_id}")
             if topic['category'] is None:
                 cmd = await self.bot.get_command_mention("tickets portal set-category")
                 await interaction.response.send_message(await self.bot._(interaction.guild_id, "tickets.missing-category-config", set_category=cmd), ephemeral=True)
