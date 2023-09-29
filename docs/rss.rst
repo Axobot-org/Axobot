@@ -76,6 +76,7 @@ If the rss feed ID is not given, the bot will open a menu to select it. And for 
     - :code:`{channel}`: the channel name (usually the same as author)
     - :code:`{date}`: the post date, using the Discord date markdown
     - :code:`{long_date}`: the post date in UTC, using extended static format
+    - :code:`{timestamp}`: the `Unix time <https://en.wikipedia.org/wiki/Unix_time>`__ in seconds, usable in `Discord timestamp markdown <https://discord.com/developers/docs/reference#message-formatting-timestamp-styles>`__
     - :code:`{link}` or :code:`{url}`: a link to the post
     - :code:`{logo}`: an emoji representing the type of post (web, Twitter, YouTube...)
     - :code:`{mentions}`: the list of mentioned roles
