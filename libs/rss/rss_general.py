@@ -79,7 +79,10 @@ class RssMessage:
         elif isinstance(date, time.struct_time):
             self.date = datetime.datetime(*date[:6]).replace(tzinfo=datetime.timezone.utc)
         elif isinstance(date, str):
-            self.date = date
+            try:
+                self.date = datetime.datetime.fromisoformat(date)
+            except ValueError:
+                self.date = date
         else:
             self.date = None
         self.author = author if author is None or len(author) < 100 else author[:99]+'…'
@@ -144,12 +147,15 @@ class RssMessage:
             date = f"<t:{self.date.timestamp():.0f}>"
             lang = await self.bot._(self.feed.guild_id, "_used_locale")
             long_date = await FormatUtils.date(self.date, lang=lang, year=True, weekday=True, seconds=False)
+            timestamp = round(self.date.timestamp())
         elif self.date is None:
             date = ""
             long_date = ""
+            timestamp = ""
         else:
             date = self.date
             long_date = self.date
+            timestamp = ""
         _channel = discord.utils.escape_markdown(self.channel) if self.channel else "?"
         _author = discord.utils.escape_markdown(self.author) if self.author else "?"
         post_text = self.post_text or ""
@@ -159,6 +165,7 @@ class RssMessage:
             title=self.title,
             date=date,
             long_date=long_date,
+            timestamp=timestamp,
             url=self.url,
             link=self.url,
             mentions=", ".join(self.mentions),

@@ -916,6 +916,7 @@ class Rss(commands.Cog):
         - `{channel}`: the channel name (usually the same as author)
         - `{date}`: the post date, using Discord date markdown
         - `{long_date}`: the post date in UTC, using extended static format
+        - `{timestamp}`: the Unix time of the post in seconds, usable in Discord timestamp markdown
         - `{link}` or `{url}`: a link to the post
         - `{logo}`: an emoji representing the type of post (web, Twitter, YouTube...)
         - `{mentions}`: the list of mentioned roles
@@ -1011,6 +1012,7 @@ class Rss(commands.Cog):
         - `{channel}`: the channel name (usually the same as author)
         - `{date}`: the post date, using Discord date markdown
         - `{long_date}`: the post date in UTC, using extended static format
+        - `{timestamp}`: the Unix time of the post in seconds, usable in Discord timestamp markdown
         - `{link}` or `{url}`: a link to the post
         - `{logo}`: an emoji representing the type of post (web, Twitter, YouTube...)
         - `{mentions}`: the list of mentioned roles
