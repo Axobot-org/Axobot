@@ -8,7 +8,7 @@ import time
 from collections import defaultdict
 from io import BytesIO
 from math import ceil
-from typing import Literal, Optional, TypedDict
+from typing import Literal, Optional, TypedDict, Union
 
 import aiohttp
 import discord
@@ -39,7 +39,7 @@ class Xp(commands.Cog):
 
     def __init__(self, bot: Axobot):
         self.bot = bot
-        self.cache = {'global':{}}
+        self.cache: dict[Union[int, Literal["global"]], dict[int, tuple[int, int]]] = {'global': {}}
         self.levels = [0]
         self.embed_color = discord.Colour(0xffcf50)
         self.table = 'xp_beta' if bot.beta else 'xp'
