@@ -1311,16 +1311,18 @@ class Rss(commands.Cog):
                 self.cache[feed.link] = objs
                 latest_post_date = None
                 for obj in objs[:self.max_messages]:
-                    # if the guild was marked as inactive (ie the bot wasn't there in the previous loop),
+                    # if the guild was marked as inactive (ie. the bot wasn't there in the previous loop),
                     #  mark the feeds as completed but do not send any message, to avoid spamming channels
                     if feed.has_recently_been_refreshed():
                         # if we can't post messages: abort
                         if not chan.permissions_for(guild.me).send_messages:
-                            self.bot.dispatch("server_warning", ServerWarningType.RSS_MISSING_TXT_PERMISSION, guild, channel=chan, feed_id=feed.feed_id)
+                            self.bot.dispatch("server_warning", ServerWarningType.RSS_MISSING_TXT_PERMISSION, guild,
+                                              channel=chan, feed_id=feed.feed_id)
                             return False
                         # same if we need to be able to send embeds
                         if feed.use_embed and not chan.permissions_for(guild.me).embed_links:
-                            self.bot.dispatch("server_warning", ServerWarningType.RSS_MISSING_EMBED_PERMISSION, guild, channel=chan, feed_id=feed.feed_id)
+                            self.bot.dispatch("server_warning", ServerWarningType.RSS_MISSING_EMBED_PERMISSION, guild,
+                                              channel=chan, feed_id=feed.feed_id)
                             return False
                         obj.feed = feed
                         obj.fill_embed_data()
@@ -1333,7 +1335,7 @@ class Rss(commands.Cog):
             else:
                 return True
         except Exception as err:
-            error_msg = f"Erreur rss sur le flux {feed.feed_id} (type {feed.type} - salon {feed.channel_id} - id {feed.feed_id})"
+            error_msg = f"RSS error on feed {feed.feed_id} (type {feed.type} - channel {feed.channel_id} )"
             self.bot.dispatch("error", err, error_msg)
             return False
 
