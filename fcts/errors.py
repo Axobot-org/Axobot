@@ -106,7 +106,7 @@ class Errors(commands.Cog):
         elif isinstance(error, commands.BadLiteralArgument):
             await ctx.send(await self.bot._(ctx.channel, 'errors.badlitteral'), ephemeral=True)
             return
-        elif isinstance(error,(commands.BadArgument,commands.BadUnionArgument)):
+        elif isinstance(error,(commands.BadArgument, commands.BadUnionArgument)):
             allowed_mentions = discord.AllowedMentions(everyone=False, users=False, roles=False)
             async def send_err(tr_key: str, **kwargs):
                 await ctx.send(await self.bot._(ctx.channel, tr_key, **kwargs),
@@ -174,7 +174,10 @@ class Errors(commands.Cog):
             # Invalid server log type
             if isinstance(error, arguments_errors.InvalidServerLogError):
                 return await send_err('errors.invalidserverlog')
-            self.bot.log.warning('Unknown error type -',error)
+            # Invalid member, role or permission
+            if isinstance(error, arguments_errors.InvalidPermissionTargetError):
+                return await send_err('errors.invalidpermissiontarget')
+            self.bot.log.warning('Unknown BadArgument error type: %s', error)
         elif isinstance(error,commands.errors.MissingRequiredArgument):
             await ctx.send(await self.bot._(
                 ctx.channel,'errors.missingargument',
