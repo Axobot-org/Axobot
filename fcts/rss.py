@@ -1113,6 +1113,8 @@ class Rss(commands.Cog):
             return True
         # check web feed
         feed = await feed_parse(self.bot, url, 8)
+        if feed is None:
+            return False
         return len(feed.get("entries", [])) > 0
 
     async def create_id(self, feed_type: FeedType):
