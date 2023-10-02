@@ -16,6 +16,7 @@
     "invalidcolor": "La couleur `%{c}` est invalide",
     "invalidinvite": "Invitation de bot ou de serveur invalide : `%{i}`",
     "invalidisbn": "ISBN invalide",
+    "invalidpermissiontarget": "Je n'ai pas trouvé de membre, rôle ou permission avec ce nom/cette valeur",
     "invalidserverlog": "Type de log de serveur invalide",
     "invalidsnowflake": "ID Discord invalide",
     "invalidunicode": "Emoji Unicode invalide : %{u}",

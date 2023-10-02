@@ -5,6 +5,7 @@ from discord import app_commands
 from discord.ext import commands
 
 from libs.arguments.args import RawPermissionValue
+from libs.arguments.errors import InvalidPermissionTargetError
 from libs.bot_classes import Axobot, MyContext
 from libs.paginator import cut_text
 
@@ -32,6 +33,7 @@ AcceptableTargetTypes = typing.Optional[typing.Union[
 
 
 class TargetConverter(commands.Converter):
+    "Convert a string argument into a Discord Member, Role or Permission object"
     async def convert(self, ctx: MyContext, argument: str) -> AcceptableTargetTypes:
         try:
             return await commands.MemberConverter().convert(ctx, argument)
@@ -51,7 +53,7 @@ class TargetConverter(commands.Converter):
         if argument == "everyone":
             return ctx.guild.default_role
 
-        raise commands.BadArgument(f"Could not find a member, role or permission value with the name {argument}")
+        raise InvalidPermissionTargetError(argument)
 
 class Perms(commands.Cog):
     """Cog with a single command, allowing you to see the permissions of a member or a role in a channel."""

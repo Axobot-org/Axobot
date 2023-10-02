@@ -50,3 +50,9 @@ class InvalidRawPermissionError(VerboseBadArgumentError):
     def __init__(self, argument: str):
         self.argument = argument
         super().__init__(f"Invalid raw permission: {argument}")
+
+class InvalidPermissionTargetError(VerboseBadArgumentError):
+    "Raised when the 'target' argument of the permissions command is not valid"
+    def __init__(self, argument: str):
+        self.argument = argument
+        super().__init__(f"Invalid member, role or permission: {argument}")
