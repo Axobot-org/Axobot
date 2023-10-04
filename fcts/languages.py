@@ -91,17 +91,18 @@ class Languages(discord.ext.commands.Cog):
         if lang_opt not in self.languages:
             # if lang not known: fallback to default
             lang_opt = self.default_language
+        return await self._recursive_get_translation(lang_opt, string_id, **kwargs)
+
+    async def _recursive_get_translation(self, locale: str, string_id: str, **kwargs):
+        "Find the translation in the given locale, or fallback to another locale"
         try:
-            return await self.get_translation(lang_opt, string_id, **kwargs)
+            return await self.get_translation(locale, string_id, **kwargs)
         except KeyError:
-            await self.msg_not_found(string_id, lang_opt)
-            if lang_opt == "en":
+            await self.msg_not_found(string_id, locale)
+            if locale == "en":
                 return string_id
-            try: # try again in english
-                return await self.get_translation("en", string_id, **kwargs)
-            except KeyError:
-                await self.msg_not_found(string_id, "en")
-                return string_id
+            fallback = "fr" if locale == "fr2" else "en"
+            return await self._recursive_get_translation(fallback, string_id, **kwargs)
 
     async def get_translation(self, locale: str, string_id: str, **kwargs) -> Union[str, list]:
         "Get a translation from the i18n files directly"
@@ -112,7 +113,7 @@ class Languages(discord.ext.commands.Cog):
     async def msg_not_found(self, string_id: str, lang: str):
         "Signal to the dev that a translation is missing"
         try:
-            err = f"Message {string_id} not found in JSON files (language {lang})"
+            err = f"Message `{string_id}` not found in JSON files (language {lang})"
             await self.bot.get_cog('Errors').senf_err_msg(err)
             self.bot.log.warning(err)
         except Exception: # pylint: disable=broad-except
