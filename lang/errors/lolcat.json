@@ -16,6 +16,7 @@
     "invalidcolor": "Ups, I can't find the color `%{c}` :confused:",
     "invalidinvite": "Invalid bot/server link: `%{i}`",
     "invalidisbn": "Invalid ISBN",
+    "invalidpermissiontarget": "Oopsie doopsie, dat thing dont look like any member/role/perm :( try wiz somethin else",
     "invalidserverlog": "Unknow server log thingy",
     "invalidsnowflake": "Uh no, dats not a discord ID sir",
     "invalidunicode": "Ungood emoji: %{u}",
