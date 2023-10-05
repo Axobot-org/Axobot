@@ -479,9 +479,9 @@ class BotEvents(commands.Cog):
         if not self.bot.database_online:
             return None
         query = "SELECT `user_id`, `points`, FIND_IN_SET( `points`, \
-            ( SELECT GROUP_CONCAT( `points` ORDER BY `points` DESC ) FROM `event_points` ) ) AS rank \
-                FROM `event_points` WHERE `user_id` = %s AND `beta` = %s"
-        async with self.bot.db_query(query, (user_id, self.bot.beta), fetchone=True) as query_results:
+            ( SELECT GROUP_CONCAT( `points` ORDER BY `points` DESC ) FROM `event_points` WHERE `beta` = %(beta)s ) ) AS rank \
+                FROM `event_points` WHERE `user_id` = %(user)s AND `beta` = %(beta)s"
+        async with self.bot.db_query(query, {'user': user_id, 'beta': self.bot.beta}, fetchone=True) as query_results:
             return query_results or None
 
     async def db_get_event_top(self, number: int):
