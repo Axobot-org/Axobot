@@ -1,7 +1,8 @@
+from collections import defaultdict
 import datetime
 import json
 import random
-from random import randint
+from random import randint, choices, lognormvariate
 from typing import Literal, Optional, Union
 
 import discord
@@ -10,7 +11,8 @@ from discord.ext import commands
 from libs.bot_classes import SUPPORT_GUILD_ID, Axobot, MyContext
 from libs.bot_events import (EventData, EventRewardRole, EventType,
                              get_events_translations)
-from libs.checks.checks import database_connected, is_fun_enabled
+from libs.bot_events.dict_types import EventItem
+from libs.checks.checks import database_connected
 from libs.formatutils import FormatUtils
 from utils import OUTAGE_REASON
 
@@ -21,10 +23,10 @@ class BotEvents(commands.Cog):
     def __init__(self, bot: Axobot):
         self.bot = bot
         self.file = "bot_events"
-        self.collect_reward = [-5, 25]
-        self.collect_cooldown = 3600
-        self.collect_max_strike_period = 3600 * 2
-        self.collect_bonus_per_strike = 1.1
+        self.collect_reward = [-8, 25]
+        self.collect_cooldown = 60*30 # (30m) time in seconds between 2 collects
+        self.collect_max_strike_period = 3600 * 2 # (2h) time in seconds after which the strike level is reset to 0
+        self.collect_bonus_per_strike = 1.1 # the amount of points is multiplied by this number for each strike level
         self.translations_data = get_events_translations()
 
         self.current_event: Optional[EventType] = None
@@ -61,11 +63,13 @@ class BotEvents(commands.Cog):
                 self.current_event = ev_data["type"]
                 self.current_event_data = ev_data
                 self.current_event_id = ev_id
+                self.bot.log.info("Current bot event: %s", ev_id)
                 break
             if ev_data["begin"] - datetime.timedelta(days=5) <= now < ev_data["begin"]:
                 self.coming_event = ev_data["type"]
                 self.coming_event_data = ev_data
                 self.coming_event_id = ev_id
+                self.bot.log.info("Incoming bot event: %s", ev_id)
 
     async def get_specific_objectives(self, reward_type: Literal["rankcard", "role", "custom"]):
         "Get all objectives matching a certain reward type"
@@ -76,6 +80,14 @@ class BotEvents(commands.Cog):
             for objective in self.current_event_data["objectives"]
             if objective["reward_type"] == reward_type
             ]
+
+    async def _is_fun_enabled(self, message: discord.Message):
+        "Check if fun is enabled in a given context"
+        if message.guild is None:
+            return True
+        if not self.bot.database_online and not message.author.guild_permissions.manage_guild:
+            return False
+        return await self.bot.get_config(message.guild.id, "enable_fun")
 
     @commands.Cog.listener()
     async def on_message(self, msg: discord.Message):
@@ -90,7 +102,7 @@ class BotEvents(commands.Cog):
             # If axobot is already there, don't do anything
             return
         if self.current_event and (data := self.current_event_data.get("emojis")):
-            if not await is_fun_enabled(msg):
+            if not await self._is_fun_enabled(msg):
                 # don't react if fun is disabled for this guild
                 return
             if random.random() < data["probability"] and any(trigger in msg.content for trigger in data["triggers"]):
@@ -139,7 +151,7 @@ class BotEvents(commands.Cog):
                 prices = self.translations_data[lang]["events_prices"]
                 if current_event in prices:
                     points = await self.bot._(ctx.channel, "bot_events.points")
-                    prices = [f"**{k} {points}:** {v}" for k,
+                    prices = [f"- **{k} {points}:** {v}" for k,
                               v in prices[current_event].items()]
                     emb.add_field(
                         name=await self.bot._(ctx.channel, "bot_events.events-price-title"),
@@ -264,23 +276,27 @@ class BotEvents(commands.Cog):
         # check last collect from this user
         seconds_since_last_collect = await self.db_get_seconds_since_last_collect(ctx.author.id)
         can_collect, is_strike = await self.check_user_collect_availability(ctx.author.id, seconds_since_last_collect)
-        if can_collect:
-            # grant points
-            strike_level = await self.db_get_user_strike_level(ctx.author.id)
-            points = await self.get_random_points(strike_level)
-            await self.db_add_collect(ctx.author.id, points, increase_strike=is_strike)
-            if points > 0:
-                txt = await self.bot._(ctx.channel, "bot_events.collect.got-points", pts=points)
-            else:
-                txt = await self.bot._(ctx.channel, "bot_events.collect.lost-points", pts=-points)
-            if is_strike:
-                txt += '\n' + await self.bot._(ctx.channel, "bot_events.collect.strike", level=strike_level+1)
-        else:
+        if not can_collect:
             # cooldown error
             time_remaining = self.collect_cooldown - seconds_since_last_collect
             lang = await self.bot._(ctx.channel, '_used_locale')
             remaining = await FormatUtils.time_delta(time_remaining, lang=lang)
             txt = await self.bot._(ctx.channel, "bot_events.collect.too-quick", time=remaining)
+        else:
+            # grant points
+            items = await self.get_random_items()
+            strike_level = await self.db_get_user_strike_level(ctx.author.id) if is_strike else 0
+            if len(items) == 0:
+                points = randint(*self.collect_reward)
+                bonus = 0
+            else:
+                points = sum(item["points"] for item in items)
+                bonus = await self.adjust_points_to_strike(points, strike_level) - points
+            txt = await self.generate_collect_message(ctx.channel, items, points + bonus)
+            if strike_level and bonus > 0:
+                txt += f"\n\n{await self.bot._(ctx.channel, 'bot_events.collect.strike-bonus', bonus=bonus, level=strike_level)}"
+            if points + bonus != 0:
+                await self.db_add_collect(ctx.author.id, points, increase_strike=is_strike)
         # send result
         if ctx.can_send_embed:
             title = self.translations_data[lang]["events_title"][current_event]
@@ -289,12 +305,53 @@ class BotEvents(commands.Cog):
         else:
             await ctx.send(txt)
 
-    async def get_random_points(self, strike_level: int):
+    async def generate_collect_message(self, channel, items: list[EventItem], points: int):
+        "Generate the message to send after a /collect command"
+        items_count = len(items)
+        # no item collected
+        if items_count == 0:
+            if points < 0:
+                return await self.bot._(channel, "bot_events.collect.lost-points", points=-points)
+            if points == 0:
+                return await self.bot._(channel, "bot_events.collect.nothing")
+            return await self.bot._(channel, "bot_events.collect.got-points", points=points)
+        language = await self.bot._(channel, "_used_locale")
+        name_key = "french_name" if language in ("fr", "fr2") else "english_name"
+        # 1 item collected
+        if items_count == 1:
+            item_name = items[0]["emoji"] + " " + items[0][name_key]
+            return await self.bot._(channel, "bot_events.collect.got-item", count=1, item=item_name, points=points)
+        # more than 1 item
+        text = await self.bot._(channel, "bot_events.collect.got-item", count=items_count, points=points)
+        items_group: dict[EventItem, int] = defaultdict(int)
+        for item in items:
+            items_group[item] += 1
+        for item, count in items_group.items():
+            item_name = item["emoji"] + " " + item[name_key]
+            item_points = ('+' if item["points"] >= 0 else '') + str(item["points"] * count)
+            text += f"\n{item_name} x{count} ({item_points} points)"
+        return text
+
+    async def adjust_points_to_strike(self, points: int, strike_level: int):
         "Get a random amount of points for the /collect command, depending on the strike level"
         strike_coef = self.collect_bonus_per_strike ** strike_level
-        min_points = int(self.collect_reward[0] * strike_coef)
-        max_points = int(self.collect_reward[1] * strike_coef)
-        return randint(min_points, max_points)
+        return round(points * strike_coef)
+
+    async def get_random_items(self) -> list[EventItem]:
+        "Get some random items to win during an event"
+        if self.current_event is None:
+            return []
+        items_count = min(round(lognormvariate(0.5, 0.7)), 8) # random number between 0 and 8
+        if items_count <= 0:
+            return []
+        items = await self.db_get_event_items(self.current_event)
+        if len(items) == 0:
+            return []
+        return choices(
+            items,
+            weights=[item["rarity"] for item in items],
+            k=items_count
+        )
 
     async def get_top_5(self) -> str:
         "Get the list of the 5 users with the most event points"
@@ -345,10 +402,11 @@ class BotEvents(commands.Cog):
         rewards: list[EventRewardRole]
         if (support_guild := self.bot.get_guild(SUPPORT_GUILD_ID.id)) is None:
             return
-        if (member := support_guild.get_member(user.id)) is None:
+        user_id = user if isinstance(user, int) else user.id
+        if (member := support_guild.get_member(user_id)) is None:
             return
         if points is None:
-            points = await self.db_get_event_rank(user.id)
+            points = await self.db_get_event_rank(user_id)
             points = 0 if (points is None) else points["points"]
         for reward in rewards:
             if points >= reward["points"]:
@@ -460,6 +518,14 @@ class BotEvents(commands.Cog):
         except Exception as err:
             self.bot.dispatch("error", err)
             return False
+
+    async def db_get_event_items(self, event_type: EventType) -> list[EventItem]:
+        "Get the items to win during a specific event"
+        if not self.bot.database_online:
+            return None
+        query = "SELECT `item_id`, `points` FROM `event_available_items` WHERE `event_type` = %s;"
+        async with self.bot.db_query(query, (event_type, )) as query_results:
+            return query_results
 
 
 async def setup(bot):
