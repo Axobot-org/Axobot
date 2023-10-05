@@ -7,82 +7,13 @@ from typing import Literal, Optional, Union
 import discord
 from discord.ext import commands
 
-from libs.checks.checks import database_connected, is_fun_enabled
 from libs.bot_classes import SUPPORT_GUILD_ID, Axobot, MyContext
-from libs.bot_events import EventData, EventRewardRole, EventType
+from libs.bot_events import (EventData, EventRewardRole, EventType,
+                             get_events_translations)
+from libs.checks.checks import database_connected, is_fun_enabled
 from libs.formatutils import FormatUtils
 from utils import OUTAGE_REASON
 
-translations_data = {
-    "fr": {
-        "events-desc": {
-            "april-2021": "Aujourd'hui, c'est la journée internationale des poissons ! Pendant toute la journée, Zbot fêtera le 1er avril avec des émojis spéciaux pour le jeu du morpion, un avatar unique ainsi que d'autres choses trop cool. \n\nProfitez-en pour récupérer des points d'événements et tentez de gagner la carte d'xp rainbow ! Pour rappel, les cartes d'xp sont accessibles via ma commande `profile card`",
-            "april-2022": "Aujourd'hui, c'est la journée internationale des poissons ! Pendant toute la journée, Zbot fêtera le 1er avril avec des émojis spéciaux pour le jeu du morpion, des commandes uniques ainsi que d'autres choses trop cool. \n\nProfitez-en pour récupérer des points d'événements et tentez de gagner la carte d'xp rainbow ! Pour rappel, les cartes d'xp sont accessibles via ma commande `profile card`",
-            "halloween-2022": "Le mois d'octobre est là ! Profitez jusqu'au 1er novembre d'une atmosphère ténébreuse, remplie de chauve-souris, de squelettes et de citrouilles.\nProfitez-en pour redécorer votre serveur aux couleurs d'Halloween avec la commande `halloween lightfy` et ses dérivées, vérifiez que votre avatar soit bien conforme avec la commande `halloween check`, et récupérez des points d'événements toutes les heures avec la commande `halloween collect`.\n\nLes plus courageux d'entre vous réussirons peut-être à débloquer la carte d'xp spécial Halloween 2022, que vous pourrez utiliser via la commande profile card !",
-            "christmas-2022": "La période des fêtes de fin d'année est là ! C'est l'occasion rêvée de retrouver ses amis et sa famille, de partager de bons moments ensemble, et de s'offrir tout plein de somptueux cadeaux !\n\nPour cet événement de rassemblement, nulle compétition, il vous suffit d'utiliser la commande `event collect` pour récupérer votre carte d'XP spécial Noël 2022 !\nVous pourrez ensuite utiliser cette carte d'XP via la commande `profile card`.\n\nBonne fêtes de fin d'année à tous !",
-            "blurple-2023": "Nous célébrons en ce moment le 8e anniversaire de Discord ! Pour l'occasion, Axobot se met aux couleurs de Discord, le célèbre blurple, et vous propose de récupérer une carte d'XP spéciale anniversaire !\n\nPour cela, il vous suffit de récupérer des points d'événements, en utilisant la commande `event collect` régulièrement ou en redécorant votre serveur avec la commande `blurple`.\n\nJoyeux anniversaire Discord !",
-            "test-2022": "Test event!"
-        },
-        "events-prices": {
-            "april-2021": {
-                "120": "Débloquez la carte d'xp multicolore, obtenable qu'un seul jour par an !"
-            },
-            "april-2022": {
-                "200": "Débloquez la carte d'xp sous-marine, obtenable pendant seulement 24h !"
-            },
-            "halloween-2022": {
-                "300": "Débloquez la carte d'xp halloween 2022, obtenable uniquement pendant cet événement !",
-                "600": "Venez réclamer votre rôle spécial Halloween 2022 sur le serveur officiel de Zbot !"
-            },
-            "blurple-2023": {
-                "300": "Débloquez la carte d'xp blurple 2023, obtenable uniquement pendant cet événement !",
-                "600": "Venez réclamer votre rôle spécial blurple 2023 sur le serveur officiel d'Axobot !"
-            }
-        },
-        "events-title": {
-            "april-2021": "Joyeux 1er avril !",
-            "april-2022": "Joyeux 1er avril !",
-            "halloween-2022": "Le temps des citrouilles est arrivé !",
-            "christmas-2022": "Joyeuses fêtes de fin d'année !",
-            "blurple-2023": "Joyeux anniversaire Discord !",
-            "test-2022": "Test event!"
-        }
-    },
-    "en": {
-        "events-desc": {
-            "april-2021": "Today is International Fish Day! All day long, Zbot will be celebrating April 1st with special tic-tac-toe emojis, a unique avatar and other cool stuff. \nTake the opportunity to collect event points and try to win the rainbow xp card! As a reminder, the xp cards are accessible via my `profile card` command",
-            "april-2022": "Today is International Fish Day! Throughout the day, Zbot will be celebrating April 1 with special tic-tac-toe emojis, unique commands and other cool stuff. \n\nTake the opportunity to collect event points and try to win the rainbow xp card! As a reminder, the xp cards are accessible via my `profile card` command",
-            "halloween-2022": "October is here! Enjoy a dark atmosphere full of bats, skeletons and pumpkins until November 1st.\nTake the opportunity to redecorate your server in Halloween colors with the `halloween lightfy` command and its derivatives, check your avatar with the `halloween check` command, and collect event points every hour with the `halloween collect` command.\n\nThe most courageous among you may succeed in unlocking the special Halloween 2022 xp card, which you can use via the profile card command!",
-            "christmas-2022": "The holiday season is here! It's the perfect opportunity to get together with friends and family, share good times together, and get all sorts of wonderful gifts!\n\nFor this gathering event, no competition, just use the `event collect` command to get your Christmas 2022 XP card!\nYou can then use this XP card via the `profile card` command.\n\nMerry Christmas to all!",
-            "blurple-2023": "We are currently celebrating Discord's 8th anniversary! For the occasion, Axobot is turning Discord's famous blurple color, and offers you to get a special anniversary XP card!\n\nTo do so, all you have to do is collect event points, by using the `event collect` command regularly or by redecorating your server with the `blurple` command.\n\nHappy birthday Discord!",
-            "test-2022": "Test event!"
-        },
-        "events-prices": {
-            "april-2021": {
-                "120": "Unlock the rainbow xp card, obtainable only one day a year!"
-            },
-            "april-2022": {
-                "200": "Unlock the submarine xp card, obtainable only for 24h!"
-            },
-            "halloween-2022": {
-                "300": "Unlock the Halloween 2022 xp card, obtainable only during this event!",
-                "600": "Come claim your special Halloween 2022 role on the official Zbot server!"
-            },
-            "blurple-2023": {
-                "300": "Unlock the blurple 2023 xp card, obtainable only during this event!",
-                "600": "Come claim your special blurple 2023 role on the official Axobot server!"
-            }
-        },
-        "events-title": {
-            "april-2021": "Happy April 1st!",
-            "april-2022": "Happy April 1st!",
-            "halloween-2022": "It's pumpkin time!",
-            "christmas-2022": "Merry Christmas!",
-            "blurple-2023": "Happy birthday Discord!",
-            "test-2022": "Test event!"
-        }
-    }
-}
 
 class BotEvents(commands.Cog):
     "Cog related to special bot events (like Halloween and Christmas)"
@@ -94,6 +25,8 @@ class BotEvents(commands.Cog):
         self.collect_cooldown = 3600
         self.collect_max_strike_period = 3600 * 2
         self.collect_bonus_per_strike = 1.1
+        self.translations_data = get_events_translations()
+
         self.current_event: Optional[EventType] = None
         self.current_event_data: EventData = {}
         self.current_event_id: Optional[str] = None
@@ -178,13 +111,13 @@ class BotEvents(commands.Cog):
         current_event = self.current_event_id
         lang = await self.bot._(ctx.channel, '_used_locale')
         lang = 'en' if lang not in ('en', 'fr') else lang
-        events_desc = translations_data[lang]['events-desc']
+        events_desc = self.translations_data[lang]["events_desc"]
 
         if current_event in events_desc:
             event_desc = events_desc[current_event]
             # Title
             try:
-                title = translations_data[lang]['events-title'][current_event]
+                title = self.translations_data[lang]["events_title"][current_event]
             except KeyError:
                 title = self.current_event
             # Begin/End dates
@@ -203,7 +136,7 @@ class BotEvents(commands.Cog):
                     value=end
                 )
                 # Prices to win
-                prices = translations_data[lang]['events-prices']
+                prices = self.translations_data[lang]["events_prices"]
                 if current_event in prices:
                     points = await self.bot._(ctx.channel, "bot_events.points")
                     prices = [f"**{k} {points}:** {v}" for k,
@@ -237,7 +170,7 @@ class BotEvents(commands.Cog):
         current_event = self.current_event_id
         lang = await self.bot._(ctx.channel, '_used_locale')
         lang = 'en' if lang not in ('en', 'fr') else lang
-        events_desc = translations_data[lang]['events-desc']
+        events_desc = self.translations_data[lang]["events_desc"]
 
         # if no event
         if not current_event in events_desc:
@@ -266,7 +199,7 @@ class BotEvents(commands.Cog):
                 else:
                     user_rank = await self.bot._(ctx.channel, "bot_events.unclassed")
                 points: int = user_rank_query["points"]
-            prices: dict[str, dict[str, str]] = translations_data[lang]['events-prices']
+            prices: dict[str, dict[str, str]] = self.translations_data[lang]["events_prices"]
             if current_event in prices:
                 emojis = self.bot.emojis_manager.customs["green_check"], self.bot.emojis_manager.customs["red_cross"]
                 prices_list = []
@@ -316,7 +249,7 @@ class BotEvents(commands.Cog):
         current_event = self.current_event_id
         lang = await self.bot._(ctx.channel, '_used_locale')
         lang = 'en' if lang not in ('en', 'fr') else lang
-        events_desc = translations_data[lang]['events-desc']
+        events_desc = self.translations_data[lang]["events_desc"]
         # if no event
         if not current_event in events_desc:
             await ctx.send(await self.bot._(ctx.channel, "bot_events.nothing-desc"))
@@ -350,7 +283,7 @@ class BotEvents(commands.Cog):
             txt = await self.bot._(ctx.channel, "bot_events.collect.too-quick", time=remaining)
         # send result
         if ctx.can_send_embed:
-            title = translations_data[lang]['events-title'][current_event]
+            title = self.translations_data[lang]["events_title"][current_event]
             emb = discord.Embed(title=title, description=txt, color=self.current_event_data["color"])
             await ctx.send(embed=emb)
         else:
