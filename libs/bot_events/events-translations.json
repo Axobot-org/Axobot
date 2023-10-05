@@ -1,0 +1,70 @@
+{
+    "fr": {
+        "events_desc": {
+            "april-2021": "Aujourd'hui, c'est la journée internationale des poissons ! Pendant toute la journée, Zbot fêtera le 1er avril avec des émojis spéciaux pour le jeu du morpion, un avatar unique ainsi que d'autres choses trop cool. \n\nProfitez-en pour récupérer des points d'événements et tentez de gagner la carte d'xp rainbow ! Pour rappel, les cartes d'xp sont accessibles via ma commande `profile card`",
+            "april-2022": "Aujourd'hui, c'est la journée internationale des poissons ! Pendant toute la journée, Zbot fêtera le 1er avril avec des émojis spéciaux pour le jeu du morpion, des commandes uniques ainsi que d'autres choses trop cool. \n\nProfitez-en pour récupérer des points d'événements et tentez de gagner la carte d'xp rainbow ! Pour rappel, les cartes d'xp sont accessibles via ma commande `profile card`",
+            "halloween-2022": "Le mois d'octobre est là ! Profitez jusqu'au 1er novembre d'une atmosphère ténébreuse, remplie de chauve-souris, de squelettes et de citrouilles.\nProfitez-en pour redécorer votre serveur aux couleurs d'Halloween avec la commande `halloween lightfy` et ses dérivées, vérifiez que votre avatar soit bien conforme avec la commande `halloween check`, et récupérez des points d'événements toutes les heures avec la commande `halloween collect`.\n\nLes plus courageux d'entre vous réussirons peut-être à débloquer la carte d'xp spécial Halloween 2022, que vous pourrez utiliser via la commande profile card !",
+            "christmas-2022": "La période des fêtes de fin d'année est là ! C'est l'occasion rêvée de retrouver ses amis et sa famille, de partager de bons moments ensemble, et de s'offrir tout plein de somptueux cadeaux !\n\nPour cet événement de rassemblement, nulle compétition, il vous suffit d'utiliser la commande `event collect` pour récupérer votre carte d'XP spécial Noël 2022 !\nVous pourrez ensuite utiliser cette carte d'XP via la commande `profile card`.\n\nBonne fêtes de fin d'année à tous !",
+            "blurple-2023": "Nous célébrons en ce moment le 8e anniversaire de Discord ! Pour l'occasion, Axobot se met aux couleurs de Discord, le célèbre blurple, et vous propose de récupérer une carte d'XP spéciale anniversaire !\n\nPour cela, il vous suffit de récupérer des points d'événements, en utilisant la commande `event collect` régulièrement ou en redécorant votre serveur avec la commande `blurple`.\n\nJoyeux anniversaire Discord !",
+            "test-2022": "Test event!"
+        },
+        "events_prices": {
+            "april-2021": {
+                "120": "Débloquez la carte d'xp multicolore, obtenable qu'un seul jour par an !"
+            },
+            "april-2022": {
+                "200": "Débloquez la carte d'xp sous-marine, obtenable pendant seulement 24h !"
+            },
+            "halloween-2022": {
+                "300": "Débloquez la carte d'xp halloween 2022, obtenable uniquement pendant cet événement !",
+                "600": "Venez réclamer votre rôle spécial Halloween 2022 sur le serveur officiel de Zbot !"
+            },
+            "blurple-2023": {
+                "300": "Débloquez la carte d'xp blurple 2023, obtenable uniquement pendant cet événement !",
+                "600": "Venez réclamer votre rôle spécial blurple 2023 sur le serveur officiel d'Axobot !"
+            }
+        },
+        "events_title": {
+            "april-2021": "Joyeux 1er avril !",
+            "april-2022": "Joyeux 1er avril !",
+            "halloween-2022": "Le temps des citrouilles est arrivé !",
+            "christmas-2022": "Joyeuses fêtes de fin d'année !",
+            "blurple-2023": "Joyeux anniversaire Discord !",
+            "test-2022": "Test event!"
+        }
+    },
+    "en": {
+        "events_desc": {
+            "april-2021": "Today is International Fish Day! All day long, Zbot will be celebrating April 1st with special tic-tac-toe emojis, a unique avatar and other cool stuff. \nTake the opportunity to collect event points and try to win the rainbow xp card! As a reminder, the xp cards are accessible via my `profile card` command",
+            "april-2022": "Today is International Fish Day! Throughout the day, Zbot will be celebrating April 1 with special tic-tac-toe emojis, unique commands and other cool stuff. \n\nTake the opportunity to collect event points and try to win the rainbow xp card! As a reminder, the xp cards are accessible via my `profile card` command",
+            "halloween-2022": "October is here! Enjoy a dark atmosphere full of bats, skeletons and pumpkins until November 1st.\nTake the opportunity to redecorate your server in Halloween colors with the `halloween lightfy` command and its derivatives, check your avatar with the `halloween check` command, and collect event points every hour with the `halloween collect` command.\n\nThe most courageous among you may succeed in unlocking the special Halloween 2022 xp card, which you can use via the profile card command!",
+            "christmas-2022": "The holiday season is here! It's the perfect opportunity to get together with friends and family, share good times together, and get all sorts of wonderful gifts!\n\nFor this gathering event, no competition, just use the `event collect` command to get your Christmas 2022 XP card!\nYou can then use this XP card via the `profile card` command.\n\nMerry Christmas to all!",
+            "blurple-2023": "We are currently celebrating Discord's 8th anniversary! For the occasion, Axobot is turning Discord's famous blurple color, and offers you to get a special anniversary XP card!\n\nTo do so, all you have to do is collect event points, by using the `event collect` command regularly or by redecorating your server with the `blurple` command.\n\nHappy birthday Discord!",
+            "test-2022": "Test event!"
+        },
+        "events_prices": {
+            "april-2021": {
+                "120": "Unlock the rainbow xp card, obtainable only one day a year!"
+            },
+            "april-2022": {
+                "200": "Unlock the submarine xp card, obtainable only for 24h!"
+            },
+            "halloween-2022": {
+                "300": "Unlock the Halloween 2022 xp card, obtainable only during this event!",
+                "600": "Come claim your special Halloween 2022 role on the official Zbot server!"
+            },
+            "blurple-2023": {
+                "300": "Unlock the blurple 2023 xp card, obtainable only during this event!",
+                "600": "Come claim your special blurple 2023 role on the official Axobot server!"
+            }
+        },
+        "events_title": {
+            "april-2021": "Happy April 1st!",
+            "april-2022": "Happy April 1st!",
+            "halloween-2022": "It's pumpkin time!",
+            "christmas-2022": "Merry Christmas!",
+            "blurple-2023": "Happy birthday Discord!",
+            "test-2022": "Test event!"
+        }
+    }
+}

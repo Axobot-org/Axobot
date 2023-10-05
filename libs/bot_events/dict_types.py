@@ -3,6 +3,12 @@ from typing import Literal, Optional, TypedDict, Union
 
 EventType = Literal["blurple", "halloween", "fish"]
 
+class EventsTranslation(TypedDict):
+    "Represents the translations for the bot events in one language"
+    events_desc: dict[str, str]
+    events_prices: dict[str, dict[str, str]]
+    events_titles: dict[str, str]
+
 class EventEmojis(TypedDict):
     "Represents data about available reactions during an event"
     reactions_list: list[str]
