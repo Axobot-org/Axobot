@@ -168,5 +168,39 @@
                 "reward_type": "custom"
             }
         ]
+    },
+    "halloween-2023": {
+        "begin": "2023-10-04",
+        "end": "2023-11-01",
+        "type": "halloween",
+        "icon": "https://zrunner.me/cdn/halloween_2022.jpg",
+        "color": 16089635,
+        "objectives": [
+            {
+                "points": 400,
+                "reward_type": "rankcard",
+                "rank_card": "halloween22"
+            },
+            {
+                "points": 600,
+                "reward_type": "role",
+                "role_id": 1159531747877330994
+            }
+        ],
+        "emojis": {
+            "reactions_list": [
+                "🦇",
+                "🎃",
+                "🕷️",
+                "👻"
+            ],
+            "triggers": [
+                "booh",
+                "halloween",
+                "witch",
+                "ghost"
+            ],
+            "probability": 0.05
+        }
     }
 }

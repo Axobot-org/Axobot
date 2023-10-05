@@ -26,7 +26,7 @@ class BotEvents(commands.Cog):
         self.collect_reward = [-8, 25]
         self.collect_cooldown = 60*30 # (30m) time in seconds between 2 collects
         self.collect_max_strike_period = 3600 * 2 # (2h) time in seconds after which the strike level is reset to 0
-        self.collect_bonus_per_strike = 1.1 # the amount of points is multiplied by this number for each strike level
+        self.collect_bonus_per_strike = 1.05 # the amount of points is multiplied by this number for each strike level
         self.translations_data = get_events_translations()
 
         self.current_event: Optional[EventType] = None
@@ -294,9 +294,9 @@ class BotEvents(commands.Cog):
                 bonus = 0
             else:
                 points = sum(item["points"] for item in items)
-                bonus = await self.adjust_points_to_strike(points, strike_level) - points
+                bonus = max(0, await self.adjust_points_to_strike(points, strike_level) - points)
             txt = await self.generate_collect_message(ctx.channel, items, points + bonus)
-            if strike_level and bonus > 0:
+            if strike_level and bonus != 0:
                 txt += f"\n\n{await self.bot._(ctx.channel, 'bot_events.collect.strike-bonus', bonus=bonus, level=strike_level)}"
             if points + bonus != 0:
                 await self.db_add_collect(ctx.author.id, points, increase_strike=is_strike)
@@ -346,7 +346,7 @@ class BotEvents(commands.Cog):
         "Get some random items to win during an event"
         if self.current_event is None:
             return []
-        items_count = min(round(lognormvariate(0.5, 0.7)), 8) # random number between 0 and 8
+        items_count = min(round(lognormvariate(1.1, 0.9)), 8) # random number between 0 and 8
         if items_count <= 0:
             return []
         items = await self.db_get_event_items(self.current_event)
@@ -354,7 +354,7 @@ class BotEvents(commands.Cog):
             return []
         return choices(
             items,
-            weights=[item["rarity"] for item in items],
+            weights=[item["frequency"] for item in items],
             k=items_count
         )
 
