@@ -157,10 +157,9 @@ async def is_fun_enabled(ctx: MyContext) -> bool:
     "Check if fun is enabled in a given context"
     if ctx.guild is None:
         return True
-    if not ctx.bot.database_online and not ctx.guild.channels[0].permissions_for(ctx.author).manage_guild:
+    if not ctx.bot.database_online and not ctx.author.guild_permissions.manage_guild:
         return False
-    ID = ctx.guild.id
-    return await ctx.bot.get_config(ID, "enable_fun")
+    return await ctx.bot.get_config(ctx.guild.id, "enable_fun")
 
 
 
