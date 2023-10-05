@@ -1,14 +1,14 @@
 {
     "collect": {
-        "got-points": "You didn't find any exciting item this time, but still managed to earn **%{points} event points**!",
-        "lost-points": "It seems like you didn't come accross any collectible item on your way, and you somehow lost **%{points} event points**...",
+        "got-points": "You didn't find any exciting item this time, but still managed to **earn %{points} event points**!",
+        "lost-points": "It seems like you didn't come accross any collectible item on your way, and you somehow **lost %{points} event points**...",
         "nothing": "You didn't find anything interesting on your way, let's hope you'll have more luck next time!",
         "got-items": {
-            "one": "You found one %{item} on your trip! ({points} event points)",
-            "many": "You found %{count} items on your trip! ({points} event points)"
+            "one": "You found **one %{item}** on your trip! (%{points} event points)",
+            "many": "You found **%{count} items** on your trip! (%{points} event points)"
         },
         "too-quick": "It's still too early! You will only be able to collect event points in %{time}!",
-        "strike-bonus": "You got %{bonus} bonus points for using this command %{level} times in a row!"
+        "strike-bonus": "You got **%{bonus} bonus points** for using this command %{level} times in a row!"
     },
     "events-price-title": "Prizes to win",
     "nothing-desc": "There are currently no events. Follow the bot news to know the date of the next one!",

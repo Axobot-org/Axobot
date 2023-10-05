@@ -1,9 +1,14 @@
 {
     "collect": {
-        "got-points": "Bravo ! Vous venez de gagner **%{pts} points** d'événement !",
-        "lost-points": "Oh non ! Tu viens de perdre **%{pts} points**",
-        "too-quick": "Il est encore trop tôt ! Vous ne pourrez récupérer des points d'événement que dans %{time} !",
-        "strike": "Vous avez obtenu un bonus en utilisant cette commande %{level} fois de suite !"
+        "got-points": "Vous n'avez pas trouvé d'objet intéressant cette fois-ci, mais vous avez tout de même réussi à **gagner %{points} points d'événement** !",
+        "lost-points": "Il semble que vous n'ayez pas trouvé d'objet à collectionner sur votre chemin, et que vous ayez inexplicablement **perdu %{points} points d'événement**...",
+        "nothing": "Tu n'as rien trouvé d'intéressant sur ton chemin, espérons que tu auras plus de chance la prochaine fois !",
+        "got-items": {
+            "one": "Vous avez trouvé **un %{item}** lors de votre voyage ! (%{points} d'événement)",
+            "many": "Vous avez trouvé **%{count} objets** lors de votre voyage ! (%{points} points d'événement)"
+        },
+        "too-quick": "Il est encore trop tôt ! Vous ne pourrez collecter des points d'événement que dans %{temps} !",
+        "strike-bonus": "Vous avez obtenu **%{bonus} points bonus** pour avoir utilisé cette commande %{level} fois de suite !"
     },
     "events-price-title": "Prix à gagner",
     "nothing-desc": "Il n'y a actuellement aucun événement. Suivez les news du bot pour connaître la date du prochain !",

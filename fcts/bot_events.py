@@ -196,6 +196,8 @@ class BotEvents(commands.Cog):
             await ctx.send(await self.bot._(ctx.channel, "bot_events.no-objectives", cmd=cmd_mention))
             return
 
+        await ctx.defer()
+
         if user is None:
             user = ctx.author
 
@@ -273,13 +275,14 @@ class BotEvents(commands.Cog):
             cmd_mention = await self.bot.get_command_mention("event info")
             await ctx.send(await self.bot._(ctx.channel, "bot_events.no-objectives", cmd=cmd_mention))
             return
+        await ctx.defer()
+
         # check last collect from this user
         seconds_since_last_collect = await self.db_get_seconds_since_last_collect(ctx.author.id)
         can_collect, is_strike = await self.check_user_collect_availability(ctx.author.id, seconds_since_last_collect)
         if not can_collect:
             # cooldown error
             time_remaining = self.collect_cooldown - seconds_since_last_collect
-            lang = await self.bot._(ctx.channel, '_used_locale')
             remaining = await FormatUtils.time_delta(time_remaining, lang=lang)
             txt = await self.bot._(ctx.channel, "bot_events.collect.too-quick", time=remaining)
         else:
@@ -320,16 +323,18 @@ class BotEvents(commands.Cog):
         # 1 item collected
         if items_count == 1:
             item_name = items[0]["emoji"] + " " + items[0][name_key]
-            return await self.bot._(channel, "bot_events.collect.got-item", count=1, item=item_name, points=points)
+            return await self.bot._(channel, "bot_events.collect.got-items", count=1, item=item_name, points=points)
         # more than 1 item
-        text = await self.bot._(channel, "bot_events.collect.got-item", count=items_count, points=points)
-        items_group: dict[EventItem, int] = defaultdict(int)
+        f_points = str(points) if points <= 0 else "+" + str(points)
+        text = await self.bot._(channel, "bot_events.collect.got-items", count=items_count, points=f_points)
+        items_group: dict[int, int] = defaultdict(int)
         for item in items:
-            items_group[item] += 1
-        for item, count in items_group.items():
+            items_group[item["item_id"]] += 1
+        for item_id, count in items_group.items():
+            item = next(item for item in items if item["item_id"] == item_id)
             item_name = item["emoji"] + " " + item[name_key]
             item_points = ('+' if item["points"] >= 0 else '') + str(item["points"] * count)
-            text += f"\n{item_name} x{count} ({item_points} points)"
+            text += f"\n**{item_name}** x{count} ({item_points} points)"
         return text
 
     async def adjust_points_to_strike(self, points: int, strike_level: int):
@@ -523,7 +528,7 @@ class BotEvents(commands.Cog):
         "Get the items to win during a specific event"
         if not self.bot.database_online:
             return None
-        query = "SELECT `item_id`, `points` FROM `event_available_items` WHERE `event_type` = %s;"
+        query = "SELECT * FROM `event_available_items` WHERE `event_type` = %s;"
         async with self.bot.db_query(query, (event_type, )) as query_results:
             return query_results
 
