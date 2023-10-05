@@ -51,4 +51,4 @@ class EventItem(TypedDict):
     french_name: str
     points: int
     event_type: EventType
-    rarity: float
+    frequency: float
