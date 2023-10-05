@@ -109,7 +109,7 @@ class BotEvents(commands.Cog):
                 react = random.choice(data["reactions_list"])
                 await msg.add_reaction(react)
 
-    @commands.group(name="events", aliases=["botevents", "botevent", "event"])
+    @commands.hybrid_group("event", aliases=["botevents", "botevent", "events"])
     @commands.check(database_connected)
     async def events_main(self, ctx: MyContext):
         """When I'm organizing some events"""
