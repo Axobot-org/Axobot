@@ -50,6 +50,7 @@ class Admin(commands.Cog):
         self.bot = bot
         self.file = "admin"
         self.emergency_time = 15.0
+        self.update: dict[Literal['fr', 'en'], Optional[str]]
         if self.bot.beta:
             self.update = {'fr':'Foo','en':'Bar'}
         else:
@@ -253,10 +254,14 @@ class Admin(commands.Cog):
                 continue
             channel: Optional[discord.TextChannel] = await ctx.bot.get_config(guild.id, 'bot_news')
             if channel is None:
+                # no channel configured
+                continue
+            if self.bot.entity_id == 0 and await self.bot.check_axobot_presence(guild=guild, channel_id=channel.id):
+                # axobot is present on this server and will send the update
                 continue
             lang: Optional[str] = await ctx.bot.get_config(guild.id, 'language')
             if lang not in self.update:
-                lang = 'en'
+                lang = 'fr' if lang == 'fr2' else 'en'
             mentions_roles: list[discord.Role] = await self.bot.get_config(guild.id, 'update_mentions') or []
             mentions = " ".join(x.mention for x in mentions_roles if x is not None)
             allowed_mentions = discord.AllowedMentions(everyone=False, roles=True)
