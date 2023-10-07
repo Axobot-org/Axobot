@@ -3,7 +3,7 @@ import datetime
 import json
 import random
 from random import randint, choices, lognormvariate
-from typing import Literal, Optional, Union
+from typing import Any, Literal, Optional, Union
 
 import discord
 from discord.ext import commands
@@ -178,16 +178,15 @@ class BotEvents(commands.Cog):
     async def events_rank(self, ctx: MyContext, user: discord.User = None):
         """Watch how many xp you already have
         Events points are reset after each event"""
-        current_event = self.current_event_id
         lang = await self.bot._(ctx.channel, '_used_locale')
         lang = 'en' if lang not in ('en', 'fr') else lang
         events_desc = self.translations_data[lang]["events_desc"]
 
         # if no event
-        if not current_event in events_desc:
+        if not self.current_event_id in events_desc:
             await ctx.send(await self.bot._(ctx.channel, "bot_events.nothing-desc"))
-            if current_event:
-                self.bot.dispatch("error", ValueError(f"'{current_event}' has no event description"), ctx)
+            if self.current_event_id:
+                self.bot.dispatch("error", ValueError(f"'{self.current_event_id}' has no event description"), ctx)
             return
         # if current event has no objectives
         if not self.current_event_data["objectives"]:
@@ -197,62 +196,88 @@ class BotEvents(commands.Cog):
 
         await ctx.defer()
 
+        title = await self.bot._(ctx.channel, "bot_events.rank-title")
+        desc = await self.bot._(ctx.channel, "bot_events.xp-howto")
+
+        if not self.bot.database_online:
+            lang = await self.bot._(ctx.channel, '_used_locale')
+            reason = OUTAGE_REASON.get(lang, OUTAGE_REASON['en'])
+            emb = discord.Embed(title=title, description=desc, color=self.current_event_data["color"])
+            emb.add_field(name="OUTAGE", value=reason)
+            await ctx.send(embed=emb)
+            return
+
         if user is None:
             user = ctx.author
 
-        if self.bot.database_online:
-            user_rank_query = await self.db_get_event_rank(user.id)
-            if user_rank_query is None:
-                user_rank = await self.bot._(ctx.channel, "bot_events.unclassed")
-                points = 0
-            else:
-                total_ranked = await self.db_get_participants_count()
-                if user_rank_query['rank'] <= total_ranked:
-                    user_rank = f"{user_rank_query['rank']}/{total_ranked}"
-                else:
-                    user_rank = await self.bot._(ctx.channel, "bot_events.unclassed")
-                points: int = user_rank_query["points"]
-            prices: dict[str, dict[str, str]] = self.translations_data[lang]["events_prices"]
-            if current_event in prices:
-                emojis = self.bot.emojis_manager.customs["green_check"], self.bot.emojis_manager.customs["red_cross"]
-                prices_list = []
-                for price, desc in prices[current_event].items():
-                    emoji = emojis[0] if int(price) <= points else emojis[1]
-                    prices_list.append(f"{emoji}{min(points, int(price))}/{price}: {desc}")
-                prices = "\n".join(prices_list)
-                objectives_title = await self.bot._(ctx.channel, "bot_events.objectives")
-            else:
-                prices = ""
-                objectives_title = ""
-            _rank_total = await self.bot._(ctx.channel, "bot_events.rank-total")
-            _position_global = await self.bot._(ctx.channel, "bot_events.position-global")
-            _rank_global = await self.bot._(ctx.channel, "bot_events.leaderboard-global", count=5)
+        emb = discord.Embed(title=title, description=desc, color=self.current_event_data["color"])
+        user: discord.User
+        emb.set_author(name=user, icon_url=user.display_avatar.replace(static_format="png", size=32))
+        for field in await self.generate_user_profile_rank_fields(ctx, lang, user):
+            emb.add_field(**field)
+        emb.add_field(**await self.generate_user_profile_collection_field(ctx, user))
+        await ctx.send(embed=emb)
 
-        title = await self.bot._(ctx.channel, "bot_events.rank-title")
-        if ctx.can_send_embed:
-            desc = await self.bot._(ctx.channel, "bot_events.xp-howto")
-            emb = discord.Embed(title=title, description=desc, color=self.current_event_data["color"])
-            user: discord.User
-            emb.set_author(name=user, icon_url=user.display_avatar.replace(static_format="png", size=32))
-            if self.bot.database_online:
-                if objectives_title != "":
-                    emb.add_field(name=objectives_title, value=prices, inline=False)
-                emb.add_field(name=_rank_total, value=str(points))
-                emb.add_field(name=_position_global, value=user_rank)
-                if top_5 := await self.get_top_5():
-                    emb.add_field(name=_rank_global, value=top_5, inline=False)
-            else:
-                lang = await self.bot._(ctx.channel, '_used_locale')
-                reason = OUTAGE_REASON.get(lang, OUTAGE_REASON['en'])
-                emb.add_field(name="OUTAGE", value=reason)
-            await ctx.send(embed=emb)
+    async def generate_user_profile_rank_fields(self, ctx: MyContext, lang: Literal["fr", "en"], user: discord.User):
+        "Compute the texts to display in the /event profile command"
+        user_rank_query = await self.db_get_event_rank(user.id)
+        if user_rank_query is None:
+            user_rank = await self.bot._(ctx.channel, "bot_events.unclassed")
+            points = 0
         else:
-            msg = f"**{title}** ({user})"
-            if self.bot.database_online:
-                if objectives_title != "":
-                    msg += f"\n\n__{objectives_title}:__\n{prices}"
-                msg += f"\n\n__{_rank_total}:__ {points}\n__{_rank_global}:__ {user_rank}"
-            await ctx.send(msg)
+            total_ranked = await self.db_get_participants_count()
+            if user_rank_query['rank'] <= total_ranked:
+                user_rank = f"{user_rank_query['rank']}/{total_ranked}"
+            else:
+                user_rank = await self.bot._(ctx.channel, "bot_events.unclassed")
+            points: int = user_rank_query["points"]
+        prices: dict[str, dict[str, str]] = self.translations_data[lang]["events_prices"]
+        if self.current_event_id in prices:
+            emojis = self.bot.emojis_manager.customs["green_check"], self.bot.emojis_manager.customs["red_cross"]
+            prices_list = []
+            for price, desc in prices[self.current_event_id].items():
+                emoji = emojis[0] if int(price) <= points else emojis[1]
+                prices_list.append(f"{emoji}{min(points, int(price))}/{price}: {desc}")
+            prices = "\n".join(prices_list)
+            objectives_title = await self.bot._(ctx.channel, "bot_events.objectives")
+        else:
+            prices = ""
+            objectives_title = ""
+
+        _points_total = await self.bot._(ctx.channel, "bot_events.points-total")
+        _position_global = await self.bot._(ctx.channel, "bot_events.position-global")
+        _rank_global = await self.bot._(ctx.channel, "bot_events.leaderboard-global", count=5)
+
+        fields: list[dict[str, Any]] = [
+            {"name": objectives_title, "value": prices, "inline": False},
+            {"name": _points_total, "value": str(points)},
+            {"name": _position_global, "value": user_rank},
+        ]
+        if top_5 := await self.get_top_5():
+            fields.append({"name": _rank_global, "value": top_5, "inline": False})
+        return fields
+
+    async def generate_user_profile_collection_field(self, ctx: MyContext, user: discord.User):
+        "Compute the texts to display in the /event profile command"
+        title = await self.bot._(ctx.channel, "bot_events.collection-title")
+        items = await self.db_get_user_collected_items(user.id)
+        if len(items) == 0:
+            _empty_collection = await self.bot._(ctx.channel, "bot_events.collection-empty")
+            return {"name": title, "value": _empty_collection, "inline": True}
+        lang = await self.bot._(ctx.channel, '_used_locale')
+        name_key = "french_name" if lang in ("fr", "fr2") else "english_name"
+        items.sort(key=lambda item: item["frequency"], reverse=True)
+        items_list: list[str] = []
+        more_count = 0
+        for item in items:
+            if len(items_list) >= 29:
+                more_count += item['count']
+                continue
+            item_name = item["emoji"] + " " + item[name_key]
+            items_list.append(f"{item_name} x{item['count']}")
+        if more_count:
+            items_list.append(await self.bot._(ctx.channel, "bot_events.collection-more", count=more_count))
+        return {"name": title, "value": "\n".join(items_list), "inline": True}
 
     @events_main.command(name="collect")
     @commands.check(database_connected)
