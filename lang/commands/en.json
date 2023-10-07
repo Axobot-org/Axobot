@@ -25,6 +25,9 @@
         "emoji list": "list",
         "emoji rename": "rename",
         "emoji restrict": "restrict",
+        "event info": "info",
+        "event profile": "profile",
+        "event collect": "collect",
         "kick": "kick",
         "last-post": "last-post",
         "modlogs disable": "disable",
@@ -97,6 +100,7 @@
         "blurple": "blurple",
         "config": "config",
         "emoji": "emoji",
+        "event": "event",
         "modlogs": "modlogs",
         "profile": "profile",
         "reminders": "reminders",
@@ -114,6 +118,7 @@
         "antiscam": "Everything related to the antiscam feature",
         "config": "Configure the bot for your server",
         "emoji": "Manage your emojis",
+        "event": "Participate in bot special events",
         "modlogs": "Enable or disable server logs in specific channels",
         "profile": "Configure the bot for your own usage",
         "reminders": "Manage your pending reminders",
@@ -385,6 +390,9 @@
         },
         "stats": {
             "category": "category"
+        },
+        "event profile": {
+            "user": "user"
         }
     }
 }

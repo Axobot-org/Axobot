@@ -111,7 +111,7 @@ class BotEvents(commands.Cog):
     @commands.hybrid_group("event", aliases=["botevents", "botevent", "events"])
     @commands.check(database_connected)
     async def events_main(self, ctx: MyContext):
-        """When I'm organizing some events"""
+        """Participate in bot special events!"""
         if ctx.subcommand_passed is None:
             await ctx.send_help(ctx.command)
 
@@ -173,11 +173,11 @@ class BotEvents(commands.Cog):
             if current_event:
                 self.bot.dispatch("error", ValueError(f"'{current_event}' has no event description"), ctx)
 
-    @events_main.command(name="rank")
+    @events_main.command(name="profile")
     @commands.check(database_connected)
-    async def events_rank(self, ctx: MyContext, user: discord.User = None):
-        """Watch how many xp you already have
-        Events points are reset after each event"""
+    async def event_profile(self, ctx: MyContext, user: discord.User = None):
+        """Take a look at your progress in the event and your global ranking
+        Event points are reset after each event"""
         lang = await self.bot._(ctx.channel, '_used_locale')
         lang = 'en' if lang not in ('en', 'fr') else lang
         events_desc = self.translations_data[lang]["events_desc"]
