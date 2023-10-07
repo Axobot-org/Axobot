@@ -12,7 +12,7 @@
             "error": "Při odstraňování připomínek došlo k chybě. Zkuste to prosím znovu nebo kontaktujte podporu.",
             "success": {
                 "one": "Vaše připomínka byla smazána!",
-                "other": "Připomínky %{count} byly úspěšně smazány!"
+                "many": "Připomínky %{count} byly úspěšně smazány!"
             },
             "title": "Zvolte, které připomenutí(s) chcete smazat"
         },
