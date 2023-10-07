@@ -1,0 +1,12 @@
+{
+    "cant-react": "K vytvoření ankety potřebuji v tomto kanálu oprávnění 'Přidat reakce'.",
+    "created": "Hlasování vytvořeno v %{url} !",
+    "no-channel": "Nelze najít zadaný kanál, vyberte prosím jiný.",
+    "text-modal": {
+        "title": "Vytvořit hlasování",
+        "label": "Zadejte text k hlasování",
+        "placeholder": "Text bude odeslán tak, jak je, takže neváhejte použít emodži a označení.",
+        "success": "Připravujeme váši zprávu, vydržte vteřinku..."
+    },
+    "too-many-options": "Vzhledem k omezením Discord nemohu použít výchozí emodži s více než 10 možnostmi. Prosím, dovolte mi použít externí emodži, nebo zredukujte počet možností na 10 nebo méně."
+}
