@@ -52,3 +52,14 @@ class EventItem(TypedDict):
     points: int
     event_type: EventType
     frequency: float
+
+class EventItemWithCount(TypedDict):
+    "Represents an item type collected by a user, with how many they have"
+    count: int
+    item_id: int
+    emoji: str
+    english_name: str
+    french_name: str
+    points: int
+    event_type: EventType
+    frequency: float
