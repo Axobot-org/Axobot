@@ -53,9 +53,12 @@
     ],
     "item-help": "Tento příkaz umožňuje získat informace o libovolné položce Minecraft. Můžete uvést její úplný nebo částečný název, ve francouzštině nebo angličtině, nebo dokonce její identifikátor. Stačí zadat `%{p}mc item <name>`",
     "mod-fields": {
+        "author": "Autor",
         "authors": "Autoři",
         "categories": "Kategorie",
         "downloads": "Počet stahování",
+        "id-curseforge": "CourseForge ID",
+        "id-modrinth": "Modrinth ID",
         "name": "Jméno",
         "release": "Poslední aktualizace",
         "summary": "Souhrn",
