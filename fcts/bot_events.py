@@ -10,8 +10,7 @@ from discord.ext import commands
 
 from libs.bot_classes import SUPPORT_GUILD_ID, Axobot, MyContext
 from libs.bot_events import (EventData, EventRewardRole, EventType,
-                             get_events_translations)
-from libs.bot_events.dict_types import EventItem
+                             get_events_translations, EventItem, EventItemWithCount)
 from libs.checks.checks import database_connected
 from libs.formatutils import FormatUtils
 from utils import OUTAGE_REASON
@@ -295,6 +294,7 @@ class BotEvents(commands.Cog):
             else:
                 points = sum(item["points"] for item in items)
                 bonus = max(0, await self.adjust_points_to_strike(points, strike_level) - points)
+                await self.db_add_user_items(ctx.author.id, [item["item_id"] for item in items])
             txt = await self.generate_collect_message(ctx.channel, items, points + bonus)
             if strike_level and bonus != 0:
                 txt += f"\n\n{await self.bot._(ctx.channel, 'bot_events.collect.strike-bonus', bonus=bonus, level=strike_level)}"
@@ -527,11 +527,30 @@ class BotEvents(commands.Cog):
     async def db_get_event_items(self, event_type: EventType) -> list[EventItem]:
         "Get the items to win during a specific event"
         if not self.bot.database_online:
-            return None
+            return []
         query = "SELECT * FROM `event_available_items` WHERE `event_type` = %s;"
         async with self.bot.db_query(query, (event_type, )) as query_results:
             return query_results
 
+    async def db_add_user_items(self, user_id: int, items_ids: list[int]):
+        "Add some items to a user's collection"
+        if not self.bot.database_online:
+            return
+        query = "INSERT INTO `event_collected_items` (`user_id`, `item_id`, `beta`) VALUES " + \
+            ", ".join(["(%s, %s, %s)"] * len(items_ids)) + ';'
+        async with self.bot.db_query(query, [arg for item_id in items_ids for arg in (user_id, item_id, self.bot.beta)]):
+            pass
+
+    async def db_get_user_collected_items(self, user_id: int) -> list[EventItemWithCount]:
+        "Get the items collected by a user"
+        if not self.bot.database_online:
+            return []
+        query = """SELECT COUNT(*) AS 'count', a.*
+        FROM `event_collected_items` c LEFT JOIN `event_available_items` a ON c.`item_id` = a.`item_id`
+        WHERE c.`user_id` = %s AND c.`beta` = %s
+        GROUP BY c.`item_id`"""
+        async with self.bot.db_query(query, (user_id, self.bot.beta)) as query_results:
+            return query_results
 
 async def setup(bot):
     await bot.add_cog(BotEvents(bot))

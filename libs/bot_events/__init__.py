@@ -3,7 +3,7 @@ import os
 from typing import Literal
 
 from .dict_types import (EventData, EventItem, EventRewardRole,
-                         EventsTranslation, EventType)
+                         EventsTranslation, EventType, EventItemWithCount)
 
 
 def get_events_translations() -> dict[Literal["fr", "en"], EventsTranslation]:
@@ -17,4 +17,5 @@ __all__ = (
     "EventItem",
     "EventRewardRole",
     "EventType",
+    "EventItemWithCount",
 )
