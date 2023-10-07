@@ -148,7 +148,7 @@
     "cmd-count": {
         "zero": "Žádný příkaz",
         "one": "1 příkaz\n`%{p}help %{cog}` pro více informací",
-        "other": "Příkazy %{count}\n`%{p}nápověda %{cog}` pro získání seznamu"
+        "many": "Příkazy %{count}\n`%{p}nápověda %{cog}` pro získání seznamu"
     },
     "cmd-not-found": "Neexistuje žádný příkaz s názvem \"%{cmd}\"",
     "cog-empty-dm": "Žádný příkaz této kategorie není v DM k dispozici!",
