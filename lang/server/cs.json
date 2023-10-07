@@ -160,9 +160,10 @@
     },
     "value-deleted": "Hodnota volby \"%{option} byla obnovena na výchozí hodnotu",
     "warnings": {
-        "antiraid_kick_ban": "Potřebuji oprávnění jak \"Vykopnout uživatele\", tak \"Zabanovat uživatele\", abych mohl uplatnit ochranu proti anti-raid",
-        "antiraid_kick": "Potřebuji povolení „Vykopnout uživatele“, abych mohl použít ochranu anti-raid",
-        "antiraid_ban": "K použití ochrany anti-raid potřebuji povolení „Zabanovat uživatele“",
+        "antiraid_perms_missing": {
+            "one": "Potřebuji oprávnění '**%{perm}**' pro použití funkce anti-raid",
+            "many": "Chybí mi některé oprávnění k použití funkce anti-raid. **%{list}**"
+        },
         "channel_write_permissions": "Potřebuji mít možnost posílat zprávy v %{channel} pro tuto možnost",
         "moderation_command": "Potřebuji oprávnění '%{perm}' pro použití tohoto příkazu",
         "title": "Varování",
