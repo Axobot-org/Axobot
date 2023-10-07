@@ -50,11 +50,11 @@
         "confirm": "Opravdu chcete nastavit roli „umlčen“?\nTato akce může narušit některá pokročilá oprávnění na serveru, a to odvoláním přepisu oprávnění „odesílat zprávy“ z některých rolí.",
         "err": "Není možné to provést. Zkontrolujte prosím moje oprávnění na serveru a zkuste to znovu.",
         "success": {
-            "other": "Role byla úspěšně vytvořena a nakonfigurována! (%{count} kanály nebylo možné nakonfigurovat kvůli nedostatku oprávnění)",
+            "many": "Role byla úspěšně vytvořena a nakonfigurována! (%{count} kanály nemohly být nakonfigurovány, kvůli nedostatku oprávnění)",
             "zero": "Role byla úspěšně vytvořena a nastavena!"
         },
         "success2": {
-            "other": "Role byla úspěšně nakonfigurována! (%{count} kanály nebylo možné nakonfigurovat z důvodu nedostatku oprávnění)",
+            "many": "Role byla úspěšně nakonfigurována! (%{count} kanály nemohly být nakonfigurovány, kvůli nedostatku oprávnění)",
             "zero": "Role byla úspěšně nakonfigurována!"
         },
         "tip": "*Tip: Použití příkazu %{mute} bez nastavené ztlumené role bude používat oficiální timeoutový systém Discord, který by mohl lépe vyhovovat vašim potřebám.*"
@@ -81,8 +81,8 @@
         "error-notfound": "Jejda, tuto zprávu nemohu najít (Error : `%{err}`)",
         "error-toomuch": "Jejda, nelze připnout tuto zprávu (máte více než 50 připnutých zpráv?). Chyba : `%{err}`"
     },
-    "raid-banned": "Byli jste automaticky zabanováni ze serveru %{guild} antiraid systémem.",
-    "raid-kicked": "Byl jste automaticky vykopnut ze serveru %{guild} systémem anti-raid. Zkuste to znovu za několik dní.",
+    "raid-banned": "Na serveru %{guild} jste byl automaticky zabanován systémem automod.",
+    "raid-kicked": "Ze serveru %{guild} jste byl automaticky vykopnut systémem automod. Zkuste to znovu za několik dní.",
     "react-clear": "Nemohu najít tuto zprávu :confused:",
     "role": {
         "color-success": "Role %{role} změnila barvu!",
