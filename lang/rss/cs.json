@@ -28,7 +28,10 @@
     "deviant-form-last": "{logo} | Zde je nový výtvor {author}:\n{title}\nPublikováno dne {date}\nOdkaz: {url}",
     "embed-json-changed": "Vložený embed v kanálu byl upraven",
     "flow-limit": "Z důvodu výkonu nemůžete sledovat více než %{limit} rss kanálů na server.",
-    "guild-complete": "%{count} rss streamů bylo správně obnoveno, za %{time} sekund!",
+    "guild-complete": {
+        "one": "Váš rss stream bylo správně obnoveno, za %{time} sekund!",
+        "many": "%{count} rss streamů bylo správně obnoveno, za %{time} sekund!"
+    },
     "guild-error": "Během postupu došlo k chybě: `%{err}`\nPokud si myslíte, že tato chyba není způsobena vámí, můžete ji nahlásit na podporu",
     "guild-loading": "Reloading %{emoji}",
     "invalid-flow": "Tato adresa URL je neplatná (prázdná nebo nedostupná RSS kanály) :confused:",
@@ -75,6 +78,7 @@
     "tw-form-last": "{logo}  | Zde je poslední tweet {author}:\nPublikováno {date}\n\n{title}\n\nOdkaz: {url}",
     "tw-no-tweet": "Vypadá to, že tento uživatel nikdy netweetoval :confused:",
     "twitch": "Twitch",
+    "twitch-default-flow": "{logo}  | Nový tweet {author}! ({date})\n\n{title}\n\nOdkaz: {link}\n\n{mentions}",
     "twitch-form-last": "{logo} | Zde je poslední video {author}:\n{title}\nPublikováno dne {date}\nOdkaz: {url}\n",
     "twitch-invalid": "Ale ne, nemohl jsem najít žádný Twitch kanál s tímto jménem!",
     "use_embed-same": "Použití embedu pro tento kanál se nezměnilo",
