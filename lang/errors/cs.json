@@ -16,6 +16,7 @@
     "invalidcolor": "Barva `%{c}` neplatná",
     "invalidinvite": "Neplatná pozvánka bot/server: `%{i}`",
     "invalidisbn": "Neplatný ISBN",
+    "invalidpermissiontarget": "Nepodařilo se najít žádného člena, roli nebo oprávnění s tímto názvem/hodnotou",
     "invalidserverlog": "Neplatný typ protokolu serveru",
     "invalidsnowflake": "Neplatné Discord ID",
     "invalidunicode": "Neplatný kod emoji: %{u}",
