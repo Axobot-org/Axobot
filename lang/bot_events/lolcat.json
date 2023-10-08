@@ -1,20 +1,28 @@
 {
     "collect": {
-        "got-points": "GG, u just got **%{pts}** points!",
-        "lost-points": "Oh no, u just lost **%{pts}** points :(",
+        "got-points": "Uh, looks like u couldn't find anything dis time, so I gave u **%{points} event points**. Make sure to open ur eyes next time tho!",
+        "lost-points": "Uh, looks like u couldn't find anything dis time duh. I took bakk **%{points} event points** from ur account, let that be a lesson to you!",
+        "nothing": "U didnt find anythin dis time. Keep ur eyes open!",
+        "got-items": {
+            "one": "Oh, look like u fund a **%{item}**! (%{points} pts)",
+            "many": "Eh look at dat, u just found **%{count} shiny things**! (%{points} pts)"
+        },
         "too-quick": "Wait no, ur too soon! Please wait %{time} again k thx",
-        "strike": "I gave u extra chances cuz you usd that command %{level} times in a row, just so u know."
+        "strike-bonus": "I gave u **extra %{bonus} points** cuz you usd that command %{level} times in a row, just so u know."
     },
+    "collection-empty": "Uh oh, ur bag is empty for now. Go get some shiny things!",
+    "collection-more": "... + %{count} hidden!",
+    "collection-title": "Ur bag",
     "events-price-title": "Prizes 2 win",
+    "leaderboard-global": "Globol %{count} best ppl",
     "nothing-desc": "There'r no events rn. Follow my bot news 2 know teh date of the next one!",
     "nothing-prices": "There's no thing 2 gain 4 this event :confused:",
     "no-objectives": "Dis event has no goal, no life meaning, nothing. At this point I wonder who am I, really.\nBut maybe %{cmd} would be more useful.",
     "objectives": "Objectives",
     "points": "pts",
+    "points-total": "Total pts",
     "position-global": "Globol rank",
-    "leaderboard-global": "Globol %{count} best ppl",
     "rank-title": "Event pts",
-    "rank-total": "Total pts",
     "soon": "Hey hey hey! ur too soon, try checking on %{date}! :hype:  ",
     "unclassed": "unclassd",
     "xp-howto": "You can earn event points by winning tic-tac-toe games, using event commands when available, or by performing various other secret tasks. Don't hesitate to come to the support server to ask for information!"
