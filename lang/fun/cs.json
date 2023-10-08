@@ -9,7 +9,6 @@
     },
     "bbw-too-many": "Ale né, mřížka je příliš velká pro Discord :confused:",
     "blame-0": "Seznam dostupných jmen pro **%{user}**",
-    "cant-react": "Nemám dostatečná oprávnění k odesílání reakcí!",
     "cookie": "%{user} nabídl krabici cookies na <@375598088850505728>! %{emoji}",
     "count": {
         "counting": "Probíhá počítání...",
@@ -91,7 +90,6 @@
     "no-embed-perm": "Nemám oprávnění k \"Vložit odkazy\" :confused:",
     "no-emoji": "Nelze najít tento emoji!",
     "no-fun": "Zábavné příkazy byly zakázány na tomto serveru. Chcete-li zobrazit jejich seznam, podívejte se na https://axobot.rtfd.io/en/latest/fun.html",
-    "no-reaction": "Nelze přidat reakce. Zkontrolujte prosím moje oprávnění...",
     "no-roll": "Nebyla nalezena žádná volba",
     "no-say": "Nelze odeslat žádnou zprávu v tomto kanálu",
     "no-voicechan": "Musíte být v hlasovém kanálu, abyste mohli použít tento příkaz.",
@@ -143,8 +141,9 @@
         "Pro-tip: příkaz `prefix` umožňuje mít seznam prefixů aktuálně použitelných na serveru",
         "Věděli jste to? Popis vašeho serveru, který lze použít na jiných serverech, můžete zadat pomocí volby `description` příkazu %{config_cmd}",
         "Věděli jste to? Na některých speciálních akcích je možné získat sběratelské xp karty. Nezapomeňte sledovat novinky na oficiálním serveru nebo s příkazem %{event_cmd}!",
-        "Líbí se vám tento bot? Neváhejte a přispějte nám návštěvou webu %{sponsor_url}!"
+        "Líbí se vám tento bot? Neváhejte a přispějte nám návštěvou webu %{sponsor_url}!",
+        "Věděli jste to? Pokud už vás nebaví poslouchat stovky hlasových zpráv odeslaných vašimi přáteli, můžete použít přepisovací funkci Axobotu pro čtení jejich textového obsahu. Klikněte na hlasovou schránku a pak zvolte \"Aplikace\" > \"Hlasový text\"!",
+        "Věděli jste to? Funkce přepisu hlasových zpráv respektuje vaše soukromí a místo odesílání zpráv externí službě používá lokální model umělé inteligence!"
     ],
-    "uninhabited-city": "Neobydlené město :confused:",
-    "vote-0": "Nemůžete dát více než 20 možností a ještě méně negativního počtu možností!"
+    "uninhabited-city": "Neobydlené město :confused:"
 }
