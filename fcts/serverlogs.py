@@ -228,15 +228,16 @@ class ServerLogs(commands.Cog):
         ..Doc moderator.html#how-to-setup-logs"""
         if len(logs) == 0:
             raise InvalidServerLogError("")
-        dest_channel = channel or ctx.channel
         if 'all' in logs:
             logs = list(self.available_logs())
+        dest_channel = channel or ctx.channel
+        currently_actived_logs = await self.db_get_from_channel(ctx.guild.id, dest_channel.id)
         actually_added: list[str] = []
         not_added: list[str] = []
         if ctx.interaction and not ctx.interaction.response.is_done():
             await ctx.defer()
         for log in logs:
-            if await self.db_add(ctx.guild.id, dest_channel.id, log):
+            if log not in currently_actived_logs and await self.db_add(ctx.guild.id, dest_channel.id, log):
                 actually_added.append(log)
             else:
                 not_added.append(log)
@@ -304,11 +305,12 @@ class ServerLogs(commands.Cog):
         if 'all' in logs:
             logs = list(self.available_logs())
         dest_channel = channel or ctx.channel
+        currently_actived_logs = await self.db_get_from_channel(ctx.guild.id, dest_channel.id)
         actually_removed: list[str] = []
         if ctx.interaction and not ctx.interaction.response.is_done():
             await ctx.defer()
         for log in logs:
-            if await self.db_remove(ctx.guild.id, dest_channel.id, log):
+            if log in currently_actived_logs and await self.db_remove(ctx.guild.id, dest_channel.id, log):
                 actually_removed.append(log)
         if actually_removed:
             removed = ', '.join(sorted(actually_removed))
