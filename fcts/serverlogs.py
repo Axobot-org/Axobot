@@ -20,7 +20,10 @@ from libs.enums import ServerWarningType
 from libs.formatutils import FormatUtils
 from libs.tips import GuildTip
 
-DISCORD_INVITE = re.compile(r'(?:https?://)?(?:www[.\s])?((?:discord[.\s](?:gg|io|li(?:nk)?)|discord\.me|discordapp\.com/invite|discord\.com/invite|dsc\.gg)[/\s]{1,3}[\w-]{2,27}(?!\w))')
+DISCORD_INVITE = re.compile(
+    r'(?:https?://)?(?:www[.\s])?((?:discord[.\s](?:gg|io|li(?:nk)?)|discord\.me|discordapp\.com/invite\
+        |discord\.com/invite|dsc\.gg)[/\s]{1,3}[\w-]{2,27}(?!\w))'
+)
 
 if TYPE_CHECKING:
     from fcts.cases import Case
@@ -43,6 +46,7 @@ class ServerLogs(commands.Cog):
 
     @classmethod
     def available_logs(cls):
+        "Returns all existing logs types"
         return {log for category in cls.logs_categories.values() for log in category}
 
 
@@ -228,19 +232,31 @@ class ServerLogs(commands.Cog):
         if 'all' in logs:
             logs = list(self.available_logs())
         actually_added: list[str] = []
+        not_added: list[str] = []
+        if ctx.interaction and not ctx.interaction.response.is_done():
+            await ctx.defer()
         for log in logs:
             if await self.db_add(ctx.guild.id, dest_channel.id, log):
                 actually_added.append(log)
+            else:
+                not_added.append(log)
         if actually_added:
-            added = ', '.join(actually_added)
+            added = ', '.join(sorted(actually_added))
             if dest_channel == ctx.channel:
                 msg = await self.bot._(ctx.guild.id, "serverlogs.enabled.current", kind=added)
             else:
                 msg = await self.bot._(ctx.guild.id, "serverlogs.enabled.other", kind=added, channel=dest_channel.mention)
-            if not dest_channel.permissions_for(ctx.guild.me).embed_links:
-                msg += "\n:warning: " + await self.bot._(ctx.guild.id, "serverlogs.embed-warning")
+            if not_added:
+                msg += "\n" + await self.bot._(
+                    ctx.guild.id, "serverlogs.enabled.already-enabled-list",
+                    kinds=', '.join(not_added),
+                    count=len(not_added)
+                )
         else:
             msg = await self.bot._(ctx.guild.id, "serverlogs.none-added")
+
+        if not dest_channel.permissions_for(ctx.guild.me).embed_links:
+            msg += "\n\n:warning: " + await self.bot._(ctx.guild.id, "serverlogs.embed-warning")
         await ctx.send(msg)
         if "member_kick" in actually_added:
             if await self.send_member_kick_warning(ctx):
@@ -264,7 +280,12 @@ class ServerLogs(commands.Cog):
             channel_id = interaction.channel_id
         actived_logs = await self.db_get_from_channel(interaction.guild_id, channel_id)
         available_logs = self.available_logs() - set(actived_logs)
-        return await self.log_name_autocomplete(current, available_logs)
+        if len(available_logs) == 0:
+            return []
+        return await self.log_name_autocomplete(
+            current, available_logs,
+            all_label=await self.bot._(interaction, "serverlogs.autocompletion-all")
+        )
 
     @modlogs_main.command(name="disable", aliases=['remove'])
     @app_commands.describe(channel="The channel to remove logs from. Leave empty to select the current channel")
@@ -284,11 +305,13 @@ class ServerLogs(commands.Cog):
             logs = list(self.available_logs())
         dest_channel = channel or ctx.channel
         actually_removed: list[str] = []
+        if ctx.interaction and not ctx.interaction.response.is_done():
+            await ctx.defer()
         for log in logs:
             if await self.db_remove(ctx.guild.id, dest_channel.id, log):
                 actually_removed.append(log)
         if actually_removed:
-            removed = ', '.join(actually_removed)
+            removed = ', '.join(sorted(actually_removed))
             if dest_channel == ctx.channel:
                 msg = await self.bot._(ctx.guild.id, "serverlogs.disabled.current", kind=removed)
             else:
@@ -304,9 +327,14 @@ class ServerLogs(commands.Cog):
         else:
             channel_id = interaction.channel_id
         actived_logs = await self.db_get_from_channel(interaction.guild_id, channel_id)
-        return await self.log_name_autocomplete(current, actived_logs)
+        if len(actived_logs) == 0:
+            return []
+        return await self.log_name_autocomplete(
+            current, actived_logs,
+            all_label=await self.bot._(interaction, "serverlogs.autocompletion-all")
+        )
 
-    async def log_name_autocomplete(self, current: str, available_logs: Optional[list[str]]=None):
+    async def log_name_autocomplete(self, current: str, available_logs: Optional[list[str]]=None, all_label: str="all"):
         "Autocompletion for log names"
         all_logs = list(self.available_logs()) if available_logs is None else  available_logs
         filtered = sorted(
@@ -314,10 +342,12 @@ class ServerLogs(commands.Cog):
             for option in all_logs
             if current in option
         )
-        return [
+        choices = [
             app_commands.Choice(name=value[1], value=value[1])
             for value in filtered
-        ][:25]
+        ][:24]
+        choices.insert(0, app_commands.Choice(name=all_label, value='all'))
+        return choices
 
     async def send_antiscam_tip(self, ctx: MyContext):
         "Send a tip if antiscam log is enabled but not the antiscam system"
