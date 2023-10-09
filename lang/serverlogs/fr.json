@@ -1,4 +1,5 @@
 {
+    "autocompletion-all": "tous",
     "categories": {
         "automod": "Automod",
         "members": "Membres",
@@ -15,7 +16,11 @@
     "embed-warning": "Pour envoyer les logs, le bot a besoin de la permission \"Intégrer les liens\" !",
     "enabled": {
         "current": "Les logs de type %{kind} seront désormais envoyés dans ce salon",
-        "other": "Les logs de type %{kind} seront désormais envoyés dans %{channel}"
+        "other": "Les logs de type %{kind} seront désormais envoyés dans %{channel}",
+        "already-enabled-list": {
+            "one": "Le log `%{kinds}` était déjà actif dans ce salon",
+            "many": "Les logs de type %{kinds} étaient déjà actifs dans ce salon"
+        }
     },
     "kick-warning": "Pour détecter les expulsions des membres (kick), le bot a besoin de la permission de \"Voir les logs du serveur\" !",
     "list": {
