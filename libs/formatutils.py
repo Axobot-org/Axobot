@@ -35,7 +35,8 @@ class FormatUtils:
 
     @staticmethod
     async def time_delta(date1: Union[datetime, int], date2: datetime = None,
-                         lang: str = 'en', year: bool = False, hour: bool = True, form: Literal["short", "developed"]='developed'):
+                         lang: str = 'en', year: bool = False, hour: bool = True, seconds: bool = True,
+                         form: Literal["short", "developed"]='developed'):
         """Translates a two time interval datetime into a readable character string
 
         form can be 'short' (3d 6h) or 'developed' (3 jours 6 heures)
@@ -79,7 +80,7 @@ class FormatUtils:
                 result += dates.format_timedelta(timedelta(minutes=delta.minutes), granularity="minute", **kwargs) + " "
                 # we remove minutes
                 delta -= relativedelta(minutes=delta.minutes)
-            if delta.seconds > 0:
+            if seconds and delta.seconds > 0:
                 # add formatted seconds
                 result += dates.format_timedelta(timedelta(seconds=delta.seconds), granularity="second", **kwargs) + " "
 

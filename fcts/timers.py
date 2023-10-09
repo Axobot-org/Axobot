@@ -72,24 +72,41 @@ class Timers(commands.Cog):
         async with self.bot.db_query(query, (original_duration, new_duration, self.bot.beta)):
             pass
 
-    @acached(timeout=60*60)
+    @acached(timeout=60)
     async def format_duration_left(self, end_date: datetime.datetime, lang: str) -> str:
         "Format the duration left for a reminder"
         now = self.bot.utcnow() if end_date.tzinfo else datetime.datetime.utcnow()
         if now > end_date:
             return "-" + await FormatUtils.time_delta(
                 end_date, now,
-                lang=lang, year=True, form="short"
+                lang=lang, year=True, seconds=False, form="short"
             )
         return await FormatUtils.time_delta(
             now, end_date,
-            lang=lang, year=True, form="short"
+            lang=lang, year=True, seconds=False, form="short"
         )
 
     @acached(timeout=30)
     async def _get_reminders_for_choice(self, user_id: int):
         "Returns a list of reminders for a given user"
         return await self.db_get_user_reminders(user_id)
+
+    @acached(timeout=60)
+    async def _format_reminder_choice(self, current: str, lang: str, reminder_id: int, begin_date: datetime.datetime,
+                                      duration: str, reminder_message: str
+                                      ) -> Optional[tuple[bool, float, app_commands.Choice[str]]]:
+        "Format a reminder for a discord Choice"
+        end_date: datetime.datetime = begin_date + datetime.timedelta(seconds=duration)
+        f_duration = await self.format_duration_left(end_date, lang)
+        label: str = f_duration + " - " + reminder_message
+        if current not in label:
+            return None
+        if len(label) > 40:
+            label = label[:37] + "..."
+        choice = app_commands.Choice(value=str(reminder_id), name=label)
+        priority = not reminder_message.lower().startswith(current)
+        return (priority, -end_date.timestamp(), choice)
+
 
     @acached(timeout=30)
     async def get_reminders_choice(self, user_id: int, lang: str, current: str) -> list[app_commands.Choice[str]]:
@@ -99,14 +116,10 @@ class Timers(commands.Cog):
             return []
         choices: list[tuple[bool, int, app_commands.Choice[str]]] = []
         for reminder in reminders:
-            end_date: datetime.datetime = reminder["begin"] + datetime.timedelta(seconds=reminder['duration'])
-            duration = await self.format_duration_left(end_date, lang)
-            label: str = duration + " - " + reminder["message"]
-            if current not in label:
-                continue
-            choice = app_commands.Choice(value=str(reminder['ID']), name=label)
-            priority = not reminder["message"].lower().startswith(current)
-            choices.append((priority, -end_date.timestamp(), choice))
+            if formated_reminder := await self._format_reminder_choice(
+                current, lang, reminder["ID"], reminder["begin"], reminder["duration"], reminder["message"]
+                ):
+                choices.append(formated_reminder)
         return [choice for _, _, choice in sorted(choices, key=lambda x: x[0:2])]
 
 
