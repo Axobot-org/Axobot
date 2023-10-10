@@ -22,6 +22,7 @@ from libs.checks import checks
 from libs.checks.checks import is_fun_enabled
 from libs.formatutils import FormatUtils
 from libs.paginator import Paginator
+from libs.tips import generate_random_tip
 from utils import flatten_list
 
 importlib.reload(checks)
@@ -633,7 +634,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
 
     @commands.command(name="hour")
     @commands.cooldown(4, 50, type=commands.BucketType.guild)
-    async def hour(self, ctx:MyContext, *, city:str):
+    async def hour(self, ctx: MyContext, *, city: str):
         """Get the hour of a city
 
         ..Example hour Paris
@@ -653,32 +654,17 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         await ctx.send("**{}**:\n{} ({})\n ({} - lat: {} - long: {})".format(tz_name,format_d,date.tzname(),g.current_result.address,round(g.json['lat'],2),round(g.json['lng'],2)))
 
     @commands.command(name="tip")
-    async def tip(self, ctx:MyContext):
+    async def tip(self, ctx: MyContext):
         """Send a tip, a fun fact or something else
 
         ..Doc fun.html#tip"""
-        params = {
-            "about_cmd": await self.bot.get_command_mention("about"),
-            "bigtext_cmd": await self.bot.get_command_mention("bigtext"),
-            "clear_cmd": await self.bot.get_command_mention("clear"),
-            "config_cmd": await self.bot.get_command_mention("config"),
-            "discordlinks_cmd": await self.bot.get_command_mention("discordlinks"),
-            "event_cmd": await self.bot.get_command_mention("event info"),
-            "stats_cmd": await self.bot.get_command_mention("stats"),
-            "say_cmd": await self.bot.get_command_mention("say"),
-            "sponsor_url": "https://github.com/sponsors/ZRunner",
-            "rss_disable_cmd": await self.bot.get_command_mention("rss disable"),
-            "rss_delete_cmd": await self.bot.get_command_mention("rss delete"),
-            "support_server_url": "https://discord.gg/N55zY88",
-            "antiscam_enable_cmd": await self.bot.get_command_mention("antiscam enable"),
-        }
-        await ctx.send(random.choice(await self.bot._(ctx.guild, "fun.tip-list", **params)))
+        await ctx.send(await generate_random_tip(self.bot, ctx.channel))
 
     @commands.command(name='afk')
     @commands.check(is_fun_enabled)
     @commands.guild_only()
     async def afk(self, ctx: MyContext, *, reason=""):
-        """Make you AFK
+        """Mark you AFK
         You'll get a nice nickname, because nicknames are cool, aren't they?
 
         ..Doc fun.html#afk"""
