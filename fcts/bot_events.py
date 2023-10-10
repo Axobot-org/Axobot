@@ -13,6 +13,7 @@ from libs.bot_events import (EventData, EventRewardRole, EventType,
                              get_events_translations, EventItem, EventItemWithCount)
 from libs.checks.checks import database_connected
 from libs.formatutils import FormatUtils
+from libs.tips import generate_random_tip
 from utils import OUTAGE_REASON
 
 
@@ -23,7 +24,7 @@ class BotEvents(commands.Cog):
         self.bot = bot
         self.file = "bot_events"
         self.collect_reward = [-8, 25]
-        self.collect_cooldown = 60*30 # (30m) time in seconds between 2 collects
+        self.collect_cooldown = 60*60 # (1h) time in seconds between 2 collects
         self.collect_max_strike_period = 3600 * 2 # (2h) time in seconds after which the strike level is reset to 0
         self.collect_bonus_per_strike = 1.05 # the amount of points is multiplied by this number for each strike level
         self.translations_data = get_events_translations()
@@ -329,6 +330,7 @@ class BotEvents(commands.Cog):
         if ctx.can_send_embed:
             title = self.translations_data[lang]["events_title"][current_event]
             emb = discord.Embed(title=title, description=txt, color=self.current_event_data["color"])
+            emb.add_field(**await self.get_random_tip_field(ctx.channel))
             await ctx.send(embed=emb)
         else:
             await ctx.send(txt)
@@ -382,6 +384,13 @@ class BotEvents(commands.Cog):
             weights=[item["frequency"] for item in items],
             k=items_count
         )
+
+    async def get_random_tip_field(self, channel):
+        return {
+            "name": await self.bot._(channel, "bot_events.tip-title"),
+            "value": await generate_random_tip(self.bot, channel),
+            "inline": False
+        }
 
     async def get_top_5(self) -> str:
         "Get the list of the 5 users with the most event points"

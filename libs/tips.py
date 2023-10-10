@@ -137,3 +137,22 @@ class TipsManager:
         )
         await ctx.send(embed=embed)
         await self.db_register_guild_tip(ctx.guild.id, tip)
+
+async def generate_random_tip(bot: "Axobot", translation_context) -> str:
+    "Pick a random tip from the translations list, and format it"
+    params = {
+        "about_cmd": await bot.get_command_mention("about"),
+        "bigtext_cmd": await bot.get_command_mention("bigtext"),
+        "clear_cmd": await bot.get_command_mention("clear"),
+        "config_cmd": await bot.get_command_mention("config"),
+        "discordlinks_cmd": await bot.get_command_mention("discordlinks"),
+        "event_cmd": await bot.get_command_mention("event info"),
+        "stats_cmd": await bot.get_command_mention("stats"),
+        "say_cmd": await bot.get_command_mention("say"),
+        "sponsor_url": "https://github.com/sponsors/ZRunner",
+        "rss_disable_cmd": await bot.get_command_mention("rss disable"),
+        "rss_delete_cmd": await bot.get_command_mention("rss delete"),
+        "support_server_url": "https://discord.gg/N55zY88",
+        "antiscam_enable_cmd": await bot.get_command_mention("antiscam enable"),
+    }
+    return random.choice(await bot._(translation_context, "fun.tip-list", **params))
