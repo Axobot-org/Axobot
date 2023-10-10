@@ -140,7 +140,12 @@
         "Le saviez-vous ? Lors de certains événements spéciaux, il est possible d'obtenir des cartes d'xp collector. N'oubliez pas de suivre les news via le serveur officiel ou avec la commande %{event} !",
         "Ce bot vous plaît ? N’hésitez pas à faire un don à l’adresse %{sponsor_url} !",
         "Le saviez-vous ? Si vous êtes fatigués de devoir écouter les centaines de messages vocaux envoyés par vos amis, vous pouvez utiliser la fonction transcription d'Axobot pour en lire le contenu. Cliquez sur un message vocal, puis choisissez \"Apps\" > \"Transcription audio\" !",
-        "Le saviez-vous ? La fonctionnalité de transcription de message vocal respecte votre vie privée, en utilisant un modèle d'IA local au lieu d'envoyer vos messages à un service externe !"
+        "Le saviez-vous ? La fonctionnalité de transcription de message vocal respecte votre vie privée, en utilisant un modèle d'IA local au lieu d'envoyer vos messages à un service externe !",
+        "Pro-tip : Si vous souhaitez désactiver temporairement un flux RSS, pour le réactiver ultérieurement, vous pouvez utiliser la commande %{rss_disable_cmd}. Inversement, la commande %{rss_delete_cmd} le supprimera définitivement !",
+        "Le saviez-vous ? Les flux RSS désactivés avec %{rss_disable_cmd} sont toujours pris en compte dans la limite du nombre de flux par serveur. Si vous avez besoin de plus d'espace, utilisez plutôt %{rss_delete_cmd} !",
+        "Pro-tip : En rejoignant le serveur officiel du bot, vous pourrez obtenir une aide rapide en cas de problème, avoir un aavnt-goût des futures mises à jour, et voter pour les fonctionnalités à venir. Rejoignez-nous sur %{support_server_url} !",
+        "Le saviez-vous ? Si vous voulez nous aider à traduire le bot dans plusieurs langues, rejoignez notre équipe sur notre serveur officiel à %{support_server_url} !",
+        "Pro-tip : Le système antiscam d'Axobot utilise une IA locale et personnalisée pour détecter et supprimer les messages de scam sur votre serveur. Activez-le avec %{antiscam_enable_cmd}"
     ],
     "uninhabited-city": "Endroit inhabité"
 }
