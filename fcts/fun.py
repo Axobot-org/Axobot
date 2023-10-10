@@ -640,18 +640,19 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         ..Example hour Paris
 
         ..Doc miscellaneous.html#hour-weather"""
-        if city.lower() in ['mee6','mee6land']:
-            return await ctx.send('**Mee6Land/MEE6**:\nEverytime (NoWhere)\n (Mee6Land - lat: unknown - long: unknown)')
         g = geocoder.arcgis(city)
         if not g.ok:
-            return await ctx.send(await self.bot._(ctx.channel,"fun.invalid-city"))
+            return await ctx.send(await self.bot._(ctx.channel, "fun.invalid-city"))
         tz_name: typing.Optional[str] = self.tf.timezone_at_land(lat=g.json['lat'], lng=g.json['lng'])
         if tz_name is None:
-            return await ctx.send(await self.bot._(ctx.channel,"fun.uninhabited-city"))
+            return await ctx.send(await self.bot._(ctx.channel, "fun.uninhabited-city"))
         tz_obj = timezone(tz_name)
         date = datetime.datetime.now(tz_obj)
-        format_d = await FormatUtils.date(date,lang=await self.bot._(ctx.channel,'_used_locale'))
-        await ctx.send("**{}**:\n{} ({})\n ({} - lat: {} - long: {})".format(tz_name,format_d,date.tzname(),g.current_result.address,round(g.json['lat'],2),round(g.json['lng'],2)))
+        format_d = await FormatUtils.date(date,lang=await self.bot._(ctx.channel, "_used_locale"))
+        address = g.current_result.address
+        latitude = round(g.json['lat'],2)
+        longitude = round(g.json['lng'],2)
+        await ctx.send(f"**{tz_name}**:\n{format_d} ({date.tzname()})\n ({address} - lat: {latitude} - long: {longitude})")
 
     @commands.command(name="tip")
     async def tip(self, ctx: MyContext):
