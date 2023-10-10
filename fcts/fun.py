@@ -667,6 +667,10 @@ You can specify a verification limit by adding a number in argument (up to 1.000
             "stats_cmd": await self.bot.get_command_mention("stats"),
             "say_cmd": await self.bot.get_command_mention("say"),
             "sponsor_url": "https://github.com/sponsors/ZRunner",
+            "rss_disable_cmd": await self.bot.get_command_mention("rss disable"),
+            "rss_delete_cmd": await self.bot.get_command_mention("rss delete"),
+            "support_server_url": "https://discord.gg/N55zY88",
+            "antiscam_enable_cmd": await self.bot.get_command_mention("antiscam enable"),
         }
         await ctx.send(random.choice(await self.bot._(ctx.guild, "fun.tip-list", **params)))
 
