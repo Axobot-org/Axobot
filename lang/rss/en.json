@@ -39,7 +39,10 @@
     "list": "*Type the number of the feeds to modify*\n\n**Link - Type - Channel - Mentions**\n",
     "list-disabled": "(disabled)",
     "list-result": "{emoji} {link}\nDiscord channel: {channel}\nMentions: {roles}\nIdentifier: {id}\nLast post: {last_post}",
-    "list-title": "List of rss feeds from the server %{server}",
+    "list-title": {
+        "one": "List of RSS feeds from the server %{server} (1 feed)",
+        "many": "List of RSS feeds from the server %{server} (%{count} feeds)"
+    },
     "list2": "*Type the number of the feeds to delete*\n\n**Link - Type - Channel**\n",
     "loop-processing": "A check of your RSS feeds is already in progress. Please wait a few minutes",
     "mc": "Minecraft",

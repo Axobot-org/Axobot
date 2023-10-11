@@ -39,7 +39,10 @@
     "list": "*Entrez le numéro du flux à modifier*\n\n**Lien - Type - Salon - Roles**\n",
     "list-disabled": "(désactivé)",
     "list-result": "{emoji} {link}\nSalon : {channel}\nRôle mentionné : {roles}\nIdentifiant : {id}\nDernier post : {last_post}",
-    "list-title": "Liste des flux rss du serveur %{server}",
+    "list-title": {
+        "one": "Liste des flux RSS du serveur %{server} (1 flux)",
+        "many": "Liste des flux RSS du serveur %{server} (%{count} flux)"
+    },
     "list2": "*Entrez le numéro du flux à supprimer*\n\n**Lien - Type - Salon**\n",
     "loop-processing": "Une vérification de vos flux RSS est déjà en cours. Veuillez patienter quelques minutes",
     "mc": "Minecraft",

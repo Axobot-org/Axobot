@@ -478,7 +478,7 @@ class Rss(commands.Cog):
     async def send_rss_list(self, ctx: MyContext, feeds: list[FeedObject]):
         "Send the list paginator"
         rss_cog = self
-        title = await self.bot._(ctx.guild.id, "rss.list-title", server=ctx.guild.name)
+        title = await self.bot._(ctx.guild.id, "rss.list-title", server=ctx.guild.name, count=len(feeds))
         translation = await self.bot._(ctx.guild.id, "rss.list-result")
         feeds_per_page = 10
 
