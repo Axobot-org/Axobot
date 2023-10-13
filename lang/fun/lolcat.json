@@ -135,15 +135,20 @@
         "Did u know? The bot staff is composed of a talented developer Admin, a second admin named after a kibble brand as well as a cat, a Ban hammer and a mushroom!",
         "Pro-tip: Teh %{say_cmd} is very useful for... tbh idk. Probably fun stuff I can't imagine.",
         "Pro-tip: Use %{discordlinks_cmd} for discord-related interesting links. Who would have guessed?",
-        "Did u know? All my design are made by the super famous artist Adri#9223, go check his profile!",
-        "Did u know? Until not-so-long-ago my name was 'Zbot', in ref 2 my creator Z_runner",
+        "Did u know? All my design are made by the super famous artist Chadrixy, go check his profile!",
+        "Did u know? Until not-so-long-ago (smth 2023-ish) my name was 'Zbot', in ref 2 my creator Z_runner",
         "Pro-tip: I've a super coll discord server, if you ever wanna follow my news and vote for the next updates. Check %{about_cmd} for the invite.",
         "Pro-tip: Teh `prefix` command allows you to have a list of the prefixes currently usable in the server",
         "Did u know? U can give a shiny description 2 ur server that may be usd in other servers, check %{config_cmd} with the `description` option!",
         "Did u know? At some special event, u may be allowd 2 collect super shiny and rare xp cards! Follow the news on our official server or with teh %{event_cmd} command!",
         "U like what I do? Feel free 2 visit %{sponsor_url} and drop some cents!",
         "Did u know? If u'r tiredof listenin' to all dem voicemails yer pals send, u can use Axobot's super cool transcribify thingy 2 read their text! Just tap on a voicemail, den pick \"Apps\" > \"Voice to text\"!",
-        "Did u know? Teh voice message transcribify thingy keeps ur personal biz safe, usin' a local AI brain instead of tossin' ur messages to some far-off place! No sneaky business here, just us cool cats!"
+        "Did u know? Teh voice message transcribify thingy keeps ur personal biz safe, usin' a local AI brain instead of tossin' ur messages to some far-off place! No sneaky business here, just us cool cats!",
+        "Pro-tip: if u wanna deactivate a rss feed just temporarily, u can use %{rss_disable_cmd}. Or.... use %{rss_delete_cmd} 2 permanently delete it.",
+        "Did u know? disabling a feed w/ %{rss_disable_cmd} wont free u a slot 4 addin' another feed. If u want 2 do dat, try %{rss_delete_cmd} instead!",
+        "Pro-tip: our amazingest support server can offer u: very quick help w/ ur problems, cool teasers of upcoming updates, and votes 4 my next features. Come & join us at <%{support_server_url}> !",
+        "Did u know? If ur wanna help us translate my messages, u can join my team on our amazingest server at %{support_server_url} !",
+        "Pro-tip: my supercool antiscam system (used 2 delete vicious msgs) runs on my own server, w/ a homemade model. Wanna try it? Check out %{antiscam_enable_cmd}"
     ],
     "uninhabited-city": "Tish place have 0 inhabitant :upside_down:"
 }
