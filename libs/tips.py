@@ -11,13 +11,17 @@ if TYPE_CHECKING:
 
 
 class UserTip(str, Enum):
+    "Tips that can be shown to users"
     RANK_CARD_PERSONALISATION = "rank_card_personalisation"
 
 
 class GuildTip(str, Enum):
+    "Tips that can be shown to guilds"
     SERVERLOG_ENABLE_ANTISCAM = "serverlog_enable_antiscam"
     SERVERLOG_ENABLE_ANTIRAID = "serverlog_enable_antiraid"
     SERVERLOG_ENABLE_BOTWARNING = "serverlog_enable_botwarning"
+    RSS_DIFFERENCE_DISABLE_DELETE = "rss_difference_disable_delete"
+    RSS_DELETE_DISABLED_FEEDS = "rss_delete_disabled_feeds"
 
 
 minTimeBetweenTips: dict[Union[UserTip, GuildTip], datetime.timedelta] = {
@@ -25,6 +29,8 @@ minTimeBetweenTips: dict[Union[UserTip, GuildTip], datetime.timedelta] = {
     GuildTip.SERVERLOG_ENABLE_ANTISCAM: datetime.timedelta(days=14),
     GuildTip.SERVERLOG_ENABLE_ANTIRAID: datetime.timedelta(days=14),
     GuildTip.SERVERLOG_ENABLE_BOTWARNING: datetime.timedelta(days=25),
+    GuildTip.RSS_DIFFERENCE_DISABLE_DELETE: datetime.timedelta(days=60),
+    GuildTip.RSS_DELETE_DISABLED_FEEDS: datetime.timedelta(days=30),
 }
 
 

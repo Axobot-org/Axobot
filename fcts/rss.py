@@ -25,6 +25,7 @@ from libs.rss import (FeedEmbedData, FeedObject, FeedType, RssMessage,
 from libs.rss.rss_deviantart import DeviantartRSS
 from libs.rss.rss_twitch import TwitchRSS
 from libs.rss.rss_web import WebRSS
+from libs.tips import GuildTip
 
 importlib.reload(args)
 importlib.reload(checks)
@@ -388,6 +389,16 @@ class Rss(commands.Cog):
         ids = ', '.join(map(str, feed_ids))
         self.bot.log.info(f"RSS feed disabled into server {ctx.guild.id} ({ids})")
         await self.send_log(f"Feed disabled into server {ctx.guild.id} ({ids})", ctx.guild)
+        if await self.bot.tips_manager.should_show_guild_tip(ctx.guild.id, GuildTip.RSS_DIFFERENCE_DISABLE_DELETE):
+            rss_enable_cmd = await self.bot.get_command_mention("rss enable")
+            rss_remove_cmd = await self.bot.get_command_mention("rss remove")
+            await self.bot.tips_manager.send_guild_tip(
+                ctx,
+                GuildTip.RSS_DIFFERENCE_DISABLE_DELETE,
+                rss_enable_cmd=rss_enable_cmd,
+                rss_remove_cmd=rss_remove_cmd,
+            )
+            return True
 
     @feed_disable.autocomplete("feed")
     async def feed_disable_autocomplete(self, interaction: discord.Interaction, current: str):
@@ -552,9 +563,22 @@ class Rss(commands.Cog):
         _quit = await self.bot._(ctx.guild, "misc.quit")
         view = FeedsPaginator(self.bot, ctx.author, stop_label=_quit.capitalize())
         msg = await view.send_init(ctx)
+        await self._send_rss_delete_disabled_feeds_tip(ctx, feeds)
         if msg and await view.wait():
             # only manually disable if it was a timeout (ie. not a user stop)
             await view.disable(msg)
+
+    async def _send_rss_delete_disabled_feeds_tip(self, ctx: MyContext, feeds: list[FeedObject]):
+        "Check if we should send a tip about deleting disabled feeds"
+        has_disabled_feeds = any(not feed.enabled for feed in feeds)
+        if has_disabled_feeds and await self.bot.tips_manager.should_show_guild_tip(ctx.guild.id, GuildTip.RSS_DELETE_DISABLED_FEEDS):
+            rss_remove_cmd = await self.bot.get_command_mention("rss remove")
+            await self.bot.tips_manager.send_guild_tip(
+                ctx,
+                GuildTip.RSS_DELETE_DISABLED_FEEDS,
+                rss_remove_cmd=rss_remove_cmd,
+            )
+            return True
 
     async def _get_feed_name(self, feed: FeedObject) -> str:
         name = feed.link
