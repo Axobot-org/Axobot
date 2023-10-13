@@ -9,6 +9,8 @@
         ]
     },
     "rank_card_personalisation": "Vous pouvez modifier l'arrière-plan de votre carte à l'aide de la commande %{profile_cmd} !",
+    "rss_difference_disable_delete": "La désactivation d'un flux signifie que le bot ne publiera plus de nouveaux messages provenant de ce flux, mais vous pouvez toujours le réactiver avec la commande %{rss_enable_cmd}.\nUn flux désactivé continue également de compter dans votre limite de flux. Si vous souhaitez supprimer le flux et libérer un emplacement, utilisez plutôt la commande %{rss_remove_cmd}.",
+    "rss_delete_disabled_feeds": "Il semble que vous ayez des flux RSS désactivés sur votre serveur. Axobot ne publiera pas les mises à jour des flux désactivés, mais ils sont toujours pris en compte dans la limite de flux de votre serveur.\nSi vous souhaitez supprimer un flux et libérer un emplacement, utilisez la commande %{rss_remove_cmd}.",
     "serverlog_enable_antiscam": "Les logs d'antiscam sont désormais activés, mais le système de protection anti-scam n'est pas actif sur ce serveur. Vous devriez peut-être l'activer avec la commande %{antiscam_enable_cmd}.",
     "serverlog_enable_antiraid": "Les logs d'antiraid sont désormais activés, mais le système de protection anti-raid n'est pas actif sur ce serveur. Vous devriez peut-être l'activer avec la commande %{config_set_cmd}.",
     "serverlog_enable_botwarning": "Vous devriez probablement envisager d'activer les logs d'avertissement du bot (`bot_warnings`) avec la commande %{log_add_cmd}. Ils vous alerteront si le bot rencontre des dysfonctionnements sur votre serveur, tels qu'une mauvaise configuration ou un manque de permissions."
