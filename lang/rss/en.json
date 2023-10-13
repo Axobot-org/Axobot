@@ -4,8 +4,14 @@
         "many": "Type the roles to mention for these feeds (either names, IDs or mentions), separated by spaces."
     },
     "ask-roles-hint-example": "For example:\n> Members \"Super VIP\" @Ping roles",
-    "change-txt": "Please enter the text to be used when creating a new post. You can use several variables, of which here is the list:\n- `{author}`: the author of the post\n- `{channel}`: the channel name (usually the same as author)\n- `{date}`: the post date (UTC)\n- `{link}` or `{url}`: a link to the post\n- `{logo}`: an emoji representing the type of post (web, Twitter, YouTube...)\n- `{mentions}`: the list of mentioned roles\n- `{title}`: the title of the post",
-    "change-txt-previous": "The current message contains  \n```\n%{text}\n```",
+    "change-txt": {
+        "title": "Edit your feed text",
+        "label": "Message template",
+        "modal-success": "We're saving your changes...",
+        "placeholder": "Enter your message template here",
+        "previous": "The current message contains  \n```\n%{text}\n```",
+        "text-version": "Please enter the text to be used when creating a new post. You can use several variables, of which here is the list:\n- `{author}`: the author of the post\n- `{channel}`: the channel name (usually the same as author)\n- `{date}`: the post date (UTC)\n- `{link}` or `{url}`: a link to the post\n- `{logo}`: an emoji representing the type of post (web, Twitter, YouTube...)\n- `{mentions}`: the list of mentioned roles\n- `{title}`: the title of the post"
+    },
     "choose-delete": "Please choose the feeds to delete",
     "choose-disable": "Please choose the feeds to disable",
     "choose-enable": "Please choose the feeds to enable",

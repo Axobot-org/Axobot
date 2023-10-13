@@ -4,8 +4,14 @@
         "many": "Entrez les rôles à mentionner pour ces flux (au choix leurs noms, IDs ou mentions), séparés par des espaces."
     },
     "ask-roles-hint-example": "Par exemple:\n> Membres \"Super VIP\" @Notifs",
-    "change-txt": "Veuillez entrer le texte à utiliser lors d'un nouveau post. Vous pouvez utiliser plusieurs variables, dont voici la liste :\n- `{author}` : l'auteur du post\n- `{channel}` : le nom de la chaîne (généralement le même que l'auteur)\n- `{date}` : la date du post (UTC)\n- `{link}` ou `{url}` : un lien vers le post\n- `{logo}` : un emoji représentant le type de post (web, Twitter, YouTube...)\n- `{mentions}` : la liste des rôles mentionnés\n- `{title}` : le titre du post",
-    "change-txt-previous": "Le message actuel contient \n```\n%{text}\n```",
+    "change-txt": {
+        "title": "Modifiez le texte de votre flux",
+        "label": "Modèle de message",
+        "modal-success": "Nous sauvegardons vos modifications...",
+        "placeholder": "Entrez votre modèle de message ici",
+        "previous": "Le message actuel contient \n```\n%{text}\n```",
+        "text-version": "Veuillez entrer le texte à utiliser lors d'un nouveau post. Vous pouvez utiliser plusieurs variables, dont voici la liste :\n- `{author}` : l'auteur du post\n- `{channel}` : le nom de la chaîne (généralement le même que l'auteur)\n- `{date}` : la date du post (UTC)\n- `{link}` ou `{url}` : un lien vers le post\n- `{logo}` : un emoji représentant le type de post (web, Twitter, YouTube...)\n- `{mentions}` : la liste des rôles mentionnés\n- `{title}` : le titre du post"
+    },
     "choose-delete": "Veuillez choisir les flux à supprimer",
     "choose-disable": "Veuillez choisir les flux à désactiver",
     "choose-enable": "Veuillez choisir les flux à réactiver",

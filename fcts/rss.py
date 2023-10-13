@@ -26,6 +26,7 @@ from libs.rss.rss_deviantart import DeviantartRSS
 from libs.rss.rss_twitch import TwitchRSS
 from libs.rss.rss_web import WebRSS
 from libs.tips import GuildTip
+from libs.views import TextInputModal
 
 importlib.reload(args)
 importlib.reload(checks)
@@ -932,7 +933,7 @@ class Rss(commands.Cog):
     @commands.guild_only()
     @commands.check(can_use_rss)
     @commands.check(checks.database_connected)
-    async def change_text_feed(self, ctx: MyContext, feed: Optional[str]=None, *, text=None):
+    async def change_text_feed(self, ctx: MyContext, feed: Optional[str]=None):
         """Change the text of an rss feed
 
         Available variables:
@@ -948,8 +949,6 @@ class Rss(commands.Cog):
         - `{full_text}`: the full text of the post
 
         ..Example rss text 3078731683662
-
-        ..Example rss text 3078731683662 {logo} | New post of {author} right here: {url}! [{date}]
 
         ..Example rss text
 
@@ -974,11 +973,26 @@ class Rss(commands.Cog):
             cmd = await self.bot.get_command_mention("about")
             await ctx.send(await self.bot._(ctx.guild, "errors.unknown2", about=cmd))
             return
-        if text is None:
-            # if no text was specified: we ask for it
-            hint = await self.bot._(ctx.guild.id, "rss.change-txt")
+        if ctx.interaction:
+            # ask for text through a modal
+            text_modal = TextInputModal(
+                title=await self.bot._(ctx.channel, "rss.change-txt.title"),
+                label=await self.bot._(ctx.channel, "rss.change-txt.label"),
+                placeholder=await self.bot._(ctx.channel, "rss.change-txt.placeholder"),
+                default=feeds[0].structure,
+                max_length=1800,
+                success_message=await self.bot._(ctx.channel, "rss.change-txt.modal-success")
+            )
+            await ctx.interaction.response.send_modal(text_modal)
+            if await text_modal.wait():
+                # view timed out -> do nothing
+                return
+            text = text_modal.value
+        else:
+            # ask for text through a message
+            hint = await self.bot._(ctx.guild.id, "rss.change-txt.text-version")
             if len(feeds) == 1:
-                hint += "\n\n" + await self.bot._(ctx.guild.id, "rss.change-txt-previous", text=feeds[0].structure)
+                hint += "\n\n" + await self.bot._(ctx.guild.id, "rss.change-txt.previous", text=feeds[0].structure)
             await ctx.send(hint)
             def check(msg: discord.Message):
                 return msg.author == ctx.author and msg.channel == ctx.channel
@@ -987,11 +1001,11 @@ class Rss(commands.Cog):
             except asyncio.TimeoutError:
                 return await ctx.send(await self.bot._(ctx.guild.id, "rss.too-long"))
             text = msg.content
-        for feed in feeds:
-            if feed.structure != text:
-                await self.db_update_feed(feed.feed_id, [('structure', text)])
+        for guild_feed in feeds:
+            if guild_feed.structure != text:
+                await self.db_update_feed(guild_feed.feed_id, [('structure', text)])
         if len(feeds) == 1:
-            await ctx.send(await self.bot._(ctx.guild.id,"rss.text-success.single", id=feed.feed_id, text=text))
+            await ctx.send(await self.bot._(ctx.guild.id,"rss.text-success.single", id=feeds[0].feed_id, text=text))
         else:
             await ctx.send(await self.bot._(ctx.guild.id,"rss.text-success.multiple", text=text))
 
