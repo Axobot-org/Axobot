@@ -1,10 +1,13 @@
+import io
 import typing
 
+import discord
 from PIL import Image
 
 from .utils import (ColorType, check_image_general, colorify_image,
-                    convert_image_general, edge_detect, invert_colors,
-                    resized_img, shift_colors, variations_filter)
+                    convert_image_general, convert_image_with_background,
+                    edge_detect, invert_colors, resized_img, shift_colors,
+                    variations_filter)
 
 DARK_ORANGE = (205, 100, 10)
 ORANGE = (255, 140, 26)
@@ -28,11 +31,13 @@ MODIFIERS = {
     'light': {
         'func': light,
         'colors': [DARK_ORANGE, ORANGE, WHITE],
+        'bg_colors': [WHITE, ORANGE],
         'color_names': ['Dark Orange', 'Orange', 'White']
     },
     'dark': {
         'func': dark,
         'colors': [NOT_QUITE_BLACK, DARK_ORANGE, ORANGE],
+        'bg_colors': [NOT_QUITE_BLACK, DARK_ORANGE],
         'color_names': ['Not Quite Black', 'Dark Orange', 'Orange']
     },
     'all': {
@@ -79,17 +84,33 @@ VARIATIONS = {
 }
 
 
-async def convert_image(image: Image.Image, modifier: str, method: str, selected_variations: list[str]):
+async def convert_image(image: bytes, modifier: str, method: str, selected_variations: list[str], replace_background: bool):
     "Change an image colors into orange-black colors by using given modifier, method and variations"
+    if image == b'':
+        raise RuntimeError('Invalid image')
     base_color_var = (.7, .42, .14, .85)
-    return await convert_image_general(
-        image, modifier, method, selected_variations,
-        MODIFIERS, base_color_var, METHODS, VARIATIONS
-    )
+    with Image.open(io.BytesIO(image)) as img:
+        if replace_background:
+            io_out = await convert_image_with_background(
+                img, modifier, method, selected_variations,
+                MODIFIERS, base_color_var, METHODS, VARIATIONS
+            )
+        else:
+            io_out = await convert_image_general(
+                img, modifier, method, selected_variations,
+                MODIFIERS, base_color_var, METHODS, VARIATIONS
+            )
+        if img.format == "GIF":
+            filename = f'{modifier}.gif'
+        else:
+            filename = f'{modifier}.png'
+    return discord.File(io_out, filename=filename)
 
 
-async def check_image(image: Image.Image):
+async def check_image(image: bytes):
     "Check if an image has enough of the event colors, and return the analyse data"
+    if image == b'':
+        raise RuntimeError('Invalid image')
     colors_refs: list[tuple[int, int, int]] = MODIFIERS["all"]["colors"]
     colors_names: list[tuple[int, int, int]] = MODIFIERS["all"]["color_names"]
 

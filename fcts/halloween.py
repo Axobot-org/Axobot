@@ -6,12 +6,11 @@ import discord
 from discord.ext import commands
 from discord.ext.commands import Cog
 
-from libs.bot_classes import (PRIVATE_GUILD_ID, SUPPORT_GUILD_ID, Axobot,
-                              MyContext)
+from libs.bot_classes import Axobot, MyContext
+from libs.checks.errors import NotDuringEventError
 from libs.colors_events import (ColorVariation, HalloweenVariationFlagType,
                                 TargetConverterType, check_halloween,
                                 convert_halloween, get_url_from_ctx)
-from libs.checks.errors import NotDuringEventError
 
 
 async def is_halloween(ctx: MyContext):
@@ -37,7 +36,6 @@ class Halloween(Cog):
             self.cache = []
 
     @commands.hybrid_group(name="halloween", brief="Happy Halloween!")
-    @discord.app_commands.guilds(PRIVATE_GUILD_ID, SUPPORT_GUILD_ID)
     @commands.check(is_halloween)
     async def hallow_main(self, ctx: MyContext):
         """Hallowify and be happy for the spooky month!
@@ -101,6 +99,7 @@ A BIG thanks to the Project Blurple and their original code for the colorization
     async def color_command(self, fmodifier: typing.Literal["light", "dark"], ctx: MyContext,
                             method: HalloweenVariationFlagType = "hallowify",
                             variations: commands.Greedy[ColorVariation] = None,
+                            replace_background: bool = False,
                             who: typing.Optional[TargetConverterType] = None):
         "Method called under the hood of each modifier command"
         if not (ctx.guild is None or ctx.channel.permissions_for(ctx.guild.me).attach_files):
@@ -115,7 +114,7 @@ A BIG thanks to the Project Blurple and their original code for the colorization
         try:
             async with aiohttp.ClientSession() as session:
                 async with session.get(str(url)) as image:
-                    result = await convert_halloween(await image.read(), fmodifier, method, variations or [])
+                    result = await convert_halloween(await image.read(), fmodifier, method, variations or [], replace_background)
         except RuntimeError as err:
             await ctx.send(await self.bot._(ctx.channel, 'color-event.unknown-err', err=str(err)))
             return
@@ -131,9 +130,10 @@ A BIG thanks to the Project Blurple and their original code for the colorization
     @commands.check(is_halloween)
     async def lightfy(self, ctx: MyContext, method: HalloweenVariationFlagType = "hallowify",
                       variations: commands.Greedy[ColorVariation] = None,
+                      replace_background: bool = False,
                       who: typing.Optional[TargetConverterType] = None):
         "Lightfy an image"
-        await self.color_command("light", ctx, method, variations, who)
+        await self.color_command("light", ctx, method, variations, replace_background, who)
 
     @hallow_main.command("darkfy")
     @commands.cooldown(6, 120, commands.BucketType.member)
@@ -141,9 +141,10 @@ A BIG thanks to the Project Blurple and their original code for the colorization
     @commands.check(is_halloween)
     async def darkfy(self, ctx: MyContext, method: HalloweenVariationFlagType = "hallowify",
                       variations: commands.Greedy[ColorVariation] = None,
+                      replace_background: bool = False,
                       who: typing.Optional[TargetConverterType] = None):
         "Darkfy an image"
-        await self.color_command("dark", ctx, method, variations, who)
+        await self.color_command("dark", ctx, method, variations, replace_background, who)
 
     @hallow_main.command("check")
     @commands.cooldown(2, 60, commands.BucketType.member)
