@@ -8,6 +8,7 @@ from discord.ext import commands
 from PIL import Image, ImageSequence
 
 from libs.bot_classes import MyContext
+from libs.colors_events.background_change import apply_gradient, get_background_mask
 
 ColorType = tuple[int, int, int]
 ColorAlphaType = tuple[int, int, int, int]
@@ -21,7 +22,8 @@ class LinkConverter(str):
         "Convert an argument into a media link, by using Discord CDN proxy and embed system"
         if not argument.startswith('https://'):
             raise commands.errors.BadArgument(f'Could not convert "{argument}" into URL')
-        if argument.startswith('https://cdn.discordapp.com/attachments/'):
+        if argument.startswith('https://cdn.discordapp.com/attachments/'
+                               ) or argument.startswith('https://cdn.discordapp.com/avatars/'):
             return argument
 
         for _ in range(10):
@@ -355,7 +357,7 @@ def color_ratios(img: Image.Image, colors: list[ColorType]):
 async def convert_image_general(image: Image.Image, modifier: str, method: str, selected_variations: list[str],
                         modifiers: dict[str, dict], base_color_var: VariationType, methods: dict[str, Callable],
                         variations: dict[str, VariationType]):
-    "Change an image colors into orange-black colors by using given modifier, method and variations"
+    "Change an image colors into themed colors by using given modifier, method and variations"
     try:
         modifier_converter = dict(modifiers[modifier])
     except KeyError:
@@ -365,9 +367,6 @@ async def convert_image_general(image: Image.Image, modifier: str, method: str, 
         method_converter = methods[method]
     except KeyError:
         raise RuntimeError('Invalid image method', method) from None
-
-    if image == b'':
-        raise RuntimeError('Invalid image')
 
     selected_variations.sort()
     background_color = None
@@ -392,61 +391,88 @@ async def convert_image_general(image: Image.Image, modifier: str, method: str, 
     if method != "--filter":
         variation_converter = base_color_var
 
-    with Image.open(io.BytesIO(image)) as img:
-        if img.format == "GIF":
-            frames = []
-            durations = []
-            try:
-                loop = img.info['loop']
-            except KeyError:
-                loop = None
+    if image.format == "GIF":
+        frames = []
+        durations = []
+        try:
+            loop = image.info['loop']
+        except KeyError:
+            loop = None
 
-            minimum = 256
-            maximum = 0
+        minimum = 256
+        maximum = 0
 
-            for img_frame in ImageSequence.Iterator(img):
-                frame = img_frame.convert('LA')
+        for img_frame in ImageSequence.Iterator(image):
+            frame = img_frame.convert('LA')
 
-                if frame.getextrema()[0][0] < minimum:
-                    minimum = frame.getextrema()[0][0]
+            if frame.getextrema()[0][0] < minimum:
+                minimum = frame.getextrema()[0][0]
 
-                if frame.getextrema()[0][1] > maximum:
-                    maximum = frame.getextrema()[0][1]
+            if frame.getextrema()[0][1] > maximum:
+                maximum = frame.getextrema()[0][1]
 
-            for frame in ImageSequence.Iterator(img):
-                new_frame = method_converter(frame, modifier_converter, variation_converter, maximum, minimum)
-                if background_color is not None:
-                    new_frame = remove_alpha(new_frame, background_color)
-
-                durations.append(frame.info.get('duration',100))
-                frames.append(new_frame)
-
-            out = io.BytesIO()
-            try:
-                frames[0].save(out, format='GIF', append_images=frames[1:], save_all=True, loop=loop,
-                               duration=durations)
-            except TypeError as err:
-                print(err)
-                raise RuntimeError('Invalid GIF') from None
-
-            filename = f'{modifier}.gif'
-
-        else:
-            img = img.convert('LA')
-
-            minimum = img.getextrema()[0][0]
-            maximum = img.getextrema()[0][1]
-
-            img = method_converter(img, modifier_converter, variation_converter, maximum, minimum)
+        for frame in ImageSequence.Iterator(image):
+            new_frame = method_converter(frame, modifier_converter, variation_converter, maximum, minimum)
             if background_color is not None:
-                img = remove_alpha(img, background_color)
-            out = io.BytesIO()
-            img.save(out, format='png')
-            filename = f'{modifier}.png'
+                new_frame = remove_alpha(new_frame, background_color)
+
+            durations.append(frame.info.get('duration',100))
+            frames.append(new_frame)
+
+        out = io.BytesIO()
+        try:
+            frames[0].save(out, format='GIF', append_images=frames[1:], save_all=True, loop=loop,
+                            duration=durations)
+        except TypeError as err:
+            print(err)
+            raise RuntimeError('Invalid GIF') from None
+
+
+    else:
+        image = image.convert('LA')
+
+        minimum = image.getextrema()[0][0]
+        maximum = image.getextrema()[0][1]
+
+        image = method_converter(image, modifier_converter, variation_converter, maximum, minimum)
+        if background_color is not None:
+            image = remove_alpha(image, background_color)
+        out = io.BytesIO()
+        image.save(out, format='png')
 
     out.seek(0)
-    return discord.File(out, filename=filename)
+    return out
 
+async def convert_image_with_background(image: Image.Image, modifier: str, method: str, selected_variations: list[str],
+                        modifiers: dict[str, dict], base_color_var: VariationType, methods: dict[str, Callable],
+                        variations: dict[str, VariationType]):
+    "Replace the image background with a colored gradient, and change the rest of the image as usual"
+    # get gradient background colors
+    try:
+        modifier_converter = dict(modifiers[modifier])
+    except KeyError:
+        raise RuntimeError('Invalid image modifier', modifier) from None
+    outer_color, inner_color = modifier_converter['bg_colors']
+    # get gradient background from mask
+    mask = await get_background_mask(image)
+    img_with_background = await apply_gradient(image, mask, inner_color, outer_color)
+
+    # apply color conversion on the object (ie. original image without background)
+    empty = Image.new("RGBA", (image.size), 0)
+    initial_object_img = Image.composite(image, empty, mask)
+    io_img_without_background = await convert_image_general(
+        initial_object_img, modifier, method, selected_variations, modifiers, base_color_var, methods, variations
+    )
+
+    # apply newly colored object on top of gradient background
+    with Image.open(io_img_without_background) as img_without_background:
+        result = Image.composite(img_without_background, img_with_background, mask)
+
+    # convert to BytesIO
+    out = io.BytesIO()
+    result.save(out, format='png')
+    out.seek(0)
+    return out
 
 class CheckResultColor(TypedDict):
     name: str
@@ -456,7 +482,7 @@ class CheckResult(TypedDict):
     passed: bool
     colors: list[CheckResultColor]
 
-async def check_image_general(image: Image.Image, colors_refs: list[ColorType], colors_names: list[ColorType]) -> CheckResult:
+async def check_image_general(image: bytes, colors_refs: list[ColorType], colors_names: list[ColorType]) -> CheckResult:
     "Check if an image has enough of the event colors, and return the analyse data"
     with Image.open(io.BytesIO(image)) as img:
         if img.format == "GIF":
