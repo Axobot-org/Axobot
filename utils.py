@@ -140,6 +140,7 @@ async def load_cogs(bot: "Axobot"):
         'fcts.errors',
         'fcts.events',
         'fcts.fun',
+        'fcts.halloween',
         'fcts.info',
         'fcts.library',
         'fcts.minecraft',
