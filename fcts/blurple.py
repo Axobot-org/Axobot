@@ -6,12 +6,11 @@ import discord
 from discord.ext import commands
 from discord.ext.commands import Cog
 
-from libs.bot_classes import (PRIVATE_GUILD_ID, SUPPORT_GUILD_ID, Axobot,
-                              MyContext)
+from libs.bot_classes import Axobot, MyContext
+from libs.checks.errors import NotDuringEventError
 from libs.colors_events import (BlurpleVariationFlagType, ColorVariation,
                                 TargetConverterType, check_blurple,
                                 convert_blurple, get_url_from_ctx)
-from libs.checks.errors import NotDuringEventError
 
 
 async def is_blurple(ctx: MyContext):
@@ -35,8 +34,7 @@ class Blurplefy(Cog):
                 jsonfile.write('[]')
             self.cache = []
 
-    @commands.hybrid_group(name="blurple", aliases=["b"], brief="Happy Discord birthday!")
-    @discord.app_commands.guilds(PRIVATE_GUILD_ID, SUPPORT_GUILD_ID)
+    @commands.hybrid_group(name="blurple", aliases=["b"], brief="Happy Discord Birthday!")
     @commands.check(is_blurple)
     async def blurple_main(self, ctx: MyContext):
         """Blurplefy and be happy for the 8th Discord birthday!
@@ -103,6 +101,7 @@ Online editor: https://projectblurple.com/paint
     async def color_command(self, fmodifier: typing.Literal["light", "dark"], ctx: MyContext,
                             method: BlurpleVariationFlagType = "blurplefy",
                             variations: commands.Greedy[ColorVariation] = None,
+                            replace_background: bool = False,
                             who: typing.Optional[TargetConverterType] = None):
         "Change a given image with the given modifier, method and variations"
         if not (ctx.guild is None or ctx.channel.permissions_for(ctx.guild.me).attach_files):
@@ -117,7 +116,7 @@ Online editor: https://projectblurple.com/paint
         try:
             async with aiohttp.ClientSession() as session:
                 async with session.get(str(url)) as image:
-                    result = await convert_blurple(await image.read(), fmodifier, method, variations or [])
+                    result = await convert_blurple(await image.read(), fmodifier, method, variations or [], replace_background)
         except RuntimeError as err:
             await ctx.send(await self.bot._(ctx.channel, 'color-event.unknown-err', err=str(err)))
             return
@@ -133,9 +132,10 @@ Online editor: https://projectblurple.com/paint
     @commands.check(is_blurple)
     async def lightfy(self, ctx: MyContext, method: BlurpleVariationFlagType = "blurplefy",
                       variations: commands.Greedy[ColorVariation] = None,
+                      replace_background: bool = False,
                       who: typing.Optional[TargetConverterType] = None):
         "Lightfy an image"
-        await self.color_command("light", ctx, method, variations, who)
+        await self.color_command("light", ctx, method, variations, replace_background, who)
 
     @blurple_main.command("darkfy")
     @commands.cooldown(6, 120, commands.BucketType.member)
@@ -143,9 +143,10 @@ Online editor: https://projectblurple.com/paint
     @commands.check(is_blurple)
     async def darkfy(self, ctx: MyContext, method: BlurpleVariationFlagType = "blurplefy",
                       variations: commands.Greedy[ColorVariation] = None,
+                      replace_background: bool = False,
                       who: typing.Optional[TargetConverterType] = None):
         "Darkfy an image"
-        await self.color_command("dark", ctx, method, variations, who)
+        await self.color_command("dark", ctx, method, variations, replace_background, who)
 
     @blurple_main.command("check")
     @commands.cooldown(2, 60, commands.BucketType.member)
