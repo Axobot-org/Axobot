@@ -986,7 +986,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
 
     @commands.command(name="avatar", aliases=['pfp'])
     @commands.cooldown(2, 10, commands.BucketType.user)
-    async def avatar(self, ctx: MyContext, user: typing.Optional[discord.Member]):
+    async def avatar(self, ctx: MyContext, user: typing.Optional[discord.User]):
         """Get the avatar of a user"""
         if user is None:
             user = ctx.author
