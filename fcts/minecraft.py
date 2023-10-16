@@ -682,6 +682,7 @@ Every information come from the website www.fr-minecraft.net"""
             return True
         except Exception as err:
             self.bot.dispatch("error", err)
+            return False
 
 
 async def setup(bot):
