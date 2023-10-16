@@ -1398,11 +1398,13 @@ class Rss(commands.Cog):
             return None
         try:
             if feed.type == 'mc':
-                return await self.bot.get_cog('Minecraft').check_feed(feed, send_stats=guild_id is None)
-            return await self.check_feed(feed, session, send_stats=guild_id is None)
+                result = await self.bot.get_cog('Minecraft').check_feed(feed, send_stats=guild_id is None)
+            else:
+                result = await self.check_feed(feed, session, send_stats=guild_id is None)
         except Exception as err:
             self.bot.dispatch("error", err, f"RSS feed {feed.feed_id}")
             return False
+        return result
 
     async def refresh_feeds(self, guild_id: Optional[int]=None):
         "Loop through feeds and do magic things"
@@ -1422,14 +1424,19 @@ class Rss(commands.Cog):
         errors_ids: list[int] = []
         checked_count = 0
         async with ClientSession() as session:
-            for feed in feeds_list:
-                check_result = await self._loop_refresh_one_feed(feed, session, guild_id)
-                if check_result is True:
-                    success_ids.append(feed.feed_id)
-                elif check_result is False:
-                    errors_ids.append(feed.feed_id)
-                if check_result is not None:
-                    checked_count += 1
+            # execute asyncio.gather by group of 20 feeds
+            for i in range(0, len(feeds_list), 20):
+                task_feeds = feeds_list[i:i+20]
+                results = await asyncio.gather(*[self._loop_refresh_one_feed(feed, session, guild_id) for feed in task_feeds])
+                for task_result, feed in zip(results, task_feeds):
+                    if task_result is True:
+                        checked_count += 1
+                        success_ids.append(feed.feed_id)
+                    elif task_result is False:
+                        checked_count += 1
+                        errors_ids.append(feed.feed_id)
+                # if it wasn't the last batch, wait a few seconds
+                if i+20 < len(feeds_list):
                     await asyncio.sleep(self.time_between_feeds_check)
         self.bot.get_cog('Minecraft').feeds.clear()
         elapsed_time = round(time.time() - start)
