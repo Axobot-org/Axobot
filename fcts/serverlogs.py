@@ -133,9 +133,9 @@ class ServerLogs(commands.Cog):
             return query_result > 0
 
 
-    @tasks.loop(seconds=20)
+    @tasks.loop(seconds=15)
     async def send_logs_task(self):
-        "Send ready logs every 20s to avoid rate limits"
+        "Send ready logs every 15s to avoid rate limits"
         try:
             for channel_id, embeds in dict(self.to_send).items():
                 channel = self.bot.get_channel(channel_id)
