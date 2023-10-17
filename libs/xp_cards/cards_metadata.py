@@ -29,11 +29,12 @@ V1_CARDS = {
 
 V3_CARDS = {
     "admin",
-    "blurple23",
     "contributor",
     "partner",
     "premium",
     "support",
+    "blurple23",
+    "halloween23",
 }
 
 JSON_DATA_FILE = os.path.dirname(__file__) + "/cards_data.json"
