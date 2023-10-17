@@ -100,6 +100,7 @@ class WebRSS:
             url=link,
             title=title,
             date=date,
+            entry_id=await self._get_entry_title(entry),
             author=author,
             channel=feed.feed['title'] if 'title' in feed.feed else '?',
             image=img,
@@ -107,7 +108,7 @@ class WebRSS:
         )
 
     async def get_new_posts(self, channel: discord.TextChannel, url: str, date: dt.datetime,
-                            last_title: Optional[str]=None,
+                            last_entry_id: Optional[str]=None,
                             session: Optional[aiohttp.ClientSession]=None) -> list[RssMessage]:
         "Get new posts from a web feed"
         feed = await self._get_feed(url, session)
@@ -130,9 +131,9 @@ class WebRSS:
                         dt.datetime(*entry_date[:6]) - date).total_seconds() < self.min_time_between_posts:
                     # we know we can break because entries are sorted by most recent first
                     break
-                if last_title is not None:
-                    entry_title = await self._get_entry_title(entry)
-                    if entry_title == last_title:
+                entry_id = await self._get_entry_title(entry)
+                if last_entry_id is not None:
+                    if entry_id == last_entry_id:
                         continue
                 if 'link' in entry:
                     link = entry['link']
@@ -165,6 +166,7 @@ class WebRSS:
                     url=link,
                     title=title,
                     date=entry_date,
+                    entry_id=entry_id,
                     author=author,
                     channel=feed.feed['title'] if 'title' in feed.feed else '?',
                     image=img,
