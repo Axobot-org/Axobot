@@ -52,6 +52,12 @@ class WebRSS:
             if entry.get(i) is not None:
                 return i
 
+    async def _get_entry_title(self, entry: FeedParserDict) -> Optional[str]:
+        "Try to find the article ID or title"
+        for i in ['id', 'title', 'updated_parsed']:
+            if value := entry.get(i):
+                return value
+
     async def get_last_post(self, channel: discord.TextChannel, url: str, session: Optional[aiohttp.ClientSession]=None):
         "Get the last post from a web feed"
         feed = await self._get_feed(url, session)
@@ -101,6 +107,7 @@ class WebRSS:
         )
 
     async def get_new_posts(self, channel: discord.TextChannel, url: str, date: dt.datetime,
+                            last_title: Optional[str]=None,
                             session: Optional[aiohttp.ClientSession]=None) -> list[RssMessage]:
         "Get new posts from a web feed"
         feed = await self._get_feed(url, session)
@@ -123,6 +130,10 @@ class WebRSS:
                         dt.datetime(*entry_date[:6]) - date).total_seconds() < self.min_time_between_posts:
                     # we know we can break because entries are sorted by most recent first
                     break
+                if last_title is not None:
+                    entry_title = await self._get_entry_title(entry)
+                    if entry_title == last_title:
+                        continue
                 if 'link' in entry:
                     link = entry['link']
                 elif 'link' in feed:
