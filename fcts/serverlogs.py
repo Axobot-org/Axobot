@@ -57,6 +57,7 @@ class ServerLogs(commands.Cog):
         self.cache: LRUCache[int, dict[int, list[str]]] = LRUCache(max_size=10000, timeout=3600*4)
         self.to_send: dict[int, list[discord.Embed]] = {}
         self.auditlogs_timeout = 3 # seconds
+        self.voice_join_timestamps: dict[tuple[int, int], float] = {}
 
     async def cog_load(self):
         self.send_logs_task.start() # pylint: disable=no-member
@@ -1557,6 +1558,7 @@ Minimum age required by anti-raid: {min_age}"
             return
         if before.channel is None and after.channel is not None:
             # voice_join
+            self.voice_join_timestamps[(member.id, after.channel.id)] = time.time()
             if channel_ids := await self.is_log_enabled(member.guild.id, "voice_join"):
                 emb = discord.Embed(
                     description=f"**{member.mention} ({member.id}) joined {after.channel.mention}**",
@@ -1572,9 +1574,14 @@ Minimum age required by anti-raid: {min_age}"
                     colour=discord.Color.light_grey()
                 )
                 emb.set_author(name=member, icon_url=member.display_avatar)
+                if join_timestamp := self.voice_join_timestamps[(member.id, before.channel.id)]:
+                    duration = await FormatUtils.time_delta(time.time() - join_timestamp)
+                    emb.add_field(name="Time spent in the channel", value=duration)
+                    del self.voice_join_timestamps[(member.id, before.channel.id)]
                 await self.validate_logs(member.guild, channel_ids, emb, "voice_leave")
         else:
             # voice_move
+            self.voice_join_timestamps[(member.id, after.channel.id)] = time.time()
             if channel_ids := await self.is_log_enabled(member.guild.id, "voice_move"):
                 emb = discord.Embed(
                     description=
@@ -1582,6 +1589,10 @@ Minimum age required by anti-raid: {min_age}"
                     colour=discord.Color.light_grey()
                 )
                 emb.set_author(name=member, icon_url=member.display_avatar)
+                if join_timestamp := self.voice_join_timestamps[(member.id, before.channel.id)]:
+                    duration = await FormatUtils.time_delta(time.time() - join_timestamp)
+                    emb.add_field(name="Time spent in the channel", value=duration)
+                    del self.voice_join_timestamps[(member.id, before.channel.id)]
                 await self.validate_logs(member.guild, channel_ids, emb, "voice_move")
 
 
