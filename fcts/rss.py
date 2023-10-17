@@ -1327,7 +1327,7 @@ class Rss(commands.Cog):
                     if feed.date is None:
                         objs = await self.web_rss.get_last_post(chan, feed.link, session)
                     else:
-                        objs = await self.web_rss.get_new_posts(chan, feed.link, feed.date, session)
+                        objs = await self.web_rss.get_new_posts(chan, feed.link, feed.date, feed.last_title, session)
                 elif feed.type == "deviant":
                     if feed.date is None:
                         objs = await self.deviant_rss.get_last_post(chan, feed.link, session)
