@@ -279,6 +279,17 @@
                 "total_xp_with_text": [255, 255, 255]
             }
         },
+        "halloween23": {
+            "xp_bar": [255, 179, 102],
+            "texts": {
+                "username": [255, 153, 51],
+                "level": [255, 140, 26],
+                "rank": [255, 140, 26],
+                "participants": [205, 100, 10],
+                "xp_to_next_level_with_text": [255, 140, 26],
+                "total_xp_with_text": [255, 140, 26]
+            }
+        },
         "premium": {
             "xp_bar": [255, 255, 102],
             "texts": {
