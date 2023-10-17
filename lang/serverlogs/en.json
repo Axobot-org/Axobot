@@ -7,7 +7,8 @@
         "moderation": "Moderation",
         "other": "Other",
         "roles": "Roles",
-        "tickets": "Tickets"
+        "tickets": "Tickets",
+        "voice": "Voice"
     },
     "disabled": {
         "current": "Logs of type %{kind} will no longer be sent to this channel",

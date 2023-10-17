@@ -7,7 +7,8 @@
         "moderation": "Modération",
         "other": "Autre",
         "roles": "Rôles",
-        "tickets": "Tickets"
+        "tickets": "Tickets",
+        "voice": "Vocal"
     },
     "disabled": {
         "current": "Les logs de type %{kind} ne seront plus envoyés dans ce salon",

@@ -42,6 +42,7 @@ class ServerLogs(commands.Cog):
         "other": {"bot_warnings", "server_update"},
         "roles": {"role_creation", "role_update", "role_deletion"},
         "tickets": {"ticket_creation"},
+        "voice": {"voice_join", "voice_move", "voice_leave"}
     }
 
     @classmethod
@@ -1547,6 +1548,41 @@ Minimum age required by anti-raid: {min_age}"
             else:
                 return
             await self.validate_logs(guild, channel_ids, emb, "bot_warnings")
+
+    @commands.Cog.listener()
+    async def on_voice_state_update(self, member: discord.Member, before: discord.VoiceState, after: discord.VoiceState):
+        """Triggered when a member changes their voice state (changes channel, mutes, deafen, etc.)
+        Corresponding log: voice_join, voice_leave, voice_move"""
+        if before.channel == after.channel:
+            return
+        if before.channel is None and after.channel is not None:
+            # voice_join
+            if channel_ids := await self.is_log_enabled(member.guild.id, "voice_join"):
+                emb = discord.Embed(
+                    description=f"**{member.mention} ({member.id}) joined {after.channel.mention}**",
+                    colour=discord.Color.light_grey()
+                )
+                emb.set_author(name=member, icon_url=member.display_avatar)
+                await self.validate_logs(member.guild, channel_ids, emb, "voice_join")
+        elif before.channel is not None and after.channel is None:
+            # voice_leave
+            if channel_ids := await self.is_log_enabled(member.guild.id, "voice_leave"):
+                emb = discord.Embed(
+                    description=f"**{member.mention} ({member.id}) left {before.channel.mention}**",
+                    colour=discord.Color.light_grey()
+                )
+                emb.set_author(name=member, icon_url=member.display_avatar)
+                await self.validate_logs(member.guild, channel_ids, emb, "voice_leave")
+        else:
+            # voice_move
+            if channel_ids := await self.is_log_enabled(member.guild.id, "voice_move"):
+                emb = discord.Embed(
+                    description=
+                    f"**{member.mention} ({member.id}) moved from {before.channel.mention} to {after.channel.mention}**",
+                    colour=discord.Color.light_grey()
+                )
+                emb.set_author(name=member, icon_url=member.display_avatar)
+                await self.validate_logs(member.guild, channel_ids, emb, "voice_move")
 
 
 async def setup(bot):
