@@ -6,7 +6,7 @@ import re
 import time
 from json import dumps
 from math import ceil
-from typing import Callable, Literal, Optional, Union
+from typing import Any, Callable, Literal, Optional, Union
 
 import discord
 from aiohttp import ClientSession, client_exceptions
@@ -1240,7 +1240,7 @@ class Rss(commands.Cog):
             t = query_results['count']
         return t
 
-    async def db_update_feed(self, feed_id: int, values=None):
+    async def db_update_feed(self, feed_id: int, values: Optional[list[tuple[str, Any]]]=None):
         "Update a field values"
         values = values if values is not None else [(None, None)]
         if self.bot.zombie_mode:
@@ -1249,6 +1249,15 @@ class Rss(commands.Cog):
         query = f"UPDATE `{self.table}` SET {set_query} WHERE `ID`=%s"
         async with self.bot.db_query(query, [val[1] for val in values] + [feed_id]):
             pass
+
+    async def _update_feed_last_entry(self, feed_id: int, last_post_date: datetime.datetime, last_entry_id: Optional[str]):
+        "Update the last entry of a feed"
+        if self.bot.zombie_mode:
+            return
+        values = [("date", last_post_date)]
+        if last_entry_id:
+            values.append(("last_entry_id", last_entry_id))
+        await self.db_update_feed(feed_id, values=values)
 
     async def db_increment_errors(self, working_ids: list[int], broken_ids: list[int]) -> int:
         "Increments recent_errors value by 1 for each of these IDs, and set it to 0 for the others"
@@ -1327,7 +1336,7 @@ class Rss(commands.Cog):
                     if feed.date is None:
                         objs = await self.web_rss.get_last_post(chan, feed.link, session)
                     else:
-                        objs = await self.web_rss.get_new_posts(chan, feed.link, feed.date, feed.last_title, session)
+                        objs = await self.web_rss.get_new_posts(chan, feed.link, feed.date, feed.last_entry_id, session)
                 elif feed.type == "deviant":
                     if feed.date is None:
                         objs = await self.deviant_rss.get_last_post(chan, feed.link, session)
@@ -1350,6 +1359,7 @@ class Rss(commands.Cog):
                 # update cache
                 self.cache[feed.link] = objs
                 latest_post_date = None
+                latest_entry_id = None
                 for obj in objs[:self.max_messages]:
                     # if the guild was marked as inactive (ie. the bot wasn't there in the previous loop),
                     #  mark the feeds as completed but do not send any message, to avoid spamming channels
@@ -1369,8 +1379,9 @@ class Rss(commands.Cog):
                         await obj.fill_mention(guild)
                         await self.send_rss_msg(obj, chan, send_stats)
                     latest_post_date = obj.date
+                    latest_entry_id = obj.entry_id
                 if isinstance(latest_post_date, datetime.datetime):
-                    await self.db_update_feed(feed.feed_id, [('date', latest_post_date)],)
+                    await self._update_feed_last_entry(feed.feed_id, latest_post_date, latest_entry_id)
                 return True
             else:
                 return True

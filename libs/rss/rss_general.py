@@ -62,6 +62,7 @@ class RssMessage:
                  title: str,
                  date: Union[datetime.datetime, time.struct_time,
                              str] = datetime.datetime.now(),
+                 entry_id: Optional[str] = None,
                  author: Optional[str] = None,
                  channel: Optional[str] = None,
                  retweeted_from: Optional[str] = None,
@@ -85,6 +86,7 @@ class RssMessage:
                 self.date = date
         else:
             self.date = None
+        self.entry_id = entry_id
         self.author = author if author is None or len(author) < 100 else author[:99]+'…'
         self.logo = feed.get_emoji(bot.emojis_manager)
         if isinstance(self.logo, discord.Emoji):
@@ -237,7 +239,7 @@ class FeedObject:
         self.type: FeedType = from_dict['type']
         self.link: str = from_dict['link']
         self.date: Optional[datetime.datetime]= from_dict['date']
-        self.last_title: Optional[str] = from_dict['last_title']
+        self.last_entry_id: Optional[str] = from_dict['last_entry_id']
         self.role_ids: list[str] = [role for role in from_dict['roles'].split(';') if role.isnumeric()]
         self.use_embed: bool = from_dict['use_embed']
         self.embed_data: FeedEmbedData = json.loads(from_dict['embed'])
@@ -276,7 +278,7 @@ class FeedObject:
             "type": from_type,
             "link": link,
             "date": None,
-            "last_title": None,
+            "last_entry_id": None,
             "roles": "",
             "use_embed": False,
             "embed": "{}",
