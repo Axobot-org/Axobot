@@ -170,10 +170,10 @@
         ]
     },
     "halloween-2023": {
-        "begin": "2023-10-04",
+        "begin": "2023-10-20",
         "end": "2023-11-01",
         "type": "halloween",
-        "icon": "https://zrunner.me/cdn/halloween_2022.jpg",
+        "icon": "https://zrunner.me/cdn/halloween_2023.png",
         "color": 16089635,
         "objectives": [
             {
