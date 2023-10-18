@@ -4,8 +4,14 @@
         "many": "Enter wat roles shuld be mentionned for dis feeds (like uh, dunno, names or number or watever)."
     },
     "ask-roles-hint-example": "Smol example:\n> Members \"Super VIP\" @Ping roles",
-    "change-txt": "Plz enter teh text 2 be usd when creating a new post. U can use some magic words, here iz the list:\n- `{author}`: author of the post\n- `{channel}`: usually same than author, but different\n- `{date}`: post date (UTC)\n- `{link}` or `{url}`: a link 2 the post\n- `{logo}`: a emoji representing teh type of post (website, BlueBird, RedTriangle...)\n- `{mentions}`: the list ov mentioned roles\n- `{title}`: the titl of teh post",
-    "change-txt-previous": "Teh current msg is:\n```\n%{text}\n```",
+    "change-txt": {
+        "title": "Edit teh RSS feed txt",
+        "label": "TXT template",
+        "modal-success": "Hold on...",
+        "placeholder": "Ur msg come right here",
+        "previous": "Teh current msg is:\n```\n%{text}\n```",
+        "text-version": "Plz enter teh text 2 be usd when creating a new post. U can use some magic words, here iz the list:\n- `{author}`: author of the post\n- `{channel}`: usually same than author, but different\n- `{date}`: post date (UTC)\n- `{link}` or `{url}`: a link 2 the post\n- `{logo}`: a emoji representing teh type of post (website, orange alien, RedTriangle...)\n- `{mentions}`: the list ov mentioned roles\n- `{title}`: the titl of teh post"
+    },
     "choose-delete": "Plz chouse teh flo to delet",
     "choose-disable": "Pls chose teh feed 2 disable",
     "choose-enable": "Pls chose teh feeds 2 enable",
@@ -39,7 +45,10 @@
     "list": "*Tipe teh nbr of the feed 2 modyfi by*\n\n**Zelda - Typez - cHanel - Mentionz**\n",
     "list-disabled": "(disabld)",
     "list-result": "{emoji} {link}\nDisc chan: {channel}\nPings: {roles}\nId: {id}\nLast thing: {last_post}",
-    "list-title": "List ov cool followed from here (%{server})",
+    "list-title": {
+        "one": "List ov cool followed from teh place named %{server} (1 feed)",
+        "many": "List ov cool followed from teh place named %{server} (%{count} feeds)"
+    },
     "list2": "*Type teh nmberZ ov the feeds 2 deletz*\n\n**Lnk - Tipe - Chanell**\n",
     "loop-processing": "Cant u plz WAIT??? Me is BUSY DUH :angrycat:",
     "mc": "Minekrraft",
