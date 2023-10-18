@@ -7,7 +7,8 @@
         "moderation": "Moderashun",
         "other": "Ozers",
         "roles": "Roles",
-        "tickets": "Tickets"
+        "tickets": "Tickets",
+        "voice": "VOICE"
     },
     "disabled": {
         "current": "Logs ov %{kind} wont be sent 2 dis channel anymore",
