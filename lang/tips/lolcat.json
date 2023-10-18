@@ -9,6 +9,8 @@
         ]
     },
     "rank_card_personalisation": "U can change ur xp card with teh %{profile_cmd} cmd!",
+    "rss_difference_disable_delete": "Disabled feed = no more msg from it. But u can always re-enable it w/ %{rss_enable_cmd}!\nBut u shuld know dat a disabled feed still count in ur feeds limit, soo... if u wanna delete a feed or 2, try out %{rss_remove_cmd} instead :)",
+    "rss_delete_disabled_feeds": "Uh, funny thing, looks like u got some disabled feeds on ur server. I wont post any msg from those, but hey, just so u know, they still count in ur feeds limit.\nIf u wanna delete a feed from dat list, try out %{rss_remove_cmd} eh.",
     "serverlog_enable_antiscam": "Enabling anti-scam logs while keeping teh anti-scam feature disabld wont be really helpful, u know... maybe u should try %{antiscam_enable_cmd} lol",
     "serverlog_enable_antiraid": "yeah so uh, theres this thing... uve just enabled antiraid modlogs but didnt enable teh actual anti-raid feature on dis server... dat wont go far, u know? check out %{config_set_cmd} lol.",
     "serverlog_enable_botwarning": "U should probbly listen 2 my future warnings thx 2 %{log_add_cmd} ('bot_warnings'). Gotta make sure everything run smooth, right?"
