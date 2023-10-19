@@ -130,6 +130,7 @@ class Events(commands.Cog):
     async def on_guild_join(self, guild: discord.Guild):
         """Called when the bot joins a guild"""
         await self.send_guild_log(guild,"join")
+        await self.send_guild_count_milestone()
         if guild.owner:
             await self.check_owner_server(guild.owner)
 
@@ -163,6 +164,13 @@ class Events(commands.Cog):
         except Exception as err:
             self.bot.dispatch('error', err, None)
 
+    async def send_guild_count_milestone(self):
+        "Check the number of guilds and send a message if it's a milestone"
+        guilds_count = len(self.bot.guilds)
+        if guilds_count % 100 != 0:
+            return
+        if channel := self.bot.get_channel(625318973164093457):
+            await channel.send(f"Nous venons d'atteindre les **{guilds_count} serveurs** ! :tada:")
 
     @commands.Cog.listener()
     async def on_message(self, msg: discord.Message):
