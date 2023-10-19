@@ -10,7 +10,6 @@ import discord
 from discord.ext import commands
 from discord.ext.commands.converter import run_converters
 
-from docs import conf
 from libs import bitly_api
 from libs.arguments import args
 from libs.bot_classes import PRIVATE_GUILD_ID, Axobot, MyContext
@@ -20,7 +19,6 @@ from libs.rss.rss_general import FeedObject
 
 default_color = discord.Color(0x50e3c2)
 
-importlib.reload(conf)
 importlib.reload(args)
 importlib.reload(checks)
 importlib.reload(bitly_api)
