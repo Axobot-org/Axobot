@@ -4,7 +4,7 @@
         "lost-points": "Il semble que vous n'ayez pas trouvé d'objet à collectionner sur votre chemin, et que vous ayez inexplicablement **perdu %{points} points d'événement**...",
         "nothing": "Tu n'as rien trouvé d'intéressant sur ton chemin, espérons que tu auras plus de chance la prochaine fois !",
         "got-items": {
-            "one": "Vous avez trouvé **un %{item}** lors de votre voyage ! (%{points} d'événement)",
+            "one": "Vous avez trouvé **un %{item}** lors de votre voyage ! (%{points} points d'événement)",
             "many": "Vous avez trouvé **%{count} objets** lors de votre voyage ! (%{points} points d'événement)"
         },
         "too-quick": "Il est encore trop tôt ! Vous ne pourrez collecter des points d'événement que dans %{time} !",
