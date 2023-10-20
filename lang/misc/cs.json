@@ -33,7 +33,7 @@
     "end": "konec",
     "example": {
         "one": "příklad",
-        "other": "příklady"
+        "many": "příklady"
     },
     "extreme": "extrémní",
     "ghost": "Duch",
