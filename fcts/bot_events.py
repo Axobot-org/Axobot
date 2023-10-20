@@ -6,7 +6,7 @@ from random import randint, choices, lognormvariate
 from typing import Any, Literal, Optional, Union
 
 import discord
-from discord.ext import commands
+from discord.ext import commands, tasks
 
 from libs.bot_classes import SUPPORT_GUILD_ID, Axobot, MyContext
 from libs.bot_events import (EventData, EventRewardRole, EventType,
@@ -37,6 +37,15 @@ class BotEvents(commands.Cog):
         self.coming_event_data: EventData = {}
         self.coming_event_id: Optional[str] = None
         self.update_current_event()
+
+    async def cog_load(self):
+        if self.bot.internal_loop_enabled:
+            self._update_event_loop.start() # pylint: disable=no-member
+
+    async def cog_unload(self):
+        # pylint: disable=no-member
+        if self._update_event_loop.is_running():
+            self._update_event_loop.cancel()
 
     def reset(self):
         "Reset current and coming events"
@@ -88,6 +97,21 @@ class BotEvents(commands.Cog):
         if not self.bot.database_online and not message.author.guild_permissions.manage_guild:
             return False
         return await self.bot.get_config(message.guild.id, "enable_fun")
+
+    @tasks.loop(time=[
+        datetime.time(hour=0,  tzinfo=datetime.timezone.utc),
+        datetime.time(hour=12, tzinfo=datetime.timezone.utc),
+    ])
+    async def _update_event_loop(self):
+        "Refresh the current bot event every 12h"
+        self.update_current_event()
+        event = self.bot.get_cog("BotEvents").current_event
+        emb = discord.Embed(
+            description=f'**Bot event** updated (current event is {event})',
+            color=1406147, timestamp=self.bot.utcnow()
+        )
+        emb.set_author(name=self.bot.user, icon_url=self.bot.user.display_avatar)
+        await self.bot.send_embed(emb, url="loop")
 
     @commands.Cog.listener()
     async def on_message(self, msg: discord.Message):

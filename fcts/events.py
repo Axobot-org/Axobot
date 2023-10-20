@@ -19,7 +19,6 @@ class Events(commands.Cog):
         self.bot = bot
         self.file = "events"
         self.dbl_last_sending = datetime.datetime.utcfromtimestamp(0)
-        self.last_eventDay_check = datetime.datetime.utcfromtimestamp(0)
         self.statslogs_last_push = datetime.datetime.utcfromtimestamp(0)
         self.loop_errors = [0,datetime.datetime.utcfromtimestamp(0)]
         self.embed_colors = {"welcome":5301186,
@@ -307,9 +306,6 @@ class Events(commands.Cog):
             # Bots lists updates - every day
             elif now.hour == 0 and now.day != self.dbl_last_sending.day:
                 await self.dbl_send_data()
-            # Check current event - every 12h UTC (start from 0:02 am)
-            elif utcnow.hour%12 == 0 and utcnow.minute%2 == 0 and (now.hour != self.last_eventDay_check.hour or now.day != self.last_eventDay_check.day):
-                await self.botEventLoop()
             # Send stats logs - every 1h (start from 0:05 am)
             elif now.minute > 5 and (now.day != self.statslogs_last_push.day or now.hour != self.statslogs_last_push.hour) and self.bot.database_online:
                 await self.send_sql_statslogs()
@@ -328,15 +324,6 @@ class Events(commands.Cog):
         await self.bot.wait_until_ready()
         await asyncio.sleep(2)
         self.bot.log.info("[tasks_loop] Starting one loop iteration")
-
-    async def botEventLoop(self):
-        "Refresh the current bot event every once in a while"
-        self.bot.get_cog("BotEvents").update_current_event()
-        event = self.bot.get_cog("BotEvents").current_event
-        emb = discord.Embed(description=f'**Bot event** updated (current event is {event})', color=1406147, timestamp=self.bot.utcnow())
-        emb.set_author(name=self.bot.user, icon_url=self.bot.user.display_avatar)
-        await self.bot.send_embed(emb, url="loop")
-        self.last_eventDay_check = datetime.datetime.today()
 
     async def dbl_send_data(self):
         """Send guilds count to Discord Bots Lists"""
