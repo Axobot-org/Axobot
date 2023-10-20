@@ -7,7 +7,7 @@
             "one": "Vous avez trouvé **un %{item}** lors de votre voyage ! (%{points} d'événement)",
             "many": "Vous avez trouvé **%{count} objets** lors de votre voyage ! (%{points} points d'événement)"
         },
-        "too-quick": "Il est encore trop tôt ! Vous ne pourrez collecter des points d'événement que dans %{temps} !",
+        "too-quick": "Il est encore trop tôt ! Vous ne pourrez collecter des points d'événement que dans %{time} !",
         "strike-bonus": "Vous avez obtenu **%{bonus} points bonus** pour avoir utilisé cette commande %{level} fois de suite !"
     },
     "collection-empty": "Votre collection est vide, vous devriez récupérer quelques items !",
