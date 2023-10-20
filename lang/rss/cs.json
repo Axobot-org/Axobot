@@ -4,8 +4,14 @@
         "many": "Zadejte role uvedené pro tyto kanály (jména, ID nebo zmínění), oddělené mezerami."
     },
     "ask-roles-hint-example": "Například:\n> Členové \"Super VIP\" @Ping role",
-    "change-txt": "Zadejte prosím text, který bude použit při vytváření nového příspěvku. Můžete použít několik proměnných, z nichž zde je seznam:\n- `{author}`: autor příspěvku\n- `{channel}`: název kanálu (obvykle stejný jako autor)\n- `{date}`: datum příspěvku (UTC)\n- `{link}` nebo `{url}`: odkaz na příspěvek\n- `{logo}`: emoji reprezentující typ příspěvku (web, Twitter, YouTube...)\n- `{mentions}`: seznam zmíněných rolí\n- `{title}`: název příspěvku",
-    "change-txt-previous": "Aktuální zpráva obsahuje  \n```\n%{text}\n```",
+    "change-txt": {
+        "title": "Upravit text kanálu",
+        "label": "Šablona zprávy",
+        "modal-success": "Ukládáme Vaše změny...",
+        "placeholder": "Zde zadejte šablonu zprávy",
+        "previous": "Aktuální zpráva obsahuje  \n```\n%{text}\n```",
+        "text-version": "Zadejte prosím text, který bude použit při vytváření nového příspěvku. Můžete použít několik proměnných, z nichž zde je seznam:\n- `{author}`: autor příspěvku\n- `{channel}`: název kanálu (obvykle stejný jako autor)\n- `{date}`: datum příspěvku (UTC)\n- `{link}` nebo `{url}`: odkaz na příspěvek\n- `{logo}`: emoji reprezentující typ příspěvku (web, Twitter, YouTube...)\n- `{mentions}`: seznam zmíněných rolí\n- `{title}`: název příspěvku"
+    },
     "choose-delete": "Vyberte prosím kanály k odstranění",
     "choose-disable": "Prosím vyberte kanály k vypnutí",
     "choose-enable": "Vyberte prosím kanál, který chcete povolit",
@@ -39,7 +45,10 @@
     "list": "*Zadejte počet kanálů pro úpravy*\n\n**Odkaz - Typ - Kanál - Zmínky**\n",
     "list-disabled": "(zakázáno)",
     "list-result": "{emoji} {link}\nDiscord kanál: {channel}\nZmínky: {roles}\nIdentifikátor: {id}\nPoslední příspěvek: {last_post}",
-    "list-title": "Seznam Rss kanálů ze serveru %{server}",
+    "list-title": {
+        "one": "Seznam RSS kanálů ze serveru %{server} (1 kanál)",
+        "many": "Seznam RSS kanálů ze serveru %{server} (%{count} kanálů)"
+    },
     "list2": "*Zadejte počet kanálů, které chcete odstranit*\n\n**Odkaz - Typ - Kanál**\n",
     "loop-processing": "Kontrola vašich RSS kanálů již probíhá. Počkejte prosím několik minut",
     "mc": "Minecraft",
