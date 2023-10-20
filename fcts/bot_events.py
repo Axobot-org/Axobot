@@ -347,7 +347,7 @@ class BotEvents(commands.Cog):
                 await self.db_add_user_items(ctx.author.id, [item["item_id"] for item in items])
             txt = await self.generate_collect_message(ctx.channel, items, points + bonus)
             if strike_level and bonus != 0:
-                txt += f"\n\n{await self.bot._(ctx.channel, 'bot_events.collect.strike-bonus', bonus=bonus, level=strike_level)}"
+                txt += f"\n\n{await self.bot._(ctx.channel, 'bot_events.collect.strike-bonus', bonus=bonus, level=strike_level+1)}"
             if points + bonus != 0:
                 await self.db_add_collect(ctx.author.id, points, increase_strike=is_strike)
         # send result
