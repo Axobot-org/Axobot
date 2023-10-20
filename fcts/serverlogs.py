@@ -900,7 +900,7 @@ class ServerLogs(commands.Cog):
             )
             emb.set_footer(text=f"Role ID: {role.id}")
             emb.add_field(name="Name", value=role.name, inline=False)
-            color_url = f"https://www.color-hex.com/color/{role.color.value:x}"
+            color_url = f"https://www.color-hex.com/color/{role.color.value:06x}"
             emb.add_field(name="Color", value=f"[{role.color}]({color_url})")
             if specs := await self.get_role_specs(role):
                 emb.add_field(name="Specificities", value=", ".join(specs), inline=False)
@@ -927,8 +927,8 @@ class ServerLogs(commands.Cog):
                 emb.add_field(name="Name", value=f"{before.name} -> {after.name}", inline=False)
             # role color
             if before.color != after.color:
-                before_color_url = f"https://www.color-hex.com/color/{before.color.value:x}"
-                after_color_url = f"https://www.color-hex.com/color/{after.color.value:x}"
+                before_color_url = f"https://www.color-hex.com/color/{before.color.value:06x}"
+                after_color_url = f"https://www.color-hex.com/color/{after.color.value:06x}"
                 txt = f"[{before.color}]({before_color_url}) -> [{after.color}]({after_color_url})"
                 emb.add_field(name="Color", value=txt, inline=False)
             # mentionnable
@@ -991,7 +991,7 @@ class ServerLogs(commands.Cog):
             )
             emb.set_footer(text=f"Role ID: {role.id}")
             emb.add_field(name="Name", value=role.name, inline=False)
-            color_url = f"https://www.color-hex.com/color/{role.color.value:x}"
+            color_url = f"https://www.color-hex.com/color/{role.color.value:06x}"
             emb.add_field(name="Color", value=f"[{role.color}]({color_url})")
             if specs := await self.get_role_specs(role):
                 emb.add_field(name="Specificities", value=", ".join(specs), inline=False)
