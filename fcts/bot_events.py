@@ -499,11 +499,13 @@ class BotEvents(commands.Cog):
             if increase_strike:
                 query = "INSERT INTO `event_points` (`user_id`, `collect_points`, `strike_level`, `beta`) VALUES (%s, %s, 1, %s) \
                     ON DUPLICATE KEY UPDATE collect_points = collect_points + VALUE(`collect_points`), \
-                        strike_level = strike_level + 1;"
+                        strike_level = strike_level + 1, \
+                        last_collect = CURRENT_TIMESTAMP();"
             else:
                 query = "INSERT INTO `event_points` (`user_id`, `collect_points`, `beta`) VALUES (%s, %s, %s) \
                     ON DUPLICATE KEY UPDATE collect_points = collect_points + VALUE(`collect_points`), \
-                        strike_level = 0;"
+                        strike_level = 0, \
+                        last_collect = CURRENT_TIMESTAMP();"
             async with self.bot.db_query(query, (user_id, points, self.bot.beta)):
                 pass
             try:
@@ -520,7 +522,7 @@ class BotEvents(commands.Cog):
         "Get the last collect datetime from a user"
         if not self.bot.database_online:
             return None
-        query = "SELECT `last_update` FROM `event_points` WHERE `user_id` = %s AND `beta` = %s;"
+        query = "SELECT `last_collect` FROM `event_points` WHERE `user_id` = %s AND `beta` = %s;"
         async with self.bot.db_query(query, (user_id, self.bot.beta), fetchone=True, astuple=True) as query_result:
             if not query_result:
                 return None
