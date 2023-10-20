@@ -1,4 +1,5 @@
 {
+    "autocompletion-all": "vše",
     "categories": {
         "automod": "Automod",
         "members": "Členi",
@@ -6,7 +7,8 @@
         "moderation": "Moderace",
         "other": "Ostatní",
         "roles": "Role",
-        "tickets": "Tikety"
+        "tickets": "Tikety",
+        "voice": "Hlas"
     },
     "disabled": {
         "current": "Protokoly typu %{kind} již nebudou na tento kanál odeslány",
@@ -15,7 +17,11 @@
     "embed-warning": "Pro odesílání logů bota potřebuje oprávnění \"Embed odkazy\"!",
     "enabled": {
         "current": "Protokoly typu %{kind} budou nyní odeslány na tento kanál",
-        "other": "Protokoly typu %{kind} budou nyní odeslány na %{channel}"
+        "other": "Protokoly typu %{kind} budou nyní odeslány na %{channel}",
+        "already-enabled-list": {
+            "one": "Typ logu %{kinds} byl již povolen",
+            "many": "Typy logů %{kinds} byly již povoleny"
+        }
     },
     "kick-warning": "Pro detekci vykopnutých členů bota potřebuje oprávnění \"Zobrazit kontrolní protokol\"!",
     "list": {
