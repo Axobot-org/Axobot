@@ -122,7 +122,7 @@
         "Věděli jste, že? Existuje několik jazyků pro bota, včetně jednoho velmi zábavného, můžete vyzkoušet: lolcat",
         "Pro-tip: pro změnu jazyka bot použijte příkaz %{config_cmd}!",
         "Pro-tip: vysvětlení každého příkazu najdete v dokumentaci bota, na https://axobot.rtfd.io. Možná i příkazy, o kterých jste nevěděli!",
-        "Věděli jste to? Výsledky příkazu %{stat_cmd} skryjí některé servery, například servery seznamu botů, nebo ty interní",
+        "Věděli jste to? Výsledky příkazu %{stats_cmd} skryjí některé servery, například servery seznamu botů, nebo ty interní",
         "Věděl jste to? Původně jsem byl navržen pro server v komunitě Minecraftu. Tam jsem si udělal jméno a proto mám nějaké příkazy související s Minecraftem.",
         "Věděli jste to? První verze bota byla napsána v únoru 2018, pro osobní použití. V té době existovaly pouze dva nebo tři jednoduché příkazy, jako %{clear_cmd} a %{say_cmd}",
         "Pro-tip: S příkazem %{say_cmd} můžete použít emodži z jakéhokoliv serveru, kde jsem, dokonce i animované emodži! Prostě dejte emodži, jako byste ji používali sami",
