@@ -122,7 +122,7 @@
         "Did you know? There are several languages for the bot, including one very fun to test: lolcat",
         "Pro-tip: to change the bot language, use %{config_cmd}!",
         "Pro-tip: u'll find explanations ov each command in teh bot doc, at https://axobot.rtfd.io. Maybe even some super-cool tricks u didn't know be4!",
-        "Did u know? Teh results of %{stat_cmd} hide some servers, such as bot list servers, or super-private ones. Boring, isn't it?",
+        "Did u know? Teh results of %{stats_cmd} hide some servers, such as bot list servers, or super-private ones. Boring, isn't it?",
         "Did u know? I was at first a minecraft-server bot. Dat's were I made my name, and why I have some minecraft-coolest commands!",
         "Did u know? Teh first version of teh bot was written in february '18, for personal use. But 't was only a few useless commands like %{clear_cmd} or %{say_cmd}.",
         "Pro-tip: U can use any emoji from any server where I am with the %{say_cmd} command, even animated ones!",
