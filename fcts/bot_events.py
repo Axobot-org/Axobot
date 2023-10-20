@@ -337,7 +337,7 @@ class BotEvents(commands.Cog):
         else:
             # grant points
             items = await self.get_random_items()
-            strike_level = await self.db_get_user_strike_level(ctx.author.id) if is_strike else 0
+            strike_level = (await self.db_get_user_strike_level(ctx.author.id) + 1) if is_strike else 0
             if len(items) == 0:
                 points = randint(*self.collect_reward)
                 bonus = 0
@@ -527,6 +527,9 @@ class BotEvents(commands.Cog):
             if not query_result:
                 return None
             query_result: tuple[datetime.datetime]
+            # if no last collect, return a very high number
+            if query_result[0] is None:
+                return 1e9
             # apply utc offset
             last_collect = query_result[0].replace(tzinfo=datetime.timezone.utc)
         return (self.bot.utcnow() - last_collect).total_seconds()
