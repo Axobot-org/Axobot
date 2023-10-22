@@ -229,8 +229,6 @@ class Cases(commands.Cog):
 
             class RecordsPaginator(Paginator):
                 "Paginator used to display a user record"
-                users: dict[int, Optional[discord.User]]
-
                 async def get_page_count(self) -> int:
                     length = len(cases)
                     if length == 0:
