@@ -141,7 +141,7 @@
         "Pro-tip: příkaz `prefix` umožňuje mít seznam prefixů aktuálně použitelných na serveru",
         "Věděli jste to? Popis vašeho serveru, který lze použít na jiných serverech, můžete zadat pomocí volby `description` příkazu %{config_cmd}",
         "Věděli jste to? Na některých speciálních akcích je možné získat sběratelské xp karty. Nezapomeňte sledovat novinky na oficiálním serveru nebo s příkazem %{event_cmd}!",
-        "Máte rádi tohto bota ? Tak právě vy nám můžete přispět návštěvou webu %{sponsor_url} !",
+        "Máte rádi tohoto bota ? Tak právě vy nám můžete přispět návštěvou webu %{sponsor_url} !",
         "Věděli jste to? Pokud už vás nebaví poslouchat stovky hlasových zpráv odeslaných vašimi přáteli, můžete použít přepisovací funkci Axobotu pro čtení jejich textového obsahu. Klikněte na hlasovou schránku a pak zvolte \"Aplikace\" > \"Hlasový text\"!",
         "Věděli jste to? Funkce přepisu hlasových zpráv respektuje vaše soukromí a místo odesílání zpráv externí službě používá lokální model umělé inteligence!",
         "Pro-tip: Pokud si přejete dočasně deaktivovat RSS kanál, později jej znovu aktivovat, můžete použít příkaz %{rss_disable_cmd}. Naopak příkaz %{rss_delete_cmd} jej trvale smaže!",
