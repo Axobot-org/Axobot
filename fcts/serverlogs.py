@@ -1204,6 +1204,7 @@ Minimum age required by anti-raid: {min_age}"
                 colour=discord.Color.blurple(),
             )
             emb.add_field(name="Previous icon", value=before.icon.url)
+            emb.add_field(name="New icon", value=after.icon.url)
             emb.set_image(url=after.icon)
         await self.validate_logs(after, channel_ids, emb, "server_update")
 
