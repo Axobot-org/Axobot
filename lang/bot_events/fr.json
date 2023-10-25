@@ -10,9 +10,15 @@
         "too-quick": "Il est encore trop tôt ! Vous ne pourrez collecter des points d'événement que dans %{time} !",
         "strike-bonus": "Vous avez obtenu **%{bonus} points bonus** pour avoir utilisé cette commande %{level} fois de suite !"
     },
-    "collection-empty": "Votre collection est vide, vous devriez récupérer quelques items !",
+    "collection-empty": {
+        "user": "Votre collection est vide, vous devriez récupérer quelques items !",
+        "other": "La collection de %{user} est vide, pour l'instant"
+    },
     "collection-more": "... et %{count} autres !",
-    "collection-title": "Votre collection",
+    "collection-title": {
+        "user": "Votre collection",
+        "other": "Collection de %{user}"
+    },
     "events-price-title": "Prix à gagner",
     "leaderboard-global": "Classement mondial (top %{count})",
     "nothing-desc": "Il n'y a actuellement aucun événement. Suivez les news du bot pour connaître la date du prochain !",

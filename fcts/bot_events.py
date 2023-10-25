@@ -284,10 +284,16 @@ class BotEvents(commands.Cog):
 
     async def generate_user_profile_collection_field(self, ctx: MyContext, user: discord.User):
         "Compute the texts to display in the /event profile command"
-        title = await self.bot._(ctx.channel, "bot_events.collection-title")
+        if ctx.author == user:
+            title = await self.bot._(ctx.channel, "bot_events.collection-title.user")
+        else:
+            title = await self.bot._(ctx.channel, "bot_events.collection-title.other", user=user.display_name)
         items = await self.db_get_user_collected_items(user.id)
         if len(items) == 0:
-            _empty_collection = await self.bot._(ctx.channel, "bot_events.collection-empty")
+            if ctx.author == user:
+                _empty_collection = await self.bot._(ctx.channel, "bot_events.collection-empty.user")
+            else:
+                _empty_collection = await self.bot._(ctx.channel, "bot_events.collection-empty.other", user=user.display_name)
             return {"name": title, "value": _empty_collection, "inline": True}
         lang = await self.bot._(ctx.channel, '_used_locale')
         name_key = "french_name" if lang in ("fr", "fr2") else "english_name"
@@ -295,7 +301,7 @@ class BotEvents(commands.Cog):
         items_list: list[str] = []
         more_count = 0
         for item in items:
-            if len(items_list) >= 29:
+            if len(items_list) >= 32:
                 more_count += item['count']
                 continue
             item_name = item["emoji"] + " " + item[name_key]
