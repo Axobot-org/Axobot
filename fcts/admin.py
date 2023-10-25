@@ -710,7 +710,7 @@ Cette option affecte tous les serveurs"""
             return
         rankcards.append(rankcard)
         await self.bot.get_cog('Users').set_rankcard(user, rankcard, add=True)
-        await ctx.send(f"L'utilisateur {user} a maintenant les flags {', '.join(rankcards)}")
+        await ctx.send(f"L'utilisateur {user} a maintenant les cartes d'xp {', '.join(rankcards)}")
 
     @admin_rankcard.command(name="remove")
     @commands.check(checks.is_bot_admin)
