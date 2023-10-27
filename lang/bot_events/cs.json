@@ -10,9 +10,15 @@
         "too-quick": "Ještě je příliš brzy! Body za události budete moci sbírat pouze v %{time}!",
         "strike-bonus": "Získali jste **%{bonus} bonusové body** za použití tohoto příkazu %{level} krát za sebou!"
     },
-    "collection-empty": "Vaše kolekce je prázdná, jděte sbírat nějaké předměty!",
+    "collection-empty": {
+        "user": "Vaše kolekce je prázdná, jděte sbírat nějaké předměty!",
+        "other": "Kolekce %{user} je prozatím prázdná"
+    },
     "collection-more": "... a %{count} více!",
-    "collection-title": "Vaše kolekce",
+    "collection-title": {
+        "user": "Vaše kolekce",
+        "other": "Sbírka %{user}"
+    },
     "events-price-title": "Ceny k vítězství",
     "leaderboard-global": "Globální žebříček (top %{count})",
     "nothing-desc": "V současné době nejsou žádné události. Sledujte novinky bota a dozvíte se datum další události!",
