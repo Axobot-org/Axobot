@@ -433,7 +433,7 @@ class Rss(commands.Cog):
         feed_ids = await self.ask_rss_id(
             input_feed_id,
             ctx,
-            await self.bot._(ctx.guild.id, "rss.choose-disable"),
+            await self.bot._(ctx.guild.id, "rss.choose-test"),
             max_count=1
         )
         if feed_ids is None:
