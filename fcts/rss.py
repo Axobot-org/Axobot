@@ -231,6 +231,7 @@ class Rss(commands.Cog):
         return len(await self.db_get_guild_feeds(guild.id)) >= feed_limit, feed_limit
 
     @rss_main.command(name="add")
+    @app_commands.guild_only()
     @commands.guild_only()
     @commands.check(can_use_rss)
     @commands.check(checks.database_connected)
@@ -292,6 +293,7 @@ class Rss(commands.Cog):
                 await serverlogs_cog.send_botwarning_tip(ctx)
 
     @rss_main.command(name="remove", aliases=["delete"])
+    @app_commands.guild_only()
     @commands.guild_only()
     @commands.check(checks.database_connected)
     @commands.check(can_use_rss)
@@ -326,6 +328,7 @@ class Rss(commands.Cog):
             self.bot.dispatch("interaction_error", interaction, err)
 
     @rss_main.command(name="enable")
+    @app_commands.guild_only()
     @commands.guild_only()
     @commands.check(checks.database_connected)
     @commands.check(can_use_rss)
@@ -365,6 +368,7 @@ class Rss(commands.Cog):
             self.bot.dispatch("interaction_error", interaction, err)
 
     @rss_main.command(name="disable")
+    @app_commands.guild_only()
     @commands.guild_only()
     @commands.check(checks.database_connected)
     @commands.check(can_use_rss)
@@ -414,6 +418,7 @@ class Rss(commands.Cog):
             self.bot.dispatch("interaction_error", interaction, err)
 
     @rss_main.command(name="test")
+    @app_commands.guild_only()
     @commands.guild_only()
     @commands.check(checks.database_connected)
     @commands.check(can_use_rss)
@@ -472,6 +477,7 @@ class Rss(commands.Cog):
             self.bot.dispatch("interaction_error", interaction, err)
 
     @rss_main.command(name="list")
+    @app_commands.guild_only()
     @commands.guild_only()
     @commands.check(checks.database_connected)
     @commands.check(can_use_rss)
@@ -705,6 +711,7 @@ class Rss(commands.Cog):
             return arg.split(" ")
 
     @rss_main.command(name="set-mentions", aliases=['set-mention'])
+    @app_commands.guild_only()
     @commands.guild_only()
     @commands.check(can_use_rss)
     @commands.check(checks.database_connected)
@@ -851,6 +858,7 @@ class Rss(commands.Cog):
 
 
     @rss_main.command(name="refresh")
+    @app_commands.guild_only()
     @commands.guild_only()
     @commands.check(can_use_rss)
     @commands.check(checks.database_connected)
@@ -874,6 +882,7 @@ class Rss(commands.Cog):
             await ctx.send(await self.bot._(ctx.guild.id,"rss.guild-error", err=err))
 
     @rss_main.command(name="move")
+    @app_commands.guild_only()
     @commands.guild_only()
     @commands.check(can_use_rss)
     @commands.check(checks.database_connected)
@@ -930,6 +939,7 @@ class Rss(commands.Cog):
             self.bot.dispatch("interaction_error", interaction, err)
 
     @rss_main.command(name="set-text")
+    @app_commands.guild_only()
     @commands.guild_only()
     @commands.check(can_use_rss)
     @commands.check(checks.database_connected)
@@ -1022,6 +1032,7 @@ class Rss(commands.Cog):
             self.bot.dispatch("interaction_error", interaction, err)
 
     @rss_main.command(name="set-embed", aliases=['embed'])
+    @app_commands.guild_only()
     @commands.guild_only()
     @commands.check(can_use_rss)
     @commands.check(checks.database_connected)
