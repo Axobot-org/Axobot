@@ -34,7 +34,6 @@ class Info(commands.Cog):
         self.bot = bot
         self.file = "info"
         self.emoji_table = 'emojis_beta' if self.bot.beta else 'emojis'
-        self.bitly_client = bitly_api.Bitly(api_key=self.bot.others['bitly'])
 
     @commands.Cog.listener()
     async def on_ready(self):
@@ -1083,58 +1082,17 @@ Available types: member, role, user, emoji, channel, server, invite, category
             return []
         if isinstance(emoji_id, int):
             query = f"SELECT * from `{self.emoji_table}` WHERE `ID`=%s"
-            args = (emoji_id,)
+            query_args = (emoji_id,)
         else:
             where_cond = "OR".join(['`ID` = %s' for _ in emoji_id])
             query = f"SELECT * from `{self.emoji_table}` WHERE {where_cond}"
-            args = (tuple(emoji_id), )
+            query_args = (tuple(emoji_id), )
         liste = []
-        async with self.bot.db_query(query, args) as query_results:
+        async with self.bot.db_query(query, query_args) as query_results:
             for x in query_results:
                 x['emoji'] = self.bot.get_emoji(x['ID'])
                 liste.append(x)
         return liste
-
-
-    @commands.group(name="bitly")
-    async def bitly_main(self, ctx: MyContext):
-        """Bit.ly website, but in Discord
-        Create shortened url and unpack them by using Bitly services
-
-        ..Doc miscellaneous.html#bitly-urls"""
-        if ctx.subcommand_passed is None:
-            await ctx.send_help(ctx.command)
-        elif ctx.invoked_subcommand is None and ctx.subcommand_passed is not None:
-            try:
-                url = await args.URL.convert(ctx,ctx.subcommand_passed)
-            except commands.BadArgument:
-                return
-            if url.domain in ['bit.ly','bitly.com','bitly.is']:
-                await self.bitly_find(ctx, url)
-            else:
-                await self.bitly_create(ctx, url)
-
-    @bitly_main.command(name="create", aliases=["shorten"])
-    async def bitly_create(self, ctx: MyContext, url: args.URL):
-        """Create a shortened url
-
-        ..Example bitly create https://fr-minecraft.net
-
-        ..Doc miscellaneous.html#bitly-urls"""
-        if url.domain == 'bit.ly':
-            return await ctx.send(await self.bot._(ctx.channel,'info.bitly_already_shortened'))
-        await ctx.send(await self.bot._(ctx.channel,'info.bitly_short', url=self.bitly_client.shorten_url(url.url)))
-
-    @bitly_main.command(name="find", aliases=['expand'])
-    async def bitly_find(self, ctx: MyContext, url: args.URL):
-        """Find the long url from a bitly link
-
-        ..Example bitly find https://bit.ly/2JEHsUf
-
-        ..Doc miscellaneous.html#bitly-urls"""
-        if url.domain != 'bit.ly':
-            return await ctx.send(await self.bot._(ctx.channel,'info.bitly_nobit'))
-        await ctx.send(await self.bot._(ctx.channel,'info.bitly_long', url=self.bitly_client.expand_url(url.url)))
 
 
 async def setup(bot):
