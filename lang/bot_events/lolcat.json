@@ -10,9 +10,15 @@
         "too-quick": "Wait no, ur too soon! Please wait %{time} again k thx",
         "strike-bonus": "I gave u **extra %{bonus} points** cuz you usd that command %{level} times in a row, just so u know."
     },
-    "collection-empty": "Uh oh, ur bag is empty for now. Go get some shiny things!",
+    "collection-empty": {
+        "user": "Uh oh, ur bag is empty for now. Go get some shiny things!",
+        "other": "%{user} bag is empty, how sad"
+    },
     "collection-more": "... + %{count} hidden!",
-    "collection-title": "Ur bag",
+    "collection-title": {
+        "user": "Ur bag",
+        "other": "%{user} bad"
+    },
     "events-price-title": "Prizes 2 win",
     "leaderboard-global": "Globol %{count} best ppl",
     "nothing-desc": "There'r no events rn. Follow my bot news 2 know teh date of the next one!",

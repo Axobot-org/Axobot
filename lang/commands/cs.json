@@ -25,6 +25,9 @@
         "emoji list": "seznam",
         "emoji rename": "přejmenovat",
         "emoji restrict": "omezit",
+        "event info": "informace",
+        "event profile": "profil",
+        "event collect": "sbírat",
         "kick": "vyhodit",
         "last-post": "poslední-příspěvek",
         "modlogs disable": "zakázat",
@@ -59,11 +62,12 @@
         "rss enable": "povolit",
         "rss list": "seznam",
         "rss move": "přesun",
-        "rss reload": "znovu-načíst",
+        "rss refresh": "znovu načti",
         "rss remove": "odstranit",
         "rss set-embed": "nastavit-embed",
         "rss set-mentions": "nastavit-zmíňky",
         "rss set-text": "nastavit-text",
+        "rss test": "test",
         "slowmode": "pomalý-režim",
         "softban": "před-banem",
         "stats": "statistiky",
@@ -96,6 +100,7 @@
         "blurple": "rozostřit",
         "config": "nastavení",
         "emoji": "emoji",
+        "event": "událost",
         "modlogs": "záznam-moderátorů",
         "profile": "profil",
         "reminders": "připomínky",
@@ -112,6 +117,7 @@
         "antiscam": "Vše, co souvisí s funkcí antiscam",
         "config": "Konfigurace bota pro váš server",
         "emoji": "Spravujte své emoji",
+        "event": "Zůčastni se speciálních událostí",
         "modlogs": "Povolit nebo zakázat protokoly serveru v určitých kanálech",
         "profile": "Nastavte si bota pro vlastní použití",
         "reminders": "Spravujte nevyřízené připomínky",
@@ -259,6 +265,9 @@
             "enable_link_in_title": "povolit-odkaz-v-názvu",
             "image_location": "umístění-obrázku"
         },
+        "rss test": {
+            "feed": "zdroj"
+        },
         "modlogs list": {
             "channel": "kanál"
         },
@@ -380,6 +389,9 @@
         },
         "stats": {
             "category": "kategorie"
+        },
+        "event profile": {
+            "user": "uživatel"
         }
     }
 }
