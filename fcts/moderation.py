@@ -46,6 +46,7 @@ Slowmode works up to one message every 6h (21600s)
         if not ctx.channel.permissions_for(ctx.guild.me).manage_channels:
             await ctx.send(await self.bot._(ctx.guild.id, "moderation.no-perm"))
             return
+        await ctx.defer()
         if seconds == 0:
             await ctx.channel.edit(slowmode_delay=0)
             message = await self.bot._(ctx.guild.id, "moderation.slowmode.disabled")
@@ -231,6 +232,7 @@ Slowmode works up to one message every 6h (21600s)
 ..Example warn @someone Please just stop, next one is a mute duh
 
 ..Doc moderator.html#warn"""
+        await ctx.defer()
         try:
             async def user_can_warn(user):
                 try:
@@ -584,6 +586,7 @@ The 'days_to_delete' option represents the number of days worth of messages to d
             f_duration = await FormatUtils.time_delta(duration,lang=await self.bot._(ctx.guild,'_used_locale'),form="short")
         else:
             f_duration = None
+        await ctx.defer()
         if not ctx.channel.permissions_for(ctx.guild.me).ban_members:
             await ctx.send(await self.bot._(ctx.guild.id, "moderation.ban.cant-ban"))
             return

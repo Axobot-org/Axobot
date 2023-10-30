@@ -4,15 +4,21 @@
         "lost-points": "Il semble que vous n'ayez pas trouvé d'objet à collectionner sur votre chemin, et que vous ayez inexplicablement **perdu %{points} points d'événement**...",
         "nothing": "Tu n'as rien trouvé d'intéressant sur ton chemin, espérons que tu auras plus de chance la prochaine fois !",
         "got-items": {
-            "one": "Vous avez trouvé **un %{item}** lors de votre voyage ! (%{points} d'événement)",
+            "one": "Vous avez trouvé **un %{item}** lors de votre voyage ! (%{points} points d'événement)",
             "many": "Vous avez trouvé **%{count} objets** lors de votre voyage ! (%{points} points d'événement)"
         },
-        "too-quick": "Il est encore trop tôt ! Vous ne pourrez collecter des points d'événement que dans %{temps} !",
+        "too-quick": "Il est encore trop tôt ! Vous ne pourrez collecter des points d'événement que dans %{time} !",
         "strike-bonus": "Vous avez obtenu **%{bonus} points bonus** pour avoir utilisé cette commande %{level} fois de suite !"
     },
-    "collection-empty": "Votre collection est vide, vous devriez récupérer quelques items !",
+    "collection-empty": {
+        "user": "Votre collection est vide, vous devriez récupérer quelques items !",
+        "other": "La collection de %{user} est vide, pour l'instant"
+    },
     "collection-more": "... et %{count} autres !",
-    "collection-title": "Votre collection",
+    "collection-title": {
+        "user": "Votre collection",
+        "other": "Collection de %{user}"
+    },
     "events-price-title": "Prix à gagner",
     "leaderboard-global": "Classement mondial (top %{count})",
     "nothing-desc": "Il n'y a actuellement aucun événement. Suivez les news du bot pour connaître la date du prochain !",

@@ -102,7 +102,9 @@ class Service:
         ).execute()
 
         items = resp['items']
-        assert len(items) <= self.max_results
+        if len(items) > self.max_results:
+            warn('more than %d results found when querying search API (%s results)', self.max_results, len(items))
+            items = items[:self.max_results]
 
         res = [], [], []
 

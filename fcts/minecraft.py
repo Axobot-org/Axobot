@@ -550,7 +550,7 @@ Every information come from the website www.fr-minecraft.net"""
         if username in self.uuid_cache:
             return self.uuid_cache[username]
         url = "https://api.mojang.com/users/profiles/minecraft/"+username
-        async with aiohttp.ClientSession(loop=self.bot.loop) as session:
+        async with self.session as session:
             async with session.get(url, timeout=10) as resp:
                 try:
                     search: dict = await resp.json()

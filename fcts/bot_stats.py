@@ -1,8 +1,9 @@
 import math
 import re
+import time
 from collections import defaultdict
 from datetime import datetime
-from typing import Optional, TypedDict, Union
+from typing import Any, Optional, TypedDict, Union
 
 import aiohttp
 import discord
@@ -79,6 +80,10 @@ class BotStats(commands.Cog):
         self.record_ws_latency.cancel()
         self.status_loop.stop()
         self.heartbeat_loop.stop()
+
+    @property
+    def emoji_table(self):
+        return 'emojis_beta' if self.bot.beta else 'emojis'
 
     @tasks.loop(seconds=10)
     async def record_cpu_usage(self):
@@ -202,6 +207,8 @@ class BotStats(commands.Cog):
         "Collect a few stats from some specific messages"
         await self._check_backup_msg(message)
         await self._check_voice_msg(message)
+        if message.author != self.bot.user:
+            await self.emoji_analysis(message)
 
     async def _check_backup_msg(self, message: discord.Message):
         "Collect the last backup size from the logs channel"
@@ -336,6 +343,43 @@ class BotStats(commands.Cog):
                 if row["guild_id"] in guild_ids:
                     count += 1
         return count
+
+    async def emoji_analysis(self, msg: discord.Message):
+        """Lists the emojis used in a message"""
+        try:
+            if not self.bot.database_online:
+                return
+            ctx = await self.bot.get_context(msg)
+            if ctx.command is not None:
+                return
+            liste = list(set(re.findall(r'<a?:[\w-]+:(\d{17,19})>',msg.content)))
+            if len(liste) == 0:
+                return
+            current_timestamp = datetime.fromtimestamp(round(time.time()))
+            query = f"INSERT INTO `{self.emoji_table}` (`ID`,`count`,`last_update`) VALUES (%(i)s, 1, %(l)s) ON DUPLICATE KEY UPDATE count = `count` + 1, last_update = %(l)s;"
+            for data in [{ 'i': x, 'l': current_timestamp } for x in liste]:
+                async with self.bot.db_query(query, data):
+                    pass
+        except Exception as err:
+            self.bot.dispatch("error", err)
+
+    async def db_get_emojis_info(self, emoji_id: Union[int, list[int]]) -> list[dict[str, Any]]:
+        """Get info about an emoji usage"""
+        if not self.bot.database_online:
+            return []
+        if isinstance(emoji_id, int):
+            query = f"SELECT * from `{self.emoji_table}` WHERE `ID`=%s"
+            query_args = (emoji_id,)
+        else:
+            where_cond = "OR".join(['`ID` = %s' for _ in emoji_id])
+            query = f"SELECT * from `{self.emoji_table}` WHERE {where_cond}"
+            query_args = (tuple(emoji_id), )
+        liste = []
+        async with self.bot.db_query(query, query_args) as query_results:
+            for x in query_results:
+                x['emoji'] = self.bot.get_emoji(x['ID'])
+                liste.append(x)
+        return liste
 
     @tasks.loop(minutes=1)
     async def sql_loop(self):
