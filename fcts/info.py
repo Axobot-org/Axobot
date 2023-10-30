@@ -1,9 +1,5 @@
-import datetime
 import importlib
 import locale
-import re
-import time
-import typing
 
 import aiohttp
 import discord
@@ -24,21 +20,12 @@ importlib.reload(checks)
 importlib.reload(bitly_api)
 
 
-async def in_support_server(ctx):
-    return ctx.guild is not None and ctx.guild.id == PRIVATE_GUILD_ID.id
-
 class Info(commands.Cog):
     "Here you will find various useful commands to get information about anything"
 
     def __init__(self, bot: Axobot):
         self.bot = bot
         self.file = "info"
-        self.emoji_table = 'emojis_beta' if self.bot.beta else 'emojis'
-
-    @commands.Cog.listener()
-    async def on_ready(self):
-        self.emoji_table = 'emojis_beta' if self.bot.beta else 'emojis'
-
 
     async def display_critical(self, ctx: MyContext):
         return ctx.author.guild_permissions.manage_guild or await self.bot.get_cog('Admin').check_if_god(ctx)
@@ -357,7 +344,7 @@ Available types: member, role, user, emoji, channel, server, invite, category
         if len(emoji.roles) > 0:
             embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.emoji-4"), value=" ".join([x.mention for x in emoji.roles]))
         # uses
-        infos_uses = await self.db_get_emojis_info(emoji.id)
+        infos_uses = await self.bot.get_cog("BotStats").db_get_emojis_info(emoji.id)
         if len(infos_uses) > 0:
             infos_uses = infos_uses[0]
             date = f"<t:{infos_uses['added_at'].timestamp():.0f}:D>"
@@ -787,6 +774,7 @@ Available types: member, role, user, emoji, channel, server, invite, category
         await ctx.send(embed=embed)
 
 
+
     find_main = discord.app_commands.Group(
         name="find",
         description="Help the bot staff to find things",
@@ -1056,43 +1044,6 @@ Available types: member, role, user, emoji, channel, server, invite, category
             for i in l:
                 text += f"- {i[0]} : {i[1]}\n"
             await ctx.send(text)
-
-    async def emoji_analysis(self, msg: discord.Message):
-        """Lists the emojis used in a message"""
-        try:
-            if not self.bot.database_online:
-                return
-            ctx = await self.bot.get_context(msg)
-            if ctx.command is not None:
-                return
-            liste = list(set(re.findall(r'<a?:[\w-]+:(\d{17,19})>',msg.content)))
-            if len(liste) == 0:
-                return
-            current_timestamp = datetime.datetime.fromtimestamp(round(time.time()))
-            query = "INSERT INTO `{}` (`ID`,`count`,`last_update`) VALUES (%(i)s, 1, %(l)s) ON DUPLICATE KEY UPDATE count = `count` + 1, last_update = %(l)s;".format(self.emoji_table)
-            for data in [{ 'i': x, 'l': current_timestamp } for x in liste]:
-                async with self.bot.db_query(query, data):
-                    pass
-        except Exception as err:
-            self.bot.dispatch("error", err)
-
-    async def db_get_emojis_info(self, emoji_id: typing.Union[int,list]) -> list[dict[str, typing.Any]]:
-        """Get info about an emoji"""
-        if not self.bot.database_online:
-            return []
-        if isinstance(emoji_id, int):
-            query = f"SELECT * from `{self.emoji_table}` WHERE `ID`=%s"
-            query_args = (emoji_id,)
-        else:
-            where_cond = "OR".join(['`ID` = %s' for _ in emoji_id])
-            query = f"SELECT * from `{self.emoji_table}` WHERE {where_cond}"
-            query_args = (tuple(emoji_id), )
-        liste = []
-        async with self.bot.db_query(query, query_args) as query_results:
-            for x in query_results:
-                x['emoji'] = self.bot.get_emoji(x['ID'])
-                liste.append(x)
-        return liste
 
 
 async def setup(bot):
