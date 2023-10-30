@@ -142,7 +142,7 @@
         "Did u know? U can give a shiny description 2 ur server that may be usd in other servers, check %{config_cmd} with the `description` option!",
         "Did u know? At some special event, u may be allowd 2 collect super shiny and rare xp cards! Follow the news on our official server or with teh %{event_cmd} command!",
         "U like what I do? Feel free 2 visit %{sponsor_url} and drop some cents!",
-        "Did u know? If u'r tiredof listenin' to all dem voice msg yer pals send, u can use Axobot's super cool transcribify thingy 2 read their text! Just tap on a voice msg, den pick \"Apps\" > \"Voice to text\"!",
+        "Did u know? If u'r tiredof listenin' to all dem voicemails yer pals send, u can use Axobot's super cool transcribify thingy 2 read their text! Just tap on a voicemail, den pick \"Apps\" > \"Voice to text\"!",
         "Did u know? Teh voice message transcribify thingy keeps ur personal biz safe, usin' a local AI brain instead of tossin' ur messages to some far-off place! No sneaky business here, just us cool cats!",
         "Pro-tip: if u wanna deactivate a rss feed just temporarily, u can use %{rss_disable_cmd}. Or.... use %{rss_delete_cmd} 2 permanently delete it.",
         "Did u know? disabling a feed w/ %{rss_disable_cmd} wont free u a slot 4 addin' another feed. If u want 2 do dat, try %{rss_delete_cmd} instead!",
