@@ -17,6 +17,7 @@
     "choose-enable": "Veuillez choisir les flux à réactiver",
     "choose-mentions-1": "Veuillez choisir les flux à modifier",
     "choose-roles": "Quels seront les rôles à mentionner ?",
+    "choose-test": "Veuillez choisir le flux à tester",
     "delete-success": {
         "many": "%{count} flux ont été supprimé avec succès !",
         "one": "Le flux a été supprimé avec succès !"

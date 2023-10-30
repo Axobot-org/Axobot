@@ -19,10 +19,14 @@ if TYPE_CHECKING:
     from libs.bot_classes import Axobot
     from libs.emojis_manager import EmojisManager
 
-async def feed_parse(bot: Axobot, url: str, timeout: int, session: ClientSession = None) -> Optional[feedparser.FeedParserDict]:
+async def feed_parse(bot: Axobot, url: str, timeout: int, session: Optional[ClientSession] = None
+                     ) -> Optional[feedparser.FeedParserDict]:
     """Asynchronous parsing using cool methods"""
     # if session is provided, we have to not close it
-    _session = session or ClientSession()
+    if session is None:
+        _session = ClientSession()
+    else:
+        _session = session
     try:
         user_agent_header = {'User-Agent': "Axobot feedparser"}
         async with _session.get(url, timeout=timeout, headers=user_agent_header) as response:

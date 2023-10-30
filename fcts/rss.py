@@ -42,6 +42,7 @@ web_link = {
 
 TWITTER_ERROR_MESSAGE = "Due to the latest Twitter API changes, Twitter feeds are no longer supported by Axobot. Join our \
 Discord server (command `/about`) to find out more."
+FEEDS_PER_SUBLOOP = 25
 
 def is_twitter_url(string: str):
     "Check if an url is a valid Twitter URL"
@@ -231,6 +232,7 @@ class Rss(commands.Cog):
         return len(await self.db_get_guild_feeds(guild.id)) >= feed_limit, feed_limit
 
     @rss_main.command(name="add")
+    @app_commands.guild_only()
     @commands.guild_only()
     @commands.check(can_use_rss)
     @commands.check(checks.database_connected)
@@ -292,6 +294,7 @@ class Rss(commands.Cog):
                 await serverlogs_cog.send_botwarning_tip(ctx)
 
     @rss_main.command(name="remove", aliases=["delete"])
+    @app_commands.guild_only()
     @commands.guild_only()
     @commands.check(checks.database_connected)
     @commands.check(can_use_rss)
@@ -326,6 +329,7 @@ class Rss(commands.Cog):
             self.bot.dispatch("interaction_error", interaction, err)
 
     @rss_main.command(name="enable")
+    @app_commands.guild_only()
     @commands.guild_only()
     @commands.check(checks.database_connected)
     @commands.check(can_use_rss)
@@ -365,6 +369,7 @@ class Rss(commands.Cog):
             self.bot.dispatch("interaction_error", interaction, err)
 
     @rss_main.command(name="disable")
+    @app_commands.guild_only()
     @commands.guild_only()
     @commands.check(checks.database_connected)
     @commands.check(can_use_rss)
@@ -414,6 +419,7 @@ class Rss(commands.Cog):
             self.bot.dispatch("interaction_error", interaction, err)
 
     @rss_main.command(name="test")
+    @app_commands.guild_only()
     @commands.guild_only()
     @commands.check(checks.database_connected)
     @commands.check(can_use_rss)
@@ -428,7 +434,7 @@ class Rss(commands.Cog):
         feed_ids = await self.ask_rss_id(
             input_feed_id,
             ctx,
-            await self.bot._(ctx.guild.id, "rss.choose-disable"),
+            await self.bot._(ctx.guild.id, "rss.choose-test"),
             max_count=1
         )
         if feed_ids is None:
@@ -472,6 +478,7 @@ class Rss(commands.Cog):
             self.bot.dispatch("interaction_error", interaction, err)
 
     @rss_main.command(name="list")
+    @app_commands.guild_only()
     @commands.guild_only()
     @commands.check(checks.database_connected)
     @commands.check(can_use_rss)
@@ -705,6 +712,7 @@ class Rss(commands.Cog):
             return arg.split(" ")
 
     @rss_main.command(name="set-mentions", aliases=['set-mention'])
+    @app_commands.guild_only()
     @commands.guild_only()
     @commands.check(can_use_rss)
     @commands.check(checks.database_connected)
@@ -851,6 +859,7 @@ class Rss(commands.Cog):
 
 
     @rss_main.command(name="refresh")
+    @app_commands.guild_only()
     @commands.guild_only()
     @commands.check(can_use_rss)
     @commands.check(checks.database_connected)
@@ -874,6 +883,7 @@ class Rss(commands.Cog):
             await ctx.send(await self.bot._(ctx.guild.id,"rss.guild-error", err=err))
 
     @rss_main.command(name="move")
+    @app_commands.guild_only()
     @commands.guild_only()
     @commands.check(can_use_rss)
     @commands.check(checks.database_connected)
@@ -930,6 +940,7 @@ class Rss(commands.Cog):
             self.bot.dispatch("interaction_error", interaction, err)
 
     @rss_main.command(name="set-text")
+    @app_commands.guild_only()
     @commands.guild_only()
     @commands.check(can_use_rss)
     @commands.check(checks.database_connected)
@@ -1022,6 +1033,7 @@ class Rss(commands.Cog):
             self.bot.dispatch("interaction_error", interaction, err)
 
     @rss_main.command(name="set-embed", aliases=['embed'])
+    @app_commands.guild_only()
     @commands.guild_only()
     @commands.check(can_use_rss)
     @commands.check(checks.database_connected)
@@ -1435,9 +1447,9 @@ class Rss(commands.Cog):
         errors_ids: list[int] = []
         checked_count = 0
         async with ClientSession() as session:
-            # execute asyncio.gather by group of 20 feeds
-            for i in range(0, len(feeds_list), 20):
-                task_feeds = feeds_list[i:i+20]
+            # execute asyncio.gather by group of 'FEEDS_PER_SUBLOOP' feeds
+            for i in range(0, len(feeds_list), FEEDS_PER_SUBLOOP):
+                task_feeds = feeds_list[i:i+FEEDS_PER_SUBLOOP]
                 results = await asyncio.gather(*[self._loop_refresh_one_feed(feed, session, guild_id) for feed in task_feeds])
                 for task_result, feed in zip(results, task_feeds):
                     if task_result is True:
@@ -1447,7 +1459,7 @@ class Rss(commands.Cog):
                         checked_count += 1
                         errors_ids.append(feed.feed_id)
                 # if it wasn't the last batch, wait a few seconds
-                if i+20 < len(feeds_list):
+                if i+FEEDS_PER_SUBLOOP < len(feeds_list):
                     await asyncio.sleep(self.time_between_feeds_check)
         self.bot.get_cog('Minecraft').feeds.clear()
         elapsed_time = round(time.time() - start)

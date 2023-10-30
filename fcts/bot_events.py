@@ -6,7 +6,7 @@ from random import randint, choices, lognormvariate
 from typing import Any, Literal, Optional, Union
 
 import discord
-from discord.ext import commands
+from discord.ext import commands, tasks
 
 from libs.bot_classes import SUPPORT_GUILD_ID, Axobot, MyContext
 from libs.bot_events import (EventData, EventRewardRole, EventType,
@@ -37,6 +37,15 @@ class BotEvents(commands.Cog):
         self.coming_event_data: EventData = {}
         self.coming_event_id: Optional[str] = None
         self.update_current_event()
+
+    async def cog_load(self):
+        if self.bot.internal_loop_enabled:
+            self._update_event_loop.start() # pylint: disable=no-member
+
+    async def cog_unload(self):
+        # pylint: disable=no-member
+        if self._update_event_loop.is_running():
+            self._update_event_loop.cancel()
 
     def reset(self):
         "Reset current and coming events"
@@ -88,6 +97,21 @@ class BotEvents(commands.Cog):
         if not self.bot.database_online and not message.author.guild_permissions.manage_guild:
             return False
         return await self.bot.get_config(message.guild.id, "enable_fun")
+
+    @tasks.loop(time=[
+        datetime.time(hour=0,  tzinfo=datetime.timezone.utc),
+        datetime.time(hour=12, tzinfo=datetime.timezone.utc),
+    ])
+    async def _update_event_loop(self):
+        "Refresh the current bot event every 12h"
+        self.update_current_event()
+        event = self.bot.get_cog("BotEvents").current_event
+        emb = discord.Embed(
+            description=f'**Bot event** updated (current event is {event})',
+            color=1406147, timestamp=self.bot.utcnow()
+        )
+        emb.set_author(name=self.bot.user, icon_url=self.bot.user.display_avatar)
+        await self.bot.send_embed(emb, url="loop")
 
     @commands.Cog.listener()
     async def on_message(self, msg: discord.Message):
@@ -260,10 +284,16 @@ class BotEvents(commands.Cog):
 
     async def generate_user_profile_collection_field(self, ctx: MyContext, user: discord.User):
         "Compute the texts to display in the /event profile command"
-        title = await self.bot._(ctx.channel, "bot_events.collection-title")
+        if ctx.author == user:
+            title = await self.bot._(ctx.channel, "bot_events.collection-title.user")
+        else:
+            title = await self.bot._(ctx.channel, "bot_events.collection-title.other", user=user.display_name)
         items = await self.db_get_user_collected_items(user.id)
         if len(items) == 0:
-            _empty_collection = await self.bot._(ctx.channel, "bot_events.collection-empty")
+            if ctx.author == user:
+                _empty_collection = await self.bot._(ctx.channel, "bot_events.collection-empty.user")
+            else:
+                _empty_collection = await self.bot._(ctx.channel, "bot_events.collection-empty.other", user=user.display_name)
             return {"name": title, "value": _empty_collection, "inline": True}
         lang = await self.bot._(ctx.channel, '_used_locale')
         name_key = "french_name" if lang in ("fr", "fr2") else "english_name"
@@ -271,7 +301,7 @@ class BotEvents(commands.Cog):
         items_list: list[str] = []
         more_count = 0
         for item in items:
-            if len(items_list) >= 29:
+            if len(items_list) >= 32:
                 more_count += item['count']
                 continue
             item_name = item["emoji"] + " " + item[name_key]
@@ -313,7 +343,7 @@ class BotEvents(commands.Cog):
         else:
             # grant points
             items = await self.get_random_items()
-            strike_level = await self.db_get_user_strike_level(ctx.author.id) if is_strike else 0
+            strike_level = (await self.db_get_user_strike_level(ctx.author.id) + 1) if is_strike else 0
             if len(items) == 0:
                 points = randint(*self.collect_reward)
                 bonus = 0
@@ -323,9 +353,8 @@ class BotEvents(commands.Cog):
                 await self.db_add_user_items(ctx.author.id, [item["item_id"] for item in items])
             txt = await self.generate_collect_message(ctx.channel, items, points + bonus)
             if strike_level and bonus != 0:
-                txt += f"\n\n{await self.bot._(ctx.channel, 'bot_events.collect.strike-bonus', bonus=bonus, level=strike_level)}"
-            if points + bonus != 0:
-                await self.db_add_collect(ctx.author.id, points, increase_strike=is_strike)
+                txt += f"\n\n{await self.bot._(ctx.channel, 'bot_events.collect.strike-bonus', bonus=bonus, level=strike_level+1)}"
+            await self.db_add_collect(ctx.author.id, points + bonus, increase_strike=is_strike)
         # send result
         if ctx.can_send_embed:
             title = self.translations_data[lang]["events_title"][current_event]
@@ -475,11 +504,13 @@ class BotEvents(commands.Cog):
             if increase_strike:
                 query = "INSERT INTO `event_points` (`user_id`, `collect_points`, `strike_level`, `beta`) VALUES (%s, %s, 1, %s) \
                     ON DUPLICATE KEY UPDATE collect_points = collect_points + VALUE(`collect_points`), \
-                        strike_level = strike_level + 1;"
+                        strike_level = strike_level + 1, \
+                        last_collect = CURRENT_TIMESTAMP();"
             else:
                 query = "INSERT INTO `event_points` (`user_id`, `collect_points`, `beta`) VALUES (%s, %s, %s) \
                     ON DUPLICATE KEY UPDATE collect_points = collect_points + VALUE(`collect_points`), \
-                        strike_level = 0;"
+                        strike_level = 0, \
+                        last_collect = CURRENT_TIMESTAMP();"
             async with self.bot.db_query(query, (user_id, points, self.bot.beta)):
                 pass
             try:
@@ -496,11 +527,14 @@ class BotEvents(commands.Cog):
         "Get the last collect datetime from a user"
         if not self.bot.database_online:
             return None
-        query = "SELECT `last_update` FROM `event_points` WHERE `user_id` = %s AND `beta` = %s;"
+        query = "SELECT `last_collect` FROM `event_points` WHERE `user_id` = %s AND `beta` = %s;"
         async with self.bot.db_query(query, (user_id, self.bot.beta), fetchone=True, astuple=True) as query_result:
             if not query_result:
                 return None
             query_result: tuple[datetime.datetime]
+            # if no last collect, return a very high number
+            if query_result[0] is None:
+                return 1e9
             # apply utc offset
             last_collect = query_result[0].replace(tzinfo=datetime.timezone.utc)
         return (self.bot.utcnow() - last_collect).total_seconds()

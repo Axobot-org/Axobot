@@ -18,11 +18,11 @@ from discord.ext import commands
 from git import GitCommandError, Repo
 
 from docs import conf
-from libs.checks import checks
 from libs.antiscam import update_unicode_map
 from libs.antiscam.training_bayes import train_model
 from libs.bot_classes import (PRIVATE_GUILD_ID, SUPPORT_GUILD_ID, Axobot,
                               MyContext)
+from libs.checks import checks
 from libs.enums import RankCardsFlag, UserFlag
 from libs.formatutils import FormatUtils
 from libs.rss.rss_general import feed_parse
@@ -710,7 +710,7 @@ Cette option affecte tous les serveurs"""
             return
         rankcards.append(rankcard)
         await self.bot.get_cog('Users').set_rankcard(user, rankcard, add=True)
-        await ctx.send(f"L'utilisateur {user} a maintenant les flags {', '.join(rankcards)}")
+        await ctx.send(f"L'utilisateur {user} a maintenant les cartes d'xp {', '.join(rankcards)}")
 
     @admin_rankcard.command(name="remove")
     @commands.check(checks.is_bot_admin)
@@ -781,7 +781,10 @@ Cette option affecte tous les serveurs"""
             elif (member.id not in owner_list) and role in member.roles:
                 text.append("Rôle supprimé à " + (member.global_name or member.name))
                 await member.remove_roles(role,reason="This user doesn't support me anymore")
-        await ctx.send("\n".join(text))
+        if text:
+            await ctx.send("\n".join(text))
+        else:
+            await ctx.send("Aucun changement n'a été effectué")
 
     async def _get_ideas_list(self, channel: discord.TextChannel):
         "Get ideas from the ideas channel"

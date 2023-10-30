@@ -17,6 +17,7 @@
     "choose-enable": "Please choose the feeds to enable",
     "choose-mentions-1": "Please choose the feeds to modify",
     "choose-roles": "What roles will be mentioned?",
+    "choose-test": "Please choose the feed to test",
     "delete-success": {
         "many": "%{count} feeds have been successfully deleted!",
         "one": "The feed has been successfully deleted!"

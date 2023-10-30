@@ -54,24 +54,27 @@ class Users(commands.Cog):
         "Change the user flags in the database"
         if not self.bot.database_online:
             return
-        query = "UPDATE `users` SET `user_flags`=%s WHERE `userID`=%s"
-        async with self.bot.db_query(query, (flags, user_id)):
+        query = "INSERT INTO `users` (`userID`, `user_flags`) VALUES (%(user)s, %(flags)s)\
+             ON DUPLICATE KEY UPDATE `user_flags`=%(flags)s"
+        async with self.bot.db_query(query, {"flags": flags, "user": user_id}):
             pass
 
     async def db_edit_user_rankcards(self, user_id: int, rankcards: int):
         "Change the unlocked rank cards for a user in the database"
         if not self.bot.database_online:
             return
-        query = "UPDATE `users` SET `rankcards_unlocked`=%s WHERE `userID`=%s"
-        async with self.bot.db_query(query, (rankcards, user_id)):
+        query = "INSERT INTO `users` (`userID`, `rankcards_unlocked`) VALUES (%(user)s, %(rankcards)s)\
+             ON DUPLICATE KEY UPDATE `rankcards_unlocked`=%(rankcards)s"
+        async with self.bot.db_query(query, {"rankcards": rankcards, "user": user_id}):
             pass
 
     async def db_edit_user_xp_card(self, user_id: int, card_style: str):
         "Change the user xp card in the database"
         if not self.bot.database_online:
             return
-        query = "UPDATE `users` SET `xp_style`=%s WHERE `userID`=%s"
-        async with self.bot.db_query(query, (card_style, user_id)):
+        query = "INSERT INTO `users` (`userID`, `xp_style`) VALUES (%(user)s, %(style)s)\
+                ON DUPLICATE KEY UPDATE `xp_style`=%(style)s"
+        async with self.bot.db_query(query, {"style": card_style, "user": user_id}):
             pass
 
     async def db_edit_user_config(self, user_id: int, config: str, value: bool):
@@ -80,15 +83,16 @@ class Users(commands.Cog):
             raise ValueError(f"Unknown user config: {config}")
         if not self.bot.database_online:
             return
-        query = f"UPDATE `users` SET `{config}`=%s WHERE `userID`=%s"
-        async with self.bot.db_query(query, (value, user_id)):
+        query = f"INSERT INTO `users` (`userID`, `{config}`) VALUES (%(user)s, %(value)s)\
+                ON DUPLICATE KEY UPDATE `{config}`=%(value)s"
+        async with self.bot.db_query(query, {"value": value, "user": user_id}):
             pass
 
     async def db_used_rank(self, user_id: int):
         """Write in the database that a user used its rank card"""
         if not self.bot.database_online:
             return
-        query = "UPDATE `users` SET `used_rank`=1 WHERE `userID`=%s"
+        query = "INSERT INTO `users` (`userID`, `used_rank`) VALUES (%s, 1) ON DUPLICATE KEY UPDATE `used_rank`=1"
         async with self.bot.db_query(query, (user_id,)):
             pass
 
