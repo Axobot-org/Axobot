@@ -144,6 +144,7 @@
         "role-3": "Nombre de membres",
         "role-5": "Position hiérarchique",
         "role-6": "Unique membre possédant ce rôle",
+        "role-title": "Rôle",
         "role-specificities": {
             "field-name": "Spécificités",
             "hoist": "Affiché séparément",

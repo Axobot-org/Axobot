@@ -159,7 +159,7 @@ class Snowflake:
         self.worker_id = int(self.binary[-22:-17])
 
     @classmethod
-    async def convert(cls, _ctx: "MyContext", argument: str) -> int:
+    async def convert(cls, _ctx: "MyContext", argument: str) -> "Snowflake":
         "Do the conversion"
         if len(argument) < 17 or len(argument) > 20 or not argument.isnumeric():
             raise commands.ObjectNotFound(argument)
