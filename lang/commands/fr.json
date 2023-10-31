@@ -28,6 +28,7 @@
         "event info": "info",
         "event profile": "profil",
         "event collect": "collecter",
+        "info": "info",
         "kick": "expulser",
         "last-post": "dernier-post",
         "modlogs disable": "désactiver",
@@ -390,6 +391,10 @@
         },
         "event profile": {
             "user": "joueur"
+        },
+        "info": {
+            "query": "recherche",
+            "query_type": "type-de-recherche"
         }
     }
 }

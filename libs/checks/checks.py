@@ -133,10 +133,15 @@ class CannotSendEmbed(commands.CommandError):
     def __init__(self):
         super().__init__("The bot must have the 'embed links' permission")
 
-async def bot_can_embed(ctx: MyContext) -> bool:
+async def bot_can_embed(ctx: typing.Union[MyContext, discord.Interaction]) -> bool:
     "Check if the bot can send embeds"
-    if ctx.can_send_embed:
+    if isinstance(ctx, commands.Context) and ctx.can_send_embed:
         return True
+    elif isinstance(ctx, discord.Interaction):
+        if ctx.guild is None:
+            return True
+        if ctx.channel.permissions_for(ctx.guild.me).embed_links:
+            return True
     raise CannotSendEmbed()
 
 async def is_translator(ctx: MyContext) -> bool:

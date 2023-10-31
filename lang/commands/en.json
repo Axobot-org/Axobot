@@ -28,6 +28,7 @@
         "event info": "info",
         "event profile": "profile",
         "event collect": "collect",
+        "info": "info",
         "kick": "kick",
         "last-post": "last-post",
         "modlogs disable": "disable",
@@ -393,6 +394,10 @@
         },
         "event profile": {
             "user": "user"
+        },
+        "info": {
+            "query": "query",
+            "query_type": "query-type"
         }
     }
 }
