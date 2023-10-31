@@ -52,7 +52,7 @@
             "sort-order-creation": "Creation time",
             "sort-order-none": "Undefined"
         },
-        "guild-0": "Guild",
+        "guild-0": "Server",
         "guild-1": "Owner",
         "guild-10": "Time before being AFK",
         "guild-11.1": "20 first roles (total %{c})",
@@ -144,6 +144,7 @@
         "role-3": "Member count",
         "role-5": "Hierarchical position",
         "role-6": "Unique member with this role",
+        "role-title": "Role",
         "role-specificities": {
             "field-name": "Specificities",
             "hoist": "Displayed separately",

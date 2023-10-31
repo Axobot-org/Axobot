@@ -1,10 +1,11 @@
 import importlib
 import locale
+from typing import Literal, Optional, Union, get_args
 
 import aiohttp
 import discord
+from discord import app_commands
 from discord.ext import commands
-from discord.ext.commands.converter import run_converters
 
 from libs import bitly_api
 from libs.arguments import args
@@ -19,6 +20,21 @@ importlib.reload(args)
 importlib.reload(checks)
 importlib.reload(bitly_api)
 
+QueryTypesTyping = Literal[
+    "member",
+    "role",
+    "emoji",
+    "text-channel",
+    "voice-channel",
+    "forum",
+    "stage-channel",
+    "category",
+    "user",
+    "invite",
+    "id",
+]
+QUERY_TYPES: tuple[str] = get_args(QueryTypesTyping)
+
 
 class Info(commands.Cog):
     "Here you will find various useful commands to get information about anything"
@@ -27,16 +43,15 @@ class Info(commands.Cog):
         self.bot = bot
         self.file = "info"
 
-    async def display_critical(self, ctx: MyContext):
-        return ctx.author.guild_permissions.manage_guild or await self.bot.get_cog('Admin').check_if_god(ctx)
+    async def display_critical(self, interaction: discord.Interaction):
+        return interaction.user.guild_permissions.manage_guild
 
-    @commands.group(name='info')
-    @commands.guild_only()
+    @app_commands.command(name='info')
+    @app_commands.guild_only()
     @commands.check(checks.bot_can_embed)
-    async def info_main(self, ctx: MyContext):
+    async def info_main(self, interaction: discord.Interaction, *, query: app_commands.Range[str, 1, 100], \
+                        query_type: Optional[QueryTypesTyping] = None):
         """Find informations about someone/something
-Available types: member, role, user, emoji, channel, server, invite, category
-
 ..Example info role The VIP
 
 ..Example info 436835675304755200
@@ -46,103 +61,168 @@ Available types: member, role, user, emoji, channel, server, invite, category
 ..Example info server
 
 ..Doc infos.html#info"""
-        if not ctx.invoked_subcommand and ctx.subcommand_passed:
-            # try to convert ourselves because we are obviously a smart bot
-            arg = ctx.message.content.replace(ctx.prefix+ctx.invoked_with, "").lstrip()
-            # force the conversion order
-            order = ('member', 'role', 'emoji', 'text-channel', 'voice-channel', 'forum', 'stage-channel', 'category', 'user', 'invite', 'id')
-            commands_list: list[commands.Command] = sorted(
-                ctx.command.commands, key=lambda x: order.index(x.name) if x.name in order else 100)
+        await interaction.response.defer()
+        ctx = await commands.Context.from_interaction(interaction)
+        if query_type is None:
+            if (guess_result := await self._guess_query_type(query, ctx)) is None:
+                await interaction.followup.send(await self.bot._(interaction, "info.not-found", N=query))
+                return
+            query_type, resolved_query = guess_result
+        else:
+            try:
+                resolved_query = await self._convert_query(query, query_type, ctx)
+            except (commands.BadArgument, ValueError):
+                await interaction.followup.send(await self.bot._(interaction, "info.not-found", N=query))
+                return
 
-            for cmd in commands_list:
-                # if no conversion needed, that's probably not what we are looking for
-                if not cmd.clean_params:
-                    continue
-                # get the needed parameter
-                param_name = list(cmd.clean_params.keys())[0]
-                param = cmd.clean_params[param_name]
-                # convert it
-                try:
-                    converted_value = await run_converters(ctx, param.annotation, arg, param)
-                except commands.BadArgument:
-                    # conversion failed, that's not the right subcommand
-                    continue
-                else:
-                    if converted_value is not None:
-                        # all is right, execute and return
-                        await cmd(ctx, converted_value)
-                        return
-            # we failed
-            await ctx.send(await self.bot._(ctx.guild.id, "info.not-found", N=arg[:1900]))
-        elif not ctx.subcommand_passed:
-            # no given parameter
-            await self.member_infos(ctx, ctx.author)
+        if query_type == "member":
+            await self.member_info(interaction, resolved_query)
+        elif query_type == "role":
+            await self.role_info(interaction, resolved_query)
+        elif query_type == "user":
+            await self.user_info(interaction, resolved_query)
+        elif query_type == "emoji":
+            await self.emoji_info(interaction, resolved_query)
+        elif query_type == "text-channel":
+            await self.textchannel_info(interaction, resolved_query)
+        elif query_type == "voice-channel":
+            await self.voicechannel_info(interaction, resolved_query)
+        elif query_type == "forum":
+            await self.forum_info(interaction, resolved_query)
+        elif query_type == "stage-channel":
+            await self.stagechannel_info(interaction, resolved_query)
+        elif query_type == "category":
+            await self.category_info(interaction, resolved_query)
+        elif query_type == "invite":
+            await self.invite_info(interaction, resolved_query)
+        elif query_type == "server":
+            await self.guild_info(interaction, resolved_query)
+        elif query_type == "id":
+            await self.snowflake_info(interaction, resolved_query)
+        else:
+            await interaction.followup.send(await self.bot._(interaction, "info.not-found", N=query))
 
-    @info_main.command(name="member")
-    async def member_infos(self, ctx: MyContext, member: discord.Member):
+    async def _guess_query_type(self, query: str, ctx: commands.Context):
+        "Guess the query type from the given query"
+        if query == "server":
+            return "server", ctx.guild
+        for query_type in QUERY_TYPES:
+            try:
+                result = await self._convert_query(query, query_type, ctx)
+            except commands.BadArgument:
+                continue
+            else:
+                return query_type, result
+        if await checks.is_bot_admin(ctx):
+            try:
+                return "server", await commands.GuildConverter().convert(ctx, query)
+            except commands.BadArgument:
+                pass
+
+    async def _convert_query(self, query: str, query_type: QueryTypesTyping, ctx: commands.Context):
+        "Try to convert the query to the given type"
+        if query_type == "member":
+            return await commands.MemberConverter().convert(ctx, query)
+        if query_type == "role":
+            return await commands.RoleConverter().convert(ctx, query)
+        if query_type == "user":
+            return await commands.UserConverter().convert(ctx, query)
+        if query_type == "emoji":
+            try:
+                return await commands.EmojiConverter().convert(ctx, query)
+            except commands.BadArgument:
+                return await commands.PartialEmojiConverter().convert(ctx, query)
+        if ctx.guild and query_type == "text-channel":
+            return await commands.TextChannelConverter().convert(ctx, query)
+        if ctx.guild and query_type == "voice-channel":
+            return await commands.VoiceChannelConverter().convert(ctx, query)
+        if ctx.guild and query_type == "forum":
+            return await commands.ForumChannelConverter().convert(ctx, query)
+        if ctx.guild and query_type == "stage-channel":
+            return await commands.StageChannelConverter().convert(ctx, query)
+        if ctx.guild and query_type == "category":
+            return await commands.CategoryChannelConverter().convert(ctx, query)
+        if query_type == "invite":
+            return await commands.InviteConverter().convert(ctx, query)
+        if query_type == "id":
+            return await args.Snowflake.convert(ctx, query)
+        raise ValueError(f"Unknown query type {query_type}")
+
+    async def member_info(self, interaction: discord.Interaction, member: discord.Member):
         "Get info about a server member"
-        lang = await self.bot._(ctx.guild.id,"_used_locale")
-        critical_info = await self.display_critical(ctx)
-        since = await self.bot._(ctx.guild.id,"misc.since")
-        embed = discord.Embed(colour=member.color, timestamp=ctx.message.created_at)
+        lang = await self.bot._(interaction, "_used_locale")
+        critical_info = await self.display_critical(interaction)
+        since = await self.bot._(interaction, "misc.since")
+        embed = discord.Embed(colour=member.color)
         embed.set_thumbnail(url=member.display_avatar.with_static_format("png"))
         embed.set_author(name=member.global_name or member.name, icon_url=member.display_avatar.with_format("png").url)
         # Name
-        embed.add_field(name=(await self.bot._(ctx.guild.id,"misc.name")).capitalize(),
+        embed.add_field(name=(await self.bot._(interaction, "misc.name")).capitalize(),
                         value=f"{member.global_name or member.name} ({member.name})",
                         inline=True)
         # Nickname
-        embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.member-0"),
-                        value=member.nick if member.nick else str(await self.bot._(ctx.channel,"misc.none")).capitalize(),
+        embed.add_field(name=await self.bot._(interaction, "info.info.member-0"),
+                        value=member.nick if member.nick else str(await self.bot._(interaction.channel,"misc.none")).capitalize(),
                         inline=True)
         # ID
-        embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.role-0"), value=str(member.id))
+        embed.add_field(name=await self.bot._(interaction, "info.info.role-0"), value=str(member.id))
         # Roles
         list_role = []
         for role in member.roles:
             if str(role) != '@everyone':
                 list_role.append(role.mention)
         # Created at
-        now = ctx.bot.utcnow()
+        now = self.bot.utcnow()
         delta = abs(member.created_at - now)
         created_date = f"<t:{member.created_at.timestamp():.0f}>"
-        created_since = await FormatUtils.time_delta(delta.total_seconds(), lang=lang, year=True, hour=delta.total_seconds() < 86400)
+        created_since = await FormatUtils.time_delta(
+            delta.total_seconds(), lang=lang, year=True, hour=delta.total_seconds() < 86400
+        )
         if member.created_at.day == now.day and member.created_at.month == now.month and member.created_at.year != now.year:
             created_date = "🎂 " + created_date
-        embed.add_field(name=await self.bot._(ctx.guild.id, "info.info.member-1"),
-                        value = "{} ({} {})".format(created_date, since, created_since), inline=False)
+        embed.add_field(name=await self.bot._(interaction, "info.info.member-1"),
+                        value=f"{created_date} ({since} {created_since})", inline=False)
         # Joined at
         if member.joined_at is not None:
             delta = abs(member.joined_at - now)
             join_date = f"<t:{member.joined_at.timestamp():.0f}>"
-            since_date = await FormatUtils.time_delta(delta.total_seconds(), lang=lang, year=True, hour=delta.total_seconds() < 86400)
-            embed.add_field(name=await self.bot._(ctx.guild.id, "info.info.member-2"),
-                            value = "{} ({} {})".format(join_date, since, since_date), inline=False)
+            since_date = await FormatUtils.time_delta(
+                delta.total_seconds(), lang=lang, year=True, hour=delta.total_seconds() < 86400
+            )
+            embed.add_field(name=await self.bot._(interaction, "info.info.member-2"),
+                            value=f"{join_date} ({since} {since_date})", inline=False)
         if member.guild.member_count < 1e4:
             # Join position
-            if sum([1 for x in ctx.guild.members if not x.joined_at]) > 0 and ctx.guild.large:
-                await ctx.guild.chunk()
-            position = str(sorted(ctx.guild.members, key=lambda m: m.joined_at).index(member) + 1) + "/" + str(len(ctx.guild.members))
-            embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.member-3"), value=position, inline=True)
+            if len([x for x in interaction.guild.members if not x.joined_at]) > 0 and interaction.guild.large:
+                await interaction.guild.chunk()
+            position = str(
+                sorted(interaction.guild.members, key=lambda m: m.joined_at).index(member) + 1
+                ) + "/" + str(len(interaction.guild.members))
+            embed.add_field(name=await self.bot._(interaction, "info.info.member-3"), value=position, inline=True)
         if self.bot.intents.presences:
             # Status
-            status_value = (await self.bot._(ctx.guild.id,f"misc.{member.status}")).capitalize()
-            embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.member-4"), value=status_value, inline=True)
+            status_value=(await self.bot._(interaction,f"misc.{member.status}")).capitalize()
+            embed.add_field(name=await self.bot._(interaction, "info.info.member-4"), value=status_value, inline=True)
             # Activity
             if member.activity is not None and (member.activity.type == discord.ActivityType.custom and
                     member.activity.emoji is None and member.activity.name is None):
                 # that's just a bug from discord apparently
                 member.activity = None
             if member.activity is None:
-                m_activity = str(await self.bot._(ctx.guild.id, "misc.activity.nothing")).capitalize()
+                m_activity = str(
+                    await self.bot._(interaction, "misc.activity.nothing")).capitalize()
             elif member.activity.type == discord.ActivityType.playing:
-                m_activity = str(await self.bot._(ctx.guild.id, "misc.activity.play")).capitalize() + " " + member.activity.name
+                m_activity = str(
+                    await self.bot._(interaction, "misc.activity.play")).capitalize() + " " + member.activity.name
             elif member.activity.type == discord.ActivityType.streaming:
-                m_activity = str(await self.bot._(ctx.guild.id, "misc.activity.stream")).capitalize() + f" ({member.activity.name})"
+                m_activity = str(
+                    await self.bot._(interaction, "misc.activity.stream")).capitalize() + " " + member.activity.name
             elif member.activity.type == discord.ActivityType.listening:
-                m_activity = str(await self.bot._(ctx.guild.id, "misc.activity.listen")).capitalize() + " " + member.activity.name
+                m_activity = str(
+                    await self.bot._(interaction, "misc.activity.listen")).capitalize() + " " + member.activity.name
             elif member.activity.type == discord.ActivityType.watching:
-                m_activity = str(await self.bot._(ctx.guild.id, "misc.activity.watch")).capitalize() +" " + member.activity.name
+                m_activity = str(
+                    await self.bot._(interaction, "misc.activity.watch")).capitalize() + " " + member.activity.name
             elif member.activity.type == discord.ActivityType.custom:
                 emoji = str(member.activity.emoji if member.activity.emoji else '')
                 m_activity = emoji + " " + (member.activity.name if member.activity.name else '')
@@ -150,26 +230,31 @@ Available types: member, role, user, emoji, channel, server, invite, category
             else:
                 m_activity="Error"
             if member.activity is None or member.activity.type != 4:
-                embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.member-5"), value = m_activity,inline=True)
+                embed.add_field(name=await self.bot._(interaction, "info.info.member-5"), value=m_activity,
+                                inline=True)
             else:
-                embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.member-8"), value = member.activity.state, inline=True)
+                embed.add_field(name=await self.bot._(interaction, "info.info.member-8"), value=member.activity.state,
+                                inline=True)
         # Bot
         if member.bot:
-            botb = await self.bot._(ctx.guild.id, "misc.yes")
+            botb = await self.bot._(interaction, "misc.yes")
             if member.public_flags.verified_bot:
-                botb += " (" + await self.bot._(ctx.guild.id, "misc.verified") + ")"
+                botb += " (" + await self.bot._(interaction, "misc.verified") + ")"
         else:
-            botb = await self.bot._(ctx.guild.id, "misc.no")
+            botb = await self.bot._(interaction, "misc.no")
         embed.add_field(name="Bot", value=botb.capitalize())
         # Administrator
-        if ctx.channel.permissions_for(member).administrator:
-            admin = await self.bot._(ctx.guild.id,"misc.yes")
+        if interaction.channel.permissions_for(member).administrator:
+            admin = await self.bot._(interaction, "misc.yes")
         else:
-            admin = await self.bot._(ctx.guild.id,"misc.no")
-        embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.member-6"), value = admin.capitalize(),inline=True)
+            admin = await self.bot._(interaction, "misc.no")
+        embed.add_field(name=await self.bot._(interaction, "info.info.member-6"), value=admin.capitalize(), inline=True)
         # Infractions count
         if critical_info and not member.bot and self.bot.database_online:
-            embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.member-7"), value = await self.bot.get_cog('Cases').db_get_user_cases_count_from_guild(member.id,ctx.guild.id),inline=True)
+            embed.add_field(
+                name=await self.bot._(interaction, "info.info.member-7"),
+                value=await self.bot.get_cog('Cases').db_get_user_cases_count_from_guild(member.id, interaction.guild.id),
+                inline=True)
         # Guilds count
         if member.bot:
             async with aiohttp.ClientSession(loop=self.bot.loop) as session:
@@ -177,117 +262,125 @@ Available types: member, role, user, emoji, channel, server, invite, category
                 bot_owners = await self.bot.get_cog('Partners').get_bot_owners(member.id, session)
             if guilds_count is not None:
                 guilds_count = await FormatUtils.format_nbr(guilds_count, lang)
-                embed.add_field(name=str(await self.bot._(ctx.guild.id,'misc.servers')).capitalize(),value=guilds_count)
+                embed.add_field(name=str(await self.bot._(interaction,'misc.servers')).capitalize(),value=guilds_count)
             if bot_owners:
                 embed.add_field(
-                    name=(await self.bot._(ctx.guild.id, 'info.info.guild-1')).capitalize(),
+                    name=(await self.bot._(interaction, 'info.info.guild-1')).capitalize(),
                     value=", ".join([str(u) for u in bot_owners])
                 )
         # Roles
-        _roles = await self.bot._(ctx.guild.id, 'info.info.member-9') + f' [{len(list_role)}]'
+        _roles = await self.bot._(interaction, 'info.info.member-9') + f' [{len(list_role)}]'
         if len(list_role) > 0:
             list_role = list_role[:40]
-            embed.add_field(name=_roles, value = ", ".join(list_role), inline=False)
+            embed.add_field(name=_roles, value=", ".join(list_role), inline=False)
         else:
-            embed.add_field(name=_roles, value=(await self.bot._(ctx.guild.id,"misc.none")).capitalize(), inline=False)
+            embed.add_field(name=_roles, value=(await self.bot._(interaction, "misc.none")).capitalize(), inline=False)
         # member verification gate
         if member.pending:
-            _waiting = await self.bot._(ctx.guild.id, 'info.info.member-10')
+            _waiting = await self.bot._(interaction, 'info.info.member-10')
             embed.add_field(name=_waiting, value='\u200b', inline=False)
-        await ctx.send(embed=embed)
+        await interaction.followup.send(embed=embed)
 
-    @info_main.command(name="role")
-    async def role_infos(self, ctx: MyContext, role: discord.Role):
+    async def role_info(self, interaction: discord.Interaction, role: discord.Role):
         "Get info about a server role"
-        lang = await self.bot._(ctx.guild.id,"_used_locale")
-        embed = discord.Embed(colour=role.color, timestamp=ctx.message.created_at)
-        embed.set_author(name=str(role), icon_url=ctx.guild.icon)
-        since = await self.bot._(ctx.guild.id,"misc.since")
+        lang = await self.bot._(interaction, "_used_locale")
+        embed = discord.Embed(colour=role.color)
+        icon_url = role.guild.icon.with_static_format('png') if role.guild.icon else None
+        embed.set_author(name=f"{await self.bot._(interaction,'info.info.role-title')} '{role.name}'", icon_url=icon_url)
+        since = await self.bot._(interaction, "misc.since")
         # Name
-        embed.add_field(name=str(await self.bot._(ctx.guild.id, "misc.name")).capitalize(), value=role.mention, inline=True)
+        embed.add_field(name=str(await self.bot._(interaction, "misc.name")).capitalize(),
+                        value=role.mention, inline=True)
         # ID
-        embed.add_field(name=await self.bot._(ctx.guild.id, "info.info.role-0"), value=str(role.id), inline=True)
+        embed.add_field(name=await self.bot._(interaction, "info.info.role-0"),
+                        value=str(role.id), inline=True)
         # Color
         color_url = f"https://www.color-hex.com/color/{role.color.value:x}"
-        embed.add_field(name=await self.bot._(ctx.guild.id, "info.info.role-1"), value=f"[{role.color}]({color_url})",inline=True)
+        embed.add_field(name=await self.bot._(interaction, "info.info.role-1"),
+                        value=f"[{role.color}]({color_url})", inline=True)
         # Mentionnable
         if role.mentionable:
-            mentionable = await self.bot._(ctx.guild.id, "misc.yes")
+            mentionable = await self.bot._(interaction, "misc.yes")
         else:
-            mentionable = await self.bot._(ctx.guild.id, "misc.no")
-        embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.role-2"), value=mentionable.capitalize(), inline=True)
+            mentionable = await self.bot._(interaction, "misc.no")
+        embed.add_field(name=await self.bot._(interaction, "info.info.role-2"),
+                        value=mentionable.capitalize(), inline=True)
         # Members count
-        embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.role-3"), value=len(role.members), inline=True)
+        embed.add_field(name=await self.bot._(interaction, "info.info.role-3"),
+                        value=len(role.members), inline=True)
         # Specificities
         if role.tags:
             specificities = []
             if role.tags.is_available_for_purchase():
-                specificities.append(await self.bot._(ctx.guild.id, "info.info.role-specificities.purchaseable"))
+                specificities.append(await self.bot._(interaction, "info.info.role-specificities.purchaseable"))
             if role.tags.is_bot_managed() and role.tags.bot_id:
-                specificities.append(await self.bot._(ctx.guild.id, "info.info.role-specificities.bot_managed",
+                specificities.append(await self.bot._(interaction, "info.info.role-specificities.bot_managed",
                                                       bot=f"<@{role.tags.bot_id}>"))
             if role.tags.is_guild_connection():
-                specificities.append(await self.bot._(ctx.guild.id, "info.info.role-specificities.guild_connection"))
+                specificities.append(await self.bot._(interaction, "info.info.role-specificities.guild_connection"))
             if role.tags.is_premium_subscriber():
-                specificities.append(await self.bot._(ctx.guild.id, "info.info.role-specificities.premium_sub"))
+                specificities.append(await self.bot._(interaction, "info.info.role-specificities.premium_sub"))
             if role.hoist:
-                specificities.append(await self.bot._(ctx.guild.id, "info.info.role-specificities.hoist"))
+                specificities.append(await self.bot._(interaction, "info.info.role-specificities.hoist"))
             if specificities:
-                embed.add_field(name=await self.bot._(ctx.guild.id, "info.info.role-specificities.field-name"),
+                embed.add_field(name=await self.bot._(interaction, "info.info.role-specificities.field-name"),
                                 value=" - ".join(specificities))
         # Created at
-        delta = abs(role.created_at - ctx.bot.utcnow())
+        delta = abs(role.created_at - self.bot.utcnow())
         created_date = f"<t:{role.created_at.timestamp():.0f}>"
         created_since = await FormatUtils.time_delta(delta.total_seconds(), lang=lang, year=True,
                                                      hour=delta.total_seconds() < 86400)
-        embed.add_field(name=await self.bot._(ctx.guild.id, "info.info.member-1"),
-                        value = f"{created_date} ({since} {created_since})",
+        embed.add_field(name=await self.bot._(interaction, "info.info.member-1"),
+                        value=f"{created_date} ({since} {created_since})",
                         inline=False)
         # Hierarchy position
-        embed.add_field(name=await self.bot._(ctx.guild.id, "info.info.role-5"), value=str(len(ctx.guild.roles) - role.position),
+        embed.add_field(name=await self.bot._(interaction, "info.info.role-5"),
+                        value=str(len(interaction.guild.roles) - role.position),
                         inline=True)
         # Unique member
         if len(role.members) == 1:
-            embed.add_field(name=await self.bot._(ctx.guild.id, "info.info.role-6"), value=role.members[0].mention, inline=True)
-        await ctx.send(embed=embed)
+            embed.add_field(name=await self.bot._(interaction, "info.info.role-6"), value=role.members[0].mention, inline=True)
+        await interaction.followup.send(embed=embed)
 
-    @info_main.command(name="user")
-    async def user_infos(self, ctx: MyContext, user: discord.User):
+    async def user_info(self, interaction: discord.Interaction, user: discord.User):
         "Get info about any Discord user"
-        lang = await self.bot._(ctx.guild.id,"_used_locale")
-        since = await self.bot._(ctx.guild.id,"misc.since")
+        lang = await self.bot._(interaction, "_used_locale")
+        since = await self.bot._(interaction, "misc.since")
         # is bot
         if user.bot:
-            botb = await self.bot._(ctx.guild.id,"misc.yes")
+            botb = await self.bot._(interaction, "misc.yes")
             if user.public_flags:
-                botb += " (" + await self.bot._(ctx.guild.id, "misc.verified") + ")"
+                botb += " (" + await self.bot._(interaction, "misc.verified") + ")"
         else:
-            botb = await self.bot._(ctx.guild.id,"misc.no")
-        if user in ctx.guild.members:
-            on_server = await self.bot._(ctx.guild.id,"misc.yes")
-        else:
-            on_server = await self.bot._(ctx.guild.id,"misc.no")
-        embed = discord.Embed(colour=default_color, timestamp=ctx.message.created_at)
+            botb = await self.bot._(interaction, "misc.no")
+        if interaction.guild:
+            if user in interaction.guild.members:
+                on_server = await self.bot._(interaction, "misc.yes")
+            else:
+                on_server = await self.bot._(interaction, "misc.no")
+        embed = discord.Embed(colour=default_color)
         embed.set_thumbnail(url=user.display_avatar.with_static_format("png"))
         embed.set_author(name=user.display_name, icon_url=user.display_avatar.with_format("png"))
         # name
-        embed.add_field(name=str(await self.bot._(ctx.guild.id,"misc.name")).capitalize(),
-                        value=f"{user.display_name} ({user.name})",inline=True)
+        embed.add_field(name=str(await self.bot._(interaction, "misc.name")).capitalize(),
+                        value=f"{user.display_name} ({user.name})", inline=True)
         # ID
-        embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.role-0"), value=str(user.id))
+        embed.add_field(name=await self.bot._(interaction, "info.info.role-0"), value=str(user.id))
         # created at
-        now = ctx.bot.utcnow()
+        now = self.bot.utcnow()
         delta = abs(user.created_at - now)
         created_date = f"<t:{user.created_at.timestamp():.0f}>"
-        created_since = await FormatUtils.time_delta(delta.total_seconds(), lang=lang, year=True, hour=delta.total_seconds() < 86400)
+        created_since = await FormatUtils.time_delta(
+            delta.total_seconds(), lang=lang, year=True, hour=delta.total_seconds() < 86400
+        )
         if user.created_at.day == now.day and user.created_at.month == now.month and user.created_at.year != now.year:
             created_date = "🎂 " + created_date
-        embed.add_field(name=await self.bot._(ctx.guild.id, "info.info.member-1"),
-                        value = "{} ({} {})".format(created_date, since, created_since), inline=False)
+        embed.add_field(name=await self.bot._(interaction, "info.info.member-1"),
+                        value=f"{created_date} ({since} {created_since})", inline=False)
         # is bot
         embed.add_field(name="Bot", value=botb.capitalize())
         # is in server
-        embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.user-0"), value=on_server.capitalize())
+        embed.add_field(name=await self.bot._(interaction, "info.info.user-0"), value=on_server.capitalize())
         if user.bot:
             async with aiohttp.ClientSession(loop=self.bot.loop) as session:
                 guilds_count = await self.bot.get_cog('Partners').get_bot_guilds(user.id, session)
@@ -295,228 +388,273 @@ Available types: member, role, user, emoji, channel, server, invite, category
             if guilds_count is not None:
                 guilds_count = await FormatUtils.format_nbr(guilds_count, lang)
                 embed.add_field(
-                    name=str(await self.bot._(ctx.guild.id, 'misc.servers')).capitalize(),
+                    name=str(await self.bot._(interaction, 'misc.servers')).capitalize(),
                     value=guilds_count
                 )
             if bot_owners:
                 embed.add_field(
-                    name=(await self.bot._(ctx.guild.id, 'info.info.guild-1')).capitalize(),
+                    name=(await self.bot._(interaction, 'info.info.guild-1')).capitalize(),
                     value=", ".join([str(u) for u in bot_owners])
                 )
-        await ctx.send(embed=embed)
+        await interaction.followup.send(embed=embed)
 
-    @info_main.command(name="emoji")
-    async def emoji_infos(self, ctx: MyContext, emoji: discord.Emoji):
+    async def emoji_info(self, interaction: discord.Interaction, emoji: Union[discord.Emoji, discord.PartialEmoji]):
         "Get info about any Discord emoji"
-        lang = await self.bot._(ctx.guild.id,"_used_locale")
-        since = await self.bot._(ctx.guild.id,"misc.since")
-        if emoji.animated:
-            animate = await self.bot._(ctx.guild.id,"misc.yes")
-        else:
-            animate = await self.bot._(ctx.guild.id,"misc.no")
-        if emoji.managed:
-            manage = await self.bot._(ctx.guild.id,"misc.yes")
-        else:
-            manage = await self.bot._(ctx.guild.id,"misc.no")
-        embed = discord.Embed(colour=default_color, timestamp=ctx.message.created_at)
+        lang = await self.bot._(interaction, "_used_locale")
+        since = await self.bot._(interaction, "misc.since")
+        is_partial = isinstance(emoji, discord.PartialEmoji)
+        embed = discord.Embed(colour=default_color)
         embed.set_thumbnail(url=emoji.url)
         embed.set_author(name=f"Emoji '{emoji.name}'", icon_url=emoji.url)
         # name
-        embed.add_field(name=str(await self.bot._(ctx.guild.id,"misc.name")).capitalize(), value=emoji.name, inline=True)
+        embed.add_field(name=str(await self.bot._(interaction, "misc.name")).capitalize(), value=emoji.name, inline=True)
         # id
-        embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.role-0"), value=str(emoji.id))
+        embed.add_field(name=await self.bot._(interaction, "info.info.role-0"), value=str(emoji.id))
         # animated
-        embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.emoji-0"), value=animate.capitalize())
+        if emoji.animated:
+            animate = await self.bot._(interaction, "misc.yes")
+        else:
+            animate = await self.bot._(interaction, "misc.no")
+        embed.add_field(name=await self.bot._(interaction, "info.info.emoji-0"), value=animate.capitalize())
         # guild name
-        if emoji.guild != ctx.guild:
-            embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.emoji-3"), value=emoji.guild.name)
+        if not is_partial and emoji.guild != interaction.guild:
+            embed.add_field(name=await self.bot._(interaction, "info.info.emoji-3"), value=emoji.guild.name)
         # string
         string = f"<a:{emoji.name}:{emoji.id}>" if emoji.animated else f"<:{emoji.name}:{emoji.id}>"
-        embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.emoji-2"), value=f"`{string}`")
+        embed.add_field(name=await self.bot._(interaction, "info.info.emoji-2"), value=f"`{string}`")
         # managed
-        embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.emoji-1"), value=manage.capitalize())
+        if not is_partial:
+            if emoji.managed:
+                manage = await self.bot._(interaction, "misc.yes")
+            else:
+                manage = await self.bot._(interaction, "misc.no")
+            embed.add_field(name=await self.bot._(interaction, "info.info.emoji-1"), value=manage.capitalize())
         # created at
-        delta = abs(emoji.created_at - ctx.bot.utcnow())
-        created_date = f"<t:{emoji.created_at.timestamp():.0f}>"
-        created_since = await FormatUtils.time_delta(delta.total_seconds(), lang=lang, year=True, hour=delta.total_seconds() < 86400)
-        embed.add_field(name=await self.bot._(ctx.guild.id, "info.info.member-1"), value = "{} ({} {})".format(created_date, since, created_since), inline=False)
+        if not is_partial:
+            delta = abs(emoji.created_at - self.bot.utcnow())
+            created_date = f"<t:{emoji.created_at.timestamp():.0f}>"
+            created_since = await FormatUtils.time_delta(
+                delta.total_seconds(), lang=lang, year=True, hour=delta.total_seconds() < 86400
+            )
+            embed.add_field(
+                name=await self.bot._(interaction, "info.info.member-1"),
+                value=f"{created_date} ({since} {created_since})",
+                inline=False
+            )
         # allowed roles
-        if len(emoji.roles) > 0:
-            embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.emoji-4"), value=" ".join([x.mention for x in emoji.roles]))
+        if not is_partial and len(emoji.roles) > 0:
+            embed.add_field(
+                name=await self.bot._(interaction, "info.info.emoji-4"),
+                value=" ".join([x.mention for x in emoji.roles])
+            )
         # uses
         infos_uses = await self.bot.get_cog("BotStats").db_get_emojis_info(emoji.id)
         if len(infos_uses) > 0:
             infos_uses = infos_uses[0]
             date = f"<t:{infos_uses['added_at'].timestamp():.0f}:D>"
-            embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.emoji-5"), value=await self.bot._(ctx.guild.id,"info.info.emoji-5v",nbr=infos_uses['count'],date=date))
-        await ctx.send(embed=embed)
+            embed.add_field(
+                name=await self.bot._(interaction, "info.info.emoji-5"),
+                value=await self.bot._(interaction, "info.info.emoji-5v", nbr=infos_uses['count'],date=date)
+            )
+        await interaction.followup.send(embed=embed)
 
-    @info_main.command(name="text-channel")
-    async def textchannel_infos(self, ctx: MyContext, channel: discord.TextChannel):
+    async def textchannel_info(self, interaction: discord.Interaction, channel: discord.TextChannel):
         "Get informations about a text channel"
-        if not channel.permissions_for(ctx.author).view_channel:
-            await ctx.send(await self.bot._(ctx.guild.id, "info.cant-see-channel"))
+        if not channel.permissions_for(interaction.user).view_channel:
+            await interaction.followup.send(await self.bot._(interaction, "info.cant-see-channel"))
             return
-        lang = await self.bot._(ctx.guild.id,"_used_locale")
-        embed = discord.Embed(colour=default_color, timestamp=ctx.message.created_at)
+        lang = await self.bot._(interaction, "_used_locale")
+        embed = discord.Embed(colour=default_color)
         icon_url = channel.guild.icon.with_format('png') if channel.guild.icon else None
-        embed.set_author(name="{} '{}'".format(await self.bot._(ctx.guild.id,"info.info.textchan-5"),channel.name), icon_url=icon_url)
-        since = await self.bot._(ctx.guild.id,"misc.since")
+        embed.set_author(
+            name=await self.bot._(interaction, "info.info.textchan-5") + " '" + channel.name + "'",
+            icon_url=icon_url)
+        since = await self.bot._(interaction, "misc.since")
         # Name
-        embed.add_field(name=str(await self.bot._(ctx.guild.id,"misc.name")).capitalize(), value=channel.name,inline=True)
+        embed.add_field(name=str(await self.bot._(interaction, "misc.name")).capitalize(), value=channel.name, inline=True)
         # ID
-        embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.role-0"), value=str(channel.id))
+        embed.add_field(name=await self.bot._(interaction, "info.info.role-0"), value=str(channel.id))
         # Category
-        embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.textchan-0"), value=str(channel.category))
+        embed.add_field(name=await self.bot._(interaction, "info.info.textchan-0"), value=str(channel.category))
         # NSFW
         if channel.nsfw:
-            nsfw = await self.bot._(ctx.guild.id,"misc.yes")
+            nsfw = await self.bot._(interaction, "misc.yes")
         else:
-            nsfw = await self.bot._(ctx.guild.id,"misc.no")
-        embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.textchan-2"), value=nsfw.capitalize())
+            nsfw = await self.bot._(interaction, "misc.no")
+        embed.add_field(name=await self.bot._(interaction, "info.info.textchan-2"), value=nsfw.capitalize())
         # Webhooks count
         try:
             web = len(await channel.webhooks())
         except Exception as err:
-            self.bot.dispatch("error", err, ctx)
-            web = await self.bot._(ctx.guild.id,"info.info.textchan-4")
-        embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.textchan-3"), value=str(web))
+            self.bot.dispatch("error", err, interaction)
+            web = await self.bot._(interaction, "info.info.textchan-4")
+        embed.add_field(name=await self.bot._(interaction, "info.info.textchan-3"), value=str(web))
         # Members nber
-        embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.role-3"), value = str(len(channel.members))+"/"+str(ctx.guild.member_count), inline=True)
+        embed.add_field(
+            name=await self.bot._(interaction, "info.info.role-3"),
+            value=str(len(channel.members)) + "/" + str(interaction.guild.member_count),
+            inline=True
+        )
         # Created at
-        delta = abs(channel.created_at - ctx.bot.utcnow())
+        delta = abs(channel.created_at - self.bot.utcnow())
         created_date = f"<t:{channel.created_at.timestamp():.0f}>"
-        created_since = await FormatUtils.time_delta(delta.total_seconds(), lang=lang, year=True, hour=delta.total_seconds() < 86400)
-        embed.add_field(name=await self.bot._(ctx.guild.id, "info.info.member-1"), value = "{} ({} {})".format(created_date, since, created_since), inline=False)
-        # Topic
-        if channel.permissions_for(ctx.author).read_messages:
-            embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.textchan-1"), value = channel.topic if channel.topic not in ['',None] else str(await self.bot._(ctx.guild.id,"misc.none")).capitalize(), inline=False)
-        await ctx.send(embed=embed)
+        created_since = await FormatUtils.time_delta(
+            delta.total_seconds(), lang=lang, year=True, hour=delta.total_seconds() < 86400)
+        embed.add_field(
+            name=await self.bot._(interaction, "info.info.member-1"),
+            value=f"{created_date} ({since} {created_since})",
+            inline=False
+        )
+        # Channel topic
+        embed.add_field(
+            name=await self.bot._(interaction, "info.info.textchan-1"),
+            value=channel.topic if channel.topic else (await self.bot._(interaction, "misc.none")).capitalize(),
+            inline=False
+        )
+        await interaction.followup.send(embed=embed)
 
-    @info_main.command(name="voice-channel")
-    async def voicechannel_info(self, ctx: MyContext, channel: discord.VoiceChannel):
+    async def voicechannel_info(self, interaction: discord.Interaction, channel: discord.VoiceChannel):
         "Get informations about a voice channel"
-        if not channel.permissions_for(ctx.author).view_channel:
-            await ctx.send(await self.bot._(ctx.guild.id, "info.cant-see-channel"))
+        if not channel.permissions_for(interaction.user).view_channel:
+            await interaction.followup.send(await self.bot._(interaction, "info.cant-see-channel"))
             return
-        lang = await self.bot._(ctx.guild.id,"_used_locale")
-        since = await self.bot._(ctx.guild.id,"misc.since")
-        embed = discord.Embed(colour=default_color, timestamp=ctx.message.created_at)
+        lang = await self.bot._(interaction, "_used_locale")
+        since = await self.bot._(interaction, "misc.since")
+        embed = discord.Embed(colour=default_color)
         icon_url = channel.guild.icon.with_static_format('png') if channel.guild.icon else None
-        embed.set_author(name=f"{await self.bot._(ctx.guild.id,'info.info.voicechan-0')} '{channel.name}'", icon_url=icon_url)
+        embed.set_author(name=f"{await self.bot._(interaction, 'info.info.voicechan-0')} '{channel.name}'", icon_url=icon_url)
         # Name
-        embed.add_field(name=str(await self.bot._(ctx.guild.id,"misc.name")).capitalize(), value=channel.name,inline=True)
+        embed.add_field(name=str(await self.bot._(interaction, "misc.name")).capitalize(), value=channel.name, inline=True)
         # ID
-        embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.role-0"), value=str(channel.id))
+        embed.add_field(name=await self.bot._(interaction, "info.info.role-0"), value=str(channel.id))
         # Category
-        embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.textchan-0"), value=str(channel.category))
+        embed.add_field(name=await self.bot._(interaction, "info.info.textchan-0"), value=str(channel.category))
         # Created at
-        delta = abs(channel.created_at - ctx.bot.utcnow())
+        delta = abs(channel.created_at - self.bot.utcnow())
         created_date = f"<t:{channel.created_at.timestamp():.0f}>"
-        created_since = await FormatUtils.time_delta(delta.total_seconds(), lang=lang, year=True, hour=delta.total_seconds() < 86400)
-        embed.add_field(name=await self.bot._(ctx.guild.id, "info.info.member-1"), value = "{} ({} {})".format(
-            created_date, since, created_since
-        ), inline=False)
+        created_since = await FormatUtils.time_delta(
+            delta.total_seconds(), lang=lang, year=True, hour=delta.total_seconds() < 86400)
+        embed.add_field(
+            name=await self.bot._(interaction, "info.info.member-1"),
+            value=f"{created_date} ({since} {created_since})",
+            inline=False
+        )
         # Bitrate
         embed.add_field(name="Bitrate",value=str(channel.bitrate/1000)+" kbps")
         # Members count
-        embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.role-3"), value="{}/{}".format(
-            len(channel.members), channel.user_limit if channel.user_limit > 0 else "∞"
-        ))
+        users_limit = channel.user_limit if channel.user_limit > 0 else "∞"
+        embed.add_field(
+            name=await self.bot._(interaction, "info.info.role-3"),
+            value=f"{len(channel.members)}/{users_limit}"
+        )
         # Region
         if channel.rtc_region is not None:
-            embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.guild-2"), value=str(channel.rtc_region).capitalize())
-        await ctx.send(embed=embed)
+            embed.add_field(name=await self.bot._(interaction, "info.info.guild-2"), value=str(channel.rtc_region).capitalize())
+        await interaction.followup.send(embed=embed)
 
-    @info_main.command(name="server", aliases=["guild"])
-    @commands.guild_only()
-    async def guild_info(self, ctx: MyContext):
+    async def guild_info(self, interaction: discord.Interaction, guild: discord.Guild):
         "Get informations about the server"
-        lang = await self.bot._(ctx.guild.id,"_used_locale")
-        critical_info = await self.display_critical(ctx)
-        guild = ctx.guild
-        if guild_id := ctx.message.content.split(ctx.invoked_with, 1)[1]:
-            if await self.bot.get_cog('Admin').check_if_admin(ctx):
-                guild = await commands.GuildConverter().convert(ctx, guild_id.lstrip())
-        since = await self.bot._(ctx.guild.id,"misc.since")
+        lang = await self.bot._(interaction, "_used_locale")
+        critical_info = await self.display_critical(interaction)
+        since = await self.bot._(interaction, "misc.since")
         _, bots, online, _ = await self.bot.get_cog("Utilities").get_members_repartition(guild.members)
 
         desc = await self.bot.get_config(guild.id, "description")
         if (desc is None or len(desc) == 0) and guild.description is not None:
             desc = guild.description
-        embed = discord.Embed(colour=default_color, timestamp=ctx.message.created_at, description=desc)
+        embed = discord.Embed(colour=default_color, description=desc)
         # Guild icon
         icon_url = guild.icon.with_static_format("png") if guild.icon else None
-        embed.set_author(name="{} '{}'".format(await self.bot._(ctx.guild.id,"info.info.guild-0"),guild.name), icon_url=icon_url)
+        embed.set_author(name=f"{await self.bot._(interaction, 'info.info.guild-0')} '{guild.name}'", icon_url=icon_url)
         embed.set_thumbnail(url=icon_url)
         # Guild banner
         if guild.banner is not None:
             embed.set_image(url=guild.banner)
         # Name
-        embed.add_field(name=str(await self.bot._(ctx.guild.id,"misc.name")).capitalize(), value=guild.name,inline=True)
+        embed.add_field(name=str(await self.bot._(interaction, "misc.name")).capitalize(), value=guild.name, inline=True)
         # ID
-        embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.role-0"), value=str(guild.id))
+        embed.add_field(name=await self.bot._(interaction, "info.info.role-0"), value=str(guild.id))
         # Owner
         if guild.owner:
-            embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.guild-1"),
+            embed.add_field(name=await self.bot._(interaction, "info.info.guild-1"),
                             value=guild.owner.global_name or guild.owner.display_name)
         # Created at
-        delta = abs(guild.created_at - ctx.bot.utcnow())
+        delta = abs(guild.created_at - self.bot.utcnow())
         created_date = f"<t:{guild.created_at.timestamp():.0f}>"
-        created_since = await FormatUtils.time_delta(delta.total_seconds(), lang=lang, year=True, hour=delta.total_seconds() < 86400)
-        embed.add_field(name=await self.bot._(ctx.guild.id, "info.info.member-1"), value = "{} ({} {})".format(created_date, since, created_since), inline=False)
+        created_since = await FormatUtils.time_delta(
+            delta.total_seconds(), lang=lang, year=True, hour=delta.total_seconds() < 86400)
+        embed.add_field(
+            name=await self.bot._(interaction, "info.info.member-1"),
+            value=f"{created_date} ({since} {created_since})",
+            inline=False
+        )
         # Member count
         if not self.bot.intents.presences:
             online = "?"
-        embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.role-3"), value=await self.bot._(ctx.guild.id,"info.info.guild-7", c=guild.member_count, b=bots, o=online))
+        embed.add_field(
+            name=await self.bot._(interaction, "info.info.role-3"),
+            value=await self.bot._(interaction, "info.info.guild-7", c=guild.member_count, b=bots, o=online)
+        )
         # Channel count
         text_count = sum(1 for channel in guild.channels if isinstance(channel, (discord.TextChannel, discord.ForumChannel)))
         voice_count = sum(1 for channel in guild.channels if isinstance(channel, (discord.VoiceChannel, discord.StageChannel)))
-        embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.guild-6"), value=await self.bot._(ctx.guild.id,"info.info.guild-3", txt=text_count, voc=voice_count, cat=len(guild.categories)))
+        embed.add_field(
+            name=await self.bot._(interaction, "info.info.guild-6"),
+            value=await self.bot._(interaction, "info.info.guild-3", txt=text_count, voc=voice_count, cat=len(guild.categories))
+        )
         # Invite count
         if guild.me.guild_permissions.manage_guild:
             len_invites = str(len(await guild.invites()))
-            embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.guild-12"), value=len_invites)
+            embed.add_field(name=await self.bot._(interaction, "info.info.guild-12"), value=len_invites)
         # Emojis count
-        c = [0, 0]
+        c = {True: 0, False: 0}
         for x in guild.emojis:
-            c[1 if x.animated else 0] += 1
-        emojis_txt = await self.bot._(ctx.guild.id, "info.info.guild-16", l=guild.emoji_limit, s=c[0], a=c[1])
-        embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.guild-5"), value=emojis_txt)
+            c[x.animated] += 1
+        emojis_txt = await self.bot._(interaction, "info.info.guild-16", l=guild.emoji_limit, s=c[False], a=c[True])
+        embed.add_field(name=await self.bot._(interaction, "info.info.guild-5"), value=emojis_txt)
         # AFK timeout
-        embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.guild-10"), value = str(int(guild.afk_timeout/60))+" minutes")
+        embed.add_field(
+            name=await self.bot._(interaction, "info.info.guild-10"),
+            value=str(int(guild.afk_timeout/60))+" minutes"
+        )
         # Splash url
         try:
-            embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.guild-15"), value=str(await guild.vanity_invite()))
+            embed.add_field(name=await self.bot._(interaction, "info.info.guild-15"), value=str(await guild.vanity_invite()))
         except (discord.errors.Forbidden, discord.errors.HTTPException):
             pass
         except Exception as err:
-            self.bot.dispatch("error", err, ctx)
+            self.bot.dispatch("error", err, interaction)
         # Premium subscriptions count
         if isinstance(guild.premium_subscription_count, int) and guild.premium_subscription_count > 0:
-            subs_count = await self.bot._(ctx.guild.id, "info.info.guild-13v",
+            subs_count = await self.bot._(interaction, "info.info.guild-13v",
                                           b=guild.premium_subscription_count, p=guild.premium_tier)
-            embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.guild-13"), value=subs_count)
+            embed.add_field(name=await self.bot._(interaction, "info.info.guild-13"), value=subs_count)
         # Roles list
         try:
-            if ctx.guild == guild:
+            if interaction.guild == guild:
                 roles = [x.mention for x in guild.roles if len(x.members) > 1][1:]
             else:
                 roles = [x.name for x in guild.roles if len(x.members) > 1][1:]
         except Exception as err:
-            self.bot.dispatch("error", err, ctx)
+            self.bot.dispatch("error", err, interaction)
             roles = guild.roles
         roles.reverse()
         if len(roles) == 0:
-            temp = (await self.bot._(ctx.guild.id,"misc.none")).capitalize()
-            embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.guild-11.2", c=len(guild.roles)-1), value=temp)
+            temp = (await self.bot._(interaction, "misc.none")).capitalize()
+            embed.add_field(
+                name=await self.bot._(interaction, "info.info.guild-11.2", c=len(guild.roles)-1),
+                value=temp)
         elif len(roles) > 20:
-            embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.guild-11.1", c=len(guild.roles)-1), value=", ".join(roles[:20]))
+            embed.add_field(
+                name=await self.bot._(interaction, "info.info.guild-11.1", c=len(guild.roles)-1),
+                value=", ".join(roles[:20]))
         else:
-            embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.guild-11.2", c=len(guild.roles)-1), value=", ".join(roles))
+            embed.add_field(
+                name=await self.bot._(interaction, "info.info.guild-11.2", c=len(guild.roles)-1),
+                value=", ".join(roles))
         # Limitations
-        embed.add_field(name=await self.bot._(ctx.guild.id, "info.info.guild-14"),
-                        value=await self.bot._(ctx.guild.id, "info.info.guild-14v",
+        embed.add_field(name=await self.bot._(interaction, "info.info.guild-14"),
+                        value=await self.bot._(interaction, "info.info.guild-14v",
                                                bit=round(guild.bitrate_limit/1000),
                                                fil=round(guild.filesize_limit/1.049e+6),
                                                emo=guild.emoji_limit,
@@ -525,30 +663,31 @@ Available types: member, role, user, emoji, channel, server, invite, category
         )
         # Features
         if len(guild.features) > 0:
-            tr = lambda x: self.bot._(ctx.guild.id,"info.info.guild-features."+x)
+            async def tr(x: str):
+                return await self.bot._(interaction, "info.info.guild-features." + x)
             features: list[str] = [await tr(x) for x in guild.features]
             features = [f.split('.')[-1] if '.' in f else f for f in features]
-            embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.inv-9"), value=" - ".join(features))
+            embed.add_field(name=await self.bot._(interaction, "info.info.inv-9"), value=" - ".join(features))
         if critical_info:
             # A2F activation
             if guild.mfa_level:
-                a2f = await self.bot._(ctx.guild.id,"misc.yes")
+                a2f = await self.bot._(interaction, "misc.yes")
             else:
-                a2f = await self.bot._(ctx.guild.id,"misc.no")
-            embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.guild-8"), value=a2f.capitalize())
+                a2f = await self.bot._(interaction, "misc.no")
+            embed.add_field(name=await self.bot._(interaction, "info.info.guild-8"), value=a2f.capitalize())
             # Verification level
-            embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.guild-9"),
-                            value=(await self.bot._(ctx.guild.id,f"misc.{guild.verification_level}")).capitalize())
-        await ctx.send(embed=embed)
+            embed.add_field(
+                name=await self.bot._(interaction, "info.info.guild-9"),
+                value=(await self.bot._(interaction,f"misc.{guild.verification_level}")).capitalize())
+        await interaction.followup.send(embed=embed)
 
-    @info_main.command(name="invite")
-    async def invite_info(self, ctx: MyContext, invite: discord.Invite):
+    async def invite_info(self, interaction: discord.Interaction, invite: discord.Invite):
         "Get informations about a Discord invite"
-        lang = await self.bot._(ctx.guild.id,"_used_locale")
-        since = await self.bot._(ctx.guild.id,"misc.since")
-        embed = discord.Embed(colour=default_color, timestamp=ctx.message.created_at)
+        lang = await self.bot._(interaction, "_used_locale")
+        since = await self.bot._(interaction, "misc.since")
+        embed = discord.Embed(colour=default_color)
         icon_url = invite.guild.icon.with_static_format('png') if invite.guild.icon else None
-        embed.set_author(name=f"{await self.bot._(ctx.guild.id, 'info.info.inv-4')} '{invite.code}'", icon_url=icon_url)
+        embed.set_author(name=f"{await self.bot._(interaction, 'info.info.inv-4')} '{invite.code}'", icon_url=icon_url)
         # Try to get the complete invite
         if invite.guild in self.bot.guilds:
             try:
@@ -558,65 +697,69 @@ Available types: member, role, user, emoji, channel, server, invite, category
             except discord.errors.Forbidden:
                 pass
             except Exception as err:
-                self.bot.dispatch("error", err, ctx)
+                self.bot.dispatch("error", err, interaction)
         # Invite URL
-        embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.inv-0"), value=invite.url,inline=True)
+        embed.add_field(name=await self.bot._(interaction, "info.info.inv-0"), value=invite.url, inline=True)
         # Inviter
-        embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.inv-1"),
+        embed.add_field(name=await self.bot._(interaction, "info.info.inv-1"),
                         value=(invite.inviter.global_name or invite.inviter.name)
-                        if invite.inviter is not None else await self.bot._(ctx.guild,'misc.unknown'))
+                        if invite.inviter is not None else await self.bot._(interaction, "misc.unknown"))
         # Invite uses
         if invite.max_uses is not None and invite.uses is not None:
             if invite.max_uses == 0:
-                uses = "{}/∞".format(invite.uses)
+                uses = f"{invite.uses}/∞"
             else:
-                uses = "{}/{}".format(invite.uses,invite.max_uses)
-            embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.inv-2"), value=uses)
+                uses = f"{invite.uses}/{invite.max_uses}"
+            embed.add_field(name=await self.bot._(interaction, "info.info.inv-2"), value=uses)
         # Duration
         if invite.max_age is not None:
             max_age = str(invite.max_age) if invite.max_age != 0 else "∞"
-            embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.inv-3"), value=max_age)
+            embed.add_field(name=await self.bot._(interaction, "info.info.inv-3"), value=max_age)
         if isinstance(invite.channel,(discord.PartialInviteChannel,discord.abc.GuildChannel)):
             # Guild name
-            embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.guild-0"), value=invite.guild.name)
+            embed.add_field(name=await self.bot._(interaction, "info.info.guild-0"), value=invite.guild.name)
             # Channel name
-            embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.textchan-5"), value="#"+invite.channel.name)
+            embed.add_field(name=await self.bot._(interaction, "info.info.textchan-5"), value="#"+invite.channel.name)
             # Guild icon
             if invite.guild.icon:
                 embed.set_thumbnail(url=icon_url)
             # Guild ID
-            embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.inv-6"), value=invite.guild.id)
+            embed.add_field(name=await self.bot._(interaction, "info.info.inv-6"), value=invite.guild.id)
             # Members count
             if invite.approximate_member_count:
-                embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.inv-7"), value=invite.approximate_member_count)
+                embed.add_field(name=await self.bot._(interaction, "info.info.inv-7"), value=invite.approximate_member_count)
         # Guild banner
         if invite.guild.banner is not None:
             embed.set_image(url=invite.guild.banner)
         # Guild description
         if invite.guild.description is not None and len(invite.guild.description) > 0:
-            embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.inv-8"), value=invite.guild.description)
+            embed.add_field(name=await self.bot._(interaction, "info.info.inv-8"), value=invite.guild.description)
         # Guild features
         if len(invite.guild.features) > 0:
-            tr = lambda x: self.bot._(ctx.guild.id,"info.info.guild-features."+x)
+            async def tr(x: str):
+                return await self.bot._(interaction, "info.info.guild-features." + x)
             features: list[str] = [await tr(x) for x in invite.guild.features]
             features = [f.split('.')[-1] if '.' in f else f for f in features]
-            embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.inv-9"), value=" - ".join(features))
+            embed.add_field(name=await self.bot._(interaction, "info.info.inv-9"), value=" - ".join(features))
         # Creation date
         if invite.created_at is not None:
             created_at = f"<t:{invite.created_at.timestamp():.0f}>"
-            show_hour = (ctx.bot.utcnow() - invite.created_at).days < 1
-            delta = await FormatUtils.time_delta(invite.created_at, ctx.bot.utcnow(), lang=lang, year=True, hour=show_hour)
-            embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.member-1"), value = "{} ({} {})".format(created_at,since,delta), inline=False)
-        await ctx.send(embed=embed)
+            show_hour = (self.bot.utcnow() - invite.created_at).days < 1
+            delta = await FormatUtils.time_delta(invite.created_at, self.bot.utcnow(), lang=lang, year=True, hour=show_hour)
+            embed.add_field(
+                name=await self.bot._(interaction, "info.info.member-1"),
+                value=f"{created_at} ({since} {delta})",
+                inline=False
+            )
+        await interaction.followup.send(embed=embed)
 
-    @info_main.command(name="category")
-    async def category_info(self, ctx: MyContext, category: discord.CategoryChannel):
+    async def category_info(self, interaction: discord.Interaction, category: discord.CategoryChannel):
         "Get informations about a category"
-        if not category.permissions_for(ctx.author).view_channel:
-            await ctx.send(await self.bot._(ctx.guild.id, "info.cant-see-channel"))
+        if not category.permissions_for(interaction.user).view_channel:
+            await interaction.followup.send(await self.bot._(interaction, "info.cant-see-channel"))
             return
-        lang = await self.bot._(ctx.guild.id,"_used_locale")
-        since = await self.bot._(ctx.guild.id,"misc.since")
+        lang = await self.bot._(interaction, "_used_locale")
+        since = await self.bot._(interaction, "misc.since")
         tchan = 0
         vchan = 0
         for channel in category.channels:
@@ -624,51 +767,66 @@ Available types: member, role, user, emoji, channel, server, invite, category
                 tchan += 1
             elif isinstance(channel, discord.VoiceChannel):
                 vchan +=1
-        embed = discord.Embed(colour=default_color, timestamp=ctx.message.created_at)
+        embed = discord.Embed(colour=default_color)
         icon_url = category.guild.icon.with_static_format('png') if category.guild.icon else None
-        embed.set_author(name=f"{await self.bot._(ctx.guild.id,'info.info.categ-0')} '{category.name}'", icon_url=icon_url)
-
-        embed.add_field(name=str(await self.bot._(ctx.guild.id,"misc.name")).capitalize(), value=category.name,inline=True)
-        embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.role-0"), value=category.id)
-        embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.categ-1"), value="{}/{}".format(category.position+1,len(ctx.guild.categories)))
-        embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.guild-6"), value=await self.bot._(ctx.guild.id,"info.info.categ-2", txt=tchan, voc=vchan))
+        embed.set_author(name=f"{await self.bot._(interaction,'info.info.categ-0')} '{category.name}'", icon_url=icon_url)
+        # Category name
+        embed.add_field(name=str(await self.bot._(interaction, "misc.name")).capitalize(), value=category.name, inline=True)
+        # ID
+        embed.add_field(name=await self.bot._(interaction, "info.info.role-0"), value=category.id)
+        # Position
+        embed.add_field(
+            name=await self.bot._(interaction, "info.info.categ-1"),
+            value=f"{category.position+1}/{len(category.guild.categories)}"
+        )
+        # Channels count
+        embed.add_field(
+            name=await self.bot._(interaction, "info.info.guild-6"),
+            value=await self.bot._(interaction, "info.info.categ-2", txt=tchan, voc=vchan)
+        )
+        # Created at
         created_at = f"<t:{category.created_at.timestamp():.0f}>"
-        show_hour = (ctx.bot.utcnow() - category.created_at).days < 1
-        delta = await FormatUtils.time_delta(category.created_at, ctx.bot.utcnow(), lang=lang, year=True, hour=show_hour)
-        embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.member-1"), value = "{} ({} {})".format(created_at,since,delta), inline=False)
-        await ctx.send(embed=embed)
+        show_hour = (self.bot.utcnow() - category.created_at).days < 1
+        delta = await FormatUtils.time_delta(category.created_at, self.bot.utcnow(), lang=lang, year=True, hour=show_hour)
+        embed.add_field(
+            name=await self.bot._(interaction, "info.info.member-1"),
+            value=f"{created_at} ({since} {delta})",
+            inline=False
+        )
+        await interaction.followup.send(embed=embed)
 
-    @info_main.command(name="forum")
-    async def forum_info(self, ctx: MyContext, forum: discord.ForumChannel):
+    async def forum_info(self, interaction: discord.Interaction, forum: discord.ForumChannel):
         "Get informations about a forum channel"
-        if not forum.permissions_for(ctx.author).view_channel:
-            await ctx.send(await self.bot._(ctx.guild.id, "info.cant-see-channel"))
+        if not forum.permissions_for(interaction.user).view_channel:
+            await interaction.followup.send(await self.bot._(interaction, "info.cant-see-channel"))
             return
-        lang = await self.bot._(ctx.guild.id,"_used_locale")
-        since = await self.bot._(ctx.guild.id,"misc.since")
-        embed = discord.Embed(colour=default_color, timestamp=ctx.message.created_at)
+        lang = await self.bot._(interaction, "_used_locale")
+        since = await self.bot._(interaction, "misc.since")
+        embed = discord.Embed(colour=default_color)
         icon_url = forum.guild.icon.with_static_format('png') if forum.guild.icon else None
-        title = await self.bot._(ctx.guild.id,"info.info.forum.title", name=forum.name)
+        title = await self.bot._(interaction, "info.info.forum.title", name=forum.name)
         embed.set_author(name=title, icon_url=icon_url)
         # Name
-        embed.add_field(name=str(await self.bot._(ctx.guild.id,"misc.name")).capitalize(), value=forum.name,inline=True)
+        embed.add_field(name=str(await self.bot._(interaction, "misc.name")).capitalize(), value=forum.name, inline=True)
         # ID
-        embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.role-0"), value=forum.id)
+        embed.add_field(name=await self.bot._(interaction, "info.info.role-0"), value=forum.id)
         # Category
         if forum.category:
-            embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.textchan-0"), value=forum.category.name)
+            embed.add_field(name=await self.bot._(interaction, "info.info.textchan-0"), value=forum.category.name)
         # NSFW
         if forum.nsfw:
-            nsfw = await self.bot._(ctx.guild.id,"misc.yes")
+            nsfw = await self.bot._(interaction, "misc.yes")
         else:
-            nsfw = await self.bot._(ctx.guild.id,"misc.no")
-        embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.textchan-2"), value=nsfw.capitalize())
+            nsfw = await self.bot._(interaction, "misc.no")
+        embed.add_field(name=await self.bot._(interaction, "info.info.textchan-2"), value=nsfw.capitalize())
         # Created at
         created_at = f"<t:{forum.created_at.timestamp():.0f}>"
-        show_hour = (ctx.bot.utcnow() - forum.created_at).days < 1
-        delta = await FormatUtils.time_delta(forum.created_at, ctx.bot.utcnow(), lang=lang, year=True, hour=show_hour)
-        embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.member-1"), value = "{} ({} {})".format(created_at,since,delta))
-        if forum.permissions_for(ctx.author).read_messages:
+        show_hour = (self.bot.utcnow() - forum.created_at).days < 1
+        delta = await FormatUtils.time_delta(forum.created_at, self.bot.utcnow(), lang=lang, year=True, hour=show_hour)
+        embed.add_field(
+            name=await self.bot._(interaction, "info.info.member-1"),
+            value=f"{created_at} ({since} {delta})")
+        if forum.permissions_for(interaction.user).read_messages:
             # Tags
             if forum.available_tags:
                 tags_list = []
@@ -678,30 +836,30 @@ Available types: member, role, user, emoji, channel, server, invite, category
                     else:
                         tags_list.append(f"`{tag.name}`")
                 tags = ", ".join(tags_list)
-                embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.forum.tags"), value=tags)
+                embed.add_field(name=await self.bot._(interaction, "info.info.forum.tags"), value=tags)
             # Default sort order
             if forum.default_sort_order == discord.ForumOrderType.latest_activity:
-                sort_order = await self.bot._(ctx.guild.id, "info.info.forum.sort-order-latest")
+                sort_order = await self.bot._(interaction, "info.info.forum.sort-order-latest")
             elif forum.default_sort_order == discord.ForumOrderType.creation_date:
-                sort_order = await self.bot._(ctx.guild.id, "info.info.forum.sort-order-creation")
+                sort_order = await self.bot._(interaction, "info.info.forum.sort-order-creation")
             elif forum.default_sort_order is None:
-                sort_order = await self.bot._(ctx.guild.id, "info.info.forum.sort-order-none")
+                sort_order = await self.bot._(interaction, "info.info.forum.sort-order-none")
             else:
                 sort_order = None
                 self.bot.dispatch("error", ValueError(f"Unknown forum sort order type: {forum.default_sort_order}"))
             if sort_order:
-                sort_order_title = await self.bot._(ctx.guild.id, "info.info.forum.sort-order")
+                sort_order_title = await self.bot._(interaction, "info.info.forum.sort-order")
                 embed.add_field(name=sort_order_title, value=sort_order)
             # Default emoji
             if forum.default_reaction_emoji:
-                embed.add_field(name=await self.bot._(ctx.guild.id, "info.info.forum.default-emoji"),
+                embed.add_field(name=await self.bot._(interaction, "info.info.forum.default-emoji"),
                                 value=forum.default_reaction_emoji)
             # Post slowmode
             if forum.slowmode_delay:
                 slowmode = await FormatUtils.time_delta(forum.slowmode_delay, lang=lang, year=True, hour=True)
             else:
-                slowmode = (await self.bot._(ctx.guild.id, "misc.none")).capitalize()
-            embed.add_field(name=await self.bot._(ctx.guild.id, "info.info.forum.slowmode"), value=slowmode)
+                slowmode = (await self.bot._(interaction, "misc.none")).capitalize()
+            embed.add_field(name=await self.bot._(interaction, "info.info.forum.slowmode"), value=slowmode)
             # Guidelines
             if forum.topic:
                 if len(forum.topic) > 400:
@@ -709,69 +867,69 @@ Available types: member, role, user, emoji, channel, server, invite, category
                 else:
                     guidelines = forum.topic
             else:
-                guidelines = (await self.bot._(ctx.guild.id, "misc.none")).capitalize()
-            embed.add_field(name=await self.bot._(ctx.guild.id, "info.info.forum.guidelines"), value=guidelines, inline=False)
-        await ctx.send(embed=embed)
+                guidelines = (await self.bot._(interaction, "misc.none")).capitalize()
+            embed.add_field(name=await self.bot._(interaction, "info.info.forum.guidelines"), value=guidelines, inline=False)
+        await interaction.followup.send(embed=embed)
 
-    @info_main.command(name="stage-channel")
-    async def stage_info(self, ctx: MyContext, stage: discord.StageChannel):
+    async def stagechannel_info(self, interaction: discord.Interaction, stage: discord.StageChannel):
         "Get information about a stage channel"
-        if not stage.permissions_for(ctx.author).view_channel:
-            await ctx.send(await self.bot._(ctx.guild.id, "info.cant-see-channel"))
+        if not stage.permissions_for(interaction.user).view_channel:
+            await interaction.followup.send(await self.bot._(interaction, "info.cant-see-channel"))
             return
-        lang = await self.bot._(ctx.guild.id,"_used_locale")
-        since = await self.bot._(ctx.guild.id,"misc.since")
-        embed = discord.Embed(colour=default_color, timestamp=ctx.message.created_at)
+        lang = await self.bot._(interaction, "_used_locale")
+        since = await self.bot._(interaction, "misc.since")
+        embed = discord.Embed(colour=default_color)
         icon_url = stage.guild.icon.with_static_format('png') if stage.guild.icon else None
-        title = await self.bot._(ctx.guild.id,"info.info.stage.title", name=stage.name)
+        title = await self.bot._(interaction, "info.info.stage.title", name=stage.name)
         embed.set_author(name=title, icon_url=icon_url)
         # Name
-        embed.add_field(name=(await self.bot._(ctx.guild.id,"misc.name")).capitalize(), value=stage.name,inline=True)
+        embed.add_field(name=(await self.bot._(interaction, "misc.name")).capitalize(), value=stage.name, inline=True)
         # ID
-        embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.role-0"), value=stage.id)
+        embed.add_field(name=await self.bot._(interaction, "info.info.role-0"), value=stage.id)
         # Category
         if stage.category:
-            embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.textchan-0"), value=stage.category.name)
+            embed.add_field(name=await self.bot._(interaction, "info.info.textchan-0"), value=stage.category.name)
         # NSFW
         if stage.nsfw:
-            nsfw = await self.bot._(ctx.guild.id,"misc.yes")
+            nsfw = await self.bot._(interaction, "misc.yes")
         else:
-            nsfw = await self.bot._(ctx.guild.id,"misc.no")
-        embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.textchan-2"), value=nsfw.capitalize())
+            nsfw = await self.bot._(interaction, "misc.no")
+        embed.add_field(name=await self.bot._(interaction, "info.info.textchan-2"), value=nsfw.capitalize())
         # Created at
         created_at = f"<t:{stage.created_at.timestamp():.0f}>"
-        show_hour = (ctx.bot.utcnow() - stage.created_at).days < 1
-        delta = await FormatUtils.time_delta(stage.created_at, ctx.bot.utcnow(), lang=lang, year=True, hour=show_hour)
-        embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.member-1"), value = "{} ({} {})".format(created_at,since,delta))
+        show_hour = (self.bot.utcnow() - stage.created_at).days < 1
+        delta = await FormatUtils.time_delta(stage.created_at, self.bot.utcnow(), lang=lang, year=True, hour=show_hour)
+        embed.add_field(
+            name=await self.bot._(interaction, "info.info.member-1"),
+            value=f"{created_at} ({since} {delta})")
         # Bitrate
         embed.add_field(name="Bitrate", value=str(stage.bitrate/1000)+" kbps")
         # Members count
-        embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.role-3"), value="{}/{}".format(
-            len(stage.members), stage.user_limit if stage.user_limit > 0 else "∞"
-        ))
+        users_limit = stage.user_limit if stage.user_limit > 0 else "∞"
+        embed.add_field(
+            name=await self.bot._(interaction, "info.info.role-3"),
+            value=f"{len(stage.members)}/{users_limit}"
+        )
         # Region
         if stage.rtc_region is not None:
-            embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.guild-2"), value=str(stage.rtc_region).capitalize())
+            embed.add_field(name=await self.bot._(interaction, "info.info.guild-2"), value=str(stage.rtc_region).capitalize())
         # Moderators
         if stage.moderators:
-            embed.add_field(name=await self.bot._(ctx.guild.id,"info.info.stage.moderators"),
+            embed.add_field(name=await self.bot._(interaction, "info.info.stage.moderators"),
                             value=", ".join(m.display_name for m in stage.moderators))
-        await ctx.send(embed=embed)
+        await interaction.followup.send(embed=embed)
 
-
-    @info_main.command(name="id", aliases=["snowflake"])
-    async def snowflake_infos(self, ctx: MyContext, snowflake: args.Snowflake):
+    async def snowflake_info(self, interaction: discord.Interaction, snowflake: args.Snowflake):
         "Get information about any Discord-generated ID"
         date = f"<t:{snowflake.date.timestamp():.0f}>"
-        embed = discord.Embed(color=default_color, timestamp=ctx.message.created_at)
-        embed.add_field(name=await self.bot._(ctx.channel,"info.info.snowflake-0"), value=date)
-        embed.add_field(name=await self.bot._(ctx.channel,"info.info.snowflake-2"), value=round(snowflake.date.timestamp()))
-        embed.add_field(name=await self.bot._(ctx.channel,"info.info.snowflake-6"), value=len(str(snowflake.id)))
-        embed.add_field(name=await self.bot._(ctx.channel,"info.info.snowflake-1"), value=snowflake.binary, inline=False)
-        embed.add_field(name=await self.bot._(ctx.channel,"info.info.snowflake-3"), value=snowflake.worker_id)
-        embed.add_field(name=await self.bot._(ctx.channel,"info.info.snowflake-4"), value=snowflake.process_id)
-        embed.set_footer(text=ctx.author, icon_url=ctx.author.display_avatar)
-        await ctx.send(embed=embed)
+        embed = discord.Embed(color=default_color)
+        embed.add_field(name=await self.bot._(interaction, "info.info.snowflake-0"), value=date)
+        embed.add_field(name=await self.bot._(interaction, "info.info.snowflake-2"), value=round(snowflake.date.timestamp()))
+        embed.add_field(name=await self.bot._(interaction, "info.info.snowflake-6"), value=len(str(snowflake.id)))
+        embed.add_field(name=await self.bot._(interaction, "info.info.snowflake-1"), value=snowflake.binary, inline=False)
+        embed.add_field(name=await self.bot._(interaction, "info.info.snowflake-3"), value=snowflake.worker_id)
+        embed.add_field(name=await self.bot._(interaction, "info.info.snowflake-4"), value=snowflake.process_id)
+        await interaction.followup.send(embed=embed)
 
 
 
@@ -1009,7 +1167,7 @@ Available types: member, role, user, emoji, channel, server, invite, category
         emb.add_field(name="Recent errors", value=str(feed.recent_errors))
         await interaction.response.send_message(embed=emb)
 
-    @commands.command(name="membercount",aliases=['member_count'])
+    @commands.command(name="membercount", aliases=['member_count'])
     @commands.guild_only()
     @commands.bot_has_permissions(send_messages=True)
     async def membercount(self, ctx: MyContext):
@@ -1020,7 +1178,12 @@ Available types: member, role, user, emoji, channel, server, invite, category
             return
         total, bots_count, online_count, unverified = await self.bot.get_cog("Utilities").get_members_repartition(ctx.guild.members)
         humans_count = total - bots_count
-        get_count = lambda nbr: "< 1" if 0 < nbr / total < 0.01 else ("> 99" if 1 > nbr/total > 0.99 else round(nbr*100/total))
+        def get_count(nbr: int):
+            if 0 < nbr / total < 0.01:
+                return "< 1"
+            elif 1 > nbr/total > 0.99:
+                return "> 99"
+            return round(nbr*100/total)
         humans_percent = get_count(humans_count)
         bots_percent = get_count(bots_count)
         online_percent = get_count(online_count)
