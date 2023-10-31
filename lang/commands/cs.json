@@ -62,7 +62,7 @@
         "rss enable": "povolit",
         "rss list": "seznam",
         "rss move": "přesun",
-        "rss refresh": "znovu načti",
+        "rss refresh": "znovu-načti",
         "rss remove": "odstranit",
         "rss set-embed": "nastavit-embed",
         "rss set-mentions": "nastavit-zmíňky",
