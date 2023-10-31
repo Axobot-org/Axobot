@@ -52,7 +52,7 @@
             "sort-order-creation": "Most-oldest-post-first",
             "sort-order-none": "I dunno"
         },
-        "guild-0": "Guild",
+        "guild-0": "Nice place",
         "guild-1": "Auwner",
         "guild-10": "Tim be4 being AFK",
         "guild-11.1": "20 first rawles (tot %{c})",
@@ -144,6 +144,7 @@
         "role-3": "Nmber ov members",
         "role-5": "Hierarchical posishun",
         "role-6": "Lonely userz",
+        "role-title": "Role",
         "role-specificities": {
             "field-name": "Weird things",
             "hoist": "Lonely role",
