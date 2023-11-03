@@ -947,15 +947,15 @@ class Info(commands.Cog):
     async def find_user(self, interaction: discord.Interaction, user: discord.User):
         "Find any user visible by the bot"
         # Servers list
-        servers_in = list()
+        servers_in: list[str] = []
         owned, membered = 0, 0
         if hasattr(user, "mutual_guilds"):
             for s in user.mutual_guilds:
                 if s.owner==user:
-                    servers_in.append(":crown: "+s.name)
+                    servers_in.append(f":crown: {s.name} ({s.id})")
                     owned += 1
                 else:
-                    servers_in.append("- "+s.name)
+                    servers_in.append(f"- {s.name} ({s.id})")
                     membered += 1
             if len("\n".join(servers_in)) > 1020:
                 servers_in = [f"{owned} owned servers, member of {membered} others"]
@@ -978,7 +978,7 @@ class Info(commands.Cog):
         disp_lang = list()
         if hasattr(user, "mutual_guilds"):
             for lang in await self.bot.get_cog('Utilities').get_languages(user):
-                disp_lang.append('{} ({}%)'.format(lang[0], round(lang[1]*100)))
+                disp_lang.append(f"{lang[0]} ({lang[1]*100:.0f}%)")
         if len(disp_lang) == 0:
             disp_lang = ["Unknown"]
         # User name
@@ -990,9 +990,9 @@ class Info(commands.Cog):
             user_name = user.name
         # XP sus
         xp_sus = "Unknown"
-        if Xp := self.bot.get_cog("Xp"):
-            if Xp.sus is not None:
-                xp_sus = str(user.id in Xp.sus)
+        if xp_cog := self.bot.get_cog("Xp"):
+            if xp_cog.sus is not None:
+                xp_sus = str(user.id in xp_cog.sus)
         # ----
         if interaction.guild is None:
             color = None
