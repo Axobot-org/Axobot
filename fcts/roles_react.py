@@ -339,7 +339,7 @@ Opposite is the subcommand 'join'
         if len(embed.embeds) != 1 or embed.embeds[0].footer.text != self.footer_txt:
             return await ctx.send(await self.bot._(ctx.guild, "roles_react.not-zbot-embed"))
         if not embed.channel.permissions_for(embed.guild.me).add_reactions:
-            return await ctx.send(await self.bot._(ctx.guild, 'fun', "cant-react"))
+            return await ctx.send(await self.bot._(ctx.guild, "poll.cant-react"))
         emb = embed.embeds[0]
         try:
             full_list: dict[str, dict[str, Any]] = {x['emoji']: x for x in await self.rr_list_role(ctx.guild.id)}

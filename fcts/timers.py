@@ -361,9 +361,6 @@ class Timers(commands.Cog):
         """Remove every pending reminder
 
         ..Doc miscellaneous.html#clear-every-reminders"""
-        if not (ctx.guild is None or ctx.channel.permissions_for(ctx.guild.me).add_reactions):
-            await ctx.send(await self.bot._(ctx.channel, "fun.cant-react"))
-            return
         count = await self.db_get_user_reminders_count(ctx.author.id)
         if count == 0:
             await ctx.send(await self.bot._(ctx.channel, "timers.rmd.empty"))
