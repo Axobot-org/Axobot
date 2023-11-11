@@ -1,6 +1,6 @@
 import importlib
 import re
-from typing import Any, Optional, Tuple, Union
+from typing import Any, Tuple, Union
 
 import discord
 from discord.ext import commands
@@ -14,6 +14,8 @@ importlib.reload(args)
 
 
 class RolesReact(commands.Cog):
+    "Allow members to get new roles by clicking on reactions"
+
     def __init__(self, bot: Axobot):
         self.bot = bot
         self.file = 'roles_react'
@@ -21,13 +23,14 @@ class RolesReact(commands.Cog):
         self.guilds_which_have_roles = set()
         self.cache_initialized = False
         self.embed_color = 12118406
-        self.footer_txt = 'ZBot roles reactions'
+        self.footer_texts = ("Axobot roles reactions", "ZBot roles reactions")
 
     @commands.Cog.listener()
     async def on_ready(self):
         self.table = 'roles_react_beta' if self.bot.beta else 'roles_react'
 
     async def prepare_react(self, payload: discord.RawReactionActionEvent) -> Tuple[discord.Message, discord.Role]:
+        "Handle new added/removed reactions and check if they are roles reactions"
         if payload.guild_id is None or payload.user_id == self.bot.user.id:
             return None, None
         if not self.cache_initialized:
@@ -42,11 +45,16 @@ class RolesReact(commands.Cog):
         except discord.NotFound: # we don't care about those
             return None, None
         except Exception as err:
-            self.bot.log.warning(f"Could not fetch roles-reactions message {payload.message_id} in guild {payload.guild_id}: {err}")
+            self.bot.log.warning(
+                f"Could not fetch roles-reactions message {payload.message_id} in guild {payload.guild_id}: {err}"
+            )
             return None, None
-        if len(msg.embeds) == 0 or msg.embeds[0].footer.text != self.footer_txt:
+        if len(msg.embeds) == 0 or msg.embeds[0].footer.text not in self.footer_texts:
             return None, None
-        temp = await self.rr_list_role(payload.guild_id, payload.emoji.id if payload.emoji.is_custom_emoji() else payload.emoji.name)
+        temp = await self.rr_list_role(
+            payload.guild_id,
+            payload.emoji.id if payload.emoji.is_custom_emoji() else payload.emoji.name
+        )
         if len(temp) == 0:
             return None, None
         role = self.bot.get_guild(payload.guild_id).get_role(temp[0]["role"])
@@ -79,7 +87,7 @@ class RolesReact(commands.Cog):
 
     async def rr_get_guilds(self) -> set:
         """Get the list of guilds which have roles reactions"""
-        query = "SELECT `guild` FROM `{}`;".format(self.table)
+        query = f"SELECT `guild` FROM `{self.table}`;"
         async with self.bot.db_query(query) as query_results:
             self.guilds_which_have_roles = {x['guild'] for x in query_results}
         self.cache_initialized = True
@@ -89,21 +97,21 @@ class RolesReact(commands.Cog):
         """Add a role reaction in the database"""
         if isinstance(emoji, discord.Emoji):
             emoji = emoji.id
-        query = ("INSERT INTO `{}` (`guild`,`role`,`emoji`,`description`) VALUES (%(g)s,%(r)s,%(e)s,%(d)s);".format(self.table))
+        query = f"INSERT INTO `{self.table}` (`guild`,`role`,`emoji`,`description`) VALUES (%(g)s,%(r)s,%(e)s,%(d)s);"
         async with self.bot.db_query(query, {'g': guild, 'r': role, 'e': emoji, 'd': desc}):
             pass
         return True
 
-    async def rr_list_role(self, guild: int, emoji: str = None):
+    async def rr_list_role(self, guild_id: int, emoji: str = None):
         """List role reaction in the database"""
         if isinstance(emoji, discord.Emoji):
             emoji = emoji.id
         if emoji is None:
-            query = "SELECT * FROM `{}` WHERE guild={} ORDER BY added_at;".format(self.table, guild)
+            query = f"SELECT * FROM `{self.table}` WHERE guild=%(g)s ORDER BY added_at;"
         else:
-            query = "SELECT * FROM `{}` WHERE guild={} AND emoji='{}' ORDER BY added_at;".format(self.table, guild, emoji)
+            query = f"SELECT * FROM `{self.table}` WHERE guild=%(g)s AND emoji=%(e)s ORDER BY added_at;"
         liste: list[dict[str, Any]] = []
-        async with self.bot.db_query(query) as query_results:
+        async with self.bot.db_query(query, {"g": guild_id, "e": emoji}) as query_results:
             for row in query_results:
                 if emoji is None or row['emoji'] == str(emoji):
                     liste.append(row)
@@ -111,8 +119,8 @@ class RolesReact(commands.Cog):
 
     async def rr_remove_role(self, rr_id: int):
         """Remove a role reaction from the database"""
-        query = ("DELETE FROM `{}` WHERE `ID`={};".format(self.table, rr_id))
-        async with self.bot.db_query(query):
+        query = f"DELETE FROM `{self.table}` WHERE `ID`=%s;"
+        async with self.bot.db_query(query, (rr_id,)):
             pass
         return True
 
@@ -246,7 +254,7 @@ It will only display the whole message with reactions. Still very cool tho
         des, emojis = await self.create_list_embed(roles_list, ctx.guild)
         title = await self.bot._(ctx.guild.id, "roles_react.rr-embed")
         emb = discord.Embed(title=title, description=des, color=self.embed_color, timestamp=ctx.message.created_at)
-        emb.set_footer(text=self.footer_txt)
+        emb.set_footer(text=self.footer_texts[0])
         msg = await ctx.send(embed=emb)
         for emoji in emojis:
             try:
@@ -319,11 +327,13 @@ Opposite is the subcommand 'join'
             self.bot.dispatch("error", err)
         else:
             if not ignore_success:
-                await channel.send(await self.bot._(guild.id, "roles_react.role-given" if give else "roles_react.role-lost", r=role.name))
+                await channel.send(
+                    await self.bot._(guild.id, "roles_react.role-given" if give else "roles_react.role-lost", r=role.name)
+                )
 
     @rr_main.command(name='update')
     @commands.check(checks.database_connected)
-    async def rr_update(self, ctx: MyContext, embed: discord.Message, change_description: Optional[bool] = True,
+    async def rr_update(self, ctx: MyContext, embed: discord.Message, change_description: bool = True,
                         emojis: commands.Greedy[Union[discord.Emoji, args.UnicodeEmoji]] = None):
         """Update an Axobot message to refresh roles/reactions
         If you don't want to update the embed content (for example if it's a custom embed) then you can use 'False' as a second argument, and I will only check the reactions
@@ -336,7 +346,7 @@ Opposite is the subcommand 'join'
         ..Doc roles-reactions.html#update-your-embed"""
         if embed.author != ctx.guild.me:
             return await ctx.send(await self.bot._(ctx.guild, "roles_react.not-zbot-msg"))
-        if len(embed.embeds) != 1 or embed.embeds[0].footer.text != self.footer_txt:
+        if len(embed.embeds) != 1 or embed.embeds[0].footer.text not in self.footer_texts:
             return await ctx.send(await self.bot._(ctx.guild, "roles_react.not-zbot-embed"))
         if not embed.channel.permissions_for(embed.guild.me).add_reactions:
             return await ctx.send(await self.bot._(ctx.guild, "poll.cant-react"))
