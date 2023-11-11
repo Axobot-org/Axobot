@@ -2,8 +2,10 @@ import json
 import os
 from typing import Literal
 
-from .dict_types import (EventData, EventItem, EventRewardRole,
-                         EventsTranslation, EventType, EventItemWithCount)
+from .abstract_subcog import AbstractSubcog
+from .dict_types import (EventData, EventItem, EventItemWithCount,
+                         EventRewardRole, EventsTranslation, EventType)
+from .random_collect_subcog import RandomCollectSubcog
 
 
 def get_events_translations() -> dict[Literal["fr", "en"], EventsTranslation]:
@@ -18,4 +20,6 @@ __all__ = (
     "EventRewardRole",
     "EventType",
     "EventItemWithCount",
+    "AbstractSubcog",
+    "RandomCollectSubcog"
 )

@@ -6,9 +6,9 @@ import discord
 from discord.ext import commands, tasks
 
 from libs.bot_classes import SUPPORT_GUILD_ID, Axobot, MyContext
-from libs.bot_events import (EventData, EventRewardRole, EventType,
+from libs.bot_events import (AbstractSubcog, EventData, EventRewardRole,
+                             EventType, RandomCollectSubcog,
                              get_events_translations)
-from libs.bot_events.random_collect_subcog import RandomCollectSubcog
 from libs.checks.checks import database_connected
 
 
@@ -18,10 +18,6 @@ class BotEvents(commands.Cog):
     def __init__(self, bot: Axobot):
         self.bot = bot
         self.file = "bot_events"
-        # self.collect_reward = [-8, 25]
-        # self.collect_cooldown = 60*60 # (1h) time in seconds between 2 collects
-        # self.collect_max_strike_period = 3600 * 2 # (2h) time in seconds after which the strike level is reset to 0
-        # self.collect_bonus_per_strike = 1.05 # the amount of points is multiplied by this number for each strike level
         self.translations_data = get_events_translations()
 
         self.current_event: Optional[EventType] = None
@@ -33,10 +29,11 @@ class BotEvents(commands.Cog):
         self.coming_event_id: Optional[str] = None
         self.update_current_event()
 
-        self._subcog = RandomCollectSubcog(self.bot, self.current_event, self.current_event_data, self.current_event_id)
+        self._subcog: AbstractSubcog = RandomCollectSubcog(
+            self.bot, self.current_event, self.current_event_data, self.current_event_id)
 
     @property
-    def subcog(self):
+    def subcog(self) -> AbstractSubcog:
         "Return the subcog populated with the current event data"
         if self._subcog.current_event != self.current_event or self._subcog.current_event_data != self.current_event_data:
             self.bot.log.info("[BotEvents] Updating subcog with new data")
@@ -219,7 +216,7 @@ class BotEvents(commands.Cog):
                 return
         cards = await users_cog.get_rankcards(user)
         if points is None:
-            points = await self.db_get_event_rank(user.id)
+            points = await self.subcog.db_get_event_rank(user.id)
             points = 0 if (points is None) else points["points"]
         for reward in rewards:
             if reward["rank_card"] not in cards and points >= reward["points"]:
@@ -243,21 +240,11 @@ class BotEvents(commands.Cog):
         if (member := support_guild.get_member(user_id)) is None:
             return
         if points is None:
-            points = await self.db_get_event_rank(user_id)
+            points = await self.subcog.db_get_event_rank(user_id)
             points = 0 if (points is None) else points["points"]
         for reward in rewards:
             if points >= reward["points"]:
                 await member.add_roles(discord.Object(reward["role_id"]))
-
-    async def db_get_event_rank(self, user_id: int):
-        "Get the ranking of a user"
-        if not self.bot.database_online:
-            return None
-        query = "SELECT `user_id`, `points`, FIND_IN_SET( `points`, \
-            ( SELECT GROUP_CONCAT( `points` ORDER BY `points` DESC ) FROM `event_points` WHERE `beta` = %(beta)s ) ) AS rank \
-                FROM `event_points` WHERE `user_id` = %(user)s AND `beta` = %(beta)s"
-        async with self.bot.db_query(query, {'user': user_id, 'beta': self.bot.beta}, fetchone=True) as query_results:
-            return query_results or None
 
     async def db_add_user_points(self, user_id: int, points: int):
         "Add some 'other' events points to a user"
