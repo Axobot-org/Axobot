@@ -60,4 +60,4 @@ The second argument 'changeDescription' can be used when you don't want Axobot t
 
 You can also use the third argument, a list of emojis, if you want your embed to contain only specific roles/emojis. Thus you can create different roles-reactions embeds with the same system.
 
-.. note:: Note that there are two criteria for the bot to recognize the embed as its own: it must be sent by itself, and the footer text must be the same as in the official embeds. This means that you can use the `embed` command to send a custom embed, it will still work.
+.. note:: Note that there are two criteria for the bot to recognize the embed as its own: it must be sent by itself, and the footer text must be the same as in the official embeds (i.e. :code:`Axobot roles reactions`). This means that you can use the `embed` command to send a custom embed, it will still work.
