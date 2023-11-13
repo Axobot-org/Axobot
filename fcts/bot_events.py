@@ -7,8 +7,7 @@ from discord.ext import commands, tasks
 
 from libs.bot_classes import SUPPORT_GUILD_ID, Axobot, MyContext
 from libs.bot_events import (AbstractSubcog, EventData, EventRewardRole,
-                             EventType, RandomCollectSubcog,
-                             get_events_translations)
+                             EventType, RandomCollectSubcog)
 from libs.checks.checks import database_connected
 
 
@@ -18,7 +17,6 @@ class BotEvents(commands.Cog):
     def __init__(self, bot: Axobot):
         self.bot = bot
         self.file = "bot_events"
-        self.translations_data = get_events_translations()
 
         self.current_event: Optional[EventType] = None
         self.current_event_data: EventData = {}
@@ -136,13 +134,13 @@ class BotEvents(commands.Cog):
         current_event = self.current_event_id
         lang = await self.bot._(ctx.channel, '_used_locale')
         lang = 'en' if lang not in ('en', 'fr') else lang
-        events_desc = self.translations_data[lang]["events_desc"]
+        events_desc = self.subcog.translations_data[lang]["events_desc"]
 
         if current_event in events_desc:
             event_desc = events_desc[current_event]
             # Title
             try:
-                title = self.translations_data[lang]["events_title"][current_event]
+                title = self.subcog.translations_data[lang]["events_title"][current_event]
             except KeyError:
                 title = self.current_event
             # Begin/End dates
@@ -161,7 +159,7 @@ class BotEvents(commands.Cog):
                     value=end
                 )
                 # Prices to win
-                prices = self.translations_data[lang]["events_prices"]
+                prices = self.subcog.translations_data[lang]["events_prices"]
                 if current_event in prices:
                     points = await self.bot._(ctx.channel, "bot_events.points")
                     prices = [f"- **{k} {points}:** {v}" for k,

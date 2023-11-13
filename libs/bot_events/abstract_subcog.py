@@ -5,6 +5,7 @@ from typing import Optional, TypedDict
 import discord
 
 from libs.bot_classes import Axobot, MyContext
+from libs.bot_events.get_translations import get_events_translations
 from libs.bot_events.dict_types import (EventData, EventItem,
                                         EventItemWithCount, EventType)
 from libs.tips import generate_random_tip
@@ -26,6 +27,7 @@ class AbstractSubcog(ABC):
         self.current_event = current_event
         self.current_event_data = current_event_data
         self.current_event_id = current_event_id
+        self.translations_data = get_events_translations()
 
     @abstractmethod
     async def on_message(self, msg: discord.Message):
@@ -71,6 +73,13 @@ class AbstractSubcog(ABC):
             "inline": False
         }
 
+    async def get_seconds_since_last_collect(self, user_id: int):
+        "Get the seconds since the last collect from a user"
+        last_collect = await self.db_get_last_user_collect(user_id)
+        if last_collect is None:
+            return 1e9
+        return (self.bot.utcnow() - last_collect).total_seconds()
+
     async def db_get_event_top(self, number: int):
         "Get the event points leaderboard containing at max the given number of users"
         if not self.bot.database_online:
@@ -109,7 +118,7 @@ class AbstractSubcog(ABC):
         async with self.bot.db_query(query, (user_id, self.bot.beta)) as query_results:
             return query_results
 
-    async def db_get_seconds_since_last_collect(self, user_id: int):
+    async def db_get_last_user_collect(self, user_id: int) -> datetime.datetime:
         "Get the last collect datetime from a user"
         if not self.bot.database_online:
             return None
@@ -120,10 +129,10 @@ class AbstractSubcog(ABC):
             query_result: tuple[datetime.datetime]
             # if no last collect, return a very high number
             if query_result[0] is None:
-                return 1e9
+                return None
             # apply utc offset
             last_collect = query_result[0].replace(tzinfo=datetime.timezone.utc)
-        return (self.bot.utcnow() - last_collect).total_seconds()
+        return last_collect
 
     async def db_add_user_items(self, user_id: int, items_ids: list[int]):
         "Add some items to a user's collection"
