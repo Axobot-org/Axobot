@@ -5,7 +5,6 @@ from typing import Any, Literal, Optional
 import discord
 
 from libs.bot_classes import Axobot, MyContext
-from libs.bot_events import get_events_translations
 from libs.bot_events.abstract_subcog import AbstractSubcog
 from libs.bot_events.dict_types import EventData, EventItem, EventType
 from libs.formatutils import FormatUtils
@@ -23,7 +22,6 @@ class RandomCollectSubcog(AbstractSubcog):
         self.collect_cooldown = 60*60 # (1h) time in seconds between 2 collects
         self.collect_max_strike_period = 3600 * 2 # (2h) time in seconds after which the strike level is reset to 0
         self.collect_bonus_per_strike = 1.05 # the amount of points is multiplied by this number for each strike level
-        self.translations_data = get_events_translations()
 
     async def on_message(self, msg: discord.Message):
         "Add random reaction to some messages"
@@ -163,7 +161,7 @@ class RandomCollectSubcog(AbstractSubcog):
         await ctx.defer()
 
         # check last collect from this user
-        seconds_since_last_collect = await self.db_get_seconds_since_last_collect(ctx.author.id)
+        seconds_since_last_collect = await self.get_seconds_since_last_collect(ctx.author.id)
         can_collect, is_strike = await self.check_user_collect_availability(ctx.author.id, seconds_since_last_collect)
         if not can_collect:
             # cooldown error
@@ -245,7 +243,7 @@ class RandomCollectSubcog(AbstractSubcog):
         if not self.bot.database_online or self.bot.current_event is None:
             return False, False
         if not seconds_since_last_collect:
-            seconds_since_last_collect = await self.db_get_seconds_since_last_collect(user_id)
+            seconds_since_last_collect = await self.get_seconds_since_last_collect(user_id)
         if seconds_since_last_collect is None:
             return True, False
         if seconds_since_last_collect < self.collect_cooldown:
