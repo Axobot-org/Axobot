@@ -1,8 +1,7 @@
 import datetime
 from typing import Literal, Optional, TypedDict, Union
 
-
-EventType = Literal["blurple", "halloween", "fish"]
+EventType = Literal["blurple", "halloween", "fish", "christmas"]
 
 class EventsTranslation(TypedDict):
     "Represents the translations for the bot events in one language"

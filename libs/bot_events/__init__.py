@@ -1,4 +1,5 @@
 from .abstract_subcog import AbstractSubcog
+from .christmas_subcog import ChristmasSubcog
 from .dict_types import (EventData, EventItem, EventItemWithCount,
                          EventRewardRole, EventType)
 from .get_translations import get_events_translations
@@ -12,5 +13,6 @@ __all__ = (
     "EventType",
     "EventItemWithCount",
     "AbstractSubcog",
-    "RandomCollectSubcog"
+    "RandomCollectSubcog",
+    "ChristmasSubcog",
 )
