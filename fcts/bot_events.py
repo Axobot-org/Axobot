@@ -6,8 +6,8 @@ import discord
 from discord.ext import commands, tasks
 
 from libs.bot_classes import SUPPORT_GUILD_ID, Axobot, MyContext
-from libs.bot_events import (AbstractSubcog, EventData, EventRewardRole,
-                             EventType, RandomCollectSubcog)
+from libs.bot_events import (AbstractSubcog, ChristmasSubcog, EventData,
+                             EventRewardRole, EventType)
 from libs.checks.checks import database_connected
 
 
@@ -27,7 +27,7 @@ class BotEvents(commands.Cog):
         self.coming_event_id: Optional[str] = None
         self.update_current_event()
 
-        self._subcog: AbstractSubcog = RandomCollectSubcog(
+        self._subcog: AbstractSubcog = ChristmasSubcog(
             self.bot, self.current_event, self.current_event_data, self.current_event_id)
 
     @property
@@ -35,7 +35,7 @@ class BotEvents(commands.Cog):
         "Return the subcog populated with the current event data"
         if self._subcog.current_event != self.current_event or self._subcog.current_event_data != self.current_event_data:
             self.bot.log.info("[BotEvents] Updating subcog with new data")
-            self._subcog = RandomCollectSubcog(self.bot, self.current_event, self.current_event_data, self.current_event_id)
+            self._subcog = ChristmasSubcog(self.bot, self.current_event, self.current_event_data, self.current_event_id)
         return self._subcog
 
     async def cog_load(self):
