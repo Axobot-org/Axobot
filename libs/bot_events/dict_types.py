@@ -30,12 +30,14 @@ class EventRewardCard(TypedDict):
     points: int
     reward_type: Literal["rankcard"]
     rank_card: str
+    min_date: Optional[str]
 
 class EventRewardRole(TypedDict):
     "Represents the special role reward for an event"
     points: int
     reward_type: Literal["role"]
     role_id: int
+    min_date: Optional[str]
 
 class EventRewardCustom(TypedDict):
     "Represents a custom reward for an event"
