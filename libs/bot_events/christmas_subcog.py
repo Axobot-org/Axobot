@@ -86,15 +86,16 @@ class ChristmasSubcog(AbstractSubcog):
         # send result
         if ctx.can_send_embed:
             title = self.translations_data[lang]["events_title"][current_event]
-            emb = discord.Embed(title=title, description=txt, color=self.current_event_data["color"])
+            emb = discord.Embed(title="✨ "+title, description=txt, color=self.current_event_data["color"])
             emb.add_field(**await self.get_random_tip_field(ctx.channel))
+            emb.set_thumbnail(url="https://cdn-icons-png.flaticon.com/512/4213/4213958.png")
             await ctx.send(embed=emb)
         else:
             await ctx.send(txt)
 
     async def today(self):
-        # return dt.datetime.now(dt.timezone.utc).date()
-        return dt.date(2023, 12, 5)
+        return dt.datetime.now(dt.timezone.utc).date()
+        # return dt.date(2023, 12, 1)
 
     async def get_calendar_gifts_from_date(self, last_collect_day: dt.date) -> list[EventItem]:
         "Get the list of the gifts from the advent calendar from a given date"
@@ -132,10 +133,10 @@ class ChristmasSubcog(AbstractSubcog):
         today = await self.today()
         total_points = sum(item["points"] for item in items)
         if today == last_collect_day:
-            text = f"Here is today's gift (**{total_points} points**):"
+            text = f"### Here is today's gift (**{total_points} points**):"
         else:
             missed_days = min(today.day - last_collect_day.day, 3)
-            text = f"Here are today's gifts, as well as the {missed_days} missed days (**{total_points} points**):"
+            text = f"### Here are today's gifts, as well as {missed_days} missed days (**{total_points} points**):"
         items_group: dict[int, int] = defaultdict(int)
         for item in items:
             items_group[item["item_id"]] += 1
