@@ -5,9 +5,9 @@ from typing import Optional, TypedDict
 import discord
 
 from libs.bot_classes import Axobot, MyContext
-from libs.bot_events.get_translations import get_events_translations
 from libs.bot_events.dict_types import (EventData, EventItem,
                                         EventItemWithCount, EventType)
+from libs.bot_events.get_translations import get_events_translations
 from libs.tips import generate_random_tip
 
 

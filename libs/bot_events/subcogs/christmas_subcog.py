@@ -6,8 +6,8 @@ from typing import Optional
 import discord
 
 from libs.bot_classes import Axobot
-from libs.bot_events.abstract_subcog import AbstractSubcog
 from libs.bot_events.dict_types import EventData, EventItem, EventType
+from libs.bot_events.subcogs.abstract_subcog import AbstractSubcog
 
 # list of the advent calendar items IDs per day between 1 and 24
 #  on december 25th the card will be unlocked
