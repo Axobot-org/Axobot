@@ -5,8 +5,8 @@ from typing import Any, Literal, Optional
 import discord
 
 from libs.bot_classes import Axobot, MyContext
-from libs.bot_events.abstract_subcog import AbstractSubcog
 from libs.bot_events.dict_types import EventData, EventItem, EventType
+from libs.bot_events.subcogs.abstract_subcog import AbstractSubcog
 from libs.formatutils import FormatUtils
 from utils import OUTAGE_REASON
 
