@@ -198,7 +198,7 @@ class BotEvents(commands.Cog):
             ]
             if related_objective and (min_date := related_objective[0].get("min_date")):
                 parsed_date = datetime.datetime.strptime(min_date, "%Y-%m-%d").replace(tzinfo=datetime.timezone.utc)
-                format_date = await FormatUtils.date(parsed_date, hour=False, seconds=False, digital=True)
+                format_date = await FormatUtils.date(parsed_date, hour=False, seconds=False)
                 description += f" ({await self.bot._(channel, 'bot_events.available-starting', date=format_date)})"
             prices.append(f"- **{required_points} {points}:** {description}")
         return "\n".join(prices)
