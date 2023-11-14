@@ -66,7 +66,6 @@ class RandomCollectSubcog(AbstractSubcog):
             return
 
         emb = discord.Embed(title=title, description=desc, color=self.current_event_data["color"])
-        user: discord.User
         emb.set_author(name=user, icon_url=user.display_avatar.replace(static_format="png", size=32))
         for field in await self.generate_user_profile_rank_fields(ctx, lang, user):
             emb.add_field(**field)
