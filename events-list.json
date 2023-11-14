@@ -202,5 +202,42 @@
             ],
             "probability": 0.05
         }
+    },
+    "christmas-2023": {
+        "begin": "2023-12-01",
+        "end": "2023-12-31",
+        "type": "christmas",
+        "icon": "https://zrunner.me/cdn/halloween_2023.png",
+        "color": 4886759,
+        "objectives": [
+            {
+                "points": 300,
+                "reward_type": "role",
+                "role_id": 1159531747877330994
+            },
+            {
+                "points": 600,
+                "reward_type": "rankcard",
+                "rank_card": "christmas23",
+                "min_date": "2023-12-25"
+            }
+        ],
+        "emojis": {
+            "reactions_list": [
+                "❄",
+                "⛇",
+                "🎅",
+                "🎄",
+                "🎁"
+            ],
+            "triggers": [
+                "christmas",
+                "present",
+                "noël",
+                "xmas",
+                "snowflake"
+            ],
+            "probability": 0.08
+        }
     }
 }
