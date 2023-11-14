@@ -1,4 +1,5 @@
 {
+    "available-starting": "available from %{date}",
     "collect": {
         "got-points": "You didn't find any exciting item this time, but still managed to **earn %{points} event points**!",
         "lost-points": "It seems like you didn't come accross any collectible item on your way, and you somehow **lost %{points} event points**...",

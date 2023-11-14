@@ -9,6 +9,7 @@ from libs.bot_classes import SUPPORT_GUILD_ID, Axobot, MyContext
 from libs.bot_events import (AbstractSubcog, ChristmasSubcog, EventData,
                              EventRewardRole, EventType)
 from libs.checks.checks import database_connected
+from libs.formatutils import FormatUtils
 
 
 class BotEvents(commands.Cog):
@@ -88,7 +89,7 @@ class BotEvents(commands.Cog):
             objective
             for objective in self.current_event_data["objectives"]
             if objective["reward_type"] == reward_type
-            ]
+        ]
 
     @tasks.loop(time=[
         datetime.time(hour=0,  tzinfo=datetime.timezone.utc),
@@ -159,14 +160,11 @@ class BotEvents(commands.Cog):
                     value=end
                 )
                 # Prices to win
-                prices = self.subcog.translations_data[lang]["events_prices"]
-                if current_event in prices:
-                    points = await self.bot._(ctx.channel, "bot_events.points")
-                    prices = [f"- **{k} {points}:** {v}" for k,
-                              v in prices[current_event].items()]
+                prices_translations = self.subcog.translations_data[lang]["events_prices"]
+                if current_event in prices_translations:
                     emb.add_field(
                         name=await self.bot._(ctx.channel, "bot_events.events-price-title"),
-                        value="\n".join(prices),
+                        value=await self.get_info_prices_field(ctx.channel),
                         inline=False
                     )
                 await ctx.send(embed=emb)
@@ -184,6 +182,26 @@ class BotEvents(commands.Cog):
             await ctx.send(await self.bot._(ctx.channel, "bot_events.nothing-desc"))
             if current_event:
                 self.bot.dispatch("error", ValueError(f"'{current_event}' has no event description"), ctx)
+
+    async def get_info_prices_field(self, channel):
+        "Get the prices field text for the current event"
+        prices_translations = self.subcog.translations_data["en"]["events_prices"]
+        if self.current_event_id not in prices_translations:
+            return await self.bot._(channel, "bot_events.nothing-desc")
+        points = await self.bot._(channel, "bot_events.points")
+        prices: list[str] = []
+        for required_points, description in prices_translations[self.current_event_id].items():
+            related_objective = [
+                objective
+                for objective in self.current_event_data["objectives"]
+                if str(objective["points"]) == required_points
+            ]
+            if related_objective and (min_date := related_objective[0].get("min_date")):
+                parsed_date = datetime.datetime.strptime(min_date, "%Y-%m-%d").replace(tzinfo=datetime.timezone.utc)
+                format_date = await FormatUtils.date(parsed_date, hour=False, seconds=False, digital=True)
+                description += f" ({await self.bot._(channel, 'bot_events.available-starting', date=format_date)})"
+            prices.append(f"- **{required_points} {points}:** {description}")
+        return "\n".join(prices)
 
     @events_main.command(name="profile")
     @commands.check(database_connected)
@@ -218,6 +236,10 @@ class BotEvents(commands.Cog):
             points = 0 if (points is None) else points["points"]
         for reward in rewards:
             if reward["rank_card"] not in cards and points >= reward["points"]:
+                if min_date := reward.get("min_date"):
+                    parsed_date = datetime.datetime.strptime(min_date, "%Y-%m-%d").replace(tzinfo=datetime.timezone.utc)
+                    if self.bot.utcnow() < parsed_date:
+                        continue
                 await users_cog.set_rankcard(user, reward["rank_card"], True)
                 # send internal log
                 embed = discord.Embed(
@@ -242,6 +264,10 @@ class BotEvents(commands.Cog):
             points = 0 if (points is None) else points["points"]
         for reward in rewards:
             if points >= reward["points"]:
+                if min_date := reward.get("min_date"):
+                    parsed_date = datetime.datetime.strptime(min_date, "%Y-%m-%d").replace(tzinfo=datetime.timezone.utc)
+                    if self.bot.utcnow() < parsed_date:
+                        continue
                 await member.add_roles(discord.Object(reward["role_id"]))
 
     async def db_add_user_points(self, user_id: int, points: int):
