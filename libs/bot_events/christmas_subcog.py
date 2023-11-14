@@ -59,6 +59,31 @@ class ChristmasSubcog(AbstractSubcog):
 
     async def profile_cmd(self, ctx, user):
         "Displays the profile of the user"
+        lang = await self.bot._(ctx.channel, '_used_locale')
+        lang = 'en' if lang not in ('en', 'fr') else lang
+        events_desc = self.translations_data[lang]["events_desc"]
+
+        # if no event
+        if not self.current_event_id in events_desc:
+            await ctx.send(await self.bot._(ctx.channel, "bot_events.nothing-desc"))
+            if self.current_event_id:
+                self.bot.dispatch("error", ValueError(f"'{self.current_event_id}' has no event description"), ctx)
+            return
+        # if current event has no objectives
+        if not self.current_event_data["objectives"]:
+            cmd_mention = await self.bot.get_command_mention("event info")
+            await ctx.send(await self.bot._(ctx.channel, "bot_events.no-objectives", cmd=cmd_mention))
+            return
+
+        await ctx.defer()
+
+        title = await self.bot._(ctx.channel, "bot_events.rank-title")
+        desc = await self.bot._(ctx.channel, "bot_events.xp-howto")
+
+        emb = discord.Embed(title=title, description=desc, color=self.current_event_data["color"])
+        emb.set_author(name=user, icon_url=user.display_avatar.replace(static_format="png", size=32))
+
+        await ctx.send(embed=emb)
 
     async def collect_cmd(self, ctx):
         "Collect your daily reward"
@@ -82,6 +107,8 @@ class ChristmasSubcog(AbstractSubcog):
         # check last collect from this user
         last_collect_day = await self.get_last_user_collect(ctx.author.id)
         gifts = await self.get_calendar_gifts_from_date(last_collect_day)
+        await self.db_add_user_items(ctx.author.id, [item["item_id"] for item in gifts])
+        await self.db_add_collect(ctx.author.id, sum(item["points"] for item in gifts))
         txt = await self.generate_collect_message(ctx.channel, gifts, last_collect_day)
         # send result
         if ctx.can_send_embed:
@@ -157,3 +184,19 @@ class ChristmasSubcog(AbstractSubcog):
         if last_collect_day.year != today.year or last_collect_day.month != today.month:
             return dt.date(2023, 12, 1)
         return last_collect_day
+
+    async def db_add_collect(self, user_id: int, points: int):
+        """Add collect points to a user"""
+        if not self.bot.database_online or self.bot.current_event is None:
+            return
+        query = "INSERT INTO `event_points` (`user_id`, `collect_points`, `beta`) VALUES (%s, %s, %s) \
+            ON DUPLICATE KEY UPDATE collect_points = collect_points + VALUE(`collect_points`), \
+                last_collect = CURRENT_TIMESTAMP();"
+        async with self.bot.db_query(query, (user_id, points, self.bot.beta)):
+            pass
+        if cog := self.bot.get_cog("BotEvents"):
+            try:
+                await cog.reload_event_rankcard(user_id)
+                await cog.reload_event_special_role(user_id)
+            except Exception as err:
+                self.bot.dispatch("error", err)
