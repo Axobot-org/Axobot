@@ -1,4 +1,5 @@
 {
+    "available-starting": "k dispozici od %{date}",
     "collect": {
         "got-points": "Tentokrát jste nenašli žádnou zajímavou položku, ale přesto se vám podařilo **získat %{points} bodů za událost**!",
         "lost-points": "Vypadá to, že jste na cestě nepřišli k žádné sběratelské položce a nějak jste **ztratili %{points} bodů za událost**...",
