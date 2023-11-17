@@ -1,5 +1,11 @@
 {
     "available-starting": "disponible à partir du %{date}",
+    "calendar": {
+        "collected-all": "Tu as récupéré tous les cadeaux du calendrier de l'avent !",
+        "collected-day": "Il n'y a plus de cadeaux pour toi aujourd'hui, reviens demain !",
+        "today-gifts": "Voici les cadeaux d'aujourd'hui (**%{points} points**) :",
+        "today-gifts-late": "Voici les cadeaux du jour, ainsi que des %{jours} jours manqués (**%{points} points**) :"
+    },
     "collect": {
         "got-points": "Vous n'avez pas trouvé d'objet intéressant cette fois-ci, mais vous avez tout de même réussi à **gagner %{points} points d'événement** !",
         "lost-points": "Il semble que vous n'ayez pas trouvé d'objet à collectionner sur votre chemin, et que vous ayez inexplicablement **perdu %{points} points d'événement**...",

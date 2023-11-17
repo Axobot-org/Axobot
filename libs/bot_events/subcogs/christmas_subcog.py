@@ -198,18 +198,19 @@ class ChristmasSubcog(AbstractSubcog):
         past_christmas = await self.is_past_christmas()
         if not items:
             if past_christmas:
-                return "You collected all the gifts from the advent calendar!"
-            return "No gift for you today, come back tomorrow!"
+                return await self.bot._(channel, "bot_events.calendar.collected-all")
+            return await self.bot._(channel, "bot_events.calendar.collected-day")
         # 1 item collected
         language = await self.bot._(channel, "_used_locale")
         name_key = "french_name" if language in ("fr", "fr2") else "english_name"
         today = await self.today()
         total_points = sum(item["points"] for item in items)
+        text = "### "
         if today == last_collect_day:
-            text = f"### Here is today's gift (**{total_points} points**):"
+            text += await self.bot._(channel, "bot_events.calendar.today-gifts", points=total_points)
         else:
             missed_days = min(today.day - last_collect_day.day, 3)
-            text = f"### Here are today's gifts, as well as {missed_days} missed days (**{total_points} points**):"
+            text = await self.bot._(channel, "bot_events.calendar.today-gifts-late", days=missed_days, points=total_points)
         items_group: dict[int, int] = defaultdict(int)
         for item in items:
             items_group[item["item_id"]] += 1
