@@ -114,12 +114,12 @@ class Fun(commands.Cog):
         ..Example roll Play Minecraft, play Star Citizens, do homeworks
 
         ..Doc fun.html#roll"""
-        liste = list(set([x for x in [x.strip() for x in options.split(',')] if len(x) > 0]))
-        if len(liste) == 0:
+        possibilities = list({x for x in [x.strip() for x in options.split(',')] if len(x) > 0})
+        if len(possibilities) == 0:
             return await ctx.send(await self.bot._(ctx.channel,"fun.no-roll"))
-        elif len(liste) == 1:
+        elif len(possibilities) == 1:
             return await ctx.send(await self.bot._(ctx.channel,"fun.not-enough-roll"))
-        choosen = random.choice(liste)
+        choosen = random.choice(possibilities)
         await ctx.send(choosen)
 
     @commands.command(name="cookie", aliases=['cookies', 'crustulum'], hidden=True)
@@ -261,14 +261,14 @@ You can specify a verification limit by adding a number in argument (up to 1.000
             if await self.is_on_guild(ctx.author, 523525264517496834): # Benny Support
                 await ctx.send(file=await self.utilities.find_img(f'blame-{name}.png'))
         elif name in ['help','list']:
-            liste = l1
+            available_names = l1
             if await self.is_on_guild(ctx.author, 391968999098810388): # fr-minecraft
-                liste += l2
+                available_names += l2
             if await self.is_on_guild(ctx.author, SUPPORT_GUILD_ID.id): # Axobot server
-                liste += l3
+                available_names += l3
             if await self.is_on_guild(ctx.author, 523525264517496834): # Benny Support
-                liste += l4
-            txt = "- "+"\n- ".join(sorted(liste))
+                available_names += l4
+            txt = "- "+"\n- ".join(sorted(available_names))
             title = await self.bot._(ctx.channel, "fun.blame-0", user=ctx.author)
             if ctx.can_send_embed:
                 emb = discord.Embed(title=title, description=txt, color=self.bot.get_cog("Help").help_color)
@@ -291,17 +291,18 @@ You can specify a verification limit by adding a number in argument (up to 1.000
             victime = name
         ex = victime.replace(" ", "_")
         author = ctx.author.mention
-        liste = await self.bot._(ctx.channel, "fun.kills-list")
-        msg = random.choice(liste)
+        possibilities = await self.bot._(ctx.channel, "fun.kills-list")
+        msg = random.choice(possibilities)
         tries = 0
         while '{attacker}' in msg and name is None and tries<50:
-            msg = random.choice(liste)
+            msg = random.choice(possibilities)
             tries += 1
         await ctx.send(msg.format(attacker=author, victim=victime, ex=ex))
 
-    @commands.command(name="arapproved",aliases=['arapprouved'],hidden=True)
+    @commands.command(name="arapproved",aliases=['arapprouved'], hidden=True)
     @commands.check(lambda ctx: ctx.author.id in [375598088850505728,279568324260528128])
     async def arapproved(self, ctx: MyContext):
+        "If you don't know why this exists, it's probably not for you"
         await ctx.send(file=await self.utilities.find_img("arapproved.png"))
 
     @commands.command(name='party',hidden=True)
