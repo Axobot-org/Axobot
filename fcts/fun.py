@@ -325,6 +325,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
             await ctx.send(file=await self.utilities.find_img('cameleon.gif'))
 
     @commands.command(name="cat", hidden=True)
+    @commands.cooldown(5, 7, commands.BucketType.user)
     @commands.check(is_fun_enabled)
     async def cat_gif(self, ctx: MyContext):
         """Wow... So cuuuute !
@@ -349,6 +350,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
             'https://tenor.com/view/cute-cat-cats-cats-of-the-internet-cattitude-gif-17600906',
             'https://tenor.com/view/cat-scared-hide-terrified-frightened-gif-17023981',
             'https://tenor.com/view/cat-running-away-escape-getaway-bye-gif-16631286',
+            'https://tenor.com/view/bye-cat-box-tight-face-bored-cat-gif-7986182'
         ]))
 
     @commands.command(name="happy-birthday", hidden=True, aliases=['birthday', 'hb'])
