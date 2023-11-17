@@ -55,7 +55,7 @@ class ChristmasSubcog(AbstractSubcog):
             if not await self.is_fun_enabled(msg):
                 # don't react if fun is disabled for this guild
                 return
-            if random() < data["probability"] and any(trigger in msg.content for trigger in data["triggers"]):
+            if random() < data["probability"] and await self.check_trigger_words(msg.content):
                 if item := await self.get_random_item_for_reaction():
                     try:
                         await msg.add_reaction(item["emoji"])
@@ -85,6 +85,8 @@ class ChristmasSubcog(AbstractSubcog):
         user_mention = f"<@{payload.user_id}>"
         desc = await self.bot._(translation_source, desc_key, user=user_mention, item=item_name, points=abs(item["points"]))
         embed = discord.Embed(title=title, description=desc, color=self.current_event_data["color"])
+        if self.current_event_data["icon"]:
+            embed.set_image(url=self.current_event_data["icon"])
         # send the notification, auto delete after 12 seconds
         if channel := self.bot.get_channel(payload.channel_id):
             await channel.send(embed=embed, delete_after=12)
@@ -160,6 +162,13 @@ class ChristmasSubcog(AbstractSubcog):
     async def today(self):
         return dt.datetime.now(dt.timezone.utc).date()
         # return dt.date(2023, 12, 1)
+
+    async def check_trigger_words(self, message: str):
+        "Check if a word in the message triggers the event"
+        if self.current_event and (data := self.current_event_data.get("emojis")):
+            message = message.lower()
+            return any(trigger in message for trigger in data["triggers"])
+        return False
 
     async def get_calendar_gifts_from_date(self, last_collect_day: dt.date) -> list[EventItem]:
         "Get the list of the gifts from the advent calendar from a given date"
