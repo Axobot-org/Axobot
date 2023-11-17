@@ -232,12 +232,27 @@
             ],
             "triggers": [
                 "christmas",
+                "xmas",
                 "present",
                 "noël",
-                "xmas",
-                "snowflake"
+                "santa",
+                "gift",
+                "cadeau",
+                "snow",
+                "neige",
+                "ice",
+                "glace",
+                "ho ho ho",
+                "reinder",
+                "sleight",
+                "traîneau",
+                "candy cane",
+                "sucre d'orge",
+                "elf ",
+                "lutin",
+                "cookie"
             ],
-            "probability": 0.08
+            "probability": 0.1
         }
     }
 }
