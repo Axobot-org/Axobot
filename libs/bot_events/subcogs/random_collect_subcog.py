@@ -78,7 +78,7 @@ class RandomCollectSubcog(AbstractSubcog):
             title = await self.bot._(ctx.channel, "bot_events.collection-title.user")
         else:
             title = await self.bot._(ctx.channel, "bot_events.collection-title.other", user=user.display_name)
-        items = await self.db_get_user_collected_items(user.id)
+        items = await self.db_get_user_collected_items(user.id, self.current_event)
         if len(items) == 0:
             if ctx.author == user:
                 _empty_collection = await self.bot._(ctx.channel, "bot_events.collection-empty.user")
