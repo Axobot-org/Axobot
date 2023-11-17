@@ -82,7 +82,9 @@ class ChristmasSubcog(AbstractSubcog):
 
         emb = discord.Embed(title=title, description=desc, color=self.current_event_data["color"])
         emb.set_author(name=user, icon_url=user.display_avatar.replace(static_format="png", size=32))
-
+        for field in await self.generate_user_profile_rank_fields(ctx, lang, user):
+            emb.add_field(**field)
+        emb.add_field(**await self.generate_user_profile_collection_field(ctx, user))
         await ctx.send(embed=emb)
 
     async def collect_cmd(self, ctx):
@@ -107,8 +109,9 @@ class ChristmasSubcog(AbstractSubcog):
         # check last collect from this user
         last_collect_day = await self.get_last_user_collect(ctx.author.id)
         gifts = await self.get_calendar_gifts_from_date(last_collect_day)
-        await self.db_add_user_items(ctx.author.id, [item["item_id"] for item in gifts])
-        await self.db_add_collect(ctx.author.id, sum(item["points"] for item in gifts))
+        if gifts:
+            await self.db_add_user_items(ctx.author.id, [item["item_id"] for item in gifts])
+            await self.db_add_collect(ctx.author.id, sum(item["points"] for item in gifts))
         txt = await self.generate_collect_message(ctx.channel, gifts, last_collect_day)
         # send result
         if ctx.can_send_embed:
@@ -136,7 +139,7 @@ class ChristmasSubcog(AbstractSubcog):
             gifts_ids += ADVENT_CALENDAR[day]
         if not gifts_ids:
             return []
-        items = await self.db_get_event_items("christmas")
+        items = await self.db_get_event_items(self.current_event)
         gifts: list[EventItem] = []
         for item in items:
             if item["item_id"] in gifts_ids:
