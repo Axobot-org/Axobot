@@ -104,6 +104,34 @@ class AbstractSubcog(ABC):
             "inline": False
         }
 
+    async def generate_user_profile_collection_field(self, ctx: MyContext, user: discord.User):
+        "Compute the texts to display in the /event profile command"
+        if ctx.author == user:
+            title = await self.bot._(ctx.channel, "bot_events.collection-title.user")
+        else:
+            title = await self.bot._(ctx.channel, "bot_events.collection-title.other", user=user.display_name)
+        items = await self.db_get_user_collected_items(user.id, self.current_event)
+        if len(items) == 0:
+            if ctx.author == user:
+                _empty_collection = await self.bot._(ctx.channel, "bot_events.collection-empty.user")
+            else:
+                _empty_collection = await self.bot._(ctx.channel, "bot_events.collection-empty.other", user=user.display_name)
+            return {"name": title, "value": _empty_collection, "inline": True}
+        lang = await self.bot._(ctx.channel, '_used_locale')
+        name_key = "french_name" if lang in ("fr", "fr2") else "english_name"
+        items.sort(key=lambda item: item["frequency"], reverse=True)
+        items_list: list[str] = []
+        more_count = 0
+        for item in items:
+            if len(items_list) >= 32:
+                more_count += item['count']
+                continue
+            item_name = item["emoji"] + " " + item[name_key]
+            items_list.append(f"{item_name} x{item['count']}")
+        if more_count:
+            items_list.append(await self.bot._(ctx.channel, "bot_events.collection-more", count=more_count))
+        return {"name": title, "value": "\n".join(items_list), "inline": True}
+
     async def get_top_5(self) -> str:
         "Get the list of the 5 users with the most event points"
         top_5 = await self.db_get_event_top(number=5)
