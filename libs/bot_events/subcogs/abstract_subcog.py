@@ -35,13 +35,16 @@ class AbstractSubcog(ABC):
         "Called when a message is sent"
 
     @abstractmethod
+    async def on_raw_reaction_add(self, payload: discord.RawReactionActionEvent):
+        "Called when a reaction is added"
+
+    @abstractmethod
     async def profile_cmd(self, ctx: MyContext, user: discord.User):
         "Displays the profile of the user"
 
     @abstractmethod
     async def collect_cmd(self, ctx: MyContext):
         "Collects the daily/hourly reward"
-
 
     async def generate_user_profile_rank_fields(self, ctx: MyContext, lang: Literal["fr", "en"], user: discord.User):
         "Compute the texts to display in the /event profile command"

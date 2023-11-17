@@ -1,9 +1,11 @@
 import datetime as dt
 from collections import defaultdict
-from random import choice, random
+from random import choices, lognormvariate, random
 from typing import Optional
 
 import discord
+import emoji
+from cachingutils import acached
 
 from libs.bot_classes import Axobot
 from libs.bot_events.dict_types import EventData, EventItem, EventType
@@ -54,8 +56,40 @@ class ChristmasSubcog(AbstractSubcog):
                 # don't react if fun is disabled for this guild
                 return
             if random() < data["probability"] and any(trigger in msg.content for trigger in data["triggers"]):
-                react = choice(data["reactions_list"])
-                await msg.add_reaction(react)
+                if item := await self.get_random_item_for_reaction():
+                    try:
+                        await msg.add_reaction(item["emoji"])
+                    except discord.HTTPException as err:
+                        self.bot.dispatch("error", err, f"When trying to add event reaction {item['emoji']}")
+                        return
+                    self.pending_reactions[msg.id] = item
+
+    async def on_raw_reaction_add(self, payload):
+        if payload.message_id not in self.pending_reactions:
+            return
+        item = self.pending_reactions[payload.message_id]
+        if payload.emoji.name != item["emoji"]:
+            print("wrong emoji")
+            return
+        del self.pending_reactions[payload.message_id]
+        # add item to user collection
+        await self.db_add_user_items(payload.user_id, [item["item_id"]])
+        await self.db_add_collect(payload.user_id, item["points"])
+        # prepare the notification embed
+        translation_source = payload.guild_id or payload.user_id
+        lang = await self.bot._(translation_source, '_used_locale')
+        title = self.translations_data[lang]["events_title"][self.current_event_id]
+        desc_key = "bot_events.reaction.positive" if item["points"] >= 0 else "bot_events.reaction.negative"
+        name_key = "french_name" if lang in ("fr", "fr2") else "english_name"
+        item_name = item["emoji"] + " " + item[name_key]
+        user_mention = f"<@{payload.user_id}>"
+        desc = await self.bot._(translation_source, desc_key, user=user_mention, item=item_name, points=abs(item["points"]))
+        embed = discord.Embed(title=title, description=desc, color=self.current_event_data["color"])
+        # send the notification, auto delete after 12 seconds
+        if channel := self.bot.get_channel(payload.channel_id):
+            await channel.send(embed=embed, delete_after=12)
+        elif user := self.bot.get_user(payload.user_id):
+            await user.send(embed=embed, delete_after=12)
 
     async def profile_cmd(self, ctx, user):
         "Displays the profile of the user"
@@ -81,7 +115,7 @@ class ChristmasSubcog(AbstractSubcog):
         desc = await self.bot._(ctx.channel, "bot_events.xp-howto")
 
         emb = discord.Embed(title=title, description=desc, color=self.current_event_data["color"])
-        emb.set_author(name=user, icon_url=user.display_avatar.replace(static_format="png", size=32))
+        emb.set_author(name=user.global_name, icon_url=user.display_avatar.replace(static_format="png", size=32))
         for field in await self.generate_user_profile_rank_fields(ctx, lang, user):
             emb.add_field(**field)
         emb.add_field(**await self.generate_user_profile_collection_field(ctx, user))
@@ -187,6 +221,27 @@ class ChristmasSubcog(AbstractSubcog):
         if last_collect_day.year != today.year or last_collect_day.month != today.month:
             return dt.date(2023, 12, 1)
         return last_collect_day
+
+    @acached(60*60*24)
+    async def _get_suitable_reaction_items(self):
+        "Get the list of items usable in reactions"
+        if self.current_event is None:
+            return []
+        items_count = min(round(lognormvariate(1.1, 0.9)), 8) # random number between 0 and 8
+        if items_count <= 0:
+            return []
+        items = await self.db_get_event_items(self.current_event)
+        if len(items) == 0:
+            return []
+        return [item for item in items if emoji.emoji_count(item["emoji"]) == 1]
+
+    async def get_random_item_for_reaction(self):
+        "Get some random items to win during an event"
+        items = await self._get_suitable_reaction_items()
+        return choices(
+            items,
+            weights=[item["frequency"] for item in items],
+        )[0]
 
     async def db_add_collect(self, user_id: int, points: int):
         """Add collect points to a user"""

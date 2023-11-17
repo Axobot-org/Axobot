@@ -4,7 +4,7 @@ from typing import Optional
 
 import discord
 
-from libs.bot_classes import Axobot, MyContext
+from libs.bot_classes import Axobot
 from libs.bot_events.dict_types import EventData, EventItem, EventType
 from libs.bot_events.subcogs.abstract_subcog import AbstractSubcog
 from libs.formatutils import FormatUtils
@@ -23,7 +23,7 @@ class RandomCollectSubcog(AbstractSubcog):
         self.collect_max_strike_period = 3600 * 2 # (2h) time in seconds after which the strike level is reset to 0
         self.collect_bonus_per_strike = 1.05 # the amount of points is multiplied by this number for each strike level
 
-    async def on_message(self, msg: discord.Message):
+    async def on_message(self, msg):
         "Add random reaction to some messages"
         if self.current_event and (data := self.current_event_data.get("emojis")):
             if not await self.is_fun_enabled(msg):
@@ -33,8 +33,10 @@ class RandomCollectSubcog(AbstractSubcog):
                 react = choice(data["reactions_list"])
                 await msg.add_reaction(react)
 
+    async def on_raw_reaction_add(self, payload):
+        pass
 
-    async def profile_cmd(self, ctx: MyContext, user: discord.User):
+    async def profile_cmd(self, ctx, user):
         "Displays the profile of the user"
         lang = await self.bot._(ctx.channel, '_used_locale')
         lang = 'en' if lang not in ('en', 'fr') else lang
@@ -72,7 +74,7 @@ class RandomCollectSubcog(AbstractSubcog):
         emb.add_field(**await self.generate_user_profile_collection_field(ctx, user))
         await ctx.send(embed=emb)
 
-    async def collect_cmd(self, ctx: MyContext):
+    async def collect_cmd(self, ctx):
         "Get some event points every hour"
         current_event = self.current_event_id
         lang = await self.bot._(ctx.channel, '_used_locale')
