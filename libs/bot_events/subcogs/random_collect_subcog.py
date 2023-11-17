@@ -1,6 +1,6 @@
 from collections import defaultdict
 from random import choice, choices, lognormvariate, randint, random
-from typing import Any, Literal, Optional
+from typing import Optional
 
 import discord
 
@@ -71,45 +71,6 @@ class RandomCollectSubcog(AbstractSubcog):
             emb.add_field(**field)
         emb.add_field(**await self.generate_user_profile_collection_field(ctx, user))
         await ctx.send(embed=emb)
-
-    async def generate_user_profile_rank_fields(self, ctx: MyContext, lang: Literal["fr", "en"], user: discord.User):
-        "Compute the texts to display in the /event profile command"
-        user_rank_query = await self.db_get_event_rank(user.id)
-        if user_rank_query is None:
-            user_rank = await self.bot._(ctx.channel, "bot_events.unclassed")
-            points = 0
-        else:
-            total_ranked = await self.db_get_participants_count()
-            if user_rank_query['rank'] <= total_ranked:
-                user_rank = f"{user_rank_query['rank']}/{total_ranked}"
-            else:
-                user_rank = await self.bot._(ctx.channel, "bot_events.unclassed")
-            points: int = user_rank_query["points"]
-        prices: dict[str, dict[str, str]] = self.translations_data[lang]["events_prices"]
-        if self.current_event_id in prices:
-            emojis = self.bot.emojis_manager.customs["green_check"], self.bot.emojis_manager.customs["red_cross"]
-            prices_list = []
-            for price, desc in prices[self.current_event_id].items():
-                emoji = emojis[0] if int(price) <= points else emojis[1]
-                prices_list.append(f"{emoji}{min(points, int(price))}/{price}: {desc}")
-            prices = "\n".join(prices_list)
-            objectives_title = await self.bot._(ctx.channel, "bot_events.objectives")
-        else:
-            prices = ""
-            objectives_title = ""
-
-        _points_total = await self.bot._(ctx.channel, "bot_events.points-total")
-        _position_global = await self.bot._(ctx.channel, "bot_events.position-global")
-        _rank_global = await self.bot._(ctx.channel, "bot_events.leaderboard-global", count=5)
-
-        fields: list[dict[str, Any]] = [
-            {"name": objectives_title, "value": prices, "inline": False},
-            {"name": _points_total, "value": str(points)},
-            {"name": _position_global, "value": user_rank},
-        ]
-        if top_5 := await self.get_top_5():
-            fields.append({"name": _rank_global, "value": top_5, "inline": False})
-        return fields
 
     async def generate_user_profile_collection_field(self, ctx: MyContext, user: discord.User):
         "Compute the texts to display in the /event profile command"
