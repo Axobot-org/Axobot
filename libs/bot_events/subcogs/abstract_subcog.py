@@ -169,15 +169,17 @@ class AbstractSubcog(ABC):
         async with self.bot.db_query(query, {'user': user_id, 'beta': self.bot.beta}, fetchone=True) as query_results:
             return query_results or None
 
-    async def db_get_user_collected_items(self, user_id: int) -> list[EventItemWithCount]:
+    async def db_get_user_collected_items(self, user_id: int, event_type: EventType) -> list[EventItemWithCount]:
         "Get the items collected by a user"
         if not self.bot.database_online:
             return []
         query = """SELECT COUNT(*) AS 'count', a.*
         FROM `event_collected_items` c LEFT JOIN `event_available_items` a ON c.`item_id` = a.`item_id`
-        WHERE c.`user_id` = %s AND c.`beta` = %s
+        WHERE c.`user_id` = %s
+            AND c.`beta` = %s
+            AND a.`event_type` = %s
         GROUP BY c.`item_id`"""
-        async with self.bot.db_query(query, (user_id, self.bot.beta)) as query_results:
+        async with self.bot.db_query(query, (user_id, self.bot.beta, event_type)) as query_results:
             return query_results
 
     async def db_get_last_user_collect(self, user_id: int) -> datetime.datetime:
@@ -189,7 +191,6 @@ class AbstractSubcog(ABC):
             if not query_result:
                 return None
             query_result: tuple[datetime.datetime]
-            # if no last collect, return a very high number
             if query_result[0] is None:
                 return None
             # apply utc offset
