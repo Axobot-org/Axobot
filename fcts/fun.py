@@ -335,7 +335,20 @@ You can specify a verification limit by adding a number in argument (up to 1.000
             'https://25.media.tumblr.com/7774fd7794d99b5998318ebd5438ba21/tumblr_n2r7h35U211rudcwro1_400.gif',
             'https://tenor.com/view/seriously-seriously-cat-cat-really-cat-really-look-cat-look-gif-22182662',
             'http://coquelico.c.o.pic.centerblog.net/chat-peur.gif',
-            'https://tenor.com/view/nope-bye-cat-leave-done-gif-12387359'
+            'https://tenor.com/view/nope-bye-cat-leave-done-gif-12387359',
+            'https://tenor.com/view/cute-cat-kitten-kitty-pussy-cat-gif-16577050',
+            'https://tenor.com/view/cat-box-gif-18395469',
+            'https://tenor.com/view/pile-cats-cute-silly-meowtain-gif-5791255',
+            'https://tenor.com/view/cat-fight-cats-cat-love-pet-lover-pelea-gif-13002823369159732311',
+            'https://tenor.com/view/cat-disapear-cat-snow-cat-jump-fail-cat-fun-jump-cats-gif-17569677',
+            'https://tenor.com/view/black-cat-tiny-cat-smol-kitten-airplane-ears-cutie-pie-gif-23391953',
+            'https://tenor.com/view/cat-cats-catsoftheinternet-biting-tale-cat-bite-gif-23554005',
+            'https://tenor.com/view/on-my-way-cat-run-cat-on-my-way-cat-cat-on-my-way-gif-26471384',
+            'https://tenor.com/view/cat-cat-activity-goober-goober-cat-silly-cat-gif-186256394908832033',
+            'https://tenor.com/view/cat-stacked-kittens-kitty-pussy-cats-gif-16220908',
+            'https://tenor.com/view/cute-cat-cats-cats-of-the-internet-cattitude-gif-17600906',
+            'https://tenor.com/view/cat-scared-hide-terrified-frightened-gif-17023981',
+            'https://tenor.com/view/cat-running-away-escape-getaway-bye-gif-16631286',
         ]))
 
     @commands.command(name="happy-birthday", hidden=True, aliases=['birthday', 'hb'])
