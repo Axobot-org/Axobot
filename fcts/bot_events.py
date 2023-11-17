@@ -121,6 +121,14 @@ class BotEvents(commands.Cog):
         if self.current_event:
             await self.subcog.on_message(msg)
 
+    @commands.Cog.listener()
+    async def on_raw_reaction_add(self, payload: discord.RawReactionActionEvent):
+        "Give points to the user if they reacted to a message with the right emoji"
+        if self.bot.zombie_mode:
+            return
+        if self.current_event:
+            await self.subcog.on_raw_reaction_add(payload)
+
     @commands.hybrid_group("event", aliases=["botevents", "botevent", "events"])
     @commands.check(database_connected)
     async def events_main(self, ctx: MyContext):

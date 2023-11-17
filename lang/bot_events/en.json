@@ -30,6 +30,10 @@
     "points-total": "Total points",
     "position-global": "Global position",
     "rank-title": "Event points",
+    "reaction": {
+        "positive": "Congrats %{user}, you found one %{item}! It has been added to your collection, and you earned **%{points} event points**!",
+        "negative": "Oh no, %{user} you found one %{item}! It has been added to your collection, but made you lose **%{points} event points**..."
+    },
     "soon": "An event is coming soon! Watch for information as it will begin on %{date}",
     "tip-title": "Random tip",
     "unclassed": "unclassed",
