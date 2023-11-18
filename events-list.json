@@ -204,7 +204,7 @@
         }
     },
     "christmas-2023": {
-        "begin": "2023-12-01",
+        "begin": "2023-11-01",
         "end": "2023-12-31",
         "type": "christmas",
         "icon": "https://zrunner.me/cdn/halloween_2023.png",
@@ -219,7 +219,7 @@
                 "points": 600,
                 "reward_type": "rankcard",
                 "rank_card": "christmas23",
-                "min_date": "2023-12-25"
+                "min_date": "2023-10-25"
             }
         ],
         "emojis": {
@@ -252,7 +252,7 @@
                 "lutin",
                 "cookie"
             ],
-            "probability": 0.1
+            "probability": 0.91
         }
     }
 }

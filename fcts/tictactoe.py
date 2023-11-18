@@ -11,12 +11,12 @@ from libs.bot_classes import Axobot, MyContext
 from libs.serverconfig.options_list import options
 
 
-class Morpions(commands.Cog):
+class TicTacToe(commands.Cog):
     "Allow users to play PvP tic-tac-toe"
 
     def __init__(self, bot: Axobot):
         self.bot = bot
-        self.file = 'morpions'
+        self.file = 'tictactoe'
         self.in_game = {}
         self.types: tuple[str] = options['ttt_display']['values']
 
@@ -37,13 +37,13 @@ class Morpions(commands.Cog):
     """
         if leave == 'leave':
             if ctx.author.id not in self.in_game:
-                await ctx.send(await self.bot._(ctx.channel, 'morpion.not-playing'))
+                await ctx.send(await self.bot._(ctx.channel, 'tictactoe.not-playing'))
             else:
                 self.in_game.pop(ctx.author.id)
-                await ctx.send(await self.bot._(ctx.channel, 'morpion.game-removed'))
+                await ctx.send(await self.bot._(ctx.channel, 'tictactoe.game-removed'))
             return
         if ctx.author.id in self.in_game:
-            await ctx.send(await self.bot._(ctx.channel, 'morpion.already-playing'))
+            await ctx.send(await self.bot._(ctx.channel, 'tictactoe.already-playing'))
             return
         self.in_game[ctx.author.id] = time.time()
         game = self.Game(ctx, self, await self.get_ttt_mode(ctx))
@@ -54,7 +54,7 @@ class Morpions(commands.Cog):
     class Game():
         "An actual tictactoe game running"
 
-        def __init__(self, ctx: MyContext, cog: 'Morpions', mode: Literal["disabled", "short", "normal"]):
+        def __init__(self, ctx: MyContext, cog: 'TicTacToe', mode: Literal["disabled", "short", "normal"]):
             self.cog = cog
             self.ctx = ctx
             self.bot = ctx.bot
@@ -129,8 +129,8 @@ class Morpions(commands.Cog):
             try:
                 grille = list(range(1, 10))
                 tour = await self.player_starts()
-                u_begin = await self.bot._(ctx.channel, 'morpion.user-begin' if tour else 'morpion.bot-begin')
-                tip = await self.bot._(ctx.channel, 'morpion.tip', symb1=self.emojis[0], symb2=self.emojis[1])
+                u_begin = await self.bot._(ctx.channel, 'tictactoe.user-begin' if tour else 'tictactoe.bot-begin')
+                tip = await self.bot._(ctx.channel, 'tictactoe.tip', symb1=self.emojis[0], symb2=self.emojis[1])
                 await ctx.send(u_begin.format(ctx.author.mention) + tip)
                 match_nul = True
 
@@ -154,7 +154,7 @@ class Morpions(commands.Cog):
                         try:
                             msg: discord.Message = await self.bot.wait_for('message', check=check, timeout=50)
                         except asyncio.TimeoutError:
-                            await ctx.channel.send(await self.bot._(ctx.channel, 'morpion.too-late'))
+                            await ctx.channel.send(await self.bot._(ctx.channel, 'tictactoe.too-late'))
                             return
                         saisie = msg.content
                         if msg.content in self.entrees_valides:
@@ -164,13 +164,13 @@ class Morpions(commands.Cog):
                                 if self.use_short:
                                     await msg.delete(delay=0.1)
                             else: # cell is not empty
-                                await ctx.send(await self.bot._(ctx.channel, 'morpion.pion-1'))
+                                await ctx.send(await self.bot._(ctx.channel, 'tictactoe.pion-1'))
                                 display_grille = False
                                 continue
                         elif msg.content.endswith("leave"): # user leaves the game
                             return
                         else: # invalid cell number
-                            await ctx.send(await self.bot._(ctx.channel, 'morpion.pion-2'))
+                            await ctx.send(await self.bot._(ctx.channel, 'tictactoe.pion-2'))
                             display_grille = False
                             continue
                 ###
@@ -203,12 +203,12 @@ class Morpions(commands.Cog):
                 if self.use_short and last_grid:
                     await last_grid.delete()
                 if match_nul:
-                    resultat = await self.bot._(ctx.channel, 'morpion.nul')
+                    resultat = await self.bot._(ctx.channel, 'tictactoe.nul')
                 else:
                     if tour:  # Le bot a gagné
-                        resultat = await self.bot._(ctx.channel, 'morpion.win-bot')
+                        resultat = await self.bot._(ctx.channel, 'tictactoe.win-bot')
                     else:  # L'utilisateur a gagné
-                        resultat = await self.bot._(ctx.channel, 'morpion.win-user', user=ctx.author.mention)
+                        resultat = await self.bot._(ctx.channel, 'tictactoe.win-user', user=ctx.author.mention)
                 await ctx.send(await self.display_grid(grille)+'\n'+resultat)
                 if not match_nul and not tour:
                     # give event points if user won
@@ -236,4 +236,4 @@ class Morpions(commands.Cog):
 
 
 async def setup(bot):
-    await bot.add_cog(Morpions(bot))
+    await bot.add_cog(TicTacToe(bot))
