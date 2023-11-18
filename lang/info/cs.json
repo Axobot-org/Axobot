@@ -52,7 +52,7 @@
             "sort-order-creation": "Čas vytvoření",
             "sort-order-none": "Nedefinováno"
         },
-        "guild-0": "Klan",
+        "guild-0": "Server",
         "guild-1": "Vlastník",
         "guild-10": "Čas před tím, než bude použito AFK",
         "guild-11.1": "20 prvních rolí (celkem %{c})",
@@ -144,6 +144,7 @@
         "role-3": "Počet členů",
         "role-5": "Hierarchická pozice",
         "role-6": "Jedinečný člen s touto rolí",
+        "role-title": "Role",
         "role-specificities": {
             "field-name": "Specifikace",
             "hoist": "Zobrazeno samostatně",

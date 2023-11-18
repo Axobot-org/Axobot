@@ -28,6 +28,7 @@
         "event info": "informace",
         "event profile": "profil",
         "event collect": "sbírat",
+        "info": "informace",
         "kick": "vyhodit",
         "last-post": "poslední-příspěvek",
         "modlogs disable": "zakázat",
@@ -392,6 +393,10 @@
         },
         "event profile": {
             "user": "uživatel"
+        },
+        "info": {
+            "query": "dotaz",
+            "query_type": "typ dotazu"
         }
     }
 }

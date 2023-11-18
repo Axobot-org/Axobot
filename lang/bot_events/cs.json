@@ -1,4 +1,11 @@
 {
+    "available-starting": "k dispozici od %{date}",
+    "calendar": {
+        "collected-all": "Všechny dárky jste shromáždili z adventního kalendáře!",
+        "collected-day": "Dnes pro vás už žádné dary nejesou, vraťte se zítra!",
+        "today-gifts": "Tady jsou dnešní dary (**%{points} body**):",
+        "today-gifts-late": "Tady jsou dnešní dary, stejně jako %{days} zmeškané dny (**%{points} body**):"
+    },
     "collect": {
         "got-points": "Tentokrát jste nenašli žádnou zajímavou položku, ale přesto se vám podařilo **získat %{points} bodů za událost**!",
         "lost-points": "Vypadá to, že jste na cestě nepřišli k žádné sběratelské položce a nějak jste **ztratili %{points} bodů za událost**...",
@@ -29,6 +36,10 @@
     "points-total": "Celkem bodů",
     "position-global": "Celková pozice",
     "rank-title": "Body události",
+    "reaction": {
+        "positive": "Gratulujeme %{user}, našli jste jeden %{item}! Byl přidán do vaší kolekce a získal jsi ** bodů události%{points}**!",
+        "negative": "Ale ne %{user}, nalezl jsi jeden %{item}! Byl přidán do vaší kolekce, ale ztratil jsi ** body události%{points} **..."
+    },
     "soon": "Událost se blíží! Sledujte informace, protože začne %{date}",
     "tip-title": "Náhodný tip",
     "unclassed": "nezařazené",
