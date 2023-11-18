@@ -1,8 +1,7 @@
 import datetime
 from typing import Literal, Optional, TypedDict, Union
 
-
-EventType = Literal["blurple", "halloween", "fish"]
+EventType = Literal["blurple", "halloween", "fish", "christmas"]
 
 class EventsTranslation(TypedDict):
     "Represents the translations for the bot events in one language"
@@ -31,12 +30,14 @@ class EventRewardCard(TypedDict):
     points: int
     reward_type: Literal["rankcard"]
     rank_card: str
+    min_date: Optional[str]
 
 class EventRewardRole(TypedDict):
     "Represents the special role reward for an event"
     points: int
     reward_type: Literal["role"]
     role_id: int
+    min_date: Optional[str]
 
 class EventRewardCustom(TypedDict):
     "Represents a custom reward for an event"

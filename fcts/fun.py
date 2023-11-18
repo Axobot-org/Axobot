@@ -114,12 +114,12 @@ class Fun(commands.Cog):
         ..Example roll Play Minecraft, play Star Citizens, do homeworks
 
         ..Doc fun.html#roll"""
-        liste = list(set([x for x in [x.strip() for x in options.split(',')] if len(x) > 0]))
-        if len(liste) == 0:
+        possibilities = list({x for x in [x.strip() for x in options.split(',')] if len(x) > 0})
+        if len(possibilities) == 0:
             return await ctx.send(await self.bot._(ctx.channel,"fun.no-roll"))
-        elif len(liste) == 1:
+        elif len(possibilities) == 1:
             return await ctx.send(await self.bot._(ctx.channel,"fun.not-enough-roll"))
-        choosen = random.choice(liste)
+        choosen = random.choice(possibilities)
         await ctx.send(choosen)
 
     @commands.command(name="cookie", aliases=['cookies', 'crustulum'], hidden=True)
@@ -261,14 +261,14 @@ You can specify a verification limit by adding a number in argument (up to 1.000
             if await self.is_on_guild(ctx.author, 523525264517496834): # Benny Support
                 await ctx.send(file=await self.utilities.find_img(f'blame-{name}.png'))
         elif name in ['help','list']:
-            liste = l1
+            available_names = l1
             if await self.is_on_guild(ctx.author, 391968999098810388): # fr-minecraft
-                liste += l2
+                available_names += l2
             if await self.is_on_guild(ctx.author, SUPPORT_GUILD_ID.id): # Axobot server
-                liste += l3
+                available_names += l3
             if await self.is_on_guild(ctx.author, 523525264517496834): # Benny Support
-                liste += l4
-            txt = "- "+"\n- ".join(sorted(liste))
+                available_names += l4
+            txt = "- "+"\n- ".join(sorted(available_names))
             title = await self.bot._(ctx.channel, "fun.blame-0", user=ctx.author)
             if ctx.can_send_embed:
                 emb = discord.Embed(title=title, description=txt, color=self.bot.get_cog("Help").help_color)
@@ -291,17 +291,18 @@ You can specify a verification limit by adding a number in argument (up to 1.000
             victime = name
         ex = victime.replace(" ", "_")
         author = ctx.author.mention
-        liste = await self.bot._(ctx.channel, "fun.kills-list")
-        msg = random.choice(liste)
+        possibilities = await self.bot._(ctx.channel, "fun.kills-list")
+        msg = random.choice(possibilities)
         tries = 0
         while '{attacker}' in msg and name is None and tries<50:
-            msg = random.choice(liste)
+            msg = random.choice(possibilities)
             tries += 1
         await ctx.send(msg.format(attacker=author, victim=victime, ex=ex))
 
-    @commands.command(name="arapproved",aliases=['arapprouved'],hidden=True)
+    @commands.command(name="arapproved",aliases=['arapprouved'], hidden=True)
     @commands.check(lambda ctx: ctx.author.id in [375598088850505728,279568324260528128])
     async def arapproved(self, ctx: MyContext):
+        "If you don't know why this exists, it's probably not for you"
         await ctx.send(file=await self.utilities.find_img("arapproved.png"))
 
     @commands.command(name='party',hidden=True)
@@ -324,6 +325,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
             await ctx.send(file=await self.utilities.find_img('cameleon.gif'))
 
     @commands.command(name="cat", hidden=True)
+    @commands.cooldown(5, 7, commands.BucketType.user)
     @commands.check(is_fun_enabled)
     async def cat_gif(self, ctx: MyContext):
         """Wow... So cuuuute !
@@ -334,7 +336,21 @@ You can specify a verification limit by adding a number in argument (up to 1.000
             'https://25.media.tumblr.com/7774fd7794d99b5998318ebd5438ba21/tumblr_n2r7h35U211rudcwro1_400.gif',
             'https://tenor.com/view/seriously-seriously-cat-cat-really-cat-really-look-cat-look-gif-22182662',
             'http://coquelico.c.o.pic.centerblog.net/chat-peur.gif',
-            'https://tenor.com/view/nope-bye-cat-leave-done-gif-12387359'
+            'https://tenor.com/view/nope-bye-cat-leave-done-gif-12387359',
+            'https://tenor.com/view/cute-cat-kitten-kitty-pussy-cat-gif-16577050',
+            'https://tenor.com/view/cat-box-gif-18395469',
+            'https://tenor.com/view/pile-cats-cute-silly-meowtain-gif-5791255',
+            'https://tenor.com/view/cat-fight-cats-cat-love-pet-lover-pelea-gif-13002823369159732311',
+            'https://tenor.com/view/cat-disapear-cat-snow-cat-jump-fail-cat-fun-jump-cats-gif-17569677',
+            'https://tenor.com/view/black-cat-tiny-cat-smol-kitten-airplane-ears-cutie-pie-gif-23391953',
+            'https://tenor.com/view/cat-cats-catsoftheinternet-biting-tale-cat-bite-gif-23554005',
+            'https://tenor.com/view/on-my-way-cat-run-cat-on-my-way-cat-cat-on-my-way-gif-26471384',
+            'https://tenor.com/view/cat-cat-activity-goober-goober-cat-silly-cat-gif-186256394908832033',
+            'https://tenor.com/view/cat-stacked-kittens-kitty-pussy-cats-gif-16220908',
+            'https://tenor.com/view/cute-cat-cats-cats-of-the-internet-cattitude-gif-17600906',
+            'https://tenor.com/view/cat-scared-hide-terrified-frightened-gif-17023981',
+            'https://tenor.com/view/cat-running-away-escape-getaway-bye-gif-16631286',
+            'https://tenor.com/view/bye-cat-box-tight-face-bored-cat-gif-7986182'
         ]))
 
     @commands.command(name="happy-birthday", hidden=True, aliases=['birthday', 'hb'])

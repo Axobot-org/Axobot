@@ -2,10 +2,11 @@ from __future__ import annotations
 
 import datetime as dt
 import re
-from typing import TYPE_CHECKING, Optional, Literal
+from typing import TYPE_CHECKING, Literal, Optional
 
 import aiohttp
 import discord
+from feedparser import CharacterEncodingOverride
 from feedparser.util import FeedParserDict
 
 from .convert_post_to_text import get_text_from_entry
@@ -30,7 +31,10 @@ class WebRSS:
     async def _get_feed(self, url: str, session: Optional[aiohttp.ClientSession]=None) -> FeedParserDict:
         "Get a list of feeds from a web URL"
         feed = await feed_parse(self.bot, url, 9, session)
-        if feed is None or 'bozo_exception' in feed or not feed.entries:
+        if feed is None or not feed.entries:
+            return None
+        if 'bozo_exception' in feed and not isinstance(feed['bozo_exception'], CharacterEncodingOverride):
+            # CharacterEncodingOverride exceptions are ignored
             return None
         date_field_key = await self._get_feed_date_key(feed.entries[0])
         if date_field_key is not None and len(feed.entries) > 1:

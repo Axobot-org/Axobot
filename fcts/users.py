@@ -1,7 +1,5 @@
 import importlib
-import json
-import time
-from typing import Any, Optional, Union
+from typing import Any, Optional
 
 import discord
 from cachingutils import acached
@@ -233,12 +231,6 @@ class Users(commands.Cog):
         await ctx.defer()
         await self.db_edit_user_xp_card(ctx.author.id, style)
         await ctx.send(await self.bot._(ctx.channel, 'users.changed-card', style=style))
-        last_update = self.get_last_rankcard_update(ctx.author.id)
-        if last_update is None:
-            await self.bot.get_cog("BotEvents").db_add_user_points(ctx.author.id, 15)
-        elif last_update < time.time()-86400:
-            await self.bot.get_cog("BotEvents").db_add_user_points(ctx.author.id, 2)
-        self.set_last_rankcard_update(ctx.author.id)
 
     @profile_card.autocomplete("style")
     async def card_autocomplete_style(self, inter: discord.Interaction, current: str):
@@ -284,25 +276,6 @@ class Users(commands.Cog):
             await self.db_edit_user_config(ctx.author.id, option, enable)
             await ctx.send(await self.bot._(ctx.channel, 'users.config_success', opt=option))
 
-    def get_last_rankcard_update(self, user_id: int):
-        "Get the timestamp of the last rank card change for a user"
-        try:
-            with open("rankcards_update.json", 'r', encoding="ascii") as file:
-                records: dict[str, int] = json.load(file)
-        except FileNotFoundError:
-            return None
-        return records.get(str(user_id))
-
-    def set_last_rankcard_update(self, user_id: int):
-        "Set the timestamp of the last rank card change for a user as now"
-        try:
-            with open("rankcards_update.json", 'r', encoding="ascii") as file:
-                old: dict[str, int] = json.load(file)
-        except FileNotFoundError:
-            old: dict[str, int] = {}
-        old[str(user_id)] = round(time.time())
-        with open("rankcards_update.json", 'w', encoding="ascii") as file:
-            json.dump(old, file)
 
 async def setup(bot):
     await bot.add_cog(Users(bot))

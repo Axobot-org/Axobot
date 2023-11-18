@@ -1,15 +1,9 @@
-import json
-import os
-from typing import Literal
-
-from .dict_types import (EventData, EventItem, EventRewardRole,
-                         EventsTranslation, EventType, EventItemWithCount)
-
-
-def get_events_translations() -> dict[Literal["fr", "en"], EventsTranslation]:
-    """Get the translations for the events"""
-    with open(os.path.dirname(__file__)+"/events-translations.json", "r", encoding="utf-8") as file:
-        return json.load(file)
+from .dict_types import (EventData, EventItem, EventItemWithCount,
+                         EventRewardRole, EventType)
+from .get_translations import get_events_translations
+from .subcogs.abstract_subcog import AbstractSubcog
+from .subcogs.christmas_subcog import ChristmasSubcog
+from .subcogs.random_collect_subcog import RandomCollectSubcog
 
 __all__ = (
     "get_events_translations",
@@ -18,4 +12,7 @@ __all__ = (
     "EventRewardRole",
     "EventType",
     "EventItemWithCount",
+    "AbstractSubcog",
+    "RandomCollectSubcog",
+    "ChristmasSubcog",
 )

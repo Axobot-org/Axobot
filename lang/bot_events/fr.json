@@ -1,4 +1,11 @@
 {
+    "available-starting": "disponible à partir du %{date}",
+    "calendar": {
+        "collected-all": "Tu as récupéré tous les cadeaux du calendrier de l'avent !",
+        "collected-day": "Il n'y a plus de cadeaux pour toi aujourd'hui, reviens demain !",
+        "today-gifts": "Voici les cadeaux d'aujourd'hui (**%{points} points**) :",
+        "today-gifts-late": "Voici les cadeaux du jour, ainsi que des %{jours} jours manqués (**%{points} points**) :"
+    },
     "collect": {
         "got-points": "Vous n'avez pas trouvé d'objet intéressant cette fois-ci, mais vous avez tout de même réussi à **gagner %{points} points d'événement** !",
         "lost-points": "Il semble que vous n'ayez pas trouvé d'objet à collectionner sur votre chemin, et que vous ayez inexplicablement **perdu %{points} points d'événement**...",
@@ -29,7 +36,22 @@
     "points-total": "Total des points",
     "position-global": "Position mondiale",
     "rank-title": "Points d'événement",
+    "rankcard-unlocked": {
+        "title": "Nouvelle carte débloquée !",
+        "desc": {
+            "one": "Grâce à ta participation à l'événement, tu as débloqué une nouvelle carte d'xp : **%{cards}**!\nTu peux l'utiliser dès maintenant avec la commande %{profile_card_cmd}.",
+            "many": "Grâce à ta participation à l'événement, tu as débloqué ces nouvelles cartes d'xp : **%{cards}**!\nTu peux les utiliser dès maintenant avec la commande %{profile_card_cmd}."
+        }
+    },
+    "reaction": {
+        "positive": "Félicitations %{user}, tu as trouvé 1 %{item} ! Il a été ajouté à ta collection et t'a fait remporter **%{points} points d'événement** !",
+        "negative": "Oh non, %{user} tu as trouvé 1 %{item} ! Il a été ajouté à ta collection, mais t'a fait perdre **%{points} points d'événement**..."
+    },
     "soon": "Un événement arrive bientôt ! Surveillez les informations, car il débutera le %{date}",
+    "tictactoe": {
+        "reward-title": "Victoire au morpion !",
+        "reward-desc": "En remportant ce match, vous avez gagné **%{points} points d'événement** !"
+    },
     "tip-title": "Astuce aléatoire",
     "unclassed": "Non classé",
     "xp-howto": "Tu peux gagner des points d'événements en remportant des parties de morpion, en utilisant les commandes événementielles quand il y en a, ou en accomplissant divers autres tâches secrètes. N'hésite pas à venir sur le serveur de support pour demander des renseignements !"

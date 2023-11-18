@@ -965,7 +965,7 @@ class EmojisManager:
                         'minecraft': '<:minecraft:958305433439834152>'}
 
         try:
-            resp = requests.get("https://www.unicode.org/Public/emoji/latest/emoji-test.txt")
+            resp = requests.get("https://www.unicode.org/Public/emoji/latest/emoji-test.txt", timeout=5)
             self.unicode_set: set[str] = set()
             for character in resp.text:
                 if character not in string.printable:
