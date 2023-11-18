@@ -74,7 +74,6 @@ class ChristmasSubcog(AbstractSubcog):
         del self.pending_reactions[payload.message_id]
         # add item to user collection
         await self.db_add_user_items(payload.user_id, [item["item_id"]])
-        await self.db_add_collect(payload.user_id, item["points"])
         # prepare the notification embed
         translation_source = payload.guild_id or payload.user_id
         lang = await self.bot._(translation_source, '_used_locale')
@@ -87,11 +86,13 @@ class ChristmasSubcog(AbstractSubcog):
         embed = discord.Embed(title=title, description=desc, color=self.current_event_data["color"])
         if self.current_event_data["icon"]:
             embed.set_image(url=self.current_event_data["icon"])
-        # send the notification, auto delete after 12 seconds
-        if channel := self.bot.get_channel(payload.channel_id):
-            await channel.send(embed=embed, delete_after=12)
-        elif user := self.bot.get_user(payload.user_id):
-            await user.send(embed=embed, delete_after=12)
+        if destination := (self.bot.get_channel(payload.channel_id) or self.bot.get_user(payload.user_id)):
+            # send the notification, auto delete after 12 seconds
+            await destination.send(embed=embed, delete_after=12)
+            # send the rank card notification if needed
+            await self.bot.get_cog("BotEvents").check_and_send_card_unlocked_notif(destination, payload.user_id)
+        # add points (and potentially grant reward rank card)
+        await self.db_add_collect(payload.user_id, item["points"])
 
     async def profile_cmd(self, ctx, user):
         "Displays the profile of the user"
@@ -147,7 +148,6 @@ class ChristmasSubcog(AbstractSubcog):
         gifts = await self.get_calendar_gifts_from_date(last_collect_day)
         if gifts:
             await self.db_add_user_items(ctx.author.id, [item["item_id"] for item in gifts])
-            await self.db_add_collect(ctx.author.id, sum(item["points"] for item in gifts))
         txt = await self.generate_collect_message(ctx.channel, gifts, last_collect_day)
         # send result
         if ctx.can_send_embed:
@@ -156,8 +156,13 @@ class ChristmasSubcog(AbstractSubcog):
             emb.add_field(**await self.get_random_tip_field(ctx.channel))
             emb.set_thumbnail(url="https://cdn-icons-png.flaticon.com/512/4213/4213958.png")
             await ctx.send(embed=emb)
+            # send the rank card notification if needed
+            await self.bot.get_cog("BotEvents").check_and_send_card_unlocked_notif(ctx.channel, ctx.author)
         else:
             await ctx.send(txt)
+        # add points (and potentially grant reward rank card)
+        if gifts:
+            await self.db_add_collect(ctx.author.id, sum(item["points"] for item in gifts))
 
     async def today(self):
         return dt.datetime.now(dt.timezone.utc).date()
