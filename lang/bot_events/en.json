@@ -36,11 +36,22 @@
     "points-total": "Total points",
     "position-global": "Global position",
     "rank-title": "Event points",
+    "rankcard-unlocked": {
+        "title": "New card unlocked!",
+        "desc": {
+            "one": "Thanks to your participation in the event, you have unlocked a new rank card: **%{cards}**!\nYou can use it with the command %{profile_card_cmd}.",
+            "many": "Thanks to your participation in the event, you have unlocked the following rank cards: **%{cards}**!\nYou can use them with the command %{profile_card_cmd}."
+        }
+    },
     "reaction": {
         "positive": "Congrats %{user}, you have found one %{item}! It has been added to your collection, and you earned **%{points} event points**!",
         "negative": "Oh no %{user}, you have found one %{item}! It has been added to your collection, but you lost **%{points} event points**..."
     },
     "soon": "An event is coming soon! Watch for information as it will begin on %{date}",
+    "tictactoe": {
+        "reward-title": "Tic-tac-toe victory!",
+        "reward-desc": "By winning this game, you earned **%{points} event points**!"
+    },
     "tip-title": "Random tip",
     "unclassed": "unclassed",
     "xp-howto": "You can earn event points by winning tic-tac-toe games, using event commands when available, or by performing various other secret tasks. Don't hesitate to come to the support server to ask for information!"

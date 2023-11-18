@@ -203,17 +203,36 @@ class Morpions(commands.Cog):
                 if self.use_short and last_grid:
                     await last_grid.delete()
                 if match_nul:
-                    await self.bot.get_cog("BotEvents").db_add_user_points(ctx.author.id, 2)
                     resultat = await self.bot._(ctx.channel, 'morpion.nul')
                 else:
                     if tour:  # Le bot a gagné
                         resultat = await self.bot._(ctx.channel, 'morpion.win-bot')
                     else:  # L'utilisateur a gagné
                         resultat = await self.bot._(ctx.channel, 'morpion.win-user', user=ctx.author.mention)
-                        await self.bot.get_cog("BotEvents").db_add_user_points(ctx.author.id, 8)
                 await ctx.send(await self.display_grid(grille)+'\n'+resultat)
+                if not match_nul and not tour:
+                    # give event points if user won
+                    await self.cog.give_event_points(ctx.channel, ctx.author, 8)
             except Exception as err:
                 self.bot.dispatch("command_error", ctx, err)
+
+    async def give_event_points(self, channel, user: discord.User, points: int):
+        "Give points to a user and check if they had unlocked a card"
+        if cog := self.bot.get_cog("BotEvents"):
+            if not cog.current_event:
+                return
+            # send win reward embed
+            emb = discord.Embed(
+                title=await self.bot._(channel, 'bot_events.tictactoe.reward-title'),
+                description=await self.bot._(channel, 'bot_events.tictactoe.reward-desc', points=points),
+                color=cog.current_event_data['color'],
+            )
+            emb.set_author(name=user.global_name, icon_url=user.display_avatar)
+            await channel.send(embed=emb)
+            # send card unlocked notif
+            await cog.check_and_send_card_unlocked_notif(channel, user)
+            # give points
+            await cog.db_add_user_points(user.id, points)
 
 
 async def setup(bot):
