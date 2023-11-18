@@ -1,5 +1,11 @@
 {
     "available-starting": "available from %{date}",
+    "calendar": {
+        "collected-all": "You collected all the gifts from the advent calendar!",
+        "collected-day": "No more gifts for you today, come back tomorrow!",
+        "today-gifts": "Here is today's gifts (**%{points} points**):",
+        "today-gifts-late": "Here are today's gifts, as well as %{days} missed days (**%{points} points**):"
+    },
     "collect": {
         "got-points": "You didn't find any exciting item this time, but still managed to **earn %{points} event points**!",
         "lost-points": "It seems like you didn't come accross any collectible item on your way, and you somehow **lost %{points} event points**...",
@@ -30,6 +36,10 @@
     "points-total": "Total points",
     "position-global": "Global position",
     "rank-title": "Event points",
+    "reaction": {
+        "positive": "Congrats %{user}, you have found one %{item}! It has been added to your collection, and you earned **%{points} event points**!",
+        "negative": "Oh no %{user}, you have found one %{item}! It has been added to your collection, but you lost **%{points} event points**..."
+    },
     "soon": "An event is coming soon! Watch for information as it will begin on %{date}",
     "tip-title": "Random tip",
     "unclassed": "unclassed",
