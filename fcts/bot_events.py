@@ -1,6 +1,6 @@
 import datetime
 import json
-from typing import Literal, Optional, Union
+from typing import Any, Generator, Literal, Optional, Union
 
 import discord
 from discord.ext import commands, tasks
@@ -227,17 +227,12 @@ class BotEvents(commands.Cog):
         "Get some event points every hour"
         await self.subcog.collect_cmd(ctx)
 
-    async def reload_event_rankcard(self, user: Union[discord.User, int], points: int = None):
-        """Grant the current event rank card to the provided user, if they have enough points
-        'points' argument can be provided to avoid re-fetching the database"""
+    async def get_user_unlockable_rankcards(self, user: discord.User, points: Optional[int]=None) -> Generator[str, Any, None]:
+        "Get a list of event rank cards that the user can unlock"
         if (users_cog := self.bot.get_cog("Users")) is None:
             return
         if self.current_event is None or len(rewards := await self.get_specific_objectives("rankcard")) == 0:
             return
-        if isinstance(user, int):
-            user = self.bot.get_user(user)
-            if user is None:
-                return
         cards = await users_cog.get_rankcards(user)
         if points is None:
             points = await self.subcog.db_get_event_rank(user.id)
@@ -248,13 +243,46 @@ class BotEvents(commands.Cog):
                     parsed_date = datetime.datetime.strptime(min_date, "%Y-%m-%d").replace(tzinfo=datetime.timezone.utc)
                     if self.bot.utcnow() < parsed_date:
                         continue
-                await users_cog.set_rankcard(user, reward["rank_card"], True)
-                # send internal log
-                embed = discord.Embed(
-                    description=f"{user} ({user.id}) has been granted the rank card **{reward['rank_card']}**",
-                    color=discord.Color.brand_green()
-                )
-                await self.bot.send_embed(embed)
+                yield reward["rank_card"]
+
+    async def check_and_send_card_unlocked_notif(self, channel, user: Union[discord.User, int]):
+        "Check if the user meets the requirements to unlock the event rank card, and send a notification if so"
+        if isinstance(user, int):
+            user = self.bot.get_user(user)
+            if user is None:
+                return
+        cards = [card async for card in self.get_user_unlockable_rankcards(user)]
+        if cards:
+            title = await self.bot._(channel, "bot_events.rankcard-unlocked.title")
+            profile_card_cmd = await self.bot.get_command_mention("profile card")
+            desc = await self.bot._(channel, "bot_events.rankcard-unlocked.desc",
+                                    cards=", ".join(cards),
+                                    profile_card_cmd=profile_card_cmd,
+                                    count=len(cards)
+                                    )
+            emb = discord.Embed(title=title, description=desc, color=discord.Color.brand_green())
+            emb.set_author(name=user.global_name, icon_url=user.display_avatar)
+            await channel.send(embed=emb)
+
+    async def reload_event_rankcard(self, user: Union[discord.User, int], points: Optional[int] = None):
+        """Grant the current event rank card to the provided user, if they have enough points
+        'points' argument can be provided to avoid re-fetching the database"""
+        if (users_cog := self.bot.get_cog("Users")) is None:
+            return
+        if self.current_event is None:
+            return
+        if isinstance(user, int):
+            user = self.bot.get_user(user)
+            if user is None:
+                return
+        async for card in self.get_user_unlockable_rankcards(user, points):
+            await users_cog.set_rankcard(user, card, True)
+            # send internal log
+            embed = discord.Embed(
+                description=f"{user} ({user.id}) has been granted the rank card **{card}**",
+                color=discord.Color.brand_green()
+            )
+            await self.bot.send_embed(embed)
 
     async def reload_event_special_role(self, user: Union[discord.User, int], points: int = None):
         """Grant the current event special role to the provided user, if they have enough points
