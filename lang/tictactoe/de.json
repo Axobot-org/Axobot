@@ -1,0 +1,14 @@
+{
+    "already-playing": "Du kannst nicht zwei Spiele gleichzeitig spielen!",
+    "bot-begin": "Lass uns loslegen, ich bin drann!",
+    "game-removed": "Du hast das aktuelle Spiel verlassen",
+    "not-playing": "Du bist nicht in einem Spielprozess",
+    "nul": "Unentschieden, keiner gewinnt...",
+    "pion-1": "Da ist schon eine Figur auf diesem Feld!",
+    "pion-2": "Keine passende Antwort",
+    "tip": "\n*Um zu spielen gib einfach eine Zahl zwischen 1 und 9 ein. Ich spiele %{symb1}, du %{symb2}*",
+    "too-late": "Du hast zu lange gebraucht, Game over!",
+    "user-begin": "{}, du bist frann!",
+    "win-bot": "Ich habe gewonnen!",
+    "win-user": "Gut gemacht, %{user} hat gewonnen!"
+}
