@@ -161,9 +161,9 @@ class ChristmasSubcog(AbstractSubcog):
         else:
             await ctx.send(txt)
         # add points (and potentially grant reward rank card)
-        if gifts:
-            await self.db_add_collect(ctx.author.id, sum(item["points"] for item in gifts))
+        await self.db_add_collect(ctx.author.id, sum(item["points"] for item in gifts))
 
+    @acached(60*2) # cache for 2min
     async def today(self):
         return dt.datetime.now(dt.timezone.utc).date()
         # return dt.date(2023, 12, 1)
@@ -262,11 +262,12 @@ class ChristmasSubcog(AbstractSubcog):
         """Add collect points to a user"""
         if not self.bot.database_online or self.bot.current_event is None:
             return
-        query = "INSERT INTO `event_points` (`user_id`, `collect_points`, `beta`) VALUES (%s, %s, %s) \
-            ON DUPLICATE KEY UPDATE collect_points = collect_points + VALUE(`collect_points`), \
-                last_collect = CURRENT_TIMESTAMP();"
-        async with self.bot.db_query(query, (user_id, points, self.bot.beta)):
-            pass
+        if points:
+            query = "INSERT INTO `event_points` (`user_id`, `collect_points`, `beta`) VALUES (%s, %s, %s) \
+                ON DUPLICATE KEY UPDATE collect_points = collect_points + VALUE(`collect_points`), \
+                    last_collect = CURRENT_TIMESTAMP();"
+            async with self.bot.db_query(query, (user_id, points, self.bot.beta)):
+                pass
         if cog := self.bot.get_cog("BotEvents"):
             try:
                 await cog.reload_event_rankcard(user_id)

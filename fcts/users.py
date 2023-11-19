@@ -213,7 +213,7 @@ class Users(commands.Cog):
     async def profile_card(self, ctx: MyContext, style: args.CardStyle):
         """Change your xp card style.
 
-        ..Example profile card christmas20
+        ..Example profile card christmas23
 
         ..Doc user.html#change-your-xp-card"""
         if style is None and len(ctx.view.buffer.split(' ')) > 2:

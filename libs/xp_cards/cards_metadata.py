@@ -1,7 +1,8 @@
 import json
 import os
 
-from libs.xp_cards.card_types import CardData, CardMetaData, TextData, TextMetaData, ColorsData
+from libs.xp_cards.card_types import (CardData, CardMetaData, ColorsData,
+                                      TextData, TextMetaData)
 
 V1_CARDS = {
     "april22",
@@ -35,6 +36,7 @@ V3_CARDS = {
     "support",
     "blurple23",
     "halloween23",
+    "christmas23"
 }
 
 JSON_DATA_FILE = os.path.dirname(__file__) + "/cards_data.json"

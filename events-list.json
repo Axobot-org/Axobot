@@ -204,7 +204,7 @@
         }
     },
     "christmas-2023": {
-        "begin": "2023-11-01",
+        "begin": "2023-12-01",
         "end": "2023-12-31",
         "type": "christmas",
         "icon": "https://zrunner.me/cdn/halloween_2023.png",
@@ -252,7 +252,7 @@
                 "lutin",
                 "cookie"
             ],
-            "probability": 0.91
+            "probability": 0.1
         }
     }
 }
