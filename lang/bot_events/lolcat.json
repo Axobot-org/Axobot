@@ -1,4 +1,11 @@
 {
+    "available-starting": "only from %{date}",
+    "calendar": {
+        "collected-all": "Oh no, u already got everything from my calendar!",
+        "collected-day": "Uh uh, no more gift 4 u today!",
+        "today-gifts": "Here're ur gifts 4 today! (**%{points} points**)",
+        "today-gifts-late": "Here're ur gifts 4 today +%{days} days! (**%{points} points**)"
+    },
     "collect": {
         "got-points": "Uh, looks like u couldn't find anything dis time, so I gave u **%{points} event points**. Make sure to open ur eyes next time tho!",
         "lost-points": "Uh, looks like u couldn't find anything dis time duh. I took bakk **%{points} event points** from ur account, let that be a lesson to you!",
@@ -29,7 +36,22 @@
     "points-total": "Total pts",
     "position-global": "Globol rank",
     "rank-title": "Event pts",
+    "rankcard-unlocked": {
+        "title": "New shiny xp card!",
+        "desc": {
+            "one": "Amazin'! U are so enthusiast with dis event, I've decided to give u my epic **%{cards} rank card**!\nEquip it right naw with %{profile_card_cmd}!",
+            "many": "Amazin'! U are so enthusiast with dis event, I've decided to give u some ov my bests cards: **%{cards}**!\nEquip 'em right naw with %{profile_card_cmd}!"
+        }
+    },
+    "reaction": {
+        "positive": "GG %{user}, u just got 1 %{item}! It got added 2 ur bag, and gave u **%{points} events points** yay!",
+        "negative": "Oh no %{user}, looks like u fund 1 %{item}! 'got added 2 ur bag, but made u lost **%{points} event points** :ohno:"
+    },
     "soon": "Hey hey hey! ur too soon, try checking on %{date}! :hype:  ",
+    "tictactoe": {
+        "reward-title": "WOW, u won against the most supremely smartest tic-tac-toe AI ever!",
+        "reward-desc": "So uh, as a reward, I've gave u **%{points} event points**, check 'em with `/event profile`!"
+    },
     "tip-title": "Cool tip",
     "unclassed": "unclassd",
     "xp-howto": "You can earn event points by winning tic-tac-toe games, using event commands when available, or by performing various other secret tasks. Don't hesitate to come to the support server to ask for information!"
