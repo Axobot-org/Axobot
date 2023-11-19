@@ -1,6 +1,6 @@
 import time
 from datetime import datetime, timedelta
-from typing import Union, Literal
+from typing import Literal, Union
 
 from babel import dates, numbers
 from dateutil.relativedelta import relativedelta
@@ -83,6 +83,8 @@ class FormatUtils:
             if seconds and delta.seconds > 0:
                 # add formatted seconds
                 result += dates.format_timedelta(timedelta(seconds=delta.seconds), granularity="second", **kwargs) + " "
+            elif not seconds and len(result.strip()) == 0 and delta.seconds > 0:
+                result += "<" + dates.format_timedelta(timedelta(minutes=1), granularity="minute", **kwargs)
 
         return result.strip()
 
