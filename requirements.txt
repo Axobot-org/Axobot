@@ -1,29 +1,29 @@
-discord.py~=2.3.0
 aiohttp
-mysql-connector-python>=8.0
-frmc-lib @ git+https://github.com/ZRunner/fr-mc-python-lib.git@v1.0.6
-i18nice~=0.9.0
-emoji>=2.0
-imageio
-geocoder
-timezonefinder
-isbnlib
-pytz
-psutil>=5.8
-speedtest-cli>=2.1.3
-feedparser>=6.0
-google-api-python-client
-Babel>=2.9
-cachingutils>=1.0
-nltk>=3.7
 autopep8
-flatten-json
-python-dateutil
-LRFutils==0.1.2
-GitPython
-Pillow~=9.4.0
+Babel>=2.9
 beautifulsoup4~=4.12.0
+cachingutils>=1.0
+discord.py~=2.3.0
+emoji>=2.0
+feedparser>=6.0
+flatten-json
+frmc-lib @ git+https://github.com/ZRunner/fr-mc-python-lib.git@v1.0.6
+geocoder
+GitPython
+google-api-python-client
+i18nice~=0.9.0
+imageio
+isbnlib
+LRFutils==0.1.2
+mysql-connector-python>=8.0
+nltk>=3.7
+Pillow~=9.4.0
+psutil>=5.8
+python-dateutil
+pytz
 rembg~=2.0.0
+speedtest-cli>=2.1.3
+timezonefinder
 
 # Antiscam training
 pandas
