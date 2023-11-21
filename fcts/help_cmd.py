@@ -7,9 +7,11 @@ import discord
 from discord.ext import commands
 
 from libs.bot_classes import Axobot, MyContext
-from libs.help_cmd import (get_command_desc_translation,
-                           get_command_description,
-                           get_command_name_translation, get_command_signature)
+from libs.help_cmd.help_all import help_all_command
+from libs.help_cmd.txt_cmd_utils import (get_command_desc_translation,
+                                         get_command_description,
+                                         get_command_name_translation,
+                                         get_command_signature)
 
 
 class CommandsCategoryData(TypedDict):
@@ -95,15 +97,14 @@ If the bot can't send the new command format, it will try to send the old one.""
 
             if commands_arg is not None and " ".join(commands_arg).lower() in self.commands_data:
                 categ_name = [" ".join(commands_arg).lower()]
+            elif commands_arg is None:
+                categ_name = []
             else:
                 translated_categories = {
                     k: await self.bot._(ctx.channel, f"help.categories.{k}")
                     for k in self.commands_data.keys()
                 }
-                if commands_arg is None:
-                    categ_name = []
-                else:
-                    categ_name = [k for k, v in translated_categories.items() if v.lower() == " ".join(commands_arg).lower()]
+                categ_name = [k for k, v in translated_categories.items() if v.lower() == " ".join(commands_arg).lower()]
 
             if len(categ_name) == 1: # cog name
                 if categ_name[0] == "unclassed":
@@ -115,14 +116,8 @@ If the bot can't send the new command format, it will try to send the old one.""
                 if len(pages) == 0 and ctx.guild is None:
                     pages = [await self.bot._(ctx.channel, "help.cog-empty-dm")]
             elif not commands_arg:  # no command
-                compress: bool = await self.bot.get_config(ctx.guild.id, 'compress_help') if ctx.guild else False
-                pages = await self.all_commands(ctx, sorted(
-                    [c for c in self.bot.commands],
-                    key=self.sort_by_name), compress=compress)
-                if ctx.guild is None:
-                    title = await self.bot._(ctx.channel, "help.embed_title_dm")
-                else:
-                    title = await self.bot._(ctx.channel, "help.embed_title", u=ctx.author.display_name)
+                await help_all_command(self, ctx)
+                return
             elif len(commands_arg) == 1:  # Unique command name?
                 name = commands_arg[0]
                 command = None

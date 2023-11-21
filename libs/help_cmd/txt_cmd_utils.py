@@ -1,13 +1,21 @@
-from typing import Any, Optional, Union, Literal
+from typing import Any, Literal, Optional, Union
 
-from discord import Locale, Attachment
+from discord import Attachment, Locale
 from discord.app_commands import Command as AppCommand
 from discord.app_commands.translator import (TranslationContext,
-                                             TranslationContextLocation, locale_str)
+                                             TranslationContextLocation,
+                                             locale_str)
 from discord.ext import commands
 
 from libs.bot_classes import MyContext
 from libs.translator import LOCALES_MAP
+
+
+async def get_command_inline_desc(ctx: MyContext, cmd: commands.Command):
+    "Generate a 1-line description with the command name and short desc"
+    name = await get_command_name_translation(ctx, cmd)
+    short = await get_command_desc_translation(ctx, cmd) or cmd.short_doc.strip()
+    return f"• **{name}**" + (f"  *{short}*" if short else "")
 
 
 async def get_command_description(ctx: MyContext, command: commands.Command):
