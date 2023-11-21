@@ -120,19 +120,14 @@ If the bot can't send the new command format, it will try to send the old one.""
                 return
             elif len(commands_arg) == 1:  # Unique command name?
                 name = commands_arg[0]
-                command = None
-                if name in self.bot.cogs:
-                    cog = self.bot.get_cog(name)
-                    pages = await self.cog_commands(ctx, cog)
-                else:
-                    command = self.bot.all_commands.get(name)
-                    if command is None:
-                        ctx2 = copy.copy(ctx)
-                        ctx2.message.content = name
-                        name = await discord.ext.commands.clean_content().convert(ctx2, name)
-                        await ctx.send(await self.bot._(ctx.channel, "help.cmd-not-found", cmd=name))
-                        return
-                    pages = await self.cmd_help(ctx, command, destination.permissions_for(bot_usr).embed_links)
+                command = self.bot.all_commands.get(name)
+                if command is None:
+                    ctx2 = copy.copy(ctx)
+                    ctx2.message.content = name
+                    name = commands.clean_content().convert(ctx2, name)
+                    await ctx.send(await self.bot._(ctx.channel, "help.cmd-not-found", cmd=name))
+                    return
+                pages = await self.cmd_help(ctx, command, destination.permissions_for(bot_usr).embed_links)
             else:  # sub-command name?
                 name = commands_arg[0]
                 command = self.bot.all_commands.get(name)
@@ -248,30 +243,6 @@ If the bot can't send the new command format, it will try to send the old one.""
                     title = tr_name
                     answer.append((f"{emoji}  __**{title.capitalize()}**__", "\n".join(values)))
         return answer
-
-    async def cog_commands(self, ctx: MyContext, cog: commands.Cog):
-        """Create pages for every command of a cog"""
-        description = inspect.getdoc(cog)
-        page = ""
-        form = "**{}**\n\n {} \n{}"
-        pages = []
-        cog_name = cog.__class__.__name__
-        if description is None:
-            description = await self.bot._(ctx.channel, "help.no-desc-cog")
-        for cmd in sorted([c for c in self.bot.commands], key=self.sort_by_name):
-            try:
-                if (not await cmd.can_run(ctx)) or cmd.hidden or (not cmd.enabled) or cmd.cog_name != cog_name:
-                    continue
-            except commands.CommandError:
-                continue
-            text = await self._display_cmd(ctx, cmd)
-            if len(page+text) > 1900:
-                pages.append(form.format(cog_name, description, page))
-                page = text
-            else:
-                page += "\n"+text
-        pages.append(form.format(cog_name, description, page))
-        return pages
 
     async def _get_subcommands(self, ctx: MyContext, cmd: commands.Group):
         ""
