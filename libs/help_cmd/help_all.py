@@ -4,8 +4,9 @@ import discord
 from discord.ext import commands
 
 from libs.bot_classes import MyContext
-from libs.help_cmd.txt_cmd_utils import get_command_inline_desc
-from libs.help_cmd.utils import FieldData, get_embed_color, get_embed_footer
+
+from .txt_cmd_utils import get_command_inline_desc
+from .utils import FieldData, get_embed_color, get_embed_footer
 
 if TYPE_CHECKING:
     from fcts.help_cmd import Help as HelpCog
@@ -17,7 +18,7 @@ def sort_by_name(cmd: commands.Command):
 async def help_all_command(cog: "HelpCog", ctx: MyContext):
     "Show all commands and groups"
     compress: bool = await cog.bot.get_config(ctx.guild.id, 'compress_help') if ctx.guild else False
-    fields = await _all_commands(cog, ctx, cog.bot.commands, compress=compress)
+    fields = await all_commands(cog, ctx, cog.bot.commands, compress=compress)
     if ctx.guild is None:
         title = await cog.bot._(ctx.channel, "help.embed_title_dm")
     else:
@@ -30,7 +31,7 @@ async def help_all_command(cog: "HelpCog", ctx: MyContext):
     await ctx.send(embed=embed)
 
 
-async def _all_commands(cog: "HelpCog", ctx: MyContext, commands_list: Iterable[commands.Command],
+async def all_commands(cog: "HelpCog", ctx: MyContext, commands_list: Iterable[commands.Command],
                         compress: bool) -> list[FieldData]:
     "Generate embed fields to describe all commands, grouped by category"
     categories: dict[str, list[str]] = { x: [] for x in cog.commands_data.keys() }

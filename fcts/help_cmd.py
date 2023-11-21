@@ -1,13 +1,12 @@
 import copy
-import inspect
 import json
-from typing import List, Optional, TypedDict
+from typing import Optional, TypedDict
 
 import discord
 from discord.ext import commands
 
 from libs.bot_classes import Axobot, MyContext
-from libs.help_cmd.help_all import help_all_command
+from libs.help_cmd import help_all_command, help_category_command
 from libs.help_cmd.txt_cmd_utils import (get_command_desc_translation,
                                          get_command_description,
                                          get_command_name_translation,
@@ -106,25 +105,19 @@ If the bot can't send the new command format, it will try to send the old one.""
                 }
                 categ_name = [k for k, v in translated_categories.items() if v.lower() == " ".join(commands_arg).lower()]
 
-            if len(categ_name) == 1: # cog name
-                if categ_name[0] == "unclassed":
-                    referenced_commands = {x for v in self.commands_data.values() for x in v['commands']}
-                    temp = [c for c in self.bot.commands if c.name not in referenced_commands]
-                else:
-                    temp = [c for c in self.bot.commands if c.name in self.commands_data[categ_name[0]]['commands']]
-                pages = await self.all_commands(ctx, sorted(temp, key=self.sort_by_name))
-                if len(pages) == 0 and ctx.guild is None:
-                    pages = [await self.bot._(ctx.channel, "help.cog-empty-dm")]
-            elif not commands_arg:  # no command
+            if len(categ_name) == 1: # category name
+                await help_category_command(self, ctx, categ_name[0])
+                return
+            if not commands_arg:  # no command
                 await help_all_command(self, ctx)
                 return
-            elif len(commands_arg) == 1:  # Unique command name?
+            if len(commands_arg) == 1:  # Unique command name?
                 name = commands_arg[0]
                 command = self.bot.all_commands.get(name)
                 if command is None:
                     ctx2 = copy.copy(ctx)
                     ctx2.message.content = name
-                    name = commands.clean_content().convert(ctx2, name)
+                    name = await commands.clean_content().convert(ctx2, name)
                     await ctx.send(await self.bot._(ctx.channel, "help.cmd-not-found", cmd=name))
                     return
                 pages = await self.cmd_help(ctx, command, destination.permissions_for(bot_usr).embed_links)
@@ -185,64 +178,6 @@ If the bot can't send the new command format, it will try to send the old one.""
 
     def sort_by_name(self, cmd: commands.Command) -> str:
         return cmd.name
-
-    async def all_commands(self, ctx: MyContext, cmds: List[commands.Command], compress: bool = False):
-        """Create pages for every bot command"""
-        categories = {x: [] for x in self.commands_data.keys()}
-        for cmd in cmds:
-            try:
-                if cmd.hidden or not cmd.enabled:
-                    continue
-                if not await cmd.can_run(ctx):
-                    continue
-            except commands.CommandError:
-                continue
-            temp = await self._display_cmd(ctx, cmd)
-            found = False
-            for k, values in self.commands_data.items():
-                if cmd.name in values['commands']:
-                    categories[k].append(temp)
-                    found = True
-                    break
-            if not found:
-                categories['unclassed'].append(temp)
-        answer = []
-        prefix = await self.bot.prefix_manager.get_prefix(ctx.guild)
-        if compress:
-            for k, values in categories.items():
-                if len(values) == 0:
-                    continue
-                tr_name = await self.bot._(ctx.channel, f"help.categories.{k}")
-                emoji = self.commands_data[k]['emoji']
-                title = f"{emoji}  __**{tr_name.capitalize()}**__"
-                count = await self.bot._(ctx.channel, "help.cmd-count",
-                                         count=len(values),
-                                         p=prefix,
-                                         cog=k)
-                answer.append((title, count))
-        else:
-            for k, values in categories.items():
-                if len(values) == 0:
-                    continue
-                emoji = self.commands_data[k]['emoji']
-                tr_name = await self.bot._(ctx.channel, f"help.categories.{k}")
-                if len("\n".join(values)) > 1020:
-                    temp = list(values)
-                    values = []
-                    i = 1
-                    for line in temp:
-                        if len("\n".join(values+[line])) > 1020:
-                            title = (tr_name+' - ' + str(i)) if 'help.' not in tr_name else (k+' - '+str(i))
-                            answer.append((f"{emoji}  __**{title.capitalize()}**__", "\n".join(values)))
-                            values.clear()
-                            i += 1
-                        values.append(line)
-                    title = (tr_name+' - ' + str(i)) if 'help.' not in tr_name else (k+' - '+str(i))
-                    answer.append((f"{emoji}  __**{title.capitalize()}**__", "\n".join(values)))
-                else:
-                    title = tr_name
-                    answer.append((f"{emoji}  __**{title.capitalize()}**__", "\n".join(values)))
-        return answer
 
     async def _get_subcommands(self, ctx: MyContext, cmd: commands.Group):
         ""
