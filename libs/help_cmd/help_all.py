@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Iterable
 
 import discord
 from discord.ext import commands
@@ -30,10 +30,11 @@ async def help_all_command(cog: "HelpCog", ctx: MyContext):
     await ctx.send(embed=embed)
 
 
-async def _all_commands(cog: "HelpCog", ctx: MyContext, commands_list: list[commands.Command], compress: bool) -> list[FieldData]:
+async def _all_commands(cog: "HelpCog", ctx: MyContext, commands_list: Iterable[commands.Command],
+                        compress: bool) -> list[FieldData]:
     "Generate embed fields to describe all commands, grouped by category"
     categories: dict[str, list[str]] = { x: [] for x in cog.commands_data.keys() }
-    commands_list.sort(key=sort_by_name)
+    commands_list = sorted(list(commands_list), key=sort_by_name)
     # group commands by category
     for command in commands_list:
         try:
@@ -52,7 +53,7 @@ async def _all_commands(cog: "HelpCog", ctx: MyContext, commands_list: list[comm
                 categories[category_id].append(cmd_desc)
                 break
         else:
-            categories["other"].append(cmd_desc)
+            categories["unclassed"].append(cmd_desc)
     # generate "compressed" embed fields
     if compress:
         return await _generate_compressed_help(cog, ctx, categories)
