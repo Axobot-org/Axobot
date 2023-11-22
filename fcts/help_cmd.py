@@ -1,4 +1,3 @@
-import copy
 import json
 from typing import Optional, TypedDict
 
@@ -8,7 +7,6 @@ from discord.ext import commands
 from libs.bot_classes import Axobot, MyContext
 from libs.help_cmd import (help_all_command, help_category_command,
                            help_text_cmd_command)
-
 
 
 class CommandsCategoryData(TypedDict):
@@ -55,7 +53,7 @@ Enable "Embed Links" permission for better rendering
 ..Doc infos.html#help"""
         try:
             if len(args) == 0:
-                await self.help_command(ctx)
+                await help_all_command(self, ctx)
             else:
                 await self.help_command(ctx, args)
         except discord.errors.Forbidden:
@@ -67,56 +65,48 @@ Enable "Embed Links" permission for better rendering
             else:
                 await self._default_help_command(ctx, args)
 
-
-    async def help_command(self, ctx: MyContext, commands_arg: Optional[list[str]] = None):
+    async def help_command(self, ctx: MyContext, command_arg: list[str]):
         """Main command for the creation of the help message
 If the bot can't send the new command format, it will try to send the old one."""
-        async with ctx.channel.typing():
-            if commands_arg is not None and " ".join(commands_arg).lower() in self.commands_data:
-                categ_name = [" ".join(commands_arg).lower()]
-            elif commands_arg is None:
-                categ_name = []
-            else:
-                translated_categories = {
-                    k: await self.bot._(ctx.channel, f"help.categories.{k}")
-                    for k in self.commands_data.keys()
-                }
-                categ_name = [k for k, v in translated_categories.items() if v.lower() == " ".join(commands_arg).lower()]
-
-            if len(categ_name) == 1: # category name
-                await help_category_command(self, ctx, categ_name[0])
-                return
-            if not commands_arg:  # no command
-                await help_all_command(self, ctx)
-                return
-            if len(commands_arg) == 1:  # Unique command name?
-                name = commands_arg[0]
-                command = self.bot.all_commands.get(name)
-                if command is None:
-                    ctx2 = copy.copy(ctx)
-                    ctx2.message.content = name
-                    name = await commands.clean_content().convert(ctx2, name)
-                    await ctx.send(await self.bot._(ctx.channel, "help.cmd-not-found", cmd=name))
-                    return
-                await help_text_cmd_command(self, ctx, command)
-                return
-            # sub-command name?
-            name = commands_arg[0]
+        # if user entered a category name
+        if category_id := await self._detect_category_from_args(ctx, command_arg):
+            await help_category_command(self, ctx, category_id)
+            return
+        # if user entered a root command/group name
+        if len(command_arg) == 1:
+            name = command_arg[0]
             command = self.bot.all_commands.get(name)
             if command is None:
                 await ctx.send(await self.bot._(ctx.channel, "help.cmd-not-found", cmd=name))
                 return
-            for key in commands_arg[1:]:
-                try:
-                    command = command.all_commands.get(key)
-                    if command is None:
-                        await ctx.send(await self.bot._(ctx.channel, "help.subcmd-not-found", name=key))
-                        return
-                except AttributeError:
-                    await ctx.send(await self.bot._(ctx.channel, "help.no-subcmd", cmd=command.name))
-                    return
             await help_text_cmd_command(self, ctx, command)
+            return
+        # if user entered a subcommand name
+        name = command_arg[0]
+        command = self.bot.all_commands.get(name)
+        if command is None:
+            await ctx.send(await self.bot._(ctx.channel, "help.cmd-not-found", cmd=name))
+            return
+        for key in command_arg[1:]:
+            if not isinstance(command, commands.Group):
+                await ctx.send(await self.bot._(ctx.channel, "help.no-subcmd", cmd=command.name))
+                return
+            command = command.all_commands.get(key)
+            if command is None:
+                await ctx.send(await self.bot._(ctx.channel, "help.subcmd-not-found", name=key))
+                return
+        await help_text_cmd_command(self, ctx, command)
 
+    async def _detect_category_from_args(self, ctx: MyContext, args: list[str]) -> Optional[str]:
+        """Detect the category from the arguments passed to the help command"""
+        arg_input = " ".join(args).lower()
+        if arg_input in self.commands_data:
+            return arg_input
+        for category_id in self.commands_data:
+            category_name = await self.bot._(ctx.channel, f"help.categories.{category_id}")
+            if category_name.lower() == arg_input:
+                return category_id
+        return None
 
     async def _default_help_command(self, ctx: MyContext, command: str = None):
         default_help = commands.DefaultHelpCommand()
