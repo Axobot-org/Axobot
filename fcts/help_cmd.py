@@ -6,11 +6,9 @@ import discord
 from discord.ext import commands
 
 from libs.bot_classes import Axobot, MyContext
-from libs.help_cmd import help_all_command, help_category_command
-from libs.help_cmd.txt_cmd_utils import (get_command_desc_translation,
-                                         get_command_description,
-                                         get_command_name_translation,
-                                         get_command_signature)
+from libs.help_cmd import (help_all_command, help_category_command,
+                           help_text_cmd_command)
+
 
 
 class CommandsCategoryData(TypedDict):
@@ -91,9 +89,6 @@ If the bot can't send the new command format, it will try to send the old one.""
                 await ctx.message.author.create_dm()
                 destination = ctx.message.author.dm_channel
 
-            bot_usr = destination.me if isinstance(destination, discord.DMChannel) else destination.guild.me
-            title = ""
-
             if commands_arg is not None and " ".join(commands_arg).lower() in self.commands_data:
                 categ_name = [" ".join(commands_arg).lower()]
             elif commands_arg is None:
@@ -120,191 +115,25 @@ If the bot can't send the new command format, it will try to send the old one.""
                     name = await commands.clean_content().convert(ctx2, name)
                     await ctx.send(await self.bot._(ctx.channel, "help.cmd-not-found", cmd=name))
                     return
-                pages = await self.cmd_help(ctx, command, destination.permissions_for(bot_usr).embed_links)
-            else:  # sub-command name?
-                name = commands_arg[0]
-                command = self.bot.all_commands.get(name)
-                if command is None:
-                    await ctx.send(await self.bot._(ctx.channel, "help.cmd-not-found", cmd=name))
-                    return
-                for key in commands_arg[1:]:
-                    try:
-                        command = command.all_commands.get(key)
-                        if command is None:
-                            await ctx.send(await self.bot._(ctx.channel, "help.subcmd-not-found", name=key))
-                            return
-                    except AttributeError:
-                        await ctx.send(await self.bot._(ctx.channel, "help.no-subcmd", cmd=command.name))
-                        return
-                pages = await self.cmd_help(ctx, command, destination.permissions_for(bot_usr).embed_links)
-
-            ft = await self.bot._(ctx.channel, "help.footer")
-            prefix = await self.bot.prefix_manager.get_prefix(ctx.guild)
-        if len(pages) == 0:
-            self.bot.dispatch("error", ValueError(f"Unable to find help for the command {' '.join(commands_arg)}"))
-            await ctx.send(await self.bot._(ctx.channel, "help.cmd-not-found", cmd=" ".join(commands_arg)))
-            return
-        if destination.permissions_for(bot_usr).embed_links:
-            if ctx.guild is not None:
-                embed_colour = ctx.guild.me.color if ctx.guild.me.color != discord.Colour.default() else discord.Colour(self.help_color)
-            else:
-                embed_colour = discord.Colour(self.help_color_dm)
-            if isinstance(pages[0], str): # use description
-                for page in pages:
-                    embed = discord.Embed(title=title, description=page, color=embed_colour, timestamp=self.bot.utcnow())
-                    embed.set_footer(text=ft.format(prefix))
-                    title = ""
-                    await ctx.send(embed=embed)
-            else: # use fields
-                embed = discord.Embed(title=title, color=embed_colour, timestamp=self.bot.utcnow())
-                embed.set_footer(text=ft.format(prefix))
-                for page in pages:
-                    if len(page) == 1:
-                        embed.title = page[0]
-                        continue
-                    embed.add_field(name=page[0], value=page[1], inline=False)
-                await ctx.send(embed=embed)
-        else:
-            for page in pages:
-                if isinstance(page, str):
-                    await ctx.send(page)
-                else:
-                    await ctx.send("\n".join(page))
-
-    async def _display_cmd(self, ctx: MyContext, cmd: commands.Command):
-        name = await get_command_name_translation(ctx, cmd)
-        short = await get_command_desc_translation(ctx, cmd) or cmd.short_doc.strip()
-        return f"• **{name}**" + (f"  *{short}*" if short else "")
-
-    def sort_by_name(self, cmd: commands.Command) -> str:
-        return cmd.name
-
-    async def _get_subcommands(self, ctx: MyContext, cmd: commands.Group):
-        ""
-        subcmds = ""
-        subs_cant_show = 0
-        sublist = []
-        for subcommand in sorted(cmd.all_commands.values(), key=self.sort_by_name):
-            try:
-                if (not subcommand.hidden) and subcommand.enabled and subcommand.name not in sublist and await subcommand.can_run(ctx):
-                    if len(subcmds) > 950:
-                        subs_cant_show += 1
-                    else:
-                        name = await get_command_name_translation(ctx, subcommand)
-                        if (description := await get_command_desc_translation(ctx, subcommand)) is None:
-                            description = subcommand.short_doc
-                        desc = f"*({description})*" if len(description) > 0 else ""
-                        subcmds += f"\n• {name} {desc}"
-                        sublist.append(subcommand.name)
-            except commands.CommandError:
-                pass
-        return subcmds, subs_cant_show
-
-    async def cmd_help(self, ctx: MyContext, cmd: commands.Command, use_embed: bool = True):
-        """Create pages for a command explanation"""
-        desc, examples, doc = await get_command_description(ctx, cmd)
-        # Syntax
-        syntax = await get_command_signature(ctx, cmd)
-        # Subcommands
-        if isinstance(cmd, commands.Group):
-            syntax += " ..."
-            subcmds, subs_cant_show = await self._get_subcommands(ctx, cmd)
-            if not use_embed:
-                subcmds = "__" + (await self.bot._(ctx.channel, "help.subcmds")).capitalize() + "__\n" + subcmds
-            if subs_cant_show > 0:
-                subcmds += "\n" + await self.bot._(ctx.channel, 'help.more-subcmds', count=subs_cant_show)
-        else:
-            subcmds = ""
-        # Is enabled
-        enabled: list[str] = []
-        if not cmd.enabled:
-            enabled.append(await self.bot._(ctx.channel, "help.not-enabled"))
-        # Checks
-        checks = []
-        if len(cmd.checks) > 0:
-            maybe_coro = discord.utils.maybe_coroutine
-            for check in cmd.checks:
+                await help_text_cmd_command(self, ctx, command)
+                return
+            # sub-command name?
+            name = commands_arg[0]
+            command = self.bot.all_commands.get(name)
+            if command is None:
+                await ctx.send(await self.bot._(ctx.channel, "help.cmd-not-found", cmd=name))
+                return
+            for key in commands_arg[1:]:
                 try:
-                    if 'guild_only.<locals>.predicate' in str(check):
-                        check_name = 'guild_only'
-                    elif 'is_owner.<locals>.predicate' in str(check):
-                        check_name = 'is_owner'
-                    elif 'bot_has_permissions.<locals>.predicate' in str(check):
-                        check_name = 'bot_has_permissions'
-                    elif '_has_permissions.<locals>.predicate' in str(check):
-                        check_name = 'has_permissions'
-                    else:
-                        check_name = check.__name__
-                    check_msg_tr = await self.bot._(ctx.channel, f'help.check-desc.{check_name}')
-                    if 'help.check-desc' not in check_msg_tr:
-                        try:
-                            pass_check = await maybe_coro(check, ctx)
-                        except Exception:
-                            pass_check = False
-                        if pass_check:
-                            checks.append(
-                                "✅ "+check_msg_tr[0])
-                        else:
-                            checks.append('❌ '+check_msg_tr[1])
-                    else:
-                        self.bot.dispatch("error", ValueError(f"No description for help check {check_name} ({check})"))
-                except Exception as err:
-                    self.bot.dispatch("error", err, f"While checking {check} in help")
-        # Module
-        category = "unclassed"
-        for key, data in self.commands_data.items():
-            categ_commands = data['commands']
-            if cmd.name in categ_commands or (cmd.full_parent_name and cmd.full_parent_name.split(" ")[0] in categ_commands):
-                category = key
-                break
-        emoji = self.commands_data[category]['emoji']
-        category = emoji + "  " + (await self.bot._(ctx.channel, f"help.categories.{category}")).capitalize()
-        # format the final embed/message
-        if use_embed:
-            answer = []
-            answer.append([f"{syntax}"])
-            answer.append((await self.bot._(ctx.channel, 'help.description'), desc))
-            if examples is not None:
-                answer.append((
-                    (await self.bot._(ctx.channel, 'misc.example', count=len(examples))).capitalize(),
-                    "\n".join(examples)
-                ))
-            if len(subcmds) > 0:
-                answer.append((await self.bot._(ctx.channel, 'help.subcmds'), subcmds))
-            if len(cmd.aliases) > 0:
-                if cmd.full_parent_name:
-                    answer.append((await self.bot._(ctx.channel, "help.aliases"), cmd.full_parent_name + " " + " - ".join(cmd.aliases)))
-                else:
-                    answer.append((await self.bot._(ctx.channel, "help.aliases"), " - ".join(cmd.aliases)))
-            if len(enabled+checks) > 0:
-                t = await self.bot._(ctx.channel, "help.warning")
-                answer.append((t, '\n'.join(enabled+checks)))
-            if doc is not None:
-                doc_url = self.doc_url + doc
-                answer.append(((await self.bot._(ctx.channel, 'misc.doc')).capitalize(), doc_url))
-            answer.append(((await self.bot._(ctx.channel, 'misc.category')).capitalize(), category))
-            return answer
-        else:
-            answer = f"{syntax}\n\n{desc}\n\n"
-            if examples is not None:
-                title = (await self.bot._(ctx.channel, 'misc.example', count=len(examples))).capitalize()
-                f_examples = '\n'.join(examples)
-                answer += f"\n__{title}__\n{f_examples}\n"
-            if len(subcmds) > 0:
-                answer += "\n"+subcmds+"\n"
-            if len(cmd.aliases) > 0:
-                answer += "\n"+"__" + await self.bot._(ctx.channel, "help.aliases") + "__: " + (" - ".join(cmd.aliases)) + "\n"
-            if len(enabled) > 0:
-                answer += enabled[0]
-            if len(checks) > 0:
-                answer += "\n" + "__" + await self.bot._(ctx.channel, "help.warning") + "__\n" + '\n'.join(checks) + "\n"
-            if doc is not None:
-                doc_url = self.doc_url + doc
-                answer += "\n__" + (await self.bot._(ctx.channel, 'misc.doc')).capitalize() + "__: " + doc_url
-            answer += "\n\n__" + (await self.bot._(ctx.channel, 'misc.category')).capitalize() + "__: " + category
-            while "\n\n\n" in answer:
-                answer = answer.replace("\n\n\n", "\n\n")
-            return [answer]
+                    command = command.all_commands.get(key)
+                    if command is None:
+                        await ctx.send(await self.bot._(ctx.channel, "help.subcmd-not-found", name=key))
+                        return
+                except AttributeError:
+                    await ctx.send(await self.bot._(ctx.channel, "help.no-subcmd", cmd=command.name))
+                    return
+            await help_text_cmd_command(self, ctx, command)
+
 
     async def _default_help_command(self, ctx: MyContext, command: str = None):
         default_help = commands.DefaultHelpCommand()
