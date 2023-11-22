@@ -67,28 +67,11 @@ Enable "Embed Links" permission for better rendering
             else:
                 await self._default_help_command(ctx, args)
 
-    async def should_dm(self, context: MyContext) -> bool:
-        "Check if the answer should be sent in DM or in current channel"
-        if context.guild is None or not self.bot.database_online:
-            return False
-        return await self.bot.get_config(context.guild.id, 'help_in_dm')
 
     async def help_command(self, ctx: MyContext, commands_arg: Optional[list[str]] = None):
         """Main command for the creation of the help message
 If the bot can't send the new command format, it will try to send the old one."""
         async with ctx.channel.typing():
-            destination: discord.abc.Messageable = None
-            if ctx.guild is not None:
-                if await self.should_dm(ctx):
-                    destination = ctx.message.author.dm_channel
-                    if ctx.guild:
-                        await ctx.message.delete(delay=0)
-                else:
-                    destination = ctx.message.channel
-            if destination is None:
-                await ctx.message.author.create_dm()
-                destination = ctx.message.author.dm_channel
-
             if commands_arg is not None and " ".join(commands_arg).lower() in self.commands_data:
                 categ_name = [" ".join(commands_arg).lower()]
             elif commands_arg is None:
