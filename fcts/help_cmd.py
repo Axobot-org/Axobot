@@ -69,30 +69,11 @@ If the bot can't send the new command format, it will try to send the old one.""
         if category_id := await self._detect_category_from_args(ctx, command_arg):
             await help_category_command(self, ctx, category_id)
             return
-        # if user entered a root command/group name
-        if len(command_arg) == 1:
-            name = command_arg[0]
-            command = self.bot.all_commands.get(name)
-            if command is None:
-                await ctx.send(await self.bot._(ctx.channel, "help.cmd-not-found", cmd=name))
-                return
+        # if user entered a command / subcommand name
+        if command := self.bot.get_command(" ".join(command_arg)):
             await help_text_cmd_command(self, ctx, command)
             return
-        # if user entered a subcommand name
-        name = command_arg[0]
-        command = self.bot.all_commands.get(name)
-        if command is None:
-            await ctx.send(await self.bot._(ctx.channel, "help.cmd-not-found", cmd=name))
-            return
-        for key in command_arg[1:]:
-            if not isinstance(command, commands.Group):
-                await ctx.send(await self.bot._(ctx.channel, "help.no-subcmd", cmd=command.name))
-                return
-            command = command.all_commands.get(key)
-            if command is None:
-                await ctx.send(await self.bot._(ctx.channel, "help.subcmd-not-found", name=key))
-                return
-        await help_text_cmd_command(self, ctx, command)
+        await self._send_error_unknown_command(ctx, command_arg)
 
     async def _detect_category_from_args(self, ctx: MyContext, args: list[str]) -> Optional[str]:
         """Detect the category from the arguments passed to the help command"""
@@ -104,6 +85,23 @@ If the bot can't send the new command format, it will try to send the old one.""
             if category_name.lower() == arg_input:
                 return category_id
         return None
+
+    async def _send_error_unknown_command(self, ctx: MyContext, args: list[str]):
+        """Send a meaningful error message if the (sub)command is not found"""
+        if len(args) == 0:
+            return # should not happen
+        if len(args) == 1:
+            await ctx.send(await self.bot._(ctx.channel, "help.cmd-not-found", cmd=args[0]))
+            return
+        parent, last_arg = args[:-1], args[-1]
+        if cmd := self.bot.get_command(" ".join(parent)):
+            if isinstance(cmd, commands.Group):
+                await ctx.send(await self.bot._(ctx.channel, "help.subcmd-not-found", name=last_arg))
+                return
+            cmd_mention = await self.bot.get_command_mention(cmd.qualified_name)
+            await ctx.send(await self.bot._(ctx.channel, "help.no-subcmd", cmd=cmd_mention))
+            return
+        await self._send_error_unknown_command(ctx, parent)
 
 
 async def setup(bot):
