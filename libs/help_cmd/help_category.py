@@ -6,7 +6,7 @@ from discord.ext import commands
 from libs.bot_classes import MyContext
 
 from .help_all import all_commands
-from .utils import get_embed_color, get_embed_footer
+from .utils import get_destination, get_embed_color, get_embed_footer
 
 if TYPE_CHECKING:
     from fcts.help_cmd import Help as HelpCog
@@ -16,6 +16,7 @@ def sort_by_name(cmd: commands.Command):
 
 async def help_category_command(cog: "HelpCog", ctx: MyContext, category_id: str):
     "Generate embed fields to describe all commands of a specific category"
+    destination = await get_destination(ctx)
     if category_id == "unclassed":
         referenced_commands = {x for v in cog.commands_data.values() for x in v['commands']}
         commands_list = [c for c in cog.bot.commands if c.name not in referenced_commands]
@@ -27,4 +28,4 @@ async def help_category_command(cog: "HelpCog", ctx: MyContext, category_id: str
     embed.set_footer(text=await get_embed_footer(ctx))
     for field in fields:
         embed.add_field(**field)
-    await ctx.send(embed=embed)
+    await destination.send(embed=embed)
