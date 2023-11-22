@@ -60,10 +60,7 @@ Enable "Embed Links" permission for better rendering
             pass
         except Exception as err:
             self.bot.dispatch("error", err, ctx)
-            if len(args) == 0:
-                await self._default_help_command(ctx)
-            else:
-                await self._default_help_command(ctx, args)
+            await ctx.send_super_help(" ".join(args) if args else None)
 
     async def help_command(self, ctx: MyContext, command_arg: list[str]):
         """Main command for the creation of the help message
@@ -107,46 +104,6 @@ If the bot can't send the new command format, it will try to send the old one.""
             if category_name.lower() == arg_input:
                 return category_id
         return None
-
-    async def _default_help_command(self, ctx: MyContext, command: str = None):
-        default_help = commands.DefaultHelpCommand()
-        default_help.context = ctx
-        default_help._command_impl = self.help_cmd
-        # General help
-        if command is None:
-            mapping = default_help.get_bot_mapping()
-            return await default_help.send_bot_help(mapping)
-        # Check if it's a cog
-        cog = self.bot.get_cog(" ".join(command))
-        if cog is not None:
-            return await default_help.send_cog_help(cog)
-        # If it's not a cog then it's a command.
-        # Since we want to have detailed errors when someone
-        # passes an invalid subcommand, we need to walk through
-        # the command group chain ourselves.
-        maybe_coro = discord.utils.maybe_coroutine
-        keys = command
-        cmd = self.bot.all_commands.get(keys[0])
-        if cmd is None:
-            string = await maybe_coro(default_help.command_not_found, default_help.remove_mentions(keys[0]))
-            return await default_help.send_error_message(string)
-
-        for key in keys[1:]:
-            try:
-                found = cmd.all_commands.get(key)
-            except AttributeError:
-                string = await maybe_coro(default_help.subcommand_not_found, cmd, default_help.remove_mentions(key))
-                return await default_help.send_error_message(string)
-            else:
-                if found is None:
-                    string = await maybe_coro(default_help.subcommand_not_found, cmd, default_help.remove_mentions(key))
-                    return await default_help.send_error_message(string)
-                cmd = found
-
-        if isinstance(cmd, commands.Group):
-            return await default_help.send_group_help(cmd)
-        else:
-            return await default_help.send_command_help(cmd)
 
 
 async def setup(bot):

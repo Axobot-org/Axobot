@@ -4,7 +4,7 @@ import sys
 import time
 from io import BytesIO
 from json import dumps
-from typing import (TYPE_CHECKING, Awaitable, Callable, Literal, Optional,
+from typing import (TYPE_CHECKING, Any, Awaitable, Callable, Literal, Optional,
                     Union, overload)
 
 import aiohttp
@@ -88,10 +88,24 @@ class MyContext(commands.Context):
                 kwargs["file"] = file
         return await super().send(*args, **kwargs)
 
-    async def send_help(self, command: Union[str, commands.Command]):
+    async def send_help(self, *args: Any):
         """Send the help message of the given command"""
-        cmd_arg = command.split(' ') if isinstance(command, str) else command.qualified_name.split(' ')
+        # command: Union[str, commands.Command]
+        if len(args) == 1 and isinstance(args[0], commands.Command):
+            cmd_arg = args[0].qualified_name.split(' ')
+        elif len(args) == 1 and isinstance(args[0], str):
+            cmd_arg = args[0].split(' ')
+        elif all(isinstance(arg, str) for arg in args):
+            cmd_arg = args
+        else:
+            raise ValueError(args)
         await self.bot.get_command("help")(self, *cmd_arg)
+
+    async def send_super_help(self, entity: Union[str, commands.Command, commands.Cog, None]=None):
+        "Use the default help command"
+        if entity:
+            return await super().send_help(entity)
+        return await super().send_help()
 
 # pylint: disable=too-many-instance-attributes
 class Axobot(commands.bot.AutoShardedBot):
