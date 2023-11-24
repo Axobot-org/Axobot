@@ -114,7 +114,7 @@ class Admin(commands.Cog):
             await ctx.send_help("admin")
 
     @main_msg.command(name="send-msg")
-    @discord.app_commands.check(checks.is_bot_admin)
+    @commands.check(checks.is_bot_admin)
     async def send_msg(self, ctx: MyContext, user: discord.User, message: str):
         "Send a DM to any user the bot can reach"
         await ctx.defer()
