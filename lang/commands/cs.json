@@ -396,7 +396,7 @@
         },
         "info": {
             "query": "dotaz",
-            "query_type": "typ dotazu"
+            "query_type": "typ-dotazu"
         }
     }
 }
