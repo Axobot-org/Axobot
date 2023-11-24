@@ -6,8 +6,8 @@ from discord.ext import commands
 from libs.bot_classes import MyContext
 
 from .txt_cmd_utils import get_command_inline_desc
-from .utils import (FieldData, get_destination, get_embed_color,
-                    get_embed_footer)
+from .utils import (FieldData, get_embed_color, get_embed_footer,
+                    get_send_callback)
 
 if TYPE_CHECKING:
     from fcts.help_cmd import Help as HelpCog
@@ -18,7 +18,7 @@ def sort_by_name(cmd: commands.Command):
 
 async def help_all_command(cog: "HelpCog", ctx: MyContext):
     "Show all commands and groups"
-    destination = await get_destination(ctx)
+    send = await get_send_callback(ctx)
     compress: bool = await cog.bot.get_config(ctx.guild.id, 'compress_help') if ctx.guild else False
     fields = await all_commands(cog, ctx, cog.bot.commands, compress=compress)
     if ctx.guild is None:
@@ -30,7 +30,7 @@ async def help_all_command(cog: "HelpCog", ctx: MyContext):
     embed.set_footer(text=await get_embed_footer(ctx))
     for field in fields:
         embed.add_field(**field)
-    await destination.send(embed=embed)
+    await send(embed=embed)
 
 
 async def all_commands(cog: "HelpCog", ctx: MyContext, commands_list: Iterable[commands.Command],
