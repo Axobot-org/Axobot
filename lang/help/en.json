@@ -162,7 +162,7 @@
     },
     "no-desc-cmd": "No description for this command",
     "no-desc-cog": "No description for this cog.",
-    "no-subcmd": "The command `%{cmd}` has no subcommand",
+    "no-subcmd": "The command %{cmd} has no subcommand",
     "not-enabled": ":warning: This command is disabled",
     "subcmd-not-found": "This command has no subcommand named \"%{name}\"",
     "subcmds": "Subcommands",
