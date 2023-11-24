@@ -9,8 +9,8 @@ from .txt_cmd_utils import (get_command_desc_translation,
                             get_command_description,
                             get_command_name_translation,
                             get_command_signature)
-from .utils import (FieldData, get_destination, get_embed_color,
-                    get_embed_footer)
+from .utils import (FieldData, get_embed_color, get_embed_footer,
+                    get_send_callback)
 
 if TYPE_CHECKING:
     from fcts.help_cmd import Help as HelpCog
@@ -22,14 +22,14 @@ def sort_by_name(cmd: commands.Command):
 
 async def help_text_cmd_command(cog: "HelpCog", ctx: MyContext, command: commands.Command):
     "Generate embed fields to describe usage of one command or commands group"
-    destination = await get_destination(ctx)
+    send = await get_send_callback(ctx)
     syntax, fields = await _generate_command_fields(cog, ctx, command)
     embed_color = get_embed_color(ctx)
     embed = discord.Embed(title=syntax, color=embed_color)
     embed.set_footer(text=await get_embed_footer(ctx))
     for field in fields:
         embed.add_field(**field)
-    await destination.send(embed=embed)
+    await send(embed=embed)
 
 
 async def _generate_command_fields(cog: "HelpCog", ctx: MyContext, command: commands.Command):

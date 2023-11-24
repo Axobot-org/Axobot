@@ -1,5 +1,5 @@
 import json
-from typing import Optional, TypedDict
+from typing import Any, Callable, Coroutine, Optional, TypedDict
 
 import discord
 from discord.ext import commands
@@ -7,6 +7,7 @@ from discord.ext import commands
 from libs.bot_classes import Axobot, MyContext
 from libs.help_cmd import (help_all_command, help_category_command,
                            help_text_cmd_command)
+from libs.help_cmd.utils import get_send_callback
 
 
 class CommandsCategoryData(TypedDict):
@@ -37,10 +38,10 @@ class Help(commands.Cog):
         self.bot.remove_command("help")
         self.bot.add_command(self.old_cmd)
 
-    @commands.command(name="help")
+    @commands.hybrid_command(name="help")
     @commands.cooldown(1, 5, commands.BucketType.user)
     @commands.cooldown(10, 30, commands.BucketType.guild)
-    async def help_cmd(self, ctx: MyContext, *args: str):
+    async def help_cmd(self, ctx: MyContext, *, args: Optional[str]=None):
         """Shows this message
 Enable "Embed Links" permission for better rendering
 
@@ -52,15 +53,15 @@ Enable "Embed Links" permission for better rendering
 
 ..Doc infos.html#help"""
         try:
-            if len(args) == 0:
+            if not args:
                 await help_all_command(self, ctx)
             else:
-                await self.help_command(ctx, args)
+                await self.help_command(ctx, args.split(" "))
         except discord.errors.Forbidden:
             pass
         except Exception as err:
             self.bot.dispatch("error", err, ctx)
-            await ctx.send_super_help(" ".join(args) if args else None)
+            await ctx.send_super_help(args or None)
 
     async def help_command(self, ctx: MyContext, command_arg: list[str]):
         """Main command for the creation of the help message
@@ -73,7 +74,8 @@ If the bot can't send the new command format, it will try to send the old one.""
         if command := self.bot.get_command(" ".join(command_arg)):
             await help_text_cmd_command(self, ctx, command)
             return
-        await self._send_error_unknown_command(ctx, command_arg)
+        send = await get_send_callback(ctx)
+        await self._send_error_unknown_command(ctx, send, command_arg)
 
     async def _detect_category_from_args(self, ctx: MyContext, args: list[str]) -> Optional[str]:
         """Detect the category from the arguments passed to the help command"""
@@ -86,22 +88,22 @@ If the bot can't send the new command format, it will try to send the old one.""
                 return category_id
         return None
 
-    async def _send_error_unknown_command(self, ctx: MyContext, args: list[str]):
+    async def _send_error_unknown_command(self, ctx: MyContext, send: Callable[..., Coroutine[Any, Any, None]], args: list[str]):
         """Send a meaningful error message if the (sub)command is not found"""
         if len(args) == 0:
             return # should not happen
         if len(args) == 1:
-            await ctx.send(await self.bot._(ctx.channel, "help.cmd-not-found", cmd=args[0]))
+            await send(await self.bot._(ctx.channel, "help.cmd-not-found", cmd=args[0]))
             return
         parent, last_arg = args[:-1], args[-1]
         if cmd := self.bot.get_command(" ".join(parent)):
             if isinstance(cmd, commands.Group):
-                await ctx.send(await self.bot._(ctx.channel, "help.subcmd-not-found", name=last_arg))
+                await send(await self.bot._(ctx.channel, "help.subcmd-not-found", name=last_arg))
                 return
             cmd_mention = await self.bot.get_command_mention(cmd.qualified_name)
-            await ctx.send(await self.bot._(ctx.channel, "help.no-subcmd", cmd=cmd_mention))
+            await send(await self.bot._(ctx.channel, "help.no-subcmd", cmd=cmd_mention))
             return
-        await self._send_error_unknown_command(ctx, parent)
+        await self._send_error_unknown_command(ctx, send, parent)
 
 
 async def setup(bot):
