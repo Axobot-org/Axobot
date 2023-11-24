@@ -55,15 +55,16 @@ class Info(commands.Cog):
     async def info_main(self, interaction: discord.Interaction, *, query: app_commands.Range[str, 1, 100], \
                         query_type: Optional[QueryTypesTyping] = None):
         """Find informations about someone/something
-..Example info role The VIP
 
-..Example info 436835675304755200
+        ..Example info role The VIP
 
-..Example info :owo:
+        ..Example info 436835675304755200
 
-..Example info server
+        ..Example info :owo:
 
-..Doc infos.html#info"""
+        ..Example info server
+
+        ..Doc infos.html#info"""
         await interaction.response.defer()
         ctx = await commands.Context.from_interaction(interaction)
         if query_type is None:
