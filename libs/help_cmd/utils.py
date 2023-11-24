@@ -1,8 +1,9 @@
-from typing import Optional, TypedDict
+from typing import Optional, TypedDict, Union
 
 import discord
 
 from libs.bot_classes import MyContext
+from libs.translator import LOCALES_MAP
 
 
 class FieldData(TypedDict):
@@ -24,6 +25,31 @@ async def get_embed_footer(ctx: MyContext):
     ft = await ctx.bot._(ctx.channel, "help.footer")
     prefix = "/"
     return ft.format(prefix)
+
+async def get_discord_locale(ctx: Union[MyContext, discord.Interaction]):
+    "Get the Discord locale to use for a given context"
+    bot_locale = await ctx.bot._(ctx.channel, "_used_locale")
+    for locale, lang in LOCALES_MAP.items():
+        if lang == bot_locale:
+            return locale
+    return discord.Locale.british_english
+
+async def extract_info(raw_description: str) -> tuple[Optional[str], list[str], Optional[str]]:
+    "Split description, examples and documentation link from the given documentation"
+    description, examples = [], []
+    doc = ""
+    for line in raw_description.split("\n\n"):
+        line = line.strip()
+        if line.startswith("..Example "):
+            examples.append(line.replace("..Example ", ""))
+        elif line.startswith("..Doc "):
+            doc = line.replace("..Doc ", "")
+        else:
+            description.append(line)
+    return (
+        x if len(x) > 0 else None
+        for x in ("\n\n".join(description), examples, doc)
+    )
 
 async def get_send_callback(ctx: MyContext):
     "Get a function to call to send the command result"

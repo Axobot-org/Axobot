@@ -8,7 +8,8 @@ from discord.app_commands.translator import (TranslationContext,
 from discord.ext import commands
 
 from libs.bot_classes import MyContext
-from libs.translator import LOCALES_MAP
+
+from .utils import extract_info, get_discord_locale
 
 
 async def get_command_inline_desc(ctx: MyContext, cmd: commands.Command):
@@ -24,7 +25,7 @@ async def get_command_description(ctx: MyContext, command: commands.Command):
     if raw_desc == '' and command.help is not None:
         raw_desc = command.help.strip()
     desc = Optional[str]
-    desc, examples, doc = await _extract_info(raw_desc)
+    desc, examples, doc = await extract_info(raw_desc)
     # check for translated description
     if short_desc := await get_command_desc_translation(ctx, command):
         if len(desc.split('\n')) > 1:
@@ -49,17 +50,9 @@ async def get_command_signature(ctx: MyContext, command: commands.Command):
     signature = await _get_command_params_signature(ctx, command)
     return f"{prefix}{translated_name} {signature}".strip()
 
-
-async def _get_discord_locale(ctx: MyContext):
-    bot_locale = await ctx.bot._(ctx.channel, "_used_locale")
-    for locale, lang in LOCALES_MAP.items():
-        if lang == bot_locale:
-            return locale
-    return Locale.british_english
-
 async def get_command_full_name_translation(ctx: MyContext, command: commands.Command):
     "Get the translated command or group name (with parent name if exists)"
-    locale = await _get_discord_locale(ctx)
+    locale = await get_discord_locale(ctx)
     full_name = await get_command_name_translation(ctx, command, locale)
     while command.parent is not None:
         full_name = await get_command_name_translation(ctx, command.parent, locale) + " " + full_name
@@ -68,7 +61,7 @@ async def get_command_full_name_translation(ctx: MyContext, command: commands.Co
 
 async def get_command_name_translation(ctx: MyContext, command: commands.Command, locale: Optional[Locale]=None):
     "Get the translated command or group name (without parent name)"
-    locale = locale or await _get_discord_locale(ctx)
+    locale = locale or await get_discord_locale(ctx)
     if isinstance(command, commands.Group):
         context = TranslationContext(
             TranslationContextLocation.group_name,
@@ -79,11 +72,11 @@ async def get_command_name_translation(ctx: MyContext, command: commands.Command
             TranslationContextLocation.command_name,
             command
         )
-    return await ctx.bot.tree.translator.translate(locale_str(""), locale, context) or command.qualified_name
+    return await ctx.bot.tree.translator.translate(locale_str(""), locale, context) or command.name
 
 async def get_command_desc_translation(ctx: MyContext, command: commands.Command):
     "Get the translated command or group description"
-    locale = await _get_discord_locale(ctx)
+    locale = await get_discord_locale(ctx)
     if isinstance(command, commands.Group):
         context = TranslationContext(
             TranslationContextLocation.group_description,
@@ -96,27 +89,9 @@ async def get_command_desc_translation(ctx: MyContext, command: commands.Command
         )
     return await ctx.bot.tree.translator.translate(locale_str(""), locale, context)
 
-
-async def _extract_info(raw_description: str) -> tuple[Optional[str], list[str], Optional[str]]:
-    "Split description, examples and documentation link from the given documentation"
-    description, examples = [], []
-    doc = ""
-    for line in raw_description.split("\n\n"):
-        line = line.strip()
-        if line.startswith("..Example "):
-            examples.append(line.replace("..Example ", ""))
-        elif line.startswith("..Doc "):
-            doc = line.replace("..Doc ", "")
-        else:
-            description.append(line)
-    return (
-        x if len(x) > 0 else None
-        for x in ("\n\n".join(description), examples, doc)
-    )
-
 async def _get_command_param_translation(ctx: MyContext, param: commands.Parameter, command: commands.HybridCommand):
     "Get the translated command parameter name"
-    locale = await _get_discord_locale(ctx)
+    locale = await get_discord_locale(ctx)
     class FakeParameter:
         def __init__(self, command: Union[AppCommand, commands.HybridCommand]):
             self.command = command

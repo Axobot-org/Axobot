@@ -1,12 +1,13 @@
 import json
-from typing import Any, Callable, Coroutine, Optional, TypedDict
+from typing import Any, Callable, Coroutine, Optional, TypedDict, Union
 
 import discord
+from discord.app_commands import Command, Group
 from discord.ext import commands
 
 from libs.bot_classes import Axobot, MyContext
 from libs.help_cmd import (help_all_command, help_category_command,
-                           help_text_cmd_command)
+                           help_text_cmd_command, help_slash_cmd_command)
 from libs.help_cmd.utils import get_send_callback
 
 
@@ -70,9 +71,13 @@ If the bot can't send the new command format, it will try to send the old one.""
         if category_id := await self._detect_category_from_args(ctx, command_arg):
             await help_category_command(self, ctx, category_id)
             return
-        # if user entered a command / subcommand name
+        # if user entered a textual or hybrid command / subcommand name
         if command := self.bot.get_command(" ".join(command_arg)):
             await help_text_cmd_command(self, ctx, command)
+            return
+        # if user entered a slash command / subcommand name
+        if command := await self._find_command_from_name(command_arg, None):
+            await help_slash_cmd_command(self, ctx, command)
             return
         send = await get_send_callback(ctx)
         await self._send_error_unknown_command(ctx, send, command_arg)
@@ -104,6 +109,21 @@ If the bot can't send the new command format, it will try to send the old one.""
             await send(await self.bot._(ctx.channel, "help.no-subcmd", cmd=cmd_mention))
             return
         await self._send_error_unknown_command(ctx, send, parent)
+
+    async def _find_command_from_name(self, args: list[str], parent_command: Union[Command, None]
+                                      ) -> Union[Command, Group, None]:
+        if parent_command and not args:
+            return parent_command
+        if not args:
+            return None
+        current_arg, args = args[0], args[1:]
+        if not parent_command:
+            if cmd := self.bot.tree.get_command(current_arg):
+                return await self._find_command_from_name(args, cmd)
+        elif isinstance(parent_command, Group):
+            for subcommand in parent_command.commands:
+                if subcommand.name == current_arg:
+                    return await self._find_command_from_name(args, subcommand)
 
 
 async def setup(bot):
