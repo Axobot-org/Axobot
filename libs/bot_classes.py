@@ -164,20 +164,22 @@ class Axobot(commands.bot.AutoShardedBot):
     @property
     def current_event(self):
         """Get the current event, from the date"""
-        try:
-            return self.get_cog("BotEvents").current_event
-        except Exception as err: # pylint: disable=broad-except
-            self.log.warning("[current_event] %s", err, exc_info=True)
-            return None
+        if cog := self.get_cog("BotEvents"):
+            try:
+                return cog.current_event
+            except Exception as err: # pylint: disable=broad-except
+                self.log.warning("[current_event] %s", err, exc_info=True)
+        return None
 
     @property
     def current_event_data(self):
         """Get the current event data, from the date"""
-        try:
-            return self.get_cog("BotEvents").current_event_data
-        except Exception as err: # pylint: disable=broad-except
-            self.log.warning("[current_event_data] %s", err, exc_info=True)
-            return None
+        if cog := self.get_cog("BotEvents"):
+            try:
+                return cog.current_event_data
+            except Exception as err: # pylint: disable=broad-except
+                self.log.warning("[current_event_data] %s", err, exc_info=True)
+        return None
 
     # pylint: disable=arguments-differ
     async def get_context(self, source: discord.Message, *, cls=MyContext) -> MyContext:
