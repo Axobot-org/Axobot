@@ -1140,7 +1140,7 @@ class Rss(commands.Cog):
 
         ..Example rss set-filter 6678466620137 none
 
-        ..Doc rss.html#setup-a-feed-embed"""
+        ..Doc rss.html#filter-a-feed-posts"""
         if ctx.interaction and not ctx.interaction.response.is_done():
             await ctx.defer()
         feed = await self.db_get_feed(feed_id)
