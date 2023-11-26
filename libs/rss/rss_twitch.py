@@ -8,7 +8,8 @@ import aiohttp
 import discord
 from feedparser.util import FeedParserDict
 
-from .rss_general import FeedObject, RssMessage, feed_parse
+from .rss_general import (FeedFilterConfig, FeedObject, RssMessage,
+                          check_filter, feed_parse)
 
 if TYPE_CHECKING:
     from libs.bot_classes import Axobot
@@ -33,17 +34,22 @@ class TwitchRSS:
             return None
         return matches.group(1)
 
-    async def _get_feed(self, username: str, session: Optional[aiohttp.ClientSession]=None) -> FeedParserDict:
+    async def _get_feed(self, username: str, filter_config: Optional[FeedFilterConfig]=None,
+                        session: Optional[aiohttp.ClientSession]=None) -> FeedParserDict:
         "Get a list of feeds from a twitch username"
         url = 'https://twitchrss.appspot.com/vod/' + username
         feed = await feed_parse(self.bot, url, 5, session)
         if feed is None or 'bozo_exception' in feed or not feed.entries:
             return None
+        if filter_config is not None:
+            feed.entries = [entry for entry in feed.entries[:50] if check_filter(entry, filter_config)]
         return feed
 
-    async def get_last_post(self, channel: discord.TextChannel, username: str, session: Optional[aiohttp.ClientSession]=  None):
+    async def get_last_post(self, channel: discord.TextChannel, username: str,
+                            filter_config: Optional[FeedFilterConfig],
+                            session: Optional[aiohttp.ClientSession]= None):
         "Get the last video of a Twitch user"
-        feed = await self._get_feed(username, session)
+        feed = await self._get_feed(username, filter_config, session)
         if feed is None:
             return await self.bot._(channel.guild, "rss.nothing")
         entry = feed.entries[0]
@@ -63,9 +69,10 @@ class TwitchRSS:
         )
 
     async def get_new_posts(self, channel: discord.TextChannel, username: str, date: dt.datetime,
+                            filter_config: Optional[FeedFilterConfig],
                             session: Optional[aiohttp.ClientSession]=None) -> list[RssMessage]:
         "Get all new videos from a Twitch user"
-        feed = await self._get_feed(username, session)
+        feed = await self._get_feed(username, filter_config, session)
         if feed is None:
             return []
         posts_list: list[RssMessage] = []
