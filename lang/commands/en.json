@@ -66,6 +66,7 @@
         "rss refresh": "refresh",
         "rss remove": "remove",
         "rss set-embed": "set-embed",
+        "rss set-filter": "set-filter",
         "rss set-mentions": "set-mentions",
         "rss set-text": "set-text",
         "rss test": "test",
@@ -243,6 +244,22 @@
         "rss disable": {
             "feed": "feed"
         },
+        "rss set-embed": {
+            "feed": "feed",
+            "should_use_embed": "should-use-embed",
+            "color": "color",
+            "author_text": "author-text",
+            "title": "title",
+            "footer_text": "footer-text",
+            "show_date_in_footer": "show-date-in-footer",
+            "enable_link_in_title": "enable-link-in-title",
+            "image_location": "image-location"
+        },
+        "rss set-filter": {
+            "feed": "feed",
+            "filter-type": "filter-type",
+            "words": "words"
+        },
         "rss set-mentions": {
             "feed": "feed",
             "silent": "silent",
@@ -255,17 +272,6 @@
         "rss set-text": {
             "feed": "feed",
             "text": "text"
-        },
-        "rss set-embed": {
-            "feed": "feed",
-            "should_use_embed": "should-use-embed",
-            "color": "color",
-            "author_text": "author-text",
-            "title": "title",
-            "footer_text": "footer-text",
-            "show_date_in_footer": "show-date-in-footer",
-            "enable_link_in_title": "enable-link-in-title",
-            "image_location": "image-location"
         },
         "rss test": {
             "feed": "feed"
