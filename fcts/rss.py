@@ -151,7 +151,7 @@ class Rss(commands.Cog):
             # we couldn't get the ID based on user input
             await ctx.send(await self.bot._(ctx.channel, "rss.yt-invalid"))
             return
-        text = await self.youtube_rss.get_last_post(ctx.channel, channel)
+        text = await self.youtube_rss.get_last_post(ctx.channel, channel, filter_config=None)
         if isinstance(text, str):
             await ctx.send(text)
         else:
@@ -443,7 +443,7 @@ class Rss(commands.Cog):
         if feed_object is None:
             return
         if feed_object.type == 'yt':
-            msg = await self.youtube_rss.get_last_post(ctx.channel, feed_object.link)
+            msg = await self.youtube_rss.get_last_post(ctx.channel, feed_object.link, feed_object.filter_config)
         elif feed_object.type == "deviant":
             msg = await self.deviant_rss.get_last_post(ctx.channel, feed_object.link)
         elif feed_object.type == "twitch":
@@ -581,7 +581,9 @@ class Rss(commands.Cog):
     async def _send_rss_delete_disabled_feeds_tip(self, ctx: MyContext, feeds: list[FeedObject]):
         "Check if we should send a tip about deleting disabled feeds"
         has_disabled_feeds = any(not feed.enabled for feed in feeds)
-        if has_disabled_feeds and await self.bot.tips_manager.should_show_guild_tip(ctx.guild.id, GuildTip.RSS_DELETE_DISABLED_FEEDS):
+        if has_disabled_feeds and await self.bot.tips_manager.should_show_guild_tip(
+            ctx.guild.id, GuildTip.RSS_DELETE_DISABLED_FEEDS
+        ):
             rss_remove_cmd = await self.bot.get_command_mention("rss remove")
             await self.bot.tips_manager.send_guild_tip(
                 ctx,
@@ -863,7 +865,9 @@ class Rss(commands.Cog):
                 ctx.command.reset_cooldown(ctx)
                 return
             start = time.time()
-            msg = await ctx.send(await self.bot._(ctx.guild.id,"rss.guild-loading", emoji=ctx.bot.emojis_manager.customs['loading']))
+            msg = await ctx.send(
+                await self.bot._(ctx.guild.id,"rss.guild-loading", emoji=ctx.bot.emojis_manager.customs['loading'])
+            )
             feeds = [f for f in await self.db_get_guild_feeds(ctx.guild.id) if f.enabled]
             await self.refresh_feeds(ctx.guild.id)
             await ctx.send(await self.bot._(ctx.guild.id,"rss.guild-complete", count=len(feeds), time=round(time.time()-start,1)))
@@ -1348,7 +1352,9 @@ class Rss(commands.Cog):
         ])
         try:
             if isinstance(content, discord.Embed):
-                await channel.send(" ".join(obj.mentions), embed=content, allowed_mentions=allowed_mentions, silent=obj.feed.silent_mention)
+                await channel.send(
+                    " ".join(obj.mentions), embed=content, allowed_mentions=allowed_mentions, silent=obj.feed.silent_mention
+                )
             else:
                 await channel.send(content, allowed_mentions=allowed_mentions, silent=obj.feed.silent_mention)
             if send_stats:
@@ -1380,9 +1386,9 @@ class Rss(commands.Cog):
             else:
                 if feed.type == "yt":
                     if feed.date is None:
-                        objs = await self.youtube_rss.get_last_post(chan, feed.link, session)
+                        objs = await self.youtube_rss.get_last_post(chan, feed.link, feed.filter_config, session)
                     else:
-                        objs = await self.youtube_rss.get_new_posts(chan, feed.link, feed.date, session)
+                        objs = await self.youtube_rss.get_new_posts(chan, feed.link, feed.date, feed.filter_config, session)
                 elif feed.type == "tw":
                     self.bot.dispatch("server_warning", ServerWarningType.RSS_TWITTER_DISABLED, guild,
                                       channel_id=feed.channel_id, feed_id=feed.feed_id)
