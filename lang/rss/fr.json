@@ -34,6 +34,14 @@
     "deviant-default-flow": "{logo}  | Nouvelle création de {author} : **{title}**\nPubliée le {date}\nLien : {link}\n{mentions}",
     "deviant-form-last": "{logo}  | Voici la dernière création de {author}:\n{title}\nPubliée le {date}\nLien : {url}",
     "embed-json-changed": "L'embed de ce flux a bien été modifié",
+    "filter": {
+        "same": "Le filtre pour ce flux n'a pas été modifié.",
+        "success": {
+            "blacklist": "Le filtre de ce flux a été modifié pour bloquer les posts contenant l'un des mots suivants : %{words}",
+            "reset": "Le filtre de ce flux a été réinitialisé (aucun filtrage ne sera effectué)",
+            "whitelist": "Le filtre de ce flux a été modifié pour n'autoriser que les posts contenant l'un des mots suivants : %{words}"
+        }
+    },
     "flow-limit": "Pour des raisons de performances, vous ne pouvez pas suivre plus de %{limit} flux rss par serveur.",
     "guild-complete": {
         "one": "Votre flux RSS a correctement été rechargé, en %{time} secondes !",

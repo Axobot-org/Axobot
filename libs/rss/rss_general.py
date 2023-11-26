@@ -228,6 +228,11 @@ class FeedEmbedData(TypedDict):
     enable_link_in_title: Optional[bool]
     image_location: Optional[Literal["thumbnail", "banner", "none"]]
 
+class FeedFilterConfig(TypedDict):
+    "Filter configuration for an RSS feed"
+    filter_type: Literal["blacklist", "whitelist", "none"]
+    words: list[str]
+
 class FeedObject:
     "A feed record from the database"
     def __init__(self, from_dict: dict):
@@ -248,6 +253,7 @@ class FeedObject:
         self.use_embed: bool = from_dict['use_embed']
         self.embed_data: FeedEmbedData = json.loads(from_dict['embed'])
         self.silent_mention: bool = bool(from_dict['silent_mention'])
+        self.filter_config: FeedFilterConfig = json.loads(from_dict['filter_config']) or {"filter_type": "none", "words": []}
         self.last_update: Optional[datetime.datetime] = (
             from_dict['last_update'].replace(tzinfo=datetime.timezone.utc)
             if from_dict['last_update']
@@ -287,6 +293,7 @@ class FeedObject:
             "use_embed": False,
             "embed": "{}",
             "silent_mention": False,
+            "filter_config": "{}",
             "last_update": None,
             "last_refresh": None,
             "recent_errors": 0,

@@ -33,6 +33,14 @@
     "deviant-default-flow": "{logo}  | New creation by {author}: **{title}**\nPublished on {date}\nLink: {link}\n{mentions}",
     "deviant-form-last": "{logo}  | Here is the new creation of {author}:\n{title}\nPublished on {date}\nLink: {url}",
     "embed-json-changed": "The embed of this feed has been modified",
+    "filter": {
+        "same": "The filter of this feed has not changed",
+        "success": {
+            "blacklist": "The filter of this feed has been modified to block posts containing one of the following words: %{words}",
+            "reset": "The filter of this feed has been reset (no filter will be applied)",
+            "whitelist": "The filter of this feed has been modified to only allow posts containing one the following words: %{words}"
+        }
+    },
     "flow-limit": "For performance reasons, you cannot track more than %{limit} rss feeds per server.",
     "guild-complete": {
         "one": "Your rss stream has been correctly reloaded, in %{time} seconds!",
