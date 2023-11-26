@@ -1,9 +1,11 @@
 import itertools
 from random import shuffle
+
 from sklearn.model_selection import RandomizedSearchCV
 
-from libs.antiscam.bayes import RoundValueType
 from . import Message, RandomForest
+from .bayes import RoundValueType
+
 
 async def get_roundvalues_combinations(values_range: range) -> list[RoundValueType]:
     "Get all possible combinations of round values"
