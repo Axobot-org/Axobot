@@ -64,7 +64,7 @@ class Rss(commands.Cog):
         self.bot = bot
         self.time_loop = 20 # min minutes between two rss loops
         self.time_between_feeds_check = 0.15 # seconds between two rss checks within a loop
-        self.max_messages = 20 # max messages sent per feed per loop
+        self.max_messages = 15 # max messages sent per feed per loop
 
         self.file = "rss"
         self.embed_color = discord.Color(6017876)
@@ -718,7 +718,7 @@ class Rss(commands.Cog):
     @commands.guild_only()
     @commands.check(can_use_rss)
     @commands.check(checks.database_connected)
-    async def roles_feeds(self, ctx: MyContext, feed: Optional[str]=None, silent: Optional[bool]=None, *, mentions: Optional[str]):
+    async def change_mentions(self, ctx: MyContext, feed: Optional[str]=None, silent: Optional[bool]=None, *, mentions: Optional[str]):
         """Configures a role to be notified when a news is posted
         The "silent" parameter (Yes/No) allows you to send new feeds as silent messages, which won't send push notifications to your users.
         If you want to use the @everyone role, please put the server ID instead of the role name.
@@ -847,19 +847,6 @@ class Rss(commands.Cog):
             self.bot.dispatch("error", err, ctx)
             return
 
-    @roles_feeds.autocomplete("feed")
-    async def roles_feeds_autocomplete(self, interaction: discord.Interaction, current: str):
-        "Autocomplete for the feed ID in the /rss roles-feeds command"
-        try:
-            return await self.get_feeds_choice(
-                interaction.guild.id,
-                current.lower(),
-                feed_filter=lambda f: f.type != "mc",
-                )
-        except Exception as err:
-            self.bot.dispatch("interaction_error", interaction, err)
-
-
     @rss_main.command(name="refresh")
     @app_commands.guild_only()
     @commands.guild_only()
@@ -946,7 +933,7 @@ class Rss(commands.Cog):
     @commands.guild_only()
     @commands.check(can_use_rss)
     @commands.check(checks.database_connected)
-    async def change_text_feed(self, ctx: MyContext, feed: Optional[str]=None):
+    async def change_text(self, ctx: MyContext, feed: Optional[str]=None):
         """Change the text of an rss feed
 
         Available variables:
@@ -1022,18 +1009,6 @@ class Rss(commands.Cog):
         else:
             await ctx.send(await self.bot._(ctx.guild.id,"rss.text-success.multiple", text=text))
 
-    @change_text_feed.autocomplete("feed")
-    async def change_text_feed_autocomplete(self, interaction: discord.Interaction, current: str):
-        """Autocomplete for the feed ID in the /rss set-text command"""
-        try:
-            return await self.get_feeds_choice(
-                interaction.guild.id,
-                current.lower(),
-                feed_filter=lambda f: f.type != "mc",
-                )
-        except Exception as err:
-            self.bot.dispatch("interaction_error", interaction, err)
-
     @rss_main.command(name="set-embed", aliases=['embed'])
     @app_commands.guild_only()
     @commands.guild_only()
@@ -1050,7 +1025,7 @@ class Rss(commands.Cog):
         image_location="Where to put the image in the embed (thumbnail, image, or None)",
     )
     @app_commands.rename(feed_id="feed")
-    async def change_use_embed(self, ctx: MyContext, feed_id: Optional[str] = None, should_use_embed: Optional[bool] = None,
+    async def change_embed(self, ctx: MyContext, feed_id: Optional[str] = None, should_use_embed: Optional[bool] = None,
                                color: discord.Color = None,
                                author_text: Optional[commands.Range[str, 2, 256]] = None,
                                title: Optional[commands.Range[str, 2, 256]] = None,
@@ -1071,7 +1046,7 @@ class Rss(commands.Cog):
         - `{title}`: the title of the post
         - `{full_text}`: the full text of the post
 
-        ..Example rss embed 6678466620137 true title: "New post from {author}!" color: red
+        ..Example rss set-embed 6678466620137 true title: "New post from {author}!" color: red
 
         ..Doc rss.html#setup-a-feed-embed"""
         input_feed_id = int(feed_id) if feed_id is not None and feed_id.isnumeric() else None
@@ -1142,9 +1117,75 @@ class Rss(commands.Cog):
             await ctx.send(await self.bot._(ctx.guild.id, "rss.guild-error", err=err))
             self.bot.dispatch("error", err, ctx)
 
-    @change_use_embed.autocomplete("feed_id")
-    async def change_use_embed_autocomplete(self, interaction: discord.Interaction, current: str):
-        """Autocomplete for the feed_id argument"""
+    @rss_main.command(name="set-filter")
+    @app_commands.guild_only()
+    @commands.guild_only()
+    @commands.check(can_use_rss)
+    @commands.check(checks.database_connected)
+    @app_commands.rename(feed_id="feed")
+    async def change_feed_filter(self, ctx: MyContext, feed_id: str, filter_type: Literal["blacklist", "whitelist", "none"], *,
+                                 words: Optional[str] = None):
+        """Add a filter on the feed to only allow posts containing (or not containing) some words
+
+        Words must be separated by a comma (`,`).
+        The bot will check their presence in either the title or the category of each post.
+
+        ..Example rss set-filter 6678466620137 blacklist "cars, mechanic"
+
+        ..Example rss set-filter 6678466620137 whitelist "princess, magic"
+
+        ..Example rss set-filter 6678466620137 none
+
+        ..Doc rss.html#setup-a-feed-embed"""
+        if ctx.interaction and not ctx.interaction.response.is_done():
+            await ctx.defer()
+        feed = await self.db_get_feed(feed_id)
+        if feed is None:
+            cmd = await self.bot.get_command_mention("about")
+            await ctx.send(await self.bot._(ctx.guild, "errors.unknown2", about=cmd))
+            return
+        # reset filter for this feed
+        if filter_type == "none":
+            if feed.filter_config["filter_type"] == "none":
+                await ctx.send(await self.bot._(ctx.guild.id, "rss.filter.same"))
+                return
+            await self.db_update_feed(feed.feed_id, [('filter_config', '{}')])
+            await ctx.send(await self.bot._(ctx.guild.id, "rss.filter.success.reset"))
+            return
+        # check for unchanged filter type
+        if filter_type == feed.filter_config["filter_type"] and words is None:
+            await ctx.send(await self.bot._(ctx.guild.id, "rss.filter.same"))
+            return
+        if words:
+            # check for unchanged type + words
+            words_list = [word.strip() for word in words.split(",")]
+            if filter_type == feed.filter_config["filter_type"] and words_list == feed.filter_config["words"]:
+                await ctx.send(await self.bot._(ctx.guild.id, "rss.filter.same"))
+                return
+            # update filter with words
+            new_config = {
+                "filter_type": filter_type,
+                "words": words_list
+            }
+        else:
+            # update filter without words
+            new_config = {
+                "filter_type": filter_type,
+                "words": feed.filter_config["words"]
+            }
+        await self.db_update_feed(feed.feed_id, [('filter_config', dumps(new_config))])
+        await ctx.send(
+            await self.bot._(ctx.guild.id, "rss.filter.success."+filter_type,
+                             type=filter_type, words=', '.join(new_config["words"]))
+        )
+
+
+    @change_mentions.autocomplete("feed")
+    @change_text.autocomplete("feed")
+    @change_embed.autocomplete("feed_id")
+    @change_feed_filter.autocomplete("feed_id")
+    async def edit_feed_autocomplete(self, interaction: discord.Interaction, current: str):
+        """Autocomplete for the feed_id argument in the /rss set-mention, set-text, set-embed and set-filter commands"""
         try:
             return await self.get_feeds_choice(
                 interaction.guild.id,
