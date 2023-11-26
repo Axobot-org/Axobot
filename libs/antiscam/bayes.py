@@ -1,10 +1,10 @@
 import math
 import os
 import pickle
+import random
 import re
 import string
 from typing import Literal, Optional, TypedDict
-import random
 
 from .classes import Message
 
@@ -32,14 +32,17 @@ class SpamDetector:
         self.vocab = set()
 
     def clean(self, s: str):
+        "Remove punctuation and make everything lowercase"
         translator = str.maketrans("", "", string.punctuation)
         return s.translate(translator)
 
     def tokenize(self, text: str) -> list[str]:
+        "Split a text into a list of words"
         text = self.clean(text).lower()
-        return [x for x in re.split("\W+", text) if x]
+        return [x for x in re.split(r"\W+", text) if x]
 
     def get_word_counts(self, words: list[str]) -> dict[str, int]:
+        "Get the number of apparitions of each word in a list"
         word_counts = {}
         for word in words:
             word_counts[word] = word_counts.get(word, 0) + 1
@@ -84,6 +87,7 @@ class SpamDetector:
                 self.classes_[record.category] = record.category+1
 
     def predict(self, data: list[Message]) -> list[CLASS]:
+        "Predict the class index for each given message"
         result = []
         for record in data:
             counts = self.get_word_counts(self.tokenize(record.normd_message))
@@ -107,8 +111,10 @@ class SpamDetector:
                 if round_value := self.round_values.get(attr):
                     v = round(v, round_value)
                 attr = '_' + attr + '_' + str(v)
-                log_attr_given_spam = math.log((self.attr_counts['spam'].get(attr, 0) + 1) / (self.num_messages['spam'] + len(self.vocab)))
-                log_attr_given_ham = math.log((self.attr_counts['ham'].get(attr, 0) + 1) / (self.num_messages['ham'] + len(self.vocab)))
+                log_attr_given_spam = math.log((self.attr_counts['spam'].get(attr, 0) + 1) /
+                                               (self.num_messages['spam'] + len(self.vocab)))
+                log_attr_given_ham = math.log((self.attr_counts['ham'].get(attr, 0) + 1) /
+                                              (self.num_messages['ham'] + len(self.vocab)))
                 spam_score += log_attr_given_spam
                 ham_score += log_attr_given_ham
 
@@ -132,7 +138,7 @@ class RandomForest:
         self.tests: list[list[Message]] = []
         self.classes_: dict[int, int] = {} # map class ID to index
 
-    def fit(self, data: list[Message], y_values: Optional[list[CLASS]]=None):
+    def fit(self, data: list[Message], _y_values: Optional[list[CLASS]]=None):
         "Train the model for a given list of messages"
         # calculate quantity of rows used to train each tree
         learning_amount = round((1-self.test_percent) * len(data))
@@ -188,5 +194,4 @@ class RandomForest:
         for tree in self.trees:
             pred = tree.predict([record])[0]
             result[pred] += 1/len(self.trees)
-        # return list(map(lambda x: round(x, 5), result))
         return {self.classes_[i]: round(x, 5) for i,x in enumerate(result)}
