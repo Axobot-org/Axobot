@@ -118,6 +118,19 @@ The available parameters are:
 - image-location: Where to put the image in the embed (thumbnail, image, or None)
 
 
+-------------------
+Filter a feed posts
+-------------------
+
+**Syntax** :code:`rss set-filter <feed ID> <blacklist|whitelist> [words]` or :code:`rss set-filter <feed ID> <none>`
+
+This command allows you to filter the posts of a feed, to only send the ones that contain specific words. You can either use a blacklist, to block posts that contain at least one of the sepcified words, or a whitelist, to only send posts that contain at least one of the specified words. Axobot will then check each new post title and tags, and will only send it if it matches the filter.
+
+The "feed ID" argument is the identifier of the feed (found with the command `rss list <#see-every-feed>`__ or via autocompletion). The words argument is the list of words you want to filter, separated by commas (:code:`,`).
+
+Using the "none" argument will disable the filter for this feed.
+
+
 ------------------
 Test a feed format
 ------------------
