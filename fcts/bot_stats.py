@@ -1,5 +1,6 @@
 import math
 import re
+import subprocess
 import time
 from collections import defaultdict
 from datetime import datetime
@@ -60,24 +61,27 @@ class BotStats(commands.Cog):
         self.emitted_serverlogs: dict[str, int] = {}
         self.serverlogs_audit_search: Optional[tuple[int, int]] = None
         self.last_backup_size: Optional[int] = None
+        self.open_files: dict[str, int] = defaultdict(int)
         self.role_reactions = {"added": 0, "removed": 0}
         self.snooze_events: dict[tuple[int, int], int] = defaultdict(int)
         self.stream_events: dict[str, int] = defaultdict(int)
         self.voice_transcript_events: dict[tuple[float, float], int] = defaultdict(int)
 
     async def cog_load(self):
-         # pylint: disable=no-member
+        # pylint: disable=no-member
         self.sql_loop.start()
         self.record_cpu_usage.start()
         self.record_ws_latency.start()
+        self.record_open_files.start()
         self.status_loop.start()
         self.heartbeat_loop.start()
 
     async def cog_unload(self):
-         # pylint: disable=no-member
+        # pylint: disable=no-member
         self.sql_loop.cancel()
         self.record_cpu_usage.cancel()
         self.record_ws_latency.cancel()
+        self.record_open_files.cancel()
         self.status_loop.stop()
         self.heartbeat_loop.stop()
 
@@ -117,6 +121,31 @@ class BotStats(commands.Cog):
     @record_ws_latency.error
     async def on_record_latency_error(self, error: Exception):
         self.bot.dispatch("error", error, "When collecting WS latency")
+
+    @tasks.loop(minutes=2)
+    async def record_open_files(self):
+        "Record the number of open files from the bot process"
+        result = subprocess.run(['lsof', '-p', str(self.process.pid)], stdout=subprocess.PIPE, check=True)
+        self.open_files.clear()
+        for line in result.stdout.split(b"\n"):
+            if line.startswith(b"COMMAND"):
+                continue # skip header
+            row = line.decode("utf8")
+            if not row:
+                continue # skip empty lines
+            while "  " in row:
+                row = row.replace("  ", " ")
+            fd = ''.join(c for c in row.split(" ")[3] if not c.isdigit())
+            if not fd:
+                self.bot.log.info("Unknown file descriptor for open file: %s", row)
+                continue
+            self.open_files[fd] += 1
+            if (file_type := row.split(" ")[4]) and file_type.startswith("IPv"):
+                self.open_files[file_type] += 1
+
+    @record_open_files.error
+    async def record_open_files_error(self, error: Exception):
+        self.bot.dispatch("error", error, "When checking process open files")
 
     async def get_list_usage(self, origin: list):
         "Calculate the average list value"
@@ -505,6 +534,11 @@ class BotStats(commands.Cog):
                 cursor.execute(query, (now, f'voice_transcripts.{message_duration:.0f}.{generation_duration:.0f}', count, 0,
                                        'transcripts', True, self.bot.entity_id))
             self.voice_transcript_events.clear()
+            # Process open files
+            for fd, count in self.open_files.items():
+                cursor.execute(query, (now, f'process.open_files.{fd}', count, 0,
+                                       'files', False, self.bot.entity_id))
+            self.open_files.clear()
             # Push everything
             cnx.commit()
         except mysql.connector.errors.IntegrityError as err: # usually duplicate primary key
