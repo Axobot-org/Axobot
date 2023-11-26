@@ -77,6 +77,9 @@
         "list": "Here is the list of roles already notified: %{roles}"
     },
     "success-add": "The rss feed of type \"%{type}\" with link <%{url}> has been properly added in the channel %{channel}!",
+    "test": {
+        "empty-result": "The generated message seems to be empty, please check your message template and feed configuration."
+    },
     "text-success": {
         "single": "The text of the feed #%{id} has been modified!\n New text: \n```\n%{text}\n```",
         "multiple": "The text of these feeds have been modified!\n New text: \n```\n%{text}\n```"

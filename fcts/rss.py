@@ -463,6 +463,8 @@ class Rss(commands.Cog):
         content = await msg.create_msg()
         if isinstance(content, discord.Embed):
             await ctx.send(embed=content, allowed_mentions=allowed_mentions, silent=feed_object.silent_mention)
+        elif content == "":
+            await ctx.send(await self.bot._(ctx.guild.id, "rss.test.empty-result"))
         else:
             await ctx.send(content, allowed_mentions=allowed_mentions, silent=feed_object.silent_mention)
 
