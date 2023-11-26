@@ -1575,7 +1575,7 @@ Minimum age required by anti-raid: {min_age}"
                     colour=discord.Color.light_grey()
                 )
                 emb.set_author(name=member, icon_url=member.display_avatar)
-                if join_timestamp := self.voice_join_timestamps[(member.id, before.channel.id)]:
+                if join_timestamp := self.voice_join_timestamps.get((member.id, before.channel.id)):
                     duration = await FormatUtils.time_delta(time.time() - join_timestamp)
                     emb.add_field(name="Time spent in the channel", value=duration)
                     del self.voice_join_timestamps[(member.id, before.channel.id)]
@@ -1590,7 +1590,7 @@ Minimum age required by anti-raid: {min_age}"
                     colour=discord.Color.light_grey()
                 )
                 emb.set_author(name=member, icon_url=member.display_avatar)
-                if join_timestamp := self.voice_join_timestamps[(member.id, before.channel.id)]:
+                if join_timestamp := self.voice_join_timestamps.get((member.id, before.channel.id)):
                     duration = await FormatUtils.time_delta(time.time() - join_timestamp)
                     emb.add_field(name="Time spent in the channel", value=duration)
                     del self.voice_join_timestamps[(member.id, before.channel.id)]
