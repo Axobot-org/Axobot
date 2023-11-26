@@ -185,7 +185,7 @@ class Rss(commands.Cog):
         "Search for the last post of a deviantart user"
         if extracted_user := await self.deviant_rss.get_username_by_url(user):
             user = extracted_user
-        text = await self.deviant_rss.get_last_post(ctx.channel, user)
+        text = await self.deviant_rss.get_last_post(ctx.channel, user, filter_config=None)
         if isinstance(text, str):
             await ctx.send(text)
         else:
@@ -445,7 +445,7 @@ class Rss(commands.Cog):
         if feed_object.type == 'yt':
             msg = await self.youtube_rss.get_last_post(ctx.channel, feed_object.link, feed_object.filter_config)
         elif feed_object.type == "deviant":
-            msg = await self.deviant_rss.get_last_post(ctx.channel, feed_object.link)
+            msg = await self.deviant_rss.get_last_post(ctx.channel, feed_object.link, feed_object.filter_config)
         elif feed_object.type == "twitch":
             msg = await self.twitch_rss.get_last_post(ctx.channel, feed_object.link)
         elif feed_object.type == "web":
@@ -1401,9 +1401,9 @@ class Rss(commands.Cog):
                                                                 feed.last_entry_id, session)
                 elif feed.type == "deviant":
                     if feed.date is None:
-                        objs = await self.deviant_rss.get_last_post(chan, feed.link, session)
+                        objs = await self.deviant_rss.get_last_post(chan, feed.link, feed.filter_config, session)
                     else:
-                        objs = await self.deviant_rss.get_new_posts(chan, feed.link, feed.date, session)
+                        objs = await self.deviant_rss.get_new_posts(chan, feed.link, feed.date, feed.filter_config, session)
                 elif feed.type == "twitch":
                     if feed.date is None:
                         objs = await self.twitch_rss.get_last_post(chan, feed.link, session)
