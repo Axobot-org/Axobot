@@ -64,6 +64,7 @@
         "rss refresh": "rafraîchir",
         "rss remove": "supprimer",
         "rss set-embed": "modifier-embed",
+        "rss set-filter": "modifier-filtre",
         "rss set-mentions": "modifier-mentions",
         "rss set-text": "modifier-texte",
         "rss test": "test",
@@ -240,6 +241,22 @@
         "rss disable": {
             "feed": "flux"
         },
+        "rss set-embed": {
+            "feed": "flux",
+            "should_use_embed": "embed-activé",
+            "color": "couleur",
+            "author_text": "texte-en-tête",
+            "title": "titre",
+            "footer_text": "pied-de-page",
+            "show_date_in_footer": "afficher-date-en-pied-de-page",
+            "enable_link_in_title": "ajouter-lien-dans-titre",
+            "image_location": "image"
+        },
+        "rss set-filter": {
+            "feed": "flux",
+            "filter-type": "type-de-filtre",
+            "words": "mots"
+        },
         "rss set-mentions": {
             "feed": "flux",
             "silent": "silencieux",
@@ -252,17 +269,6 @@
         "rss set-text": {
             "feed": "flux",
             "text": "texte"
-        },
-        "rss set-embed": {
-            "feed": "flux",
-            "should_use_embed": "embed-activé",
-            "color": "couleur",
-            "author_text": "texte-en-tête",
-            "title": "titre",
-            "footer_text": "pied-de-page",
-            "show_date_in_footer": "afficher-date-en-pied-de-page",
-            "enable_link_in_title": "ajouter-lien-dans-titre",
-            "image_location": "image"
         },
         "rss test": {
             "feed": "flux"
