@@ -200,7 +200,7 @@ class Rss(commands.Cog):
         "Search for the last post of a web feed"
         link = web_link.get(link, link)
         try:
-            text = await self.web_rss.get_last_post(ctx.channel, link)
+            text = await self.web_rss.get_last_post(ctx.channel, link, filter_config=None)
         except client_exceptions.InvalidURL:
             await ctx.send(await self.bot._(ctx.channel, "rss.invalid-link"))
             return
@@ -449,7 +449,7 @@ class Rss(commands.Cog):
         elif feed_object.type == "twitch":
             msg = await self.twitch_rss.get_last_post(ctx.channel, feed_object.link)
         elif feed_object.type == "web":
-            msg = await self.web_rss.get_last_post(ctx.channel, feed_object.link)
+            msg = await self.web_rss.get_last_post(ctx.channel, feed_object.link, feed_object.filter_config)
         else:
             await ctx.send(await self.bot._(ctx.guild.id, "rss.invalid-flow"))
             return
@@ -1158,7 +1158,7 @@ class Rss(commands.Cog):
             return
         if words:
             # check for unchanged type + words
-            words_list = [word.strip() for word in words.split(",")]
+            words_list = [word.strip().lower() for word in words.split(",")]
             if filter_type == feed.filter_config["filter_type"] and words_list == feed.filter_config["words"]:
                 await ctx.send(await self.bot._(ctx.guild.id, "rss.filter.same"))
                 return
@@ -1389,9 +1389,10 @@ class Rss(commands.Cog):
                     return False
                 elif feed.type == "web":
                     if feed.date is None:
-                        objs = await self.web_rss.get_last_post(chan, feed.link, session)
+                        objs = await self.web_rss.get_last_post(chan, feed.link, feed.filter_config, session)
                     else:
-                        objs = await self.web_rss.get_new_posts(chan, feed.link, feed.date, feed.last_entry_id, session)
+                        objs = await self.web_rss.get_new_posts(chan, feed.link, feed.date, feed.filter_config,
+                                                                feed.last_entry_id, session)
                 elif feed.type == "deviant":
                     if feed.date is None:
                         objs = await self.deviant_rss.get_last_post(chan, feed.link, session)

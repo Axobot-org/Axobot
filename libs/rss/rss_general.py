@@ -56,6 +56,31 @@ async def feed_parse(bot: Axobot, url: str, timeout: int, session: Optional[Clie
     result["status"] = response.status
     return result
 
+async def _entry_match_word(entry: FeedParserDict, word: str) -> bool:
+    if word in entry.get("title", "").lower():
+        return True
+    if "tags" in entry:
+        for tag in entry["tags"]:
+            if word in tag.get("term", "").lower():
+                return True
+    return False
+
+async def check_filter(entry: FeedParserDict, filter_config: FeedFilterConfig) -> bool:
+    "Check if an entry is valid according to the filter"
+    if filter_config["filter_type"] == "none":
+        return True
+    if filter_config["filter_type"] == "blacklist":
+        for word in filter_config["words"]:
+            if await _entry_match_word(entry, word):
+                return False
+        return True
+    if filter_config["filter_type"] == "whitelist":
+        for word in filter_config["words"]:
+            if await _entry_match_word(entry, word):
+                return True
+        return False
+    return True
+
 class RssMessage:
     "Represents a message ready to be sent"
 
