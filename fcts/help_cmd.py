@@ -40,7 +40,7 @@ class Help(commands.Cog):
         self.bot.add_command(self.old_cmd)
 
     @commands.hybrid_command(name="help")
-    @commands.cooldown(1, 5, commands.BucketType.user)
+    @commands.cooldown(2, 8, commands.BucketType.user)
     @commands.cooldown(10, 30, commands.BucketType.guild)
     async def help_cmd(self, ctx: MyContext, *, args: Optional[str]=None):
         """Shows this message
