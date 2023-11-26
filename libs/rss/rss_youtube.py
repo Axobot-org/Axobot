@@ -12,6 +12,7 @@ from feedparser.util import FeedParserDict
 from libs.youtube_search import Service
 
 from . import FeedObject, RssMessage, feed_parse, get_text_from_entry
+from .rss_general import FeedFilterConfig, check_filter
 
 if TYPE_CHECKING:
     from libs.bot_classes import Axobot
@@ -93,17 +94,23 @@ class YoutubeRSS:
     def get_channel_name_by_id(self, channel_id: str):
         return self.search_service.query_channel_title(channel_id)
 
-    async def _get_feed_list(self, identifiant: str, session: Optional[aiohttp.ClientSession]=None) -> list[FeedParserDict]:
+    async def _get_feed_list(self, channel_id: str, filter_config: Optional[FeedFilterConfig]=None,
+                             session: Optional[aiohttp.ClientSession]=None) -> list[FeedParserDict]:
         "Get the feed list from a youtube channel"
-        url = 'https://www.youtube.com/feeds/videos.xml?channel_id='+identifiant
+        url = 'https://www.youtube.com/feeds/videos.xml?channel_id='+channel_id
         feed = await feed_parse(self.bot, url, 7, session)
         if feed is None or not feed.entries:
             return []
+        if filter_config is not None:
+            # Remove entries that don't match the filter
+            return [entry for entry in feed.entries[:50] if await check_filter(entry, filter_config)]
         return feed.entries
 
-    async def get_last_post(self, channel: discord.TextChannel, identifiant: str, session: Optional[aiohttp.ClientSession]=None):
+    async def get_last_post(self, channel: discord.TextChannel, yt_channel_id: str,
+                            filter_config: Optional[FeedFilterConfig],
+                            session: Optional[aiohttp.ClientSession]=None):
         "Get the last post from a youtube channel"
-        entries = await self._get_feed_list(identifiant, session)
+        entries = await self._get_feed_list(yt_channel_id, filter_config, session)
         if len(entries) == 0:
             return await self.bot._(channel, "rss.nothing")
         entry = entries[0]
@@ -124,9 +131,10 @@ class YoutubeRSS:
         )
 
     async def get_new_posts(self, channel: discord.TextChannel, identifiant: str, date: dt.datetime,
+                            filter_config: Optional[FeedFilterConfig],
                             session: Optional[aiohttp.ClientSession]=None) -> list[RssMessage]:
         "Get new posts from a youtube channels"
-        entries = await self._get_feed_list(identifiant, session)
+        entries = await self._get_feed_list(identifiant, filter_config, session)
         if len(entries) == 0:
             return []
         posts_list: list[RssMessage] = []
