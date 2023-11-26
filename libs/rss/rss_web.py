@@ -10,7 +10,8 @@ from feedparser import CharacterEncodingOverride
 from feedparser.util import FeedParserDict
 
 from .convert_post_to_text import get_text_from_entry
-from .rss_general import FeedObject, RssMessage, feed_parse
+from .rss_general import (FeedFilterConfig, FeedObject, RssMessage,
+                          check_filter, feed_parse)
 
 if TYPE_CHECKING:
     from libs.bot_classes import Axobot
@@ -28,7 +29,8 @@ class WebRSS:
         matches = re.match(self.url_pattern, string)
         return bool(matches)
 
-    async def _get_feed(self, url: str, session: Optional[aiohttp.ClientSession]=None) -> FeedParserDict:
+    async def _get_feed(self, url: str, filter_config: Optional[FeedFilterConfig]=None,
+                        session: Optional[aiohttp.ClientSession]=None) -> FeedParserDict:
         "Get a list of feeds from a web URL"
         feed = await feed_parse(self.bot, url, 9, session)
         if feed is None or not feed.entries:
@@ -46,6 +48,9 @@ class WebRSS:
                     del feed.entries[0]
             except KeyError:
                 pass
+        if filter_config is not None:
+            # Remove entries that don't match the filter
+            feed.entries = [entry for entry in feed.entries[:50] if await check_filter(entry, filter_config)]
         return feed
 
     async def _get_feed_date_key(self, entry: FeedParserDict) -> Optional[
@@ -62,9 +67,11 @@ class WebRSS:
             if value := entry.get(i):
                 return value
 
-    async def get_last_post(self, channel: discord.TextChannel, url: str, session: Optional[aiohttp.ClientSession]=None):
+    async def get_last_post(self, channel: discord.TextChannel, url: str,
+                            filter_config: Optional[FeedFilterConfig],
+                            session: Optional[aiohttp.ClientSession]=None):
         "Get the last post from a web feed"
-        feed = await self._get_feed(url, session)
+        feed = await self._get_feed(url, filter_config, session)
         if not feed:
             return await self.bot._(channel, "rss.web-invalid")
         entry = feed.entries[0]
@@ -112,10 +119,11 @@ class WebRSS:
         )
 
     async def get_new_posts(self, channel: discord.TextChannel, url: str, date: dt.datetime,
+                            filter_config: Optional[FeedFilterConfig],
                             last_entry_id: Optional[str]=None,
                             session: Optional[aiohttp.ClientSession]=None) -> list[RssMessage]:
         "Get new posts from a web feed"
-        feed = await self._get_feed(url, session)
+        feed = await self._get_feed(url, filter_config, session)
         if not feed:
             return []
         posts_list: list[RssMessage] = []
