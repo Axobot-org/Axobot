@@ -92,14 +92,14 @@ class MyContext(commands.Context):
         """Send the help message of the given command"""
         # command: Union[str, commands.Command]
         if len(args) == 1 and isinstance(args[0], commands.Command):
-            cmd_arg = args[0].qualified_name.split(' ')
+            cmd_arg = args[0].qualified_name
         elif len(args) == 1 and isinstance(args[0], str):
-            cmd_arg = args[0].split(' ')
+            cmd_arg = args[0]
         elif all(isinstance(arg, str) for arg in args):
             cmd_arg = args
         else:
             raise ValueError(args)
-        await self.bot.get_command("help")(self, *cmd_arg)
+        await self.bot.get_command("help")(self, args=cmd_arg)
 
     async def send_super_help(self, entity: Union[str, commands.Command, commands.Cog, None]=None):
         "Use the default help command"
