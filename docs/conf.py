@@ -15,6 +15,7 @@
 #
 import os
 import sys
+
 sys.path.insert(0, os.path.abspath('.'))
 
 # -- Project information -----------------------------------------------------
@@ -24,9 +25,9 @@ copyright = '2019 - 2023'
 author = 'ZRunner'
 
 # The short X.Y version
-version = '4.4'
+version = '4.5'
 # The full version, including alpha/beta/rc tags
-release = '4.4.4'
+release = '4.5.0'
 
 _documentation_name = "Axobot Documentation"
 
