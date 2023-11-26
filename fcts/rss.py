@@ -977,7 +977,7 @@ class Rss(commands.Cog):
             cmd = await self.bot.get_command_mention("about")
             await ctx.send(await self.bot._(ctx.guild, "errors.unknown2", about=cmd))
             return
-        if ctx.interaction:
+        if ctx.interaction and not ctx.interaction.response.is_done():
             # ask for text through a modal
             text_modal = TextInputModal(
                 title=await self.bot._(ctx.channel, "rss.change-txt.title"),
