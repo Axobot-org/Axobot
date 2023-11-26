@@ -1163,6 +1163,7 @@ class Rss(commands.Cog):
         if words:
             # check for unchanged type + words
             words_list = [word.strip().lower() for word in words.split(",")]
+            words_list = [word for word in words_list if len(word) > 0]
             if filter_type == feed.filter_config["filter_type"] and words_list == feed.filter_config["words"]:
                 await ctx.send(await self.bot._(ctx.guild.id, "rss.filter.same"))
                 return
