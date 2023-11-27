@@ -162,7 +162,7 @@
     },
     "no-desc-cmd": "No descripshun for those c:o2:mmand",
     "no-desc-cog": "No more discripton for dis cogg.",
-    "no-subcmd": "Teh kommand `%{cmd}` had not sub~~scribe~~commanD",
+    "no-subcmd": "Teh kommand %{cmd} had no sub~~scribe~~command",
     "not-enabled": ":warning: This command iz def not enable",
     "subcmd-not-found": "Thiz commnd have no sUbcommant newmed \"%{name}\"",
     "subcmds": "Subcommands",
