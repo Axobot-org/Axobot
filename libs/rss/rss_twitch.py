@@ -42,7 +42,7 @@ class TwitchRSS:
         if feed is None or 'bozo_exception' in feed or not feed.entries:
             return None
         if filter_config is not None:
-            feed.entries = [entry for entry in feed.entries[:50] if check_filter(entry, filter_config)]
+            feed.entries = [entry for entry in feed.entries[:50] if await check_filter(entry, filter_config)]
         return feed
 
     async def get_last_post(self, channel: discord.TextChannel, username: str,
