@@ -14,8 +14,8 @@
         "counting": "Counting in progress...",
         "forbidden": "You cannot use this command in a channel where you do not have access to the message history",
         "missing-perms": "Oops, I'm unable to read this channel history. Please check my permissions...",
-        "result-user": "On the last %{limit} messages, %{user} has posted %{x} messages (%{p}%)",
-        "result-you": "On the last %{limit} posts, you have posted %{x} messages (%{p}%)",
+        "result-user": "On the last %{limit} messages, %{user} has posted %{x} messages (%{p}%%)",
+        "result-you": "On the last %{limit} posts, you have posted %{x} messages (%{p}%%)",
         "too-much": "You wanna blow up Discord! %{e} For obvious performance reasons, I will impose a limit of %{l} messages."
     },
     "discordjobs-count": "%{c} offers found",

@@ -194,7 +194,7 @@
         "bot_version": "**Version du bot :** %{v}",
         "cmds_24h": "**Commandes traitées en 24h :** %{v}",
         "codes_lines": "**Nombre de lignes de code :** %{v}",
-        "cpu_usage": "**Charge sur le CPU :** %{v} %",
+        "cpu_usage": "**Charge sur le CPU :** %{v} %%",
         "languages": "**Langues utilisées :** %{v}",
         "lib_version": "**Version de la bibliothèque `discord.py` :** %{v}",
         "python_version": "**Version de Python :** %{v}",

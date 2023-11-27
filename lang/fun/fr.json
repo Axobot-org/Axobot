@@ -14,8 +14,8 @@
         "counting": "Comptage en cours...",
         "forbidden": "Vous ne pouvez pas utiliser cette commande dans un salon où vous n'avez pas accès à l'historique des messages",
         "missing-perms": "Oups, il m'est impossible de lire l'historique de ce salon. Veuillez vérifier mes permissions...",
-        "result-user": "Sur les %{limit} derniers messages, %{user} en a posté %{x} (%{p}%)",
-        "result-you": "Sur les %{limit} derniers messages, vous en avez posté %{x} (%{p}%)",
+        "result-user": "Sur les %{limit} derniers messages, %{user} en a posté %{x} (%{p}%%)",
+        "result-you": "Sur les %{limit} derniers messages, vous en avez posté %{x} (%{p}%%)",
         "too-much": "Mais vous voulez faire exploser Discord ! %{e} Pour des raisons évidentes de performances, je vais vous imposer une limite à %{l} messages."
     },
     "discordjobs-count": "%{c} offres trouvées",
