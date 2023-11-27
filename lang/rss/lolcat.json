@@ -33,6 +33,14 @@
     "deviant-default-flow": "{logo}  | New draw by {author} : **{title}**\nDated on {date}\nURL: {link}\n{mentions}",
     "deviant-form-last": "{logo}  | Here is da brand new thing of {author}:\n{title}\nDarwn on {date}\nZelda: {url}",
     "embed-json-changed": "The embed ov feed have been modifed",
+    "filter": {
+        "same": "Nothing 2 change 4 dis feed!",
+        "success": {
+            "blacklist": "Okaip, Ive edited teh filter ov dis feed 2 block msg containing: %{words}",
+            "reset": "Okay, Ive removd teh filter 4 dis feed!",
+            "whitelist": "Okaip, Ive edited teh filter ov dis feed 2 only allows msg containing: %{words}"
+        }
+    },
     "flow-limit": "Fr pirformunce reesons, U can notz track mor than %{limit} rss feeds per srver.",
     "guild-complete": {
         "one": "Ur rss stream haz correctly reloadd in %{time} seconds!",
@@ -77,6 +85,9 @@
         "list": "Her iz teh lis for rolez alreedy indicatd: %{roles}"
     },
     "success-add": "Teh rss feed for type '%{type}' with lik <%{url}> have bein prperly addded in the cannel %{channel} !",
+    "test": {
+        "empty-result": "Uh oh, looks like teh generated msg is empty :/ plz check ur feed config or contact our help crew."
+    },
     "text-success": {
         "single": "Teh text of the feed #%{id} haz been modified!\n New cute text : \n```\n%{text}\n```",
         "multiple": "Teh text of these feeds haz been modified!\n New cute text : \n```\n%{text}\n```"
