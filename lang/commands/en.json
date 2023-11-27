@@ -257,7 +257,7 @@
         },
         "rss set-filter": {
             "feed": "feed",
-            "filter-type": "filter-type",
+            "filter_type": "filter-type",
             "words": "words"
         },
         "rss set-mentions": {

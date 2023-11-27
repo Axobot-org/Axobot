@@ -254,7 +254,7 @@
         },
         "rss set-filter": {
             "feed": "flux",
-            "filter-type": "type-de-filtre",
+            "filter_type": "type-de-filtre",
             "words": "mots"
         },
         "rss set-mentions": {
