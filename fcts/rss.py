@@ -1494,6 +1494,8 @@ class Rss(commands.Cog):
         else:
             self.bot.log.info(f"Check RSS lancé pour le serveur {guild_id}")
             feeds_list = await self.db_get_guild_feeds(guild_id)
+        # remove disabled feeds
+        feeds_list = [feed for feed in feeds_list if feed.enabled]
         success_ids: list[int] = []
         errors_ids: list[int] = []
         checked_count = 0
