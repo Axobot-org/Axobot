@@ -42,7 +42,7 @@ web_link = {
 
 TWITTER_ERROR_MESSAGE = "Due to the latest Twitter API changes, Twitter feeds are no longer supported by Axobot. Join our \
 Discord server (command `/about`) to find out more."
-FEEDS_PER_SUBLOOP = 25
+FEEDS_PER_SUBLOOP = 20
 
 def is_twitter_url(string: str):
     "Check if an url is a valid Twitter URL"
