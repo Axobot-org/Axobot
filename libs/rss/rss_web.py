@@ -51,6 +51,8 @@ class WebRSS:
         if filter_config is not None:
             # Remove entries that don't match the filter
             feed.entries = [entry for entry in feed.entries[:50] if await check_filter(entry, filter_config)]
+            if not feed.entries:
+                return None
         return feed
 
     async def _get_feed_date_key(self, entry: FeedParserDict) -> Optional[
@@ -124,7 +126,7 @@ class WebRSS:
                             session: Optional[aiohttp.ClientSession]=None) -> list[RssMessage]:
         "Get new posts from a web feed"
         feed = await self._get_feed(url, filter_config, session)
-        if not feed:
+        if not feed or not feed.entries:
             return []
         posts_list: list[RssMessage] = []
         date_field_key = await self._get_feed_date_key(feed.entries[0])
