@@ -133,6 +133,15 @@ class TaskHandler:
                     self.bot.dispatch("error", err)
                     self.bot.log.error("[role-grant_task] Unable to remove temporary role: %s", err)
 
+    async def _get_or_fetch_user(self, user_id: int):
+        if user := self.bot.get_user(user_id):
+            return user
+        try:
+            return await self.bot.fetch_user(user_id)
+        except discord.NotFound:
+            pass
+        return None
+
     async def task_timer(self, task: dict) -> bool:
         """Send a reminder
         Returns True if the reminder has been sent"""
@@ -145,12 +154,12 @@ class TaskHandler:
             channel = guild.get_channel_or_thread(task["channel"])
             member = await guild.fetch_member(task["user"])
             # if channel has been deleted, or if member left the guild, we send it in DM
-            if channel is None or member is None:
-                channel = self.bot.get_user(task["user"])
+            if channel is None or member is None or not channel.permissions_for(guild.me).send_messages:
+                channel = await self._get_or_fetch_user(task["user"])
                 if channel is None:
                     return False
         else:
-            channel = self.bot.get_user(task["user"])
+            channel = await self._get_or_fetch_user(task["user"])
             if not channel:
                 return False
         user = channel if isinstance(channel, discord.User) else self.bot.get_user(task["user"])
