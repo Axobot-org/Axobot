@@ -141,8 +141,9 @@ class BotInfo(commands.Cog):
         """List the most used commands
 
         ..Doc infos.html#statistics"""
-        forbidden = ['cmd.eval', 'cmd.admin', 'cmd.test', 'cmd.bug', 'cmd.idea', 'cmd.send_msg']
-        forbidden_where = ', '.join(f"'{elem}'" for elem in forbidden)
+        forbidden = ['eval', 'admin', 'test', 'bug', 'idea', 'send_msg']
+        forbidden_where = ', '.join(f"'cmd.{elem}'" for elem in forbidden)
+        forbidden_where += ', ' + ', '.join(f"'app_cmd.{elem}'" for elem in forbidden)
         commands_limit = 15
         lang = await self.bot._(ctx.channel, '_used_locale')
         # SQL query
@@ -185,7 +186,7 @@ ORDER BY usages DESC LIMIT %(limit)s"""
             query_args = {"entity_id": self.bot.entity_id, "minutes": minutes, "limit": commands_limit}
             async with self.bot.db_query(query, query_args) as query_result:
                 pass
-            return query_result
+            return [row for row in query_result if not any(row["cmd"].startswith(x) for x in forbidden)]
 
         # in the last 24h
         data_24h = await do_query(60*24)
