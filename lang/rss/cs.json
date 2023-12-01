@@ -17,6 +17,7 @@
     "choose-enable": "Vyberte prosím kanál, který chcete povolit",
     "choose-mentions-1": "Vyberte prosím kanály ke změně",
     "choose-roles": "Jaké role budou zmíněny?",
+    "choose-test": "Vyberte prosím pole k testování",
     "delete-success": {
         "many": "Zdroje %{count} byly úspěšně smazány!",
         "one": "Kanál byl úspěšně smazán!"
@@ -33,6 +34,14 @@
     "deviant-default-flow": "{logo} | Nová tvorba {author}: **{title}**\nPublikováno dne {date}\nOdkaz: {link}\n{mentions}",
     "deviant-form-last": "{logo} | Zde je nový výtvor {author}:\n{title}\nPublikováno dne {date}\nOdkaz: {url}",
     "embed-json-changed": "Vložený embed v kanálu byl upraven",
+    "filter": {
+        "same": "Filtr tohoto kanálu se nezměnil",
+        "success": {
+            "blacklist": "Filtr tohoto kanálu byl upraven tak, aby blokoval příspěvky obsahující jedno z následujících slov: %{words}",
+            "reset": "Filtr tohoto kanálu byl resetován (nebude použit filtr)",
+            "whitelist": "Filtr tohoto kanálu byl upraven tak, aby umožňoval pouze příspěvky obsahující jedno z následujících slov: %{words}"
+        }
+    },
     "flow-limit": "Z důvodu výkonu nemůžete sledovat více než %{limit} rss kanálů na server.",
     "guild-complete": {
         "one": "Váš rss stream bylo správně obnoveno, za %{time} sekund!",
@@ -77,6 +86,9 @@
         "list": "Zde je seznam rolí, které již byly oznámeny: %{roles}"
     },
     "success-add": "Rss kanál typu \"%{type}\" s odkazem <%{url}> byl správně přidán do kanálu %{channel}!",
+    "test": {
+        "empty-result": "Vygenerovaná zpráva se zdá být prázdná, zkontrolujte prosím šablonu zprávy a konfiguraci feedu."
+    },
     "text-success": {
         "single": "Text kanálu #%{id} byl změněn!\n Nový text: \n```\n%{text}\n```",
         "multiple": "Text kanálu byl změněn!\n Nový text: \n```\n%{text}\n```"
