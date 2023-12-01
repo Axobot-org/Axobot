@@ -492,10 +492,13 @@ class BotStats(commands.Cog):
                 cursor.execute(query, (now, 'tickets.creation', self.ticket_events["creation"], 0, 'tickets/min', True, self.bot.entity_id))
                 self.ticket_events["creation"] = 0
             if self.bot.current_event:
-                # Dailies points
-                await self.db_record_event_collect_values(now)
-                # Events points
-                await self.db_record_event_points_values(now)
+                try:
+                    # Dailies points
+                    await self.db_record_event_collect_values(now)
+                    # Events points
+                    await self.db_record_event_points_values(now)
+                except Exception as err: # pylint: disable=broad-except
+                    self.bot.dispatch("error", err, "When recording event points")
             # serverlogs
             for serverlogs_query in await self.db_record_serverlogs_enabled(now):
                 cursor.execute(*serverlogs_query)
