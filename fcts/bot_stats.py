@@ -199,12 +199,21 @@ class BotStats(commands.Cog):
     @commands.Cog.listener()
     async def on_command_completion(self, ctx: MyContext):
         """Called when a command is correctly used by someone"""
-        name = ctx.command.full_parent_name.split()[0] if ctx.command.parent is not None else ctx.command.name
+        if ctx.interaction:
+            return # will be handled in on_app_command_completion
+        name = ctx.command.qualified_name
         self.commands_uses[name] = self.commands_uses.get(name, 0) + 1
         self.received_events['CMD_USE'] = self.received_events.get('CMD_USE', 0) + 1
-        if ctx.interaction:
-            self.app_commands_uses[name] = self.app_commands_uses.get(name, 0) + 1
-            self.received_events['SLASH_CMD_USE'] = self.received_events.get('SLASH_CMD_USE', 0) + 1
+
+    @commands.Cog.listener()
+    async def on_app_command_completion(self, _interaction: discord.Interaction,
+                                        command: Union[discord.app_commands.Command, discord.app_commands.ContextMenu]):
+        "Called when an app command is correctly used by someone"
+        name = command.qualified_name
+        self.commands_uses[name] = self.commands_uses.get(name, 0) + 1
+        self.received_events['CMD_USE'] = self.received_events.get('CMD_USE', 0) + 1
+        self.app_commands_uses[name] = self.app_commands_uses.get(name, 0) + 1
+        self.received_events['SLASH_CMD_USE'] = self.received_events.get('SLASH_CMD_USE', 0) + 1
 
     @commands.Cog.listener()
     async def on_serverlog(self, _guild_id: int, _channel_id: int, log_type: str):
