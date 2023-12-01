@@ -53,7 +53,12 @@
     "invalid-link": "Oups, cette adresse url est invalide ou incomplète :confused:",
     "list": "*Entrez le numéro du flux à modifier*\n\n**Lien - Type - Salon - Roles**\n",
     "list-disabled": "(désactivé)",
-    "list-result": "{emoji} {link}\nSalon : {channel}\nRôle mentionné : {roles}\nIdentifiant : {id}\nDernier post : {last_post}",
+    "list-result": "{emoji} {link}\nSalon : {channel}\nRôle mentionné : {roles} | {filter}\nIdentifiant : {id}\nDernier post : {last_post}",
+    "list-result-filter": {
+        "none": "Aucun filtre",
+        "blacklist": "Filtre par liste noire",
+        "whitelist": "Filtre par liste blanche"
+    },
     "list-title": {
         "one": "Liste des flux RSS du serveur %{server} (1 flux)",
         "many": "Liste des flux RSS du serveur %{server} (%{count} flux)"
