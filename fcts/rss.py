@@ -528,6 +528,11 @@ class Rss(commands.Cog):
                         roles = ", ".join(roles)
                         if feed.silent_mention:
                             roles += " <:silent:1093658138567245925>"
+                    # feed filter
+                    filter_state = await self.client._(
+                        ctx.guild.id,
+                        "rss.list-result-filter." + feed.filter_config["filter_type"]
+                    )
                     # feed name
                     feed_name: str = feed.link
                     if feed.type == 'yt' and (channel_name := rss_cog.youtube_rss.get_channel_name_by_id(feed.link)):
@@ -548,6 +553,7 @@ class Rss(commands.Cog):
                         channel=channel,
                         link=feed_name,
                         roles=roles,
+                        filter=filter_state,
                         id=feed.feed_id,
                         last_post=last_date
                     ))
