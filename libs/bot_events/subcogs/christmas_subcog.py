@@ -124,6 +124,9 @@ class ChristmasSubcog(AbstractSubcog):
         emb.set_author(name=user.global_name, icon_url=user.display_avatar.replace(static_format="png", size=32))
         for field in await self.generate_user_profile_rank_fields(ctx, lang, user):
             emb.add_field(**field)
+        if user == ctx.author:
+            if field := await self._generate_user_profile_top_rank_field(user):
+                emb.add_field(**field)
         emb.add_field(**await self.generate_user_profile_collection_field(ctx, user))
         await ctx.send(embed=emb)
 
@@ -169,7 +172,6 @@ class ChristmasSubcog(AbstractSubcog):
     @acached(60*2) # cache for 2min
     async def today(self):
         return dt.datetime.now(dt.timezone.utc).date()
-        # return dt.date(2023, 12, 1)
 
     async def check_trigger_words(self, message: str):
         "Check if a word in the message triggers the event"
@@ -196,6 +198,22 @@ class ChristmasSubcog(AbstractSubcog):
             if item["item_id"] in gifts_ids:
                 gifts.append(item)
         return gifts
+
+    async def _generate_user_profile_top_rank_field(self, user: discord.User):
+        "If user is in Top 3, returns an embed field indicating that they may win a Nitro prize"
+        user_rank_query = await self.db_get_event_rank(user.id)
+        if user_rank_query is None:
+            return None
+        rank = user_rank_query['rank']
+        if rank > 3:
+            return None
+        return {
+            "name": ":wave: Hey, congrats!",
+            "value": "Hey, it looks like you're in the **top 3!**\nDid you know that the top 3 players will win a Nitro prize at \
+the end of the event? Don't forget to join our [support server](https://discord.gg/N55zY88) to claim your prize if you win!\n\
+<:_nothing:446782476375949323>",
+            "inline": False,
+        }
 
     async def is_past_christmas(self):
         today = await self.today()
