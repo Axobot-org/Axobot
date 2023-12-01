@@ -162,7 +162,7 @@
     },
     "no-desc-cmd": "Žádný popis pro tento příkaz",
     "no-desc-cog": "Pro toto kolečko není popis.",
-    "no-subcmd": "Příkaz `%{cmd}` nemá žádný podpříkaz",
+    "no-subcmd": "Příkaz %{cmd} nemá žádný subpříkaz",
     "not-enabled": ":warning: Tento příkaz je zakázán",
     "subcmd-not-found": "Tento příkaz nemá žádný příkaz s názvem \"%{name}\"",
     "subcmds": "Podpříkazy",
