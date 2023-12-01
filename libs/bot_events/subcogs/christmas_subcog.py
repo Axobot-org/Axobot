@@ -182,9 +182,9 @@ class ChristmasSubcog(AbstractSubcog):
             return []
         gifts_ids = []
         # make sure user can't get more than 3 gifts in the past
-        min_past_day = max(today.day - 3, last_collect_day.day)
-        for day in range(min_past_day, today.day + 1):
-            gifts_ids += ADVENT_CALENDAR[day]
+        min_past_day = max(today.day - 3, last_collect_day.day if last_collect_day.month == 12 else 0)
+        for day in range(min_past_day, today.day):
+            gifts_ids += ADVENT_CALENDAR[day + 1]
         if not gifts_ids:
             return []
         items = await self.db_get_event_items(self.current_event)
@@ -211,7 +211,7 @@ class ChristmasSubcog(AbstractSubcog):
         today = await self.today()
         total_points = sum(item["points"] for item in items)
         text = "### "
-        if today == last_collect_day:
+        if today == last_collect_day or last_collect_day.month != 12:
             text += await self.bot._(channel, "bot_events.calendar.today-gifts", points=total_points)
         else:
             missed_days = min(today.day - last_collect_day.day, 3)
@@ -230,11 +230,11 @@ class ChristmasSubcog(AbstractSubcog):
         "Get the UTC date of the last collect from a user, or December 1st if never collected"
         last_collect_date = await self.db_get_last_user_collect(user_id)
         if last_collect_date is None:
-            return dt.date(2023, 12, 1)
+            return dt.date(2023, 11, 30)
         today = await self.today()
         last_collect_day = last_collect_date.date()
         if last_collect_day.year != today.year or last_collect_day.month != today.month:
-            return dt.date(2023, 12, 1)
+            return dt.date(2023, 11, 30)
         return last_collect_day
 
     @acached(60*60*24)
@@ -263,10 +263,11 @@ class ChristmasSubcog(AbstractSubcog):
         if not self.bot.database_online or self.bot.current_event is None:
             return
         if points:
-            query = "INSERT INTO `event_points` (`user_id`, `collect_points`, `beta`) VALUES (%s, %s, %s) \
+            query = "INSERT INTO `event_points` (`user_id`, `collect_points`, `last_collect`, `beta`) \
+                VALUES (%s, %s, CURRENT_TIMESTAMP(), %s) \
                 ON DUPLICATE KEY UPDATE collect_points = collect_points + VALUE(`collect_points`), \
                     last_collect = CURRENT_TIMESTAMP();"
-            async with self.bot.db_query(query, (user_id, points, self.bot.beta)):
+            async with self.bot.db_query(query, (user_id, points,  self.bot.beta)):
                 pass
         if cog := self.bot.get_cog("BotEvents"):
             try:

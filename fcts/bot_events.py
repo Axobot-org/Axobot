@@ -222,7 +222,7 @@ class BotEvents(commands.Cog):
 
     @events_main.command(name="collect")
     @commands.check(database_connected)
-    @commands.cooldown(3, 60, commands.BucketType.user)
+    @commands.cooldown(1, 60, commands.BucketType.user)
     async def event_collect(self, ctx: MyContext):
         "Get some event points every hour"
         await self.subcog.collect_cmd(ctx)
