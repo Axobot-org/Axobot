@@ -14,8 +14,8 @@
         "counting": "Probíhá počítání...",
         "forbidden": "Tento příkaz nelze použít v kanálu, kde nemáte přístup k historii zpráv",
         "missing-perms": "Ale né, nemohu číst historii tohoto kanálu. Zkontrolujte prosím má oprávnění...",
-        "result-user": "Při posledních %{limit} zprávách %{user} odeslal %{x} zpráv (%{p}%)",
-        "result-you": "Na posledních %{limit} příspěvků jste poslal/a %{x} zpráv (%{p}%)",
+        "result-user": "V rámci posledních %{limit} zpráv %{user} poslal %{x} zpráv (%{p}%%)",
+        "result-you": "V rámci poslední %{limit} zpráv, jste poslal %{x} zpráv (%{p}%%)",
         "too-much": "Chcete vyhodit do povětří Discord! %{e} Z pochopitelných důvodů výkonu zavedu limit %{l} zpráv."
     },
     "discordjobs-count": "Nalezeno %{c} nabídek",
