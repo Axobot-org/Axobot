@@ -52,6 +52,9 @@ class ChristmasSubcog(AbstractSubcog):
     async def on_message(self, msg):
         "Add random reaction to some messages"
         if self.current_event and (data := self.current_event_data.get("emojis")):
+            if msg.guild is not None and not msg.channel.permissions_for(msg.guild.me).add_reactions:
+                # don't react if we can't add reactions
+                return
             if not await self.is_fun_enabled(msg):
                 # don't react if fun is disabled for this guild
                 return
