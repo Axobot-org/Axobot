@@ -256,7 +256,7 @@
         },
         "rss set-filter": {
             "feed": "pole",
-            "filter_type": "typ filtru",
+            "filter_type": "typ-filtru",
             "words": "slova"
         },
         "rss set-mentions": {
