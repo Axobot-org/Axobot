@@ -53,7 +53,12 @@
     "invalid-link": "Oops, this url address is invalid or incomplete :confused:",
     "list": "*Type the number of the feeds to modify*\n\n**Link - Type - Channel - Mentions**\n",
     "list-disabled": "(disabled)",
-    "list-result": "{emoji} {link}\nDiscord channel: {channel}\nMentions: {roles}\nIdentifier: {id}\nLast post: {last_post}",
+    "list-result": "{emoji} {link}\nDiscord channel: {channel}\nMentions: {roles} | {filter}\nIdentifier: {id}\nLast post: {last_post}",
+    "list-result-filter": {
+        "none": "No filter",
+        "blacklist": "Blacklist filter",
+        "whitelist": "Whitelist filter"
+    },
     "list-title": {
         "one": "List of RSS feeds from the server %{server} (1 feed)",
         "many": "List of RSS feeds from the server %{server} (%{count} feeds)"
