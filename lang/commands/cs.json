@@ -66,6 +66,7 @@
         "rss refresh": "znovu-načti",
         "rss remove": "odstranit",
         "rss set-embed": "nastavit-embed",
+        "rss set-filter": "nastavit filtr",
         "rss set-mentions": "nastavit-zmíňky",
         "rss set-text": "nastavit-text",
         "rss test": "test",
@@ -242,6 +243,22 @@
         "rss disable": {
             "feed": "zdroj"
         },
+        "rss set-embed": {
+            "feed": "zdroj",
+            "should_use_embed": "má-používat-embed",
+            "color": "barva",
+            "author_text": "text-autora",
+            "title": "název",
+            "footer_text": "text-zápatí",
+            "show_date_in_footer": "ukázat-datum-v-zápatí",
+            "enable_link_in_title": "povolit-odkaz-v-názvu",
+            "image_location": "umístění-obrázku"
+        },
+        "rss set-filter": {
+            "feed": "pole",
+            "filter_type": "typ-filtru",
+            "words": "slova"
+        },
         "rss set-mentions": {
             "feed": "zdroj",
             "silent": "ticho",
@@ -254,17 +271,6 @@
         "rss set-text": {
             "feed": "zdroj",
             "text": "text"
-        },
-        "rss set-embed": {
-            "feed": "zdroj",
-            "should_use_embed": "má-používat-embed",
-            "color": "barva",
-            "author_text": "text-autora",
-            "title": "název",
-            "footer_text": "text-zápatí",
-            "show_date_in_footer": "ukázat-datum-v-zápatí",
-            "enable_link_in_title": "povolit-odkaz-v-názvu",
-            "image_location": "umístění-obrázku"
         },
         "rss test": {
             "feed": "zdroj"

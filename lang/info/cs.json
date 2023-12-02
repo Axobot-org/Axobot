@@ -194,7 +194,7 @@
         "bot_version": "**Bot verze:** %{v}",
         "cmds_24h": "**Příkazy zpracované za 24 h:** %{v}",
         "codes_lines": "**Počet řádků kódu:** %{v}",
-        "cpu_usage": "**využití CPU:** %{v}%",
+        "cpu_usage": "**využití CPU:** %{v} %%",
         "languages": "**Použité jazyky:** %{v}",
         "lib_version": "**Verze `discord.py` lib:** %{v}",
         "python_version": "**Python verze:** %{v}",
