@@ -133,7 +133,7 @@ class BotEvents(commands.Cog):
     @commands.check(database_connected)
     async def events_main(self, ctx: MyContext):
         """Participate in bot special events!"""
-        if ctx.subcommand_passed is None:
+        if ctx.subcommand_passed is None and not ctx.command_failed:
             await ctx.send_help(ctx.command)
 
     @events_main.command(name="info")
