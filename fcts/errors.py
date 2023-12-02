@@ -97,7 +97,7 @@ class Errors(commands.Cog):
             await ctx.send(await self.bot._(ctx.channel, 'errors.notduringevent', cmd=cmd), ephemeral=True)
             return
         elif isinstance(error,commands.errors.CommandOnCooldown):
-            if await checks.is_bot_admin(ctx):
+            if await checks.is_bot_admin(ctx) and not ctx.interaction:
                 await ctx.reinvoke()
                 return
             if await self.can_send_cooldown_error(ctx.author.id):
