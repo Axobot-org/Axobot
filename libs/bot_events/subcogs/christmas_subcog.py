@@ -1,6 +1,6 @@
 import datetime as dt
 from collections import defaultdict
-from random import choices, lognormvariate, random
+from random import choices, random
 from typing import Optional
 
 import discord
@@ -89,11 +89,15 @@ class ChristmasSubcog(AbstractSubcog):
         embed = discord.Embed(title=title, description=desc, color=self.current_event_data["color"])
         if self.current_event_data["icon"]:
             embed.set_image(url=self.current_event_data["icon"])
-        if destination := (self.bot.get_channel(payload.channel_id) or self.bot.get_user(payload.user_id)):
-            # send the notification, auto delete after 12 seconds
-            await destination.send(embed=embed, delete_after=12)
+        # get the destination channel
+        if (channel := self.bot.get_channel(payload.channel_id)) and channel.permissions_for(channel.guild.me).send_messages:
+            await channel.send(embed=embed, delete_after=12)
             # send the rank card notification if needed
-            await self.bot.get_cog("BotEvents").check_and_send_card_unlocked_notif(destination, payload.user_id)
+            await self.bot.get_cog("BotEvents").check_and_send_card_unlocked_notif(channel, payload.user_id)
+        elif (user := self.bot.get_user(payload.user_id)) and user.dm_channel is not None:
+            await user.dm_channel.send(embed=embed)
+            # send the rank card notification if needed
+            await self.bot.get_cog("BotEvents").check_and_send_card_unlocked_notif(user.dm_channel, payload.user_id)
         # add points (and potentially grant reward rank card)
         await self.db_add_collect(payload.user_id, item["points"])
 
