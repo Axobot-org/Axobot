@@ -263,9 +263,6 @@ the end of the event? Don't forget to join our [support server](https://discord.
         "Get the list of items usable in reactions"
         if self.current_event is None:
             return []
-        items_count = min(round(lognormvariate(1.1, 0.9)), 8) # random number between 0 and 8
-        if items_count <= 0:
-            return []
         items = await self.db_get_event_items(self.current_event)
         if len(items) == 0:
             return []
@@ -274,6 +271,8 @@ the end of the event? Don't forget to join our [support server](https://discord.
     async def get_random_item_for_reaction(self):
         "Get some random items to win during an event"
         items = await self._get_suitable_reaction_items()
+        if not items:
+            return None
         return choices(
             items,
             weights=[item["frequency"] for item in items],
