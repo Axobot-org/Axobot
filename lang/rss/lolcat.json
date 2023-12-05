@@ -17,6 +17,7 @@
     "choose-enable": "Pls chose teh feeds 2 enable",
     "choose-mentions-1": "Pleese chose the feed 2 modify",
     "choose-roles": "Which roles should bee piing?",
+    "choose-test": "Pls chose A feed 2 test",
     "delete-success": {
         "many": "%{count} feeds had been deletd by success!",
         "one": "Teh feed had bein sussellfuccy delet!"
@@ -52,7 +53,12 @@
     "invalid-link": "Oops, dis url ADress is unvalid or outcompletz :confused:",
     "list": "*Tipe teh nbr of the feed 2 modyfi by*\n\n**Zelda - Typez - cHanel - Mentionz**\n",
     "list-disabled": "(disabld)",
-    "list-result": "{emoji} {link}\nDisc chan: {channel}\nPings: {roles}\nId: {id}\nLast thing: {last_post}",
+    "list-result": "{emoji} {link}\nDisc chan: {channel}\nPings: {roles} | {filter}\nId: {id}\nLast thing: {last_post}",
+    "list-result-filter": {
+        "none": "No filter",
+        "blacklist": "Black filter",
+        "whitelist": "White filter"
+    },
     "list-title": {
         "one": "List ov cool followed from teh place named %{server} (1 feed)",
         "many": "List ov cool followed from teh place named %{server} (%{count} feeds)"
