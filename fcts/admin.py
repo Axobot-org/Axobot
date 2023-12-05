@@ -599,7 +599,7 @@ class Admin(commands.Cog):
     @main_msg.command(name="module")
     @commands.check(checks.is_bot_admin)
     @discord.app_commands.describe(enable="Should we enable or disable this module")
-    async def enable_module(self, ctx: MyContext, module: Literal["xp", "rss", "alerts"], enable: bool):
+    async def enable_module(self, ctx: MyContext, module: Literal["xp", "rss", "stats", "files-count"], enable: bool):
         """Active ou désactive un module (xp/rss/alerts)
 Cette option affecte tous les serveurs"""
         if module=='xp':
@@ -615,11 +615,17 @@ Cette option affecte tous les serveurs"""
             else:
                 await ctx.send("Les flux RSS sont mainenant désactivée")
         elif module == 'alerts':
-            self.bot.alerts_enabled = enable
+            self.bot.stats_enabled = enable
             if enable:
-                await ctx.send("Le système d'alertes est mainenant activé")
+                await ctx.send("Le système de log de statistiques est mainenant activé")
             else:
-                await ctx.send("Le système d'alertes est mainenant désactivé")
+                await ctx.send("Le système de log de statistiques est mainenant désactivé")
+        elif module == "files-count":
+            self.bot.files_count_enabled = enable
+            if enable:
+                await ctx.send("Le comptage de fichiers ouverts est mainenant activé")
+            else:
+                await ctx.send("Le comptage de fichiers ouverts est mainenant désactivé")
         else:
             await ctx.send('Module introuvable')
 

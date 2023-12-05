@@ -132,7 +132,8 @@ class Axobot(commands.bot.AutoShardedBot):
         self._cnx = [[None, 0], [None, 0], [None, 0]] # database connections
         self.xp_enabled: bool = True # if xp is enabled
         self.rss_enabled: bool = True # if rss is enabled
-        self.alerts_enabled: bool = True # if alerts system is enabled
+        self.stats_enabled: bool = True # if the stats system is enabled (for grafana mainly)
+        self.files_count_enabled: bool = False # if the files count stats system is enabled
         self.internal_loop_enabled: bool = True # if internal loop is enabled
         self.zws = "\u200B"  # here's a zero width space
         self.others = get_secrets_dict() # other misc credentials

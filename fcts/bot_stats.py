@@ -125,6 +125,8 @@ class BotStats(commands.Cog):
     @tasks.loop(minutes=2)
     async def record_open_files(self):
         "Record the number of open files from the bot process"
+        if not self.bot.files_count_enabled:
+            return
         result = subprocess.run(['lsof', '-p', str(self.process.pid)], stdout=subprocess.PIPE, check=True)
         self.open_files.clear()
         for line in result.stdout.split(b"\n"):
@@ -422,7 +424,7 @@ class BotStats(commands.Cog):
     @tasks.loop(minutes=1)
     async def sql_loop(self):
         """Send our stats every minute"""
-        if not (self.bot.alerts_enabled and self.bot.database_online):
+        if not (self.bot.stats_enabled and self.bot.database_online):
             return
         self.bot.log.debug("Stats loop triggered")
         # get current time
@@ -615,7 +617,7 @@ class BotStats(commands.Cog):
     @tasks.loop(minutes=2)
     async def heartbeat_loop(self):
         "Register a hearbeat in our database every 2min"
-        if not self.bot.internal_loop_enabled:
+        if not self.bot.stats_enabled:
             return
         query = "INSERT INTO `statsbot`.`heartbeat` (`entity_id`) VALUES (%s)"
         async with self.bot.db_query(query, (self.bot.entity_id,)):
