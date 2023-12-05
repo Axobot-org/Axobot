@@ -104,6 +104,8 @@ async def main():
     # RSS enabled
     if not args.rss_features:
         client.rss_enabled = False
+    if args.count_open_files:
+        client.files_count_enabled = True
 
 
     client.connect_database_xp()
