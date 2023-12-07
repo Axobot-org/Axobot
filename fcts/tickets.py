@@ -7,13 +7,12 @@ from discord.ext import commands
 from mysql.connector.errors import IntegrityError
 
 from libs.bot_classes import Axobot, MyContext
+from libs.checks import checks
 from libs.enums import ServerWarningType
 from libs.tickets.converters import EmojiConverterType
 from libs.tickets.types import DBTopicRow
 from libs.tickets.views import (AskTitleModal, AskTopicSelect, SelectView,
                                 SendHintText, TicketCreationEvent)
-
-from libs.checks import checks
 
 
 def is_named_other(name: str, other_translated: str):
@@ -184,7 +183,11 @@ class Tickets(commands.Cog):
     async def ask_user_topic(self, ctx: MyContext, multiple = False, message: Optional[str] = None):
         "Ask a user which topic they want to edit"
         placeholder = await self.bot._(ctx.guild.id, "tickets.selection-placeholder")
-        view = AskTopicSelect(ctx.author.id, await self.db_get_topics(ctx.guild.id), placeholder, 25 if multiple else 1)
+        topics = await self.db_get_topics(ctx.guild.id)
+        if not topics:
+            await ctx.send(await self.bot._(ctx.guild.id, "tickets.topic.no-server-topic"))
+            return None
+        view = AskTopicSelect(ctx.author.id, topics, placeholder, max_values=25 if multiple else 1)
         msg = await ctx.send(message or await self.bot._(ctx.guild.id, "tickets.choose-topic-edition"), view=view)
         await view.wait()
         if view.topics is None:
