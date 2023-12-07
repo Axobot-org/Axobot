@@ -489,8 +489,7 @@ class Info(commands.Cog):
         # Webhooks count
         try:
             web = len(await channel.webhooks())
-        except Exception as err:
-            self.bot.dispatch("error", err, interaction)
+        except discord.Forbidden:
             web = await self.bot._(interaction, "info.info.textchan-4")
         embed.add_field(name=await self.bot._(interaction, "info.info.textchan-3"), value=str(web))
         # Members nber
