@@ -1374,6 +1374,17 @@ class Rss(commands.Cog):
             self.bot.log.info(f"[send_rss_msg] Cannot send message on channel {channel.id}: {err}")
             self.bot.dispatch("error", err, f"While sending feed {obj.feed.feed_id} on channel {channel.id}")
 
+    async def _get_channel_or_thread(self, guild: discord.Guild, channel_id: int
+                                     ) -> Union[discord.TextChannel, discord.Thread, None]:
+        """Get a channel or thread from its ID
+        If not in cache, fetch it from Discord"""
+        if channel := guild.get_channel_or_thread(channel_id):
+            return channel
+        try:
+            return await guild.fetch_channel(channel_id)
+        except discord.NotFound:
+            return None
+
     async def check_feed(self, feed: FeedObject, session: ClientSession = None, send_stats: bool=False):
         """Check one rss feed and send messages if required
         Return True if the operation was a success"""
@@ -1382,7 +1393,7 @@ class Rss(commands.Cog):
             if guild is None:
                 self.bot.log.info("[send_rss_msg] Cannot send message on server %s (unknown guild)", feed.guild_id)
                 return False
-            chan: Union[discord.TextChannel, discord.Thread, None] = guild.get_channel_or_thread(feed.channel_id)
+            chan = await self._get_channel_or_thread(guild, feed.channel_id)
             if chan is None:
                 self.bot.log.info("[send_rss_msg] Cannot send message on channel %s (unknown channel)", feed.channel_id)
                 self.bot.dispatch("server_warning", ServerWarningType.RSS_UNKNOWN_CHANNEL, guild,
