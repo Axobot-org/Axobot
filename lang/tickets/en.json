@@ -82,6 +82,7 @@
             "many": "%{count} topics have been deleted"
         },
         "list": "Your server topics:",
+        "no-server-topic": "No topic has been created for this server yet!",
         "other-already-exists": "An \"other\" topic is already proposed by default, no need to add one :innocent:",
         "too-long": "The topic name cannot exceed 100 characters",
         "too-many": "Oops, you have reached the limit of allowed topics! Due to Discord restrictions, you can't have more than %{max} topics at the same time."

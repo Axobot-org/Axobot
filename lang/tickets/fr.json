@@ -82,6 +82,7 @@
             "many": "%{count} topics ont bien été supprimés"
         },
         "list": "Les topics de votre serveur :",
+        "no-server-topic": "Aucun topic n'a encore été créé pour ce serveur !",
         "other-already-exists": "Un topic \"autre\" est déjà proposé par défaut, pas la peine de le rajouter :innocent:",
         "too-long": "Le nom du topic ne peut excéder 100 caractères",
         "too-many": "Oups, vous avez atteint la limite de topics autorisée ! À cause des limitations de Discord, vous ne pouvez pas avoir plus de %{max} topics en même temps."
