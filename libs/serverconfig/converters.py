@@ -130,7 +130,7 @@ AllRepresentation = Union[
 
 class OptionConverter:
     @staticmethod
-    def from_raw(raw: str, repr: TypedDict, guild: discord.Guild):
+    async def from_raw(raw: str, repr: TypedDict, guild: discord.Guild):
         raise NotImplementedError
 
     @staticmethod
@@ -180,19 +180,22 @@ def get_converter(option_name: str):
     else:
         raise ValueError(f"Invalid option name: {option_name}")
 
-def from_raw(option_name: str, raw: str, guild: discord.Guild):
+async def from_raw(option_name: str, raw: str, guild: discord.Guild):
+    "Convert an option value to a usable object"
     if raw is None:
         return None
     converter = get_converter(option_name)
-    return converter.from_raw(raw, options_list[option_name], guild)
+    return await converter.from_raw(raw, options_list[option_name], guild)
 
 def to_raw(option_name: str, value):
+    "Convert a config object to a string value, for storage in db"
     if value is None:
         return None
     converter = get_converter(option_name)
     return converter.to_raw(value)
 
 async def to_display(option_name: str, value, guild: discord.Guild, bot: "Axobot") -> Optional[str]:
+    "Convert a config object to a string value, for display in embeds"
     if value is None:
         if option_name == "levelup_msg":
             return "default"
@@ -204,14 +207,24 @@ async def to_display(option_name: str, value, guild: discord.Guild, bot: "Axobot
     return result
 
 async def from_input(option_name: str, raw: str, guild: discord.Guild, ctx: MyContext):
+    "Convert a user input to a config object"
     if raw is None:
         return None
     converter = get_converter(option_name)
     return await converter.from_input(raw, options_list[option_name], guild, ctx)
 
+async def getch_channel(guild: discord.Guild, channel_id: int) -> Optional[discord.TextChannel]:
+    "Get a channel from its id, or None if not found"
+    if channel := guild.get_channel(channel_id):
+        return channel
+    try:
+        return await guild.fetch_channel(channel_id)
+    except discord.NotFound:
+        return None
+
 class IntOption(OptionConverter):
     @staticmethod
-    def from_raw(raw: str, repr: IntOptionRepresentation, guild: discord.Guild):
+    async def from_raw(raw: str, repr: IntOptionRepresentation, guild: discord.Guild):
         try:
             value = int(raw)
             if value < repr["min"]:
@@ -244,7 +257,7 @@ class IntOption(OptionConverter):
 
 class FloatOption(OptionConverter):
     @staticmethod
-    def from_raw(raw: str, repr: FloatOptionRepresentation, guild: discord.Guild):
+    async def from_raw(raw: str, repr: FloatOptionRepresentation, guild: discord.Guild):
         try:
             value = float(raw)
             if value < repr["min"]:
@@ -277,7 +290,7 @@ class FloatOption(OptionConverter):
 
 class BooleanOption(OptionConverter):
     @staticmethod
-    def from_raw(raw: str, repr: BooleanOptionRepresentation, guild: discord.Guild):
+    async def from_raw(raw: str, repr: BooleanOptionRepresentation, guild: discord.Guild):
         return raw.lower() == "true"
 
     @staticmethod
@@ -301,7 +314,7 @@ class BooleanOption(OptionConverter):
 
 class EnumOption(OptionConverter):
     @staticmethod
-    def from_raw(raw: str, repr: EnumOptionRepresentation, guild: discord.Guild):
+    async def from_raw(raw: str, repr: EnumOptionRepresentation, guild: discord.Guild):
         if raw == "(╯°□°）╯︵ ┻━┻":
             return "extreme"
         if raw not in repr["values"]:
@@ -324,7 +337,7 @@ class EnumOption(OptionConverter):
 
 class TextOption(OptionConverter):
     @staticmethod
-    def from_raw(raw: str, repr: TextOptionRepresentation, guild: discord.Guild):
+    async def from_raw(raw: str, repr: TextOptionRepresentation, guild: discord.Guild):
         return raw
 
     @staticmethod
@@ -345,7 +358,7 @@ class TextOption(OptionConverter):
 
 class RoleOption(OptionConverter):
     @staticmethod
-    def from_raw(raw: str, repr: RoleOptionRepresentation, guild: discord.Guild):
+    async def from_raw(raw: str, repr: RoleOptionRepresentation, guild: discord.Guild):
         try:
             role_id = int(raw)
         except ValueError:
@@ -382,7 +395,7 @@ class RoleOption(OptionConverter):
 
 class RolesListOption(OptionConverter):
     @staticmethod
-    def from_raw(raw: str, repr: RolesListOptionRepresentation, guild: discord.Guild) -> list[discord.Role]:
+    async def from_raw(raw: str, repr: RolesListOptionRepresentation, guild: discord.Guild) -> list[discord.Role]:
         role_ids = json.loads(raw)
         if any(not isinstance(id, int) for id in role_ids):
             log.warning("[RolesListConverter] Invalid role ids: %s", role_ids)
@@ -427,13 +440,13 @@ class RolesListOption(OptionConverter):
 
 class TextChannelOption(OptionConverter):
     @staticmethod
-    def from_raw(raw: str, repr: TextChannelOptionRepresentation, guild: discord.Guild):
+    async def from_raw(raw: str, repr: TextChannelOptionRepresentation, guild: discord.Guild):
         try:
             channel_id = int(raw)
         except ValueError:
             log.warning("[TextChannelConverter] Invalid channel id: %s", raw)
             return None
-        channel = guild.get_channel_or_thread(channel_id)
+        channel = await getch_channel(guild, channel_id)
         if channel is None:
             log.warning("[TextChannelConverter] Channel not found: %s", raw)
             return None
@@ -465,7 +478,7 @@ class TextChannelOption(OptionConverter):
 
 class TextChannelsListOption(OptionConverter):
     @staticmethod
-    def from_raw(raw: str, repr: TextChannelsListOptionRepresentation, guild: discord.Guild) -> list[Union[discord.TextChannel, discord.Thread]]:
+    async def from_raw(raw: str, repr: TextChannelsListOptionRepresentation, guild: discord.Guild) -> list[Union[discord.TextChannel, discord.Thread]]:
         channel_ids = json.loads(raw)
         if any(not isinstance(id, int) for id in channel_ids):
             log.warning("[TextChannelsListConverter] Invalid channel ids: %s", channel_ids)
@@ -511,7 +524,7 @@ class TextChannelsListOption(OptionConverter):
 
 class VoiceChannelOption(OptionConverter):
     @staticmethod
-    def from_raw(raw: str, repr: VoiceChannelOptionRepresentation, guild: discord.Guild):
+    async def from_raw(raw: str, repr: VoiceChannelOptionRepresentation, guild: discord.Guild):
         try:
             channel_id = int(raw)
         except ValueError:
@@ -547,7 +560,7 @@ class VoiceChannelOption(OptionConverter):
 
 class CategoryOption(OptionConverter):
     @staticmethod
-    def from_raw(raw: str, repr: CategoryOptionRepresentation, guild: discord.Guild):
+    async def from_raw(raw: str, repr: CategoryOptionRepresentation, guild: discord.Guild):
         try:
             channel_id = int(raw)
         except ValueError:
@@ -577,7 +590,7 @@ class CategoryOption(OptionConverter):
 
 class EmojisListOption(OptionConverter):
     @staticmethod
-    def from_raw(raw: str, repr: EmojisListOptionRepresentation, guild: discord.Guild):
+    async def from_raw(raw: str, repr: EmojisListOptionRepresentation, guild: discord.Guild):
         emoji_ids: list[Union[str, int]] = json.loads(raw)
         if any(not isinstance(id, (int, str)) for id in emoji_ids):
             log.warning("[EmojisListConverter] Invalid emoji ids: %s", emoji_ids)
@@ -631,7 +644,7 @@ class EmojisListOption(OptionConverter):
 
 class ColorOption(OptionConverter):
     @staticmethod
-    def from_raw(raw: str, repr: ColorOptionRepresentation, guild: discord.Guild):
+    async def from_raw(raw: str, repr: ColorOptionRepresentation, guild: discord.Guild):
         try:
             color = int(raw, 16)
         except ValueError:
@@ -658,7 +671,7 @@ class ColorOption(OptionConverter):
 
 class LevelupChannelOption(OptionConverter):
     @staticmethod
-    def from_raw(raw: str, repr: LevelupChannelOptionRepresentation, guild: discord.guild):
+    async def from_raw(raw: str, repr: LevelupChannelOptionRepresentation, guild: discord.guild):
         if raw in {"any", "none", "dm"}:
             return raw
         channel_repr: TextChannelOptionRepresentation = repr | {

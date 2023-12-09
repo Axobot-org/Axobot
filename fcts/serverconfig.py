@@ -58,7 +58,7 @@ class ServerConfig(commands.Cog):
             value = options_list[option_name]["default"]
         else:
             raw_value = await self.get_raw_option(guild_id, option_name)
-            value = from_raw(option_name, raw_value, guild)
+            value = await from_raw(option_name, raw_value, guild)
         if option_name == "nicknames_history" and value is None:
             value = len(guild.members) < self.max_members_for_nicknames
         self.cache[(guild_id, option_name)] = value
@@ -119,7 +119,7 @@ class ServerConfig(commands.Cog):
                 if option_name not in config:
                     config[option_name] = option["default"]
                 else:
-                    config[option_name] = from_raw(option_name, config[option_name], guild)
+                    config[option_name] = await from_raw(option_name, config[option_name], guild)
         return config
 
     async def get_languages(self, ignored_guilds: list[int]):
