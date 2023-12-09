@@ -226,9 +226,9 @@ async def from_input(option_name: str, raw: str, guild: discord.Guild, ctx: MyCo
     converter = get_converter(option_name)
     return await converter.from_input(raw, options_list[option_name], guild, ctx)
 
-async def getch_channel(guild: discord.Guild, channel_id: int) -> Optional[discord.TextChannel]:
+async def getch_channel_or_thread(guild: discord.Guild, channel_id: int):
     "Get a channel from its id, or None if not found"
-    if channel := guild.get_channel(channel_id):
+    if channel := guild.get_channel_or_thread(channel_id):
         return channel
     try:
         return await guild.fetch_channel(channel_id)
@@ -467,7 +467,7 @@ class TextChannelOption(OptionConverter):
         except ValueError:
             log.warning("[TextChannelConverter] Invalid channel id: %s", raw)
             return None
-        channel = await getch_channel(guild, channel_id)
+        channel = await getch_channel_or_thread(guild, channel_id)
         if channel is None:
             log.warning("[TextChannelConverter] Channel not found: %s", raw)
             return None
@@ -506,7 +506,12 @@ class TextChannelsListOption(OptionConverter):
         if any(not isinstance(id, int) for id in channel_ids):
             log.warning("[TextChannelsListConverter] Invalid channel ids: %s", channel_ids)
             channel_ids = [id for id in channel_ids if isinstance(id, int)]
-        channels = [guild.get_channel_or_thread(id) for id in channel_ids]
+        channels: list[Union[discord.TextChannel, discord.Thread]] = []
+        for channel_id in channel_ids:
+            if channel := await getch_channel_or_thread(guild, channel_id):
+                channels.append(channel)
+            else:
+                log.warning("[TextChannelsListConverter] Channel not found: %s", channel_id)
         if None in channels:
             log.warning("[TextChannelsListConverter] Some channels not found: %s", channel_ids)
             channels = [channel for channel in channels if channel is not None]
@@ -554,7 +559,7 @@ class VoiceChannelOption(OptionConverter):
         except ValueError:
             log.warning("[VoiceChannelConverter] Invalid channel id: %s", raw)
             return None
-        channel = guild.get_channel(channel_id)
+        channel = await getch_channel_or_thread(guild, channel_id)
         if not isinstance(channel, discord.channel.VocalGuildChannel):
             log.warning("[VoiceChannelConverter] Channel not found: %s", raw)
             return None
@@ -591,7 +596,7 @@ class CategoryOption(OptionConverter):
         except ValueError:
             log.warning("[CategoryConverter] Invalid category id: %s", raw)
             return None
-        channel = guild.get_channel(channel_id)
+        channel = await getch_channel_or_thread(guild, channel_id)
         if not isinstance(channel, discord.CategoryChannel):
             log.warning("[CategoryConverter] Category not found: %s", raw)
             return None
