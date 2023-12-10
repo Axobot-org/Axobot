@@ -1349,11 +1349,11 @@ class Rss(commands.Cog):
         async with self.bot.db_query(query, (datetime.datetime.utcnow(),), returnrowcount=True) as query_results:
             self.bot.log.info("[rss] set last refresh for %s feeds", query_results)
 
-    async def send_rss_msg(self, obj: "RssMessage", channel: Union[discord.TextChannel, discord.Thread], send_stats):
+    async def send_rss_msg(self, obj: "RssMessage", channel: Union[discord.TextChannel, discord.Thread]):
         "Send a RSS message into its Discord channel, with the corresponding mentions"
         content = await obj.create_msg()
         if self.bot.zombie_mode:
-            return
+            return False
         allowed_mentions = discord.AllowedMentions(everyone=False, roles=[
             discord.Object(id=int(role_id)) for role_id in obj.feed.role_ids
         ])
@@ -1364,15 +1364,14 @@ class Rss(commands.Cog):
                 )
             else:
                 await channel.send(content, allowed_mentions=allowed_mentions, silent=obj.feed.silent_mention)
-            if send_stats:
-                if statscog := self.bot.get_cog("BotStats"):
-                    statscog.rss_stats['messages'] += 1
+            return True
         except discord.HTTPException as err:
             self.bot.log.info(f"[send_rss_msg] Cannot send message on channel {channel.id}: {err}")
             self.bot.dispatch("error", err, f"While sending feed {obj.feed.feed_id} on channel {channel.id}")
         except Exception as err:
             self.bot.log.info(f"[send_rss_msg] Cannot send message on channel {channel.id}: {err}")
             self.bot.dispatch("error", err, f"While sending feed {obj.feed.feed_id} on channel {channel.id}")
+        return False
 
     async def _get_channel_or_thread(self, guild: discord.Guild, channel_id: int
                                      ) -> Union[discord.TextChannel, discord.Thread, None]:
@@ -1385,7 +1384,7 @@ class Rss(commands.Cog):
         except discord.NotFound:
             return None
 
-    async def check_feed(self, feed: FeedObject, session: ClientSession = None, send_stats: bool=False):
+    async def check_feed(self, feed: FeedObject, session: ClientSession = None, should_send_stats: bool=False):
         """Check one rss feed and send messages if required
         Return True if the operation was a success"""
         try:
@@ -1440,6 +1439,7 @@ class Rss(commands.Cog):
                 self.cache[feed.link] = objs
                 latest_post_date = None
                 latest_entry_id = None
+                sent_messages = 0
                 for obj in objs[:self.max_messages]:
                     # if the guild was marked as inactive (ie. the bot wasn't there in the previous loop),
                     #  mark the feeds as completed but do not send any message, to avoid spamming channels
@@ -1457,11 +1457,14 @@ class Rss(commands.Cog):
                         obj.feed = feed
                         obj.fill_embed_data()
                         await obj.fill_mention(guild)
-                        await self.send_rss_msg(obj, chan, send_stats)
+                        if await self.send_rss_msg(obj, chan):
+                            sent_messages += 1
                     latest_post_date = obj.date
                     latest_entry_id = obj.entry_id
                 if isinstance(latest_post_date, datetime.datetime):
                     await self._update_feed_last_entry(feed.feed_id, latest_post_date, latest_entry_id)
+                if should_send_stats and sent_messages and (statscog := self.bot.get_cog("BotStats")):
+                    statscog.rss_stats['messages'] += sent_messages
                 return True
             else:
                 return True
@@ -1491,7 +1494,7 @@ class Rss(commands.Cog):
             if feed.type == 'mc':
                 result = await self.bot.get_cog('Minecraft').check_feed(feed, send_stats=guild_id is None)
             else:
-                result = await self.check_feed(feed, session, send_stats=guild_id is None)
+                result = await self.check_feed(feed, session, should_send_stats=guild_id is None)
         except Exception as err:
             self.bot.dispatch("error", err, f"RSS feed {feed.feed_id}")
             return False
