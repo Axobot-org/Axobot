@@ -100,7 +100,9 @@ class BotInfo(commands.Cog):
             else:
                 total_xp = ""
             # Commands within 24h
-            cmds_24h = await self.bot.get_cog("BotStats").get_stats("wsevent.CMD_USE", 60*24)
+            cmds_24h = await self.bot.get_cog("BotStats").get_sum_stats("wsevent.CMD_USE", 60*24)
+            # RSS messages within 24h
+            rss_msg_24h = await self.bot.get_cog("BotStats").get_sum_stats("rss.messages", 60*24)
             # number formatter
             lang = await self.bot._(ctx.guild.id,"_used_locale")
             async def n_format(nbr: Union[int, float, None]):
@@ -119,6 +121,7 @@ class BotInfo(commands.Cog):
                 ('cpu_usage', await n_format(cpu)),
                 ('api_ping', await n_format(latency)),
                 ('cmds_24h', await n_format(cmds_24h)),
+                ('rss_msg_24h', await n_format(rss_msg_24h)),
                 ('total_xp', await n_format(total_xp)+" ")]:
                 str_args = {f'v{i}': var[i] for i in range(len(var))} if isinstance(var, (tuple, list)) else {'v': var}
                 desc += await self.bot._(ctx.channel, "info.stats."+key, **str_args) + "\n"
