@@ -570,7 +570,7 @@ class BotStats(commands.Cog):
     async def on_sql_loop_error(self, error: Exception):
         self.bot.dispatch("error", error, "SQL stats loop has stopped <@279568324260528128>")
 
-    async def get_stats(self, variable: str, minutes: int) -> Union[int, float, str, None]:
+    async def get_sum_stats(self, variable: str, minutes: int) -> Union[int, float, str, None]:
         """Get the sum of a certain variable in the last X minutes"""
         cnx = self.bot.cnx_axobot
         cursor = cnx.cursor(dictionary=True)
@@ -584,10 +584,9 @@ class BotStats(commands.Cog):
         result = result[0]
         if result['type'] == 0:
             return int(result['value'])
-        elif result['type'] == 1:
+        if result['type'] == 1:
             return float(result['value'])
-        else:
-            return result['value']
+        return result['value']
 
     @tasks.loop(minutes=4)
     async def status_loop(self):

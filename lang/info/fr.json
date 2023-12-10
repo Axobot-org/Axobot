@@ -199,6 +199,7 @@
         "lib_version": "**Version de la bibliothèque `discord.py` :** %{v}",
         "python_version": "**Version de Python :** %{v}",
         "ram_usage": "**Charge sur la mémoire vive :** %{v} GB",
+        "rss_msg_24h": "**Messages RSS envoyés en 24h :** %{v}",
         "servers_count": "**Nombre de serveurs :** %{v}",
         "title": "**Statistiques du bot**",
         "total_xp": "**Nombre total d'xp gagné :** %{v}xp",
