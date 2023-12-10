@@ -623,16 +623,22 @@ Every information come from the website www.fr-minecraft.net"""
         return msg
 
     async def form_msg_server(self, obj, guild: discord.Guild, ip: str):
+        "Create the embed from the saved data"
         if isinstance(obj, str):
             if ip[1] is None:
                 ip = ip[0]
             else:
                 ip = f"{ip[0]}:{ip[1]}"
-            return discord.Embed(title=await self.bot._(guild, "minecraft.serv-title", ip=ip), color=discord.Colour(0x417505), description=obj, timestamp=datetime.datetime.utcfromtimestamp(time.time()))
+            return discord.Embed(
+                title=await self.bot._(guild, "minecraft.serv-title", ip=ip),
+                color=discord.Colour(0x417505),
+                description=obj,
+                timestamp=datetime.datetime.utcfromtimestamp(time.time())
+            )
         else:
             return await obj.create_msg(guild, self.bot._)
 
-    async def find_msg(self, channel: discord.TextChannel, ip: list, feed_id: str):
+    async def find_msg(self, channel: discord.TextChannel, _ip: list, feed_id: str):
         "Find the minecraft server message posted from that feed"
         if channel is None:
             return None
