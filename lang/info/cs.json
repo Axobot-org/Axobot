@@ -199,6 +199,7 @@
         "lib_version": "**Verze `discord.py` lib:** %{v}",
         "python_version": "**Python verze:** %{v}",
         "ram_usage": "**využití RAM:** %{v} GB",
+        "rss_msg_24h": "**Zprávy RSS odeslané za 24 h:** %{v}",
         "servers_count": "**Počet serverů:** %{v}",
         "title": "**Statistiky bota**",
         "total_xp": "**Celkem získaných xp:** %{v}xp",
