@@ -54,6 +54,11 @@
     "list": "*Zadejte počet kanálů pro úpravy*\n\n**Odkaz - Typ - Kanál - Zmínky**\n",
     "list-disabled": "(zakázáno)",
     "list-result": "{emoji} {link}\nDiscord kanál: {channel}\nZmínky: {roles}\nIdentifikátor: {id}\nPoslední příspěvek: {last_post}",
+    "list-result-filter": {
+        "none": "Žádný filtr",
+        "blacklist": "Filtr černé listiny",
+        "whitelist": "Whitelist filtr"
+    },
     "list-title": {
         "one": "Seznam RSS kanálů ze serveru %{server} (1 kanál)",
         "many": "Seznam RSS kanálů ze serveru %{server} (%{count} kanálů)"

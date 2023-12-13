@@ -194,7 +194,7 @@
         "bot_version": "**Baut vershun:** %{v}",
         "cmds_24h": "**How much people uze me:** %{v}",
         "codes_lines": "**Nbr ov code lin:** %{v}",
-        "cpu_usage": "**Computer pressure:** %{v} %",
+        "cpu_usage": "**Computer pressure:** %{v} %%",
         "languages": "**Uzd languages:** %{v}",
         "lib_version": "**Verson of teh `discord.py` thingy:** %{v}",
         "python_version": "**Python versoon :** %{v}",
