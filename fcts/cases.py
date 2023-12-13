@@ -15,6 +15,8 @@ from libs.paginator import Paginator
 
 importlib.reload(args)
 
+CaseIDType = app_commands.Range[int, 1]
+
 
 async def can_edit_case(ctx: MyContext):
     "Check if the context user can edit or delete a moderation case"
@@ -155,8 +157,11 @@ class Cases(commands.Cog):
             return False
         if not isinstance(case, Case):
             raise ValueError
-        query = f"INSERT INTO `{self.table}` (`guild`, `user`, `type`, `mod`, `reason`,`duration`) VALUES (%(g)s, %(u)s, %(t)s, %(m)s, %(r)s, %(d)s)"
-        query_args = { 'g': case.guild_id, 'u': case.user_id, 't': case.type, 'm': case.mod_id, 'r': case.reason, 'd': case.duration }
+        query = f"INSERT INTO `{self.table}` (`guild`, `user`, `type`, `mod`, `reason`,`duration`) \
+VALUES (%(g)s, %(u)s, %(t)s, %(m)s, %(r)s, %(d)s)"
+        query_args = {
+            'g': case.guild_id, 'u': case.user_id, 't': case.type, 'm': case.mod_id, 'r': case.reason, 'd': case.duration
+            }
         async with self.bot.db_query(query, query_args) as last_row_id:
             case.id = last_row_id
         return True
@@ -290,7 +295,7 @@ class Cases(commands.Cog):
 
     @case_main.command(name="edit-reason", aliases=["edit"])
     @commands.guild_only()
-    async def reason(self, ctx: MyContext, case_id: int, *, new_reason: str):
+    async def reason(self, ctx: MyContext, case_id: CaseIDType, *, new_reason: app_commands.Range[str, 1, 255]):
         """Edit the reason of a case
 
         ..Example cases reason 95 Was too dumb
@@ -299,7 +304,7 @@ class Cases(commands.Cog):
         if not self.bot.database_online:
             return await ctx.send(await self.bot._(ctx.guild.id,'cases.no_database'))
         old_case = await self.db_get_case_from_id(ctx.guild.id, case_id)
-        if old_case is None:
+        if old_case is None or old_case.guild_id != ctx.guild.id:
             await ctx.send(await self.bot._(ctx.guild.id,"cases.not-found"))
             return
         new_case = old_case.copy()
@@ -310,7 +315,7 @@ class Cases(commands.Cog):
 
     @case_main.command(name="search")
     @commands.guild_only()
-    async def search_case(self, ctx: MyContext, case_id: int):
+    async def search_case(self, ctx: MyContext, case_id: CaseIDType):
         """Search for a specific case in your guild
 
         ..Example cases search 69
@@ -319,7 +324,7 @@ class Cases(commands.Cog):
         if not self.bot.database_online:
             return await ctx.send(await self.bot._(ctx.guild.id, 'cases.no_database'))
         case = await self.db_get_case_from_id(ctx.guild.id, case_id)
-        if case is None:
+        if case is None or case.guild_id != ctx.guild.id:
             await ctx.send(await self.bot._(ctx.guild.id, "cases.not-found"))
             return
         if not ctx.can_send_embed:
@@ -368,7 +373,7 @@ class Cases(commands.Cog):
 
     @case_main.command(name="remove")
     @commands.guild_only()
-    async def remove(self, ctx: MyContext, case_id: int):
+    async def remove(self, ctx: MyContext, case_id: CaseIDType):
         """Delete a case forever
         Warning: "Forever", it's very long. And no backups are done
 
@@ -378,7 +383,7 @@ class Cases(commands.Cog):
         if not self.bot.database_online:
             return await ctx.send(await self.bot._(ctx.guild.id,'cases.no_database'))
         case = await self.db_get_case_from_id(ctx.guild.id, case_id)
-        if case is None:
+        if case is None or case.guild_id != ctx.guild.id:
             await ctx.send(await self.bot._(ctx.guild.id,"cases.not-found"))
             return
         await self.db_delete_case(case.id)
