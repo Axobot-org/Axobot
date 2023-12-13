@@ -172,7 +172,7 @@ async def _generate_command_category_field(cog: "HelpCog", ctx: MyContext, comma
     emoji = cog.commands_data[category]['emoji']
     category = emoji + "  " + (await cog.bot._(ctx.channel, f"help.categories.{category}")).capitalize()
     return {
-        "name": await ctx.bot._(ctx.channel, "misc.category"),
+        "name": (await ctx.bot._(ctx.channel, "misc.category")).capitalize(),
         "value": category,
         "inline": False
     }
