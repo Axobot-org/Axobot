@@ -181,7 +181,8 @@ class ServerLog(str):
 class RawPermissionValue(int):
     "Represents a raw permission value, as an integer"
     @classmethod
-    async def convert(self, _ctx: "MyContext", argument: str):
+    async def convert(cls, _ctx: "MyContext", argument: str):
+        "Do the conversion"
         if re.match(r'0b[0,1]+', argument):
             return int(argument[2:], 2)
         if not argument.isnumeric():
@@ -203,3 +204,28 @@ class ISBN(int):
         if isbnlib.notisbn(argument):
             raise arguments_errors.InvalidISBNError(argument)
         return isbnlib.get_canonical_isbn(argument)
+
+
+class GuildTransformer(discord.app_commands.Transformer):
+    "Convert a string argument in an interaction usage to a valid discord Guild"
+
+    async def transform(self, interaction, value, /) -> discord.Guild:
+        "Do the conversion"
+        match = commands.IDConverter._get_id_match(value) # pylint: disable=protected-access
+        result = None
+
+        if match is not None:
+            guild_id = int(match.group(1))
+            result = interaction.client.get_guild(guild_id)
+
+        if result is None:
+            result = discord.utils.get(interaction.client.guilds, name=value)
+
+            if result is None:
+                raise commands.GuildNotFound(value)
+        return result
+
+    async def autocomplete(self, interaction, value, /):
+        raise NotImplementedError()
+
+GuildArgument = discord.app_commands.Transform[discord.Guild, GuildTransformer]

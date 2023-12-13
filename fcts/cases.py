@@ -4,6 +4,7 @@ from math import ceil
 from typing import Any, Optional
 
 import discord
+from discord import app_commands
 from discord.ext import commands
 
 from libs.arguments import args
@@ -170,13 +171,14 @@ class Cases(commands.Cog):
         return True
 
 
-    @commands.group(name="cases", aliases=['case', 'infractions'])
+    @commands.hybrid_group(name="cases")
     @commands.guild_only()
     @commands.cooldown(5, 15, commands.BucketType.user)
     @commands.check(can_edit_case)
+    @app_commands.default_permissions(moderate_members=True)
     @commands.check(database_connected)
     async def case_main(self, ctx: MyContext):
-        """Do anything with any user cases
+        """Manage your user moderation cases
 
         ..Doc moderator.html#handling-cases"""
         if ctx.subcommand_passed is None:
@@ -185,7 +187,7 @@ class Cases(commands.Cog):
     @case_main.command(name="list")
     @commands.guild_only()
     @commands.cooldown(5, 30, commands.BucketType.user)
-    async def see_case(self, ctx: MyContext, *, user:args.AnyUser):
+    async def see_case(self, ctx: MyContext, *, user: discord.User):
         """Get every case of a user
         This user can have left the server
 
@@ -196,10 +198,10 @@ class Cases(commands.Cog):
             return await ctx.send(await self.bot._(ctx.guild.id,'cases.no_database'))
         await self.see_case_main(ctx, ctx.guild.id, user)
 
-    @case_main.command(name="glist")
+    @case_main.command(name="glist", with_app_command=False)
     @commands.guild_only()
     @commands.check(is_support_staff)
-    async def see_case_2(self, ctx: MyContext, guild: Optional[discord.Guild], *, user: discord.User):
+    async def see_case_2(self, ctx: MyContext, guild: Optional[args.GuildArgument], *, user: discord.User):
         """Get every case of a user on a specific guild or on every guilds
         This user can have left the server
 
@@ -212,6 +214,8 @@ class Cases(commands.Cog):
 
     async def see_case_main(self, ctx: MyContext, guild_id: Optional[int], user: discord.User):
         "Main method to show cases from a given user"
+        if ctx.interaction:
+            await ctx.interaction.response.defer()
         if guild_id is None:
             syntax: str = await self.bot._(ctx.guild, 'cases.list-1')
             cases = await self.db_get_all_user_cases(user.id)
@@ -362,8 +366,7 @@ class Cases(commands.Cog):
         emb.set_author(name=user, icon_url=user.display_avatar)
         await ctx.send(embed=emb)
 
-
-    @case_main.command(name="remove", aliases=["delete"])
+    @case_main.command(name="remove")
     @commands.guild_only()
     async def remove(self, ctx: MyContext, case_id: int):
         """Delete a case forever
