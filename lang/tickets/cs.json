@@ -82,6 +82,7 @@
             "many": "Bylo odstraněno %{count} témat"
         },
         "list": "Témata vašeho serveru:",
+        "no-server-topic": "Zatím pro tento server nebylo vytvořeno žádné téma!",
         "other-already-exists": "Ve výchozím nastavení je již navrženo „jiné“ téma, není třeba přidávat další :innocent:",
         "too-long": "Název tématu nesmí překročit 100 znaků",
         "too-many": "Jejda, dosáhl jsi limitu povolených témat! Kvůli Discordu nemůžeš mít více než %{max} témat zároveň."

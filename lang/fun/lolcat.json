@@ -14,8 +14,8 @@
         "counting": "Countng in progrez...",
         "forbidden": "U cannot use tish cmd at a channel where U do not have access to msg history",
         "missing-perms": "Oops, Im unable to reed dis channel ystory. Pls check mah perms...",
-        "result-user": "On teh last %{limit} msgs, %{user} had postd %{x} things (%{p}%)",
-        "result-you": "On teh last %{limit} posts, U has postd %{x} msgs (%{p}%)",
+        "result-user": "On teh last %{limit} msgs, %{user} had postd %{x} things (%{p}%%)",
+        "result-you": "On teh last %{limit} posts, U has postd %{x} msgs (%{p}%%)",
         "too-much": "You wanna blow up Discord! %{e} For obvious performance reasons, I'm gonna impose limit ov %{l} msgz."
     },
     "discordjobs-count": "%{c} available house",
