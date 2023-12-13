@@ -13,6 +13,10 @@
         "blurple darkfy": "darkfy",
         "blurple help": "help",
         "blurple lightfy": "lightfy",
+        "cases edit-reason": "edit-reason",
+        "cases list": "list",
+        "cases remove": "remove",
+        "cases search": "search",
         "clear": "clear",
         "config list": "list",
         "config reset": "reset",
@@ -100,6 +104,7 @@
     "group_name": {
         "antiscam": "antiscam",
         "blurple": "blurple",
+        "cases": "cases",
         "config": "config",
         "emoji": "emoji",
         "event": "event",
@@ -115,9 +120,14 @@
         "twitch": "twitch"
     },
     "command_short_description": {
+        "cases edit-reason": "Edit the reason of a moderation case",
+        "cases list": "List all the moderation cases of a user",
+        "cases remove": "Permanently delete a moderation case",
+        "cases search": "Find the details of a moderation case"
     },
     "group_description": {
         "antiscam": "Everything related to the antiscam feature",
+        "cases": "Manage your user moderation cases",
         "config": "Configure the bot for your server",
         "emoji": "Manage your emojis",
         "event": "Participate in bot special events",
@@ -141,6 +151,19 @@
         },
         "slowmode": {
             "seconds": "seconds"
+        },
+        "cases edit-reason": {
+            "case_id": "case-id",
+            "new_reason": "new-reason"
+        },
+        "cases list": {
+            "user": "user"
+        },
+        "cases remove": {
+            "case_id": "case-id"
+        },
+        "cases search": {
+            "case_id": "case-id"
         },
         "clear": {
             "number": "number",

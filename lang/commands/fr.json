@@ -13,6 +13,10 @@
         "blurple darkfy": "darkfy",
         "blurple help": "aide",
         "blurple lightfy": "lightfy",
+        "cases edit-reason": "modifier-raison",
+        "cases list": "liste",
+        "cases remove": "supprimer",
+        "cases search": "rechercher",
         "clear": "effacer-chat",
         "config list": "liste",
         "config reset": "reset",
@@ -95,6 +99,7 @@
     "group_name": {
         "antiscam": "anti-arnaque",
         "blurple": "blurple",
+        "cases": "casier",
         "config": "config",
         "emoji": "émoji",
         "event": "événement",
@@ -110,11 +115,16 @@
         "twitch": "twitch"
     },
     "command_short_description": {
+        "cases edit-reason": "Modifie la raison d'un casier de modération",
+        "cases list": "Liste tous les casiers de modération d'un utilisateur",
+        "cases remove": "Supprime un casier de modération",
+        "cases search": "Affiche les détails d'un casier de modération",
         "clear": "Supprime des messages du salon",
         "slowmode": "Ralenti le spam du salon en activant le mode lent"
     },
     "group_description": {
         "antiscam": "Tout ce qui concerne la fonction d'anti-arnaque",
+        "cases": "Gère les casiers de modération de tes membres",
         "config": "Configure le bot pour ton serveur",
         "emoji": "Gère les émojis de votre serveur",
         "event": "Participe aux événements spéciaux du bot",
@@ -138,6 +148,19 @@
         },
         "slowmode": {
             "seconds": "secondes"
+        },
+        "cases edit-reason": {
+            "case_id": "id-du-casier",
+            "new_reason": "nouvelle-raison"
+        },
+        "cases list": {
+            "user": "utilisateur"
+        },
+        "cases remove": {
+            "case_id": "id-du-casier"
+        },
+        "cases search": {
+            "case_id": "id-du-casier"
         },
         "clear": {
             "number": "nombre",

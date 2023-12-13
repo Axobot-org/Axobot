@@ -194,7 +194,6 @@ VALUES (%(g)s, %(u)s, %(t)s, %(m)s, %(r)s, %(d)s)"
     @commands.cooldown(5, 30, commands.BucketType.user)
     async def see_case(self, ctx: MyContext, *, user: discord.User):
         """Get every case of a user
-        This user can have left the server
 
         ..Example cases list @someone
 
