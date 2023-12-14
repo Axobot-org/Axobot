@@ -13,6 +13,10 @@
         "blurple darkfy": "tmavý",
         "blurple help": "pomoc",
         "blurple lightfy": "světlý",
+        "cases edit-reason": "editovat-důvod",
+        "cases list": "seznam",
+        "cases remove": "odstranit",
+        "cases search": "vyhledat",
         "clear": "vyčistit",
         "config list": "seznam",
         "config reset": "obnovit",
@@ -100,6 +104,7 @@
     "group_name": {
         "antiscam": "proti-podvodu",
         "blurple": "rozostřit",
+        "cases": "případy",
         "config": "nastavení",
         "emoji": "emoji",
         "event": "událost",
@@ -114,9 +119,15 @@
         "tickets topic": "příspěvek",
         "twitch": "twitch"
     },
-    "command_short_description": {},
+    "command_short_description": {
+        "cases edit-reason": "Upravit důvod případu moderace",
+        "cases list": "Seznam všech případů moderování uživatele",
+        "cases remove": "Trvale smazat případ moderace",
+        "cases search": "Najít podrobnosti moderování případu"
+    },
     "group_description": {
         "antiscam": "Vše, co souvisí s funkcí antiscam",
+        "cases": "Spravovat moderované případy uživatele",
         "config": "Konfigurace bota pro váš server",
         "emoji": "Spravujte své emoji",
         "event": "Zůčastni se speciálních událostí",
@@ -140,6 +151,19 @@
         },
         "slowmode": {
             "seconds": "sekundy"
+        },
+        "cases edit-reason": {
+            "case_id": "případ-id",
+            "new_reason": "nový-důvod"
+        },
+        "cases list": {
+            "user": "uživatel"
+        },
+        "cases remove": {
+            "case_id": "případ-id"
+        },
+        "cases search": {
+            "case_id": "případ-id"
         },
         "clear": {
             "number": "číslo",
