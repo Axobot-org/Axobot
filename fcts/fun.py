@@ -733,14 +733,16 @@ You can specify a verification limit by adding a number in argument (up to 1.000
             return
         if self.bot.zombie_mode:
             return
-        for member in msg.mentions:
-            if await self.user_is_afk(member) and member!=msg.author:
-                if member.id not in self.afk_guys or len(self.afk_guys[member.id]) == 0:
-                    await msg.channel.send(await self.bot._(msg.guild.id,"fun.afk.afk-user-noreason"))
-                else:
-                    tr = await self.bot._(msg.guild.id,"fun.afk.afk-user-reason",reason=self.afk_guys[member.id])
-                    reason = await self.utilities.clear_msg(tr, ctx=ctx)
-                    await msg.channel.send(reason)
+        # send a message if someone is afk and the bot can speak
+        if msg.channel.permissions_for(msg.guild.me).send_messages:
+            for member in msg.mentions:
+                if await self.user_is_afk(member) and member != msg.author:
+                    if member.id not in self.afk_guys or len(self.afk_guys[member.id]) == 0:
+                        await msg.channel.send(await self.bot._(msg.guild.id,"fun.afk.afk-user-noreason"))
+                    else:
+                        tr = await self.bot._(msg.guild.id,"fun.afk.afk-user-reason",reason=self.afk_guys[member.id])
+                        reason = await self.utilities.clear_msg(tr, ctx=ctx)
+                        await msg.channel.send(reason)
         # auto unafk if the author was afk and has enabled it
         if isinstance(ctx.author, discord.Member) and not await checks.is_a_cmd(msg, self.bot):
             if (ctx.author.nick and ctx.author.nick.endswith(' [AFK]')) or ctx.author.id in self.afk_guys:
