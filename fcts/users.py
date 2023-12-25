@@ -221,6 +221,8 @@ class Users(commands.Cog):
             available_cards = ', '.join(await ctx.bot.get_cog('Utilities').allowed_card_styles(ctx.author))
             if ctx.view.buffer.split(' ')[2] == 'list':
                 try:
+                    # send the rank card notification if needed
+                    await self.bot.get_cog("BotEvents").check_and_send_card_unlocked_notif(ctx.channel, ctx.author)
                     await self.bot.get_cog("BotEvents").reload_event_rankcard(ctx.author.id)
                 except Exception as err:
                     self.bot.dispatch("error", err)
