@@ -21,13 +21,13 @@ sys.path.insert(0, os.path.abspath('.'))
 # -- Project information -----------------------------------------------------
 
 project = 'Axobot'
-copyright = '2019 - 2023'
+copyright = '2019 - 2024'
 author = 'ZRunner'
 
 # The short X.Y version
 version = '4.5'
 # The full version, including alpha/beta/rc tags
-release = '4.5.1'
+release = '4.5.2'
 
 _documentation_name = "Axobot Documentation"
 
