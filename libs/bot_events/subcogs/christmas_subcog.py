@@ -189,6 +189,8 @@ class ChristmasSubcog(AbstractSubcog):
         today = await self.today()
         if today.month != 12:
             return []
+        if today.day >= 25:
+            today = dt.date(today.year, 12, 24)
         gifts_ids = []
         # make sure user can't get more than 3 gifts in the past
         min_past_day = max(today.day - 3, last_collect_day.day if last_collect_day.month == 12 else 0)
