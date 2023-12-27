@@ -712,7 +712,7 @@ class LevelupChannelOption(OptionConverter):
             "allow_announcement_channels": True,
             "allow_non_nsfw_channels": True,
         }
-        return TextChannelOption.from_raw(raw, channel_repr, guild)
+        return await TextChannelOption.from_raw(raw, channel_repr, guild)
 
     @staticmethod
     def to_raw(value: Union[str, discord.TextChannel]):
