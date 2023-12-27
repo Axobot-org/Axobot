@@ -90,7 +90,11 @@ class ChristmasSubcog(AbstractSubcog):
         if self.current_event_data["icon"]:
             embed.set_image(url=self.current_event_data["icon"])
         # get the destination channel
-        if (channel := self.bot.get_channel(payload.channel_id)) and channel.permissions_for(channel.guild.me).send_messages:
+        if (
+            (channel := self.bot.get_channel(payload.channel_id))
+            and channel.permissions_for(channel.guild.me).send_messages
+            and channel.permissions_for(channel.guild.me).embed_links
+        ):
             await channel.send(embed=embed, delete_after=12)
             # send the rank card notification if needed
             await self.bot.get_cog("BotEvents").check_and_send_card_unlocked_notif(channel, payload.user_id)
