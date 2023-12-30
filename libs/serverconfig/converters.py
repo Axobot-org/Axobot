@@ -9,6 +9,7 @@ from discord.ext import commands
 from libs.arguments.args import UnicodeEmoji
 from libs.bot_classes import Axobot, MyContext
 from libs.emojis_manager import EmojisManager
+from libs.getch_methods import getch_channel_or_thread
 from libs.serverconfig.options_list import options as options_list
 
 log = logging.getLogger("runner")
@@ -225,15 +226,6 @@ async def from_input(option_name: str, raw: str, guild: discord.Guild, ctx: MyCo
         return None
     converter = get_converter(option_name)
     return await converter.from_input(raw, options_list[option_name], guild, ctx)
-
-async def getch_channel_or_thread(guild: discord.Guild, channel_id: int):
-    "Get a channel from its id, or None if not found"
-    if channel := guild.get_channel_or_thread(channel_id):
-        return channel
-    try:
-        return await guild.fetch_channel(channel_id)
-    except discord.NotFound:
-        return None
 
 class IntOption(OptionConverter):
     "Option converter for integer values"
