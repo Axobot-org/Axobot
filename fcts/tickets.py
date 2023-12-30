@@ -6,10 +6,10 @@ from discord import app_commands
 from discord.ext import commands
 from mysql.connector.errors import IntegrityError
 
+from libs.arguments import PartialorUnicodeEmoji
 from libs.bot_classes import Axobot, MyContext
 from libs.checks import checks
 from libs.enums import ServerWarningType
-from libs.tickets.converters import EmojiConverterType
 from libs.tickets.types import DBTopicRow
 from libs.tickets.views import (AskTitleModal, AskTopicSelect, SelectView,
                                 SendHintText, TicketCreationEvent)
@@ -535,7 +535,7 @@ class Tickets(commands.Cog):
     @commands.cooldown(3, 45, commands.BucketType.guild)
     @commands.guild_only()
     @commands.check(checks.has_manage_channels)
-    async def topic_add(self, ctx: MyContext, emote: Optional[EmojiConverterType]=None, *, name: str):
+    async def topic_add(self, ctx: MyContext, emote: Optional[PartialorUnicodeEmoji]=None, *, name: str):
         """Create a new ticket topic
         A topic name is limited to 100 characters
         Only Discord emojis are accepted for now
@@ -599,7 +599,7 @@ class Tickets(commands.Cog):
     @commands.guild_only()
     @commands.check(checks.has_manage_channels)
     async def topic_set_emote(self, ctx: MyContext, topic_id: Optional[int],
-                              emote: Optional[EmojiConverterType]=None):
+                              emote: Optional[PartialorUnicodeEmoji]=None):
         """Edit a topic emoji
         Type "None" to set no emoji for this topic
 

@@ -1,6 +1,6 @@
 import datetime
 import re
-import typing
+from typing import TYPE_CHECKING, Annotated, Optional, Union
 
 import discord
 from dateutil.relativedelta import relativedelta
@@ -8,7 +8,7 @@ from discord.ext import commands
 
 from libs.arguments import errors as arguments_errors
 
-if typing.TYPE_CHECKING:
+if TYPE_CHECKING:
     from libs.bot_classes import MyContext
 
 
@@ -16,7 +16,7 @@ class Duration(float):
     "Argument converter for durations input"
 
     @classmethod
-    async def convert(cls, _ctx: typing.Optional["MyContext"], argument: str) -> int:
+    async def convert(cls, _ctx: Optional["MyContext"], argument: str) -> int:
         "Converts a string to a duration in seconds."
         duration: int = 0
         found = False
@@ -87,7 +87,7 @@ class CardStyle(str):
 class BotOrGuildInvite(commands.Converter):
     """Converts a string to a bot invite or a guild invite"""
 
-    async def convert(self, _ctx: "MyContext", argument: str) -> typing.Union[str, int]:
+    async def convert(self, _ctx: "MyContext", argument: str) -> Union[str, int]:
         answer = None
         r_invite = re.search(
             r'^https://discord(?:app)?\.com/(?:api/)?oauth2/authorize\?(?:client_id=(\d{17,19})|scope=([a-z\.\+]+?)|(?:permissions|guild_id|disable_guild_select|redirect_uri)=[^&\s]+)(?:&(?:client_id=(\d{17,19})|scope=([a-z\.\+]+?)|(?:permissions|guild_id|disable_guild_select|redirect_uri)=[^&\s]+))*$',
@@ -128,8 +128,9 @@ class URL:
             raise arguments_errors.InvalidUrlError(argument)
         return cls(r)
 
-class UnicodeEmoji(str):
+class UnicodeEmojiConverter(str):
     "Represents any Unicode emoji"
+
     @classmethod
     async def convert(cls, ctx: "MyContext", argument: str):
         "Check if a string is a unicod emoji, else raise BadArgument"
@@ -137,6 +138,32 @@ class UnicodeEmoji(str):
         if all(char in unicodes for char in argument):
             return argument
         raise arguments_errors.InvalidUnicodeEmojiError(argument)
+
+class PartialOrUnicodeEmojiConverter:
+    "Represents any unicode or Discord emoji"
+
+    @classmethod
+    async def convert(cls, ctx: "MyContext", argument: str):
+        "Convert an argument into a PartialEmoji or Unicode emoji"
+        try:
+            return await commands.PartialEmojiConverter().convert(ctx, argument)
+        except commands.errors.BadArgument:
+            return await UnicodeEmojiConverter().convert(ctx, argument)
+
+PartialorUnicodeEmoji = Annotated[Union[discord.PartialEmoji, str], PartialOrUnicodeEmojiConverter]
+
+class DiscordOrUnicodeEmojiConverter:
+    "Represents any unicode or Discord emoji"
+
+    @classmethod
+    async def convert(cls, ctx: "MyContext", argument: str):
+        "Convert an argument into a PartialEmoji or Unicode emoji"
+        try:
+            return await commands.EmojiConverter().convert(ctx, argument)
+        except commands.errors.BadArgument:
+            return await UnicodeEmojiConverter().convert(ctx, argument)
+
+DiscordOrUnicodeEmoji = Annotated[Union[discord.Emoji, str], DiscordOrUnicodeEmojiConverter]
 
 
 class arguments(commands.Converter):
