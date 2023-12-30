@@ -260,6 +260,23 @@
             "url": "url",
             "type": "type-de-flux"
         },
+        "roles-react add": {
+            "emoji": "émoji",
+            "role": "rôle",
+            "description": "description"
+        },
+        "roles-react remove": {
+            "emoji": "émoji"
+        },
+        "roles-react set-description": {
+            "emoji": "émoji",
+            "description": "description"
+        },
+        "roles-react update": {
+            "embed": "embed",
+            "change_description": "modifier-description",
+            "emojis": "émojis"
+        },
         "rss add": {
             "link": "lien"
         },

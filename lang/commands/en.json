@@ -263,6 +263,23 @@
             "url": "url",
             "type": "feed-type"
         },
+        "roles-react add": {
+            "emoji": "emoji",
+            "role": "role",
+            "description": "description"
+        },
+        "roles-react remove": {
+            "emoji": "emoji"
+        },
+        "roles-react set-description": {
+            "emoji": "emoji",
+            "description": "description"
+        },
+        "roles-react update": {
+            "embed": "embed",
+            "change_description": "change-description",
+            "emojis": "emojis"
+        },
         "rss add": {
             "link": "link"
         },
