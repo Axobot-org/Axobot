@@ -61,6 +61,7 @@
         "roles-react add": "add",
         "roles-react get": "get",
         "roles-react list": "list",
+        "roles-react set-description": "set-description",
         "roles-react remove": "remove",
         "roles-react update": "update",
         "roles-rewards add": "add",

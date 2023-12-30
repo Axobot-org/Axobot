@@ -21,6 +21,8 @@ class RoleReactionRow(TypedDict):
     description: str
     added_at: datetime.datetime
 
+RoleDescription = app_commands.Range[str, 1, 150]
+
 
 class RolesReact(commands.Cog):
     "Allow members to get new roles by clicking on reactions"
@@ -60,13 +62,13 @@ class RolesReact(commands.Cog):
             return None
         if len(msg.embeds) == 0 or msg.embeds[0].footer.text not in self.footer_texts:
             return None
-        temp = await self.db_get_roles(
+        temp = await self.db_get_role_from_emoji(
             payload.guild_id,
             payload.emoji.id if payload.emoji.is_custom_emoji() else payload.emoji.name
         )
-        if len(temp) == 0:
+        if not temp:
             return None
-        role = self.bot.get_guild(payload.guild_id).get_role(temp[0]["role"])
+        role = self.bot.get_guild(payload.guild_id).get_role(temp["role"])
         return msg, role
 
     @commands.Cog.listener('on_raw_reaction_add')
@@ -111,25 +113,34 @@ class RolesReact(commands.Cog):
             pass
         return True
 
-    async def db_get_roles(self, guild_id: int, emoji: Optional[str] = None):
+    async def db_get_roles(self, guild_id: int):
         """List role reaction in the database"""
+        query = f"SELECT * FROM `{self.table}` WHERE guild=%s ORDER BY added_at;"
+        rr_list: list[RoleReactionRow] = []
+        async with self.bot.db_query(query, (guild_id,)) as query_results:
+            for row in query_results:
+                rr_list.append(row)
+        return rr_list
+
+    async def db_get_role_from_emoji(self, guild_id: int, emoji: Union[discord.Emoji, int]) -> Optional[RoleReactionRow]:
+        """Get a role reaction from the database corresponding to an emoji"""
         if isinstance(emoji, discord.Emoji):
             emoji = emoji.id
-        if emoji is None:
-            query = f"SELECT * FROM `{self.table}` WHERE guild=%(g)s ORDER BY added_at;"
-        else:
-            query = f"SELECT * FROM `{self.table}` WHERE guild=%(g)s AND emoji=%(e)s ORDER BY added_at;"
-        rr_list: list[RoleReactionRow] = []
-        async with self.bot.db_query(query, {"g": guild_id, "e": emoji}) as query_results:
-            for row in query_results:
-                if emoji is None or row['emoji'] == str(emoji):
-                    rr_list.append(row)
-        return rr_list
+        query = f"SELECT * FROM `{self.table}` WHERE guild=%(g)s AND emoji=%(e)s ORDER BY added_at;"
+        async with self.bot.db_query(query, {"g": guild_id, "e": emoji}, fetchone=True) as query_results:
+            return query_results
 
     async def db_remove_role(self, rr_id: int):
         """Remove a role reaction from the database"""
         query = f"DELETE FROM `{self.table}` WHERE `ID`=%s;"
         async with self.bot.db_query(query, (rr_id,)):
+            pass
+        return True
+
+    async def db_edit_description(self, rr_id: int, new_description: str):
+        """Edit the description of a role reaction"""
+        query = f"UPDATE `{self.table}` SET `description`=%s WHERE `ID`=%s;"
+        async with self.bot.db_query(query, (new_description, rr_id)):
             pass
         return True
 
@@ -184,7 +195,7 @@ class RolesReact(commands.Cog):
     @commands.check(checks.has_manage_guild)
     @commands.check(checks.database_connected)
     async def rr_add(self, ctx: MyContext, emoji: DiscordOrUnicodeEmoji, role: discord.Role, *,
-                     description: str = ''):
+                     description: RoleDescription = ''):
         """Add a role reaction
         This role will be given when a membre click on a specific reaction
         Your description can only be a maximum of 150 characters
@@ -198,13 +209,13 @@ class RolesReact(commands.Cog):
             if role.name == '@everyone':
                 raise commands.BadArgument(f'Role "{role.name}" not found')
             await ctx.defer()
-            l = await self.db_get_roles(ctx.guild.id, emoji)
-            if len(l) > 0:
+            if await self.db_get_role_from_emoji(ctx.guild.id, emoji):
                 return await ctx.send(await self.bot._(ctx.guild.id, "roles_react.already-1-rr"))
             max_rr: int = await self.bot.get_config(ctx.guild.id, 'roles_react_max_number')
-            if len(l) >= max_rr:
+            existing_list = await self.db_get_roles(ctx.guild.id)
+            if len(existing_list) >= max_rr:
                 return await ctx.send(await self.bot._(ctx.guild.id, "roles_react.too-many-rr", l=max_rr))
-            await self.db_add_role(ctx.guild.id, role.id, emoji, description[:150])
+            await self.db_add_role(ctx.guild.id, role.id, emoji, description)
         except Exception as err:
             self.bot.dispatch("command_error", ctx, err)
         else:
@@ -227,23 +238,18 @@ class RolesReact(commands.Cog):
             r = re.search(r'<a?:[^:]+:(\d+)>', emoji)
             if r is not None:
                 emoji = r.group(1)
-            l = await self.db_get_roles(ctx.guild.id, emoji)
-            if len(l) == 0:
+            role_react = await self.db_get_role_from_emoji(ctx.guild.id, emoji)
+            if role_react is None:
                 return await ctx.send(await self.bot._(ctx.guild.id, "roles_react.no-rr"))
-            await self.db_remove_role(l[0]['ID'])
+            await self.db_remove_role(role_react['ID'])
         except Exception as err:
             self.bot.dispatch("command_error", ctx, err)
             return
-        role = ctx.guild.get_role(l[0]['role'])
+        role = ctx.guild.get_role(role_react['role'])
         if role is None:
             await ctx.send(await self.bot._(ctx.guild.id, "roles_react.rr-removed-2", e=old_emoji))
         else:
             await ctx.send(await self.bot._(ctx.guild.id, "roles_react.rr-removed", r=role, e=old_emoji))
-        if len(l) < 2:
-            try:
-                self.guilds_which_have_roles.remove(ctx.guild.id)
-            except KeyError:
-                pass
 
     async def create_list_embed(self, rr_list: list[RoleReactionRow], guild: discord.Guild):
         """Create a text with the roles list"""
@@ -317,6 +323,38 @@ It will only display the whole message with reactions. Still very cool tho
                     continue
                 self.bot.dispatch("command_error", ctx, err)
                 break
+
+    @rr_main.command(name="set-description")
+    @commands.check(checks.database_connected)
+    @commands.check(checks.has_manage_guild)
+    async def rr_set_description(self, ctx: MyContext, emoji: DiscordOrUnicodeEmoji, *, description: RoleDescription):
+        """Set the description of a role reaction
+        Use the 'none' keyword to remove the description
+
+        ..Example roles_react set-description :uwu: lolcats
+
+        ..Example roles_react set-description :bell: none
+
+        ..Doc roles-reactions.html#edit-a-reaction-description"""
+        await ctx.defer()
+        if description.lower() == "none":
+            description = ""
+        try:
+            role_react = await self.db_get_role_from_emoji(ctx.guild.id, emoji)
+            if role_react is None:
+                return await ctx.send(await self.bot._(ctx.guild.id, "roles_react.no-rr"))
+            await self.db_edit_description(role_react['ID'], description[:150])
+        except Exception as err:
+            self.bot.dispatch("command_error", ctx, err)
+        else:
+            if role := ctx.guild.get_role(role_react['role']):
+                role_mention = f"<@&{role.id}>"
+            else:
+                role_mention = str(role_react['role'])
+            await ctx.send(await self.bot._(
+                ctx.guild.id,
+                "roles_react.rr-description-set" if description else "roles_react.rr-description-reset",
+                role=role_mention))
 
     @rr_main.command(name='update')
     @commands.check(checks.database_connected)
