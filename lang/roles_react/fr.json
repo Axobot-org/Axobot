@@ -11,6 +11,8 @@
     "role-lost": "Le rôle %{r} a bien été retiré",
     "role-not-in-list": "Ce rôle ne fait pas partie des rôles attribuables",
     "rr-added": "Le rôle %{r} a bien été ajouté pour l'émoji %{e}",
+    "rr-description-reset": "La description du rôle %{role} a été supprimée",
+    "rr-description-set": "La description du rôle %{role} a été modifiée",
     "rr-embed": "S'attribuer un rôle",
     "rr-list": "Liste des rôles réactions (%{n}/%{m})",
     "rr-removed": "Le rôle %{r} ne peut plus être donné via l'émoji %{e}",

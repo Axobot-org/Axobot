@@ -59,6 +59,7 @@
         "roles-react add": "ajouter",
         "roles-react get": "envoyer",
         "roles-react list": "liste",
+        "roles-react set-description": "modifier-description",
         "roles-react remove": "retirer",
         "roles-react update": "modifier",
         "roles-rewards add": "ajouter",
