@@ -294,7 +294,7 @@ class RolesReact(commands.Cog):
             emb.set_footer(text=ctx.author, icon_url=ctx.author.display_avatar)
             await ctx.send(embed=emb)
 
-    @rr_main.command(name="get", aliases=['display'])
+    @rr_main.command(name="send")
     @commands.check(checks.database_connected)
     @commands.check(checks.bot_can_embed)
     async def rr_get(self, ctx: MyContext):

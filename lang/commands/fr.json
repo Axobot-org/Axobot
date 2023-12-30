@@ -57,7 +57,7 @@
         "role set-color": "modifier-couleur",
         "role temporary-grant": "donner-temporairement",
         "roles-react add": "ajouter",
-        "roles-react get": "envoyer",
+        "roles-react send": "envoyer",
         "roles-react list": "liste",
         "roles-react set-description": "modifier-description",
         "roles-react remove": "retirer",
