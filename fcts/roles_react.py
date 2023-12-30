@@ -357,6 +357,10 @@ It will only display the whole message with reactions. Still very cool tho
                 role=role_mention))
 
     @rr_main.command(name='update')
+    @app_commands.describe(
+        embed="A link to the message you want to update",
+        change_description="Update the embed content (default: True)",
+        emojis="A list of emojis to include (default: all)")
     @commands.check(checks.database_connected)
     async def rr_update(self, ctx: MyContext, embed: discord.Message, change_description: bool = True,
                         emojis: commands.Greedy[DiscordOrUnicodeEmoji] = None):
