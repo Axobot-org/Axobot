@@ -6,7 +6,7 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
-from libs.arguments import args
+from libs.arguments import DiscordOrUnicodeEmoji
 from libs.bot_classes import Axobot, MyContext
 from libs.checks import checks
 from libs.getch_methods import getch_member
@@ -60,7 +60,7 @@ class RolesReact(commands.Cog):
             return None
         if len(msg.embeds) == 0 or msg.embeds[0].footer.text not in self.footer_texts:
             return None
-        temp = await self.db_list_role(
+        temp = await self.db_get_roles(
             payload.guild_id,
             payload.emoji.id if payload.emoji.is_custom_emoji() else payload.emoji.name
         )
@@ -111,7 +111,7 @@ class RolesReact(commands.Cog):
             pass
         return True
 
-    async def db_list_role(self, guild_id: int, emoji: Optional[str] = None):
+    async def db_get_roles(self, guild_id: int, emoji: Optional[str] = None):
         """List role reaction in the database"""
         if isinstance(emoji, discord.Emoji):
             emoji = emoji.id
@@ -183,7 +183,7 @@ class RolesReact(commands.Cog):
     @rr_main.command(name="add")
     @commands.check(checks.has_manage_guild)
     @commands.check(checks.database_connected)
-    async def rr_add(self, ctx: MyContext, emoji: Union[discord.Emoji, args.UnicodeEmoji], role: discord.Role, *,
+    async def rr_add(self, ctx: MyContext, emoji: DiscordOrUnicodeEmoji, role: discord.Role, *,
                      description: str = ''):
         """Add a role reaction
         This role will be given when a membre click on a specific reaction
@@ -197,7 +197,8 @@ class RolesReact(commands.Cog):
         try:
             if role.name == '@everyone':
                 raise commands.BadArgument(f'Role "{role.name}" not found')
-            l = await self.db_list_role(ctx.guild.id, emoji)
+            await ctx.defer()
+            l = await self.db_get_roles(ctx.guild.id, emoji)
             if len(l) > 0:
                 return await ctx.send(await self.bot._(ctx.guild.id, "roles_react.already-1-rr"))
             max_rr: int = await self.bot.get_config(ctx.guild.id, 'roles_react_max_number')
@@ -219,13 +220,14 @@ class RolesReact(commands.Cog):
         ..Example roles_react remove :uwu:
 
         ..Doc roles-reactions.html#add-and-remove-a-reaction"""
+        await ctx.defer()
         try:
             # if emoji is a custom one:
             old_emoji = emoji
             r = re.search(r'<a?:[^:]+:(\d+)>', emoji)
             if r is not None:
                 emoji = r.group(1)
-            l = await self.db_list_role(ctx.guild.id, emoji)
+            l = await self.db_get_roles(ctx.guild.id, emoji)
             if len(l) == 0:
                 return await ctx.send(await self.bot._(ctx.guild.id, "roles_react.no-rr"))
             await self.db_remove_role(l[0]['ID'])
@@ -273,8 +275,9 @@ class RolesReact(commands.Cog):
         """List every roles reactions of your server
 
         ..Doc roles-reactions.html#list-every-roles-reactions"""
+        await ctx.defer()
         try:
-            roles_list = await self.db_list_role(ctx.guild.id)
+            roles_list = await self.db_get_roles(ctx.guild.id)
         except Exception as err:
             self.bot.dispatch("command_error", ctx, err)
         else:
@@ -293,8 +296,9 @@ class RolesReact(commands.Cog):
 It will only display the whole message with reactions. Still very cool tho
 
 ..Doc roles-reactions.html#get-or-leave-a-role"""
+        await ctx.defer()
         try:
-            roles_list = await self.db_list_role(ctx.guild.id)
+            roles_list = await self.db_get_roles(ctx.guild.id)
         except Exception as err:
             self.bot.dispatch("command_error", ctx, err)
             return
@@ -317,7 +321,7 @@ It will only display the whole message with reactions. Still very cool tho
     @rr_main.command(name='update')
     @commands.check(checks.database_connected)
     async def rr_update(self, ctx: MyContext, embed: discord.Message, change_description: bool = True,
-                        emojis: commands.Greedy[Union[discord.Emoji, args.UnicodeEmoji]] = None):
+                        emojis: commands.Greedy[DiscordOrUnicodeEmoji] = None):
         """Update an Axobot message to refresh roles/reactions
         If you don't want to update the embed content (for example if it's a custom embed) then you can use 'False' as a second argument, and I will only check the reactions
         Specifying a list of emojis will update the embed only for those emojis, and ignore other roles reactions
@@ -333,9 +337,10 @@ It will only display the whole message with reactions. Still very cool tho
             return await ctx.send(await self.bot._(ctx.guild, "roles_react.not-zbot-embed"))
         if not embed.channel.permissions_for(embed.guild.me).add_reactions:
             return await ctx.send(await self.bot._(ctx.guild, "poll.cant-react"))
+        await ctx.defer()
         emb = embed.embeds[0]
         try:
-            full_list = {x['emoji']: x for x in await self.db_list_role(ctx.guild.id)}
+            full_list = {x['emoji']: x for x in await self.db_get_roles(ctx.guild.id)}
         except Exception as err:
             return self.bot.dispatch("command_error", ctx, err)
         if emojis is not None:
