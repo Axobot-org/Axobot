@@ -23,17 +23,9 @@ Note that it is not possible to give more than one role per emoji, and that you 
 Get or leave a role
 -------------------
 
-**Syntax:** :code:`roles_react get` (alias :code:`display`)
+**Syntax:** :code:`roles_react send`
 
-**Syntax:** :code:`roles_react join <role>`
-
-**Syntax:** :code:`roles_react leave <role>`
-
-There are two ways to assign or withdraw a role: either via reaction or via a command.
-
-For the first case, the 'get' command will display a list of available roles with their corresponding emojis, and will add each reaction at the bottom of the message. It is then sufficient to click once on a reaction to get the role, and a second time to remove it. As simple as that.
-
-If you know exactly which role to get/remove, it is faster to use the 'join' and 'leave' subcommands followed by the role in question. You can give either the name of the role or its ID as a parameter. Note that it is not possible by this means to obtain or loose a role which is not in the list of reaction roles.
+The 'get' command will display a list of available roles with their corresponding emojis, and will add each reaction at the bottom of the message. It is then sufficient to click once on a reaction to get the role, and a second time to remove it. As simple as that.
 
 
 .. warning:: For the **first** command, the bot needs "`Embed Links <perms.html#embed-links>`__" and "`Add Reactions <perms.html#add-reactions>`__" permissions for this command
