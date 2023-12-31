@@ -1,5 +1,6 @@
 import datetime
 import re
+from collections import defaultdict
 from typing import Optional, Tuple, TypedDict, Union
 
 import discord
@@ -20,6 +21,7 @@ class RoleReactionRow(TypedDict):
     emoji: str
     description: str
     added_at: datetime.datetime
+    emoji_display: Optional[str]
 
 RoleDescription = app_commands.Range[str, 1, 150]
 
@@ -31,7 +33,7 @@ class RolesReact(commands.Cog):
         self.bot = bot
         self.file = 'roles_react'
         self.table = 'roles_react_beta' if bot.beta else 'roles_react'
-        self.guilds_which_have_roles = set()
+        self.cache: dict[int, dict[int, RoleReactionRow]] = defaultdict(dict)
         self.cache_initialized = False
         self.embed_color = 12118406
         self.footer_texts = ("Axobot roles reactions", "ZBot roles reactions")
@@ -45,8 +47,8 @@ class RolesReact(commands.Cog):
         if payload.guild_id is None or payload.user_id == self.bot.user.id:
             return None
         if not self.cache_initialized:
-            await self.db_get_guilds()
-        if payload.guild_id not in self.guilds_which_have_roles:
+            await self.db_init_cache()
+        if payload.guild_id not in self.cache:
             return None
         chan = self.bot.get_channel(payload.channel_id)
         if chan is None or isinstance(chan, discord.abc.PrivateChannel):
@@ -96,13 +98,23 @@ class RolesReact(commands.Cog):
         except discord.DiscordException as err:
             self.bot.dispatch("error", err)
 
-    async def db_get_guilds(self) -> set:
+    async def _add_rr_to_cache(self, rr: RoleReactionRow):
+        """Add a role reaction to the cache"""
+        if guild := self.bot.get_guild(rr['guild']):
+            rr["emoji_display"] = await self.get_emoji_display_form(guild, rr['emoji'])
+        else:
+            rr["emoji_display"] = rr['emoji']
+        self.cache[rr['guild']][rr['ID']] = rr
+
+    async def db_init_cache(self):
         """Get the list of guilds which have roles reactions"""
-        query = f"SELECT `guild` FROM `{self.table}`;"
+        self.cache_initialized = False
+        self.cache.clear()
+        query = f"SELECT * FROM `{self.table}`;"
         async with self.bot.db_query(query) as query_results:
-            self.guilds_which_have_roles = {x['guild'] for x in query_results}
+            for row in query_results:
+                await self._add_rr_to_cache(row)
         self.cache_initialized = True
-        return self.guilds_which_have_roles
 
     async def db_add_role(self, guild: int, role: int, emoji: str, desc: str):
         """Add a role reaction in the database"""
@@ -122,13 +134,13 @@ class RolesReact(commands.Cog):
                 rr_list.append(row)
         return rr_list
 
-    async def db_get_role_from_emoji(self, guild_id: int, emoji: Union[discord.Emoji, int]) -> Optional[RoleReactionRow]:
+    async def db_get_role_from_emoji(self, guild_id: int, emoji: Union[discord.Emoji, int, str]) -> Optional[RoleReactionRow]:
         """Get a role reaction from the database corresponding to an emoji"""
         if isinstance(emoji, discord.Emoji):
             emoji = emoji.id
         query = f"SELECT * FROM `{self.table}` WHERE guild=%(g)s AND emoji=%(e)s ORDER BY added_at;"
-        async with self.bot.db_query(query, {"g": guild_id, "e": emoji}, fetchone=True) as query_results:
-            return query_results
+        async with self.bot.db_query(query, {"g": guild_id, "e": str(emoji)}, fetchone=True) as query_results:
+            return query_results or None
 
     async def db_remove_role(self, rr_id: int):
         """Remove a role reaction from the database"""
@@ -180,6 +192,18 @@ class RolesReact(commands.Cog):
                     await self.bot._(guild.id, "roles_react.role-given" if give else "roles_react.role-lost", r=role.name)
                 )
 
+    async def get_emoji_display_form(self, guild: discord.Guild, raw_emoji: str):
+        """Returns the emoji in a displayable form"""
+        if len(raw_emoji) > 15 and raw_emoji.isnumeric():
+            if not (emoji := self.bot.get_emoji(int(raw_emoji))):
+                # if we couldn't get the emoji from cache, try to load from the guild
+                try:
+                    emoji = await guild.fetch_emoji(int(raw_emoji))
+                except discord.errors.NotFound:
+                    return raw_emoji
+            return str(emoji)
+        return raw_emoji
+
     @commands.hybrid_group(name="roles-react")
     @commands.guild_only()
     @commands.cooldown(1, 5, commands.BucketType.guild)
@@ -220,7 +244,10 @@ class RolesReact(commands.Cog):
             self.bot.dispatch("command_error", ctx, err)
         else:
             await ctx.send(await self.bot._(ctx.guild.id, "roles_react.rr-added", r=role.name, e=emoji))
-            self.guilds_which_have_roles.add(ctx.guild.id)
+            if rr := await self.db_get_role_from_emoji(ctx.guild.id, emoji):
+                await self._add_rr_to_cache(rr)
+            else:
+                self.bot.log.warning(f"Could not add role reaction {emoji} in cache")
 
     @rr_main.command(name="remove")
     @commands.check(checks.database_connected)
@@ -233,7 +260,7 @@ class RolesReact(commands.Cog):
         ..Doc roles-reactions.html#add-and-remove-a-reaction"""
         await ctx.defer()
         try:
-            # if emoji is a custom one:
+            # if emoji is a custom one: extract the id
             old_emoji = emoji
             r = re.search(r'<a?:[^:]+:(\d+)>', emoji)
             if r is not None:
@@ -250,27 +277,24 @@ class RolesReact(commands.Cog):
             await ctx.send(await self.bot._(ctx.guild.id, "roles_react.rr-removed-2", e=old_emoji))
         else:
             await ctx.send(await self.bot._(ctx.guild.id, "roles_react.rr-removed", r=role, e=old_emoji))
+        try:
+            if ctx.guild.id in self.cache:
+                del self.cache[ctx.guild.id][role_react["ID"]]
+        except KeyError:
+            self.bot.log.debug(f"Emoji {emoji} not found in cache")
 
     async def create_list_embed(self, rr_list: list[RoleReactionRow], guild: discord.Guild):
         """Create a text with the roles list"""
         emojis: list[Union[str, discord.Emoji]] = []
         for k in rr_list:
-            if len(k['emoji']) > 15 and k['emoji'].isnumeric():
-                if not (temp := self.bot.get_emoji(int(k['emoji']))):
-                    # if we couldn't get the emoji from cache, try to load from the guild
-                    try:
-                        temp = await guild.fetch_emoji(int(k['emoji']))
-                    except discord.errors.NotFound:
-                        emojis.append(k['emoji'])
-                        continue
-                emojis.append(temp)
-                k['emoji'] = str(temp)
-            else:
-                emojis.append(k['emoji'])
+            emojis.append(await self.get_emoji_display_form(guild, k['emoji']))
         result = [
-            f"{x['emoji']}   <@&{x['role']}> - *{x['description']}*" if len(
-                x['description']) > 0 else f"{x['emoji']}   <@&{x['role']}>"
-            for x in rr_list
+            (
+                f"{emoji}   <@&{rr['role']}> - *{rr['description']}*"
+                if len(rr['description']) > 0
+                else f"{emoji}   <@&{rr['role']}>"
+            )
+            for rr, emoji in zip(rr_list, emojis)
         ]
         return '\n'.join(result), emojis
 
@@ -282,17 +306,16 @@ class RolesReact(commands.Cog):
 
         ..Doc roles-reactions.html#list-every-roles-reactions"""
         await ctx.defer()
-        try:
-            roles_list = await self.db_get_roles(ctx.guild.id)
-        except Exception as err:
-            self.bot.dispatch("command_error", ctx, err)
+        if self.cache_initialized and ctx.guild.id in self.cache:
+            roles_list = list(self.cache[ctx.guild.id].values())
         else:
-            des, _ = await self.create_list_embed(roles_list, ctx.guild)
-            max_rr: int = await self.bot.get_config(ctx.guild.id, 'roles_react_max_number')
-            title = await self.bot._(ctx.guild.id, "roles_react.rr-list", n=len(roles_list), m=max_rr)
-            emb = discord.Embed(title=title, description=des, color=self.embed_color, timestamp=ctx.message.created_at)
-            emb.set_footer(text=ctx.author, icon_url=ctx.author.display_avatar)
-            await ctx.send(embed=emb)
+            roles_list = await self.db_get_roles(ctx.guild.id)
+        des, _ = await self.create_list_embed(roles_list, ctx.guild)
+        max_rr: int = await self.bot.get_config(ctx.guild.id, 'roles_react_max_number')
+        title = await self.bot._(ctx.guild.id, "roles_react.rr-list", n=len(roles_list), m=max_rr)
+        emb = discord.Embed(title=title, description=des, color=self.embed_color, timestamp=ctx.message.created_at)
+        emb.set_footer(text=ctx.author, icon_url=ctx.author.display_avatar)
+        await ctx.send(embed=emb)
 
     @rr_main.command(name="send")
     @commands.check(checks.database_connected)
