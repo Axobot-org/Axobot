@@ -1,5 +1,5 @@
 -i https://pypi.org/simple
-sphinx
-sphinxext-opengraph>=0.6
-sphinx_book_theme
-sphinx_design
+sphinx~=7.2
+sphinxext-opengraph~=0.9
+sphinx_book_theme~=1.1
+sphinx_design~=0.5
