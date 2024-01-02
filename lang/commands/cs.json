@@ -58,6 +58,12 @@
         "role revoke": "odvolat",
         "role set-color": "nastavit-barvu",
         "role temporary-grant": "dočasný-grant",
+        "roles-react add": "přidat",
+        "roles-react send": "odeslat",
+        "roles-react list": "seznam",
+        "roles-react set-description": "nastavit-popis",
+        "roles-react remove": "smazat",
+        "roles-react update": "aktualizovat",
         "roles-rewards add": "přidat",
         "roles-rewards list": "seznam",
         "roles-rewards reload": "znovu-načíst",
@@ -112,6 +118,7 @@
         "profile": "profil",
         "reminders": "připomínky",
         "role": "role",
+        "roles-react": "reakce-rolí",
         "roles-rewards": "odměny-rolí",
         "rss": "rss",
         "tickets": "tikety",
@@ -135,6 +142,7 @@
         "profile": "Nastavte si bota pro vlastní použití",
         "reminders": "Spravujte nevyřízené připomínky",
         "role": "Několik příkazů ke správě rolí",
+        "roles-react": "Spravujte váš systém-rolí a reakcí",
         "roles-rewards": "Dejte role svým členům, když dosáhnou určité úrovně",
         "rss": "Přihlásit se k odběru RSS kanálů na vašem serveru",
         "tickets": "Spravovat systém tiketů",
@@ -254,6 +262,23 @@
         "last-post": {
             "url": "url",
             "type": "zpětný-zdroj"
+        },
+        "roles-react add": {
+            "emoji": "emoji",
+            "role": "role",
+            "description": "popis"
+        },
+        "roles-react remove": {
+            "emoji": "emoji"
+        },
+        "roles-react set-description": {
+            "emoji": "emoji",
+            "description": "popis"
+        },
+        "roles-react update": {
+            "embed": "embed",
+            "change_description": "změnit-popis",
+            "emojis": "emoji"
         },
         "rss add": {
             "link": "odkaz"
