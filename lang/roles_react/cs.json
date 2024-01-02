@@ -11,6 +11,8 @@
     "role-lost": "Role %{r} byla odstraněna z vašich rolí",
     "role-not-in-list": "Tato role není součástí přiřaditelných rolí",
     "rr-added": "Role %{r} byla přidána pro emoji %{e}",
+    "rr-description-reset": "Popis role %{role} byl resetován",
+    "rr-description-set": "Byl nastaven popis role %{role}",
     "rr-embed": "Převzetí role",
     "rr-list": "Seznam reakčních rolí (%{n}/%{m})",
     "rr-removed": "Role %{r} již nemůže být zadána prostřednictvím emoji %{e}",
