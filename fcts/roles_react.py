@@ -427,5 +427,32 @@ It will only display the whole message with reactions. Still very cool tho
             await ctx.send(await self.bot._(ctx.guild, "roles_react.reactions-edited"))
 
 
+    @rr_remove.autocomplete("emoji")
+    @rr_set_description.autocomplete("emoji")
+    async def emoji_autocompletion(self, interaction: discord.Interaction, current: str):
+        """Autocompletion for the role-reaction emoji in slash commands"""
+        if interaction.guild_id is None:
+            return []
+        if not self.cache_initialized:
+            await self.db_init_cache()
+        if interaction.guild_id not in self.cache:
+            return []
+        options: list[tuple[bool, str, str]] = []
+        for rr in self.cache[interaction.guild_id].values():
+            if ':' in rr["emoji_display"]:
+                emoji_display = ':' + rr["emoji_display"].split(':')[1] + ':'
+            else:
+                emoji_display = rr["emoji_display"]
+            role = interaction.guild.get_role(rr["role"])
+            role_name = role.name if role else str(rr["role"])
+            if current in rr["emoji_display"] or current in role_name:
+                options.append((not True, f"{emoji_display} {role_name}", rr['emoji']))
+        options.sort()
+        return [
+            app_commands.Choice(name=emoji, value=emoji_id)
+            for _, emoji, emoji_id in options
+        ]
+
+
 async def setup(bot):
     await bot.add_cog(RolesReact(bot))
