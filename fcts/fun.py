@@ -23,7 +23,6 @@ from libs.checks.checks import is_fun_enabled
 from libs.formatutils import FormatUtils
 from libs.paginator import Paginator
 from libs.tips import generate_random_tip
-from utils import flatten_list
 
 importlib.reload(checks)
 importlib.reload(args)
@@ -35,6 +34,9 @@ cmds_list = ['count_msg', 'ragequit', 'pong', 'run', 'nope', 'blame', 'party', '
              'osekour', 'me', 'kill', 'cat', 'happy-birthday', 'rekt', 'thanos', 'nuke', 'pikachu', 'pizza', 'google',
              'loading', 'piece', 'roll', 'afk', 'bubble-wrap', 'reverse', 'wink']
 
+
+def flatten_list(first_list: list) -> list:
+    return [item for sublist in first_list for item in sublist]
 
 async def can_say(ctx: MyContext):
     "Check if a user can use the 'say' cmd"
