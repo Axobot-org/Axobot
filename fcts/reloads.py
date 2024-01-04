@@ -1,8 +1,10 @@
 import importlib
+
 from discord.ext import commands
+
+from libs.bot_classes import Axobot, MyContext
 from libs.checks.checks import is_bot_admin
-from libs.bot_classes import MyContext, Axobot
-from utils import count_code_lines
+
 
 class Reloads(commands.Cog):
     """Cog to manage the other cogs. Even if all are disabled, this is the last one left."""
@@ -20,9 +22,10 @@ class Reloads(commands.Cog):
         ]
 
     async def reload_cogs(self, ctx: MyContext, cogs: list[str]):
+        "Reload a list of cogs and python modules"
         if len(cogs)==1 and cogs[0]=='all':
             cogs = sorted([x.file for x in self.bot.cogs.values()])
-        reloaded_cogs = list()
+        reloaded_cogs = []
         for cog in cogs:
             if not cog.startswith("fcts."):
                 fcog = "fcts."+cog
@@ -50,9 +53,9 @@ class Reloads(commands.Cog):
             if cog == 'utilities':
                 await self.bot.get_cog('Utilities').on_ready()
         if len(reloaded_cogs) > 0:
-            await ctx.send("These cogs has successfully reloaded: {}".format(", ".join(reloaded_cogs)))
+            await ctx.send(f"These cogs has successfully reloaded: {', '.join(reloaded_cogs)}")
             if info_cog := self.bot.get_cog("BotInfo"):
-                info_cog.codelines = await count_code_lines()
+                await info_cog.refresh_code_lines_count()
 
     @commands.command(name="add_cog",hidden=True)
     @commands.check(is_bot_admin)

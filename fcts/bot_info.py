@@ -1,4 +1,6 @@
 
+import glob
+import os
 import sys
 from typing import Literal, Optional, Union
 
@@ -10,7 +12,6 @@ from docs import conf
 from libs.bot_classes import Axobot, MyContext
 from libs.checks import checks
 from libs.formatutils import FormatUtils
-from utils import count_code_lines
 
 
 class BotInfo(commands.Cog):
@@ -26,8 +27,24 @@ class BotInfo(commands.Cog):
 
     @commands.Cog.listener()
     async def on_ready(self):
-        self.codelines = await count_code_lines()
+        await self.refresh_code_lines_count()
 
+
+    async def refresh_code_lines_count(self):
+        """Count lines of Python code in the current folder
+
+        Comments and empty lines are ignored."""
+        count = 0
+        path = os.getcwd() + '/**/*.py'
+        for filename in glob.iglob(path, recursive=True):
+            if '/env/' in filename or not filename.endswith('.py'):
+                continue
+            with open(filename, 'r', encoding='utf-8') as file:
+                for line in file.read().split("\n"):
+                    cleaned_line = line.strip()
+                    if len(cleaned_line) > 2 and not cleaned_line.startswith('#') or cleaned_line.startswith('"'):
+                        count += 1
+        self.codelines = count
 
     @commands.command(name="admins")
     async def admin_list(self, ctx: MyContext):
