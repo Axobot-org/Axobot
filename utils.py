@@ -1,16 +1,14 @@
 import argparse
 import glob
-import logging
 import os
 import sys
-from logging.handlers import RotatingFileHandler
 from typing import TYPE_CHECKING
-from LRFutils import progress
-from mysql.connector import errors as mysql_errors
 
 import discord
 import mysql
 from discord.ext import commands
+from LRFutils import progress
+from mysql.connector import errors as mysql_errors
 
 if TYPE_CHECKING:
     from libs.bot_classes import Axobot
@@ -27,61 +25,6 @@ async def get_prefix(bot:"Axobot", msg: discord.Message) -> list:
     if msg.guild is None:
         prefixes.append("")
     return commands.when_mentioned_or(*prefixes)(bot, msg)
-
-
-
-def flatten_list(first_list: list) -> list:
-    return [item for sublist in first_list for item in sublist]
-
-def setup_bot_logger():
-    """Create the logger module for the bot, used for logs"""
-    # on chope le premier logger
-    log = logging.getLogger("runner")
-    # on définis un formatteur
-    log_format = logging.Formatter("%(asctime)s %(levelname)s: %(message)s", datefmt="[%d/%m/%Y %H:%M:%S]")
-    # ex du format : [08/11/2018 14:46] WARNING: Rss fetch_rss_flux l.288 : Cannot get the RSS flux because of the following error: (suivi du traceback)
-
-    # log vers un fichier
-    file_handler = RotatingFileHandler("logs/debug.log", maxBytes=1e6, backupCount=2, delay=True)
-    # tous les logs de niveau DEBUG et supérieur sont evoyés dans le fichier
-    file_handler.setLevel(logging.DEBUG)
-    file_handler.setFormatter(log_format)
-
-    # log vers la console
-    stream_handler = logging.StreamHandler(sys.stdout)
-    # tous les logs de niveau INFO et supérieur sont evoyés dans le fichier
-    stream_handler.setLevel(logging.INFO)
-    stream_handler.setFormatter(log_format)
-
-    # supposons que tu veuille collecter les erreurs sur ton site d'analyse d'erreurs comme sentry
-    #sentry_handler = x
-    #sentry_handler.setLevel(logging.ERROR)  # on veut voir que les erreurs et au delà, pas en dessous
-    #sentry_handler.setFormatter(format)
-
-    log.addHandler(file_handler)
-    log.addHandler(stream_handler)
-    #log.addHandler(sentry_handler)
-
-    log.setLevel(logging.DEBUG)
-    return log
-
-def setup_database_logger():
-    "Create the logger module for database access"
-    log = logging.getLogger("database")
-    log_format = logging.Formatter("%(asctime)s %(levelname)s: [SQL] %(message)s", datefmt="[%d/%m/%Y %H:%M]")
-    file_handler = RotatingFileHandler("logs/sql-debug.log", maxBytes=2e6, backupCount=2, delay=True)
-
-    file_handler.setLevel(logging.DEBUG)
-    file_handler.setFormatter(log_format)
-
-    stream_handler = logging.StreamHandler(sys.stdout)
-    stream_handler.setLevel(logging.INFO)
-    stream_handler.setFormatter(log_format)
-
-    log.addHandler(file_handler)
-    log.addHandler(stream_handler)
-    log.setLevel(logging.DEBUG)
-    return log
 
 def setup_start_parser():
     "Create a parser for the command-line interface"
@@ -170,7 +113,13 @@ async def load_cogs(bot: "Axobot"):
         'fcts.welcomer',
         'fcts.xp'
     ]
-    progress_bar = progress.Bar(max=len(initial_extensions), width=60, prefix="Loading extensions", eta=False, show_duration=False)
+    progress_bar = progress.Bar(
+        max=len(initial_extensions),
+        width=60,
+        prefix="Loading extensions",
+        eta=False,
+        show_duration=False
+    )
 
     # Here we load our extensions (cogs) listed above in [initial_extensions]
     count = 0
