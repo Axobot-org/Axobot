@@ -1,0 +1,4 @@
+import discord
+
+PRIVATE_GUILD_ID = discord.Object(625316773771608074)
+SUPPORT_GUILD_ID = discord.Object(356067272730607628)

@@ -29,8 +29,7 @@ import json
 from random import choice
 from fcts import tokens  # pylint: disable=no-name-in-module
 from libs.bot_classes import Axobot
-from libs.boot_utils import set_beta_logs, setup_bot_logger, setup_database_logger
-from utils import load_cogs, load_sql_connection, setup_start_parser
+from libs.boot_utils import set_beta_logs, setup_start_parser, setup_bot_logger, setup_database_logger, load_cogs, load_sql_connection
 
 async def main():
     "Load everything and start the bot"
