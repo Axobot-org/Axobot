@@ -8,7 +8,6 @@ from libs.bot_classes import Axobot
 from libs.bot_events.dict_types import EventData, EventItem, EventType
 from libs.bot_events.subcogs.abstract_subcog import AbstractSubcog
 from libs.formatutils import FormatUtils
-from utils import OUTAGE_REASON
 
 
 class RandomCollectSubcog(AbstractSubcog):
@@ -61,14 +60,6 @@ class RandomCollectSubcog(AbstractSubcog):
 
         title = await self.bot._(ctx.channel, "bot_events.rank-title")
         desc = await self.bot._(ctx.channel, "bot_events.xp-howto")
-
-        if not self.bot.database_online:
-            lang = await self.bot._(ctx.channel, '_used_locale')
-            reason = OUTAGE_REASON.get(lang, OUTAGE_REASON['en'])
-            emb = discord.Embed(title=title, description=desc, color=self.current_event_data["color"])
-            emb.add_field(name="OUTAGE", value=reason)
-            await ctx.send(embed=emb)
-            return
 
         emb = discord.Embed(title=title, description=desc, color=self.current_event_data["color"])
         emb.set_author(name=user, icon_url=user.display_avatar.replace(static_format="png", size=32))
