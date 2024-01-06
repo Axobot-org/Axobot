@@ -29,16 +29,15 @@ import json
 from random import choice
 from fcts import tokens  # pylint: disable=no-name-in-module
 from libs.bot_classes import Axobot
-from libs.boot_utils import set_beta_logs, setup_start_parser, setup_bot_logger, setup_database_logger, load_cogs, load_sql_connection
+from libs.boot_utils import set_beta_logs, setup_start_parser, setup_logger, load_cogs, load_sql_connection
 
 async def main():
     "Load everything and start the bot"
     parser = setup_start_parser()
     args = parser.parse_args()
 
-    log = setup_bot_logger()
+    log = setup_logger()
     log.info("Starting bot")
-    setup_database_logger()
 
     client = Axobot(case_insensitive=True, status=discord.Status('online'))
 

@@ -1,8 +1,9 @@
 import logging
 from typing import Optional
+
 from bs4 import BeautifulSoup
 
-log = logging.getLogger("runner")
+log = logging.getLogger("bot.rss")
 
 async def get_text_from_entry(entry: dict) -> Optional[str]:
     "Get the text from an RSS feed entry"
@@ -10,7 +11,7 @@ async def get_text_from_entry(entry: dict) -> Optional[str]:
         return await convert_post_to_text(entry["content"][0]["value"], entry["content"][0]["type"])
     if "summary" in entry:
         return await convert_post_to_text(entry["summary"], entry["summary_detail"]["type"])
-    log.error("[rss] No content or summary in entry for article %s", entry['link'])
+    log.error("No content or summary in entry for article %s", entry['link'])
     return None
 
 async def convert_post_to_text(post: str, post_type: str) -> Optional[str]:
@@ -20,7 +21,7 @@ async def convert_post_to_text(post: str, post_type: str) -> Optional[str]:
     elif post_type == "text/plain":
         return post
     else:
-        log.error("[rss] Unknown post type: %s", post_type)
+        log.error("Unknown post type: %s", post_type)
         return None
 
 
