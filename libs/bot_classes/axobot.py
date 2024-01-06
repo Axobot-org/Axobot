@@ -70,7 +70,7 @@ class Axobot(commands.bot.AutoShardedBot):
         self.beta = beta # if the bot is in beta mode
         self.entity_id: int = 0 # ID of the bot for the statistics database
         self.database_keys = get_database_connection() # credentials for the database
-        self.log = logging.getLogger("runner") # logs module
+        self.log = logging.getLogger("bot") # logs module
         self._cnx = [[None, 0], [None, 0], [None, 0]] # database connections
         self.xp_enabled: bool = True # if xp is enabled
         self.rss_enabled: bool = True # if rss is enabled

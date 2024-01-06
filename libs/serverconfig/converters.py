@@ -12,7 +12,7 @@ from libs.emojis_manager import EmojisManager
 from libs.getch_methods import getch_channel_or_thread
 from libs.serverconfig.options_list import options as options_list
 
-log = logging.getLogger("runner")
+log = logging.getLogger("bot")
 UnicodeEmojis = EmojisManager(None).unicode_set
 
 class IntOptionRepresentation(TypedDict):

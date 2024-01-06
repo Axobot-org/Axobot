@@ -1,13 +1,14 @@
 import logging
 import sys
 from types import GeneratorType
-from typing import Union, TYPE_CHECKING
+from typing import TYPE_CHECKING, Union
+
+from mysql.connector import errors
+from mysql.connector.connection import MySQLConnection, MySQLCursor
+from mysql.connector.cursor import RE_PY_PARAM, _bytestr_format_dict, _ParamSubstitutor
 
 if TYPE_CHECKING:
     from mysql.connector.connection_cext import CMySQLConnection, CMySQLCursor
-from mysql.connector.connection import MySQLConnection, MySQLCursor
-from mysql.connector.cursor import _bytestr_format_dict, _ParamSubstitutor, RE_PY_PARAM
-from mysql.connector import errors
 
 
 def create_database_query(cnx_axobot: Union[MySQLConnection, 'CMySQLConnection']):
@@ -27,6 +28,7 @@ def create_database_query(cnx_axobot: Union[MySQLConnection, 'CMySQLConnection']
             self.returnrowcount = returnrowcount
             self.astuple = astuple
             self.cursor: Union[MySQLCursor, 'CMySQLCursor'] = None
+            self.log = logging.getLogger("bot.db")
 
         async def _format_query(self):
             if isinstance(self.cursor, MySQLCursor):
@@ -97,12 +99,12 @@ def create_database_query(cnx_axobot: Union[MySQLConnection, 'CMySQLConnection']
             )
 
             query_for_logs = await self._format_query()
-            logging.getLogger("database").debug("%s", query_for_logs)
+            self.log.debug("%s", query_for_logs)
 
             try:
                 execute_result = self.cursor.execute(self.query, self.args, multi=self.multi)
             except errors.ProgrammingError as err:
-                logging.getLogger("database").error("%s", self.cursor._executed, exc_info=True)
+                self.log.error("%s", self.cursor._executed, exc_info=True)
                 await self.__aexit__(*sys.exc_info())
                 raise err
 
