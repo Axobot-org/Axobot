@@ -6,7 +6,7 @@ from logging.handlers import RotatingFileHandler
 def setup_bot_logger():
     """Create the logger module for the bot, used for logs"""
     log = logging.getLogger("runner")
-    log_format = logging.Formatter("%(asctime)s %(levelname)s: %(message)s", datefmt="[%d/%m/%Y %H:%M:%S]")
+    log_format = logging.Formatter("[{asctime}] {levelname} {name}: {message}", datefmt="%Y-%m-%d %H:%M:%S", style='{')
 
     # DEBUG logs to a file
     file_handler = RotatingFileHandler("logs/debug.log", maxBytes=1e6, backupCount=2, delay=True)
@@ -47,9 +47,17 @@ def setup_database_logger():
     return log
 
 def set_beta_logs():
-    "Edit the logging level to DEBUG, when the beta bot is used"
-    log = logging.getLogger("runner")
-    for handler in log.handlers:
+    "Edit the logging handlers to be more verbose in console, when the beta bot is used"
+    # set the console logger to DEBUG
+    bot_logger = logging.getLogger("runner")
+    for handler in bot_logger.handlers:
         if handler.name == "console":
             handler.setLevel(logging.DEBUG)
+            break
+    # add discord.py logs to console
+    discord_logger = logging.getLogger('discord')
+    discord_logger.setLevel(logging.INFO)
+    for handler in bot_logger.handlers:
+        if handler.name == "console":
+            discord_logger.addHandler(handler)
             break
