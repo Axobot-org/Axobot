@@ -82,35 +82,35 @@ async def moderation_commands_check(bot: Axobot, guild: discord.Guild, option: s
         return await _create_warning_embed(
             bot,
             guild,
-            await bot._(guild, "server.warnings.moderation_commands", perm=ban_perm)
+            await bot._(guild, "server.warnings.moderation_command", perm=ban_perm)
         )
     if option == "clear_allowed_roles" and not guild.me.guild_permissions.manage_messages:
         manage_msg_perms = await bot._(guild, "permissions.list.manage_messages")
         return await _create_warning_embed(
             bot,
             guild,
-            await bot._(guild, "server.warnings.moderation_commands", perm=manage_msg_perms)
+            await bot._(guild, "server.warnings.moderation_command", perm=manage_msg_perms)
         )
     if option == "kick_allowed_roles" and not guild.me.guild_permissions.kick_members:
         kick_perm = await bot._(guild, "permissions.list.kick_members")
         return await _create_warning_embed(
             bot,
             guild,
-            await bot._(guild, "server.warnings.moderation_commands", perm=kick_perm)
+            await bot._(guild, "server.warnings.moderation_command", perm=kick_perm)
         )
     if option == "mute_allowed_roles" and not guild.me.guild_permissions.moderate_members:
         moderate_perm = await bot._(guild, "permissions.list.moderate_members")
         return await _create_warning_embed(
             bot,
             guild,
-            await bot._(guild, "server.warnings.moderation_commands", perm=moderate_perm)
+            await bot._(guild, "server.warnings.moderation_command", perm=moderate_perm)
         )
     if option == "slowmode_allowed_roles" and not guild.me.guild_permissions.manage_channels:
         manage_channel_perm = await bot._(guild, "permissions.list.manage_channels")
         return await _create_warning_embed(
             bot,
             guild,
-            await bot._(guild, "server.warnings.moderation_commands", perm=manage_channel_perm)
+            await bot._(guild, "server.warnings.moderation_command", perm=manage_channel_perm)
         )
 
 
