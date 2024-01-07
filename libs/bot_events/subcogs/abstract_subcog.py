@@ -9,7 +9,6 @@ from libs.bot_events.dict_types import (EventData, EventItem,
                                         EventItemWithCount, EventType)
 from libs.bot_events.get_translations import get_events_translations
 from libs.formatutils import FormatUtils
-from libs.tips import generate_random_tip
 
 
 class DBUserRank(TypedDict):
@@ -162,7 +161,7 @@ class AbstractSubcog(ABC):
     async def get_random_tip_field(self, channel):
         return {
             "name": await self.bot._(channel, "bot_events.tip-title"),
-            "value": await generate_random_tip(self.bot, channel),
+            "value": await self.bot.tips_manager.generate_random_tip(channel),
             "inline": False
         }
 

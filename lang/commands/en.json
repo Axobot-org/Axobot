@@ -47,6 +47,7 @@
         "profile card-preview": "card-preview",
         "profile config": "config",
         "profile list-card-styles": "list-card-styles",
+        "random-tip": "random-tip",
         "rank": "rank",
         "reminders clear": "clear",
         "reminders create": "create",
@@ -130,7 +131,8 @@
         "cases edit-reason": "Edit the reason of a moderation case",
         "cases list": "List all the moderation cases of a user",
         "cases remove": "Permanently delete a moderation case",
-        "cases search": "Find the details of a moderation case"
+        "cases search": "Find the details of a moderation case",
+        "random-tip": "Get a random tip or trivia about the bot"
     },
     "group_description": {
         "antiscam": "Everything related to the antiscam feature",

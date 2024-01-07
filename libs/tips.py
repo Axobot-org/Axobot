@@ -42,6 +42,28 @@ class TipsManager:
         _cache_init: dict[int, list[self.UserTipsFetchResult]] = {}
         self.user_cache = LRUCache(max_size=10_000, timeout=3_600 * 2, values=_cache_init)
         self.guild_cache = LRUCache(max_size=10_000, timeout=3_600 * 2, values=dict(_cache_init))
+        self._random_tips_params: Optional[dict[str, str]] = None
+
+    async def get_random_tips_params(self) -> dict[str, str]:
+        "Get the translation parameters for the random tips"
+        if self._random_tips_params:
+            return self._random_tips_params
+        self._random_tips_params  = {
+            "about_cmd": await self.bot.get_command_mention("about"),
+            "bigtext_cmd": await self.bot.get_command_mention("bigtext"),
+            "clear_cmd": await self.bot.get_command_mention("clear"),
+            "config_cmd": await self.bot.get_command_mention("config"),
+            "discordlinks_cmd": await self.bot.get_command_mention("discordlinks"),
+            "event_cmd": await self.bot.get_command_mention("event info"),
+            "stats_cmd": await self.bot.get_command_mention("stats"),
+            "say_cmd": await self.bot.get_command_mention("say"),
+            "sponsor_url": "https://github.com/sponsors/ZRunner",
+            "rss_disable_cmd": await self.bot.get_command_mention("rss disable"),
+            "rss_delete_cmd": await self.bot.get_command_mention("rss delete"),
+            "support_server_url": "https://discord.gg/N55zY88",
+            "antiscam_enable_cmd": await self.bot.get_command_mention("antiscam enable"),
+        }
+        return self._random_tips_params
 
     class UserTipsFetchResult(TypedDict):
         tip_id: UserTip
@@ -144,21 +166,7 @@ class TipsManager:
         await ctx.send(embed=embed)
         await self.db_register_guild_tip(ctx.guild.id, tip)
 
-async def generate_random_tip(bot: "Axobot", translation_context) -> str:
-    "Pick a random tip from the translations list, and format it"
-    params = {
-        "about_cmd": await bot.get_command_mention("about"),
-        "bigtext_cmd": await bot.get_command_mention("bigtext"),
-        "clear_cmd": await bot.get_command_mention("clear"),
-        "config_cmd": await bot.get_command_mention("config"),
-        "discordlinks_cmd": await bot.get_command_mention("discordlinks"),
-        "event_cmd": await bot.get_command_mention("event info"),
-        "stats_cmd": await bot.get_command_mention("stats"),
-        "say_cmd": await bot.get_command_mention("say"),
-        "sponsor_url": "https://github.com/sponsors/ZRunner",
-        "rss_disable_cmd": await bot.get_command_mention("rss disable"),
-        "rss_delete_cmd": await bot.get_command_mention("rss delete"),
-        "support_server_url": "https://discord.gg/N55zY88",
-        "antiscam_enable_cmd": await bot.get_command_mention("antiscam enable"),
-    }
-    return random.choice(await bot._(translation_context, "fun.tip-list", **params))
+    async def generate_random_tip(self, translation_context) -> str:
+        "Pick a random tip from the translations list, and format it"
+        params = await self.get_random_tips_params()
+        return random.choice(await self.bot._(translation_context, "fun.tip-list", **params))

@@ -22,7 +22,6 @@ from libs.checks import checks
 from libs.checks.checks import is_fun_enabled
 from libs.formatutils import FormatUtils
 from libs.paginator import Paginator
-from libs.tips import generate_random_tip
 
 importlib.reload(checks)
 importlib.reload(args)
@@ -671,13 +670,6 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         latitude = round(g.json['lat'],2)
         longitude = round(g.json['lng'],2)
         await ctx.send(f"**{tz_name}**:\n{format_d} ({date.tzname()})\n ({address} - lat: {latitude} - long: {longitude})")
-
-    @commands.command(name="tip")
-    async def tip(self, ctx: MyContext):
-        """Send a tip, a fun fact or something else
-
-        ..Doc fun.html#tip"""
-        await ctx.send(await generate_random_tip(self.bot, ctx.channel))
 
     @commands.command(name='afk')
     @commands.check(is_fun_enabled)

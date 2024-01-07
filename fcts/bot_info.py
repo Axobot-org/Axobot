@@ -1,4 +1,3 @@
-
 import glob
 import os
 import sys
@@ -386,6 +385,14 @@ ORDER BY usages DESC LIMIT %(limit)s"""
             await ctx.send(embed=discord.Embed(description=msg, color=16298524))
         else:
             await ctx.send(msg)
+
+    @commands.hybrid_command(name="random-tip")
+    @commands.cooldown(10, 30)
+    async def tip(self, ctx: MyContext):
+        """Send a random tip or trivia about the bot
+
+        ..Doc fun.html#tip"""
+        await ctx.send(await self.bot.tips_manager.generate_random_tip(ctx.channel))
 
 
 async def setup(bot: Axobot):

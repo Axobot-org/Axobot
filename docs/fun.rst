@@ -312,7 +312,7 @@ Well, if you want to know if you will be spared by this guy or not, check out th
 Tip
 ---
 
-**Syntax:** :code:`tip`
+**Syntax:** :code:`random-tip`
 
 If you want to get some advice on how to use the bot, or just a funny fact, you will surely find what you are looking for here. This command returns a random phrase from a defined list of "Pro-tip" and "Did you know?", to hopefully teach you something!
 
