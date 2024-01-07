@@ -1,4 +1,5 @@
 import importlib
+import logging
 import operator
 import os
 import random
@@ -39,6 +40,9 @@ class Xp(commands.Cog):
 
     def __init__(self, bot: Axobot):
         self.bot = bot
+        self.file = 'xp'
+        self.log = logging.getLogger("bot.xp")
+
         self.cache: dict[Union[int, Literal["global"]], dict[int, tuple[int, int]]] = {'global': {}}
         self.levels = [0]
         self.embed_color = discord.Colour(0xffcf50)
@@ -49,10 +53,10 @@ class Xp(commands.Cog):
         self.spam_rate = 0.20
         self.xp_per_char = 0.11
         self.max_xp_per_msg = 70
-        self.file = 'xp'
         self.sus = None
         self.default_xp_style = "dark"
         self.types = ['global','mee6-like','local']
+
         verdana_font = "./assets/fonts/Verdana.ttf"
         roboto_font = "./assets/fonts/Roboto-Medium.ttf"
         self.fonts = {
@@ -66,6 +70,7 @@ class Xp(commands.Cog):
 
     @commands.Cog.listener()
     async def on_ready(self):
+        "Load cache on bot boot"
         self.table = 'xp_beta' if self.bot.beta else 'xp'
         await self.db_load_cache(None)
         if not self.bot.database_online:
@@ -294,7 +299,7 @@ class Xp(commands.Cog):
                 if r is None:
                     continue
                 if not self.bot.beta:
-                    await member.add_roles(r,reason="Role reward (lvl {})".format(role['level']))
+                    await member.add_roles(r, reason=f"Role reward (lvl {role['level']})")
                 c += 1
             except Exception as err:
                 if self.bot.beta:
@@ -307,7 +312,7 @@ class Xp(commands.Cog):
                 if r is None:
                     continue
                 if not self.bot.beta:
-                    await member.remove_roles(r,reason="Role reward (lvl {})".format(role['level']))
+                    await member.remove_roles(r, reason=f"Role reward (lvl {role['level']})")
                 c += 1
             except Exception as err:
                 if self.bot.beta:
@@ -323,7 +328,7 @@ class Xp(commands.Cog):
             if not query_result:
                 return
             self.sus = {item['userID'] for item in query_result}
-        self.bot.log.info("[xp] Reloaded xp suspects (%d suspects)", len(self.sus))
+        self.log.info("Reloaded xp suspects (%s suspects)", len(self.sus))
 
     async def send_sus_msg(self, msg: discord.Message, xp: int):
         """Send a message into the sus channel"""
@@ -344,16 +349,15 @@ class Xp(commands.Cog):
         cnx = self.bot.cnx_xp
         cursor = cnx.cursor()
         try:
-            cursor.execute("SELECT 1 FROM `{}` LIMIT 1;".format(guild))
+            cursor.execute(f"SELECT 1 FROM `{guild}` LIMIT 1;")
             return guild
         except mysql.connector.errors.ProgrammingError:
             if create_if_missing:
-                cursor.execute("CREATE TABLE `{}` LIKE `example`;".format(guild))
-                self.bot.log.info(f"[get_table] XP Table `{guild}` created")
-                cursor.execute("SELECT 1 FROM `{}` LIMIT 1;".format(guild))
+                cursor.execute(f"CREATE TABLE `{guild}` LIKE `example`;")
+                self.log.info("[get_table] XP Table `%s` created", guild)
+                cursor.execute(f"SELECT 1 FROM `{guild}` LIMIT 1;")
                 return guild
-            else:
-                return None
+            return None
 
 
     async def db_set_xp(self, user_id: int, points: int, action: Literal['add', 'set']='add', guild_id: Optional[int]=None):
@@ -458,11 +462,11 @@ class Xp(commands.Cog):
                 await self.bot.unload_extension("fcts.xp")
                 return
             if guild_id is None:
-                self.bot.log.info("[xp] Loading XP cache (global)")
+                self.log.info("Loading XP cache (global)")
                 cnx = self.bot.cnx_axobot
                 query = f"SELECT `userID`,`xp` FROM `{self.table}` WHERE `banned`=0"
             else:
-                self.bot.log.info(f"[xp] Loading XP cache (guild {guild_id})")
+                self.log.info("Loading XP cache (guild %s)", guild_id)
                 table = await self.get_table_name(guild_id, False)
                 if table is None:
                     self.cache[guild_id] = {}
@@ -535,10 +539,12 @@ class Xp(commands.Cog):
             if guild is not None and await self.bot.get_config(guild.id, "xp_type") != "global":
                 cnx = self.bot.cnx_xp
                 table = await self.get_table_name(guild.id, False)
-                query = f"SELECT `userID`,`xp`, @curRank := @curRank + 1 AS rank FROM `{table}` p, (SELECT @curRank := 0) r WHERE `banned`='0' ORDER BY xp desc;"
+                query = f"SELECT `userID`,`xp`, @curRank := @curRank + 1 AS rank FROM `{table}` p, \
+                    (SELECT @curRank := 0) r WHERE `banned`='0' ORDER BY xp desc;"
             else:
                 cnx = self.bot.cnx_axobot
-                query = f"SELECT `userID`,`xp`, @curRank := @curRank + 1 AS rank FROM `{self.table}` p, (SELECT @curRank := 0) r WHERE `banned`='0' ORDER BY xp desc;"
+                query = f"SELECT `userID`,`xp`, @curRank := @curRank + 1 AS rank FROM `{self.table}` p, \
+                    (SELECT @curRank := 0) r WHERE `banned`='0' ORDER BY xp desc;"
             cursor = cnx.cursor(dictionary = True)
             try:
                 cursor.execute(query)
@@ -660,7 +666,8 @@ class Xp(commands.Cog):
         except Exception as err:
             self.bot.dispatch("command_error", ctx, err)
 
-    async def create_card(self, translation_map: dict[str, str], user: discord.User, style: str, xp: int, rank: int, ranks_nb: int, levels_info: tuple[int, int, int]):
+    async def create_card(self, translation_map: dict[str, str], user: discord.User, style: str, xp: int, rank: int,
+                          ranks_nb: int, levels_info: tuple[int, int, int]):
         "Find the user rank card, or generate a new one, based on given data"
         static = not (
             user.display_avatar.is_animated()
@@ -671,7 +678,7 @@ class Xp(commands.Cog):
         # check if the card has already been generated, and return it if it is the case
         if os.path.isfile(filepath):
             return discord.File(filepath)
-        self.bot.log.debug(f"XP card for user {user.id} ({xp=} - {style=} - {static=})")
+        self.log.debug("Generating new XP card for user %s (xp=%s - style=%s - static=%s)", user.id, xp, style, static)
         user_avatar = await self.get_image_from_url(user.display_avatar.replace(format=file_ext, size=256).url)
         card_generator = CardGeneration(
             card_name=style,
@@ -716,7 +723,8 @@ class Xp(commands.Cog):
             "total_xp": await self.bot._(source, "xp.card-xp-total"),
         }
 
-    async def send_card(self, ctx: MyContext, user: discord.User, xp: int, rank: int, ranks_nb: int, levels_info: tuple[int, int, int]):
+    async def send_card(
+            self, ctx: MyContext, user: discord.User, xp: int, rank: int, ranks_nb: int, levels_info: tuple[int, int, int]):
         """Generate and send a user rank card
         levels_info contains (current level, xp needed for the next level, xp needed for the current level)"""
         style = await self.bot.get_cog('Utilities').get_xp_style(user)
@@ -777,10 +785,10 @@ class Xp(commands.Cog):
     async def send_txt(self, ctx: MyContext, user: discord.User, xp, rank, ranks_nb,  levels_info: tuple[int, int, int]):
         "Send the user rank as a text message (fallback from embed)"
         txts = [await self.bot._(ctx.channel, "xp.card-level"), await self.bot._(ctx.channel, "xp.card-rank")]
-        msg = """__**{}**__
-**XP** {}/{}
-**{}** {}
-**{}** {}/{}""".format(user.display_name, xp, levels_info[1], txts[0].title(), levels_info[0], txts[1].title(), rank, ranks_nb)
+        msg = f"""__**{user.display_name}**__
+**XP** {xp}/{levels_info[1]}
+**{txts[0].title()}** {levels_info[0]}
+**{txts[1].title()}** {rank}/{ranks_nb}"""
         send_in_private = await self.bot.get_config(ctx.guild.id, "rank_in_dm")
         if ctx.interaction:
             await ctx.send(msg, ephemeral=send_in_private)
@@ -1003,7 +1011,7 @@ class Xp(commands.Cog):
                 await self.db_load_cache(ctx.guild.id)
             self.cache[ctx.guild.id][user.id] = [round(time.time()), xp]
             desc = f"XP of user {user} `{user.id}` edited (from {prev_xp} to {xp}) in server `{ctx.guild.id}`"
-            self.bot.log.info("[xp] " + desc)
+            self.log.info(desc)
             emb = discord.Embed(description=desc,color=8952255, timestamp=self.bot.utcnow())
             emb.set_footer(text=ctx.guild.name)
             emb.set_author(name=self.bot.user, icon_url=self.bot.user.display_avatar)
@@ -1090,7 +1098,8 @@ class Xp(commands.Cog):
                     for x in roles_list
                 ])
             else:
-                desc = await self.bot._(ctx.guild.id, "xp.no-rr-list", add=await self.bot.get_command_mention("roles-rewards add"))
+                desc = await self.bot._(
+                    ctx.guild.id, "xp.no-rr-list", add=await self.bot.get_command_mention("roles-rewards add"))
             max_rr: int = await self.bot.get_config(ctx.guild.id, "rr_max_number")
             title = await self.bot._(ctx.guild.id,"xp.rr_list", c=len(roles_list), max=max_rr)
             emb = discord.Embed(title=title, description=desc, timestamp=ctx.message.created_at)

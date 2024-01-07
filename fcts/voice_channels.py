@@ -1,12 +1,14 @@
 import json
+import logging
 import random
 from typing import Optional
-import discord
+
 import aiohttp
+import discord
 from discord.ext import commands
 
-from libs.checks import checks
 from libs.bot_classes import Axobot, MyContext
+from libs.checks import checks
 
 RANDOM_NAMES_URL = 'https://randommer.io/api/Name?nameType=surname&quantity=20'
 MINECRAFT_ENTITIES_URL = 'https://raw.githubusercontent.com/PixiGeko/Minecraft-generated-data/master/1.19/releases/1.19.3/data/tags/universal_tags/all_entity_type.json'
@@ -17,6 +19,7 @@ class VoiceChannels(commands.Cog):
     def __init__(self, bot: Axobot):
         self.bot = bot
         self.file = "voice_channels"
+        self.log = logging.getLogger("bot.voice_channels")
         self.names: dict[str, list[str]] = {'random': [], 'minecraft': []}
         self.channels: dict[int, list[int]] = {}
         self.table = 'voices_chats'
@@ -64,7 +67,7 @@ class VoiceChannels(commands.Cog):
         if not self.bot.database_online:
             return
         if not member.guild.me.guild_permissions.manage_roles:
-            self.bot.log.info(f"[Voice] Missing \"manage_roles\" permission on guild \"{member.guild.name}\"")
+            self.log.info("Missing \"manage_roles\" permission on guild %s", member.guild.id)
             return
         roles: Optional[list[discord.Role]] = await self.bot.get_config(member.guild.id, 'voice_roles')
         if not roles:
@@ -104,7 +107,11 @@ class VoiceChannels(commands.Cog):
                         await member.move_to(before.channel)
                         return
                 await self.create_channel(member)
-            if (before.channel is not None) and (member.guild.id in self.channels) and (before.channel.id in self.channels[member.guild.id]):
+            if (
+                (before.channel is not None)
+                and (member.guild.id in self.channels)
+                and (before.channel.id in self.channels[member.guild.id])
+            ):
                 await self.delete_channel(before.channel)
             if after.channel is None:
                 await self.give_roles(member, remove=True)
@@ -122,10 +129,10 @@ class VoiceChannels(commands.Cog):
         perms = category.permissions_for(member.guild.me)
         # if bot is missing perms: abort
         if not (perms.manage_channels and perms.move_members):
-            self.bot.log.info(f"[Voice] Missing \"manage_channels, move_members\" permission on guild \"{member.guild.id}\"")
+            self.log.info("Missing \"manage_channels, move_members\" permission on guild %s", member.guild.id)
             return
         if not (member.voice.channel.permissions_for(member.guild.me)).move_members:
-            self.bot.log.info(f"[Voice] Missing \"move_members\" permission on channel \"{member.voice.channel}\"")
+            self.log.info("Missing \"move_members\" permission on channel %s", member.voice.channel.id)
             return
         p = len(category.channels)
         # try to calculate the correct permissions

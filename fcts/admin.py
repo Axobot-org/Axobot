@@ -899,7 +899,7 @@ Cette option affecte tous les serveurs"""
         """Teste une url rss"""
         await ctx.defer()
         url = url.replace('<','').replace('>','')
-        feeds = await feed_parse(self.bot, url, 8)
+        feeds = await feed_parse(url, 8)
         if feeds is None:
             await ctx.send("Got a timeout")
             return

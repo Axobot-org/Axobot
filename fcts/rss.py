@@ -1,6 +1,7 @@
 import asyncio
 import datetime
 import importlib
+import logging
 import random
 import re
 import time
@@ -67,6 +68,7 @@ class Rss(commands.Cog):
         self.max_messages = 15 # max messages sent per feed per loop
 
         self.file = "rss"
+        self.log = logging.getLogger("bot.rss")
         self.embed_color = discord.Color(6017876)
         self.loop_processing = False
         self.errors_treshold = 24 * (60 / self.time_loop) # max errors allowed before disabling a feed (24h)
@@ -283,7 +285,7 @@ class Rss(commands.Cog):
             await ctx.send(await self.bot._(
                 ctx.guild,"rss.success-add", type=display_type, url=link, channel=ctx.channel.mention
             ))
-            self.bot.log.info(f"RSS feed added into server {ctx.guild.id} ({link} - {feed_id})")
+            self.log.info("RSS feed added into server %s (%s - %s)", ctx.guild.id, link, feed_id)
             await self.send_log(f"Feed added into server {ctx.guild.id} ({feed_id})", ctx.guild)
         except Exception as err:
             cmd = await self.bot.get_command_mention("about")
@@ -317,7 +319,7 @@ class Rss(commands.Cog):
         await self.db_remove_feeds(feed_ids)
         await ctx.send(await self.bot._(ctx.guild, "rss.delete-success", count=len(feed_ids)))
         ids = ', '.join(map(str, feed_ids))
-        self.bot.log.info(f"RSS feed deleted into server {ctx.guild.id} ({ids})")
+        self.log.info("RSS feed deleted into server %s (%s)", ctx.guild.id, ids)
         await self.send_log(f"Feed deleted into server {ctx.guild.id} ({ids})", ctx.guild)
 
     @systeme_rm.autocomplete("feed")
@@ -353,7 +355,7 @@ class Rss(commands.Cog):
         await self.db_enable_feeds(feed_ids, enable=True)
         await ctx.send(await self.bot._(ctx.guild, "rss.enable-success", count=len(feed_ids)))
         ids = ', '.join(map(str, feed_ids))
-        self.bot.log.info(f"RSS feed enabled into server {ctx.guild.id} ({ids})")
+        self.log.info("RSS feed enabled into server %s (%s)", ctx.guild.id, ids)
         await self.send_log(f"Feed enabled into server {ctx.guild.id} ({ids})", ctx.guild)
 
     @feed_enable.autocomplete("feed")
@@ -393,7 +395,7 @@ class Rss(commands.Cog):
         await self.db_enable_feeds(feed_ids, enable=False)
         await ctx.send(await self.bot._(ctx.guild, "rss.disable-success", count=len(feed_ids)))
         ids = ', '.join(map(str, feed_ids))
-        self.bot.log.info(f"RSS feed disabled into server {ctx.guild.id} ({ids})")
+        self.log.info("RSS feed disabled into server %s (%s)", ctx.guild.id, ids)
         await self.send_log(f"Feed disabled into server {ctx.guild.id} ({ids})", ctx.guild)
         if await self.bot.tips_manager.should_show_guild_tip(ctx.guild.id, GuildTip.RSS_DIFFERENCE_DISABLE_DELETE):
             rss_enable_cmd = await self.bot.get_command_mention("rss enable")
@@ -1216,7 +1218,7 @@ class Rss(commands.Cog):
         if self.deviant_rss.is_deviantart_url(url):
             return True
         # check web feed
-        feed = await feed_parse(self.bot, url, 8)
+        feed = await feed_parse(url, 8)
         if feed is None:
             return False
         return len(feed.get("entries", [])) > 0
@@ -1261,7 +1263,8 @@ class Rss(commands.Cog):
             form = ''
         else:
             form = await self.bot._(guild_id, f"rss.{_type}-default-flow")
-        query = f"INSERT INTO `{self.table}` (`ID`, `guild`, `channel`, `type`, `link`, `structure`) VALUES (%(i)s, %(g)s, %(c)s, %(t)s, %(l)s, %(f)s)"
+        query = f"INSERT INTO `{self.table}` (`ID`, `guild`, `channel`, `type`, `link`, `structure`) \
+            VALUES (%(i)s, %(g)s, %(c)s, %(t)s, %(l)s, %(f)s)"
         async with self.bot.db_query(query, { 'i': feed_id, 'g': guild_id, 'c': channel_id, 't': _type, 'l': link, 'f': form }):
             pass
         return feed_id
@@ -1333,7 +1336,7 @@ class Rss(commands.Cog):
             working_ids_list = ', '.join(map(str, working_ids))
             query = f"UPDATE `{self.table}` SET `recent_errors` = 0 WHERE `ID` IN ({working_ids_list})"
             async with self.bot.db_query(query, returnrowcount=True) as query_results:
-                self.bot.log.debug("[rss] reset errors for %s feeds", query_results)
+                self.log.debug("Reset errors for %s feeds", query_results)
         if broken_ids:
             broken_ids_list = ', '.join(map(str, broken_ids))
             query = f"UPDATE `{self.table}` SET `recent_errors` = `recent_errors` + 1 WHERE `ID` IN ({broken_ids_list})"
@@ -1347,7 +1350,7 @@ class Rss(commands.Cog):
         ids_list = ', '.join(map(str, feed_ids))
         query = f"UPDATE `{self.table}` SET `last_refresh` = %s WHERE `ID` IN ({ids_list})"
         async with self.bot.db_query(query, (datetime.datetime.utcnow(),), returnrowcount=True) as query_results:
-            self.bot.log.info("[rss] set last refresh for %s feeds", query_results)
+            self.log.info("Set last refresh date for %s feeds", query_results)
 
     async def send_rss_msg(self, obj: "RssMessage", channel: Union[discord.TextChannel, discord.Thread]):
         "Send a RSS message into its Discord channel, with the corresponding mentions"
@@ -1366,10 +1369,10 @@ class Rss(commands.Cog):
                 await channel.send(content, allowed_mentions=allowed_mentions, silent=obj.feed.silent_mention)
             return True
         except discord.HTTPException as err:
-            self.bot.log.info(f"[send_rss_msg] Cannot send message on channel {channel.id}: {err}")
+            self.log.info("Cannot send message on channel %s: %s", channel.id, err)
             self.bot.dispatch("error", err, f"While sending feed {obj.feed.feed_id} on channel {channel.id}")
         except Exception as err:
-            self.bot.log.info(f"[send_rss_msg] Cannot send message on channel {channel.id}: {err}")
+            self.log.info("Cannot send message on channel %s: %s", channel.id, err)
             self.bot.dispatch("error", err, f"While sending feed {obj.feed.feed_id} on channel {channel.id}")
         return False
 
@@ -1390,11 +1393,11 @@ class Rss(commands.Cog):
         try:
             guild = self.bot.get_guild(feed.guild_id)
             if guild is None:
-                self.bot.log.info("[send_rss_msg] Cannot send message on server %s (unknown guild)", feed.guild_id)
+                self.log.info("Cannot send message on server %s (unknown guild)", feed.guild_id)
                 return False
             chan = await self._get_channel_or_thread(guild, feed.channel_id)
             if chan is None:
-                self.bot.log.info("[send_rss_msg] Cannot send message on channel %s (unknown channel)", feed.channel_id)
+                self.log.info("Cannot send message on channel %s (unknown channel)", feed.channel_id)
                 self.bot.dispatch("server_warning", ServerWarningType.RSS_UNKNOWN_CHANNEL, guild,
                                   channel_id=feed.channel_id, feed_id=feed.feed_id)
                 return False
@@ -1478,7 +1481,7 @@ class Rss(commands.Cog):
         for feed in feeds:
             if feed.recent_errors >= self.errors_treshold:
                 await self.db_update_feed(feed.feed_id, [('enabled', False)])
-                self.bot.log.info(f"[rss] Disabled feed {feed.feed_id} (too many errors)")
+                self.log.info("Disabled feed %s (too many errors)", feed.feed_id)
                 if guild := self.bot.get_guild(feed.guild_id):
                     self.bot.dispatch("server_warning", ServerWarningType.RSS_DISABLED_FEED,
                                       guild,
@@ -1508,11 +1511,11 @@ class Rss(commands.Cog):
         if self.loop_processing:
             return
         if guild_id is None:
-            self.bot.log.info("Check RSS lancé")
+            self.log.info("Started RSS check")
             self.loop_processing = True
             feeds_list = await self.db_get_all_feeds()
         else:
-            self.bot.log.info(f"Check RSS lancé pour le serveur {guild_id}")
+            self.log.info("Started RSS check for guild %s", guild_id)
             feeds_list = await self.db_get_guild_feeds(guild_id)
         # remove disabled feeds
         feeds_list = [feed for feed in feeds_list if feed.enabled]
@@ -1553,9 +1556,9 @@ class Rss(commands.Cog):
         emb = discord.Embed(description='\n'.join(desc), color=1655066, timestamp=self.bot.utcnow())
         emb.set_author(name=self.bot.user, icon_url=self.bot.user.display_avatar)
         await self.bot.send_embed(emb, url="loop")
-        self.bot.log.info(desc[0])
+        self.log.info(desc[0])
         if len(errors_ids) > 0:
-            self.bot.log.warning("[rss] "+desc[1])
+            self.log.warning(desc[1])
         if guild_id is None:
             self.loop_processing = False
         self.cache.clear()
@@ -1566,9 +1569,9 @@ class Rss(commands.Cog):
         if not self.bot.rss_enabled:
             return
         if not self.bot.database_online:
-            self.bot.log.warning('[rss] Database is offline, skipping rss loop')
+            self.log.warning('[rss] Database is offline, skipping rss loop')
             return
-        self.bot.log.info(" Boucle rss commencée !")
+        self.log.info(" RSS loop starting!")
         try:
             await self.refresh_feeds()
         except Exception as err:
@@ -1602,14 +1605,14 @@ class Rss(commands.Cog):
                 await ctx.send("Boucle rss relancée !")
         elif new_state == "stop":
             self.rss_loop.cancel() # pylint: disable=no-member
-            self.bot.log.info(" Boucle rss arrêtée de force par un admin")
+            self.log.info(" RSS loop force-stopped by an admin")
             await ctx.send("Boucle rss arrêtée de force !")
         elif new_state == "once":
             if self.loop_processing:
                 await ctx.send("Une boucle rss est déjà en cours !")
             else:
                 await ctx.send("Et hop ! Une itération de la boucle en cours !")
-                self.bot.log.info(" Boucle rss forcée")
+                self.log.info(" RSS loop forced by an admin")
                 await self.refresh_feeds()
 
     async def send_log(self, text: str, guild: discord.Guild):

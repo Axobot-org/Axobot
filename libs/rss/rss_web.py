@@ -32,7 +32,7 @@ class WebRSS:
     async def _get_feed(self, url: str, filter_config: Optional[FeedFilterConfig]=None,
                         session: Optional[aiohttp.ClientSession]=None) -> FeedParserDict:
         "Get a list of feeds from a web URL"
-        feed = await feed_parse(self.bot, url, 9, session)
+        feed = await feed_parse(url, 9, session)
         if feed is None or not feed.entries:
             return None
         if 'bozo_exception' in feed and not isinstance(feed['bozo_exception'], CharacterEncodingOverride):

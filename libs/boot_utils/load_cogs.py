@@ -67,7 +67,7 @@ async def load_cogs(bot: "Axobot"):
         try:
             await bot.load_extension(extension)
         except discord.DiscordException:
-            bot.log.critical('Failed to load extension %s', extension, exc_info=True)
+            bot.log.critical("Failed to load extension %s", extension, exc_info=True)
             count += 1
         if count  > 0:
             bot.log.critical("%s modules not loaded\nEnd of program", count)

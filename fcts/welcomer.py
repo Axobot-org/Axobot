@@ -1,4 +1,5 @@
 import asyncio
+import logging
 from typing import Literal, Optional
 
 import discord
@@ -15,6 +16,7 @@ class Welcomer(commands.Cog):
     def __init__(self, bot: Axobot):
         self.bot = bot
         self.file = "welcomer"
+        self.log = logging.getLogger("bot.welcomer")
         # List of users who won't receive welcome/leave messages :
         #   someone, Awhikax's alt, Z_Jumper
         self.no_message = {392766377078816789, 504269440872087564, 552273019020771358}
@@ -127,39 +129,39 @@ class Welcomer(commands.Cog):
             await msg.delete()
             return True
         except discord.HTTPException as err:
-            self.bot.log.debug(f"Failed to delete welcome message {message_id} in {channel.guild.id} | {channel.id}: {err}")
+            self.log.warning("Failed to delete welcome message %s in %s | %s: %s", message_id, channel.guild.id, channel.id, err)
         except Exception as err:
             self.bot.dispatch("error", err, f"While deleting welcome message in {channel.guild.id} | {channel.id}")
         return False
 
     async def check_owner_server(self, member: discord.Member):
-        """Vérifie si un nouvel arrivant est un propriétaire de serveur"""
+        """Check if a newscommer of the support server is the owner of a server"""
         servers = [x for x in self.bot.guilds if x.owner == member and x.member_count > 10]
         if len(servers) > 0:
             role = member.guild.get_role(486905171738361876)
             if role is None:
-                self.bot.log.warning('[check_owner_server] Owner role not found')
+                self.log.warning("Owner role not found in support server")
                 return
             if role not in member.roles:
                 await member.add_roles(role,reason="This user support me")
 
     async def check_support(self, member: discord.Member):
-        """Vérifie si un nouvel arrivant fait partie du support"""
+        """Check if a newscommer of the support server is part of the bot support team"""
         if await self.bot.get_cog('Users').has_userflag(member, 'support'):
             role = member.guild.get_role(412340503229497361)
             if role is not None:
                 await member.add_roles(role)
             else:
-                self.bot.log.warning('[check_support] Support role not found')
+                self.log.warning("Support role not found in support server")
 
     async def check_contributor(self, member: discord.Member):
-        """Vérifie si un nouvel arrivant est un contributeur"""
+        """Check if a newscommer of the support server is a contributor"""
         if await self.bot.get_cog('Users').has_userflag(member, 'contributor'):
             role = member.guild.get_role(552428810562437126)
             if role is not None:
                 await member.add_roles(role)
             else:
-                self.bot.log.warning('[check_contributor] Contributor role not found')
+                self.log.warning("Contributor role not found in support server")
 
     async def give_roles_back(self, member: discord.Member):
         """Give roles rewards/muted role to new users"""

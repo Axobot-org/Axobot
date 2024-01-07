@@ -1,3 +1,4 @@
+import logging
 import math
 import re
 import subprocess
@@ -44,6 +45,8 @@ class BotStats(commands.Cog):
     def __init__(self, bot: Axobot):
         self.bot = bot
         self.file = 'bot_stats'
+        self.log = logging.getLogger("bot.stats")
+
         self.received_events = {'CMD_USE': 0}
         self.commands_uses: dict[str, int] = {}
         self.app_commands_uses: dict[str, int] = {}
@@ -139,7 +142,7 @@ class BotStats(commands.Cog):
                 row = row.replace("  ", " ")
             fd = ''.join(c for c in row.split(" ")[3] if not c.isdigit())
             if not fd:
-                self.bot.log.info("Unknown file descriptor for open file: %s", row)
+                self.log.info("Unknown file descriptor for open file: %s", row)
                 continue
             self.open_files[fd] += 1
             if (file_type := row.split(" ")[4]) and file_type.startswith("IPv"):
@@ -262,7 +265,7 @@ class BotStats(commands.Cog):
                 self.last_backup_size /= 1024
             elif unit == "K":
                 self.last_backup_size /= 1024**2
-            self.bot.log.info(f"Last backup size detected: {self.last_backup_size}G")
+            self.log.info("Last backup size detected: %sG", self.last_backup_size)
 
     async def _check_voice_msg(self, message: discord.Message):
         "Collect the amount of sent voice messages"
@@ -396,7 +399,8 @@ class BotStats(commands.Cog):
             if len(liste) == 0:
                 return
             current_timestamp = datetime.fromtimestamp(round(time.time()))
-            query = f"INSERT INTO `{self.emoji_table}` (`ID`,`count`,`last_update`) VALUES (%(i)s, 1, %(l)s) ON DUPLICATE KEY UPDATE count = `count` + 1, last_update = %(l)s;"
+            query = f"INSERT INTO `{self.emoji_table}` (`ID`,`count`,`last_update`) VALUES (%(i)s, 1, %(l)s) \
+                ON DUPLICATE KEY UPDATE count = `count` + 1, last_update = %(l)s;"
             for data in [{ 'i': x, 'l': current_timestamp } for x in liste]:
                 async with self.bot.db_query(query, data):
                     pass
@@ -426,7 +430,7 @@ class BotStats(commands.Cog):
         """Send our stats every minute"""
         if not (self.bot.stats_enabled and self.bot.database_online):
             return
-        self.bot.log.debug("Stats loop triggered")
+        self.log.debug("Stats loop triggered")
         # get current time
         now = self.bot.utcnow()
         # remove seconds and less
@@ -454,13 +458,16 @@ class BotStats(commands.Cog):
                     cursor.execute(query, (now, 'rss.'+k, v, 0, k, k == "messages", self.bot.entity_id))
                     self.rss_stats[k] = 0
                 self.rss_loop_finished = False
-            cursor.execute(query, (now, 'rss.disabled', await self.db_get_disabled_rss(), 0, 'disabled', False, self.bot.entity_id))
+            cursor.execute(query,
+                           (now, 'rss.disabled', await self.db_get_disabled_rss(), 0, 'disabled', False, self.bot.entity_id))
             # XP cards
             if self.xp_cards["generated"]:
-                cursor.execute(query, (now, 'xp.generated_cards', self.xp_cards["generated"], 0, 'cards/min', True, self.bot.entity_id))
+                cursor.execute(query,
+                               (now, 'xp.generated_cards', self.xp_cards["generated"], 0, 'cards/min', True, self.bot.entity_id))
                 self.xp_cards["generated"] = 0
             if self.xp_cards["sent"]:
-                cursor.execute(query, (now, 'xp.sent_cards', self.xp_cards["sent"], 0, 'cards/min', True, self.bot.entity_id))
+                cursor.execute(query,
+                               (now, 'xp.sent_cards', self.xp_cards["sent"], 0, 'cards/min', True, self.bot.entity_id))
                 self.xp_cards["sent"] = 0
             # Latency
             if latency := await self.get_list_usage(self.latency_records):
@@ -488,19 +495,26 @@ class BotStats(commands.Cog):
             del unav, total
             # antiscam warn/deletions
             if self.antiscam["warning"]:
-                cursor.execute(query, (now, 'antiscam.warning', self.antiscam["warning"], 0, 'warning/min', True, self.bot.entity_id))
+                cursor.execute(query,
+                               (now, 'antiscam.warning', self.antiscam["warning"], 0, 'warning/min', True, self.bot.entity_id))
             if self.antiscam["deletion"]:
-                cursor.execute(query, (now, 'antiscam.deletion', self.antiscam["deletion"], 0, 'deletion/min', True, self.bot.entity_id))
+                cursor.execute(query,
+                               (now, 'antiscam.deletion', self.antiscam["deletion"], 0, 'deletion/min', True, self.bot.entity_id))
             self.antiscam["warning"] = self.antiscam["deletion"] = 0
             # antiscam scanned messages
             if antiscam_cog := self.bot.get_cog("AntiScam"):
-                cursor.execute(query, (now, 'antiscam.scanned', antiscam_cog.messages_scanned, 0, 'messages/min', True, self.bot.entity_id))
+                cursor.execute(query,
+                               (now, 'antiscam.scanned',
+                                antiscam_cog.messages_scanned, 0, 'messages/min', True, self.bot.entity_id))
                 antiscam_cog.messages_scanned = 0
             # antiscam activated count
-            cursor.execute(query, (now, 'antiscam.activated', await self.db_get_antiscam_enabled_count(), 0, 'guilds', False, self.bot.entity_id))
+            antiscam_enabled = await self.db_get_antiscam_enabled_count()
+            cursor.execute(query, (now, 'antiscam.activated',antiscam_enabled, 0, 'guilds', False, self.bot.entity_id))
             # tickets creation
             if self.ticket_events["creation"]:
-                cursor.execute(query, (now, 'tickets.creation', self.ticket_events["creation"], 0, 'tickets/min', True, self.bot.entity_id))
+                cursor.execute(query,
+                               (now, 'tickets.creation',
+                                self.ticket_events["creation"], 0, 'tickets/min', True, self.bot.entity_id))
                 self.ticket_events["creation"] = 0
             if self.bot.current_event:
                 try:
@@ -556,7 +570,7 @@ class BotStats(commands.Cog):
             # Push everything
             cnx.commit()
         except mysql.connector.errors.IntegrityError as err: # usually duplicate primary key
-            self.bot.log.warning(f"Stats loop iteration cancelled: {err}", exc_info=True)
+            self.log.warning("Stats loop iteration cancelled: %s", err, exc_info=True)
             self.bot.dispatch("error", err, "Stats loop iteration cancelled")
         # if something goes wrong, we still have to close the cursor
         cursor.close()
@@ -602,8 +616,7 @@ class BotStats(commands.Cog):
                 "https://api.statuspage.io/v1/pages/g9cnphg3mhm9/metrics/x4xs4clhkmz0/data",
                     json=params) as response:
                 response.raise_for_status()
-                self.bot.log.debug(
-                    f"StatusPage API returned {response.status} for {params} (latency)")
+                self.log.debug("StatusPage API returned %s for %s (latency)", response.status, params)
 
     @status_loop.before_loop
     async def before_status_loop(self):
@@ -620,7 +633,7 @@ class BotStats(commands.Cog):
             return
         query = "INSERT INTO `statsbot`.`heartbeat` (`entity_id`) VALUES (%s)"
         async with self.bot.db_query(query, (self.bot.entity_id,)):
-            self.bot.log.debug("Heartbeat sent to database")
+            self.log.debug("Heartbeat sent to database")
 
     @heartbeat_loop.before_loop
     async def before_heartbeat_loop(self):
