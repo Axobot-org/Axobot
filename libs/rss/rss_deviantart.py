@@ -38,7 +38,7 @@ class DeviantartRSS:
                         session: Optional[aiohttp.ClientSession]=None) -> FeedParserDict:
         "Get a list of feeds from a deviantart username"
         url = 'https://backend.deviantart.com/rss.xml?q=gallery%3A' + username
-        feed = await feed_parse(self.bot, url, 9, session)
+        feed = await feed_parse(url, 9, session)
         if feed is None or 'bozo_exception' in feed or not feed.entries:
             return None
         if filter_config is not None:

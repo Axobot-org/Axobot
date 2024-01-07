@@ -98,7 +98,7 @@ class YoutubeRSS:
                              session: Optional[aiohttp.ClientSession]=None) -> list[FeedParserDict]:
         "Get the feed list from a youtube channel"
         url = 'https://www.youtube.com/feeds/videos.xml?channel_id='+channel_id
-        feed = await feed_parse(self.bot, url, 7, session)
+        feed = await feed_parse(url, 7, session)
         if feed is None or not feed.entries:
             return []
         if filter_config is not None:

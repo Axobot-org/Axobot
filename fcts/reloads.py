@@ -1,4 +1,5 @@
 import importlib
+import logging
 
 from discord.ext import commands
 
@@ -12,6 +13,7 @@ class Reloads(commands.Cog):
     def __init__(self, bot: Axobot):
         self.bot = bot
         self.file = "reloads"
+        self.log = logging.getLogger("bot.reloads")
         self.ignored_guilds = [
             471361000126414848, # Zbot emojis 1
             513087032331993090, # Zbot emojis 2
@@ -42,13 +44,13 @@ class Reloads(commands.Cog):
                 except ModuleNotFoundError:
                     await ctx.send(f"Cog {cog} was never loaded")
                 else:
-                    self.bot.log.info(f"Lib {cog} reloaded")
+                    self.log.info("Lib %s reloaded", cog)
                     await ctx.send(f"Lib {cog} reloaded")
             except Exception as err:
                 self.bot.dispatch("error", err, ctx)
                 await ctx.send(f'**`ERROR:`** {type(err).__name__} - {err}')
             else:
-                self.bot.log.info(f"Module {cog} rechargé")
+                self.log.info("Extension %s reloaded", cog)
                 reloaded_cogs.append(cog)
             if cog == 'utilities':
                 await self.bot.get_cog('Utilities').on_ready()
@@ -64,7 +66,7 @@ class Reloads(commands.Cog):
         try:
             await self.bot.load_extension('fcts.'+name)
             await ctx.send(f"Module '{name}' ajouté !")
-            self.bot.log.info(f"Module {name} ajouté")
+            self.log.info("Extension %s loaded", name)
         except Exception as err:
             await ctx.send(str(err))
 
@@ -75,7 +77,7 @@ class Reloads(commands.Cog):
         try:
             await self.bot.unload_extension('fcts.'+name)
             await ctx.send(f"Module '{name}' désactivé !")
-            self.bot.log.info(f"Module {name} ajouté")
+            self.log.info("Extension %s unloaded", name)
         except Exception as err:
             await ctx.send(str(err))
 

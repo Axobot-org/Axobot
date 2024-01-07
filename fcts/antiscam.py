@@ -1,8 +1,10 @@
+import logging
 import typing
 
 import discord
 from discord import app_commands
 from discord.ext import commands
+
 from libs.antiscam import AntiScamAgent, Message
 from libs.antiscam.classes import (EMBED_COLORS, MsgReportView,
                                    PredictionResult, get_avg_word_len,
@@ -12,7 +14,6 @@ from libs.antiscam.normalization import normalize
 from libs.antiscam.similarities import check_message
 from libs.antiscam.training_bayes import train_model
 from libs.bot_classes import Axobot, MyContext
-
 from libs.checks import checks
 
 
@@ -29,10 +30,11 @@ class AntiScam(commands.Cog):
     def __init__(self, bot: Axobot):
         self.bot = bot
         self.file = "antiscam"
+        self.log = logging.getLogger("bot.antiscam")
         try:
             self.agent = AntiScamAgent()
         except FileNotFoundError:
-            self.bot.log.error("[antiscam] Failed to load the agent: file not found")
+            self.log.error("Failed to load the agent: file not found")
             self.agent = None
         self.table = 'messages_beta'
         self.report_ctx_menu = app_commands.ContextMenu(
@@ -46,11 +48,11 @@ class AntiScam(commands.Cog):
         "Load websites list from database"
         if self.bot.database_online:
             if self.agent is None:
-                self.bot.log.warning("[antiscam] No model found, training a new one... this will take a while")
+                self.log.warning("No model found, training a new one... this will take a while")
                 model = await train_model(await self.get_messages_list(), quick_train=True)
                 AntiScamAgent.save_model_to_file(model)
                 self.agent = AntiScamAgent()
-                self.bot.log.info("[antiscam] Model trained and saved to file")
+                self.log.info("Model trained and saved to file")
             try:
                 data: dict[str, bool] = {}
                 query = "SELECT `domain`, `is_safe` FROM `spam-detection`.`websites`"
@@ -58,12 +60,12 @@ class AntiScam(commands.Cog):
                     for row in query_result:
                         data[row['domain']] = row['is_safe']
                 self.agent.save_websites_locally(data)
-                self.bot.log.info(f"[antiscam] Loaded {len(data)} domain names from database")
+                self.log.info("Loaded %s domain names from database", len(data))
                 return
             except Exception as err:
                 self.bot.dispatch("error", err, "While loading antiscam domains list")
         self.agent.fetch_websites_locally()
-        self.bot.log.info(f"[antiscam] Loaded {len(self.agent.websites_list)} domain names from local file")
+        self.log.info("Loaded %s domain names from local file", len(self.agent.websites_list))
 
     async def cog_unload(self):
         "Disable the report context menu"
@@ -343,7 +345,7 @@ class AntiScam(commands.Cog):
         result = self.agent.predict_bot(message)
         if result.result > 1:
             message.category = 0
-            self.bot.log.info("[antiscam] detected (%s): %s", result.probabilities[2], message.message)
+            self.log.info("Detected (%s): %s", result.probabilities[2], message.message)
             if result.probabilities[1] < 0.005: # if probability of not being harmless is less than 0.5%
                 try:
                     await msg.delete() # try to delete it, silently fails

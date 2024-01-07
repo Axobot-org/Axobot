@@ -1,3 +1,4 @@
+import logging
 import time
 from typing import Optional
 
@@ -6,8 +7,8 @@ from aiohttp import ClientSession
 from discord import app_commands
 from discord.ext import commands
 
-from libs.checks import checks
 from libs.bot_classes import Axobot
+from libs.checks import checks
 from libs.formatutils import FormatUtils
 
 
@@ -17,6 +18,7 @@ class VoiceMessages(commands.Cog):
     def __init__(self, bot: Axobot):
         self.bot = bot
         self.file = "voice_msg"
+        self.log = logging.getLogger("bot.voice_msg")
         self.stt_ctx_menu = app_commands.ContextMenu(
             name='Voice to text',
             callback=self.handle_message_command,
@@ -56,13 +58,15 @@ class VoiceMessages(commands.Cog):
             # if message is in the cache, use it
             result = self.cache[message.id]
             duration = None
+            self.log.debug("Transcript already available in cache: skipping API call")
         else:
             # else generate it
             start = time.time()
             result = await self._get_transcript(attachment)
             duration = time.time() - start
-            self.bot.log.info(
-                f"[VoiceMessage] Transcript done in {duration:.1f}s (original duration: {attachment.duration:.1f}s)"
+            self.log.info(
+                "Transcript done in %ss (original duration: %ss)",
+                round(duration, 1), round(attachment.duration, 1)
             )
             self.bot.dispatch("voice_transcript_completed", attachment.duration, duration)
             self.cache[message.id] = result
@@ -73,6 +77,7 @@ class VoiceMessages(commands.Cog):
                 await self.bot._(interaction.user, "voice_msg.no-transcript"),
                 ephemeral=True
             )
+            self.log.info("Transcript is empty")
             return
         # if transcript is too long, truncate it
         if len(result) > 1900:

@@ -1,3 +1,4 @@
+import logging
 import os
 import random
 import re
@@ -22,6 +23,7 @@ class Errors(commands.Cog):
     def __init__(self, bot: Axobot):
         self.bot = bot
         self.file = "errors"
+        self.log = logging.getLogger("bot.errors")
         # map of user ID and number of cooldowns recently hit
         self.cooldown_pool: dict[int, int] = {}
 
@@ -178,7 +180,7 @@ class Errors(commands.Cog):
             # Invalid member, role or permission
             if isinstance(error, arguments_errors.InvalidPermissionTargetError):
                 return await send_err('errors.invalidpermissiontarget')
-            self.bot.log.warning('Unknown BadArgument error type: %s', error)
+            self.log.warning('Unknown BadArgument error type: %s', error)
         elif isinstance(error,commands.errors.MissingRequiredArgument):
             await ctx.send(await self.bot._(
                 ctx.channel,'errors.missingargument',
@@ -200,9 +202,9 @@ class Errors(commands.Cog):
             try:
                 await ctx.send(await self.bot._(ctx.channel, 'errors.unknown', about=cmd), ephemeral=True)
             except Exception as newerror:
-                self.bot.log.info(f"[on_cmd_error] Can't send error on channel {ctx.channel.id}: {newerror}")
+                self.log.info("[on_cmd_error] Can't send error on channel %s: %s", ctx.channel.id, newerror)
         # All other Errors not returned come here... And we can just print the default TraceBack.
-        self.bot.log.warning(f'Ignoring exception in command {ctx.message.content}:')
+        self.log.warning('Ignoring exception in command %s:', ctx.message.content)
         await self.on_error(error,ctx)
 
     @commands.Cog.listener()
@@ -242,7 +244,7 @@ class Errors(commands.Cog):
         elif interaction.type == discord.InteractionType.autocomplete:
             await self.on_error(error, f"Command autocompletion | {guild}")
         else:
-            self.bot.log.warn(f"Unhandled interaction error type: {interaction.type}")
+            self.log.warning("Unhandled interaction error type: %s", interaction.type)
             await self.on_error(error, None)
 
     @commands.Cog.listener()
@@ -257,7 +259,7 @@ class Errors(commands.Cog):
         try:
             # if this is only an interaction too slow, don't report in bug channel
             if isinstance(error, discord.NotFound) and error.code == 10062:
-                self.bot.log.warning(f"[on_error] {error}", exc_info=exc_info)
+                self.log.warning("Ignored NotFound error: %s", error, exc_info=exc_info)
                 return
             # get traceback info
             if isinstance(ctx, discord.Message):
@@ -282,9 +284,9 @@ class Errors(commands.Cog):
                 await ctx.channel.send(f"{context}\n```py\n{trace[:1950]}\n```")
             else:
                 await self.send_error_msg_autoformat(context, trace)
-            self.bot.log.warning(f"[on_error] {error}", exc_info=exc_info)
+            self.log.warning("Error: %s", error, exc_info=exc_info)
         except Exception as err: # pylint: disable=broad-except
-            self.bot.log.error(f"[on_error] {err}", exc_info=exc_info)
+            self.log.error("Error while sending logs for another error: %s", err, exc_info=exc_info)
 
     async def send_error_msg_autoformat(self, context: str, python_message: str):
         """Envoie un message dans le salon d'erreur"""

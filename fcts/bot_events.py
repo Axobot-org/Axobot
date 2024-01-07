@@ -1,5 +1,6 @@
 import datetime
 import json
+import logging
 from typing import Any, Generator, Literal, Optional, Union
 
 import discord
@@ -18,6 +19,7 @@ class BotEvents(commands.Cog):
     def __init__(self, bot: Axobot):
         self.bot = bot
         self.file = "bot_events"
+        self.log = logging.getLogger("bot.event")
 
         self.current_event: Optional[EventType] = None
         self.current_event_data: EventData = {}
@@ -35,7 +37,7 @@ class BotEvents(commands.Cog):
     def subcog(self) -> AbstractSubcog:
         "Return the subcog populated with the current event data"
         if self._subcog.current_event != self.current_event or self._subcog.current_event_data != self.current_event_data:
-            self.bot.log.info("[BotEvents] Updating subcog with new data")
+            self.log.debug("Updating subcog with new data")
             self._subcog = ChristmasSubcog(self.bot, self.current_event, self.current_event_data, self.current_event_id)
         return self._subcog
 
@@ -73,13 +75,13 @@ class BotEvents(commands.Cog):
                 self.current_event = ev_data["type"]
                 self.current_event_data = ev_data
                 self.current_event_id = ev_id
-                self.bot.log.info("Current bot event: %s", ev_id)
+                self.log.info("Current bot event: %s", ev_id)
                 break
             if ev_data["begin"] - datetime.timedelta(days=5) <= now < ev_data["begin"]:
                 self.coming_event = ev_data["type"]
                 self.coming_event_data = ev_data
                 self.coming_event_id = ev_id
-                self.bot.log.info("Incoming bot event: %s", ev_id)
+                self.log.info("Incoming bot event: %s", ev_id)
 
     async def get_specific_objectives(self, reward_type: Literal["rankcard", "role", "custom"]):
         "Get all objectives matching a certain reward type"

@@ -1,3 +1,4 @@
+import logging
 import time
 from typing import Optional, Union
 
@@ -26,6 +27,7 @@ class Tickets(commands.Cog):
     def __init__(self, bot: Axobot):
         self.bot = bot
         self.file = "tickets"
+        self.log = logging.getLogger("bot.tickets")
         self.cooldowns: dict[discord.User, float] = {}
         self.default_name_format = "{username}-{topic}"
         self.max_format_length = 70
@@ -289,6 +291,7 @@ class Tickets(commands.Cog):
             try:
                 channel = await category.create_text_channel(channel_name, overwrites=perms)
             except discord.Forbidden:
+                self.log.info("Missing perms to create channel in %s", category.id)
                 await interaction.edit_original_response(content=await self.bot._(interaction.guild_id, "tickets.missing-perms-creation.channel", category=category.name))
                 self.bot.dispatch("server_warning", ServerWarningType.TICKET_CREATION_FAILED,
                     interaction.guild,
@@ -296,16 +299,6 @@ class Tickets(commands.Cog):
                     topic_name=topic['topic']
                 )
                 return
-            # try:
-            #     await self.get_ticket_channel_perms(channel, topic, interaction.user)
-            # except discord.Forbidden:
-            #     await self.send_missing_permissions_err(interaction, category.name)
-            #     self.bot.dispatch("server_warning", ServerWarningType.TICKET_INIT_FAILED,
-            #         interaction.guild,
-            #         channel=category,
-            #         topic_name=topic['topic']
-            #     )
-            #     sent_error = True
         elif isinstance(category, discord.TextChannel):
             try:
                 if "PRIVATE_THREADS" in interaction.guild.features and category.permissions_for(interaction.guild.me).create_private_threads:
@@ -314,6 +307,7 @@ class Tickets(commands.Cog):
                     channel_type = discord.ChannelType.public_thread
                 channel = await category.create_thread(name=channel_name, type=channel_type)
             except discord.Forbidden:
+                self.log.info("Missing perms to create thread in %s", category.id)
                 await interaction.edit_original_response(content=await self.bot._(interaction.guild_id, "tickets.missing-perms-creation.thread", channel=category.mention))
                 self.bot.dispatch("server_warning", ServerWarningType.TICKET_CREATION_FAILED,
                     interaction.guild,
@@ -323,8 +317,9 @@ class Tickets(commands.Cog):
                 return
             await self.setup_ticket_thread(channel, topic, interaction.user)
         else:
-            self.bot.log.error("[ticket] unknown category type: %s", type(category))
+            self.log.error("Unknown channel or category type: %s", type(category))
             return
+        self.log.debug("Created channel/thread %s", channel.id)
         topic['topic'] = topic['topic'] or await self.bot._(interaction.guild_id, "tickets.other")
         txt: str = await self.bot._(interaction.guild_id, "tickets.ticket-created", channel=channel.mention, topic=topic['topic'])
         if sent_error:

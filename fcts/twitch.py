@@ -1,4 +1,5 @@
 import json
+import logging
 import re
 from typing import Optional, TypedDict
 
@@ -29,6 +30,7 @@ class Twitch(commands.Cog):
     def __init__(self, bot: Axobot):
         self.bot = bot
         self.file = "twitch"
+        self.log = logging.getLogger("bot.twitch")
         self.agent = TwitchApiAgent()
         self.twitch_color = 0x6441A4
 
@@ -37,13 +39,13 @@ class Twitch(commands.Cog):
             self.bot.others["twitch"]["client_id"],
             self.bot.others["twitch"]["client_secret"]
         )
-        self.bot.log.info("[twitch] connected to API")
+        self.log.info("Connected to API")
         self.stream_check_task.start() # pylint: disable=no-member
 
     async def cog_unload(self):
         "Close the Twitch session"
         await self.agent.close_session()
-        self.bot.log.info("[twitch] connection closed")
+        self.log.info("Connection to API closed")
         self.stream_check_task.cancel() # pylint: disable=no-member
 
     async def db_add_streamer(self, guild_id: int, platform: PlatformId, user_id: str, user_name: str):
@@ -245,6 +247,7 @@ class Twitch(commands.Cog):
             await ctx.send(await self.bot._(ctx, "twitch.check-stream.offline", streamer=streamer))
 
     async def create_stream_embed(self, stream: StreamObject, guild_id: int, streamer_avatar: Optional[str]=None):
+        "Create a Discord embed for a starting Twitch stream"
         started_at = isoparse(stream["started_at"])
         embed = discord.Embed(
             title=stream["title"],
@@ -272,7 +275,10 @@ class Twitch(commands.Cog):
     async def find_streamer_offline_in_guild(self, guild: discord.Guild, role: discord.Role):
         "Find any member in the guild who has the streamer role but is not currently streaming"
         for member in guild.members:
-            if role in member.roles and not any(activity.type == discord.ActivityType.streaming for activity in member.activities):
+            if (
+                role in member.roles
+                and not any(activity.type == discord.ActivityType.streaming for activity in member.activities)
+            ):
                 yield member
 
     async def send_stream_alert(self, stream: StreamObject, channel: discord.abc.GuildChannel):
@@ -311,24 +317,24 @@ class Twitch(commands.Cog):
                 try:
                     await member.add_roles(role, reason="Twitch streamer is live")
                 except discord.Forbidden:
-                    self.bot.log.info("[twitch] Cannot add role %s to member %s in guild %s: Forbidden", role.id, member.id, guild.id)
+                    self.log.info("Cannot add role %s to member %s in guild %s: Forbidden", role.id, member.id, guild.id)
 
     @commands.Cog.listener()
-    async def on_stream_ends(self, streamer_name: str, guild: discord.Guild):
+    async def on_stream_ends(self, _streamer_name: str, guild: discord.Guild):
         "When a stream ends, remove the role from the streamer"
         if role := await self.bot.get_config(guild.id, "streaming_role"):
             async for member in self.find_streamer_offline_in_guild(guild, role):
                 try:
                     await member.remove_roles(role, reason="Twitch streamer is offline")
                 except discord.Forbidden:
-                    self.bot.log.info("[twitch] Cannot remove role %s from member %s in guild %s: Forbidden", role.id, member.id, guild.id)
+                    self.log.info("Cannot remove role %s from member %s in guild %s: Forbidden", role.id, member.id, guild.id)
 
     @tasks.loop(minutes=5)
     async def stream_check_task(self):
         "Check if any subscribed streamer is streaming and send notifications"
         await self.bot.wait_until_ready()
         if not self.bot.database_online:
-            self.bot.log.warning("[twitch] Database is offline, skipping stream check")
+            self.log.warning("Database is offline, skipping stream check")
             return
         count = 0
         streamer_ids: dict[str, _StreamersReadyForNotification] = {}
@@ -351,7 +357,7 @@ class Twitch(commands.Cog):
                 streamer_ids = {}
         if streamer_ids:
             await self._update_streams(streamer_ids)
-        self.bot.log.info("[twitch] %s streamers checked", count)
+        self.log.debug("%s streamers checked", count)
 
     @stream_check_task.error
     async def on_stream_check_error(self, error: Exception):

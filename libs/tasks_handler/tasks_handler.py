@@ -1,13 +1,14 @@
 from __future__ import annotations
 
 import json
+import logging
 import re
 from datetime import datetime, timedelta, timezone
 from typing import TYPE_CHECKING, Optional
 
 import discord
-from libs.enums import ServerWarningType
 
+from libs.enums import ServerWarningType
 from libs.formatutils import FormatUtils
 
 from .types import DbTask
@@ -21,6 +22,7 @@ class TaskHandler:
 
     def __init__(self, bot: Axobot):
         self.bot = bot
+        self.log = logging.getLogger("bot.tasks")
 
     async def get_events_from_db(self, get_all: bool = False) -> list[DbTask]:
         """Renvoie une liste de tous les events qui doivent être exécutés"""
@@ -49,7 +51,7 @@ class TaskHandler:
         tasks_list = await self.get_events_from_db()
         if len(tasks_list) == 0:
             return
-        self.bot.log.debug("[tasks_loop] Itération (%s tâches trouvées)", len(tasks_list))
+        self.log.debug("Iterating (%s tasks found)", len(tasks_list))
         for task in tasks_list:
             # if axobot is there, let it handle it
             if task['guild'] and await self.bot.check_axobot_presence(guild_id=task['guild'], channel_id=task['channel']):
@@ -70,7 +72,7 @@ class TaskHandler:
                     await self.remove_task(task['ID'])
                 except Exception as err:  # pylint: disable=broad-except
                     self.bot.dispatch("error", err)
-                    self.bot.log.error("[unmute_task] Unable to auto unmute %s", err)
+                    self.log.error("Unmute: Unable to auto unmute %s", err)
             if task['action'] == 'ban':
                 try:
                     guild = self.bot.get_guild(task['guild'])
@@ -91,7 +93,7 @@ class TaskHandler:
                     await self.remove_task(task['ID'])
                 except Exception as err:  # pylint: disable=broad-except
                     self.bot.dispatch("error", err)
-                    self.bot.log.error("[unban_task] Unable to auto unban: %s", err)
+                    self.log.error("Unban: Unable to auto unban: %s", err)
             if task['action'] == "timer":
                 try:
                     sent = await self.task_timer(task)
@@ -99,7 +101,7 @@ class TaskHandler:
                     await self.remove_task(task['ID'])
                 except Exception as err:  # pylint: disable=broad-except
                     self.bot.dispatch("error", err)
-                    self.bot.log.error("[timer_task] Unable to send timer: %s", err)
+                    self.log.error("Reminder: Unable to send timer: %s", err)
                 else:
                     if sent:
                         await self.remove_task(task['ID'])
@@ -127,11 +129,11 @@ class TaskHandler:
                                 role=role,
                                 user=user
                             )
-                            self.bot.log.warning("[role-grant_task] Unable to remove temporary role: Forbidden")
+                            self.log.warning("RoleGrant: Unable to remove temporary role: Forbidden")
                     await self.remove_task(task['ID'])
                 except Exception as err:  # pylint: disable=broad-except
                     self.bot.dispatch("error", err)
-                    self.bot.log.error("[role-grant_task] Unable to remove temporary role: %s", err)
+                    self.log.error("RoleGrant: Unable to remove temporary role: %s", err)
 
     async def _get_or_fetch_user(self, user_id: int):
         if user := self.bot.get_user(user_id):
