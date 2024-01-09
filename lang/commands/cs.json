@@ -47,6 +47,7 @@
         "profile card-preview": "karta-náhledů",
         "profile config": "nastavení",
         "profile list-card-styles": "seznam-stylů-karet",
+        "random-tip": "náhodný-tip",
         "rank": "hodnost",
         "reminders clear": "vyčistit",
         "reminders create": "vytvořit",
@@ -130,7 +131,8 @@
         "cases edit-reason": "Upravit důvod případu moderace",
         "cases list": "Seznam všech případů moderování uživatele",
         "cases remove": "Trvale smazat případ moderace",
-        "cases search": "Najít podrobnosti moderování případu"
+        "cases search": "Najít podrobnosti moderování případu",
+        "random-tip": "Získejte náhodný tip nebo zajímavost o botovi"
     },
     "group_description": {
         "antiscam": "Vše, co souvisí s funkcí antiscam",
