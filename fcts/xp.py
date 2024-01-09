@@ -289,35 +289,46 @@ class Xp(commands.Cog):
         return (current_level, xp_for_next_lvl, xp_for_current_lvl)
 
 
-    async def give_rr(self, member: discord.Member, level: int, rr_list: list, remove: bool=False):
+    async def give_rr(self, member: discord.Member, level: int, rr_list: list[dict], remove: bool=False):
         """Give (and remove?) roles rewards to a member"""
-        c = 0
-        has_roles = [x.id for x in member.roles]
-        for role in [x for x in rr_list if x['level']<=level and x['role'] not in has_roles]:
-            try:
-                r = member.guild.get_role(role['role'])
-                if r is None:
-                    continue
-                if not self.bot.beta:
-                    await member.add_roles(r, reason=f"Role reward (lvl {role['level']})")
-                c += 1
-            except Exception as err:
-                if self.bot.beta:
-                    self.bot.dispatch("error", err)
+        if not member.guild.me.guild_permissions.manage_roles:
+            return 0
+        count = 0
+        has_roles = {role.id for role in member.roles}
+        bot_top_role_position = member.guild.me.top_role.position
+        # list roles to add to this member
+        roles_to_give: list[discord.Role] = []
+        for role in [rr for rr in rr_list if rr['level'] <= level and rr['role'] not in has_roles]:
+            role = member.guild.get_role(role['role'])
+            if role is None or role.position >= bot_top_role_position:
+                continue
+            roles_to_give.append(role)
+        # give missing roles
+        try:
+            if not self.bot.beta:
+                await member.add_roles(*roles_to_give, reason="Role rewards")
+            count += len(roles_to_give)
+        except Exception as err:
+            if self.bot.beta:
+                self.bot.dispatch("error", err)
         if not remove:
-            return c
-        for role in [x for x in rr_list if x['level']>level and x['role'] in has_roles]:
-            try:
-                r = member.guild.get_role(role['role'])
-                if r is None:
-                    continue
-                if not self.bot.beta:
-                    await member.remove_roles(r, reason=f"Role reward (lvl {role['level']})")
-                c += 1
-            except Exception as err:
-                if self.bot.beta:
-                    self.bot.dispatch("error", err)
-        return c
+            return count
+        # list roles to remove from this member
+        roles_to_remove: list[discord.Role] = []
+        for role in [rr for rr in rr_list if rr['level'] > level and rr['role'] in has_roles]:
+            role = member.guild.get_role(role['role'])
+            if role is None or role.position >= bot_top_role_position:
+                continue
+            roles_to_remove.append(role)
+        # remove unauthorized roles
+        try:
+            if not self.bot.beta:
+                await member.remove_roles(*roles_to_remove, reason="Role rewards")
+            count += len(roles_to_remove)
+        except Exception as err:
+            if self.bot.beta:
+                self.bot.dispatch("error", err)
+        return count
 
     async def reload_sus(self):
         """Check who should be observed for potential xp cheating"""
