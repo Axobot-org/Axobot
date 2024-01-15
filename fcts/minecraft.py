@@ -293,11 +293,10 @@ Every information come from the website www.fr-minecraft.net"""
             "sortOrder": "desc",
             "searchFilter": search_value
         }
-        async with aiohttp.ClientSession(loop=self.bot.loop, headers=header) as session:
-            async with session.get(url, params=params, timeout=10) as resp:
-                if resp.status >= 400:
-                    raise ValueError(f"CurseForge API returned {resp.status} for {search_value}")
-                api_results: list[dict[str, Any]] = (await resp.json())["data"]
+        async with self.session.get(url, params=params, headers=header, timeout=10) as resp:
+            if resp.status >= 400:
+                raise ValueError(f"CurseForge API returned {resp.status} for {search_value}")
+            api_results: list[dict[str, Any]] = (await resp.json())["data"]
         if len(api_results) == 0:
             return
         search = api_results[0]
@@ -342,7 +341,10 @@ Every information come from the website www.fr-minecraft.net"""
             translation = await self.bot._(ctx.channel, "minecraft.mod-fields."+name)
             if isinstance(data_value, int):
                 data_value = await FormatUtils.format_nbr(data_value, lang)
-            inline = name in {"authors", "release", "downloads", "id-curseforge"} or name == "categories" and len(data_value) < 100
+            inline = (
+                name in {"authors", "release", "downloads", "id-curseforge"}
+                or name == "categories" and len(data_value) < 100
+            )
             embed.add_field(name=translation, value=data_value, inline=inline)
         return embed, pertinence
 
@@ -353,11 +355,10 @@ Every information come from the website www.fr-minecraft.net"""
             "query": search_value,
             "facets": "[[\"project_type:mod\"]]",
         }
-        async with aiohttp.ClientSession(loop=self.bot.loop) as session:
-            async with session.get(url, params=params, timeout=10) as resp:
-                if resp.status >= 400:
-                    raise ValueError(f"Modrinth API returned {resp.status} for {search_value}")
-                api_results: list[dict[str, Any]] = (await resp.json())["hits"]
+        async with self.session.get(url, params=params, timeout=10) as resp:
+            if resp.status >= 400:
+                raise ValueError(f"Modrinth API returned {resp.status} for {search_value}")
+            api_results: list[dict[str, Any]] = (await resp.json())["hits"]
         if len(api_results) == 0:
             return
         search = api_results[0]
@@ -550,13 +551,12 @@ Every information come from the website www.fr-minecraft.net"""
         if username in self.uuid_cache:
             return self.uuid_cache[username]
         url = "https://api.mojang.com/users/profiles/minecraft/"+username
-        async with self.session as session:
-            async with session.get(url, timeout=10) as resp:
-                try:
-                    search: dict = await resp.json()
-                    self.uuid_cache[username] = search.get("id")
-                except aiohttp.ContentTypeError:
-                    self.uuid_cache[username] = None
+        async with self.session.get(url, timeout=10) as resp:
+            try:
+                search: dict = await resp.json()
+                self.uuid_cache[username] = search.get("id")
+            except aiohttp.ContentTypeError:
+                self.uuid_cache[username] = None
         return self.uuid_cache[username]
 
     class MCServer:
