@@ -131,7 +131,7 @@ class WebRSS:
         posts_list: list[RssMessage] = []
         date_field_key = await self._get_feed_date_key(feed.entries[0])
         if date_field_key is None or date_field_key == "published":
-            last_entry = await self.get_last_post(channel, url, session)
+            last_entry = await self.get_last_post(channel, url, filter_config, session)
             if isinstance(last_entry, RssMessage):
                 return [last_entry]
             return []
