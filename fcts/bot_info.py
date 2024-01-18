@@ -86,61 +86,61 @@ class BotInfo(commands.Cog):
 
     async def stats_general(self, ctx: MyContext):
         "General statistics about the bot"
+        await ctx.defer()
         python_version = sys.version_info
         f_python_version = str(python_version.major)+"."+str(python_version.minor)
         latency = round(self.bot.latency*1000, 2)
-        async with ctx.channel.typing():
-            # RAM/CPU
-            ram_usage = round(self.process.memory_info()[0]/2.**30,3)
-            if cog := self.bot.get_cog("BotStats"):
-                cpu: float = await cog.get_list_usage(cog.bot_cpu_records)
-            else:
-                cpu = 0.0
-            # Guilds count
-            ignored_guilds = []
-            if self.bot.database_online:
-                ignored_guilds = [int(x) for x in self.bot.get_cog('Utilities').config['banned_guilds'].split(";") if len(x) > 0]
-            ignored_guilds += self.bot.get_cog('Reloads').ignored_guilds
-            len_servers = await self.get_guilds_count(ignored_guilds)
-            # Languages
-            langs_list = list((await self.bot.get_cog('ServerConfig').get_languages(ignored_guilds)).items())
-            langs_list.sort(reverse=True, key=lambda x: x[1])
-            lang_total = sum(x[1] for x in langs_list)
-            langs_list = ' | '.join([f"{x[0]}: {x[1]/lang_total*100:.0f}%" for x in langs_list if x[1] > 0])
-            del lang_total
-            # Users/bots
-            users,bots = self.get_users_nber(ignored_guilds)
-            # Total XP
-            if self.bot.database_online:
-                total_xp = await self.bot.get_cog('Xp').db_get_total_xp()
-            else:
-                total_xp = ""
-            # Commands within 24h
-            cmds_24h = await self.bot.get_cog("BotStats").get_sum_stats("wsevent.CMD_USE", 60*24)
-            # RSS messages within 24h
-            rss_msg_24h = await self.bot.get_cog("BotStats").get_sum_stats("rss.messages", 60*24)
-            # number formatter
-            lang = await self.bot._(ctx.guild.id,"_used_locale")
-            async def n_format(nbr: Union[int, float, None]):
-                return await FormatUtils.format_nbr(nbr, lang) if nbr is not None else "0"
-            # Generating message
-            desc = ""
-            for key, var in [
-                ('bot_version', self.bot_version),
-                ('servers_count', await n_format(len_servers)),
-                ('users_count', (await n_format(users), await n_format(bots))),
-                ('codes_lines', await n_format(self.codelines)),
-                ('languages', langs_list),
-                ('python_version', f_python_version),
-                ('lib_version', discord.__version__),
-                ('ram_usage', await n_format(ram_usage)),
-                ('cpu_usage', await n_format(cpu)),
-                ('api_ping', await n_format(latency)),
-                ('cmds_24h', await n_format(cmds_24h)),
-                ('rss_msg_24h', await n_format(rss_msg_24h)),
-                ('total_xp', await n_format(total_xp)+" ")]:
-                str_args = {f'v{i}': var[i] for i in range(len(var))} if isinstance(var, (tuple, list)) else {'v': var}
-                desc += await self.bot._(ctx.channel, "info.stats."+key, **str_args) + "\n"
+        # RAM/CPU
+        ram_usage = round(self.process.memory_info()[0]/2.**30,3)
+        if cog := self.bot.get_cog("BotStats"):
+            cpu: float = await cog.get_list_usage(cog.bot_cpu_records)
+        else:
+            cpu = 0.0
+        # Guilds count
+        ignored_guilds = []
+        if self.bot.database_online:
+            ignored_guilds = [int(x) for x in self.bot.get_cog('Utilities').config['banned_guilds'].split(";") if len(x) > 0]
+        ignored_guilds += self.bot.get_cog('Reloads').ignored_guilds
+        len_servers = await self.get_guilds_count(ignored_guilds)
+        # Languages
+        langs_list = list((await self.bot.get_cog('ServerConfig').get_languages(ignored_guilds)).items())
+        langs_list.sort(reverse=True, key=lambda x: x[1])
+        lang_total = sum(x[1] for x in langs_list)
+        langs_list = ' | '.join([f"{x[0]}: {x[1]/lang_total*100:.0f}%" for x in langs_list if x[1] > 0])
+        del lang_total
+        # Users/bots
+        users,bots = self.get_users_nber(ignored_guilds)
+        # Total XP
+        if self.bot.database_online:
+            total_xp = await self.bot.get_cog('Xp').db_get_total_xp()
+        else:
+            total_xp = ""
+        # Commands within 24h
+        cmds_24h = await self.bot.get_cog("BotStats").get_sum_stats("wsevent.CMD_USE", 60*24)
+        # RSS messages within 24h
+        rss_msg_24h = await self.bot.get_cog("BotStats").get_sum_stats("rss.messages", 60*24)
+        # number formatter
+        lang = await self.bot._(ctx.guild.id,"_used_locale")
+        async def n_format(nbr: Union[int, float, None]):
+            return await FormatUtils.format_nbr(nbr, lang) if nbr is not None else "0"
+        # Generating message
+        desc = ""
+        for key, var in [
+            ('bot_version', self.bot_version),
+            ('servers_count', await n_format(len_servers)),
+            ('users_count', (await n_format(users), await n_format(bots))),
+            ('codes_lines', await n_format(self.codelines)),
+            ('languages', langs_list),
+            ('python_version', f_python_version),
+            ('lib_version', discord.__version__),
+            ('ram_usage', await n_format(ram_usage)),
+            ('cpu_usage', await n_format(cpu)),
+            ('api_ping', await n_format(latency)),
+            ('cmds_24h', await n_format(cmds_24h)),
+            ('rss_msg_24h', await n_format(rss_msg_24h)),
+            ('total_xp', await n_format(total_xp)+" ")]:
+            str_args = {f'v{i}': var[i] for i in range(len(var))} if isinstance(var, (tuple, list)) else {'v': var}
+            desc += await self.bot._(ctx.channel, "info.stats."+key, **str_args) + "\n"
         if ctx.can_send_embed: # if we can use embed
             title = await self.bot._(ctx.channel,"info.stats.title")
             color = ctx.bot.get_cog('Help').help_color
