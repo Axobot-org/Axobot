@@ -446,9 +446,6 @@ class ServerConfig(commands.Cog):
         "Send the specific config value for guild into a channel"
         if self.bot.zombie_mode:
             return
-        if not ctx.channel.permissions_for(ctx.guild.me).embed_links:
-            await ctx.send(await self.bot._(ctx.channel, "minecraft.cant-embed"))
-            return
         if (opt_data := options_list.get(option)) is None:
             return await ctx.send(await self.bot._(ctx.guild.id, "server.option-notfound"))
         if not opt_data["is_listed"]:
