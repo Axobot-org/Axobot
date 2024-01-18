@@ -76,7 +76,9 @@ class Xp(commands.Cog):
         if not self.bot.database_online:
             await self.bot.unload_extension("fcts.xp")
 
-    async def get_lvlup_chan(self, msg: discord.Message) -> discord.abc.Messageable:
+    async def get_lvlup_chan(self, msg: discord.Message) -> Union[
+            None, discord.DMChannel, discord.TextChannel, discord.VoiceChannel, discord.StageChannel, discord.Thread
+        ]:
         "Find the channel where to send the levelup message"
         value = await self.bot.get_config(msg.guild.id, "levelup_channel")
         if value == "none":
@@ -217,7 +219,10 @@ class Xp(commands.Cog):
         if msg.guild is None:
             return
         destination = await self.get_lvlup_chan(msg)
-        if destination is None or (not msg.channel.permissions_for(msg.guild.me).send_messages):
+        # if no destination could be found, or destination is in guild and bot can't send messages: abort
+        if destination is None or (
+            not isinstance(destination, discord.DMChannel) and not destination.permissions_for(msg.guild.me).send_messages
+        ):
             return
         text: Optional[str] = await self.bot.get_config(msg.guild.id, "levelup_msg")
         if text is None or len(text) == 0:
