@@ -21,7 +21,7 @@
         "Version d'ajout"
     ],
     "block-help": "Cette commande permet d'obtenir des informations sur n'importe quel bloc de Minecraft. Vous pouvez donner son nom complet ou partiel, en français ou en anglais, ou même son identifiant. Il suffit d'entrer `%{p}mc block <nom>`",
-    "cant-embed": "Impossible d'envoyez l'embed. Vérifiez que la permission \"Embed links\" est bien activée svp",
+    "cant-embed": "Impossible d'envoyez l'embed. Vérifiez que la permission \"Embed links\" est bien activée",
     "cmd-fields": [
         "Nom",
         "Syntaxe",
