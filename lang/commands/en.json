@@ -35,6 +35,7 @@
         "info": "info",
         "kick": "kick",
         "last-post": "last-post",
+        "membercount": "membercount",
         "modlogs disable": "disable",
         "modlogs enable": "enable",
         "modlogs list": "list",
@@ -132,6 +133,7 @@
         "cases list": "List all the moderation cases of a user",
         "cases remove": "Permanently delete a moderation case",
         "cases search": "Find the details of a moderation case",
+        "membercount": "Get some stats about your server members",
         "random-tip": "Get a random tip or trivia about the bot"
     },
     "group_description": {

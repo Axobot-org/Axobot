@@ -103,19 +103,6 @@ class Utilities(commands.Cog):
             return False
         return True
 
-    async def get_members_repartition(self, members: List[discord.Member]):
-        """Get number of total/online/bots members in a selection"""
-        bots = online = total = unverified = 0
-        for u in members:
-            if u.bot:
-                bots += 1
-            if u.status != discord.Status.offline:
-                online += 1
-            if u.pending:
-                unverified += 1
-            total += 1
-        return total, bots, online, unverified
-
     def sync_check_any_link(self, text: str):
         "Check if a text contains a http url"
         pattern = r"(https?://?(?:[-\w.]|(?:%[\da-fA-F]{2}))+|discord.gg/[^\s]+)"

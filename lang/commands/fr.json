@@ -128,6 +128,7 @@
         "cases remove": "Supprime un casier de modération",
         "cases search": "Affiche les détails d'un casier de modération",
         "clear": "Supprime des messages du salon",
+        "membercount": "Donne quelques stats sur les membres du serveur",
         "random-tip": "Affiche une astuce aléatoire à propos du bot",
         "slowmode": "Ralenti le spam du salon en activant le mode lent"
     },
