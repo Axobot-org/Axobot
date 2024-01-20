@@ -117,9 +117,6 @@ class BotEvents(commands.Cog):
         if msg.guild is not None and not msg.channel.permissions_for(msg.guild.me).add_reactions:
             # don't react if we don't have the required permission
             return
-        if msg.guild and await self.bot.check_axobot_presence(guild=msg.guild):
-            # If axobot is already there, don't do anything
-            return
         if self.current_event:
             await self.subcog.on_message(msg)
 

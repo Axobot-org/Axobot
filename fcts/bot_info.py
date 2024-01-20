@@ -279,9 +279,7 @@ ORDER BY usages DESC LIMIT %(limit)s"""
         """Get the documentation url"""
         text = self.bot.emojis_manager.customs['readthedocs'] + await self.bot._(ctx.channel,"info.docs") + \
             " https://axobot.rtfd.io"
-        if self.bot.entity_id == 0:
-            text += '/en/main'
-        elif self.bot.entity_id == 1:
+        if self.bot.entity_id == 1:
             text += '/en/develop'
         await ctx.send(text)
 
@@ -370,7 +368,7 @@ ORDER BY usages DESC LIMIT %(limit)s"""
 
 ..Doc infos.html#about"""
         urls = ""
-        bot_invite = "https://zrunner.me/" + ("invitezbot" if self.bot.entity_id == 0 else "invite-axobot")
+        bot_invite = discord.utils.oauth_url(self.bot.user.id)
         links = {
             "server": "https://discord.gg/N55zY88",
             "invite": bot_invite,

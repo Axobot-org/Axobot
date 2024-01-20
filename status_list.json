@@ -1,18 +1,11 @@
 {
-    "zbot": [
-        "something",
-        "type !help for the win",
-        "type !help",
-        "minecraft powaaa",
-        "tic-tac-toe",
-        "with Wumpus"
-    ],
     "axobot": [
         "now with slash commands!",
         "something",
         "type / for the win",
         "minecraft",
         "tic-tac-toe",
+        "with Wumpus",
         "axolotl adventures",
         "in an Axolotl bucket",
         "with OpenAI voice-to-text"

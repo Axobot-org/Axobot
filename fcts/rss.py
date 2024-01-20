@@ -1289,16 +1289,12 @@ class Rss(commands.Cog):
             return query_result > 0
 
     async def db_get_all_feeds(self):
-        """Get every feed of the database"""
-        guild_ids = [
-            guild.id
-            for guild in self.bot.guilds
-            if not await self.bot.check_axobot_presence(guild=guild)
-        ]
+        """Get every feed of the database from known guilds"""
+        guild_ids = [guild.id for guild in self.bot.guilds]
         query = "SELECT * FROM `{}` WHERE `guild` in ({})".format(self.table,','.join(["'{}'".format(g_id) for g_id in guild_ids]))
         async with self.bot.db_query(query) as query_results:
-            liste = [FeedObject(result) for result in query_results]
-        return liste
+            feeds_list = [FeedObject(result) for result in query_results]
+        return feeds_list
 
     async def db_get_raws_count(self, get_disabled: bool = False):
         """Get the number of rss feeds"""

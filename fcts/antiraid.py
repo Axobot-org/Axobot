@@ -43,9 +43,6 @@ class AntiRaid(commands.Cog):
 
     async def _get_raid_level(self, guild: discord.Guild) -> int:
         "Get the raid protection level of a guild, between 0 and 5"
-        if await self.bot.check_axobot_presence(guild=guild):
-            # if Axobot is there, we don't care
-            return 0
         level_name: str = await self.bot.get_config(guild.id, "anti_raid")
         return options["anti_raid"]["values"].index(level_name)
 
