@@ -113,27 +113,6 @@ class Utilities(commands.Cog):
         pattern = r"((?:discord\.gg|discord(?:app)?.com/invite|discord.me)/.+)"
         return re.search(pattern, text)
 
-    async def clear_msg(self, text: str, everyone: bool=False, ctx: MyContext=None, emojis: bool=True):
-        """Remove every mass mention from a text, and add custom emojis"""
-        if emojis:
-            for x in re.finditer(r'(?<!<|a):([^:<]+):', text):
-                try:
-                    if ctx is not None:
-                        em = await commands.EmojiConverter().convert(ctx, x.group(1))
-                    else:
-                        emoji_id = x.group(1)
-                        if emoji_id.isnumeric():
-                            em = self.bot.get_emoji(int(emoji_id))
-                        else:
-                            em = discord.utils.find(
-                                lambda e, id=emoji_id: e.name == id, self.bot.emojis)
-                except (commands.BadArgument, commands.EmojiNotFound):
-                    continue
-                if em is not None:
-                    text = text.replace(x.group(0), "<{}:{}:{}>".format(
-                        'a' if em.animated else '', em.name, em.id))
-        return text
-
     async def get_xp_style(self, user: discord.User) -> str:
         "Return the chosen rank card style for a user"
         if config := await self.bot.get_cog("Users").db_get_userinfo(user.id):
