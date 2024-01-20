@@ -387,12 +387,11 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         ..Example bigtext Hi world! I'm 69?!
 
         ..Doc fun.html#bigtext"""
-        # contenu = await self.bot.get_cog('Utilities').clear_msg(text,ctx=ctx,emojis=False)
-        contenu = await commands.clean_content().convert(ctx, text)
+        content = await commands.clean_content().convert(ctx, text)
         text = ""
         Em = self.bot.emojis_manager
         mentions = [x.group(1) for x in re.finditer(r'(<(?:@!?&?|#|a?:[a-zA-Z0-9_]+:)\d+>)',ctx.message.content)]
-        content = "¬¬".join(contenu.split("\n"))
+        content = "¬¬".join(content.split("\n"))
         for x in mentions:
             content = content.replace(x,'¤¤')
         for l in content:
@@ -508,11 +507,6 @@ You can specify a verification limit by adding a number in argument (up to 1.000
                     await ctx.send(f"Yeah we know you are {word[0]}")
                     return
         try:
-            text = await self.utilities.clear_msg(text, ctx=ctx)
-        except Exception as err:
-            self.bot.dispatch("command_error", ctx, err)
-            return
-        try:
             if not channel.permissions_for(ctx.guild.me).send_messages:
                 return await ctx.send(str(await self.bot._(ctx.guild.id, 'fun', 'no-say'))+random.choice([' :confused:', '', '', '']))
             await channel.send(text)
@@ -526,13 +520,15 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         """No U
 
         ..Doc fun.html#me"""
-        text = "*{} {}*".format(ctx.author.display_name,text)
-        text = await self.utilities.clear_msg(text,ctx=ctx)
+        text = f"*{ctx.author.display_name} {text}*"
         await ctx.send(text)
         try:
-            if self.bot.database_online and await self.bot.get_cog("ServerConfig").check_member_config_permission(ctx.author, "say_allowed_roles"):
+            if (
+                self.bot.database_online
+                and await self.bot.get_cog("ServerConfig").check_member_config_permission(ctx.author, "say_allowed_roles")
+            ):
                 await ctx.message.delete(delay=0)
-        except commands.CommandError: # user can't use 'say'
+        except commands.CommandError:  # user can't use 'say'
             pass
 
     @commands.command(name="react")
@@ -680,7 +676,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
 
         ..Doc fun.html#afk"""
         try:
-            self.afk_guys[ctx.author.id] = await self.utilities.clear_msg(reason, ctx=ctx)
+            self.afk_guys[ctx.author.id] = reason
             if (not ctx.author.display_name.endswith(' [AFK]')) and len(ctx.author.display_name)<26:
                 await ctx.author.edit(nick=ctx.author.display_name+" [AFK]")
             await ctx.send(await self.bot._(ctx.guild.id,"fun.afk.afk-done"))
@@ -689,7 +685,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
 
     async def user_is_afk(self, user: discord.User) -> bool:
         "Check if a user is currently afk"
-        cond = user.id in self.afk_guys.keys()
+        cond = user.id in self.afk_guys
         if cond:
             return True
         return isinstance(user, discord.Member) and user.nick and user.nick.endswith(' [AFK]')
@@ -734,9 +730,9 @@ You can specify a verification limit by adding a number in argument (up to 1.000
                     if member.id not in self.afk_guys or len(self.afk_guys[member.id]) == 0:
                         await msg.channel.send(await self.bot._(msg.guild.id,"fun.afk.afk-user-noreason"))
                     else:
-                        tr = await self.bot._(msg.guild.id,"fun.afk.afk-user-reason",reason=self.afk_guys[member.id])
-                        reason = await self.utilities.clear_msg(tr, ctx=ctx)
-                        await msg.channel.send(reason)
+                        await msg.channel.send(
+                            await self.bot._(msg.guild.id,"fun.afk.afk-user-reason",reason=self.afk_guys[member.id])
+                        )
         # auto unafk if the author was afk and has enabled it
         if isinstance(ctx.author, discord.Member) and not await checks.is_a_cmd(msg, self.bot):
             if (ctx.author.nick and ctx.author.nick.endswith(' [AFK]')) or ctx.author.id in self.afk_guys:

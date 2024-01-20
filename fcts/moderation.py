@@ -188,15 +188,9 @@ Slowmode works up to one message every 6h (21600s)
             return
         # send DM
         await self.dm_user(user, "kick", ctx, reason=reason)
-        if reason is None:
-            f_reason = "Unspecified"
-        else:
-            f_reason = await self.bot.get_cog("Utilities").clear_msg(
-                reason,
-                everyone = not ctx.channel.permissions_for(ctx.author).mention_everyone
-            )
+        f_reason = reason or "Unspecified"
         try:
-            await ctx.guild.kick(user, reason=f_reason[:512]+self.bot.zws)
+            await ctx.guild.kick(user, reason=f_reason[:512] + self.bot.zws)
         except discord.errors.Forbidden:
             await ctx.send(await self.bot._(ctx.guild.id, "moderation.kick.too-high"))
         case_id = None
@@ -253,10 +247,6 @@ Slowmode works up to one message every 6h (21600s)
         try:
             # send DM
             await self.dm_user(user, "warn", ctx, reason=message)
-            message = await self.bot.get_cog("Utilities").clear_msg(
-                message,
-                everyone = not ctx.channel.permissions_for(ctx.author).mention_everyone
-            )
             case_id = None
             if self.bot.database_online:
                 if cases_cog := self.bot.get_cog('Cases'):
@@ -380,13 +370,7 @@ You can also mute this member for a defined duration, then use the following for
             return
         case_id = None
         try:
-            if reason is None:
-                f_reason = "Unspecified"
-            else:
-                f_reason = await self.bot.get_cog("Utilities").clear_msg(
-                    reason,
-                    everyone = not ctx.channel.permissions_for(ctx.author).mention_everyone
-                )
+            f_reason = reason or "Unspecified"
             if self.bot.database_online:
                 cases_cog = self.bot.get_cog('Cases')
                 if f_duration is None:
@@ -611,13 +595,7 @@ The 'days_to_delete' option represents the number of days worth of messages to d
             await self.dm_user(user, "ban", ctx, reason=reason)
         if days_to_delete not in range(8):
             days_to_delete = 0
-        if reason is None:
-            f_reason = "Unspecified"
-        else:
-            f_reason = await self.bot.get_cog("Utilities").clear_msg(
-                reason,
-                everyone = not ctx.channel.permissions_for(ctx.author).mention_everyone
-            )
+        f_reason = reason or "Unspecified"
         try:
             await ctx.guild.ban(user, reason=f_reason[:512]+self.bot.zws, delete_message_seconds=days_to_delete * 86400)
         except discord.errors.Forbidden:
@@ -682,14 +660,8 @@ The 'days_to_delete' option represents the number of days worth of messages to d
         except discord.NotFound:
             await ctx.send(await self.bot._(ctx.guild.id, "moderation.ban.user-not-banned"))
             return
-        if reason is None:
-            f_reason = "Unspecified"
-        else:
-            f_reason = await self.bot.get_cog("Utilities").clear_msg(
-                reason,
-                everyone = not ctx.channel.permissions_for(ctx.author).mention_everyone
-            )
-        await ctx.guild.unban(user, reason=f_reason[:512]+self.bot.zws)
+        f_reason = reason or "Unspecified"
+        await ctx.guild.unban(user, reason=f_reason[:512] + self.bot.zws)
         case_id = None
         if self.bot.database_online:
             cases_cog = self.bot.get_cog('Cases')
@@ -741,14 +713,8 @@ Permissions for using this command are the same as for the kick
             # send DM
             await self.dm_user(user, "kick", ctx, reason = None if reason=="Unspecified" else reason)
 
-            if reason is None:
-                f_reason = "Unspecified"
-            else:
-                f_reason = await self.bot.get_cog("Utilities").clear_msg(
-                    reason,
-                    everyone = not ctx.channel.permissions_for(ctx.author).mention_everyone
-                )
-            await ctx.guild.ban(user, reason=f_reason[:512]+self.bot.zws, delete_message_days=7)
+            f_reason = reason or "Unspecified"
+            await ctx.guild.ban(user, reason=f_reason[:512] + self.bot.zws, delete_message_days=7)
             await user.unban(reason=self.bot.zws)
             case_id = None
             if self.bot.database_online:
@@ -783,8 +749,8 @@ Permissions for using this command are the same as for the kick
         else:
             return
         color: int = None
-        if helpCog := self.bot.get_cog("Help"):
-            color = helpCog.help_color
+        if help_cog := self.bot.get_cog("Help"):
+            color = help_cog.help_color
         emb = discord.Embed(description=message, colour=color)
         if duration:
             if len(duration) > 1020:
@@ -819,8 +785,8 @@ Permissions for using this command are the same as for the kick
         if ctx.can_send_embed:
             color = discord.Color.red()
             if action in ("unmute", "unban"):
-                if helpCog := self.bot.get_cog("Help"):
-                    color = helpCog.help_color
+                if help_cog := self.bot.get_cog("Help"):
+                    color = help_cog.help_color
             emb = discord.Embed(description=message, colour=color)
             if case:
                 emb.add_field(name=_case.capitalize(), value=f"#{case}")

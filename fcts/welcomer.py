@@ -87,7 +87,6 @@ class Welcomer(commands.Cog):
                 if await self.delete_cached_welcome_message(channel, msg_id):
                     # if the welcome message was deleted, don't send the leave message
                     return
-            text = await self.bot.get_cog('Utilities').clear_msg(text, ctx=None)
             botormember = await self.bot._(member.guild, "misc.bot" if member.bot else "misc.member")
             try:
                 text = text.format_map(self.bot.SafeDict(
@@ -99,7 +98,6 @@ class Welcomer(commands.Cog):
                     member_count=member.guild.member_count,
                     type=botormember
                 ))
-                text = await self.bot.get_cog("Utilities").clear_msg(text, everyone=False)
                 msg = await channel.send(text)
                 if event_type == "welcome":
                     self.join_cache[member.guild.id, member.id] = msg.id
