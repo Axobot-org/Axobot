@@ -560,7 +560,7 @@ class Info(commands.Cog):
         lang = await self.bot._(interaction, "_used_locale")
         critical_info = await self.display_critical(interaction)
         since = await self.bot._(interaction, "misc.since")
-        _, bots, online, _ = await self.bot.get_cog("Utilities").get_members_repartition(guild.members)
+        _, bots, online, _ = await self.get_members_repartition(guild.members)
 
         desc = await self.bot.get_config(guild.id, "description")
         if (desc is None or len(desc) == 0) and guild.description is not None:
@@ -935,6 +935,19 @@ class Info(commands.Cog):
         await interaction.followup.send(embed=embed)
 
 
+    async def get_members_repartition(self, members: list[discord.Member]):
+        """Get number of total/online/bots members in a selection"""
+        bots = online = total = unverified = 0
+        for u in members:
+            if u.bot:
+                bots += 1
+            if u.status != discord.Status.offline:
+                online += 1
+            if u.pending:
+                unverified += 1
+            total += 1
+        return total, bots, online, unverified
+
 
     find_main = discord.app_commands.Group(
         name="find",
@@ -1170,21 +1183,20 @@ class Info(commands.Cog):
         emb.add_field(name="Recent errors", value=str(feed.recent_errors))
         await interaction.response.send_message(embed=emb)
 
-    @commands.command(name="membercount", aliases=['member_count'])
+    @commands.hybrid_command(name="membercount")
     @commands.guild_only()
     @commands.bot_has_permissions(send_messages=True)
     async def membercount(self, ctx: MyContext):
         """Get some digits on the number of server members
 
         ..Doc infos.html#membercount"""
-        if not ctx.channel.permissions_for(ctx.guild.me).send_messages:
-            return
-        total, bots_count, online_count, unverified = await self.bot.get_cog("Utilities").get_members_repartition(ctx.guild.members)
+        await ctx.defer()
+        total, bots_count, online_count, unverified = await self.get_members_repartition(ctx.guild.members)
         humans_count = total - bots_count
         def get_count(nbr: int):
             if 0 < nbr / total < 0.01:
                 return "< 1"
-            elif 1 > nbr/total > 0.99:
+            if 1 > nbr/total > 0.99:
                 return "> 99"
             return round(nbr*100/total)
         humans_percent = get_count(humans_count)
@@ -1193,23 +1205,18 @@ class Info(commands.Cog):
         unverified_percent = get_count(unverified)
         l = [
             (await self.bot._(ctx.guild.id, "info.membercount-0"), total),
-            (await self.bot._(ctx.guild.id, "info.membercount-2"), "{} ({}%)".format(humans_count, humans_percent)),
-            (await self.bot._(ctx.guild.id, "info.membercount-1"), "{} ({}%)".format(bots_count, bots_percent)),
+            (await self.bot._(ctx.guild.id, "info.membercount-2"), f"{humans_count} ({humans_percent}%)"),
+            (await self.bot._(ctx.guild.id, "info.membercount-1"), f"{bots_count} ({bots_percent}%)"),
         ]
         if self.bot.intents.presences:
-            l.append((await self.bot._(ctx.guild.id, "info.membercount-3"), "{} ({}%)".format(online_count, online_percent)))
+            l.append((await self.bot._(ctx.guild.id, "info.membercount-3"), f"{online_count} ({online_percent}%)"))
         if "MEMBER_VERIFICATION_GATE_ENABLED" in ctx.guild.features:
-            l.append((await self.bot._(ctx.guild.id, "info.membercount-4"), "{} ({}%)".format(unverified, unverified_percent)))
+            l.append((await self.bot._(ctx.guild.id, "info.membercount-4"), f"{unverified} ({unverified_percent}%)"))
         if ctx.can_send_embed:
             embed = discord.Embed(colour=ctx.guild.me.color)
             for i in l:
                 embed.add_field(name=i[0], value=i[1], inline=True)
             await ctx.send(embed=embed)
-        else:
-            text = ""
-            for i in l:
-                text += f"- {i[0]} : {i[1]}\n"
-            await ctx.send(text)
 
 
 async def setup(bot):
