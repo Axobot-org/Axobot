@@ -101,9 +101,13 @@ class Perms(commands.Cog):
 
     @commands.hybrid_command(name='permissions', aliases=['perms'])
     @app_commands.default_permissions(manage_roles=True)
-    @app_commands.describe(channel="The channel to check the permissions in", target="The member or role to check the permissions of, or an integer/binary value")
+    @app_commands.describe(
+        channel="The channel to check the permissions in",
+        target="The member or role to check the permissions of, or an integer/binary value"
+    )
     @commands.guild_only()
-    async def check_permissions(self, ctx: MyContext, channel:AcceptableChannelTypes=None, *, target: typing.Annotated[AcceptableTargetTypes, TargetConverter]=None):
+    async def check_permissions(self, ctx: MyContext, channel:AcceptableChannelTypes=None, *,
+                                target: typing.Annotated[AcceptableTargetTypes, TargetConverter]=None):
         """Check the permissions assigned to a member/role
         By default, it will calculate the author's permissions at the server level.
         You can also choose to view the permissions associated to a raw integer/binary value (in which case channel will be ignored)
@@ -148,31 +152,26 @@ class Perms(commands.Cog):
         perms_list = await self.collect_permissions(ctx, perms, channel)
         perms_list.sort(key=lambda x: x[1])
         perms_list = [''.join(perm) for perm in perms_list]
-        if ctx.can_send_embed:
-            if isinstance(target, int):
-                desc = None
-            elif channel is None:
-                desc = await self.bot._(ctx, "permissions.channel.general")
-            elif isinstance(channel, discord.CategoryChannel):
-                desc = await self.bot._(ctx, "permissions.channel.category", name=channel.name)
-            else:
-                desc = await self.bot._(ctx, "permissions.channel.channel", mention=channel.mention)
-
-            embed = discord.Embed(color=col, description=desc)
-            paragraphs = cut_text(perms_list, max_size=21)
-            for paragraph in paragraphs:
-                embed.add_field(name=self.bot.zws, value=paragraph)
-
-            _whatisthat = await self.bot._(ctx, "permissions.whatisthat")
-            embed.add_field(name=self.bot.zws, value=f'[{_whatisthat}](https://axobot.readthedocs.io/en/latest/perms.html)',
-                            inline=False)
-            embed.set_author(name=name, icon_url=avatar)
-            embed.set_footer(text=ctx.author, icon_url=ctx.author.display_avatar)
-            await ctx.send(embed=embed)
+        if isinstance(target, int):
+            desc = None
+        elif channel is None:
+            desc = await self.bot._(ctx, "permissions.channel.general")
+        elif isinstance(channel, discord.CategoryChannel):
+            desc = await self.bot._(ctx, "permissions.channel.category", name=channel.name)
         else:
-            txt = await self.bot._(ctx.guild.id,"permissions.title", name=name) + "\n".join(perms_list)
-            allowed_mentions = discord.AllowedMentions.none()
-            await ctx.send(txt, allowed_mentions=allowed_mentions)
+            desc = await self.bot._(ctx, "permissions.channel.channel", mention=channel.mention)
+
+        embed = discord.Embed(color=col, description=desc)
+        paragraphs = cut_text(perms_list, max_size=21)
+        for paragraph in paragraphs:
+            embed.add_field(name=self.bot.zws, value=paragraph)
+
+        _whatisthat = await self.bot._(ctx, "permissions.whatisthat")
+        embed.add_field(name=self.bot.zws, value=f'[{_whatisthat}](https://axobot.readthedocs.io/en/latest/perms.html)',
+                        inline=False)
+        embed.set_author(name=name, icon_url=avatar)
+        embed.set_footer(text=ctx.author, icon_url=ctx.author.display_avatar)
+        await ctx.send(embed=embed)
 
 
 async def setup(bot):
