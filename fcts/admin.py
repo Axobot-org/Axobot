@@ -302,7 +302,7 @@ class Admin(commands.Cog):
         await self.cleanup_workspace()
         await msg.edit(content="Bot en voie d'extinction")
         await self.bot.change_presence(status=discord.Status('offline'))
-        self.bot.log.info("Fermeture du bot")
+        self.bot.log.info("Closing Discord connection")
         await self.bot.close()
 
     async def cleanup_workspace(self):
