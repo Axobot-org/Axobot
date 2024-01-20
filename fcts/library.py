@@ -22,7 +22,8 @@ class Library(commands.Cog):
 
     async def db_add_search(self, isbn: int, name: str):
         current_timestamp = self.bot.utcnow()
-        query = "INSERT INTO `{}` (`ISBN`,`name`,`count`) VALUES (%(i)s, %(n)s, 1) ON DUPLICATE KEY UPDATE count = `count` + 1, last_update = %(l)s;".format(self.tables[0])
+        query = f"INSERT INTO `{self.tables[0]}` (`ISBN`,`name`,`count`) VALUES (%(i)s, %(n)s, 1) \
+            ON DUPLICATE KEY UPDATE count = `count` + 1, last_update = %(l)s;"
         async with self.bot.db_query(query, {'i': isbn, 'n': name, 'l': current_timestamp}):
             pass
 
@@ -39,24 +40,25 @@ class Library(commands.Cog):
         url += '&country=FR'
         async with aiohttp.ClientSession() as session:
             async with session.get(url) as resp:
-                resp = await resp.json()
-        if 'items' in resp.keys():
+                resp: dict = await resp.json()
+        if 'items' in resp:
             return resp['items'][0]
         if language is not None:
             return await self.search_book(isbn, keywords)
         return None
 
     async def isbn_from_words(self, keywords: str) -> Optional[str]:
-        """Get the ISBN of a book from some keywords"""
+        """Get the ISBN of a book from some keywords, using Google Books API"""
         url = "https://www.googleapis.com/books/v1/volumes?maxResults=1&q=" + html.escape(keywords.replace(' ', '+'))
         async with aiohttp.ClientSession() as session:
             async with session.get(url) as resp:
-                resp = await resp.json()
-        if 'items' in resp.keys():
+                resp: dict = await resp.json()
+        if 'items' in resp:
             return resp['items'][0]['volumeInfo']['industryIdentifiers'][-1]['identifier']
         return None
 
     async def search_book_2(self, isbn: Optional[str], keywords: str) -> dict:
+        """Search a book from its ISBN or from some keywords, using various APIs"""
         if isbn is None:
             if keywords is None:
                 raise ValueError

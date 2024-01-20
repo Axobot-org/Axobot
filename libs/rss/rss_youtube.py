@@ -115,7 +115,7 @@ class YoutubeRSS:
             return await self.bot._(channel, "rss.nothing")
         entry = entries[0]
         img_url = None
-        if 'media_thumbnail' in entry.keys() and len(entry['media_thumbnail']) > 0:
+        if 'media_thumbnail' in entry and len(entry['media_thumbnail']) > 0:
             img_url = entry['media_thumbnail'][0]['url']
         post_text = await get_text_from_entry(entry)
         return RssMessage(
@@ -148,7 +148,7 @@ class YoutubeRSS:
                 # we know we can break because entries are sorted by most recent first
                 break
             img_url = None
-            if 'media_thumbnail' in entry.keys() and len(entry['media_thumbnail']) > 0:
+            if 'media_thumbnail' in entry and len(entry['media_thumbnail']) > 0:
                 img_url = entry['media_thumbnail'][0]['url']
             post_text = await get_text_from_entry(entry)
             obj = RssMessage(

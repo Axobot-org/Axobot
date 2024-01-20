@@ -114,7 +114,7 @@ class Translations(commands.Cog):
             targets = languages
         for language in targets:
             for module, en_tr in translations['en'].items():
-                for key in en_tr.keys():
+                for key in en_tr:
                     if key in translations.get(language, {}).get(module, {}):
                         continue
                     if key in projects.get(language, {}).get(module, {}):
