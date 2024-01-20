@@ -898,7 +898,7 @@ Cette option affecte tous les serveurs"""
             await ctx.send("Got a timeout")
             return
         txt = f"feeds.keys()\n```py\n{feeds.keys()}\n```"
-        if 'bozo_exception' in feeds.keys():
+        if 'bozo_exception' in feeds:
             txt += f"\nException ({feeds['bozo']}): {feeds['bozo_exception']}"
             return await ctx.send(txt)
         if len(str(feeds.feed)) < 1400-len(txt):
@@ -939,7 +939,7 @@ Cette option affecte tous les serveurs"""
             txt.append(f"Entrées : {len(feeds.entries)}")
             if len(feeds.entries) > 0:
                 entry = feeds.entries[0]
-                if 'title' in entry.keys():
+                if 'title' in entry:
                     txt.append(nothing_+ok_+" title: ")
                     if len(entry['title'].split('\n')) > 1:
                         txt[-1] += entry['title'].split('\n')[0]+"..."
@@ -947,15 +947,15 @@ Cette option affecte tous les serveurs"""
                         txt[-1] += entry['title']
                 else:
                     txt.append(nothing_+notok_+' title')
-                if 'published_parsed' in entry.keys():
+                if 'published_parsed' in entry:
                     txt.append(nothing_+ok_+" published_parsed")
-                elif 'published' in entry.keys():
+                elif 'published' in entry:
                     txt.append(nothing_+ok_+" published")
-                elif 'updated_parsed' in entry.keys():
+                elif 'updated_parsed' in entry:
                     txt.append(nothing_+ok_+" updated_parsed")
                 else:
                     txt.append(nothing_+notok_+' date')
-                if 'author' in entry.keys():
+                if 'author' in entry:
                     txt.append(nothing_+ok_+" author: "+entry['author'])
                 else:
                     txt.append(nothing_+notok_+' author')

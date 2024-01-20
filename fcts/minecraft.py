@@ -514,7 +514,7 @@ Every information come from the website www.fr-minecraft.net"""
             url = "https://api.mcsrvstat.us/1/"+str(ip)+"/"+str(port)
         try:
             async with self.session.get(url, timeout=5) as resp:
-                r: dict = await resp.json()
+                data: dict = await resp.json()
         except aiohttp.ClientConnectorError:
             return await self.bot._(guild, "minecraft.no-api")
         except json.decoder.JSONDecodeError:
@@ -523,25 +523,25 @@ Every information come from the website www.fr-minecraft.net"""
             self.bot.log.error(f"[mc-server-2] Erreur sur l'url {url} :")
             self.bot.dispatch("error", err, f"While checking minecraft server {ip}")
             return await self.bot._(guild, "minecraft.serv-error")
-        if r["debug"]["ping"] is False:
+        if data["debug"]["ping"] is False:
             return await self.bot._(guild, "minecraft.no-ping")
-        if 'list' in r['players'].keys():
-            players = r['players']['list'][:20]
+        if 'list' in data['players']:
+            players = data['players']['list'][:20]
         else:
             players = []
         if players == []:
-            if r['players']['online'] == 0:
+            if data['players']['online'] == 0:
                 players = [str(await self.bot._(guild, "misc.none")).capitalize()]
             else:
                 players = [await self.bot._(guild, "minecraft.no-player-list")]
-        if "software" in r.keys():
-            version = r["software"]+" "+r['version']
+        if "software" in data:
+            version = data["software"]+" "+data['version']
         else:
-            version = r['version']
+            version = data['version']
         IP = f"{ip}:{port}" if port is not None else str(ip)
-        desc = "\n".join(r['motd']['clean'])
-        o = r['players']['online']
-        m = r['players']['max']
+        desc = "\n".join(data['motd']['clean'])
+        o = data['players']['online']
+        m = data['players']['max']
         l = None
         return await self.MCServer(IP, version=version, online_players=o, max_players=m, players=players, img=None, ping=l,
                                    desc=desc, api="api.mcsrvstat.us").clear_desc()
