@@ -33,7 +33,7 @@ class MyContext(commands.Context):
     @property
     def can_send_embed(self) -> bool:
         """If the bot has the right permissions to send an embed in the current context"""
-        return self.bot_permissions.embed_links
+        return self.interaction is not None or self.bot_permissions.embed_links
 
     async def send(self, *args, json: Union[dict, list, None]=None, **kwargs) -> Optional[discord.Message]:
         if self.bot.zombie_mode and self.command.name not in self.bot.allowed_commands:
