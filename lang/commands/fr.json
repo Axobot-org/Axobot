@@ -9,6 +9,8 @@
         "antiscam test": "tester",
         "ban": "bannir",
         "banlist": "liste-des-bans",
+        "bitly create": "créer",
+        "bitly find": "trouver",
         "blurple check": "vérifier",
         "blurple darkfy": "darkfy",
         "blurple help": "aide",
@@ -123,6 +125,8 @@
         "twitch": "twitch"
     },
     "command_short_description": {
+        "bitly create": "Raccourci un lien en utilisant Bitly",
+        "bitly find": "Trouve un lien raccourci commençant par bit.ly",
         "cases edit-reason": "Modifie la raison d'un casier de modération",
         "cases list": "Liste tous les casiers de modération d'un utilisateur",
         "cases remove": "Supprime un casier de modération",
@@ -159,6 +163,12 @@
         },
         "slowmode": {
             "seconds": "secondes"
+        },
+        "bitly create": {
+            "url": "url"
+        },
+        "bitly find": {
+            "url": "url"
         },
         "cases edit-reason": {
             "case_id": "id-du-casier",

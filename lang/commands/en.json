@@ -9,6 +9,8 @@
         "antiscam test": "test",
         "ban": "ban",
         "banlist": "banlist",
+        "bitly create": "create",
+        "bitly find": "find",
         "blurple check": "check",
         "blurple darkfy": "darkfy",
         "blurple help": "help",
@@ -163,6 +165,12 @@
         },
         "slowmode": {
             "seconds": "seconds"
+        },
+        "bitly create": {
+            "url": "url"
+        },
+        "bitly find": {
+            "url": "url"
         },
         "cases edit-reason": {
             "case_id": "case-id",
