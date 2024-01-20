@@ -81,6 +81,7 @@
         "rss set-mentions": "modifier-mentions",
         "rss set-text": "modifier-texte",
         "rss test": "test",
+        "set-xp": "modifier-xp",
         "slowmode": "mode-lent",
         "stats": "stats",
         "tickets portal set-category": "modifier-catégorie",
@@ -134,6 +135,7 @@
         "clear": "Supprime des messages du salon",
         "membercount": "Donne quelques stats sur les membres du serveur",
         "random-tip": "Affiche une astuce aléatoire à propos du bot",
+        "set-xp": "Modifie l'XP d'un utilisateur dans le serveur",
         "slowmode": "Ralenti le spam du salon en activant le mode lent"
     },
     "group_description": {
@@ -333,6 +335,10 @@
         },
         "rss test": {
             "feed": "flux"
+        },
+        "set-xp": {
+            "user": "utilisateur",
+            "xp": "xp"
         },
         "modlogs list": {
             "channel": "salon"

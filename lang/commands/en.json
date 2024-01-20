@@ -84,6 +84,7 @@
         "rss set-mentions": "set-mentions",
         "rss set-text": "set-text",
         "rss test": "test",
+        "set-xp": "set-xp",
         "slowmode": "slowmode",
         "softban": "softban",
         "stats": "stats",
@@ -136,7 +137,8 @@
         "cases remove": "Permanently delete a moderation case",
         "cases search": "Find the details of a moderation case",
         "membercount": "Get some stats about your server members",
-        "random-tip": "Get a random tip or trivia about the bot"
+        "random-tip": "Get a random tip or trivia about the bot",
+        "set-xp": "Set the XP of a user in your server"
     },
     "group_description": {
         "antiscam": "Everything related to the antiscam feature",
@@ -335,6 +337,10 @@
         },
         "rss test": {
             "feed": "feed"
+        },
+        "set-xp": {
+            "user": "user",
+            "xp": "xp"
         },
         "modlogs list": {
             "channel": "channel"
