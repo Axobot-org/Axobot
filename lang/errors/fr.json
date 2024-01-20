@@ -35,6 +35,5 @@
     "toomanytxtchan": "Vous avez trop de salons textuels accessibles",
     "unknown": "Oups, une erreur est survenue :confused: Réessayez plus tard, ou contactez le support (commande %{about}).",
     "unknown2": "Une erreur s'est produite lors du traitement de votre réponse. Merci de réessayer plus tard, ou de contacter le support du bot (entrez la commande %{about} pour le lien du serveur)",
-    "usernotfound": "Impossible de trouver l'utilisateur `%{u}` :confused:",
-    "zbot-migration": "Ce serveur utilise désormais <@1048011651145797673>, la nouvelle identité de Zbot. Si vous avez besoin d'aide pour la migration, n'hésitez pas à nous demander à <%{invite}> !"
+    "usernotfound": "Impossible de trouver l'utilisateur `%{u}` :confused:"
 }

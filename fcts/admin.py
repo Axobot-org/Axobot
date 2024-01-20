@@ -249,15 +249,9 @@ class Admin(commands.Cog):
             return
         count = 0
         for guild in ctx.bot.guilds:
-            if guild.id == SUPPORT_GUILD_ID.id and self.bot.entity_id == 0:
-                # The support server should not receive updates from Zbot but only Axobot
-                continue
             channel: Optional[discord.TextChannel] = await ctx.bot.get_config(guild.id, 'bot_news')
             if channel is None:
                 # no channel configured
-                continue
-            if self.bot.entity_id == 0 and await self.bot.check_axobot_presence(guild=guild, channel_id=channel.id):
-                # axobot is present on this server and will send the update
                 continue
             lang: Optional[str] = await ctx.bot.get_config(guild.id, 'language')
             if lang not in self.update:

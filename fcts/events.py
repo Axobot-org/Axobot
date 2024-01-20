@@ -9,7 +9,7 @@ import aiohttp
 import discord
 from discord.ext import commands, tasks
 
-from libs.bot_classes import SUPPORT_GUILD_ID, Axobot, MyContext
+from libs.bot_classes import SUPPORT_GUILD_ID, Axobot
 
 
 class Events(commands.Cog):
@@ -109,9 +109,6 @@ class Events(commands.Cog):
     async def on_message(self, msg: discord.Message):
         """Called for each new message because it's cool"""
         if self.bot.zombie_mode:
-            return
-        # If axobot is already there, don't do anything
-        if msg.guild and await self.bot.check_axobot_presence(guild=msg.guild):
             return
         if msg.guild is None and not msg.flags.ephemeral:
             await self.send_mp(msg)
@@ -281,36 +278,7 @@ class Events(commands.Cog):
         except Exception as err:
             answers.append("top.gg: 0")
             self.bot.dispatch("error", err, "Sending server count to top.gg")
-        if self.bot.entity_id == 0:
-            try: # https://bots.ondiscord.xyz/bots/486896267788812288
-                payload = json.dumps({
-                    'guildCount': guild_count
-                })
-                headers = {
-                    'Authorization': self.bot.others["botsondiscord"],
-                    'Content-Type': 'application/json'
-                }
-                async with session.post(f'https://bots.ondiscord.xyz/bot-api/bots/{self.bot.user.id}/guilds', data=payload, headers=headers) as resp:
-                    self.bot.log.debug(f'BotsOnDiscord returned {resp.status} for {payload}')
-                    answers.append(f"BotsOnDiscord: {resp.status}")
-            except Exception as err:
-                answers.append("BotsOnDiscord: 0")
-                self.bot.dispatch("error", err, "Sending server count to BotsOnDiscord")
-            try: # https://api.discordextremelist.xyz/v2/bot/486896267788812288/stats
-                payload = json.dumps({
-                    'guildCount': guild_count
-                })
-                headers = {
-                    'Authorization': self.bot.others["discordextremelist"],
-                    'Content-Type': 'application/json'
-                }
-                async with session.post(f'https://api.discordextremelist.xyz/v2/bot/{self.bot.user.id}/stats', data=payload, headers=headers) as resp:
-                    self.bot.log.debug(f'DiscordExtremeList returned {resp.status} for {payload}')
-                    answers.append(f"DiscordExtremeList: {resp.status}")
-            except Exception as err:
-                answers.append("DiscordExtremeList: 0")
-                self.bot.dispatch("error", err, "Sending server count to DiscordExtremeList")
-        elif self.bot.entity_id == 2:
+        if self.bot.entity_id == 2:
             try: # https://discordbotlist.com/api/v1/bots/1048011651145797673/stats
                 payload = json.dumps({
                     'guilds': guild_count
@@ -377,28 +345,6 @@ class Events(commands.Cog):
         emb.set_author(name=self.bot.user, icon_url=self.bot.user.display_avatar)
         await self.bot.send_embed(emb, url="loop")
         self.statslogs_last_push = datetime.datetime.now()
-
-
-    @commands.Cog.listener()
-    async def on_command_completion(self, ctx: MyContext):
-        "If a command is executed with Zbot, remind the user to invite Axobot instead"
-        class MigrationView(discord.ui.View):
-            def __init__(self):
-                super().__init__()
-                self.add_item(discord.ui.Button(label='Invite Axobot', url="https://zrunner.me/invite-axobot", style=discord.ButtonStyle.blurple))
-                self.add_item(discord.ui.Button(label='About the migration', url="https://axobot.readthedocs.io/en/latest/articles/v4.html#new-identity"))
-                self.add_item(discord.ui.Button(label='Support server', url="https://discord.gg/N55zY88"))
-
-        if self.bot.entity_id == 0:
-            txt = """Hey, Zbot is currently changing its identity to **Axobot**!
-
-During the migration period, Zbot will continue to work, but will **receive updates later** than Axobot and may not work as well.
-Luckily for you, **the migration is very quick**, just invite Axobot and give it the same roles as Zbot to avoid any service interruption!
-
-:warning: Zbot will go offline permanently in January 2024!"""
-            emb = discord.Embed(title="Zbot is becoming Axobot!", description=txt, color=0x00ff00)
-            emb.set_thumbnail(url="https://zrunner.me/axolotl.png")
-            await ctx.send(embed=emb, view=MigrationView())
 
 
 async def setup(bot):

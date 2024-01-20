@@ -61,8 +61,6 @@ async def main():
         else:
             if client.beta:
                 status = choice(status_list['beta'])
-            elif client.entity_id == 0:
-                status = choice(status_list['zbot'])
             else:
                 status = choice(status_list['axobot'])
             await client.change_presence(activity=discord.Game(name=status))
@@ -76,11 +74,7 @@ async def main():
         client.log.fatal("Invalid bot token")
         return
 
-    if args.token == 'zbot':
-        bot_data = tokens.get_token(client, 486896267788812288)
-        token = bot_data["token"]
-        client.entity_id = bot_data["entity_id"]
-    elif args.token == 'axobot':
+    if args.token == 'axobot':
         bot_data = tokens.get_token(client, 1048011651145797673)
         token = bot_data["token"]
         client.entity_id = bot_data["entity_id"]

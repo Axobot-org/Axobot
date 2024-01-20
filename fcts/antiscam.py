@@ -332,9 +332,6 @@ class AntiScam(commands.Cog):
             or is_immune(msg.author) or await self.bot.potential_command(msg)
         ):
             return
-        # If axobot is already there, let it handle it
-        if await self.bot.check_axobot_presence(guild=msg.guild):
-            return
         await self.bot.wait_until_ready()
         if not await self.bot.get_config(msg.guild.id, "anti_scam"):
             return

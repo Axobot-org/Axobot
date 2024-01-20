@@ -90,7 +90,7 @@ class Axobot(commands.bot.AutoShardedBot):
 
     @property
     def dbl_token(self):
-        return self.others["dbl_zbot"] if self.entity_id == 0 else self.others["dbl_axobot"]
+        return self.others["dbl_axobot"]
 
     async def on_error(self, event_method: Union[Exception, str], *_args, **_kwargs):
         "Called when an event raises an uncaught exception"
@@ -356,27 +356,6 @@ class Axobot(commands.bot.AutoShardedBot):
             return f"`{command.qualified_name}`"
         self.log.error("Trying to mention invalid command: %s", command_name)
         return f"`{command_name}`"
-
-    async def check_axobot_presence(self, *, ctx: Optional[MyContext] = None, guild: Optional[discord.Guild] = None, interaction: Optional[discord.Interaction] = None, guild_id: Optional[int] = None, channel_id: Optional[int] = None):
-        "Check if Axobot is present in the given context"
-        if ctx is None and guild is None and interaction is None and guild_id is None:
-            raise ValueError("No context provided")
-        await self.wait_until_ready()
-        if self.user.id != 486896267788812288:
-            # We're not Zbot, we don't care
-            return False
-        channel = None
-        if ctx is not None:
-            guild = ctx.guild
-            channel = ctx.channel
-        elif interaction is not None:
-            guild = interaction.guild
-            channel = interaction.channel
-        elif guild_id is not None:
-            guild = self.get_guild(guild_id)
-        if channel_id is not None:
-            channel = self.get_channel(channel_id)
-        return await self._check_axobot_in_guild(guild, channel)
 
     @acached(timeout=60)
     async def _check_axobot_in_guild(self, guild: Optional[discord.Guild], channel: Optional[discord.abc.GuildChannel] = None):

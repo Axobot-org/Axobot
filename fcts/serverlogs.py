@@ -71,9 +71,6 @@ class ServerLogs(commands.Cog):
         if not self.bot.database_online:
             return
         guild_logs = await self.db_get_from_guild(guild_id)
-        # if axobot is also there, don't send anything
-        if await self.bot.check_axobot_presence(guild_id=guild_id):
-            return []
         res: list[int] = []
         for channel, event in guild_logs.items():
             if log in event:

@@ -715,7 +715,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
 
     @commands.Cog.listener()
     async def on_message(self, msg: discord.Message):
-        if msg.guild and not await self.bot.check_axobot_presence(guild=msg.guild):
+        if msg.guild:
             await self.check_afk(msg)
 
     async def check_afk(self, msg: discord.Message):

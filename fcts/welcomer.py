@@ -26,27 +26,22 @@ class Welcomer(commands.Cog):
     @commands.Cog.listener()
     async def on_member_join(self, member:discord.Member):
         """Main function called when a member joins a server"""
-        if self.bot.database_online:
-            # If axobot is already there, let it handle it
-            if await self.bot.check_axobot_presence(guild=member.guild):
-                return
-            await self.bot.get_cog("ServerConfig").update_memberchannel(member.guild)
-            if "MEMBER_VERIFICATION_GATE_ENABLED" not in member.guild.features:
-                await self.send_msg(member, "welcome")
-                self.bot.loop.create_task(self.give_roles(member))
-                await self.give_roles_back(member)
-                await self.check_muted(member)
-                if member.guild.id == SUPPORT_GUILD_ID.id:
-                    await self.check_owner_server(member)
-                    await self.check_support(member)
-                    await self.check_contributor(member)
+        if not self.bot.database_online:
+            return
+        await self.bot.get_cog("ServerConfig").update_memberchannel(member.guild)
+        if "MEMBER_VERIFICATION_GATE_ENABLED" not in member.guild.features:
+            await self.send_msg(member, "welcome")
+            self.bot.loop.create_task(self.give_roles(member))
+            await self.give_roles_back(member)
+            await self.check_muted(member)
+            if member.guild.id == SUPPORT_GUILD_ID.id:
+                await self.check_owner_server(member)
+                await self.check_support(member)
+                await self.check_contributor(member)
 
     @commands.Cog.listener()
     async def on_member_update(self, before:discord.Member, after:discord.Member):
         """Main function called when a member got verified in a community server"""
-        # If axobot is already there, let it handle it
-        if await self.bot.check_axobot_presence(guild=before.guild):
-            return
         if before.pending and not after.pending:
             if "MEMBER_VERIFICATION_GATE_ENABLED" in after.guild.features:
                 await self.send_msg(after, "welcome")
@@ -58,14 +53,12 @@ class Welcomer(commands.Cog):
     @commands.Cog.listener()
     async def on_member_remove(self, member:discord.Member):
         """Fonction principale appelée lorsqu'un membre quitte un serveur"""
-        if self.bot.database_online:
-            # If axobot is already there, let it handle it
-            if await self.bot.check_axobot_presence(guild=member.guild):
-                return
-            await self.bot.get_cog("ServerConfig").update_memberchannel(member.guild)
-            if "MEMBER_VERIFICATION_GATE_ENABLED" not in member.guild.features or not member.pending:
-                await self.send_msg(member, "leave")
-            await self.bot.get_cog('Events').check_user_left(member)
+        if not self.bot.database_online:
+            return
+        await self.bot.get_cog("ServerConfig").update_memberchannel(member.guild)
+        if "MEMBER_VERIFICATION_GATE_ENABLED" not in member.guild.features or not member.pending:
+            await self.send_msg(member, "leave")
+        await self.bot.get_cog('Events').check_user_left(member)
 
     async def _is_raider(self, member: discord.Member):
         "Use the AntiRaid cog to check if a member has just been detected as a potential raider"
