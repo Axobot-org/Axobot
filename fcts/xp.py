@@ -992,16 +992,23 @@ class Xp(commands.Cog):
                 await view.disable(msg)
 
 
-    @commands.command(name='set-xp', aliases=["setxp"])
+    @commands.hybrid_command(name='set-xp')
+    @app_commands.default_permissions(administrator=True)
+    @app_commands.describe(
+        user="The user to set the XP of",
+        xp="The new XP value. Set to 0 to remove the user from the leaderboard",
+    )
     @commands.guild_only()
+    @commands.cooldown(3, 15, commands.BucketType.user)
     @commands.check(checks.has_admin)
     async def set_xp(self, ctx: MyContext, user: discord.User, xp: commands.Range[int, 0, 10**15]):
         """Set the XP of a user
 
-        ..Example set_xp 3000 @someone"""
+        ..Example set_xp @someone 3000"""
         if user.bot:
             await ctx.send(await self.bot._(ctx.guild.id, "xp.no-bot"))
             return
+        await ctx.defer()
         xp_used_type: str = await self.bot.get_config(ctx.guild.id, "xp_type")
         if xp_used_type == "global":
             await ctx.send(await self.bot._(ctx.guild.id, "xp.change-global-xp"))
