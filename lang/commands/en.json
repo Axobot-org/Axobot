@@ -9,6 +9,8 @@
         "antiscam test": "test",
         "ban": "ban",
         "banlist": "banlist",
+        "bitly create": "create",
+        "bitly find": "find",
         "blurple check": "check",
         "blurple darkfy": "darkfy",
         "blurple help": "help",
@@ -35,6 +37,7 @@
         "info": "info",
         "kick": "kick",
         "last-post": "last-post",
+        "membercount": "membercount",
         "modlogs disable": "disable",
         "modlogs enable": "enable",
         "modlogs list": "list",
@@ -81,6 +84,7 @@
         "rss set-mentions": "set-mentions",
         "rss set-text": "set-text",
         "rss test": "test",
+        "set-xp": "set-xp",
         "slowmode": "slowmode",
         "softban": "softban",
         "stats": "stats",
@@ -132,7 +136,9 @@
         "cases list": "List all the moderation cases of a user",
         "cases remove": "Permanently delete a moderation case",
         "cases search": "Find the details of a moderation case",
-        "random-tip": "Get a random tip or trivia about the bot"
+        "membercount": "Get some stats about your server members",
+        "random-tip": "Get a random tip or trivia about the bot",
+        "set-xp": "Set the XP of a user in your server"
     },
     "group_description": {
         "antiscam": "Everything related to the antiscam feature",
@@ -161,6 +167,12 @@
         },
         "slowmode": {
             "seconds": "seconds"
+        },
+        "bitly create": {
+            "url": "url"
+        },
+        "bitly find": {
+            "url": "url"
         },
         "cases edit-reason": {
             "case_id": "case-id",
@@ -325,6 +337,10 @@
         },
         "rss test": {
             "feed": "feed"
+        },
+        "set-xp": {
+            "user": "user",
+            "xp": "xp"
         },
         "modlogs list": {
             "channel": "channel"
