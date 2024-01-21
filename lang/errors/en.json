@@ -35,6 +35,5 @@
     "toomanytxtchan": "You have too many accessible text channels",
     "unknown": "Oops, an error occurred :confused: Try again later, or contact support (command %{about}).",
     "unknown2": "An error occurred while processing your response. Please try again later, or contact bot support (enter the command %{about} for server link)",
-    "usernotfound": "Unable to find the user `%{u}` :confused:",
-    "zbot-migration": "This server now use <@1048011651145797673>, the new identity of Zbot. If you need help with the migration, don't hesitate to ask us at <%{invite}>!"
+    "usernotfound": "Unable to find the user `%{u}` :confused:"
 }
