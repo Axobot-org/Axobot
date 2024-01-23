@@ -126,6 +126,7 @@
         "partner_role": "Rôle donné aux partenaires : %{value}",
         "poll_channels": "Liste des salons dans lesquels les réactions :thumbsup: et :thumbsdown: seront automatiquement ajoutées à chaque message : %{value}",
         "prefix": "Préfixe actuel du bot : %{value}",
+        "private_leaderboard": "Les non-membres doivent-ils pouvoir accéder au classement du serveur ? %{value}",
         "rank_in_dm": "Envoyer les cartes d'xp en messages privés ? %{value}",
         "save_roles": "Les rôles doivent-ils être sauvegardés lorsqu'un membre part, au cas où il revienne ? %{value}",
         "say_allowed_roles": "Liste des rôles qui peuvent utiliser la commande 'say' : %{value}",

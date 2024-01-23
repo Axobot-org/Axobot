@@ -191,6 +191,11 @@
         "default": "!",
         "is_listed": true
     },
+    "private_leaderboard": {
+        "type": "boolean",
+        "default": true,
+        "is_listed": true
+    },
     "rank_in_dm": {
         "type": "boolean",
         "default": false,
