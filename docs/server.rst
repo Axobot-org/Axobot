@@ -85,6 +85,7 @@ List of every option
 * partner_role: A role given to every administrator of a partner server. Default to None.
 * poll_channels: List of channels in which the bot will add the reactions 👍 and 👎 to each message
 * prefix: Character string that will be the bot prefix, for all commands, beginning with the validation message. The prefix must be between 1 and 5 characters long. By default, :code:`!`.
+* private_leaderboard: Allow non-members to see your server XP leaderboard on our website. Default to False.
 * rank_in_dm: Boolean indicating whether the rank command message should be sent as a private message or not. If the value is set to :code:`True`, the message will be sent in DM or as an ephemeral message.
 * say_allowed_roles: List of roles allowed to use the `say` command. By default, none.
 * slowmode_allowed_roles: List of roles allowed to use the `slowmode <moderator.html#slowmode>`__ and `freeze <moderator.html#freeze>`__ commands. By default, none.
