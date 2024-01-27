@@ -6,8 +6,8 @@ from typing import Literal
 import discord
 from discord.ext import commands
 
-from libs.checks.checks import is_ttt_enabled
 from libs.bot_classes import Axobot, MyContext
+from libs.checks.checks import is_ttt_enabled
 from libs.serverconfig.options_list import options
 
 
