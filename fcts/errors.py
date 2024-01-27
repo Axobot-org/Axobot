@@ -227,6 +227,9 @@ class Errors(commands.Cog):
                 await self.bot._(interaction, "errors.checkfailure", help_cmd=help_cmd),
                 ephemeral=True)
             return
+        if isinstance(error, discord.app_commands.TransformerError):
+            await interaction.response.send_message(error.args[0], ephemeral=True)
+            return
         if interaction.guild:
             guild = f"{interaction.guild.name} | {interaction.channel.name}"
         elif interaction.guild_id:
