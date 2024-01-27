@@ -6,7 +6,6 @@ beautifulsoup4~=4.12.0
 discord.py~=2.3.0
 emoji~=2.8.0
 feedparser~=6.0.0
-frmc-lib @ git+https://github.com/ZRunner/fr-mc-python-lib.git@v1.0.6
 geocoder
 GitPython
 google-api-python-client~=2.108.0
