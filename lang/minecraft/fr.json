@@ -1,57 +1,5 @@
 {
-    "adv-fields": [
-        "Nom",
-        "Identifiant",
-        "Type",
-        "Action",
-        "Parent",
-        "Enfants",
-        "Version d'ajout"
-    ],
-    "adv-help": "Cette commande permet d'obtenir des informations sur n'importe quel progrès du jeu Minecraft (parfois ausis appelé 'avancement'). Il vous suffit d'entrer le nom ou l'identifiant du progrès.",
-    "block-fields": [
-        "ID",
-        "Taille d'un stack",
-        "Onglet du mode créatif",
-        "Points de dégâts",
-        "Points de durabilité",
-        "Outil capable de le détruire",
-        "Résistance à la TNT",
-        "Mobs pouvant lâcher cet item",
-        "Version d'ajout"
-    ],
-    "block-help": "Cette commande permet d'obtenir des informations sur n'importe quel bloc de Minecraft. Vous pouvez donner son nom complet ou partiel, en français ou en anglais, ou même son identifiant. Il suffit d'entrer `%{p}mc block <nom>`",
     "cant-embed": "Impossible d'envoyez l'embed. Vérifiez que la permission \"Embed links\" est bien activée",
-    "cmd-fields": [
-        "Nom",
-        "Syntaxe",
-        "Exemples",
-        "Version d'ajout"
-    ],
-    "cmd-help": "Cette commande permet d'obtenir des informations sur n'importe quelle commande de Minecraft. Il suffit d'entrer `%{p}mc command <nom>`",
-    "contact-mail": "Si vous constatez une erreur dans les informations données, merci de me contacter rapidement, ou de rapporter l'erreur directement [sur le site](https://fr-minecraft.net).",
-    "dimensions": "Largeur: %{la}\nLongueur: %{lo}\nHauteur: %{ha}",
-    "entity-fields": [
-        "ID",
-        "Type",
-        "Points de vie",
-        "Points d'attaque",
-        "Points d'expérience lâchées à la mort",
-        "Biomes de prédilection",
-        "Version d'ajout"
-    ],
-    "entity-help": "Cette commande permet d'obtenir des informations sur n'importe quelle entité de Minecraft. Vous pouvez donner son nom complet ou partiel, en français ou en anglais, ou même son identifiant. Il suffit d'entrer `%{p}mc entity <nom>`",
-    "item-fields": [
-        "ID",
-        "Taille d'un stack",
-        "Onglet du mode créatif",
-        "Points de dégâts",
-        "Points de durabilité",
-        "Outil capable de le détruire",
-        "Mobs pouvant lâcher cet item",
-        "Version d'ajout"
-    ],
-    "item-help": "Cette commande permet d'obtenir des informations sur n'importe quel item de Minecraft. Vous pouvez donner son nom complet ou partiel, en français ou en anglais, ou même son identifiant. Il suffit d'entrer `%{p}mc item <nom>`",
     "mod-fields": {
         "author": "Auteur",
         "authors": "Auteurs",
@@ -65,31 +13,9 @@
         "versions": "Versions du jeu"
     },
     "mod-help": "Cette commande permet d'obtenir des informations sur un grand nombre de mods Minecraft. Vous pouvez donner son nom complet ou partiel, il suffit d'entrer `%{p}mc mod <nom>`. Le mod doit être enregistré sur la plateforme CurseForge pour apparaître",
-    "mojang_desc": {
-        "account.mojang.com": "Site de gestion des comptes Mojang",
-        "api.mojang.com": "Service d'API fournit par Mojang",
-        "authserver.mojang.com": "Serveur d'authentification",
-        "minecraft.net": "Site officiel",
-        "mojang.com": "Site officiel",
-        "session.minecraft.net": "Sessions multijoueurs (obsolètes)",
-        "sessionserver.mojang.com": "Sessions multijoueurs",
-        "textures.minecraft.net": "Serveur de textures (skin & capes)"
-    },
-    "names": [
-        "Bloc",
-        "Entité",
-        "Item",
-        "Commande",
-        "Progrès",
-        "Mod"
-    ],
-    "no-adv": "Progrès introuvable",
+    "mod-title": "Mod",
     "no-api": "Erreur : Impossible de se connecter à l'API",
-    "no-block": "Bloc introuvable",
-    "no-cmd": "Commande introuvable",
     "no-embed": "Impossible d'envoyer le résultat ! Veuillez me donner la permission 'Intégrer les liens' pour que je puisse l'envoyer.",
-    "no-entity": "Entité introuvable",
-    "no-item": "Item introuvable",
     "no-mod": "Mod introuvable",
     "no-ping": "Erreur : Impossible de ping ce serveur",
     "no-player-list": "Non disponible",
