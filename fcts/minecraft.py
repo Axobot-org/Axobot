@@ -6,19 +6,22 @@ from difflib import SequenceMatcher
 from typing import Any, Optional, Union
 
 import aiohttp
+import discord
 from asyncache import cached
 from cachetools import TTLCache
-import discord
 from dateutil.parser import isoparse
 from discord import app_commands
 from discord.ext import commands
-from fcts.rss import can_use_rss
 
+from fcts.rss import can_use_rss
 from libs.bot_classes import Axobot, MyContext
 from libs.checks import checks
 from libs.formatutils import FormatUtils
 from libs.rss.rss_general import FeedObject
 
+SERVER_ADDRESS_REGEX = re.compile(r"^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$|"
+                                  r"^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)+([A-Za-z]|"
+                                  r"[A-Za-z][A-Za-z0-9\-]*[A-Za-z0-9])$")
 
 def _similar(input_1: str, input_2: str):
     "Compare two strings and output the similarity ratio"
@@ -242,16 +245,11 @@ class Minecraft(commands.Cog):
         ..Example minecraft server play.gunivers.net
 
         ..Doc minecraft.html#mc"""
-        if ":" in ip and port is None:
-            ip, port_str = ip.split(":")
-            if not port_str.isnumeric():
-                await ctx.send(await self.bot._(ctx.guild, "minecraft.invalid-port"))
-                return
-            port = int(port_str)
-        elif port is None:
-            port_str = None
-        else:
-            port_str = str(port)
+        if (validation := await self.validate_server_ip(ip, port)) is None:
+            await ctx.send(await self.bot._(ctx.guild.id, "minecraft.invalid-ip"))
+            return
+        ip, port = validation
+        port_str = str(port) if port else ''
         await ctx.defer()
         obj = await self.create_server_1(ctx.guild, ip, port_str)
         embed = await self.form_msg_server(obj, ctx.guild, (ip, port_str))
@@ -271,13 +269,10 @@ class Minecraft(commands.Cog):
         if not ctx.bot.database_online:
             await ctx.send(await self.bot._(ctx.guild.id, "cases.no_database"))
             return
-        if ":" in ip and port is None:
-            ip, port_str = ip.split(":")
-            if not port_str.isnumeric():
-                await ctx.send(await self.bot._(ctx.guild, "minecraft.invalid-port"))
-                return
-            port = int(port_str)
-        # TODO: add proper ip validation and testing
+        if (validation := await self.validate_server_ip(ip, port)) is None:
+            await ctx.send(await self.bot._(ctx.guild.id, "minecraft.invalid-ip"))
+            return
+        ip, port = validation
         await ctx.defer()
         is_over, flow_limit = await self.bot.get_cog('Rss').is_overflow(ctx.guild)
         if is_over:
@@ -299,6 +294,20 @@ class Minecraft(commands.Cog):
             cmd = await self.bot.get_command_mention("about")
             await ctx.send(await self.bot._(ctx.guild, "errors.unknown2", about=cmd))
             self.bot.dispatch("error", err, ctx)
+
+    async def validate_server_ip(self, ip: str, port: Optional[int] = None):
+        "Validate a server IP and port"
+        if ":" in ip and port is None:
+            ip, port_str = ip.split(":")
+            if not port_str.isnumeric():
+                return None
+            port = int(port_str)
+        if port is not None:
+            if not 0 < port < 65536:
+                return None
+        if not SERVER_ADDRESS_REGEX.match(ip):
+            return None
+        return ip, port
 
     async def create_server_1(self, guild: discord.Guild, ip: str, port: Optional[str]=None) -> Union[str, 'MCServer']:
         "Collect and serialize server data from a given IP, using minetools.eu"

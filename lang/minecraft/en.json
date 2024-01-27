@@ -1,6 +1,6 @@
 {
     "cant-embed": "Cannot send embed. Please make sure the \"Embed links\" permission is enabled.",
-    "invalid-port": "Invalid server port",
+    "invalid-ip": "Invalid server IP",
     "mod-fields": {
         "author": "Author",
         "authors": "Authors",
