@@ -143,7 +143,7 @@ Every information come from the website www.fr-minecraft.net"""
             "downloads": int(search['downloadCount']),
             "id-curseforge": str(search['id'])
         }
-        title = (await self.bot._(ctx.channel, "minecraft.names"))[5] + " - " + search['name']
+        title = await self.bot._(ctx.channel, "minecraft.mod-title") + " - " + search['name']
         embed = discord.Embed(
             title=title,
             color=self.embed_color,
@@ -196,7 +196,7 @@ Every information come from the website www.fr-minecraft.net"""
             "downloads": int(search['downloads']),
             "id-modrinth": search["slug"]
         }
-        title = (await self.bot._(ctx.channel, "minecraft.names"))[5] + " - " + search["title"]
+        title = await self.bot._(ctx.channel, "minecraft.mod-title") + " - " + search["title"]
         embed = discord.Embed(
             title=title,
             color=self.embed_color,
