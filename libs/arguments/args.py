@@ -256,3 +256,13 @@ class GuildTransformer(discord.app_commands.Transformer):
         raise NotImplementedError()
 
 GuildArgument = discord.app_commands.Transform[discord.Guild, GuildTransformer]
+
+class MessageTransformer(discord.app_commands.Transformer): # pylint: disable=abstract-method
+    "Convert a string argument in an interaction usage to a valid discord Message"
+
+    async def transform(self, interaction, value, /):
+        "Do the conversion"
+        ctx = await commands.Context.from_interaction(interaction)
+        return await commands.MessageConverter().convert(ctx, value) # pylint: disable=protected-access
+
+MessageArgument = discord.app_commands.Transform[discord.Message, MessageTransformer]

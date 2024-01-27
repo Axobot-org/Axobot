@@ -1,0 +1,7 @@
+{
+    "error": {
+        "empty-message": "This message has no content to quote!",
+        "too-long": "I cannot quote messages longer than %{max} characters!"
+    },
+    "success": "Your quote has been posted to %{message_url}"
+}

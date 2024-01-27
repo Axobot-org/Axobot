@@ -1,0 +1,7 @@
+{
+    "error": {
+        "empty-message": "Ce message n'a pas de texte à citer!",
+        "too-long": "Je ne peux pas citer les messages de plus de %{max} caractères !"
+    },
+    "success": "Votre citation a bien été postée dans %{message_url}"
+}
