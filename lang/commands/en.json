@@ -38,6 +38,10 @@
         "kick": "kick",
         "last-post": "last-post",
         "membercount": "membercount",
+        "minecraft follow-server": "follow-server",
+        "minecraft mod": "mod",
+        "minecraft server": "server",
+        "minecraft skin": "skin",
         "modlogs disable": "disable",
         "modlogs enable": "enable",
         "modlogs list": "list",
@@ -119,6 +123,7 @@
         "config": "config",
         "emoji": "emoji",
         "event": "event",
+        "minecraft": "minecraft",
         "modlogs": "modlogs",
         "profile": "profile",
         "reminders": "reminders",
@@ -137,6 +142,10 @@
         "cases remove": "Permanently delete a moderation case",
         "cases search": "Find the details of a moderation case",
         "membercount": "Get some stats about your server members",
+        "minecraft follow-server": "Follow a server's info in real time in your channel",
+        "minecraft mod": "Get info about any mod registered on CurseForge or Modrinth",
+        "minecraft server": "Get infos about any Minecraft Java server",
+        "minecraft skin": "Get the skin of any Minecraft Java player",
         "random-tip": "Get a random tip or trivia about the bot",
         "set-xp": "Set the XP of a user in your server"
     },
@@ -146,6 +155,7 @@
         "config": "Configure the bot for your server",
         "emoji": "Manage your emojis",
         "event": "Participate in bot special events",
+        "minecraft": "Search for info about servers/players/mods from Minecraft",
         "modlogs": "Enable or disable server logs in specific channels",
         "profile": "Configure the bot for your own usage",
         "reminders": "Manage your pending reminders",
@@ -242,6 +252,21 @@
         "emoji clear": {
             "message": "message",
             "emoji": "emoji"
+        },
+        "minecraft follow-server": {
+            "ip": "ip",
+            "port": "port",
+            "channel": "channel"
+        },
+        "minecraft mod": {
+            "mod_name": "mod-name"
+        },
+        "minecraft server": {
+            "ip": "ip",
+            "port": "port"
+        },
+        "minecraft skin": {
+            "username": "username"
         },
         "role set-color": {
             "role": "role",
