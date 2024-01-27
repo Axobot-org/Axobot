@@ -1,7 +1,7 @@
 from typing import TYPE_CHECKING
 
 import discord
-from cachingutils import LRUCache
+from cachetools import TTLCache
 
 from libs.serverconfig.options_list import options as options_list
 
@@ -14,7 +14,7 @@ class PrefixManager:
 
     def __init__(self, bot: 'Axobot'):
         self.bot = bot
-        self.cache: LRUCache[int, str] = LRUCache(max_size=1000, timeout=3600)
+        self.cache = TTLCache[int, str](maxsize=1_000, ttl=60*60)
 
     async def get_prefix(self, guild: discord.Guild) -> str:
         "Find the prefix attached to a guild"
@@ -63,4 +63,4 @@ class PrefixManager:
         "Reset the prefix cache for a guild"
         self.bot.log.debug("Prefix reset for guild %s", guild_id)
         if guild_id in self.cache:
-            del self.cache._items[guild_id]
+            self.cache.pop(guild_id)

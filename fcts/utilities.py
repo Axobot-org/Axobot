@@ -2,16 +2,17 @@ import asyncio
 import importlib
 import operator
 import re
-from typing import Any, List
+from typing import Any
 
 import aiohttp
-from cachingutils import acached
 import discord
+from asyncache import cached
+from cachetools import TTLCache
 from discord.ext import commands
-from libs.bot_classes import MyContext, Axobot
-from libs.serverconfig.options_list import options
 
 from libs.arguments import args
+from libs.bot_classes import Axobot, MyContext
+from libs.serverconfig.options_list import options
 
 importlib.reload(args)
 
@@ -36,7 +37,7 @@ class Utilities(commands.Cog):
 
     async def get_bot_infos(self):
         if not self.bot.database_online:
-            return list()
+            return []
         query = ("SELECT * FROM `bot_infos` WHERE `ID` = %s")
         async with self.bot.db_query(query, (self.bot.user.id,)) as query_results:
             config_list = list(query_results)
@@ -120,7 +121,7 @@ class Utilities(commands.Cog):
                 return config['xp_style']
         return self.bot.get_cog("Xp").default_xp_style
 
-    @acached(timeout=60)
+    @cached(TTLCache(maxsize=10_000, ttl=60))
     async def allowed_card_styles(self, user: discord.User):
         """Retourne la liste des styles autorisées pour la carte d'xp de cet utilisateur"""
         liste = ['blue', 'dark', 'green', 'grey', 'orange',
@@ -167,11 +168,14 @@ class Utilities(commands.Cog):
         votes = []
         async with aiohttp.ClientSession() as session:
             try:  # https://top.gg/bot/486896267788812288
-                async with session.get(f'https://top.gg/api/bots/{self.bot.user.id}/check?userId={userid}', headers={'Authorization': str(self.bot.dbl_token)}) as r:
+                async with session.get(
+                    f'https://top.gg/api/bots/{self.bot.user.id}/check?userId={userid}',
+                    headers={'Authorization': str(self.bot.dbl_token)}
+                ) as r:
                     json = await r.json()
                     if "error" in json:
                         raise ValueError("Error while checking votes on top.gg: "+json["error"])
-                    elif json["voted"]:
+                    if json["voted"]:
                         votes.append(("Discord Bots List", "https://top.gg/"))
             except Exception as err:
                 self.bot.dispatch("error", err)

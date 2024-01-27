@@ -2,10 +2,11 @@ import datetime as dt
 from collections import defaultdict
 from random import choices, random
 from typing import Optional
+from cachetools import TTLCache
 
 import discord
 import emoji
-from cachingutils import acached
+from asyncache import cached
 
 from libs.bot_classes import Axobot
 from libs.bot_events.dict_types import EventData, EventItem, EventType
@@ -177,7 +178,7 @@ class ChristmasSubcog(AbstractSubcog):
         # add points (and potentially grant reward rank card)
         await self.db_add_collect(ctx.author.id, sum(item["points"] for item in gifts))
 
-    @acached(60*2) # cache for 2min
+    @cached(TTLCache(maxsize=1, ttl=60*2)) # cache for 2min
     async def today(self):
         return dt.datetime.now(dt.timezone.utc).date()
 
@@ -268,7 +269,7 @@ the end of the event? Don't forget to join our [support server](https://discord.
             return dt.date(2023, 11, 30)
         return last_collect_day
 
-    @acached(60*60*24)
+    @cached(TTLCache(maxsize=1, ttl=60*60*24))
     async def _get_suitable_reaction_items(self):
         "Get the list of items usable in reactions"
         if self.current_event is None:

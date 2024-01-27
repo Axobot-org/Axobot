@@ -3,7 +3,7 @@ import logging
 from typing import Literal, Optional
 
 import discord
-from cachingutils import Cache
+from cachetools import TTLCache
 from discord.ext import commands
 
 from libs.bot_classes import SUPPORT_GUILD_ID, Axobot
@@ -20,7 +20,7 @@ class Welcomer(commands.Cog):
         # List of users who won't receive welcome/leave messages :
         #   someone, Awhikax's alt, Z_Jumper
         self.no_message = {392766377078816789, 504269440872087564, 552273019020771358}
-        self.join_cache = Cache[tuple[int, int], int](timeout=60)
+        self.join_cache = TTLCache[tuple[int, int], int](maxsize=50_000, ttl=90)
 
 
     @commands.Cog.listener()

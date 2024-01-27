@@ -11,7 +11,8 @@ from typing import Any, Callable, Literal, Optional, Union
 
 import discord
 from aiohttp import ClientSession, client_exceptions
-from cachingutils import acached
+from asyncache import cached
+from cachetools import TTLCache
 from discord import app_commands
 from discord.ext import commands, tasks
 
@@ -639,7 +640,7 @@ class Rss(commands.Cog):
                 ))
         return options
 
-    @acached(timeout=30)
+    @cached(TTLCache(1_000, ttl=30))
     async def _get_feeds_for_choice(self, guild_id: int, feed_filter: Callable[[FeedObject], bool]=None):
         "Return a list of FeedObject for a given Guild, matching the given filter"
         guild_feeds = await self.db_get_guild_feeds(guild_id)
@@ -647,7 +648,7 @@ class Rss(commands.Cog):
             return [feed for feed in guild_feeds if feed_filter(feed)]
         return guild_feeds
 
-    @acached(timeout=30)
+    @cached(TTLCache(1_000, 30))
     async def get_feeds_choice(self, guild_id: int, current: str, feed_filter: Callable[[FeedObject], bool]=None
                                ) -> list[app_commands.Choice[str]]:
         "Return a list of feed Choice for a given Guild, matching the current input and the given filter"

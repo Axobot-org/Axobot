@@ -7,10 +7,11 @@ from typing import Any, Optional
 from urllib.parse import urlparse
 
 import requests
-from cachingutils import cached
+from asyncache import cached
+from cachetools import TTLCache
 
 BITLY_API_VERSION = 'v4'
-BITLY_SERVICE_URL = 'https://api-ssl.bitly.com/%s/' %BITLY_API_VERSION
+BITLY_SERVICE_URL = f'https://api-ssl.bitly.com/{BITLY_API_VERSION}/'
 
 class ShortenerServiceError(Exception):
     pass
@@ -31,9 +32,9 @@ class BaseShortener():
 
         try:
             if data:
-                response = requests.post(request_url, json=data, headers=headers)
+                response = requests.post(request_url, json=data, headers=headers, timeout=10)
             else:
-                response = requests.get(request_url, headers=headers)
+                response = requests.get(request_url, headers=headers, timeout=10)
             return response.status_code, response.content
 
         except requests.exceptions.HTTPError as err:
@@ -59,7 +60,7 @@ class Bitly(BaseShortener):
         """The exact nature of the error is obtained from the 'message' json attribute"""
         return response.get('message')
 
-    @cached(timeout=86400)
+    @cached(TTLCache(10_000, ttl=86400))
     def shorten_url(self, long_url: str, domain: str='bit.ly'):  # pylint: disable=arguments-differ
         "Shorten a given URL to a bit.ly url"
         params = {
@@ -71,14 +72,14 @@ class Bitly(BaseShortener):
 
         if status >= 400:
             msg = self._get_error_from_response(response)
-            raise BitlyError('Error occurred while shortening url %s: %s' % (long_url, msg))
+            raise BitlyError(f"Error occurred while shortening url {long_url}: {msg}")
 
         short_url: str = response.get('link')
         if not short_url:
-            raise BitlyError('Error occurred while shortening url %s' %long_url)
+            raise BitlyError(f"Error occurred while shortening url {long_url}")
         return short_url
 
-    @cached(timeout=86400)
+    @cached(TTLCache(10_000, ttl=86400))
     def expand_url(self, short_url: str):
         "Extract a full URL from a given shortened url"
         # Extract info from short_url
@@ -91,9 +92,9 @@ class Bitly(BaseShortener):
 
         if status >= 400:
             msg = self._get_error_from_response(response)
-            raise BitlyError('Error occurred while expanding url %s: %s' % (short_url, msg))
+            raise BitlyError(f'Error occurred while expanding url {short_url}: {msg}')
 
         long_url = response.get('long_url')
         if not long_url:
-            raise BitlyError('Error occurred while expanding url %s' %short_url)
+            raise BitlyError(f'Error occurred while expanding url {short_url}')
         return long_url

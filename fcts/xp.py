@@ -14,7 +14,8 @@ from typing import Literal, Optional, TypedDict, Union
 import aiohttp
 import discord
 import mysql
-from cachingutils import acached
+from asyncache import cached
+from cachetools import Cache
 from discord import app_commands
 from discord.ext import commands
 from PIL import Image, ImageFont
@@ -850,7 +851,7 @@ class Xp(commands.Cog):
         async def get_page_count(self):
             return self.max_page
 
-        @acached()
+        @cached(Cache(maxsize=1)) # cache as long as possible, as it should never change for one same Paginator
         async def get_user_rank(self):
             "Get the embed field content corresponding to the user's rank"
             pos = [(i+1, pos) for i, pos in enumerate(self.positions) if pos is not None and pos["user_id"] == self.user.id]

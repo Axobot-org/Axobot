@@ -13,7 +13,8 @@ from typing import TYPE_CHECKING, Literal, Optional, Union
 
 import discord
 import speedtest
-from cachingutils import acached
+from asyncache import cached
+from cachetools import TTLCache
 from discord.ext import commands
 from git import GitCommandError, Repo
 
@@ -449,7 +450,7 @@ class Admin(commands.Cog):
             txt = "\n".join(f"{result[0]:>{length}}: {result[1]} MB" for result in query_results if result[1] is not None)
         await ctx.send("```yaml\n" + txt + "\n```")
 
-    @acached(timeout=3600)
+    @cached(TTLCache(1, 3600))
     async def get_databases_names(self) -> list[str]:
         "Get every database names visible for the bot"
         query = "SHOW DATABASES"

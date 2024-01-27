@@ -3,7 +3,7 @@ from datetime import timedelta
 from typing import Optional
 
 import discord
-from cachingutils import Cache
+from cachetools import TTLCache
 from discord.ext import commands, tasks
 
 from libs.bot_classes import Axobot
@@ -17,7 +17,7 @@ class AntiRaid(commands.Cog):
         self.bot = bot
         self.file = "antiraid"
         # Cache of raider status for (guild_id, user_id) - True if raider detected
-        self.check_cache = Cache[tuple[int, int], bool](timeout=60)
+        self.check_cache = TTLCache[tuple[int, int], bool](maxsize=10_000, ttl=60)
         # Cache of mentions sent by users - count of recent mentions, decreased every minute
         self.mentions_score: defaultdict[int, int] = defaultdict(int)
 
@@ -36,7 +36,7 @@ class AntiRaid(commands.Cog):
             is_raider = await self.raid_check(member)
             self.check_cache[(member.guild.id, member.id)] = is_raider
 
-    async def is_raider(self, member: discord.Member) -> bool:
+    async def is_raider(self, member: discord.Member):
         "Check if a member is a potential raider"
         return self.check_cache.get((member.guild.id, member.id), False)
 

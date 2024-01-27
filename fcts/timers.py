@@ -2,9 +2,10 @@ import copy
 import datetime
 import time
 from typing import Optional
-from cachingutils import acached
 
 import discord
+from asyncache import cached
+from cachetools import TTLCache
 from discord import app_commands
 from discord.ext import commands
 
@@ -54,9 +55,8 @@ class Timers(commands.Cog):
 
     async def db_delete_reminders(self, reminder_ids: list[int], user: int) -> bool:
         "Delete multiple reminders for a user"
-        query = "DELETE FROM `timed` WHERE user=%s AND action='timer' AND ID IN ({})".format(
-            ",".join(["%s"] * len(reminder_ids))
-        )
+        list_placeholder = ",".join(["%s"] * len(reminder_ids))
+        query = f"DELETE FROM `timed` WHERE user=%s AND action='timer' AND ID IN ({list_placeholder})"
         async with self.bot.db_query(query, (user, *reminder_ids), returnrowcount=True) as query_result:
             return query_result > 0
 
@@ -72,7 +72,7 @@ class Timers(commands.Cog):
         async with self.bot.db_query(query, (original_duration, new_duration, self.bot.beta)):
             pass
 
-    @acached(timeout=60)
+    @cached(TTLCache(1_000, ttl=60))
     async def format_duration_left(self, end_date: datetime.datetime, lang: str) -> str:
         "Format the duration left for a reminder"
         now = self.bot.utcnow() if end_date.tzinfo else datetime.datetime.utcnow()
@@ -86,12 +86,12 @@ class Timers(commands.Cog):
             lang=lang, year=True, seconds=False, form="short"
         )
 
-    @acached(timeout=30)
+    @cached(TTLCache(1_000, ttl=30))
     async def _get_reminders_for_choice(self, user_id: int):
         "Returns a list of reminders for a given user"
         return await self.db_get_user_reminders(user_id)
 
-    @acached(timeout=60)
+    @cached(TTLCache(1_000, ttl=60))
     async def _format_reminder_choice(self, current: str, lang: str, reminder_id: int, begin_date: datetime.datetime,
                                       duration: str, reminder_message: str
                                       ) -> Optional[tuple[bool, float, app_commands.Choice[str]]]:
@@ -108,9 +108,9 @@ class Timers(commands.Cog):
         return (priority, -end_date.timestamp(), choice)
 
 
-    @acached(timeout=30)
+    @cached(TTLCache(1_000, ttl=30))
     async def get_reminders_choice(self, user_id: int, lang: str, current: str) -> list[app_commands.Choice[str]]:
-        "Returns a list of reminders Choice for a guven user, matching the current input"
+        "Returns a list of reminders Choice for a given user, matching the current input"
         reminders = await self._get_reminders_for_choice(user_id)
         if len(reminders) == 0:
             return []
