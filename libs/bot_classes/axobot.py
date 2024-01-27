@@ -7,7 +7,6 @@ from typing import (TYPE_CHECKING, Awaitable, Callable, Literal, Optional,
 
 import aiohttp
 import discord
-from cachingutils import acached
 from discord.ext import commands
 from mysql.connector import connect as sql_connect
 from mysql.connector.connection import MySQLConnection
@@ -21,7 +20,7 @@ from libs.serverconfig.options_list import options as options_list
 from libs.tasks_handler import TaskHandler
 from libs.tips import TipsManager
 
-from .consts import PRIVATE_GUILD_ID, SUPPORT_GUILD_ID
+from .consts import PRIVATE_GUILD_ID
 from .my_context import MyContext
 
 if TYPE_CHECKING:
@@ -356,16 +355,3 @@ class Axobot(commands.bot.AutoShardedBot):
             return f"`{command.qualified_name}`"
         self.log.error("Trying to mention invalid command: %s", command_name)
         return f"`{command_name}`"
-
-    @acached(timeout=60)
-    async def _check_axobot_in_guild(self, guild: Optional[discord.Guild], channel: Optional[discord.abc.GuildChannel] = None):
-        if guild is None:
-            return False
-        axo_member = guild.get_member(1048011651145797673)
-        if axo_member is None:
-            return False
-        if guild.id in {PRIVATE_GUILD_ID.id, SUPPORT_GUILD_ID.id} and channel:
-            # if we're in the staff or support server, check by channel instead
-            return channel.permissions_for(axo_member).read_messages
-        # else, don't bother and just return True
-        return True
