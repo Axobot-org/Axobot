@@ -1,5 +1,6 @@
 {
     "cant-embed": "Cannot send embed. Please make sure the \"Embed links\" permission is enabled.",
+    "invalid-port": "Invalid server port",
     "mod-fields": {
         "author": "Author",
         "authors": "Authors",
@@ -12,7 +13,6 @@
         "summary": "Summary",
         "versions": "Game versions"
     },
-    "mod-help": "This command provides information about a large number of Minecraft mods. You can give its full or partial name, just enter `%{p}mc mod <name>`. The mod must be registered on the CurseForge platform to appear",
     "mod-title": "Mod",
     "no-api": "Error: Unable to connect to API",
     "no-embed": "Unable to send the result! Please give me 'Embed links' permission to send it",
@@ -26,7 +26,10 @@
     "serv-1": "List of the first 20 players connected",
     "serv-2": "List of online players",
     "serv-3": "Latency",
+    "serv-follow": {
+        "missing-perms": "Error: I cannot send messages and embeds in the selected channel",
+        "success": "A message with server details %{ip} has been added to the channel %{channel}, and will be updated regularly!"
+    },
     "serv-error": "Oops, an unknown error occurred. Please try again later :confused:",
-    "serv-title": "Server information %{ip}",
-    "success-add": "A message with server details %{ip} has been added to the channel %{channel}!"
+    "serv-title": "Server information %{ip}"
 }
