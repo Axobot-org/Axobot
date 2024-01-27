@@ -67,6 +67,8 @@ class Quote(commands.Cog):
     async def quote_message(self, message: discord.Message, channel: discord.abc.Messageable) -> Optional[discord.Message]:
         "Generate a Quote card from a message and post it to the channel"
         text = discord.utils.remove_markdown(message.clean_content)
+        while '\n\n' in text:
+            text = text.replace('\n\n', '\n')
         author_name = message.author.display_name
         author_avatar = await self.get_image_from_url(message.author.display_avatar.replace(format="png", size=256).url)
         generator = QuoteGeneration(
