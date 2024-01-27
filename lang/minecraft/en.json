@@ -1,57 +1,6 @@
 {
-    "adv-fields": [
-        "Name",
-        "ID",
-        "Type",
-        "Action",
-        "Parent",
-        "Children",
-        "Added in the version"
-    ],
-    "adv-help": "This command provides information about any advancement of the game Minecraft. Simply enter the name or the identifier of the advancement.",
-    "block-fields": [
-        "ID",
-        "Stack size",
-        "Creative mode tab",
-        "Damage points",
-        "Durability",
-        "Tool able to destroy it",
-        "TNT resistance",
-        "Mobs able to loot it",
-        "Added in the version"
-    ],
-    "block-help": "This command allows you to obtain information on any Minecraft block. You can give its full or partial name, in French or English, or even its identifier. Just enter `%{p}mc block <name>`",
     "cant-embed": "Cannot send embed. Please make sure the \"Embed links\" permission is enabled.",
-    "cmd-fields": [
-        "Name",
-        "Syntax",
-        "Examples",
-        "Added in the version"
-    ],
-    "cmd-help": "This command allows you to obtain information about any Minecraft command. All you have to do is type `%{p}mc command <name>`",
-    "contact-mail": "If you notice an error in the information provided, please contact me personally, or report the error directly [on the site](https://fr-minecraft.net).",
-    "dimensions": "Width: %{la}\nLength: %{lo}\nHeight: %{ha}",
-    "entity-fields": [
-        "ID",
-        "Type",
-        "Health Points",
-        "Attack Points",
-        "Experience Points Released to Death",
-        "Preferred Biomes",
-        "Added in the version"
-    ],
-    "entity-help": "This command allows you to obtain information about any Minecraft entity. You can give its full or partial name, in French or English, or even its identifier. Just enter `%{p}mc entity <name>`",
-    "item-fields": [
-        "ID",
-        "Size of a stack",
-        "Creative mode tab",
-        "Damage points",
-        "Durability points",
-        "Tool able to destroy it",
-        "Mobs able to drop this item",
-        "Added in the version"
-    ],
-    "item-help": "This command allows you to obtain information on any Minecraft item. You can give its full or partial name, in French or English, or even its identifier. Just enter `%{p}mc item <name>`",
+    "invalid-ip": "Invalid server IP",
     "mod-fields": {
         "author": "Author",
         "authors": "Authors",
@@ -64,32 +13,9 @@
         "summary": "Summary",
         "versions": "Game versions"
     },
-    "mod-help": "This command provides information about a large number of Minecraft mods. You can give its full or partial name, just enter `%{p}mc mod <name>`. The mod must be registered on the CurseForge platform to appear",
-    "mojang_desc": {
-        "account.mojang.com": "Mojang account management site",
-        "api.mojang.com": "API service provided by Mojang",
-        "authserver.mojang.com": "Authentication server",
-        "minecraft.net": "Official Site",
-        "mojang.com": "Official website",
-        "session.minecraft.net": "Multiplayer sessions (obsolete)",
-        "sessionserver.mojang.com": "Multiplayer sessions",
-        "textures.minecraft.net": "Texture server (skin & capes)"
-    },
-    "names": [
-        "Block",
-        "Entity",
-        "Item",
-        "Command",
-        "Advancement",
-        "Mod"
-    ],
-    "no-adv": "Unable to find this advancement",
+    "mod-title": "Mod",
     "no-api": "Error: Unable to connect to API",
-    "no-block": "Unable to find this block",
-    "no-cmd": "Unable to find this command",
     "no-embed": "Unable to send the result! Please give me 'Embed links' permission to send it",
-    "no-entity": "Unable to find this entity",
-    "no-item": "Unable to find this item",
     "no-mod": "Unable to find this mod",
     "no-ping": "Error: Unable to ping this server",
     "no-player-list": "Not available",
@@ -100,7 +26,10 @@
     "serv-1": "List of the first 20 players connected",
     "serv-2": "List of online players",
     "serv-3": "Latency",
+    "serv-follow": {
+        "missing-perms": "Error: I cannot send messages and embeds in the selected channel",
+        "success": "A message with server details %{ip} has been added to the channel %{channel}, and will be updated regularly!"
+    },
     "serv-error": "Oops, an unknown error occurred. Please try again later :confused:",
-    "serv-title": "Server information %{ip}",
-    "success-add": "A message with server details %{ip} has been added to the channel %{channel}!"
+    "serv-title": "Server information %{ip}"
 }
