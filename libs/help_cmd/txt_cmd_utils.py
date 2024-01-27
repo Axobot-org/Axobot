@@ -31,6 +31,8 @@ async def get_command_description(ctx: MyContext, command: commands.Command):
         if len(desc.split('\n')) > 1:
             long_desc = '\n'.join(desc.split('\n')[1:]).strip()
             desc = f"{short_desc}\n\n{long_desc}"
+        else:
+            desc = short_desc
     if desc is None:
         desc = await ctx.bot._(ctx.channel, "help.no-desc-cmd")
     return desc, examples, doc
