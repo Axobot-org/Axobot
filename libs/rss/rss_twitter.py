@@ -7,7 +7,8 @@ from typing import TYPE_CHECKING, Optional
 
 import discord
 import twitter
-from cachingutils import acached
+from asyncache import cached
+from cachetools import TTLCache
 
 from .rss_general import FeedObject, RssMessage
 
@@ -38,7 +39,7 @@ class TwitterRSS:
         usr = await self.get_user_from_name(name)
         return usr.id if usr else None
 
-    @acached(timeout=86400)
+    @cached(TTLCache(maxsize=10_000, ttl=86400))
     async def get_user_from_name(self, name: str):
         "Get a Twitter user object from a twitter username"
         try:
@@ -46,7 +47,7 @@ class TwitterRSS:
         except twitter.TwitterError:
             return None
 
-    @acached(timeout=86400)
+    @cached(TTLCache(maxsize=10_000, ttl=86400))
     async def get_user_from_id(self, user_id: int):
         "Get a Twitter user object from a Twitter user ID"
         try:

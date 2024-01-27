@@ -3,12 +3,12 @@ import time
 from typing import Any, Optional
 
 import discord
-from cachingutils import LRUCache
+from cachetools import TTLCache
 from discord import app_commands
 from discord.ext import commands, tasks
 
-from libs.checks import checks
 from libs.bot_classes import Axobot, MyContext
+from libs.checks import checks
 from libs.serverconfig.autocomplete import autocomplete_main
 from libs.serverconfig.checks import check_config
 from libs.serverconfig.config_paginator import ServerConfigPaginator
@@ -23,7 +23,7 @@ class ServerConfig(commands.Cog):
     def __init__(self, bot: Axobot):
         self.bot = bot
         self.file = "serverconfig"
-        self.cache: LRUCache = LRUCache(max_size=1_000, timeout=3_600 * 2)
+        self.cache = TTLCache[tuple[int, str], Any](maxsize=10_000, ttl=3_600 * 2)
         self.membercounter_pending: dict[int, int] = {}
         self.embed_color = 0x3fb9ef
         self.log_color = 0x1b5fb1
@@ -36,7 +36,7 @@ class ServerConfig(commands.Cog):
         self.update_every_membercounter.cancel() # pylint: disable=no-member
 
     async def clear_cache(self):
-        self.cache._items.clear() # pylint: disable=protected-access
+        self.cache.clear()
 
     # ---- PUBLIC QUERIES ----
 
@@ -85,7 +85,7 @@ class ServerConfig(commands.Cog):
             return False
         if await self.db_delete_option(guild_id, option_name):
             if (guild_id, option_name) in self.cache:
-                del self.cache._items[(guild_id, option_name)]
+                self.cache.pop((guild_id, option_name))
             if option_name == "prefix":
                 await self.bot.prefix_manager.reset_prefix(guild_id)
             return True
@@ -98,7 +98,7 @@ class ServerConfig(commands.Cog):
         if await self.db_delete_guild(guild_id):
             for option_name in options_list:
                 if (guild_id, option_name) in self.cache:
-                    del self.cache._items[(guild_id, option_name)]
+                    self.cache.pop((guild_id, option_name))
                     await self.bot.prefix_manager.reset_prefix(guild_id)
             return True
         return False

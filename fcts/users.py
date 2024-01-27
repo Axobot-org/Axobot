@@ -2,7 +2,8 @@ import importlib
 from typing import Any, Optional
 
 import discord
-from cachingutils import acached
+from asyncache import cached
+from cachetools import TTLCache
 from discord import app_commands
 from discord.ext import commands
 
@@ -35,7 +36,7 @@ class Users(commands.Cog):
         async with self.bot.db_query(query, (user_id,), fetchone=True) as query_result:
             return query_result or None
 
-    @acached(timeout=3600)
+    @cached(TTLCache(maxsize=100_000, ttl=3600))
     async def db_get_user_config(self, user_id: int, config: str):
         "Get a user config value from the database"
         if config not in user_options_list:

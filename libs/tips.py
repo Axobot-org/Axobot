@@ -4,7 +4,7 @@ from enum import Enum
 from typing import TYPE_CHECKING, Optional, TypedDict, Union
 
 import discord
-from cachingutils import LRUCache
+from cachetools import TTLCache
 
 if TYPE_CHECKING:
     from bot_classes import Axobot, MyContext
@@ -39,9 +39,8 @@ class TipsManager:
 
     def __init__(self, bot: "Axobot"):
         self.bot = bot
-        _cache_init: dict[int, list[self.UserTipsFetchResult]] = {}
-        self.user_cache = LRUCache(max_size=10_000, timeout=3_600 * 2, values=_cache_init)
-        self.guild_cache = LRUCache(max_size=10_000, timeout=3_600 * 2, values=dict(_cache_init))
+        self.user_cache = TTLCache[int, list[self.UserTipsFetchResult]](maxsize=10_000, ttl=60 * 60 * 2)
+        self.guild_cache = TTLCache[int, list[self.GuildTipsFetchResult]](maxsize=10_000, ttl=60 * 60 * 2)
         self._random_tips_params: Optional[dict[str, str]] = None
 
     async def get_random_tips_params(self) -> dict[str, str]:
@@ -84,8 +83,11 @@ class TipsManager:
 
     async def db_get_guild_tips(self, guild_id: int) -> list["GuildTipsFetchResult"]:
         "Get list of tips shown to a guild"
+        if value := self.guild_cache.get(guild_id):
+            return value
         query = "SELECT tip_id, shown_at FROM tips WHERE guild_id = %s"
         async with self.bot.db_query(query, (guild_id,)) as query_result:
+            self.guild_cache[guild_id] = query_result
             return query_result
 
     async def db_register_user_tip(self, user_id: int, tip: UserTip):

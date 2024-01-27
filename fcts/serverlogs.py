@@ -6,7 +6,7 @@ from random import random
 from typing import TYPE_CHECKING, Any, Callable, Optional
 
 import discord
-from cachingutils import LRUCache
+from cachetools import TTLCache
 from discord import app_commands
 from discord.ext import commands, tasks
 
@@ -54,7 +54,7 @@ class ServerLogs(commands.Cog):
     def __init__(self, bot: Axobot):
         self.bot = bot
         self.file = "serverlogs"
-        self.cache: LRUCache[int, dict[int, list[str]]] = LRUCache(max_size=10000, timeout=3600*4)
+        self.cache = TTLCache[int, dict[int, list[str]]](maxsize=10_000, ttl=3600*4)
         self.to_send: dict[int, list[discord.Embed]] = {}
         self.auditlogs_timeout = 3 # seconds
         self.voice_join_timestamps: dict[tuple[int, int], float] = {}
