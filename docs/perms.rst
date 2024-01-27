@@ -118,7 +118,7 @@ Allows the bot to send a TTS (text-to-speech) message, i.e. a message that will 
 Embed Links
 -----------
 
-Allows the bot the bot to send an embed. Some commands will need that permissions, some others will only look worse. Examples of use for a better display: `membercount <infos.html#membercount>`__ , `mojang <minecraft.html#mojang>`__, `XP system <user.html#xp-system>`__ . Examples of required permission: `infos <infos.html#info>`__ , `mc <minecraft.html#mc>`__ , `config see <server.html#watch>`__, `embeds generator <miscellaneous.html#embed>`__
+Allows the bot the bot to send an embed. Some commands will need that permissions, some others will only look worse. Examples of use for a better display: `membercount <infos.html#membercount>`__ , `mojang <minecraft.html#mojang>`__, `XP system <user.html#xp-system>`__ . Examples of required permission: `infos <infos.html#info>`__ , `minecraft <minecraft.html#mc>`__ , `config see <server.html#watch>`__, `embeds generator <miscellaneous.html#embed>`__
 
 Attach Files
 ------------

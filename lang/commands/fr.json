@@ -38,6 +38,10 @@
         "kick": "expulser",
         "last-post": "dernier-post",
         "membercount": "nb-membres",
+        "minecraft follow-server": "suivre-serveur",
+        "minecraft mod": "mod",
+        "minecraft server": "serveur",
+        "minecraft skin": "skin",
         "modlogs disable": "désactiver",
         "modlogs enable": "activer",
         "modlogs list": "liste",
@@ -114,6 +118,7 @@
         "config": "config",
         "emoji": "émoji",
         "event": "événement",
+        "minecraft": "minecraft",
         "modlogs": "logs-modération",
         "profile": "profil",
         "reminders": "rappels",
@@ -135,6 +140,10 @@
         "cases search": "Affiche les détails d'un casier de modération",
         "clear": "Supprime des messages du salon",
         "membercount": "Donne quelques stats sur les membres du serveur",
+        "minecraft follow-server": "Suis les informations d'un serveur en temps réel dans ton salon",
+        "minecraft mod": "Obtiens des informations sur tout mod enregistré sur CurseForge ou Modrinth",
+        "minecraft server": "Obtiens des informations sur un serveur Minecraft Java",
+        "minecraft skin": "Obtiens le skin de n'importe quel joueur Minecraft Java",
         "random-tip": "Affiche une astuce aléatoire à propos du bot",
         "set-xp": "Modifie l'XP d'un utilisateur dans le serveur",
         "slowmode": "Ralenti le spam du salon en activant le mode lent"
@@ -145,6 +154,7 @@
         "config": "Configure le bot pour ton serveur",
         "emoji": "Gère les émojis de votre serveur",
         "event": "Participe aux événements spéciaux du bot",
+        "minecraft": "Recherche d'informations sur les serveurs/joueurs/mods de Minecraft",
         "modlogs": "Active ou désactive les logs de modération",
         "profile": "Configure le bot pour ta propre utilisation",
         "reminders": "Gère tes rappels en attente",
@@ -241,6 +251,21 @@
         "emoji clear": {
             "message": "message",
             "emoji": "émoji"
+        },
+        "minecraft follow-server": {
+            "ip": "ip",
+            "port": "port",
+            "channel": "salon"
+        },
+        "minecraft mod": {
+            "mod_name": "nom"
+        },
+        "minecraft server": {
+            "ip": "ip",
+            "port": "port"
+        },
+        "minecraft skin": {
+            "username": "joueur"
         },
         "role set-color": {
             "role": "rôle",

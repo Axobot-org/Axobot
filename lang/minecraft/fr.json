@@ -1,5 +1,6 @@
 {
     "cant-embed": "Impossible d'envoyez l'embed. Vérifiez que la permission \"Embed links\" est bien activée",
+    "invalid-port": "Numéro de port invalide",
     "mod-fields": {
         "author": "Auteur",
         "authors": "Auteurs",
@@ -12,7 +13,6 @@
         "summary": "Résumé",
         "versions": "Versions du jeu"
     },
-    "mod-help": "Cette commande permet d'obtenir des informations sur un grand nombre de mods Minecraft. Vous pouvez donner son nom complet ou partiel, il suffit d'entrer `%{p}mc mod <nom>`. Le mod doit être enregistré sur la plateforme CurseForge pour apparaître",
     "mod-title": "Mod",
     "no-api": "Erreur : Impossible de se connecter à l'API",
     "no-embed": "Impossible d'envoyer le résultat ! Veuillez me donner la permission 'Intégrer les liens' pour que je puisse l'envoyer.",
@@ -26,7 +26,10 @@
     "serv-1": "Liste des 20 premiers joueurs connectés",
     "serv-2": "Liste des joueurs connectés",
     "serv-3": "Latence",
+    "serv-follow": {
+        "missing-perms": "Impossible de faire cela : je ne peux pas envoyer de messages et d'embeds dans ce salon",
+        "success": "Un message avec les détails du serveur %{ip} a bien été ajouté dans le salon %{channel}, et sera régulièrement mis à jour !"
+    },
     "serv-error": "Oups, une erreur inconnue s'est produite. Veuillez réessayer plus tard :confused:",
-    "serv-title": "Informations du serveur %{ip}",
-    "success-add": "Un message avec les détails du serveur %{ip} a bien été ajouté dans le salon %{channel} !"
+    "serv-title": "Informations du serveur %{ip}"
 }
