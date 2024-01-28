@@ -34,7 +34,9 @@ class QuoteGeneration:
         mask_im = Image.new("L", self.avatar.size, 0)
         draw = ImageDraw.Draw(mask_im)
         draw.ellipse((0, 0, AVATAR_SIZE, AVATAR_SIZE), fill=255)
-        self.result.paste(self.avatar, AVATAR_POSITION, mask_im)
+        avatar_with_mask = Image.new('RGBA', self.avatar.size, (0, 0, 0, 0))
+        avatar_with_mask.paste(self.avatar, mask=mask_im)
+        self.result.paste(avatar_with_mask, AVATAR_POSITION, avatar_with_mask)
 
     @cached(Cache(maxsize=1_000))
     def _find_max_text_size(self, text: str, rect: tuple[tuple[int, int], tuple[int, int]], font_name: str, font_size: str):
@@ -82,7 +84,6 @@ class QuoteGeneration:
                 line.append(word)
         if line:
             lines.append(line)
-        print([len(' '.join(line)) for line in lines])
         return '\n'.join(' '.join(line) for line in lines if line)
 
     def _generate_quote_text(self):
