@@ -1,7 +1,5 @@
 import datetime
 
-from asyncache import cached
-from cachetools import Cache
 from PIL import Image, ImageDraw, ImageFont
 
 CARD_SIZE = (1000, 400)
@@ -38,7 +36,6 @@ class QuoteGeneration:
         avatar_with_mask.paste(self.avatar, mask=mask_im)
         self.result.paste(avatar_with_mask, AVATAR_POSITION, avatar_with_mask)
 
-    @cached(Cache(maxsize=1_000))
     def _find_max_text_size(self, text: str, rect: tuple[tuple[int, int], tuple[int, int]], font_name: str, font_size: str):
         draw = ImageDraw.Draw(self.result)
         while True:

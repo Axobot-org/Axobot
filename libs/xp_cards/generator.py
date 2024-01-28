@@ -1,5 +1,3 @@
-from asyncache import cached
-from cachetools import Cache
 from PIL import Image, ImageDraw, ImageFont, ImageSequence
 
 from libs.xp_cards.cards_metadata import get_card_data
@@ -53,7 +51,6 @@ class CardGeneration:
                 self.avatar = self.avatar.resize(self.data["avatar_size"], resample=Image.Resampling.LANCZOS)
             self.result.paste(self.avatar, self.data["avatar_position"])
 
-    @cached(Cache(maxsize=1_000))
     def _find_max_text_size(self, text: str, rect: tuple[tuple[int, int], tuple[int, int]], font_name: str, font_size: str):
         fonts_cache: dict[tuple[str, int], ImageFont.FreeTypeFont] = {}
         while True:
