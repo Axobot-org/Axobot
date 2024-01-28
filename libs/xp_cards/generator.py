@@ -22,6 +22,7 @@ class CardGeneration:
         self.avatar = avatar
         self.data = get_card_data(card_name, translation_map, username,
                                   level, rank, participants, xp_to_current_level, xp_to_next_level, total_xp)
+        self.fonts_cache: dict[tuple[str, int], ImageFont.FreeTypeFont] = {}
         if self.avatar.format == "GIF":
             self.skip_second_frames = self.avatar.n_frames > 60 and self.avatar.info['duration'] < 30
             self.result = [
@@ -52,16 +53,15 @@ class CardGeneration:
             self.result.paste(self.avatar, self.data["avatar_position"])
 
     def _find_max_text_size(self, text: str, rect: tuple[tuple[int, int], tuple[int, int]], font_name: str, font_size: str):
-        fonts_cache: dict[tuple[str, int], ImageFont.FreeTypeFont] = {}
         while True:
-            if (font_name, font_size) in fonts_cache:
-                font = fonts_cache[(font_name, font_size)]
+            if (font_name, font_size) in self.fonts_cache:
+                font = self.fonts_cache[(font_name, font_size)]
             else:
                 try:
                     font = ImageFont.truetype(font_name, font_size)
                 except OSError:
                     raise ValueError(f"Font {font_name} not found") from None
-                fonts_cache[(font_name, font_size)] = font
+                self.fonts_cache[(font_name, font_size)] = font
             # Measure the size of the text when rendered with the current font
             text_box = font.getbbox(text)
             text_width, text_height = text_box[2] - text_box[0], text_box[3] - text_box[1]
