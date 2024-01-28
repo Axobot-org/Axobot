@@ -1,5 +1,6 @@
 {
     "command_name": {
+        "Quote": "Quote",
         "Report a scam": "Report a scam",
         "Voice to text": "Voice to text",
         "about": "about",
@@ -54,6 +55,7 @@
         "profile card-preview": "card-preview",
         "profile config": "config",
         "profile list-card-styles": "list-card-styles",
+        "quote": "quote",
         "random-tip": "random-tip",
         "rank": "rank",
         "reminders clear": "clear",
@@ -146,6 +148,7 @@
         "minecraft mod": "Get info about any mod registered on CurseForge or Modrinth",
         "minecraft server": "Get infos about any Minecraft Java server",
         "minecraft skin": "Get the skin of any Minecraft Java player",
+        "quote": "Quote a message with a nice generated image",
         "random-tip": "Get a random tip or trivia about the bot",
         "set-xp": "Set the XP of a user in your server"
     },
@@ -267,6 +270,9 @@
         },
         "minecraft skin": {
             "username": "username"
+        },
+        "quote": {
+            "message": "message"
         },
         "role set-color": {
             "role": "role",
