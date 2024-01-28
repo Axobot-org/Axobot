@@ -9,7 +9,7 @@ from PIL import Image
 
 from libs.arguments import args
 from libs.bot_classes import Axobot
-from libs.quote.generator import QuoteGeneration
+from libs.quote.generator import QuoteGeneration, QuoteStyle
 
 
 class Quote(commands.Cog):
@@ -18,10 +18,10 @@ class Quote(commands.Cog):
     def __init__(self, bot: Axobot):
         self.bot = bot
         self.file = "quote"
-        self.max_characters = 800
+        self.max_characters = 600
         self.quote_ctx_menu = app_commands.ContextMenu(
             name="Quote",
-            callback=self.quote_command,
+            callback=self.quote_context_command,
         )
         self.bot.tree.add_command(self.quote_ctx_menu)
 
@@ -29,8 +29,10 @@ class Quote(commands.Cog):
         "Disable the Quote context menu"
         self.bot.tree.remove_command(self.quote_ctx_menu.name, type=self.quote_ctx_menu.type)
 
+    async def quote_context_command(self, interaction: discord.Interaction, message: discord.Message):
+        await self.quote_command(interaction, message, style="classic")
 
-    async def quote_command(self, interaction: discord.Interaction, message: discord.Message):
+    async def quote_command(self, interaction: discord.Interaction, message: discord.Message, style: QuoteStyle):
         "Quote a message using the context menu"
         # check if message exists
         if not message.content:
@@ -48,7 +50,7 @@ class Quote(commands.Cog):
             return
         # defer and try to generate the quote
         await interaction.response.defer(ephemeral=True)
-        if msg := await self.quote_message(message, interaction.channel):
+        if msg := await self.quote_message(message, interaction.channel, style):
             await interaction.followup.send(
                 f"Your quote has been posted to {msg.jump_url}"
             )
@@ -59,12 +61,14 @@ class Quote(commands.Cog):
     @app_commands.command(name="quote")
     @app_commands.checks.cooldown(2, 30)
     @app_commands.describe(message="The URL of the message to quote")
-    async def quote_slash_cmd(self, interaction: discord.Interaction, message: args.MessageArgument):
+    async def quote_slash_cmd(self, interaction: discord.Interaction, message: args.MessageArgument, style: QuoteStyle="classic"):
         "Quote a message using the slash command"
-        await self.quote_command(interaction, message)
+        await self.quote_command(interaction, message, style)
 
 
-    async def quote_message(self, message: discord.Message, channel: discord.abc.Messageable) -> Optional[discord.Message]:
+    async def quote_message(
+            self, message: discord.Message, channel: discord.abc.Messageable, style: QuoteStyle
+            ) -> Optional[discord.Message]:
         "Generate a Quote card from a message and post it to the channel"
         text = discord.utils.remove_markdown(message.clean_content)
         while '\n\n' in text:
@@ -75,7 +79,8 @@ class Quote(commands.Cog):
             text,
             author_name,
             author_avatar,
-            message.created_at
+            message.created_at,
+            style,
         )
         generated_card = generator.draw_card()
 
