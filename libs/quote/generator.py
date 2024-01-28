@@ -1,6 +1,9 @@
 import datetime
+from typing import Literal
 
 from PIL import Image, ImageDraw, ImageFont
+
+QuoteStyle = Literal["modern", "classic"]
 
 CARD_SIZE = (1000, 400)
 AVATAR_SIZE = 256
@@ -11,30 +14,67 @@ QUOTE_LINE_SPACING = 12
 AUTHOR_FONT_SIZE = 25
 AUTHOR_RECT = ((350, 290), (930, 310))
 MIN_FONT_SIZE = 17
-MAX_CHARACTERS_PER_LINE = 60
+WATERMARK_SIZE = (85, 15)
+WATERMARK_POSITION = (CARD_SIZE[0] - WATERMARK_SIZE[0] - 20, CARD_SIZE[1] - WATERMARK_SIZE[1] - 20)
 
 class QuoteGeneration:
     "Generate a quote card from a message"
 
-    def __init__(self, text: str, author_name: str, avatar: Image.Image, date: datetime.datetime):
+    def __init__(self, text: str, author_name: str, avatar: Image.Image, date: datetime.datetime,
+                 style: QuoteStyle = "classic"):
         self.text = text
         self.author_name = author_name
         self.avatar = avatar
         self.date = date
+        self.style = style
+        if self.style == "modern":
+            self.max_characters_per_line = 60
+            self.quote_font_name = "./assets/fonts/Roboto-Medium.ttf"
+            self.author_font_name = "./assets/fonts/RobotoSlab-Regular.ttf"
+        else:
+            self.max_characters_per_line = 75
+            self.quote_font_name = "./assets/fonts/GreatVibes-Regular.ttf"
+            self.author_font_name = "./assets/fonts/Metropolis-Thin.otf"
         self.fonts_cache: dict[tuple[str, int], ImageFont.FreeTypeFont] = {}
         self.result = Image.new('RGBA', CARD_SIZE, (15, 0, 11, 255))
         self.last_quote_line_bottomheight = QUOTE_RECT[1][1]
+
+    def _avatar_transform_classic_style(self):
+        "Apply a grayscale and an opacity gradient to the avatar"
+        avatar = self.avatar.convert("L")
+        gradient = Image.new('L', (AVATAR_SIZE, AVATAR_SIZE), 0)
+        draw = ImageDraw.Draw(gradient)
+        for i in range(AVATAR_SIZE):
+            alpha = round((AVATAR_SIZE - i) ** 0.9)
+            draw.line((0, i, AVATAR_SIZE, i), fill=alpha)
+        gradient = gradient.rotate(-30)
+        avatar.putalpha(gradient)
+        return avatar
 
     def _paste_avatar(self):
         "Paste the avatar onto the destination image"
         if self.avatar.size != (AVATAR_SIZE, AVATAR_SIZE):
             self.avatar = self.avatar.resize((AVATAR_SIZE, AVATAR_SIZE), resample=Image.Resampling.LANCZOS)
-        mask_im = Image.new("L", self.avatar.size, 0)
+        # convert avatar to RGBA if needed
+        if self.avatar.mode != "RGBA":
+            self.avatar = self.avatar.convert("RGBA")
+        # apply avatar style
+        if self.style == "classic":
+            avatar = self._avatar_transform_classic_style()
+        else:
+            avatar = self.avatar
+        mask_im = Image.new("L", avatar.size, 0)
         draw = ImageDraw.Draw(mask_im)
         draw.ellipse((0, 0, AVATAR_SIZE, AVATAR_SIZE), fill=255)
-        avatar_with_mask = Image.new('RGBA', self.avatar.size, (0, 0, 0, 0))
-        avatar_with_mask.paste(self.avatar, mask=mask_im)
+        avatar_with_mask = Image.new('RGBA', avatar.size, (0, 0, 0, 0))
+        avatar_with_mask.paste(avatar, mask=mask_im)
         self.result.paste(avatar_with_mask, AVATAR_POSITION, avatar_with_mask)
+
+    def _paste_watermark(self):
+        "Paste the watermark onto the destination image, in the bottom right corner"
+        watermark = Image.open("./assets/images/axobot_gray.png")
+        watermark = watermark.resize(WATERMARK_SIZE, resample=Image.Resampling.LANCZOS)
+        self.result.paste(watermark, WATERMARK_POSITION, watermark)
 
     def _find_max_text_size(self, text: str, rect: tuple[tuple[int, int], tuple[int, int]], font_name: str, font_size: str):
         draw = ImageDraw.Draw(self.result)
@@ -58,7 +98,7 @@ class QuoteGeneration:
                 break
             # Otherwise, reduce the font size and try again
             font_size = round(font_size*0.8)
-        return font, font_size
+        return font
 
     def _split_text(self, text: str):
         """Split the text into multiple lines of max MAX_CHARACTERS_PER_LINE characters
@@ -74,7 +114,7 @@ class QuoteGeneration:
                 line = rest
                 continue
             new_line = ' '.join(line + [word])
-            if len(new_line) > MAX_CHARACTERS_PER_LINE:
+            if len(new_line) > self.max_characters_per_line:
                 lines.append(line)
                 line = [word]
             else:
@@ -86,7 +126,7 @@ class QuoteGeneration:
     def _generate_quote_text(self):
         text = self._split_text('“' + self.text.strip() + '”')
         # calculate optimal font size
-        font, _ = self._find_max_text_size(text, QUOTE_RECT, "Roboto-Medium.ttf", font_size=QUOTE_FONT_SIZE)
+        font = self._find_max_text_size(text, QUOTE_RECT, self.quote_font_name, font_size=QUOTE_FONT_SIZE)
         # calculate centered position
         h_pos = round(QUOTE_RECT[0][1] + (QUOTE_RECT[1][1] - QUOTE_RECT[0][1])/2)
         w_pow = round(QUOTE_RECT[0][0] + (QUOTE_RECT[1][0] - QUOTE_RECT[0][0])/2)
@@ -110,10 +150,14 @@ class QuoteGeneration:
     def _generate_author_text(self):
         date = self.date.strftime("%Y-%m-%d")
         text = f"@{self.author_name} — {date}"
+        # calculate box height based on quote text height
         rect = ((AUTHOR_RECT[0][0], self.last_quote_line_bottomheight), AUTHOR_RECT[1])
-        font, _ = self._find_max_text_size(text, rect, "Roboto-Medium.ttf", font_size=AUTHOR_FONT_SIZE)
+        # calculate optimal font size
+        font = self._find_max_text_size(text, rect, self.author_font_name, font_size=AUTHOR_FONT_SIZE)
+        # calculate right-aligned position
         h_pos = round(rect[0][1] + (rect[1][1] - rect[0][1])/2)
         pos = rect[1][0], h_pos
+        # return the result
         return {
             "xy": pos,
             "text": text,
@@ -133,5 +177,6 @@ class QuoteGeneration:
     def draw_card(self):
         "Do the magic"
         self._paste_avatar()
+        self._paste_watermark()
         self._add_texts()
         return self.result
