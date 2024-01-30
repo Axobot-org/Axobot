@@ -17,6 +17,8 @@ MIN_FONT_SIZE = 17
 WATERMARK_SIZE = (85, 15)
 WATERMARK_POSITION = (CARD_SIZE[0] - WATERMARK_SIZE[0] - 20, CARD_SIZE[1] - WATERMARK_SIZE[1] - 20)
 
+# TODO: gradient background
+
 class QuoteGeneration:
     "Generate a quote card from a message"
 
@@ -33,7 +35,7 @@ class QuoteGeneration:
             self.author_font_name = "./assets/fonts/RobotoSlab-Regular.ttf"
         else:
             self.max_characters_per_line = 75
-            self.quote_font_name = "./assets/fonts/GreatVibes-Regular.ttf"
+            self.quote_font_name = "./assets/fonts/DancingScript-Medium.ttf"
             self.author_font_name = "./assets/fonts/Metropolis-Thin.otf"
         self.fonts_cache: dict[tuple[str, int], ImageFont.FreeTypeFont] = {}
         self.result = Image.new('RGBA', CARD_SIZE, (15, 0, 11, 255))
@@ -53,6 +55,7 @@ class QuoteGeneration:
 
     def _paste_avatar(self):
         "Paste the avatar onto the destination image"
+        # resize avatar if needed
         if self.avatar.size != (AVATAR_SIZE, AVATAR_SIZE):
             self.avatar = self.avatar.resize((AVATAR_SIZE, AVATAR_SIZE), resample=Image.Resampling.LANCZOS)
         # convert avatar to RGBA if needed
@@ -63,11 +66,14 @@ class QuoteGeneration:
             avatar = self._avatar_transform_classic_style()
         else:
             avatar = self.avatar
+        # create a mask to crop the avatar into a circle
         mask_im = Image.new("L", avatar.size, 0)
         draw = ImageDraw.Draw(mask_im)
         draw.ellipse((0, 0, AVATAR_SIZE, AVATAR_SIZE), fill=255)
+        # apply the mask to a copy of the avatar (to avoid issues with transparency)
         avatar_with_mask = Image.new('RGBA', avatar.size, (0, 0, 0, 0))
         avatar_with_mask.paste(avatar, mask=mask_im)
+        # paste the avatar onto the destination image
         self.result.paste(avatar_with_mask, AVATAR_POSITION, avatar_with_mask)
 
     def _paste_watermark(self):
