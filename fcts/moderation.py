@@ -710,6 +710,7 @@ Permissions for using this command are the same as for the kick
             if user.roles[-1].position >= ctx.guild.me.roles[-1].position:
                 await ctx.send(await self.bot._(ctx.guild.id, "moderation.kick.too-high"))
                 return
+            await ctx.defer()
             # send DM
             await self.dm_user(user, "kick", ctx, reason = None if reason=="Unspecified" else reason)
 
