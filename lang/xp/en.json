@@ -153,6 +153,7 @@
     "rr-reload": "%{role_count} updated roles / %{member_count} scanned members",
     "rr-removed": "No role will be given for level %{level} anymore",
     "rr_list": "Roles rewards list (%{c}/%{max})",
+    "see-online": "See online",
     "too-many-rr": "You already have %{c} roles rewards, you can't add more!",
     "top-name": "__Top %{min}-%{max} (page %{page}/%{total}):__",
     "top-title-1": "Global ranking",

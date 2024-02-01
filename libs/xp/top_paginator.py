@@ -30,6 +30,7 @@ class TopPaginator(Paginator):
             user_id: int
 
         self.guild = guild
+        self.display_url = guild.id % 3 == 2
         self.scope = scope
         self.page = start_page
         self.raw_data: list[Optional[RawData]] = []
@@ -150,9 +151,13 @@ class TopPaginator(Paginator):
             embed_title = await self.client._(self.guild, "xp.top-title-2")
         else:
             embed_title = await self.client._(self.guild, "xp.top-title-1")
+        emb = discord.Embed(title=embed_title, color=self.cog.embed_color)
+        if self.display_url:
+            domain = "axobeta.zrunner.me" if self.client.beta else "axobot.xyz"
+            online_desc = await self.client._(self.guild, "xp.see-online")
+            emb.description = f"[{online_desc}](https://{domain}/leaderboard/{self.guild.id})"
         # field name
         field_title = await self.client._(self.guild, "xp.top-name", min=(page-1)*20+1, max=i, page=page, total=self.max_page)
-        emb = discord.Embed(title=embed_title, color=self.cog.embed_color)
         emb.add_field(name=field_title, value="\n".join(txt), inline=False)
         # user rank
         emb.add_field(**await self.get_user_rank())
