@@ -1,6 +1,6 @@
 from PIL import Image, ImageDraw, ImageFont, ImageSequence
 
-from libs.xp_cards.cards_metadata import get_card_data
+from .cards_metadata import get_card_data
 
 CARD_SIZE = (1021, 340)
 

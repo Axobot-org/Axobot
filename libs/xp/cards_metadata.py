@@ -1,8 +1,8 @@
 import json
 import os
 
-from libs.xp_cards.card_types import (CardData, CardMetaData, ColorsData,
-                                      TextData, TextMetaData)
+from .card_types import (CardData, CardMetaData, ColorsData, TextData,
+                         TextMetaData)
 
 V1_CARDS = {
     "april22",
