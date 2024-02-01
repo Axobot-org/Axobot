@@ -153,6 +153,7 @@
     "rr-reload": "%{role_count} rôles mis à jour / %{member_count} membres scannés",
     "rr-removed": "Plus aucun rôle ne sera donné pour le niveau %{level}",
     "rr_list": "Liste des rôles (%{c}/%{max})",
+    "see-online": "Voir en ligne",
     "too-many-rr": "Vous avez déjà %{c} rôles, vous ne pouvez pas en ajouter plus !",
     "top-name": "__Top %{min}-%{max} (page %{page}/%{total}) :__",
     "top-title-1": "Classement global",
