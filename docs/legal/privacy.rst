@@ -7,7 +7,7 @@ Privacy Policy
 
 Axobot has a very specific Privacy Policy, defining among other things our use of the collected data. We provide you with a translation of this policy here, but only as a guide. **This version cannot be used as a replacement for the original and official version**, available in French at https://zrunner.me/axobot-privacy.pdf.
 
-Here is the unofficial translation of the December 2, 2022 version.
+Here is the unofficial translation of the February 1, 2024 version.
 
 
 1. Object
@@ -17,7 +17,7 @@ The purpose of this document (hereinafter the "**Privacy Policy**") is to descri
 
 Any natural person using Axobot acknowledges having fully read the Privacy Policy at the time of its implementation or use.
 
-Axobot is available, in its official version, on the website https://axobot.readthedocs.io. It can also sometimes be accessible on mirror sites or referencing sites.
+Axobot is available, in its official version, on the website https://axobot.xyz. It can also sometimes be accessible on mirror sites or referencing sites.
 
 The service(s) proposed by Axobot (hereafter the "Service") consist in the addition of additional functionalities to the Discord platform, all detailed in the documentation available at https://axobot.readthedocs.io/.
 
@@ -89,7 +89,7 @@ All Data Collected:
 6. Data Transfer
 ----------------
 
-The Data collected by Axobot are only stored on our server hosted by OVH in France (https://www.ovh.com).
+The Data collected by Axobot are only stored on our server hosted by Hetzner in Germany (https://www.hetzner.com).
 
 Axobot will take all reasonable steps to ensure that your data is treated securely and in accordance with this Privacy Policy and your Personal Data will not be transferred to any organization or country unless adequate controls are in place, including with respect to the security of your data and other personal data.
 

@@ -7,7 +7,7 @@ Terms of Service
 
 Axobot, as any verified Discord app, has its own terms of services, defining among other things how you should use our app and what to expect from us. We provide you with a translation of these terms here, but only as a guide. **This version cannot be used as a replacement for the original and official version**, available in French at https://zrunner.me/axobot-cgu.pdf.
 
-Here is the unofficial translation of the December 2, 2022 version.
+Here is the unofficial translation of the February 1, 2024 version.
 
 
 1. Object
@@ -17,7 +17,7 @@ The purpose of this document (hereinafter the "**Terms of Service**") is to prov
 
 Any natural person using Axobot acknowledges having fully understood these Terms of Service at the latest at the time of its implementation or use.
 
-Axobot is available, in its official version, on the website https://axobot.readthedocs.io. It may also be accessible on mirror sites or referral sites.
+Axobot is available, in its official version, on the website https://axobot.xyz. It may also be accessible on mirror sites or referral sites.
 
 The service(s) offered by Axobot (hereinafter the "**Service**") consist in the addition of additional functionalities to the DISCORD platform, all of which are detailed in the documentation available at https://axobot.readthedocs.io/. Therefore, the use of the Service requires the creation and use of an account on the DISCORD platform (hereinafter the "**User Account**").
 
