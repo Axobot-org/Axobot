@@ -214,7 +214,7 @@ class BotStats(commands.Cog):
     async def on_app_command_completion(self, _interaction: discord.Interaction,
                                         command: Union[discord.app_commands.Command, discord.app_commands.ContextMenu]):
         "Called when an app command is correctly used by someone"
-        name = command.qualified_name
+        name = command.qualified_name.lower()
         self.commands_uses[name] = self.commands_uses.get(name, 0) + 1
         self.received_events['CMD_USE'] = self.received_events.get('CMD_USE', 0) + 1
         self.app_commands_uses[name] = self.app_commands_uses.get(name, 0) + 1
