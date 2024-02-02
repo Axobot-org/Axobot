@@ -82,6 +82,7 @@
             "many": "%{count} topics hat been deleted"
         },
         "list": "Ur serv topics:",
+        "no-server-topic": "Uh oh, u didnt create any topic 4 dis server yet!",
         "other-already-exists": "A \"other\" topic is already proposed by default, no need to add another :proud:",
         "too-long": "Uh-uh, no more than 100 chars for ur topic name kthx",
         "too-many": "Oops uh, u reached teh max allowd topics limit! Blame discord 4 not allowing more than %{max} at the same time ig."

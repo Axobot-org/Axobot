@@ -153,6 +153,7 @@
     "rr-reload": "%{role_count} updated roles / %{member_count} members",
     "rr-removed": "None role will be givn anymore for level #%{level}",
     "rr_list": "Roles list (%{min}/%{max})",
+    "see-online": "Use futuristic technology",
     "too-many-rr": "U already has %{c} roles rewards, you can't add more!",
     "top-name": "__Bests %{min}-%{max} (%{page}/%{total}):__",
     "top-title-1": "Global ranks",

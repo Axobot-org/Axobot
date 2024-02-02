@@ -1,0 +1,7 @@
+{
+    "error": {
+        "empty-message": "Hey, dis msg is empty!",
+        "too-long": "Uh no sir, so much txt wont fit into my %{max}-chars card!"
+    },
+    "success": "U quote haz been sent 2 %{message_url}"
+}

@@ -199,6 +199,7 @@
         "lib_version": "**Verson of teh `discord.py` thingy:** %{v}",
         "python_version": "**Python versoon :** %{v}",
         "ram_usage": "**Memory thingy:** %{v} GB",
+        "rss_msg_24h": "**RSS msg sent in 24h:** %{v}",
         "servers_count": "**Nbr ov serverz:** %{v}",
         "title": "**Boat statz**",
         "total_xp": "**xp won by ppl:** %{v}xp",

@@ -1,57 +1,6 @@
 {
-    "adv-fields": [
-        "Named",
-        "IDz",
-        "Tipe",
-        "Actshun",
-        "Parent",
-        "Childrn",
-        "Added on the vershun"
-    ],
-    "adv-help": "Dis cmd provids informashunz 'bout any advanshement ov the gayme Minekraft. Simple entr the naime or teh identifer of thE advancemenZ.",
-    "block-fields": [
-        "ID",
-        "Stack size",
-        "Creative mod tab",
-        "Damage points",
-        "Durability",
-        "Tool able to destroy it",
-        "Resistance 2 TNT",
-        "Mobs able to loot it",
-        "Added in the version"
-    ],
-    "block-help": "This comand allows U to obt:a:in inforation on any Mine-craft bloc pleez. U can give itz full or partial name, in French r English, or evn itz identifier. Just enter `%{p}mc block <name>`",
     "cant-embed": "Cannot send embd. Plz make shure the \"Embed linkz\" perm is enabld.",
-    "cmd-fields": [
-        "Nayme",
-        "Sntax",
-        "Exmple",
-        "Adedd in teh vershuon"
-    ],
-    "cmd-help": "This comand a-laws yu to obtayn informtionz abut any Mynekrahft commandZ. Al u had 2 doo iz type `%{p}mc command <nom>`",
-    "contact-mail": "If U notis an errrror in da info providd, plz contact my personale, or report teh errer directlly [with the nice website](https://fr-minecraft.net).",
-    "dimensions": "Width: %{la}\nLenght: %{lo}\nHeight: %{ha}",
-    "entity-fields": [
-        "Oh ID",
-        "Type",
-        "HeartH Points",
-        "Atack Pts",
-        "Experince Points Releas to Dead",
-        "Preferred Biomes",
-        ":A:ded in teh version"
-    ],
-    "entity-help": "Dis cmd allows U to obtain info 'bout any Minekrahft entity. U can giv itz full or partial naym, in French or English, or even itz identifir. Just enter `%{p}mc entity <name>`",
-    "item-fields": [
-        "ID",
-        "Size ov stack",
-        "Creativ mod tab",
-        "Damge points",
-        "Durability points",
-        "Toolz able 2 destroy it",
-        "Mobs able to drop dis item",
-        "Added in da vershun"
-    ],
-    "item-help": "Dis command allowz you to earn info 'bout any Minecraft itam. You can gave its full or partial nayme, in French r English, r even its identifier. Just entr `%{p}mc item <name>`",
+    "invalid-ip": "Uh no, dats not a correct server IP",
     "mod-fields": {
         "author": "Otaur",
         "authors": "Who wrote dis",
@@ -64,32 +13,9 @@
         "summary": "What dat mean",
         "versions": "Flex versions"
     },
-    "mod-help": "Well uhhhh... u can use dat to get info 'bout some cool mods, cuz mods are cool, right? So just use `%{p}mc mod <name>` 2 get what u need, that's it, right? But eh, I check CurseForge for dat, so I may not find everything dude.",
-    "mojang_desc": {
-        "account.mojang.com": "Mojang 'ccount managmnt site",
-        "api.mojang.com": "API service givn bay Mojang",
-        "authserver.mojang.com": "Authentication servr",
-        "minecraft.net": "Offishul Block Site",
-        "mojang.com": "Official Ex Website",
-        "session.minecraft.net": "Many-People-Together sessions (obsolete)",
-        "sessionserver.mojang.com": "Many-People-Together sessions",
-        "textures.minecraft.net": "Texture servr (nice skin & capz)"
-    },
-    "names": [
-        "Blok",
-        "Entity",
-        "Aitem",
-        "Comand",
-        "Advanshument",
-        "MOd"
-    ],
-    "no-adv": "Unabled to found thiz advunshement",
+    "mod-title": "MOd",
     "no-api": "Error: Unable 2 connect to API pliz",
-    "no-block": "Unable 2 found dis block",
-    "no-cmd": "Unable 2 findz dis comand",
     "no-embed": "UwU cant send embeds! Plz bring meh 'Embed links' perms :sadcat:",
-    "no-entity": "Unable 2 find this entity",
-    "no-item": "Unablz to find dis item",
     "no-mod": "Cant find dat mod owo",
     "no-ping": "Error: Una:b:le 2 ping dis servr",
     "no-player-list": "Uhhh nope, cant see that",
@@ -100,7 +26,10 @@
     "serv-1": "List ov teh first tweny connected plyerz",
     "serv-2": "List of nice online people",
     "serv-3": "LaTENcy",
+    "serv-follow": {
+        "missing-perms": "Woops, looks like I cant send embeds into dis channel",
+        "success": "A nize messag wif servr details %{ip} has bin addd to teh channel %{channel}, and i'll make shure 2 update it regularly!"
+    },
     "serv-error": "Oops, an Unown errR occurrd. Plz try again latr :smirk_cat:",
-    "serv-title": "Servr info %{ip}",
-    "success-add": "A nize messag wif servr details %{ip} has bin addd to teh channel %{channel} !"
+    "serv-title": "Servr info %{ip}"
 }
