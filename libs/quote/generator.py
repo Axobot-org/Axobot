@@ -71,7 +71,7 @@ class QuoteGeneration:
         gradient = Image.new('L', (AVATAR_SIZE, AVATAR_SIZE), 0)
         draw = ImageDraw.Draw(gradient)
         for i in range(AVATAR_SIZE):
-            alpha = round((AVATAR_SIZE - i) ** 0.9)
+            alpha = round((AVATAR_SIZE - i) ** 0.94)
             draw.line((0, i, AVATAR_SIZE, i), fill=alpha)
         gradient = gradient.rotate(-30)
 
