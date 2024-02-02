@@ -131,6 +131,7 @@
         "partner_role": "Role givn 2 partners: %{value}",
         "poll_channels": "List oof channl whre :thumbsup: & :thumbsdown: réactonz would be aut:o2:maticall ad to aech msg pliz : %{value}",
         "prefix": "Currnt baot prfx: %{value}",
+        "private_leaderboard": "Shud we allow random ppl 2 access teh xp leaderboard? %{value}",
         "rank_in_dm": "Send shiny rank cards on private msg? %{value}",
         "save_roles": "Can role bee save:b: wHen an membr leive, in case him retrns? %{value}",
         "say_allowed_roles": "Lizt of Rawles dat can wuse teh comnd 'say' : %{value}",

@@ -13,6 +13,10 @@
         "blurple darkfy": "tmavý",
         "blurple help": "pomoc",
         "blurple lightfy": "světlý",
+        "cases edit-reason": "editovat-důvod",
+        "cases list": "seznam",
+        "cases remove": "odstranit",
+        "cases search": "vyhledat",
         "clear": "vyčistit",
         "config list": "seznam",
         "config reset": "obnovit",
@@ -43,6 +47,7 @@
         "profile card-preview": "karta-náhledů",
         "profile config": "nastavení",
         "profile list-card-styles": "seznam-stylů-karet",
+        "random-tip": "náhodný-tip",
         "rank": "hodnost",
         "reminders clear": "vyčistit",
         "reminders create": "vytvořit",
@@ -54,6 +59,12 @@
         "role revoke": "odvolat",
         "role set-color": "nastavit-barvu",
         "role temporary-grant": "dočasný-grant",
+        "roles-react add": "přidat",
+        "roles-react send": "odeslat",
+        "roles-react list": "seznam",
+        "roles-react set-description": "nastavit-popis",
+        "roles-react remove": "smazat",
+        "roles-react update": "aktualizovat",
         "roles-rewards add": "přidat",
         "roles-rewards list": "seznam",
         "roles-rewards reload": "znovu-načíst",
@@ -100,6 +111,7 @@
     "group_name": {
         "antiscam": "proti-podvodu",
         "blurple": "rozostřit",
+        "cases": "případy",
         "config": "nastavení",
         "emoji": "emoji",
         "event": "událost",
@@ -107,6 +119,7 @@
         "profile": "profil",
         "reminders": "připomínky",
         "role": "role",
+        "roles-react": "reakce-rolí",
         "roles-rewards": "odměny-rolí",
         "rss": "rss",
         "tickets": "tikety",
@@ -114,9 +127,16 @@
         "tickets topic": "příspěvek",
         "twitch": "twitch"
     },
-    "command_short_description": {},
+    "command_short_description": {
+        "cases edit-reason": "Upravit důvod případu moderace",
+        "cases list": "Seznam všech případů moderování uživatele",
+        "cases remove": "Trvale smazat případ moderace",
+        "cases search": "Najít podrobnosti moderování případu",
+        "random-tip": "Získejte náhodný tip nebo zajímavost o botovi"
+    },
     "group_description": {
         "antiscam": "Vše, co souvisí s funkcí antiscam",
+        "cases": "Spravovat moderované případy uživatele",
         "config": "Konfigurace bota pro váš server",
         "emoji": "Spravujte své emoji",
         "event": "Zůčastni se speciálních událostí",
@@ -124,6 +144,7 @@
         "profile": "Nastavte si bota pro vlastní použití",
         "reminders": "Spravujte nevyřízené připomínky",
         "role": "Několik příkazů ke správě rolí",
+        "roles-react": "Spravujte váš systém-rolí a reakcí",
         "roles-rewards": "Dejte role svým členům, když dosáhnou určité úrovně",
         "rss": "Přihlásit se k odběru RSS kanálů na vašem serveru",
         "tickets": "Spravovat systém tiketů",
@@ -140,6 +161,19 @@
         },
         "slowmode": {
             "seconds": "sekundy"
+        },
+        "cases edit-reason": {
+            "case_id": "případ-id",
+            "new_reason": "nový-důvod"
+        },
+        "cases list": {
+            "user": "uživatel"
+        },
+        "cases remove": {
+            "case_id": "případ-id"
+        },
+        "cases search": {
+            "case_id": "případ-id"
         },
         "clear": {
             "number": "číslo",
@@ -230,6 +264,23 @@
         "last-post": {
             "url": "url",
             "type": "zpětný-zdroj"
+        },
+        "roles-react add": {
+            "emoji": "emoji",
+            "role": "role",
+            "description": "popis"
+        },
+        "roles-react remove": {
+            "emoji": "emoji"
+        },
+        "roles-react set-description": {
+            "emoji": "emoji",
+            "description": "popis"
+        },
+        "roles-react update": {
+            "embed": "embed",
+            "change_description": "změnit-popis",
+            "emojis": "emoji"
         },
         "rss add": {
             "link": "odkaz"

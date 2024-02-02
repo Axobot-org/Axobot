@@ -11,6 +11,8 @@
     "role-lost": "ThE rolE %{r} HAS BEeN reMoVEd fR0M yOUr ROLEs",
     "role-not-in-list": "Tish role iz NOT part ov the giveable r0ls",
     "rr-added": "Da role %{r} has been added for the emoji %{e}",
+    "rr-description-reset": "Ive erased teh tag for ur role %{role}",
+    "rr-description-set": "Ive correctly changed teh tag for ur role %{role}",
     "rr-embed": "tAkInG on A ROle",
     "rr-list": "lIsT 0v REacti0n RoLes (%{n}/%{m})",
     "rr-removed": "The role %{r} can no longer be given via the emoji %{e}",

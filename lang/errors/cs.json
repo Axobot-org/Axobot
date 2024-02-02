@@ -35,6 +35,5 @@
     "toomanytxtchan": "Máte příliš mnoho přístupných textových kanálů",
     "unknown": "Ale né, došlo k chybě :confused: Zkuste to později znovu, nebo kontaktujte podporu (příkaz %{about}).",
     "unknown2": "Při zpracování vaší odpovědi došlo k chybě. Zkuste to prosím později znovu, nebo se obraťte na podporu bot (zadejte příkaz %{about} pro odkaz na server)",
-    "usernotfound": "Nelze najít uživatele `%{u}` :confused:",
-    "zbot-migration": "Tento server nyní používá <@1048011651145797673>, novou identitu Zbotu. Pokud potřebujete pomoc s migrací, neváhejte se nás zeptat na <%{invite}>!"
+    "usernotfound": "Nelze najít uživatele `%{u}` :confused:"
 }
