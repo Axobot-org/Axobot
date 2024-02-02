@@ -59,17 +59,26 @@ class QuoteGeneration:
                 # Place the pixel
                 self.result.putpixel((x, y), (int(r), int(g), int(b), 255))
 
-    def _avatar_transform_classic_style(self):
-        "Apply a grayscale and an opacity gradient to the avatar"
-        avatar = self.avatar.convert("L")
+    def _create_avatar_mask(self):
+        # Create circular mask
+        mask = Image.new('L', (AVATAR_SIZE, AVATAR_SIZE), 0)
+        draw = ImageDraw.Draw(mask)
+        draw.ellipse((0, 0, AVATAR_SIZE, AVATAR_SIZE), fill=255)
+        if self.style == "modern":
+            return mask
+
+        # Create gradient mask (brightest on top right, darkest on bottom left)
         gradient = Image.new('L', (AVATAR_SIZE, AVATAR_SIZE), 0)
         draw = ImageDraw.Draw(gradient)
         for i in range(AVATAR_SIZE):
             alpha = round((AVATAR_SIZE - i) ** 0.9)
             draw.line((0, i, AVATAR_SIZE, i), fill=alpha)
         gradient = gradient.rotate(-30)
-        avatar.putalpha(gradient)
-        return avatar
+
+        # Apply circular mask to gradient
+        result = Image.new('L', gradient.size, 0)
+        result.paste(gradient, mask=mask)
+        return result
 
     def _paste_avatar(self):
         "Paste the avatar onto the destination image"
@@ -81,18 +90,16 @@ class QuoteGeneration:
             self.avatar = self.avatar.convert("RGBA")
         # apply avatar style
         if self.style == "classic":
-            avatar = self._avatar_transform_classic_style()
+            avatar = self.avatar.convert("LA")
         else:
             avatar = self.avatar
-        # create a mask to crop the avatar into a circle
-        mask_im = Image.new("L", avatar.size, 0)
-        draw = ImageDraw.Draw(mask_im)
-        draw.ellipse((0, 0, AVATAR_SIZE, AVATAR_SIZE), fill=255)
+        # create the mask
+        mask_im = self._create_avatar_mask()
         # apply the mask to a copy of the avatar (to avoid issues with transparency)
         avatar_with_mask = Image.new('RGBA', avatar.size, (0, 0, 0, 0))
         avatar_with_mask.paste(avatar, mask=mask_im)
         # paste the avatar onto the destination image
-        self.result.paste(avatar_with_mask, AVATAR_POSITION, avatar_with_mask)
+        self.result.paste(avatar, AVATAR_POSITION, avatar_with_mask)
 
     def _paste_watermark(self):
         "Paste the watermark onto the destination image, in the bottom right corner"
