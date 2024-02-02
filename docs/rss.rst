@@ -137,7 +137,7 @@ Test a feed format
 
 **Syntax:** :code:`rss test [feed ID]`
 
-If you want to test the format of a feed, this command is for you. It will send you a message with the current format of the feed, so you can see if it suits you or not. If you want to change it, you can use the `rss set-text <#change-the-text>`__ or `rss set-embed <#setup-a-feed-embed>`commands. This command will also allow you to check that your feed URL is working correctly; if not, you'll receive an error message.
+If you want to test the format of a feed, this command is for you. It will send you a message with the current format of the feed, so you can see if it suits you or not. If you want to change it, you can use the `rss set-text <#change-the-text>`__ or `rss set-embed <#setup-a-feed-embed>`__ commands. This command will also allow you to check that your feed URL is working correctly; if not, you'll receive an error message.
 
 The message sent will use the last post of the selected feed, and will follow exactly the configuration of text, embeds and mentions set up for this feed. Note, however, that role mentions will be disabled to avoid actually mentioning your members.
 
