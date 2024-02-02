@@ -1122,6 +1122,12 @@ The 'show_reasons' parameter is used to display the mute reasons.
         if start_message.guild != ctx.guild:
             await ctx.send(await self.bot._(ctx.guild.id, "moderation.destop.no-guild"))
             return
+        if isinstance(start_message.channel, discord.PartialMessageable):
+            start_message.channel = await start_message.guild.fetch_channel(start_message.channel.id)
+            if start_message.channel is None:
+                self.bot.dispatch("command_error", ctx, ValueError("Channel not found"))
+                return
+        p = start_message.channel.permissions_for(ctx.guild.me)
         if not start_message.channel.permissions_for(ctx.guild.me).manage_messages:
             await ctx.send(await self.bot._(ctx.guild.id, "moderation.need-manage-messages"))
             return
