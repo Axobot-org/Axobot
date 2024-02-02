@@ -1,4 +1,5 @@
 import datetime
+import math
 from typing import Literal
 
 from PIL import Image, ImageDraw, ImageFont
@@ -6,6 +7,8 @@ from PIL import Image, ImageDraw, ImageFont
 QuoteStyle = Literal["modern", "classic"]
 
 CARD_SIZE = (1000, 400)
+CARD_OUTER_COLOR = (8, 0, 7, 255)
+CARD_INNER_COLOR = (23, 0, 20, 255)
 AVATAR_SIZE = 256
 AVATAR_POSITION = (35, 65)
 QUOTE_FONT_SIZE = 50
@@ -16,8 +19,6 @@ AUTHOR_RECT = ((350, 290), (930, 310))
 MIN_FONT_SIZE = 17
 WATERMARK_SIZE = (85, 15)
 WATERMARK_POSITION = (CARD_SIZE[0] - WATERMARK_SIZE[0] - 20, CARD_SIZE[1] - WATERMARK_SIZE[1] - 20)
-
-# TODO: gradient background
 
 class QuoteGeneration:
     "Generate a quote card from a message"
@@ -38,8 +39,25 @@ class QuoteGeneration:
             self.quote_font_name = "./assets/fonts/DancingScript-Medium.ttf"
             self.author_font_name = "./assets/fonts/Metropolis-Thin.otf"
         self.fonts_cache: dict[tuple[str, int], ImageFont.FreeTypeFont] = {}
-        self.result = Image.new('RGBA', CARD_SIZE, (15, 0, 11, 255))
+        with open("./assets/images/quote_background.png", "rb") as f:
+            self.result = Image.open(f).convert("RGBA")
         self.last_quote_line_bottomheight = QUOTE_RECT[1][1]
+
+    def _generate_background_gradient(self):
+        "Edit the background to add a round gradient"
+        imgsize = self.result.size
+        for y in range(imgsize[1]):
+            for x in range(imgsize[0]):
+                # Find the distance to the center
+                distance = math.sqrt((x - imgsize[0]/2) ** 2 + (y - imgsize[1]/2) ** 2)
+                # Make it on a scale from 0 to 1
+                distance = float(distance) / (math.sqrt(2) * imgsize[0]/2)
+                # Calculate rgb values
+                r = CARD_OUTER_COLOR[0] * distance + CARD_INNER_COLOR[0] * (1 - distance)
+                g = CARD_OUTER_COLOR[1] * distance + CARD_INNER_COLOR[1] * (1 - distance)
+                b = CARD_OUTER_COLOR[2] * distance + CARD_INNER_COLOR[2] * (1 - distance)
+                # Place the pixel
+                self.result.putpixel((x, y), (int(r), int(g), int(b), 255))
 
     def _avatar_transform_classic_style(self):
         "Apply a grayscale and an opacity gradient to the avatar"
@@ -182,7 +200,8 @@ class QuoteGeneration:
 
     def draw_card(self):
         "Do the magic"
+        # self._generate_background_gradient()
         self._paste_avatar()
-        self._paste_watermark()
+        # self._paste_watermark()
         self._add_texts()
         return self.result
