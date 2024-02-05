@@ -58,7 +58,10 @@ class Tickets(commands.Cog):
                 raise RuntimeError(f"No topic found on guild {interaction.guild_id} with ID {topic_id}")
             if topic['category'] is None:
                 cmd = await self.bot.get_command_mention("tickets portal set-category")
-                await interaction.response.send_message(await self.bot._(interaction.guild_id, "tickets.missing-category-config", set_category=cmd), ephemeral=True)
+                await interaction.response.send_message(
+                    await self.bot._(interaction.guild_id, "tickets.missing-category-config", set_category=cmd),
+                    ephemeral=True
+                )
                 return
             if topic['hint']:
                 hint_view = SendHintText(interaction.user.id,
@@ -78,12 +81,17 @@ class Tickets(commands.Cog):
                 if hint_view.interaction:
                     interaction = hint_view.interaction
             if (cooldown := self.cooldowns.get(interaction.user)) and time.time() - cooldown < 120:
-                await interaction.response.send_message(await self.bot._(interaction.guild_id, "tickets.too-quick"), ephemeral=True)
+                await interaction.response.send_message(
+                    await self.bot._(interaction.guild_id, "tickets.too-quick"),
+                    ephemeral=True
+                )
                 return
             modal_title = await self.bot._(interaction.guild_id, "tickets.title-modal.title")
             modal_label = await self.bot._(interaction.guild_id, "tickets.title-modal.label")
             modal_placeholder = await self.bot._(interaction.guild_id, "tickets.title-modal.placeholder")
-            await interaction.response.send_modal(AskTitleModal(interaction.guild.id, topic, modal_title, modal_label, modal_placeholder, self.create_ticket))
+            await interaction.response.send_modal(
+                AskTitleModal(interaction.guild.id, topic, modal_title, modal_label, modal_placeholder, self.create_ticket)
+            )
         except Exception as err: # pylint: disable=broad-except
             self.bot.dispatch('error', err, f"when creating a ticket in guild {interaction.guild_id}")
 
@@ -136,7 +144,8 @@ class Tickets(commands.Cog):
 
     async def db_delete_topics(self, guild_id: int, topic_ids: list[int]) -> int:
         "Delete multiple topics from a guild"
-        query = "DELETE FROM `tickets` WHERE `guild_id` = %s AND id IN ({}) AND `beta` = %s".format(', '.join(map(str, topic_ids)))
+        topic_ids = ', '.join(map(str, topic_ids))
+        query = f"DELETE FROM `tickets` WHERE `guild_id` = %s AND id IN ({topic_ids}) AND `beta` = %s"
         async with self.bot.db_query(query, (guild_id, self.bot.beta), returnrowcount=True) as db_query:
             return db_query
 
@@ -145,6 +154,12 @@ class Tickets(commands.Cog):
         query = "SELECT 1 FROM `tickets` WHERE `guild_id` = %s AND `id` = %s AND `topic` IS NOT NULL AND `beta` = %s"
         async with self.bot.db_query(query, (guild_id, topic_id, self.bot.beta)) as db_query:
             return len(db_query) > 0
+
+    async def db_edit_topic_name(self, guild_id: int, topic_id: int, name: str) -> bool:
+        "Edit a topic name"
+        query = "UPDATE `tickets` SET `topic` = %s WHERE `guild_id` = %s AND `id` = %s AND `beta` = %s"
+        async with self.bot.db_query(query, (name, guild_id, topic_id, self.bot.beta), returnrowcount=True) as db_query:
+            return db_query > 0
 
     async def db_edit_topic_emoji(self, guild_id: int, topic_id: int, emoji: Optional[str]) -> bool:
         "Edit a topic emoji"
@@ -292,7 +307,10 @@ class Tickets(commands.Cog):
                 channel = await category.create_text_channel(channel_name, overwrites=perms)
             except discord.Forbidden:
                 self.log.info("Missing perms to create channel in %s", category.id)
-                await interaction.edit_original_response(content=await self.bot._(interaction.guild_id, "tickets.missing-perms-creation.channel", category=category.name))
+                await interaction.edit_original_response(
+                    content=await self.bot._(interaction.guild_id, "tickets.missing-perms-creation.channel",
+                                             category=category.name)
+                )
                 self.bot.dispatch("server_warning", ServerWarningType.TICKET_CREATION_FAILED,
                     interaction.guild,
                     channel=category,
@@ -301,14 +319,19 @@ class Tickets(commands.Cog):
                 return
         elif isinstance(category, discord.TextChannel):
             try:
-                if "PRIVATE_THREADS" in interaction.guild.features and category.permissions_for(interaction.guild.me).create_private_threads:
+                if (
+                    "PRIVATE_THREADS" in interaction.guild.features
+                        and category.permissions_for(interaction.guild.me).create_private_threads):
                     channel_type = discord.ChannelType.private_thread
                 else:
                     channel_type = discord.ChannelType.public_thread
                 channel = await category.create_thread(name=channel_name, type=channel_type)
             except discord.Forbidden:
                 self.log.info("Missing perms to create thread in %s", category.id)
-                await interaction.edit_original_response(content=await self.bot._(interaction.guild_id, "tickets.missing-perms-creation.thread", channel=category.mention))
+                await interaction.edit_original_response(
+                    content=await self.bot._(interaction.guild_id, "tickets.missing-perms-creation.thread",
+                                             channel=category.mention)
+                )
                 self.bot.dispatch("server_warning", ServerWarningType.TICKET_CREATION_FAILED,
                     interaction.guild,
                     channel=category,
@@ -588,6 +611,29 @@ class Tickets(commands.Cog):
     async def topic_remove_autocomplete(self, interaction: discord.Interaction, current: str):
         return await self.topic_id_autocompletion(interaction, current, allow_other=False)
 
+    @tickets_topics.command(name="set-name")
+    @commands.cooldown(3, 30, commands.BucketType.guild)
+    @commands.guild_only()
+    @commands.check(checks.has_manage_channels)
+    async def topic_edit_name(self, ctx: MyContext, topic_id: Optional[int], *, name: commands.Range[str, 1, 100]):
+        """Edit a topic name
+        A topic name is limited to 100 characters
+
+        ..Example tickets topic set-name 5 "Minecraft issues"
+
+        ..Doc tickets.html#edit-a-topic-name"""
+        if not topic_id or not await self.db_topic_exists(ctx.guild.id, topic_id):
+            topic_id = await self.ask_user_topic(ctx)
+            if topic_id is None:
+                # timeout
+                return
+        if len(name) > 100:
+            await ctx.send(await self.bot._(ctx.guild.id, "tickets.topic.too-long"))
+            return
+        if await self.db_edit_topic_name(ctx.guild.id, topic_id, name):
+            await ctx.send(await self.bot._(ctx.guild.id, "tickets.name-edited", name=name))
+        else:
+            await ctx.send(await self.bot._(ctx.guild.id, "tickets.nothing-to-edit"))
 
     @tickets_topics.command(name="set-emote", aliases=["set-emoji"])
     @commands.cooldown(3, 30, commands.BucketType.guild)

@@ -32,6 +32,7 @@
         "to-member": "Oops, I couldn't properly set up your ticket channel. Please ask a server moderator to fix my permissions, otherwise anyone having access to the tickets category may be able to read your ticket.",
         "to-staff": "Oops, I couldn't set up the channel permissions for your ticket. Please make sure I have the 'Manage roles' permission in the category %{category}, else anyone having access to this category may be able to see new tickets."
     },
+    "name-edited": "The name of the topic has been edited to \"%{topic}\"",
     "nothing-to-edit": "Nothing to edit!",
     "other": "other",
     "review": {
