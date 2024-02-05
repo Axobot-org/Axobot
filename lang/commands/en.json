@@ -107,6 +107,7 @@
         "tickets topic set-emote": "set-emote",
         "tickets topic set-format": "set-format",
         "tickets topic set-hint": "set-hint",
+        "tickets topic set-name": "set-name",
         "tickets topic set-role": "set-role",
         "top": "top",
         "twitch check-stream": "check-stream",
@@ -423,6 +424,10 @@
         "tickets topic set-hint": {
             "topic_id": "topic-id",
             "message": "message"
+        },
+        "tickets topic set-name": {
+            "topic_id": "topic-id",
+            "name": "name"
         },
         "tickets topic set-role": {
             "topic_id": "topic-id",

@@ -138,6 +138,14 @@ Edit a topic emoji
 Edit or delete the emote associated with a particular topic. If you don't enter a topic ID, Axobot will ask you directly which topic to edit via an intuitive menu. Use the keyword "none" to delete the emoji associated with the topic.
 
 
+Edit a topic name
+-----------------
+
+**Syntax:** :code:`tickets topic set-name [topic ID] <name>`
+
+Edit the name of a topic. If you don't enter a topic ID, Axobot will ask you directly which topic to edit via an intuitive menu. The name must be less than 100 characters long.
+
+
 Topic-specific hint
 -------------------
 
