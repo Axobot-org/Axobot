@@ -210,13 +210,16 @@ class Axobot(commands.bot.AutoShardedBot):
         if len(self.database_keys) > 0:
             if self._cnx[0][0] is not None:
                 self._cnx[0][0].close()
-            self.log.debug('Connecting to MySQL (user %s, database "%s")',
-                           self.database_keys['user'], self.database_keys['database1'])
+            self.log.debug(
+                'Connecting to MySQL (user %s, database "%s")',
+                self.database_keys['user'],
+                self.database_keys['name_main']
+            )
             self._cnx[0][0] = sql_connect(
                 user=self.database_keys['user'],
                 password=self.database_keys['password'],
                 host=self.database_keys['host'],
-                database=self.database_keys['database1'],
+                database=self.database_keys['name_main'],
                 buffered=True,
                 charset='utf8mb4',
                 collation='utf8mb4_unicode_ci',
@@ -252,13 +255,16 @@ class Axobot(commands.bot.AutoShardedBot):
         if len(self.database_keys) > 0:
             if self._cnx[1][0] is not None:
                 self._cnx[1][0].close()
-            self.log.debug('Connecting to MySQL (user %s, database "%s")',
-                           self.database_keys['user'], self.database_keys['database2'])
+            self.log.debug(
+                'Connecting to MySQL (user %s, database "%s")',
+                self.database_keys['user'],
+                self.database_keys['name_xp']
+            )
             self._cnx[1][0] = sql_connect(
                 user=self.database_keys['user'],
                 password=self.database_keys['password'],
                 host=self.database_keys['host'],
-                database=self.database_keys['database2'],
+                database=self.database_keys['name_xp'],
                 buffered=True,
                 connection_timeout=5
             )
