@@ -4,7 +4,6 @@
         "category": "4 teh category %{name}",
         "general": "Global perms or smth"
     },
-    "invalid_arg": "Uh no, %{arg} iz no valid sir",
     "list": {
         "add_reactions": "Add reactions",
         "administrator": "Administrator",
