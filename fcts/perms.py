@@ -119,9 +119,6 @@ class Perms(commands.Cog):
         ..Example permissions 0b1001
 
         ..Doc infos.html#permissions"""
-        if ctx.current_argument and target is None and channel is None:
-            await ctx.send(await self.bot._(ctx.guild.id, "permissions.invalid_arg", arg=ctx.current_argument))
-            return
         if target is None:
             target = ctx.author
         if isinstance(target, discord.Member):
