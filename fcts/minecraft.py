@@ -333,24 +333,19 @@ class Minecraft(commands.Cog):
                     break
         except KeyError:
             players = []
-        if not players:
-            if data['players']['online'] == 0:
-                players = [str(await self.bot._(guild, "misc.none")).capitalize()]
-            else:
-                players = [await self.bot._(guild, "minecraft.no-player-list")]
         formated_ip = f"{ip}:{port}" if port is not None else str(ip)
         if data["favicon"] is not None:
             img_url = "https://api.minetools.eu/favicon/" + \
                 str(ip) + str("/"+str(port) if port is not None else '')
         else:
             img_url = None
-        v = data['version']['name']
-        o = data['players']['online']
-        m = data['players']['max']
-        l = data['latency']
+        version = data['version']['name']
+        online_players = data['players']['online']
+        max_players = data['players']['max']
+        latency = data['latency']
         return await self.MCServer(
-            formated_ip, version=v, online_players=o, max_players=m, players=players, img=img_url,
-            ping=l, desc=data['description'], api='api.minetools.eu'
+            formated_ip, version=version, online_players=online_players, max_players=max_players, players=players, img=img_url,
+            ping=latency, desc=data['description'], api='api.minetools.eu'
         ).clear_desc()
 
     async def create_server_2(self, guild: discord.Guild, ip: str, port: Optional[str]):
@@ -376,22 +371,17 @@ class Minecraft(commands.Cog):
             players = data['players']['list'][:20]
         else:
             players = []
-        if players == []:
-            if data['players']['online'] == 0:
-                players = [str(await self.bot._(guild, "misc.none")).capitalize()]
-            else:
-                players = [await self.bot._(guild, "minecraft.no-player-list")]
         if "software" in data:
             version = data["software"]+" "+data['version']
         else:
             version = data['version']
         formated_ip = f"{ip}:{port}" if port is not None else str(ip)
         desc = "\n".join(data['motd']['clean'])
-        o = data['players']['online']
-        m = data['players']['max']
+        online_players = data['players']['online']
+        max_players = data['players']['max']
         l = None
         return await self.MCServer(
-            formated_ip, version=version, online_players=o, max_players=m, players=players, img=None,
+            formated_ip, version=version, online_players=online_players, max_players=max_players, players=players, img=None,
             ping=l, desc=desc, api="api.mcsrvstat.us"
         ).clear_desc()
 
@@ -436,7 +426,7 @@ class Minecraft(commands.Cog):
             "Create a Discord embed from the saved data"
             if self.players == []:
                 if self.online_players == 0:
-                    p = ["Aucun"]
+                    p = [str(await translate(guild, "misc.none")).capitalize()]
                 else:
                     p: list[str] = [await translate(guild, "minecraft.no-player-list")]
             else:
@@ -446,22 +436,26 @@ class Minecraft(commands.Cog):
                 color=discord.Colour(0x417505),
                 timestamp=datetime.datetime.utcfromtimestamp(time.time())
             )
-            embed.set_footer(text=f"From {self.api}")
+            embed.set_footer(text=await translate(guild, "minecraft.server.from-provider", provider=self.api))
             if self.image is not None:
                 embed.set_thumbnail(url=self.image)
-            embed.add_field(name="Version", value=self.version)
+            embed.add_field(name=await translate(guild, "minecraft.server.version"), value=self.version)
             embed.add_field(
-                name=await translate(guild, "minecraft.serv-0"),
+                name=await translate(guild, "minecraft.server.players-count"),
                 value=f"{self.online_players}/{self.max_players}"
             )
             if len(p) > 20:
-                embed.add_field(name=await translate(guild, "minecraft.serv-1"), value=", ".join(p[:20]))
+                embed.add_field(name=await translate(guild, "minecraft.server.players-list-20"), value=", ".join(p[:20]))
             else:
-                embed.add_field(name=await translate(guild, "minecraft.serv-2"), value=", ".join(p))
+                embed.add_field(name=await translate(guild, "minecraft.server.players-list-all"), value=", ".join(p))
             if self.ping is not None:
-                embed.add_field(name=await translate(guild, "minecraft.serv-3"), value=f"{self.ping:.0f} ms")
+                embed.add_field(name=await translate(guild, "minecraft.server.latency"), value=f"{self.ping:.0f} ms")
             if self.desc:
-                embed.add_field(name="Description", value="```\n" + self.desc + "\n```", inline=False)
+                embed.add_field(
+                    name=await translate(guild, "minecraft.server.description"),
+                    value="```\n" + self.desc + "\n```",
+                    inline=False
+                )
             return embed
 
     async def send_msg_server(self, obj: Union[str, "MCServer"], channel: discord.abc.Messageable, ip: tuple[str, Optional[str]]):

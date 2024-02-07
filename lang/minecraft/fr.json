@@ -22,10 +22,15 @@
     "player-not-found": "Aucun joueur Minecraft Java avec ce pseudo ne semble exister",
     "player-skin-download": "Cliquez ici pour télécharger",
     "player-skin-title": "Skin du joueur %{player}",
-    "serv-0": "Nombre de joueurs",
-    "serv-1": "Liste des 20 premiers joueurs connectés",
-    "serv-2": "Liste des joueurs connectés",
-    "serv-3": "Latence",
+    "server": {
+        "description": "Description",
+        "from-provider": "De %{provider}",
+        "latency": "Latence",
+        "players-count": "Nombre de joueurs",
+        "players-list-20": "Liste des 20 premiers joueurs connectés",
+        "players-list-all": "Liste des joueurs connectés",
+        "version": "Version"
+    },
     "serv-follow": {
         "missing-perms": "Impossible de faire cela : je ne peux pas envoyer de messages et d'embeds dans ce salon",
         "success": "Un message avec les détails du serveur %{ip} a bien été ajouté dans le salon %{channel}, et sera régulièrement mis à jour !"
