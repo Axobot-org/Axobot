@@ -4,7 +4,6 @@
         "category": "V kategorii %{name}",
         "general": "Obecná oprávnění"
     },
-    "invalid_arg": "Neplatný argument: %{arg}",
     "list": {
         "add_reactions": "Přidat reakce",
         "administrator": "Administrátor",
