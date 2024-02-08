@@ -10,6 +10,7 @@ from PIL import Image
 from libs.arguments import args
 from libs.bot_classes import Axobot
 from libs.quote.generator import QuoteGeneration, QuoteStyle
+from libs.text_cleanup import remove_markdown
 
 
 class Quote(commands.Cog):
@@ -70,7 +71,7 @@ class Quote(commands.Cog):
             self, message: discord.Message, channel: discord.abc.Messageable, style: QuoteStyle
             ) -> Optional[discord.Message]:
         "Generate a Quote card from a message and post it to the channel"
-        text = discord.utils.remove_markdown(message.clean_content)
+        text = remove_markdown(message.clean_content)
         while '\n\n' in text:
             text = text.replace('\n\n', '\n')
         author_name = message.author.display_name
