@@ -11,6 +11,8 @@
     "role-lost": "%{r} on otettu pois sinun rooleista",
     "role-not-in-list": "Tämä rooli ei ole osa listasta",
     "rr-added": "%{r} rooli on lisätty hymiölle %{e}",
+    "rr-description-reset": "Roolin %{role} kuvaus on nollattu",
+    "rr-description-set": "Roolin %{role} kuvaus on asetettu",
     "rr-embed": "Roolit joita voi ottaa",
     "rr-list": "Lista reagointi rooleista (%{n}/%{m})",
     "rr-removed": "%{r} roolia ei enään anneta hymiöllä %{e}",
