@@ -4,7 +4,6 @@
         "category": "In category %{name}",
         "general": "General permissions"
     },
-    "invalid_arg": "Invalid argument: %{arg}",
     "list": {
         "add_reactions": "Add reactions",
         "administrator": "Administrator",
