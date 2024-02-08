@@ -567,6 +567,7 @@ class Rss(commands.Cog):
                 if length == 0:
                     return 1
                 return ceil(length / feeds_per_page)
+
             async def get_page_content(self, interaction, page):
                 "Create one page"
                 embed = discord.Embed(title=title, color=rss_cog.embed_color, timestamp=ctx.message.created_at)
@@ -728,7 +729,8 @@ class Rss(commands.Cog):
     @commands.guild_only()
     @commands.check(can_use_rss)
     @commands.check(checks.database_connected)
-    async def change_mentions(self, ctx: MyContext, feed: Optional[str]=None, silent: Optional[bool]=None, *, mentions: Optional[str]):
+    async def change_mentions(self, ctx: MyContext, feed: Optional[str]=None, silent: Optional[bool]=None, *,
+                              mentions: Optional[str]):
         """Configures a role to be notified when a news is posted
         The "silent" parameter (Yes/No) allows you to send new feeds as silent messages, which won't send push notifications to your users.
         If you want to use the @everyone role, please put the server ID instead of the role name.
