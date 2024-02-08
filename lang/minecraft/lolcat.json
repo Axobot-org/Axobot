@@ -22,10 +22,15 @@
     "player-not-found": "Uh ohh, no player found!",
     "player-skin-download": "Weird link u may not wanna touch",
     "player-skin-title": "How %{player} look like:",
-    "serv-0": "Numbr of playerz",
-    "serv-1": "List ov teh first tweny connected plyerz",
-    "serv-2": "List of nice online people",
-    "serv-3": "LaTENcy",
+    "server": {
+        "description": "Smol text",
+        "from-provider": "According 2 %{provider}",
+        "latency": "ping",
+        "players-count": "Numbr of playerz",
+        "players-list-20": "1st 20 online ~~cats~~ playerz",
+        "players-list-all": "List ov nice online ppl",
+        "version": "Vershun"
+    },
     "serv-follow": {
         "missing-perms": "Woops, looks like I cant send embeds into dis channel",
         "success": "A nize messag wif servr details %{ip} has bin addd to teh channel %{channel}, and i'll make shure 2 update it regularly!"

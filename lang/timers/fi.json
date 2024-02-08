@@ -3,14 +3,28 @@
         "cancelled": "Lopetetaan muistutusta",
         "cleared": "Sinun muistutukset ovat nyt poistettu!",
         "confirm": "Oletko varma, että haluat poistaa kaikki muistutuksesi? (%{count} jäljellä)",
-        "deleted": "Muistutus #%{id} viestillä `%{message}` on poistettu!",
+        "custom-duration": {
+            "button": "Muu kesto",
+            "title": "Mukautetun muistutuksen kesto",
+            "input": "Syötä muistutuksesi kesto"
+        },
+        "delete": {
+            "error": "Jotain meni pieleen muistutusten poistamisessa. Yritä uudelleen tai ota yhteyttä tukeen.",
+            "success": {
+                "one": "Muistutuksesi on poistettu!",
+                "many": "%{count} muistutusta on nyt onnistuneesti poistettu!"
+            },
+            "title": "Valitse mitkä muistutukset haluat poistaa"
+        },
         "embed-asked": "%{user}, pyysit minua muistuttaa sinua %{duration} sitten tästä:",
         "embed-date": "Pyydetty",
         "embed-link": "Alkuperäinen viesti",
         "embed-title": "Musitutus",
         "empty": "Ups, sinulla ei ole odotettavia muistutuksia...",
         "item": "Tunniste: `{id}` | {duration} | Kanava: {channel} | Viesti: {msg}",
+        "recreated": "Uusi muistutus on luotu ajaksi %{duration}!",
         "saved": "Selvä! Muistutan sinua %{duration} päästä",
+        "select-placeholder": "Valitse yksi tai useampi muistutus",
         "title": "Lista muistutuksistasi",
         "too-long": "Mahdotonta laittaa niin pitkää aikaa",
         "too-short": "Olet laittanut pätemättömän ajan"
