@@ -219,6 +219,7 @@ class Rss(commands.Cog):
 
 
     @commands.hybrid_group(name="rss")
+    @app_commands.guild_only()
     @app_commands.default_permissions(manage_guild=True)
     @commands.cooldown(2, 15, commands.BucketType.channel)
     async def rss_main(self, ctx: MyContext):
