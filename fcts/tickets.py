@@ -810,6 +810,7 @@ If that still doesn't work, please create your ticket
     @portal_review_config.autocomplete("topic_id")
     async def portal_review_autocomplete(self, interaction: discord.Interaction, current: str):
         return await self.topic_id_autocompletion(interaction, current, allow_other=False)
+
     async def review_all(self, ctx: MyContext):
         "Send a global recap of a guild settings"
         topics = await self.db_get_topics(ctx.guild.id)
