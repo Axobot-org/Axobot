@@ -9,6 +9,7 @@
         "autounmute": "automaattinen mykistyksen poisto",
         "invite": "Automaattinen valvoja (Discord kutsu linkki)",
         "memberchan": "Automaattinen tapahtuma (configuraatio käyttäjänlaskelma)",
+        "mentions": "Automod (liian monta mainintaa)",
         "unban": "porttikiellon poistanut %{user}",
         "unmute": "mykistäjä %{user}",
         "welcome_roles": "Automated action (config welcome_roles)",
