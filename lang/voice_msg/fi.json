@@ -1,0 +1,6 @@
+{
+    "attachment-too-long": "Teknisten rajoitusten vuoksi en voi käsitellä liitteitä pidempään kuin %{duration}",
+    "no-transcript": "En havainnut yhtään sanaa tästä ääniviestistä :confused:",
+    "openai-credits": "Powered by local [OpenAI's Whisper model](%{url})",
+    "title": "Transkriptin luonti"
+}
