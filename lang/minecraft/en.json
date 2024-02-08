@@ -22,10 +22,15 @@
     "player-not-found": "I could not find any Minecraft Java player with this username",
     "player-skin-download": "Click here to download",
     "player-skin-title": "Skin of the player %{player}",
-    "serv-0": "Number of players",
-    "serv-1": "List of the first 20 players connected",
-    "serv-2": "List of online players",
-    "serv-3": "Latency",
+    "server": {
+        "description": "Description",
+        "from-provider": "From %{provider}",
+        "latency": "Latency",
+        "players-count": "Number of players",
+        "players-list-20": "List of the first 20 players connected",
+        "players-list-all": "List of online players",
+        "version": "Version"
+    },
     "serv-follow": {
         "missing-perms": "Error: I cannot send messages and embeds in the selected channel",
         "success": "A message with server details %{ip} has been added to the channel %{channel}, and will be updated regularly!"
