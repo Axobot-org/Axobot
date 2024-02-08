@@ -1,6 +1,7 @@
 {
     "deleted": {
-        "many": "%{count} poistettuja kanavia"
+        "many": "%{count} poistettuja kanavia",
+        "one": "1 poistettu kanava"
     },
     "no-channel": "Tällä palvelimella ei ole yhtään puhekanavaa tehtynä"
 }
