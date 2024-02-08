@@ -1,0 +1,26 @@
+{
+    "check-stream": {
+        "category": "**Kategoria:** %{game}",
+        "no-nsfw": "Tämä striimi on merkitty kypsäksi, ja tämä kanava ei ole NSFW",
+        "offline": "Tämä kanava ei ole striimaamassa",
+        "title": "%{streamer} striimaa!"
+    },
+    "invalid-streamer-name": "Tämä nimi ei ole kelvollinen Twitch-striimaajan nimi",
+    "on-live-indication": "suorana",
+    "stream-alerts": "%{streamer} striimaa!",
+    "subscribe": {
+        "success": "Palvelimesi on tilannut striimaajan %{streamer} ilmoitukset!",
+        "limit-reached": "Et voi tilata enempää kuin %{limit} striimaajaa!",
+        "already-subscribed": "Palvelin on jo tilannut %{streamer} striimi-ilmoitukset!"
+    },
+    "subs-list": {
+        "title": "Tilaaja lista (%{current}/%{max}):",
+        "empty": "Tämä palvelin ei ole tilannut yhtään striimaajaa!",
+        "empty-tip": "Käytä komentoa %{cmd} tilaaksesi ilmoitukset maksimissaan %{max} striimajalle."
+    },
+    "unknown-streamer": "Tuntematon striimaaja",
+    "unsubscribe": {
+        "success": "Palvelin on peruttanut ilmoitukset striimaajalta %{streamer}",
+        "not-subscribed": "Palvelin ei ole tilannut %{streamer} ilmoituksia"
+    }
+}

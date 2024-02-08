@@ -7,7 +7,7 @@
         "list-title-2": "Lista 60 käyttäjästä joilla on porttikielto tältä palvelimelta \"{}\"",
         "no-bans": "Näyttää siltä että kenelläkään ei ole porttikieltoa",
         "staff-ban": "Et voi antaa porttikieltoa toiselle työntekijälle!",
-        "too-high": "Näyttää siltä että tämä jäsen on liian korkea että voisin antaa hänelle porttikiellon 🤔",
+        "too-high": "Näyttää siltä että tämä jäsen on liian korkea että voisin antaa hänelle porttikiellon :thinking:",
         "user-not-banned": "Tällä jäsenellä ei ole porttikieltoa 🙃"
     },
     "ban-chat": "Käyttäjällä %{user} (%{userid}) on nyt porttikielto",
@@ -28,7 +28,7 @@
         "too-old": "En voi poistaa viestejä, jotka ovat yli %{days} päivää vanhoja!"
     },
     "emoji": {
-        "cant-emoji": "Ups, minulta puuttuu käyttöoikeus `Hallinnoi hymiöitä` 😕",
+        "cant-emoji": "Ups, minulta puuttuu käyttöoikeus `Hallinnoi hymiöitä` :confused:",
         "emoji-valid": "Nyt hymiötä %{name} voi vain käyttää roolit `%{roles}`",
         "list": "{} (`:{}:`) lisätty {} {}",
         "list-title": "Hymiöt palvelimella %{guild}",
@@ -40,34 +40,38 @@
     "kick": {
         "cant-staff": "Et voi potkia toista työntekijää!",
         "no-perm": "Käyttöoikeus \"Potkia jäseniä\" tarvitaan 😕",
-        "too-high": "Näyttää siltä että tämä jäsen on liian korkealla niin en voi potkia häntä ulos 🤔"
+        "too-high": "Näyttää siltä että tämä jäsen on liian korkealla niin en voi potkia häntä ulos :thinking:"
     },
     "kick-chat": "Käyttäjä %{user} (%{userid}) on nyt potkittu ulos tältä palvelimelta",
     "kick-dm": "Sinut on juuri potkittu ulos palvelimelta %{guild} 😕",
     "missing-manage-nick": "Ups, minulta puuttuu \"Hallinnoi nimimerkkejä\" käyttöoikeus!",
     "missing-user-perms": "Ups, sinulta puuttuu käyttöoikeuksia (joko hallinnoi rooleja, hallinnoi palvelinta tai hallinnoi viestejä)",
     "mute-config": {
+        "confirm": "Oletko varma, että haluat määrittää \"vaimennetun\" roolin?\nTämä toiminto saattaa rikkoa joitakin lisäoikeuksia palvelimellasi, peruuttamalla 'lähetä viestejä' oikeudet korvaamaan joistakin rooleista.",
         "err": "Mahdotonta tehdä noin. Varmista onko minulla oikeat käyttöoikeudet ja yritä uudelleen.",
         "success": {
-            "other": "Rooli on tehty ja konfiguroitu oikein! (%{count} kanavaa ei pystytty konfiguroimaan, oikeuksien puutteiden takia)",
+            "many": "Rooli on onnistuneesti luotu ja määritetty! (%{count} kanavaa ei voitu määrittää, koska minulta puuttuu käyttöoikeuksia)",
             "zero": "Rooli on tehty ja konfiguroitu oikein!"
         },
         "success2": {
-            "other": "Rooli on konfiguroitu oikein! (%{count} kanavaa ei pystytty konfiguroimaan, oikeuksien puutteiden takia)",
+            "many": "Rooli on onnistuneesti määritetty! (%{count} kanavaa ei voitu määrittää, koska minulta puuttuu käyttöoikeuksia)",
             "zero": "Rooli on konfiguroitu oikein!"
-        }
+        },
+        "tip": "*Vihje: %{mute} komennon käyttäminen ilman mykistettyä roolia käyttää Discordin virallista aikakatkaisujärjestelmää, joka voi sopia paremmin tarpeisiisi.*"
     },
     "mute": {
         "already-mute": "Tämä jäsen on jo mykistetty!",
         "already-unmute": "Tämä jäsen ei ole mykistetty!",
         "cant-mute": "Ups, näyttää siltä että minulla ei ole tarpeeksi käyttöoikeuksia tohon... Anna minulle `Hallinnoi rooleja` käyttöoikeudet ennen jatkamista.",
+        "cant-timeout": "Hups, minulla ei ole lupaa tähän... Anna minulle lupa `Valvoa jäseniä` ennen jatkamista, tai luo mykistetty rooli.",
         "list-title-0": "Lista jäähyllä olevista jäsenistä palvelimella \"%{guild}\"",
         "list-title-1": "Lista 45 jäähyllä olevasta jäsenestä palvelimella \"%{guild}\"",
         "list-title-2": "Lista 60 jäähyllä olevasta jäsenestä palvelimella \"%{guild}\"",
         "mute-high": "Ups, näyttää siltä että `mykistetty` rooli on liian korkealla että voisin antaa sen... Korjaa tämä sillä että laita minun roolini `Mykistetty` roolin yläpuolelle.",
         "no-mute": "Ups, näyttää siltä että `mykistetty` rooli ei ole olemassa 😕 Tede yksi ja anna käyttöoikeudet manuallisesti.",
         "no-mutes": "Kenelläkään ei näytä olevan porttikieltoa täällä",
-        "staff-mute": "Et voi mykistää toista työntekijää"
+        "staff-mute": "Et voi mykistää toista työntekijää",
+        "too-high": "Näyttää siltä että tämä jäsen on liian korkealla niin en voi asettaa häntä jäähylle :thinking:"
     },
     "mute-chat": "Käyttäjä %{user} (%{userid}) on pistetty jäähylle",
     "mute-dm": "Sinut on pistetty jäähylle palvelimella %{guild}",
@@ -78,16 +82,31 @@
         "error-toomuch": "Ups, mahdotonta kiinnittää tämä viesti (onko sinulla enemmän kuin 50 kiinnitettyä viestiä?). Virhe : `%{err}`"
     },
     "raid-banned": "Sinulle on automaattisesti annettu porttikielto palvelimelta %{guild} mellakkatorjunnan syystä.",
-    "raid-kicked": "Sinut on automaattisesti potkittu ulos palvelimelta %{guild} mellakkatorjunnan syystä. Yritä uudelleen muutaman päivän kuluttua",
+    "raid-kicked": "Sinut on automaattisesti potkittu ulos palvelimelta %{guild} mellakkatorjunnan syystä. Yritä uudelleen muutaman päivän kuluttua.",
     "react-clear": "En voi löytää tätä viestiä 😕",
     "role": {
         "color-success": "Rooli %{role} on vaihtanut väriä!",
+        "give-pending": "Lisätään roolia %{n} jäsenelle, se voi kestää muutaman minuutin...",
         "give-roles-higher": "Et voi antaa tai ottaa rooleja jotka ovat sinua ylempänä!",
+        "give-success": {
+            "many": "-> %{count} / %{m} roolia annettu!",
+            "one": "-> 1 / %{m} rooli annettu",
+            "zero": "Yhtään roolia määrästä %{m} ei voitu antaa"
+        },
         "give-too-high": "Ups, näyttää siltä että tämä rooli on liian ylhäällä jotta voisin antaa tai ottaa sen keneltä tahansa. Laita minun roolini roolin `%{r}` yläpuolelle",
+        "limit-hit": "Välttääkseni spämmimistä, pystyin vaikuttaa %{limit} jäseneen. Käytä tätä komentoa uudelleen muutaman sekunnin kuluttua, jos haluat vaikuttaa enemmän",
         "list": "Lista palvelimen rooleista",
+        "remove-pending": "Poistetaan roolia %{n} jäseneltä, se voi kestää muutaman minuutin...",
+        "remove-success": {
+            "many": "-> %{count} / %{m} roolia otettu pois!",
+            "one": "-> 1 / %{m} rooli otettu pois",
+            "zero": "Yhtään roolia määrästä %{m} ei voitu ottaa pois"
+        },
+        "temp-grant-success": "%{role} rooli on lisätty käyttäjälle %{user} ajaksi %{time}!",
         "too-high": "Ups, tämä rooli on liian korkealla että minä voisin muokata sitä. Siirrä minun roolini `%{r}` roolin yli ennen kun yrität uudelleen 😕"
     },
     "slowmode": {
+        "cant-slowmode": "Minulla ei ole käyttöoikeuksia `Hallinnoida tätä kanavaa` :confused:",
         "disabled": "Tällä kanavalla ei ole enää etanatilaa",
         "enabled": "%{channel} on nyt etanatilassa. Odota %{s} sekunttia ennenkun lähetät viestin.",
         "info": "Etanatila tällä kanavalla on %{s} sekunttia",
@@ -100,54 +119,8 @@
         "one": "1 nimimerkki muutettu!",
         "zero": "Lempinimiä ei ole muutettu"
     },
+    "unhoist-too-many-members": "Hups, palvelimellasi on liian monta jäsentä, jotta voin tehdä tuon toiminnon. Ota yhteyttä tukitiimiin saadaksesi lisätietoja.",
     "unmute-chat": "Käyttäjältä %{user} (%{userid}) on poistettu jäähy",
-    "verify-role-high": "Ups, näyttää siltä että `%{r}` on liian korkealla että voisin antaa sen. Laita minun rooli sen yläpuolelle.",
-    "verify_questions": [
-        [
-            "How many seconds are there in a minute?",
-            "60"
-        ],
-        [
-            "How many sides does a triangle have?",
-            "3"
-        ],
-        [
-            "What does the emoji :pig: represent? a `fish`, `plant` or `pig`?",
-            "pig"
-        ],
-        [
-            "What does the product of 2 by 3 give?",
-            "6"
-        ],
-        [
-            "What is 2+7?",
-            "9"
-        ],
-        [
-            "What is the first letter of `Zbot`?",
-            "z"
-        ],
-        [
-            "What is the fourth cardinal point? North, south, east, ...",
-            "west"
-        ],
-        [
-            "What is the name of this server?",
-            "_special_servername"
-        ],
-        [
-            "What is the opposite color to black?",
-            "white"
-        ],
-        [
-            "What is the result of 10 minus 5?",
-            "5"
-        ],
-        [
-            "Which of these words begins with D? `bathtub`, `crow`, `galion` or `drawing`",
-            "drawing"
-        ]
-    ],
     "warn": {
         "cant-bot": "En voi varoittaa bottia ^^",
         "cant-staff": "Et voi varoittaa toista työntekijää!",

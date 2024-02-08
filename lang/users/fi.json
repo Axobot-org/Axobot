@@ -16,6 +16,10 @@
             "false": "Sinun täytyy poistaa AFK merkki itse",
             "true": "Minä poistan AFK merkin sinulta heti kun lähetät viestin"
         },
+        "show_tips": {
+            "false": "Et enää saa vinkkejä botilta",
+            "true": "Saat satunnaisesti vinkkejä botilta"
+        },
         "usernames_log": {
             "false": "Olet laittanut nimimerkkien ja käyttäjänimien kuvaamisen",
             "true": "Olet hyväksynyt käyttäjänimien ja nimimerkkien kuvaamisen"
