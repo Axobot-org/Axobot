@@ -32,6 +32,7 @@
         "to-member": "Nastala chyba, nemohl jsem správně nastavit váš ticket kanál. Prosím, požádejte moderátora serveru o opravu mých oprávnění, jinak kdokoliv, kdo má přístup ke kategorii ticketů, může být schopen přečíst váš ticket.",
         "to-staff": "Chyba, nemohl jsem nastavit oprávnění kanálu pro váš tiket. Prosím, ujistěte se, že mám oprávnění 'Správa rolí' v kategorii %{category}, jinak kdokoliv, kdo má přístup do této kategorie, může vidět nové tikety."
     },
+    "name-edited": "Název tématu byl upraven na \"%{topic}\"",
     "nothing-to-edit": "Nic k úpravě!",
     "other": "ostatní",
     "review": {
