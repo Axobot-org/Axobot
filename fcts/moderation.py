@@ -1020,6 +1020,26 @@ The 'show_reasons' parameter is used to display the mute reasons.
         except (discord.Forbidden, discord.NotFound):
             pass
 
+    @emoji_rename.autocomplete("emoji")
+    @emoji_restrict.autocomplete("emoji")
+    @emoji_group.autocomplete("emoji")
+    async def emoji_autocompletion(self, interaction: discord.Interaction, current: str):
+        """Autocompletion for the role-reaction emoji in slash commands"""
+        if interaction.guild_id is None:
+            return []
+        current = current.lower()
+        options: list[tuple[bool, str, str]] = []
+        for emoji in interaction.guild.emojis:
+            emoji_display = ':' + emoji.name + ':'
+            lowercase_emoji_display = emoji_display.lower()
+            if current in lowercase_emoji_display or current in str(emoji.id):
+                options.append((lowercase_emoji_display.startswith(current), emoji_display, str(emoji.id)))
+        options.sort()
+        return [
+            app_commands.Choice(name=emoji, value=emoji_id)
+            for _, emoji, emoji_id in options
+        ]
+
     @emoji_group.command(name="list")
     @commands.guild_only()
     @commands.check(checks.bot_can_embed)
