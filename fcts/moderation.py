@@ -930,7 +930,7 @@ The 'show_reasons' parameter is used to display the mute reasons.
         await view.send_init(ctx)
 
 
-    @commands.hybrid_group(name="emoji",aliases=['emojis', 'emote'])
+    @commands.hybrid_group(name="emoji")
     @app_commands.default_permissions(manage_expressions=True)
     @commands.guild_only()
     @commands.cooldown(5,20, commands.BucketType.guild)
@@ -949,7 +949,7 @@ The 'show_reasons' parameter is used to display the mute reasons.
     async def emoji_rename(self, ctx: MyContext, emoji: discord.Emoji, name: str):
         """Rename an emoji
 
-        ..Example emoji rename :cool\: supercool
+        ..Example emoji rename :cool: supercool
 
         ..Doc moderator.html#emoji-manager"""
         if emoji.guild != ctx.guild:
@@ -962,10 +962,13 @@ The 'show_reasons' parameter is used to display the mute reasons.
         await ctx.send(await self.bot._(ctx.guild.id, "moderation.emoji.renamed", emoji=emoji))
 
     @emoji_group.command(name="restrict")
-    @app_commands.describe(emoji="The emoji to restrict", roles="The roles allowed to use this emoji (separated by spaces), or 'everyone'")
+    @app_commands.describe(
+        emoji="The emoji to restrict",
+        roles="The roles allowed to use this emoji (separated by spaces), or 'everyone'")
     @commands.guild_only()
     @commands.check(checks.has_manage_expressions)
-    async def emoji_restrict(self, ctx: MyContext, emoji: discord.Emoji, roles: commands.Greedy[Union[discord.Role, Literal['everyone']]]):
+    async def emoji_restrict(self, ctx: MyContext, emoji: discord.Emoji,
+                             roles: commands.Greedy[Union[discord.Role, Literal['everyone']]]):
         """Restrict the use of an emoji to certain roles
 
         ..Example emoji restrict :vip: @VIP @Admins
@@ -979,13 +982,20 @@ The 'show_reasons' parameter is used to display the mute reasons.
         if not ctx.guild.me.guild_permissions.manage_expressions:
             await ctx.send(await self.bot._(ctx.guild.id, "moderation.emoji.cant-emoji"))
             return
-        for e, role in enumerate(roles):
-            if role == "everyone":
-                roles[e] = ctx.guild.default_role
+        await ctx.defer()
+        # everyone role
+        if "everyone" in roles:
+            await emoji.edit(roles=[ctx.guild.default_role])
+            await ctx.send(await self.bot._(ctx.guild.id, "moderation.emoji.unrestricted", name=emoji))
+            return
         # remove duplicates
         roles = list(set(roles))
-        await emoji.edit(name=emoji.name, roles=roles)
-        await ctx.send(await self.bot._(ctx.guild.id, "moderation.emoji.emoji-valid", name=emoji, roles=", ".join([x.name for x in roles])))
+        await emoji.edit(roles=roles)
+        # send success message
+        roles_mentions = " ".join([x.mention for x in roles])
+        await ctx.send(
+            await self.bot._(ctx.guild.id, "moderation.emoji.emoji-valid", name=emoji, roles=roles_mentions, count=len(roles))
+        )
 
     @emoji_group.command(name="clear")
     @commands.guild_only()

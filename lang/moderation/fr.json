@@ -29,11 +29,15 @@
     },
     "emoji": {
         "cant-emoji": "Oups, il me manque la permission `Gérer les émojis` :confused:",
-        "emoji-valid": "L'émoji %{name} a été modifié pour n'autoriser que les rôles %{roles}",
+        "emoji-valid": {
+            "one": "L'émoji %{name} a été modifié pour n'être utilisable que par le rôle %{roles}",
+            "many": "L'émoji %{name} a été modifié pour n'être utilisable que par les rôles %{roles}"
+        },
         "list": "{} (`:{}:`) ajouté le {} {}",
         "list-title": "Emojis du serveur %{guild}",
         "private": "[Restreint]",
         "renamed": "L'émoji %{emoji} a bien été renommé !",
+        "unrestricted": "L'émoji %{name} a été modifié pour être utilisable par tout le monde",
         "wrong-guild": "Oups, il semble que cet émoji n'appartienne pas à ce serveur :thinking:"
     },
     "error": "Oups, une erreur inconnue est survenue. Réessayez plus tard ou contactez le support",
