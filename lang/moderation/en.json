@@ -29,11 +29,15 @@
     },
     "emoji": {
         "cant-emoji": "Oops, I'm missing the permission `Manage expressions` :confused:",
-        "emoji-valid": "The emoji %{name} has been modified to allow only the roles %{roles}",
+        "emoji-valid": {
+            "one": "The %{name} emoji has been changed so that it can only be used by the %{roles} role",
+            "many": "The %{name} emoji has been changed so that it can only be used by the %{roles} roles"
+        },
         "list": "{} (`:{}:`) added on {} {}",
         "list-title": "Emojis of the server %{guild}",
         "private": "[Restricted]",
         "renamed": "The emoji %{emoji} has been renamed!",
+        "unrestricted": "The %{name} emoji has been changed so that it can be used by everyone",
         "wrong-guild": "Oops, it seems this emoji doesn't belong to this server :thinking:"
     },
     "error": "Oops, an unknown error occurred. Try again later or contact support",
