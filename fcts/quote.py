@@ -51,13 +51,10 @@ class Quote(commands.Cog):
             return
         # defer and try to generate the quote
         await interaction.response.defer(ephemeral=True)
-        if msg := await self.quote_message(message, interaction.channel, style):
-            await interaction.followup.send(
-                f"Your quote has been posted to {msg.jump_url}"
-            )
-        else:
-            cmd = await self.bot.get_command_mention("about")
-            await interaction.followup.send(await self.bot._(interaction, "errors.unknown2", about=cmd))
+        file = await self.quote_message(message, style)
+        await interaction.followup.send(
+            file=file
+        )
 
     @app_commands.command(name="quote")
     @app_commands.checks.cooldown(2, 30)
@@ -67,9 +64,7 @@ class Quote(commands.Cog):
         await self.quote_command(interaction, message, style)
 
 
-    async def quote_message(
-            self, message: discord.Message, channel: discord.abc.Messageable, style: QuoteStyle
-            ) -> Optional[discord.Message]:
+    async def quote_message(self, message: discord.Message, style: QuoteStyle) -> Optional[discord.Message]:
         "Generate a Quote card from a message and post it to the channel"
         text = remove_markdown(message.clean_content)
         while '\n\n' in text:
@@ -88,8 +83,7 @@ class Quote(commands.Cog):
         img_byte_arr = BytesIO()
         generated_card.save(img_byte_arr, format='PNG')
         img_byte_arr.seek(0)
-        file = discord.File(img_byte_arr, filename="quote.png")
-        return await channel.send(file=file)
+        return discord.File(img_byte_arr, filename="quote.png")
 
     async def get_image_from_url(self, url: str):
         "Download an image from an url"
