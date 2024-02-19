@@ -16,7 +16,7 @@
             "prefix",
             "rss",
             "stats",
-            "tip"
+            "random-tip"
         ]
     },
     "moderation": {
@@ -90,7 +90,7 @@
             "arapproved",
             "bitly",
             "cookie",
-            "events",
+            "event",
             "minecraft",
             "nasa",
             "tic-tac-toe",
