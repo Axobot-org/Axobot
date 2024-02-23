@@ -147,15 +147,15 @@
     },
     "cmd-count": {
         "zero": "No command",
-        "one": "1 command\n`%{p}help %{cog}` for more info",
-        "many": "%{count} commands\n`%{p}help %{cog}` to get the list"
+        "one": "1 command\n`/help %{cog}` for more info",
+        "many": "%{count} commands\n`/help %{cog}` to get the list"
     },
     "cmd-not-found": "There is no command named \"%{cmd}\"",
     "cog-empty-dm": "No command of this category is available in DM!",
     "description": "Description",
     "embed_title": "Available commands for %{u}",
     "embed_title_dm": "Available commands in DM",
-    "footer": "Type {}help command for more info on a command",
+    "footer": "Type '/help command' for more info on a command",
     "more-subcmds": {
         "one": "and 1 more",
         "many": "and %{count} more"

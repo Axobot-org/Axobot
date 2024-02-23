@@ -147,15 +147,15 @@
     },
     "cmd-count": {
         "zero": "Aucune commande",
-        "one": "1 commande\n`%{p}help %{cog}` pour l'afficher",
-        "many": "%{count} commandes\n`%{p}help %{cog}` pour en afficher la liste"
+        "one": "1 commande\n`/help %{cog}` pour l'afficher",
+        "many": "%{count} commandes\n`/help %{cog}` pour en afficher la liste"
     },
     "cmd-not-found": "Aucune commande nommée \"%{cmd}\"",
     "cog-empty-dm": "Aucune commande de ce module n'est disponible en MP !",
     "description": "Description",
     "embed_title": "Liste des commandes disponibles pour %{u}",
     "embed_title_dm": "Liste des commandes disponibles en MP",
-    "footer": "Entrez {}help commande pour plus d'informations sur une commande",
+    "footer": "Entrez '/help commande' pour plus d'informations sur une commande",
     "more-subcmds": {
         "one": "et 1 de plus",
         "many": "et %{count} de plus"
@@ -164,7 +164,7 @@
     "no-desc-cog": "Aucune description pour ce module.",
     "no-subcmd": "La commande %{cmd} n'a aucune sous-commande",
     "not-enabled": ":warning: Cette commande est désactivée",
-    "subcmd-not-found": "Cette commande ne possède aucune sous-commande nommée \"%{name}\"",
+    "subcmd-not-found": "Cette commande ne possède aucune sous-commande nommée \"%{name}\"",
     "subcmds": "Sous-commandes",
     "warning": "Prérequis"
 }
