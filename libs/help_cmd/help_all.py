@@ -72,9 +72,8 @@ async def _generate_compressed_help(cog: "HelpCog", ctx: MyContext, categories: 
         category_name = await cog.bot._(ctx.channel, f"help.categories.{category_id}")
         emoji = cog.commands_data[category_id]["emoji"]
         title = f"{emoji}  __**{category_name.capitalize()}**__"
-        prefix = await ctx.bot.prefix_manager.get_prefix(ctx.guild)
         description = await cog.bot._(
-            ctx.channel, "help.cmd-count", count=len(category_commands), p=prefix, cog=category_id
+            ctx.channel, "help.cmd-count", count=len(category_commands), p='/', cog=category_id
         )
         fields.append({"name": title, "value": description, "inline": False})
     return fields

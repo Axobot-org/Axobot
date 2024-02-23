@@ -22,9 +22,7 @@ def get_embed_color(ctx: MyContext):
 
 async def get_embed_footer(ctx: MyContext):
     "Get the footer text to use for help embeds"
-    ft = await ctx.bot._(ctx.channel, "help.footer")
-    prefix = "/"
-    return ft.format(prefix)
+    return (await ctx.bot._(ctx.channel, "help.footer")).format('/')
 
 async def get_discord_locale(ctx: Union[MyContext, discord.Interaction]):
     "Get the Discord locale to use for a given context"
