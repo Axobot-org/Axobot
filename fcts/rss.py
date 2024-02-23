@@ -443,6 +443,8 @@ class Rss(commands.Cog):
         )
         if feed_ids is None:
             return
+        if ctx.interaction and not ctx.interaction.response.is_done():
+            await ctx.interaction.defer()
         feed_object = await self.db_get_feed(feed_ids[0])
         if feed_object is None:
             return
