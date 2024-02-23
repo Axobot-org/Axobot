@@ -142,9 +142,10 @@ class ServerLogs(commands.Cog):
                 try:
                     perms = channel.permissions_for(channel.guild.me)
                     if perms.send_messages and perms.embed_links:
-                        await channel.send(embeds=embeds[:10])
-                        if len(embeds) > 10:
-                            self.to_send[channel_id] = self.to_send[channel_id][10:]
+                        embeds_to_send = await self._get_embeds_batch(embeds)
+                        await channel.send(embeds=embeds_to_send)
+                        if len(embeds) > len(embeds_to_send):
+                            self.to_send[channel_id] = self.to_send[channel_id][len(embeds_to_send):]
                         else:
                             self.to_send.pop(channel_id)
                 except discord.HTTPException as err:
@@ -156,6 +157,16 @@ class ServerLogs(commands.Cog):
     async def before_logs_task(self):
         await self.bot.wait_until_ready()
 
+    async def _get_embeds_batch(self, embeds: list[discord.Embed]):
+        "Return a list of max. 10 embeds, such that the list do not exceed 6000 characters"
+        batch: list[discord.Embed] = []
+        current = 0
+        for embed in embeds[:10]:
+            if current + len(embed) > 6000:
+                break
+            batch.append(embed)
+            current += len(embed)
+        return batch
 
     @commands.hybrid_group(name="modlogs")
     @app_commands.default_permissions(manage_guild=True)
