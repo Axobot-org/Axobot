@@ -962,6 +962,7 @@ class Info(commands.Cog):
         # Servers list
         servers_in: list[str] = []
         owned, membered = 0, 0
+        await interaction.response.defer()
         if hasattr(user, "mutual_guilds"):
             for s in user.mutual_guilds:
                 if s.owner==user:
@@ -1024,13 +1025,14 @@ class Info(commands.Cog):
         embed.add_field(name="Upvoted the bot?", value=votes)
         embed.add_field(name="XP sus?", value=xp_sus)
 
-        await interaction.response.send_message(embed=embed)
+        await interaction.followup.send(embed=embed)
 
     @find_main.command(name="guild")
     @discord.app_commands.check(checks.is_support_staff)
     @discord.app_commands.describe(guild="The server name or ID")
     async def find_guild(self, interaction: discord.Interaction, guild: str):
         "Find any guild where the bot is"
+        await interaction.response.defer()
         if guild.isnumeric():
             guild: discord.Guild = self.bot.get_guild(int(guild))
         else:
@@ -1086,13 +1088,14 @@ class Info(commands.Cog):
         emb.add_field(name="RSS feeds count", value=rss_numb)
         emb.add_field(name="Roles rewards count", value=rr_len)
         emb.add_field(name="Streamers count", value=streamers_len)
-        await interaction.response.send_message(embed=emb)
+        await interaction.followup.send(embed=emb)
 
     @find_main.command(name='channel')
     @discord.app_commands.check(checks.is_support_staff)
     @discord.app_commands.describe(channel="The ID/name of the channel to look for")
     async def find_channel(self, interaction: discord.Interaction, channel: str):
         "Find any channel from any server where the bot is"
+        await interaction.response.defer()
         class FakeCtx:
             def __init__(self, bot):
                 self.bot = bot
@@ -1100,7 +1103,7 @@ class Info(commands.Cog):
         try:
             c = await commands.GuildChannelConverter().convert(FakeCtx(self.bot), channel)
         except commands.ChannelNotFound:
-            await interaction.response.send_message("Unknonwn channel")
+            await interaction.followup.send("Unknonwn channel")
             return
         if interaction.guild is None:
             color = None
@@ -1109,19 +1112,20 @@ class Info(commands.Cog):
         emb = discord.Embed(title="#"+c.name, color=color)
         emb.add_field(name="ID", value=c.id)
         emb.add_field(name="Server", value=f"{c.guild.name} ({c.guild.id})", inline=False)
-        await interaction.response.send_message(embed=emb)
+        await interaction.followup.send(embed=emb)
 
     @find_main.command(name='role')
     @discord.app_commands.check(checks.is_support_staff)
     @discord.app_commands.describe(role_name="The ID/name of the role to look for")
     async def find_role(self, interaction: discord.Interaction, role_name: str):
         "Find any role from any server where the bot is"
+        await interaction.response.defer()
         every_roles: list[discord.Role] = []
         for serv in self.bot.guilds:
             every_roles += serv.roles
         role = discord.utils.find(lambda item: role_name in {str(item.id), item.name, item.mention}, every_roles)
         if role is None:
-            await interaction.response.send_message("Unknown role")
+            await interaction.followup.send("Unknown role")
             return
         if interaction.guild is None:
             color = None
@@ -1132,15 +1136,16 @@ class Info(commands.Cog):
         emb.add_field(name="Server", value=f"{role.guild.name} ({role.guild.id})", inline=False)
         emb.add_field(name="Members", value=len(role.members))
         emb.add_field(name="Colour", value=str(role.colour))
-        await interaction.response.send_message(embed=emb)
+        await interaction.followup.send(embed=emb)
 
     @find_main.command(name='rss')
     @discord.app_commands.check(checks.is_support_staff)
     async def find_rss(self, interaction: discord.Interaction, feed_id: int):
         "Find any active or inactive RSS feed"
+        await interaction.response.defer()
         feed: FeedObject = await self.bot.get_cog('Rss').db_get_feed(feed_id)
         if feed is None:
-            await interaction.response.send_message("Unknown RSS feed")
+            await interaction.followup.send("Unknown RSS feed")
             return
         guild = self.bot.get_guild(feed.guild_id)
         if guild is None:
@@ -1181,7 +1186,7 @@ class Info(commands.Cog):
         if specificities:
             emb.add_field(name="Specificities", value=" - ".join(specificities))
         emb.add_field(name="Recent errors", value=str(feed.recent_errors))
-        await interaction.response.send_message(embed=emb)
+        await interaction.followup.send(embed=emb)
 
     @commands.hybrid_command(name="membercount")
     @commands.guild_only()
