@@ -100,6 +100,7 @@ class RssMessage:
                  retweeted_from: Optional[str] = None,
                  image: Optional[str] = None,
                  post_text: Optional[str] = None,
+                 post_description: Optional[str] = None,
                  ):
         self.bot = bot
         self.feed = feed
@@ -107,6 +108,7 @@ class RssMessage:
         self.title = title if len(title) < 300 else title[:299]+'…'
         self.image = image
         self.post_text = post_text
+        self.post_description = post_description
         if isinstance(date, datetime.datetime):
             self.date = date
         elif isinstance(date, time.struct_time):
@@ -192,8 +194,12 @@ class RssMessage:
             timestamp = ""
         _channel = discord.utils.escape_markdown(self.channel) if self.channel else "?"
         _author = discord.utils.escape_markdown(self.author) if self.author else "?"
+        # full post text
         post_text = self.post_text or ""
         post_text_size_limit = 3800 if self.feed.use_embed else 1800
+        # post description/summary
+        description = self.post_description or ""
+        description_size_limit = 1500
         return self.bot.SafeDict(
             channel=_channel,
             title=self.title,
@@ -206,6 +212,7 @@ class RssMessage:
             logo=self.logo,
             author=_author,
             full_text=post_text[:post_text_size_limit] + '…' if len(post_text) > post_text_size_limit else post_text,
+            description=description[:description_size_limit] + '…' if len(description) > description_size_limit else description,
         )
 
     async def create_msg(self, msg_format: str=None):

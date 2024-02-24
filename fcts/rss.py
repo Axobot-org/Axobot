@@ -964,6 +964,7 @@ class Rss(commands.Cog):
         - `{mentions}`: the list of mentioned roles
         - `{title}`: the title of the post
         - `{full_text}`: the full text of the post
+        - `{description}`: the description/summary of the post
 
         ..Example rss text 3078731683662
 
@@ -1062,6 +1063,7 @@ class Rss(commands.Cog):
         - `{mentions}`: the list of mentioned roles
         - `{title}`: the title of the post
         - `{full_text}`: the full text of the post
+        - `{description}`: the description/summary of the post
 
         ..Example rss set-embed 6678466620137 true title: "New post from {author}!" color: red
 

@@ -9,7 +9,7 @@ import discord
 from feedparser import CharacterEncodingOverride
 from feedparser.util import FeedParserDict
 
-from .convert_post_to_text import get_text_from_entry
+from .convert_post_to_text import get_summary_from_entry, get_text_from_entry
 from .rss_general import (FeedFilterConfig, FeedObject, RssMessage,
                           check_filter, feed_parse)
 
@@ -103,6 +103,7 @@ class WebRSS:
         else:
             title = '?'
         post_text = await get_text_from_entry(entry)
+        post_description = await get_summary_from_entry(entry)
         img = None
         img_match = re.search(r'(http(s?):)([/|.\w\s-])*\.(?:jpe?g|gif|png|webp)', str(entry))
         if img_match is not None:
@@ -117,7 +118,8 @@ class WebRSS:
             author=author,
             channel=feed.feed['title'] if 'title' in feed.feed else '?',
             image=img,
-            post_text=post_text
+            post_text=post_text,
+            post_description=post_description
         )
 
     async def get_new_posts(self, channel: discord.TextChannel, url: str, date: dt.datetime,
