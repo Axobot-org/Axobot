@@ -960,6 +960,16 @@ Cette option affecte tous les serveurs"""
                     txt.append(nothing_+ok_+" author: "+entry['author'])
                 else:
                     txt.append(nothing_+notok_+' author')
+                if 'content' in entry:
+                    txt.append(nothing_+ok_+" content")
+                elif 'summary' in entry:
+                    txt.append(nothing_+ok_+" summary (as main content)")
+                else:
+                    txt.append(nothing_+notok_+' content')
+                if 'content' in entry and 'summary' in entry:
+                    txt.append(nothing_+ok_+" summary")
+                else:
+                    txt.append(nothing_+notok_+' summary (as description)')
             await ctx.send("\n".join(txt))
 
     @main_msg.group(name="antiscam")
