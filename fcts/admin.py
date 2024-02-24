@@ -894,23 +894,23 @@ Cette option affecte tous les serveurs"""
         """Teste une url rss"""
         await ctx.defer()
         url = url.replace('<','').replace('>','')
-        feeds = await feed_parse(url, 8)
-        if feeds is None:
+        feed = await feed_parse(url, 8)
+        if feed is None:
             await ctx.send("Got a timeout")
             return
-        txt = f"feeds.keys()\n```py\n{feeds.keys()}\n```"
-        if 'bozo_exception' in feeds:
-            txt += f"\nException ({feeds['bozo']}): {feeds['bozo_exception']}"
+        txt = f"feeds.keys()\n```py\n{feed.keys()}\n```"
+        if 'bozo_exception' in feed:
+            txt += f"\nException ({feed['bozo']}): {feed['bozo_exception']}"
             return await ctx.send(txt)
-        if len(str(feeds.feed)) < 1400-len(txt):
-            txt += f"feeds.feed\n```py\n{feeds.feed}\n```"
+        if len(str(feed.feed)) < 1400-len(txt):
+            txt += f"feeds.feed\n```py\n{feed.feed}\n```"
         else:
-            txt += f"feeds.feed.keys()\n```py\n{feeds.feed.keys()}\n```"
-        if len(feeds.entries) > 0:
-            if len(str(feeds.entries[0])) < 1950-len(txt):
-                txt += f"feeds.entries[0]\n```py\n{feeds.entries[0]}\n```"
+            txt += f"feeds.feed.keys()\n```py\n{feed.feed.keys()}\n```"
+        if len(feed.entries) > 0:
+            if len(str(feed.entries[0])) < 1950-len(txt):
+                txt += f"feeds.entries[0]\n```py\n{feed.entries[0]}\n```"
             else:
-                txt += f"feeds.entries[0].keys()\n```py\n{feeds.entries[0].keys()}\n```"
+                txt += f"feeds.entries[0].keys()\n```py\n{feed.entries[0].keys()}\n```"
         if arguments is not None and 'feeds' in arguments and 'ctx' not in arguments:
             txt += f"\n{arguments}\n```py\n{eval(arguments)}\n```" # pylint: disable=eval-used
         try:
@@ -924,22 +924,22 @@ Cette option affecte tous les serveurs"""
             notok_ = '<:redcheck:513105827817717762>'
             nothing_ = '<:_nothing:446782476375949323>'
             txt = ['**__Analyse :__**','']
-            if feeds.status >= 400:
-                txt.append(f"{notok_} Status code: {feeds.status}")
+            if feed.status >= 400:
+                txt.append(f"{notok_} Status code: {feed.status}")
             if not url.startswith('https://'):
                 txt.append(f"{notok_} Not https")
             youtube_rss = self.bot.get_cog("Rss").youtube_rss
-            if 'link' not in feeds.feed:
+            if 'link' not in feed.feed:
                 txt.append(notok_+" No 'link' var")
-            elif yt_account := await youtube_rss.get_channel_by_any_url(feeds.feed['link']):
+            elif yt_account := await youtube_rss.get_channel_by_any_url(feed.feed['link']):
                 txt.append("<:youtube:447459436982960143>  " + yt_account)
-            elif 'link' in feeds.feed.keys():
-                txt.append(f":newspaper:  <{feeds.feed['link']}>")
+            elif 'link' in feed.feed.keys():
+                txt.append(f":newspaper:  <{feed.feed['link']}>")
             else:
                 txt.append(":newspaper:  No 'link' var")
-            txt.append(f"Entrées : {len(feeds.entries)}")
-            if len(feeds.entries) > 0:
-                entry = feeds.entries[0]
+            txt.append(f"Entrées : {len(feed.entries)}")
+            if len(feed.entries) > 0:
+                entry = feed.entries[0]
                 if 'title' in entry:
                     txt.append(nothing_+ok_+" title: ")
                     if len(entry['title'].split('\n')) > 1:
