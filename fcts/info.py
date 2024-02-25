@@ -7,7 +7,6 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
-from libs import bitly_api
 from libs.arguments import args
 from libs.bot_classes import PRIVATE_GUILD_ID, Axobot, MyContext
 from libs.checks import checks
@@ -18,7 +17,6 @@ default_color = discord.Color(0x50e3c2)
 
 importlib.reload(args)
 importlib.reload(checks)
-importlib.reload(bitly_api)
 
 QueryTypesTyping = Literal[
     "member",
