@@ -8,10 +8,13 @@ from libs.bot_classes import Axobot
 class ConfirmView(discord.ui.View):
     "A simple view used to confirm an action"
 
-    def __init__(self, bot: Axobot, ctx, validation: Callable[[discord.Interaction], bool], ephemeral: bool=True,
+    def __init__(
+            self, bot: Axobot, ctx, validation: Callable[[discord.Interaction], bool], ephemeral: bool=True,
             timeout: int=60, send_confirmation: bool=True):
         super().__init__(timeout=timeout)
         self.value: Optional[bool] = None
+        self.response_interaction: Optional[discord.Interaction] = None
+
         self.bot = bot
         self.ctx = ctx
         self.validation = validation
@@ -34,8 +37,10 @@ class ConfirmView(discord.ui.View):
         if not self.validation(interaction):
             return
         if self.send_confirmation:
-            await interaction.response.send_message(await self.bot._(self.ctx, "misc.btn.confirm.answer"), ephemeral=self.ephemeral)
+            await interaction.response.send_message(
+                await self.bot._(self.ctx, "misc.btn.confirm.answer"), ephemeral=self.ephemeral)
         self.value = True
+        self.response_interaction = interaction
         self.stop()
 
     async def cancel(self, interaction: discord.Interaction):
@@ -44,6 +49,7 @@ class ConfirmView(discord.ui.View):
             return
         await interaction.response.send_message(await self.bot._(self.ctx, "misc.btn.cancel.answer"), ephemeral=self.ephemeral)
         self.value = False
+        self.response_interaction = interaction
         self.stop()
 
     async def disable(self, interaction: Union[discord.Message, discord.Interaction]):
