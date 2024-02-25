@@ -28,7 +28,7 @@ from libs.rss.rss_deviantart import DeviantartRSS
 from libs.rss.rss_twitch import TwitchRSS
 from libs.rss.rss_web import WebRSS
 from libs.tips import GuildTip
-from libs.views import TextInputModal
+from libs.views import ConfirmView, TextInputModal
 
 importlib.reload(args)
 importlib.reload(checks)
@@ -444,7 +444,7 @@ class Rss(commands.Cog):
         if feed_ids is None:
             return
         if ctx.interaction and not ctx.interaction.response.is_done():
-            await ctx.interaction.defer()
+            await ctx.defer()
         feed_object = await self.db_get_feed(feed_ids[0])
         if feed_object is None:
             return
@@ -960,7 +960,7 @@ class Rss(commands.Cog):
         - `{long_date}`: the post date in UTC, using extended static format
         - `{timestamp}`: the Unix time of the post in seconds, usable in Discord timestamp markdown
         - `{link}` or `{url}`: a link to the post
-        - `{logo}`: an emoji representing the type of post (web, Twitter, YouTube...)
+        - `{logo}`: an emoji representing the type of post (web, Reddit, YouTube...)
         - `{mentions}`: the list of mentioned roles
         - `{title}`: the title of the post
         - `{full_text}`: the full text of the post
@@ -991,34 +991,24 @@ class Rss(commands.Cog):
             cmd = await self.bot.get_command_mention("about")
             await ctx.send(await self.bot._(ctx.guild, "errors.unknown2", about=cmd))
             return
-        if ctx.interaction and not ctx.interaction.response.is_done():
-            # ask for text through a modal
-            text_modal = TextInputModal(
-                title=await self.bot._(ctx.channel, "rss.change-txt.title"),
-                label=await self.bot._(ctx.channel, "rss.change-txt.label"),
-                placeholder=await self.bot._(ctx.channel, "rss.change-txt.placeholder"),
-                default=feeds[0].structure,
-                max_length=1800,
-                success_message=await self.bot._(ctx.channel, "rss.change-txt.modal-success")
-            )
-            await ctx.interaction.response.send_modal(text_modal)
-            if await text_modal.wait():
-                # view timed out -> do nothing
-                return
-            text = text_modal.value
-        else:
-            # ask for text through a message
-            hint = await self.bot._(ctx.guild.id, "rss.change-txt.text-version")
-            if len(feeds) == 1:
-                hint += "\n\n" + await self.bot._(ctx.guild.id, "rss.change-txt.previous", text=feeds[0].structure)
-            await ctx.send(hint)
-            def check(msg: discord.Message):
-                return msg.author == ctx.author and msg.channel == ctx.channel
-            try:
-                msg: discord.Message = await self.bot.wait_for('message', check=check,timeout=90)
-            except asyncio.TimeoutError:
-                return await ctx.send(await self.bot._(ctx.guild.id, "rss.too-long"))
-            text = msg.content
+        # present current structure and available variables, and wait for confirmation
+        confirmed, interaction = await self._send_current_text_and_variabels(ctx, feeds[0].structure)
+        if not confirmed or not interaction:
+            return
+        # ask for text through a modal
+        text_modal = TextInputModal(
+            title=await self.bot._(ctx.channel, "rss.change-txt.title"),
+            label=await self.bot._(ctx.channel, "rss.change-txt.label"),
+            placeholder=await self.bot._(ctx.channel, "rss.change-txt.placeholder"),
+            default=feeds[0].structure,
+            max_length=1800,
+            success_message=await self.bot._(ctx.channel, "rss.change-txt.modal-success")
+        )
+        await interaction.response.send_modal(text_modal)
+        if await text_modal.wait():
+            # view timed out -> do nothing
+            return
+        text = text_modal.value
         for guild_feed in feeds:
             if guild_feed.structure != text:
                 await self.db_update_feed(guild_feed.feed_id, [('structure', text)])
@@ -1026,6 +1016,33 @@ class Rss(commands.Cog):
             await ctx.send(await self.bot._(ctx.guild.id,"rss.text-success.single", id=feeds[0].feed_id, text=text))
         else:
             await ctx.send(await self.bot._(ctx.guild.id,"rss.text-success.multiple", text=text))
+
+    async def _send_current_text_and_variabels(self, ctx: MyContext, current_feed_structure: str):
+        "Send the current feed structure and the available variables, with a button to open the edition modal"
+        confirm_label = await self.bot._(ctx, "misc.btn.confirm.label")
+        text = await self.bot._(ctx, "rss.change-txt.confirmation.current-structure", button_label=confirm_label)
+        text += f"\n```{current_feed_structure}```"
+        embed_description = await self.bot._(ctx, "rss.change-txt.confirmation.variables-explanation")
+        for variable in sorted(("author", "channel", "date", "long_date", "timestamp", "link", "logo", "mentions", "title",
+                         "full_text", "description")):
+            embed_description += "\n- " + await self.bot._(ctx, f"rss.change-txt.confirmation.variables.{variable}")
+        embed = discord.Embed(
+            title=await self.bot._(ctx, "rss.change-txt.confirmation.variables-title"),
+            description=embed_description,
+            color=discord.Colour.green(),
+        )
+        view = ConfirmView(
+            self.bot, ctx,
+            validation=lambda inter: inter.user == ctx.author,
+            ephemeral=False,
+            send_confirmation=False,
+            timeout=150, # 2:30min
+        )
+        await view.init()
+        msg = await ctx.send(text, embed=embed, view=view)
+        await view.wait()
+        await view.disable(msg)
+        return bool(view.value), view.response_interaction
 
     @rss_main.command(name="set-embed", aliases=['embed'])
     @app_commands.guild_only()
@@ -1059,7 +1076,7 @@ class Rss(commands.Cog):
         - `{long_date}`: the post date in UTC, using extended static format
         - `{timestamp}`: the Unix time of the post in seconds, usable in Discord timestamp markdown
         - `{link}` or `{url}`: a link to the post
-        - `{logo}`: an emoji representing the type of post (web, Twitter, YouTube...)
+        - `{logo}`: an emoji representing the type of post (web, Reddit, YouTube...)
         - `{mentions}`: the list of mentioned roles
         - `{title}`: the title of the post
         - `{full_text}`: the full text of the post
