@@ -9,8 +9,24 @@
         "label": "Modèle de message",
         "modal-success": "Nous sauvegardons vos modifications...",
         "placeholder": "Entrez votre modèle de message ici",
-        "previous": "Le message actuel contient \n```\n%{text}\n```",
-        "text-version": "Veuillez entrer le texte à utiliser lors d'un nouveau post. Vous pouvez utiliser plusieurs variables, dont voici la liste :\n- `{author}` : l'auteur du post\n- `{channel}` : le nom de la chaîne (généralement le même que l'auteur)\n- `{date}` : la date du post (UTC)\n- `{link}` ou `{url}` : un lien vers le post\n- `{logo}` : un emoji représentant le type de post (web, Twitter, YouTube...)\n- `{mentions}` : la liste des rôles mentionnés\n- `{title}` : le titre du post"
+        "confirmation": {
+            "current-structure": "Voici la structure actuelle de votre flux. Vous pouvez la modifier en cliquant sur le bouton '%{button_label}' ci-dessous.",
+            "variables-title": "Variables disponibles",
+            "variables-explanation": "Vous pouvez utiliser les variables suivantes dans votre structure de message :",
+            "variables": {
+                "author": "`{author}`: l'auteur du post",
+                "channel": "`{channel}`: le nom du canal (généralement le nom de l'auteur)",
+                "date": "`{date}`: la date de publication, en utilisant le format markdown Discord des dates",
+                "long_date": "`{long_date}`: la date de publication en UTC, en utilisant le format statique étendu",
+                "timestamp": "`{timestamp}`: la date Unix de publication en secondes, utilisable dans la notation de timestamp de Discord",
+                "link": "`{link}` ou `{url}`: un lien vers le post",
+                "logo": "`{logo}`: un emoji représentant le type de post (web, Reddit, YouTube...)",
+                "mentions": "`{mentions}`: la liste des rôles mentionnés",
+                "title": "`{title}`: le titre du post",
+                "full_text": "`{full_text}`: le texte complet du post, si disponible",
+                "description": "`{description}`: la description/le résumé du post, si disponible"
+            }
+        }
     },
     "choose-delete": "Veuillez choisir les flux à supprimer",
     "choose-disable": "Veuillez choisir les flux à désactiver",
