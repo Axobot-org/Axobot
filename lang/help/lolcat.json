@@ -147,15 +147,15 @@
     },
     "cmd-count": {
         "zero": "No cmd",
-        "one": "1 cmd\n`%{p}help%{cog}` 4 more info",
-        "many": "%{count} cmds\n`%{p}help %{cog}` 2 get teh full list"
+        "one": "1 cmd\n`/help%{cog}` 4 more info",
+        "many": "%{count} cmds\n`/help %{cog}` 2 get teh full list"
     },
     "cmd-not-found": "Dere are no comand naymme \"%{cmd}\"",
     "cog-empty-dm": "Uhh no, dat box has no cmd for here :/ try in ur serv",
     "description": "Smol text",
     "embed_title": "Cmds list 4 %{u}",
     "embed_title_dm": "Cmds list 4 here only",
-    "footer": "Type {}help cmd 4 mure info abawt an commandZ",
+    "footer": "Type '/help cmd' 4 + info abawt any command",
     "more-subcmds": {
         "one": "+ 1",
         "many": "+ %{count}"
