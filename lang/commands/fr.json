@@ -1,8 +1,5 @@
 {
     "command_name": {
-        "Quote": "Citer",
-        "Report a scam": "Signaler une arnaque",
-        "Voice to text": "Transcription audio",
         "about": "à-propos",
         "antiscam disable": "désactiver",
         "antiscam enable": "activer",
@@ -32,9 +29,9 @@
         "emoji list": "liste",
         "emoji rename": "renommer",
         "emoji restrict": "restreindre",
+        "event collect": "collecter",
         "event info": "info",
         "event profile": "profil",
-        "event collect": "collecter",
         "info": "info",
         "kick": "expulser",
         "last-post": "dernier-post",
@@ -54,6 +51,7 @@
         "profile config": "config",
         "profile list-card-styles": "liste-styles-cartes",
         "quote": "citation",
+        "Quote": "Citer",
         "random-tip": "astuce-aléatoire",
         "rank": "rang",
         "reminders clear": "tout-annuler",
@@ -61,16 +59,17 @@
         "reminders delete": "annuler",
         "reminders list": "liste",
         "remindme": "rappelle-moi",
+        "Report a scam": "Signaler une arnaque",
         "role grant": "donner",
         "role members-list": "liste-des-membres",
         "role revoke": "révoquer",
         "role set-color": "modifier-couleur",
         "role temporary-grant": "donner-temporairement",
         "roles-react add": "ajouter",
-        "roles-react send": "envoyer",
         "roles-react list": "liste",
-        "roles-react set-description": "modifier-description",
         "roles-react remove": "retirer",
+        "roles-react send": "envoyer",
+        "roles-react set-description": "modifier-description",
         "roles-react update": "modifier",
         "roles-rewards add": "ajouter",
         "roles-rewards list": "liste",
@@ -112,27 +111,8 @@
         "twitch subscribe": "s-abonner",
         "twitch unsubscribe": "se-désabonner",
         "unban": "débannir",
+        "Voice to text": "Transcription audio",
         "warn": "avertir"
-    },
-    "group_name": {
-        "antiscam": "anti-arnaque",
-        "blurple": "blurple",
-        "cases": "casier",
-        "config": "config",
-        "emoji": "émoji",
-        "event": "événement",
-        "minecraft": "minecraft",
-        "modlogs": "logs-modération",
-        "profile": "profil",
-        "reminders": "rappels",
-        "role": "rôle",
-        "roles-react": "rôles-réactions",
-        "roles-rewards": "rôles-récompenses",
-        "rss": "rss",
-        "tickets": "tickets",
-        "tickets portal": "portail",
-        "tickets topic": "topic",
-        "twitch": "twitch"
     },
     "command_short_description": {
         "bitly create": "Raccourci un lien en utilisant Bitly",
@@ -171,21 +151,60 @@
         "tickets topic": "Gère les différents sujets de tickets",
         "twitch": "Abonne ton serveur à des streamers Twitch"
     },
+    "group_name": {
+        "antiscam": "anti-arnaque",
+        "blurple": "blurple",
+        "cases": "casier",
+        "config": "config",
+        "emoji": "émoji",
+        "event": "événement",
+        "minecraft": "minecraft",
+        "modlogs": "logs-modération",
+        "profile": "profil",
+        "reminders": "rappels",
+        "role": "rôle",
+        "roles-react": "rôles-réactions",
+        "roles-rewards": "rôles-récompenses",
+        "rss": "rss",
+        "tickets": "tickets",
+        "tickets portal": "portail",
+        "tickets topic": "topic",
+        "twitch": "twitch"
+    },
     "param_name": {
-        "antiscam test": {
-            "text": "texte"
-        },
         "antiscam report": {
             "message": "message"
         },
-        "slowmode": {
-            "seconds": "secondes"
+        "antiscam test": {
+            "text": "texte"
+        },
+        "ban": {
+            "days_to_delete": "jours-à-supprimer",
+            "reason": "raison",
+            "time": "durée",
+            "user": "utilisateur"
+        },
+        "banlist": {
+            "show_reasons": "lister-les-raisons"
         },
         "bitly create": {
             "url": "url"
         },
         "bitly find": {
             "url": "url"
+        },
+        "blurple check": {
+            "who": "cible"
+        },
+        "blurple darkfy": {
+            "method": "méthode",
+            "variations": "variations",
+            "who": "cible"
+        },
+        "blurple lightfy": {
+            "method": "méthode",
+            "variations": "variations",
+            "who": "cible"
         },
         "cases edit-reason": {
             "case_id": "id-du-casier",
@@ -201,48 +220,29 @@
             "case_id": "id-du-casier"
         },
         "clear": {
-            "number": "nombre",
-            "users": "utilisateurs",
             "contains_file": "contient-fichier",
-            "contains_url": "contient-url",
             "contains_invite": "contiens-invite",
-            "is_pinned": "est-épinglé"
+            "contains_url": "contient-url",
+            "is_pinned": "est-épinglé",
+            "number": "nombre",
+            "users": "utilisateurs"
         },
-        "kick": {
-            "user": "utilisateur",
-            "reason": "raison"
+        "config reset": {
+            "option": "option"
         },
-        "warn": {
-            "user": "utilisateur",
+        "config see": {
+            "option": "option"
+        },
+        "config set": {
+            "option": "option",
+            "value": "valeur"
+        },
+        "destop": {
+            "start_message": "premier-message"
+        },
+        "emoji clear": {
+            "emoji": "émoji",
             "message": "message"
-        },
-        "mute": {
-            "user": "utilisateur",
-            "time": "durée",
-            "reason": "raison"
-        },
-        "unmute": {
-            "user": "utilisateur"
-        },
-        "ban": {
-            "user": "utilisateur",
-            "time": "durée",
-            "days_to_delete": "jours-à-supprimer",
-            "reason": "raison"
-        },
-        "unban": {
-            "user": "utilisateur",
-            "reason": "raison"
-        },
-        "softban": {
-            "user": "utilisateur",
-            "reason": "raison"
-        },
-        "banlist": {
-            "show_reasons": "lister-les-raisons"
-        },
-        "mutelist": {
-            "show_reasons": "lister-les-raisons"
         },
         "emoji rename": {
             "emoji": "émoji",
@@ -252,14 +252,25 @@
             "emoji": "émoji",
             "roles": "rôles"
         },
-        "emoji clear": {
-            "message": "message",
-            "emoji": "émoji"
+        "event profile": {
+            "user": "joueur"
+        },
+        "info": {
+            "query": "recherche",
+            "query_type": "type-de-recherche"
+        },
+        "kick": {
+            "reason": "raison",
+            "user": "utilisateur"
+        },
+        "last-post": {
+            "type": "type-de-flux",
+            "url": "url"
         },
         "minecraft follow-server": {
+            "channel": "salon",
             "ip": "ip",
-            "port": "port",
-            "channel": "salon"
+            "port": "port"
         },
         "minecraft mod": {
             "mod_name": "nom"
@@ -271,82 +282,126 @@
         "minecraft skin": {
             "username": "joueur"
         },
-        "quote": {
-            "message": "message"
+        "modlogs disable": {
+            "channel": "salon",
+            "logs": "logs"
         },
-        "role set-color": {
-            "role": "rôle",
-            "color": "couleur"
+        "modlogs enable": {
+            "channel": "salon",
+            "logs": "logs"
         },
-        "role members-list": {
-            "role": "rôle"
+        "modlogs list": {
+            "channel": "salon"
         },
-        "role temporary-grant": {
-            "role": "rôle",
-            "user": "utilisateur",
-            "time": "durée"
+        "mute": {
+            "reason": "raison",
+            "time": "durée",
+            "user": "utilisateur"
         },
-        "role grant": {
-            "role": "rôle",
-            "users": "utilisateurs"
-        },
-        "role revoke": {
-            "role": "rôle",
-            "users": "utilisateurs"
-        },
-        "unhoist": {
-            "chars": "caractères"
-        },
-        "destop": {
-            "start_message": "premier-message"
+        "mutelist": {
+            "show_reasons": "lister-les-raisons"
         },
         "permissions": {
             "channel": "salon",
             "target": "cible"
         },
-        "last-post": {
-            "url": "url",
-            "type": "type-de-flux"
+        "profile card": {
+            "style": "style"
+        },
+        "profile card-preview": {
+            "style": "style"
+        },
+        "profile config": {
+            "enable": "activer",
+            "option": "option"
+        },
+        "quote": {
+            "message": "message"
+        },
+        "rank": {
+            "user": "utilisateur"
+        },
+        "reminders create": {
+            "duration": "durée",
+            "message": "message"
+        },
+        "reminders delete": {
+            "reminder_id": "id-du-rappel"
+        },
+        "remindme": {
+            "duration": "durée",
+            "message": "message"
+        },
+        "role grant": {
+            "role": "rôle",
+            "users": "utilisateurs"
+        },
+        "role members-list": {
+            "role": "rôle"
+        },
+        "role revoke": {
+            "role": "rôle",
+            "users": "utilisateurs"
+        },
+        "role set-color": {
+            "color": "couleur",
+            "role": "rôle"
+        },
+        "role temporary-grant": {
+            "role": "rôle",
+            "time": "durée",
+            "user": "utilisateur"
         },
         "roles-react add": {
+            "description": "description",
             "emoji": "émoji",
-            "role": "rôle",
-            "description": "description"
+            "role": "rôle"
         },
         "roles-react remove": {
             "emoji": "émoji"
         },
         "roles-react set-description": {
-            "emoji": "émoji",
-            "description": "description"
+            "description": "description",
+            "emoji": "émoji"
         },
         "roles-react update": {
-            "embed": "embed",
             "change_description": "modifier-description",
+            "embed": "embed",
             "emojis": "émojis"
+        },
+        "roles-rewards add": {
+            "level": "niveau",
+            "role": "rôle"
+        },
+        "roles-rewards remove": {
+            "level": "niveau"
         },
         "rss add": {
             "link": "lien"
         },
-        "rss remove": {
+        "rss disable": {
             "feed": "flux"
         },
         "rss enable": {
             "feed": "flux"
         },
-        "rss disable": {
+        "rss move": {
+            "channel": "salon",
+            "feed": "flux"
+        },
+        "rss remove": {
             "feed": "flux"
         },
         "rss set-embed": {
-            "feed": "flux",
-            "should_use_embed": "embed-activé",
-            "color": "couleur",
             "author_text": "texte-en-tête",
-            "title": "titre",
-            "footer_text": "pied-de-page",
-            "show_date_in_footer": "afficher-date-en-pied-de-page",
+            "color": "couleur",
             "enable_link_in_title": "ajouter-lien-dans-titre",
-            "image_location": "image"
+            "feed": "flux",
+            "footer_text": "pied-de-page",
+            "image_location": "image",
+            "should_use_embed": "embed-activé",
+            "show_date_in_footer": "afficher-date-en-pied-de-page",
+            "title": "titre"
         },
         "rss set-filter": {
             "feed": "flux",
@@ -355,12 +410,8 @@
         },
         "rss set-mentions": {
             "feed": "flux",
-            "silent": "silencieux",
-            "mentions": "mentions"
-        },
-        "rss move": {
-            "feed": "flux",
-            "channel": "salon"
+            "mentions": "mentions",
+            "silent": "silencieux"
         },
         "rss set-text": {
             "feed": "flux",
@@ -373,26 +424,21 @@
             "user": "utilisateur",
             "xp": "xp"
         },
-        "modlogs list": {
-            "channel": "salon"
+        "slowmode": {
+            "seconds": "secondes"
         },
-        "modlogs enable": {
-            "logs": "logs",
-            "channel": "salon"
+        "softban": {
+            "reason": "raison",
+            "user": "utilisateur"
         },
-        "modlogs disable": {
-            "logs": "logs",
-            "channel": "salon"
+        "stats": {
+            "category": "catégorie"
         },
-        "config set": {
-            "option": "option",
-            "value": "valeur"
+        "tickets portal set-category": {
+            "category_or_channel": "catégory-ou-salon"
         },
-        "config reset": {
-            "option": "option"
-        },
-        "config see": {
-            "option": "option"
+        "tickets portal set-format": {
+            "name_format": "format-de-nom"
         },
         "tickets portal set-hint": {
             "message": "message"
@@ -403,46 +449,42 @@
         "tickets portal set-text": {
             "message": "message"
         },
-        "tickets portal set-category": {
-            "category_or_channel": "catégory-ou-salon"
-        },
-        "tickets portal set-format": {
-            "name_format": "format-de-nom"
+        "tickets review-config": {
+            "topic_id": "topic-id"
         },
         "tickets topic add": {
-            "name": "nom",
-            "emote": "émoji"
+            "emote": "émoji",
+            "name": "nom"
         },
         "tickets topic remove": {
             "topic_id": "topic-id"
         },
         "tickets topic set-emote": {
-            "topic_id": "topic-id",
-            "emote": "émoji"
-        },
-        "tickets topic set-hint": {
-            "topic_id": "topic-id",
-            "message": "message"
-        },
-
-        "tickets topic set-name": {
-            "topic_id": "topic-id",
-            "name": "nom"
-        },
-        "tickets topic set-role": {
-            "topic_id": "topic-id",
-            "role": "rôle"
+            "emote": "émoji",
+            "topic_id": "topic-id"
         },
         "tickets topic set-format": {
             "name_format": "format-de-nom",
             "topic_id": "topic-id"
         },
-        "tickets review-config": {
+        "tickets topic set-hint": {
+            "message": "message",
             "topic_id": "topic-id"
         },
-        "remindme": {
-            "duration": "durée",
-            "message": "message"
+        "tickets topic set-name": {
+            "name": "nom",
+            "topic_id": "topic-id"
+        },
+        "tickets topic set-role": {
+            "role": "rôle",
+            "topic_id": "topic-id"
+        },
+        "top": {
+            "page": "page",
+            "scope": "cible"
+        },
+        "twitch check-stream": {
+            "streamer": "streamer"
         },
         "twitch subscribe": {
             "streamer": "streamer"
@@ -450,62 +492,19 @@
         "twitch unsubscribe": {
             "streamer": "streamer"
         },
-        "twitch check-stream": {
-            "streamer": "streamer"
-        },
-        "profile card-preview": {
-            "style": "style"
-        },
-        "profile card": {
-            "style": "style"
-        },
-        "profile config": {
-            "option": "option",
-            "enable": "activer"
-        },
-        "rank": {
+        "unban": {
+            "reason": "raison",
             "user": "utilisateur"
         },
-        "top": {
-            "page": "page",
-            "scope": "cible"
+        "unhoist": {
+            "chars": "caractères"
         },
-        "roles-rewards add": {
-            "level": "niveau",
-            "role": "rôle"
+        "unmute": {
+            "user": "utilisateur"
         },
-        "roles-rewards remove": {
-            "level": "niveau"
-        },
-        "blurple lightfy": {
-            "method": "méthode",
-            "variations": "variations",
-            "who": "cible"
-        },
-        "blurple darkfy": {
-            "method": "méthode",
-            "variations": "variations",
-            "who": "cible"
-        },
-        "blurple check": {
-            "who": "cible"
-        },
-        "reminders create": {
-            "duration": "durée",
-            "message": "message"
-        },
-        "reminders delete": {
-            "reminder_id": "id-du-rappel"
-        },
-        "stats": {
-            "category": "catégorie"
-        },
-        "event profile": {
-            "user": "joueur"
-        },
-        "info": {
-            "query": "recherche",
-            "query_type": "type-de-recherche"
+        "warn": {
+            "message": "message",
+            "user": "utilisateur"
         }
     }
 }
