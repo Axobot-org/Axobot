@@ -32,6 +32,7 @@
         "event collect": "collect",
         "event info": "info",
         "event profile": "profile",
+        "help": "help",
         "info": "info",
         "kick": "kick",
         "last-post": "last-post",
@@ -48,12 +49,13 @@
         "mutelist": "mutelist",
         "permissions": "permissions",
         "ping": "ping",
+        "poll": "poll",
         "profile card": "card",
         "profile card-preview": "card-preview",
         "profile config": "config",
         "profile list-card-styles": "list-card-styles",
-        "quote": "quote",
         "Quote": "Quote",
+        "quote": "quote",
         "random-tip": "random-tip",
         "rank": "rank",
         "reminders clear": "clear",
@@ -135,6 +137,7 @@
     },
     "group_description": {
         "antiscam": "Everything related to the antiscam feature",
+        "bitly": "Create shortened url and unpack them by using Bitly services",
         "cases": "Manage your user moderation cases",
         "config": "Configure the bot for your server",
         "emoji": "Manage your emojis",
@@ -154,6 +157,7 @@
     },
     "group_name": {
         "antiscam": "antiscam",
+        "bitly": "bitly",
         "blurple": "blurple",
         "cases": "cases",
         "config": "config",
@@ -256,6 +260,9 @@
         "event profile": {
             "user": "user"
         },
+        "help": {
+            "args": "arguments"
+        },
         "info": {
             "query": "query",
             "query_type": "query-type"
@@ -306,6 +313,11 @@
             "channel": "channel",
             "target": "target"
         },
+        "poll": {
+            "channel": "channel",
+            "options_count": "options-count",
+            "text": "text"
+        },
         "profile card": {
             "style": "style"
         },
@@ -317,7 +329,8 @@
             "option": "option"
         },
         "quote": {
-            "message": "message"
+            "message": "message",
+            "style": "style"
         },
         "rank": {
             "user": "user"
