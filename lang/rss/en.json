@@ -9,8 +9,24 @@
         "label": "Message template",
         "modal-success": "We're saving your changes...",
         "placeholder": "Enter your message template here",
-        "previous": "The current message contains  \n```\n%{text}\n```",
-        "text-version": "Please enter the text to be used when creating a new post. You can use several variables, of which here is the list:\n- `{author}`: the author of the post\n- `{channel}`: the channel name (usually the same as author)\n- `{date}`: the post date (UTC)\n- `{link}` or `{url}`: a link to the post\n- `{logo}`: an emoji representing the type of post (web, Twitter, YouTube...)\n- `{mentions}`: the list of mentioned roles\n- `{title}`: the title of the post"
+        "confirmation": {
+            "current-structure": "Here is the current structure of your feed. You can edit it by clicking on the '%{button_label}' button below.",
+            "variables-title": "Available variables",
+            "variables-explanation": "You can use the following variables in your message template:",
+            "variables": {
+                "author": "`{author}`: the author of the post",
+                "channel": "`{channel}`: the channel name (usually the same as author)",
+                "date": "`{date}`: the post date, using Discord date markdown",
+                "long_date": "`{long_date}`: the post date in UTC, using extended static format",
+                "timestamp": "`{timestamp}`: the Unix time of the post in seconds, usable in Discord timestamp markdown",
+                "link": "`{link}` or `{url}`: a link to the post",
+                "logo": "`{logo}`: an emoji representing the type of post (web, Reddit, YouTube...)",
+                "mentions": "`{mentions}`: the list of mentioned roles",
+                "title": "`{title}`: the title of the post",
+                "full_text": "`{full_text}`: the full text of the post, if available",
+                "description": "`{description}`: the description/summary of the post, if available"
+            }
+        }
     },
     "choose-delete": "Please choose the feeds to delete",
     "choose-disable": "Please choose the feeds to disable",
