@@ -131,6 +131,7 @@
         "partner_role": "Role přidělená partnerům: %{value}",
         "poll_channels": "Seznam kanálů, kde budou reakce :thumbsup: a :thumbsdown: automaticky přidány do každé zprávy: %{value}",
         "prefix": "Aktuální předpona bota: %{value}",
+        "private_leaderboard": "Měli by nečlenové serveu mít přístup k žebříčku serveru? %{value}",
         "rank_in_dm": "Odeslat žebříčky v soukromých zprávách? %{value}",
         "save_roles": "Měly by být role uloženy, když člen odejde, v případě, že se vrátí? %{value}",
         "say_allowed_roles": "Seznam rolí, které mohou použít příkaz \"say\" : %{value}",

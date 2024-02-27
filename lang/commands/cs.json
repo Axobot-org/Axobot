@@ -1,5 +1,6 @@
 {
     "command_name": {
+        "Quote": "Citát",
         "Report a scam": "Nahlásit podvod",
         "Voice to text": "Převod hlasu na text",
         "about": "o-aplikaci",
@@ -9,6 +10,8 @@
         "antiscam test": "test",
         "ban": "blokovat",
         "banlist": "seznam-blokovaných",
+        "bitly create": "vytvořit",
+        "bitly find": "najít",
         "blurple check": "zkontrolovat",
         "blurple darkfy": "tmavý",
         "blurple help": "pomoc",
@@ -35,6 +38,11 @@
         "info": "informace",
         "kick": "vyhodit",
         "last-post": "poslední-příspěvek",
+        "membercount": "počet členů",
+        "minecraft follow-server": "sledovací server",
+        "minecraft mod": "mod",
+        "minecraft server": "server",
+        "minecraft skin": "skin",
         "modlogs disable": "zakázat",
         "modlogs enable": "povolit",
         "modlogs list": "seznam",
@@ -47,6 +55,7 @@
         "profile card-preview": "karta-náhledů",
         "profile config": "nastavení",
         "profile list-card-styles": "seznam-stylů-karet",
+        "quote": "citát",
         "random-tip": "náhodný-tip",
         "rank": "hodnost",
         "reminders clear": "vyčistit",
@@ -81,6 +90,7 @@
         "rss set-mentions": "nastavit-zmíňky",
         "rss set-text": "nastavit-text",
         "rss test": "test",
+        "set-xp": "nastavit-xp",
         "slowmode": "pomalý-režim",
         "softban": "před-banem",
         "stats": "statistiky",
@@ -97,6 +107,7 @@
         "tickets topic set-emote": "nastavit-emote",
         "tickets topic set-format": "nastavit-formát",
         "tickets topic set-hint": "nastavit-nápovědu",
+        "tickets topic set-name": "nastavit-jméno",
         "tickets topic set-role": "nastavit-roli",
         "top": "nahoře",
         "twitch check-stream": "zkontrolova-stream",
@@ -115,6 +126,7 @@
         "config": "nastavení",
         "emoji": "emoji",
         "event": "událost",
+        "minecraft": "minecraft",
         "modlogs": "záznam-moderátorů",
         "profile": "profil",
         "reminders": "připomínky",
@@ -132,7 +144,14 @@
         "cases list": "Seznam všech případů moderování uživatele",
         "cases remove": "Trvale smazat případ moderace",
         "cases search": "Najít podrobnosti moderování případu",
-        "random-tip": "Získejte náhodný tip nebo zajímavost o botovi"
+        "membercount": "Získejte nějaké statistiky o členech vašeho serveru",
+        "minecraft follow-server": "Sledujte informace o serveru v reálném čase ve vašem kanálu",
+        "minecraft mod": "Získejte informace o jakémkoli modu registrovaném na CurseForge nebo Modrinth",
+        "minecraft server": "Získejte informace o jakémkoli Minecraft Java serveru",
+        "minecraft skin": "Získejte skin libovolného hráče Minecraft Java",
+        "quote": "Citujte zprávu s pěkně vygenerovaným obrázkem",
+        "random-tip": "Získejte náhodný tip nebo zajímavost o botovi",
+        "set-xp": "Nastavte XP uživateli na vašem serveru"
     },
     "group_description": {
         "antiscam": "Vše, co souvisí s funkcí antiscam",
@@ -140,6 +159,7 @@
         "config": "Konfigurace bota pro váš server",
         "emoji": "Spravujte své emoji",
         "event": "Zůčastni se speciálních událostí",
+        "minecraft": "Hledat informace o serverech/hráčích/modech z Minecraftu",
         "modlogs": "Povolit nebo zakázat protokoly serveru v určitých kanálech",
         "profile": "Nastavte si bota pro vlastní použití",
         "reminders": "Spravujte nevyřízené připomínky",
@@ -161,6 +181,12 @@
         },
         "slowmode": {
             "seconds": "sekundy"
+        },
+        "bitly create": {
+            "url": "url"
+        },
+        "bitly find": {
+            "url": "url"
         },
         "cases edit-reason": {
             "case_id": "případ-id",
@@ -230,6 +256,24 @@
         "emoji clear": {
             "message": "zpráva",
             "emoji": "emoji"
+        },
+        "minecraft follow-server": {
+            "ip": "ip",
+            "port": "port",
+            "channel": "kanál"
+        },
+        "minecraft mod": {
+            "mod_name": "jméno-modu"
+        },
+        "minecraft server": {
+            "ip": "ip",
+            "port": "port"
+        },
+        "minecraft skin": {
+            "username": "uživatelské jméno"
+        },
+        "quote": {
+            "message": "zpráva"
         },
         "role set-color": {
             "role": "role",
@@ -326,6 +370,10 @@
         "rss test": {
             "feed": "zdroj"
         },
+        "set-xp": {
+            "user": "uživatel",
+            "xp": "xp"
+        },
         "modlogs list": {
             "channel": "kanál"
         },
@@ -376,6 +424,10 @@
         "tickets topic set-hint": {
             "topic_id": "id-téma",
             "message": "zpráva"
+        },
+        "tickets topic set-name": {
+            "topic_id": "topic-id",
+            "name": "jméno"
         },
         "tickets topic set-role": {
             "topic_id": "id-téma",

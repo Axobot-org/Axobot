@@ -1,0 +1,7 @@
+{
+    "error": {
+        "empty-message": "Tato zpráva nemá žádný obsah k citaci!",
+        "too-long": "Nemohu citovat zprávy delší než %{max} znaků!"
+    },
+    "success": "Vaše citace byla zveřejněna na %{message_url}"
+}

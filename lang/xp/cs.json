@@ -153,6 +153,7 @@
     "rr-reload": "%{role_count} aktualizoval role / %{member_count} naskenovaných členů",
     "rr-removed": "Pro úroveň %{level} již nebude zadána žádná role",
     "rr_list": "Seznam odměn rolí (%{c}/%{max})",
+    "see-online": "Zobrazit online",
     "too-many-rr": "Již máš %{c} odměn za role, nemůžeš přidat více!",
     "top-name": "__Top %{min}-%{max} (strana %{page}/%{total}):__",
     "top-title-1": "Globální Umístění",
