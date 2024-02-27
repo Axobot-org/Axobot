@@ -9,8 +9,24 @@
         "label": "TXT template",
         "modal-success": "Hold on...",
         "placeholder": "Ur msg come right here",
-        "previous": "Teh current msg is:\n```\n%{text}\n```",
-        "text-version": "Plz enter teh text 2 be usd when creating a new post. U can use some magic words, here iz the list:\n- `{author}`: author of the post\n- `{channel}`: usually same than author, but different\n- `{date}`: post date (UTC)\n- `{link}` or `{url}`: a link 2 the post\n- `{logo}`: a emoji representing teh type of post (website, orange alien, RedTriangle...)\n- `{mentions}`: the list ov mentioned roles\n- `{title}`: the titl of teh post"
+        "confirmation": {
+            "current-structure": "Dat's how ur feed looks right naw. Click on teh kewl '%{button_label}' button when u wanna edit it.",
+            "variables-title": "Epic shortcuts",
+            "variables-explanation": "U can use any of these epic shortcuts in ur message:",
+            "variables": {
+                "author": "`{author}`: author of the post",
+                "channel": "`{channel}`: usually same than author, but different",
+                "date": "`{date}`: post date usin' Discord markdown",
+                "long_date": "`{long_date}`: post date, but in UTC txt",
+                "timestamp": "`{timestamp}`: Unix time in seconds, for some nerdy users",
+                "link": "`{link}` or `{url}`: a link 2 the post",
+                "logo": "`{logo}`: a emoji representing teh type of feed (newspaper, orange alien, RedTriangle...)",
+                "mentions": "`{mentions}`: teh list of roles 2 mention",
+                "title": "`{title}`: I sure hope this one is obvious enouf",
+                "full_text": "`{full_text}`: the very full post text, if available ofc",
+                "description": "`{description}`: a short summary of the post, when provided"
+            }
+        }
     },
     "choose-delete": "Plz chouse teh flo to delet",
     "choose-disable": "Pls chose teh feed 2 disable",

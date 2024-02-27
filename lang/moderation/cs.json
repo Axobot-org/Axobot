@@ -29,11 +29,15 @@
     },
     "emoji": {
         "cant-emoji": "Ale né, chybí mi oprávnění `Správa výrazů` :confused:",
-        "emoji-valid": "Emoji %{name} byla upraven tak, aby povolovala pouze role %{roles}",
+        "emoji-valid": {
+            "one": "%{name} emoji bylo změněno tak, aby ji mohla použít pouze role %{roles}",
+            "many": "%{name} emoji bylo změněno tak, aby ji mohly používat pouze role %{roles}"
+        },
         "list": "{} (`:{}:`) přidáno {} {}",
         "list-title": "Emoji ze serveru %{guild}",
         "private": "[Restricted]",
         "renamed": "Emoji %{emoji} byla přejmenována!",
+        "unrestricted": "%{name} emoji bylo změněno tak, aby ji mohli používat všichni",
         "wrong-guild": "Jejda, zdá se, že tento emoji nepatří k tomuto serveru :thinking:"
     },
     "error": "Jejda, došlo k neznámé chybě. Zkuste to znovu později nebo kontaktujte podporu",
