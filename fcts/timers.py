@@ -177,6 +177,7 @@ class Timers(commands.Cog):
         if duration > 60*60*24*365*5:
             await ctx.send(await self.bot._(ctx.channel, "timers.rmd.too-long"))
             return
+        await ctx.defer()
         lang = await self.bot._(ctx.channel,'_used_locale')
         f_duration = await FormatUtils.time_delta(duration, lang=lang, year=True, form='developed')
         try:
