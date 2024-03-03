@@ -38,8 +38,8 @@
         "info": "informace",
         "kick": "vyhodit",
         "last-post": "poslední-příspěvek",
-        "membercount": "počet členů",
-        "minecraft follow-server": "sledovací server",
+        "membercount": "počet-členů",
+        "minecraft follow-server": "sledovací-server",
         "minecraft mod": "mod",
         "minecraft server": "server",
         "minecraft skin": "skin",
@@ -270,7 +270,7 @@
             "port": "port"
         },
         "minecraft skin": {
-            "username": "uživatelské jméno"
+            "username": "uživatelské-jméno"
         },
         "quote": {
             "message": "zpráva"
