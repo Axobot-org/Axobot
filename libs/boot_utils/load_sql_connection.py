@@ -25,7 +25,7 @@ def load_sql_connection(bot: "Axobot"):
                 password=bot.database_keys['password'],
                 host=bot.database_keys['host'],
                 database=bot.database_keys['name_main'],
-                connection_timeout=5
+                connection_timeout=10
             )
             bot.log.info("Database connected remotely")
         else:
