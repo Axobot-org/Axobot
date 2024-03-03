@@ -163,7 +163,7 @@ This information on partners is refreshed every 7 hours, starting at 1am (Paris 
 Add a partner
 -------------
 
-**Syntax:** :code:`partner add <invite> [description]`
+**Syntax:** :code:`partners add <invite> [description]`
 
 Allows you to add a server or bot to your partner list. The invitation must be either a server invitation (starting with discord.gg) or a bot invitation (discord.com/oauth). This invitation will be used to synchronize the partner, so make sure it does not expire.
 
@@ -171,7 +171,7 @@ Allows you to add a server or bot to your partner list. The invitation must be e
 Change the embed color
 ----------------------
 
-**Syntax:** :code:`partner color <new color>`
+**Syntax:** :code:`partners set-color <new color>`
 
 Modifies the color of the partner embed, i. e. the color of the bar to the left of the presentations. An alias exists with the subcommand "colour".
 
@@ -179,7 +179,7 @@ Modifies the color of the partner embed, i. e. the color of the bar to the left 
 Modify a description
 --------------------
 
-**Syntax:** :code:`partner description <ID> <new message>`
+**Syntax:** :code:`partners set-description <ID> <new message>`
 
 Adds or modifies the description of a partner. The identifier must be that of the partnership, obtainable via the command `partners list` or under the embed displayed in the partners' lounge.
 
@@ -187,7 +187,7 @@ Adds or modifies the description of a partner. The identifier must be that of th
 Change a server invite
 ----------------------
 
-**Syntax:** :code:`partner invite <ID> [new invite]`
+**Syntax:** :code:`partners set-invite <ID> [new invite]`
 
 It often happens that for X reason an invitation becomes invalid. Problem: Axobot uses the partner invitation to synchronize partners with the channel. There is therefore a command to quickly change the invitation of a server.
 
@@ -204,10 +204,10 @@ Lists all the partners that your server currently has. The bot will display the 
 .. warning:: For a better display of the list, it is recommended to give "`Embed Links <perms.html#embed-links>`__" permission to the bot.
 
 
-Reload your list
-----------------
+Refresh your list
+-----------------
 
-**Syntax:** :code:`partner reload`
+**Syntax:** :code:`partners refresh`
 
 Allows you to remove a partner from the list. You will be asked for a confirmation, to avoid misuse. Once a partner is removed, you must reconfigure it completely if you want to put it back into the channel.
 
@@ -215,7 +215,7 @@ Allows you to remove a partner from the list. You will be asked for a confirmati
 Remove a partner
 ----------------
 
-**Syntax:** :code:`partner remove <ID>`
+**Syntax:** :code:`partners remove <ID>`
 
 Allows you to remove a partner from the list. You will be asked for a confirmation, to avoid misuse. Once a partner is removed, you must reconfigure it completely if you want to put it back into the channel.
 

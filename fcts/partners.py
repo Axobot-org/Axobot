@@ -5,6 +5,7 @@ from typing import Optional, Union
 
 import aiohttp
 import discord
+from discord import app_commands
 from discord.ext import commands, tasks
 
 from libs.arguments import args
@@ -16,6 +17,7 @@ importlib.reload(args)
 importlib.reload(checks)
 
 utc = datetime.timezone.utc
+DescriptionType = app_commands.Range[str, 1, 1500]
 
 
 class Partners(commands.Cog):
@@ -323,8 +325,25 @@ class Partners(commands.Cog):
                     except discord.HTTPException:
                         pass
 
+    async def fetch_user_or_invite_from_id(self, invite: args.BotOrGuildInvite):
+        "Fetch the Bot User or Guild Invite from the given invitation ID (bot ID or invite code)"
+        if isinstance(invite, int):
+            try:
+                item = await self.bot.fetch_user(invite)
+                if not item.bot:
+                    return "bot", None
+            except discord.NotFound:
+                return "bot", None
+            return "bot", item
+        try:
+            item = await self.bot.fetch_invite(invite)
+        except discord.errors.NotFound:
+            return "guild", None
+        return "guild", item
 
-    @commands.group(name="partner",aliases=['partners'])
+
+    @commands.hybrid_group(name="partners")
+    @app_commands.default_permissions(manage_guild=True)
     @commands.guild_only()
     @commands.check(checks.database_connected)
     @commands.check(checks.has_manage_guild)
@@ -337,104 +356,120 @@ class Partners(commands.Cog):
 
     @partner_main.command(name='add')
     @commands.check(checks.database_connected)
-    async def partner_add(self, ctx: MyContext, invite: args.BotOrGuildInvite, *, description=''):
+    @commands.check(checks.has_manage_guild)
+    async def partner_add(self, ctx: MyContext, invite: args.BotOrGuildInvite, *, description: DescriptionType = ''):
         """Add a partner in your list
 
-        ..Example partners add https://discord.com/oauth2/authorize?client_id=486896267788812288&scope=bot
+        ..Example partners add https://discord.com/oauth2/authorize?client_id=1048011651145797673&scope=bot
 
-        ..Example partners add discord.gg/mee6
+        ..Example partners add discord.gg/N55zY88
 
         ..Doc server.html#add-a-partner"""
-        if isinstance(invite, int):
-            try:
-                item = await self.bot.fetch_user(invite)
-                if not item.bot:
-                    raise ValueError("Not a bot")
-            except discord.NotFound:
+        await ctx.defer()
+        partner_type, item = await self.fetch_user_or_invite_from_id(invite)
+        if item is None:
+            if partner_type == 'bot':
                 return await ctx.send(await self.bot._(ctx.guild.id, "partners.invalid-bot"))
-            partner_type = 'bot'
-        elif isinstance(invite,str):
-            try:
-                item = await self.bot.fetch_invite(invite)
-            except discord.errors.NotFound:
-                return await ctx.send(await self.bot._(ctx.guild.id, "partners.invalid-invite"))
-            partner_type = 'guild'
-        else:
-            return
+            return await ctx.send(await self.bot._(ctx.guild.id, "partners.invalid-invite"))
         current_list = [x['target'] for x in await self.db_get_partners_of_guild(ctx.guild.id)]
         if str(item.id) in current_list:
             return await ctx.send(await self.bot._(ctx.guild, "partners.already-added"))
-        if len(description) > 0:
-            description = await self.bot.emojis_manager.anti_code(description)
-        await self.db_set_partner(guild_id=ctx.guild.id,partner_id=item.id,partner_type=partner_type,desc=description)
+        await self.db_set_partner(guild_id=ctx.guild.id, partner_id=item.id, partner_type=partner_type, desc=description)
         await ctx.send(await self.bot._(ctx.guild.id, "partners.added-partner"))
         # logs
-        emb = discord.Embed(description=f"New partner added: {partner_type} {item.id}", color=10949630,
-                            timestamp=self.bot.utcnow())
+        emb = discord.Embed(
+            description=f"New partner added: {partner_type} {item.id}",
+            color=10949630,
+            timestamp=self.bot.utcnow()
+        )
         emb.set_footer(text=ctx.guild.name)
         emb.set_author(name=self.bot.user, icon_url=self.bot.user.display_avatar)
         await self.bot.send_embed(emb)
 
-    @partner_main.command(name='description', aliases=['desc'])
+    @partner_main.command(name='set-description')
+    @app_commands.rename(partner_id="partner")
     @commands.check(checks.database_connected)
-    async def partner_desc(self, ctx: MyContext, partner_id:int, *, description:str):
+    @commands.check(checks.has_manage_guild)
+    async def partner_desc(self, ctx: MyContext, partner_id: int, *, description: DescriptionType):
         """Add or modify a description for a partner
 
-        ..Example partner desc 779713982 Very cool bot with tons of features, costs a lot
+        ..Example partners set-description 779713982 Very cool bot with tons of features, costs a lot
 
         ..Doc server.html#add-a-partner"""
-        partner = await self.db_get_partner(partner_id,ctx.guild.id)
+        await ctx.defer()
+        partner = await self.db_get_partner(partner_id, ctx.guild.id)
         if not partner:
             return await ctx.send(await self.bot._(ctx.guild.id, "partners.invalid-partner"))
-        description = await self.bot.emojis_manager.anti_code(description)
         if await self.db_edit_partner(partner['ID'], desc=description):
             await ctx.send(await self.bot._(ctx.guild.id, "partners.changed-desc"))
         else:
             await ctx.send(await self.bot._(ctx.guild.id, "partners.unknown-error"))
 
-    @partner_main.command(name='invite')
-    async def partner_invite(self, ctx: MyContext, partner_id: int, new_invite: Optional[discord.Invite]=None):
-        """Get the invite of a guild partner.
-        If you specify an invite, the partner will be updated with this new invite
+    @partner_main.command(name='reset-description')
+    @app_commands.rename(partner_id="partner")
+    @commands.check(checks.database_connected)
+    @commands.check(checks.has_manage_guild)
+    async def partner_reset_desc(self, ctx: MyContext, partner_id: int):
+        """Reset the description of a partner
 
-        ..Example partner invite 795897339 discord.gg/ruyvNYQ
+        ..Example partners reset-description 779713982
+
+        ..Doc server.html#reset-a-partner-description"""
+        await ctx.defer()
+        partner = await self.db_get_partner(partner_id, ctx.guild.id)
+        if not partner:
+            return await ctx.send(await self.bot._(ctx.guild.id, "partners.invalid-partner"))
+        if await self.db_edit_partner(partner['ID'], desc=""):
+            await ctx.send(await self.bot._(ctx.guild.id, "partners.reset-desc"))
+        else:
+            await ctx.send(await self.bot._(ctx.guild.id, "partners.unknown-error"))
+
+    @partner_main.command(name='set-invite')
+    @app_commands.rename(partner_id="partner")
+    @commands.check(checks.database_connected)
+    @commands.check(checks.has_manage_guild)
+    async def partner_invite(self, ctx: MyContext, partner_id: int, new_invite: args.BotOrGuildInvite):
+        """Edit the invite of a partner.
+
+        ..Example partners set-invite 795897339 discord.gg/ruyvNYQ
 
         ..Doc server.html#change-a-server-invite"""
-        partner = await self.db_get_partner(partner_id,ctx.guild.id)
-        if not partner or partner['type']!='guild':
+        await ctx.defer()
+        partner = await self.db_get_partner(partner_id, ctx.guild.id)
+        if not partner:
             return await ctx.send(await self.bot._(ctx.guild.id, "partners.unknown-server"))
-        if new_invite is None:
-            txt = await self.bot._(ctx.guild.id,'info.info.inv-4')
-            return await ctx.send(f"{txt}: discord.gg/{partner['target']}")
-        if not await checks.has_admin(ctx):
-            return
-        if await self.db_edit_partner(partner['ID'],target=new_invite.code):
+        partner_type, item = await self.fetch_user_or_invite_from_id(new_invite)
+        if item is None or partner_type != partner["type"]:
+            if partner["type"] == "bot":
+                return await ctx.send(await self.bot._(ctx.guild.id, "partners.invalid-bot"))
+            return await ctx.send(await self.bot._(ctx.guild.id, "partners.invalid-invite"))
+        if await self.db_edit_partner(partner['ID'], target=item.id):
             await ctx.send(await self.bot._(ctx.guild.id, "partners.changed-invite"))
         else:
             await ctx.send(await self.bot._(ctx.guild.id, "partners.unknown-error"))
 
     @partner_main.command(name='remove')
-    @commands.check(checks.has_admin)
+    @app_commands.rename(partner_id="partner")
+    @commands.check(checks.database_connected)
+    @commands.check(checks.has_manage_guild)
     async def partner_remove(self, ctx: MyContext, partner_id: int):
         """Remove a partner from the partners list
 
         ..Example partner remove 800697342
 
         ..Doc server.html#remove-a-partner"""
-        if not ctx.channel.permissions_for(ctx.guild.me).add_reactions:
-            await ctx.send(await self.bot._(ctx.guild.id, "partners.missing-reactions"))
-            return
-        partner = await self.db_get_partner(partner_id,ctx.guild.id)
+        await ctx.defer()
+        partner = await self.db_get_partner(partner_id, ctx.guild.id)
         if not partner:
             await ctx.send(await self.bot._(ctx.guild.id, "partners.invalid-partner"))
             return
-        if partner['type']=='bot':
+        if partner['type'] == 'bot':
             try:
                 bot = await self.bot.fetch_user(partner['target'])
             except discord.NotFound:
                 bot = partner['target']
             confirm_txt = await self.bot._(ctx.guild.id, "partners.confirm-bot", bot=bot)
-        elif partner['type']=='guild':
+        elif partner['type'] == 'guild':
             try:
                 server = (await self.bot.fetch_invite(partner['target'])).guild.name
             except discord.NotFound:
@@ -445,7 +480,8 @@ class Partners(commands.Cog):
         confirm_view = ConfirmView(
             self.bot, ctx.channel,
             validation=lambda inter: inter.user == ctx.author,
-            ephemeral=False)
+            ephemeral=False
+        )
         await confirm_view.init()
         await ctx.send(confirm_txt, view=confirm_view)
         await confirm_view.wait()
@@ -456,8 +492,11 @@ class Partners(commands.Cog):
             return
         if await self.db_del_partner(partner['ID']):
             await ctx.send(await self.bot._(ctx.guild.id, "partners.deleted"))
-            emb = discord.Embed(description=f"Partner removed: {partner['type']} {partner['ID']}", color=10949630,
-                                timestamp=self.bot.utcnow())
+            emb = discord.Embed(
+                description=f"Partner removed: {partner['type']} {partner['ID']}",
+                color=10949630,
+                timestamp=self.bot.utcnow()
+            )
             emb.set_footer(text=ctx.guild.name)
             emb.set_author(name=self.bot.user, icon_url=self.bot.user.display_avatar)
             await self.bot.send_embed(emb)
@@ -465,11 +504,13 @@ class Partners(commands.Cog):
             await ctx.send(await self.bot._(ctx.guild.id, "partners.unknown-error"))
 
     @partner_main.command(name="list")
+    @commands.check(checks.database_connected)
     @commands.check(checks.has_manage_guild)
     async def partner_list(self, ctx: MyContext):
-        """Get the list of every partners
+        """Get the list of your server partners
 
         ..Doc server.html#list-every-partners"""
+        await ctx.defer()
         lists = ['', '']
         tr_bot = await self.bot._(ctx.guild.id, "misc.bot")
         tr_guild = await self.bot._(ctx.guild.id, "misc.server")
@@ -511,33 +552,35 @@ class Partners(commands.Cog):
             if ctx.guild.icon:
                 emb.set_thumbnail(url=ctx.guild.icon)
             emb.add_field(name=fields_name[1], value=lists[0], inline=False)
-            emb.add_field(name=self.bot.zws, value=self.bot.zws, inline=False)
             emb.add_field(name=fields_name[2], value=lists[1], inline=False)
             emb.set_footer(text=ctx.author, icon_url=ctx.author.display_avatar)
             await ctx.send(embed=emb)
         else:
             await ctx.send(f"__{fields_name[0]}:__\n{lists[0]}\n\n__{fields_name[1]}:__\n{lists[1]}")
 
-    @partner_main.command(name="color", aliases=['colour'])
+    @partner_main.command(name="set-color")
+    @commands.check(checks.database_connected)
     @commands.check(checks.has_manage_guild)
     async def partner_color(self, ctx: MyContext, color: str):
         """Change the color of the partners embed
-    It has the same result as `config set partner_color`
+    It has the same result as using `/config set partner_color`
 
     ..Example partners color yellow
 
     ..Example partners color #FF00FF
 
     ..Doc server.html#change-the-embed-color"""
+        await ctx.defer()
         await self.bot.get_cog('ServerConfig').config_set_cmd(ctx, "partner_color", color)
 
-    @partner_main.command(name="reload")
+    @partner_main.command(name="refresh")
+    @commands.check(checks.database_connected)
     @commands.check(checks.has_manage_guild)
     @commands.cooldown(1,60,commands.BucketType.guild)
     async def partner_reload(self, ctx: MyContext):
-        """Reload your partners channel
+        """Refresh your partners information in the designated channel
 
-        ..Doc server.html#reload-your-list"""
+        ..Doc server.html#refresh-your-list"""
         msg = await ctx.send(await self.bot._(ctx.guild, "rss.guild-loading", emoji=self.bot.emojis_manager.customs['loading']))
         channel: Optional[discord.abc.GuildChannel] = await self.bot.get_config(ctx.guild.id, "partner_channel")
         if channel is None:
