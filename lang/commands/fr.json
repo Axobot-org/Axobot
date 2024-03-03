@@ -45,6 +45,14 @@
         "modlogs enable": "activer",
         "modlogs list": "liste",
         "mutelist": "liste-des-mutes",
+        "partners add": "ajouter",
+        "partners list": "liste",
+        "partners refresh": "rafraîchir",
+        "partners remove": "supprimer",
+        "partners reset-description": "effacer-description",
+        "partners set-color": "modifier-couleur",
+        "partners set-description": "modifier-description",
+        "partners set-invite": "modifier-invitation",
         "permissions": "permissions",
         "ping": "ping",
         "poll": "vote",
@@ -52,8 +60,8 @@
         "profile card-preview": "aperçu-carte",
         "profile config": "config",
         "profile list-card-styles": "liste-styles-cartes",
-        "Quote": "Citer",
         "quote": "citation",
+        "Quote": "Citer",
         "random-tip": "astuce-aléatoire",
         "rank": "rang",
         "reminders clear": "tout-annuler",
@@ -129,6 +137,14 @@
         "minecraft mod": "Obtiens des informations sur tout mod enregistré sur CurseForge ou Modrinth",
         "minecraft server": "Obtiens des informations sur un serveur Minecraft Java",
         "minecraft skin": "Obtiens le skin de n'importe quel joueur Minecraft Java",
+        "partners add": "Ajouter un partenaire à votre serveur",
+        "partners list": "Liste les partenaires de votre serveur",
+        "partners refresh": "Rafraîchit les informations de vos partenaires dans le salon dédié",
+        "partners remove": "Supprime un partenariat de votre serveur",
+        "partners reset-description": "Réinitialise la description d'un partenaire",
+        "partners set-color": "Modifie la couleur utilisée pour les embeds de partenaires",
+        "partners set-description": "Modifie la description d'un partenaire",
+        "partners set-invite": "Modifie l'URL d'invitation d'un partenaire",
         "quote": "Cite un message avec une jolie image générée",
         "random-tip": "Affiche une astuce aléatoire à propos du bot",
         "set-xp": "Modifie l'XP d'un utilisateur dans le serveur",
@@ -143,6 +159,7 @@
         "event": "Participe aux événements spéciaux du bot",
         "minecraft": "Recherche d'informations sur les serveurs/joueurs/mods de Minecraft",
         "modlogs": "Active ou désactive les logs de modération",
+        "partners": "Gère les partenariats de votre serveur",
         "profile": "Configure le bot pour ta propre utilisation",
         "reminders": "Gère tes rappels en attente",
         "role": "Quelques commandes pour gérer les rôles du serveur",
@@ -164,6 +181,7 @@
         "event": "événement",
         "minecraft": "minecraft",
         "modlogs": "logs-modération",
+        "partners": "partenaires",
         "profile": "profil",
         "reminders": "rappels",
         "role": "rôle",
@@ -307,6 +325,27 @@
         },
         "mutelist": {
             "show_reasons": "lister-les-raisons"
+        },
+        "partners add": {
+            "description": "description",
+            "invite": "invitation"
+        },
+        "partners remove": {
+            "partner": "partenaire"
+        },
+        "partners reset-description": {
+            "partner": "partenaire"
+        },
+        "partners set-color": {
+            "color": "couleur"
+        },
+        "partners set-description": {
+            "description": "description",
+            "partner": "partenaire"
+        },
+        "partners set-invite": {
+            "new_invite": "nouvelle-invitation",
+            "partner": "partenaire"
         },
         "permissions": {
             "channel": "salon",
