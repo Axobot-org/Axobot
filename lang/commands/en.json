@@ -47,6 +47,14 @@
         "mute": "mute",
         "mute-config": "mute-config",
         "mutelist": "mutelist",
+        "partners add": "add",
+        "partners list": "list",
+        "partners refresh": "refresh",
+        "partners remove": "remove",
+        "partners reset-description": "reset-description",
+        "partners set-color": "set-color",
+        "partners set-description": "set-description",
+        "partners set-invite": "set-invite",
         "permissions": "permissions",
         "ping": "ping",
         "poll": "poll",
@@ -54,8 +62,8 @@
         "profile card-preview": "card-preview",
         "profile config": "config",
         "profile list-card-styles": "list-card-styles",
-        "Quote": "Quote",
         "quote": "quote",
+        "Quote": "Quote",
         "random-tip": "random-tip",
         "rank": "rank",
         "reminders clear": "clear",
@@ -131,6 +139,14 @@
         "minecraft mod": "Get info about any mod registered on CurseForge or Modrinth",
         "minecraft server": "Get infos about any Minecraft Java server",
         "minecraft skin": "Get the skin of any Minecraft Java player",
+        "partners add": "Add a partner to your server",
+        "partners list": "List all the partners of your server",
+        "partners refresh": "Refresh the partners information in your designated channel",
+        "partners remove": "Remove a partner from your server",
+        "partners reset-description": "Reset the description of a partner",
+        "partners set-color": "Set the color used for your partners embeds",
+        "partners set-description": "Edit the description of a partner",
+        "partners set-invite": "Edit the invite URL of a partner",
         "quote": "Quote a message with a nice generated image",
         "random-tip": "Get a random tip or trivia about the bot",
         "set-xp": "Set the XP of a user in your server"
@@ -144,6 +160,7 @@
         "event": "Participate in bot special events",
         "minecraft": "Search for info about servers/players/mods from Minecraft",
         "modlogs": "Enable or disable server logs in specific channels",
+        "partners": "Manage the partners of your server",
         "profile": "Configure the bot for your own usage",
         "reminders": "Manage your pending reminders",
         "role": "A few commands to manage roles",
@@ -165,6 +182,7 @@
         "event": "event",
         "minecraft": "minecraft",
         "modlogs": "modlogs",
+        "partners": "partners",
         "profile": "profile",
         "reminders": "reminders",
         "role": "role",
@@ -308,6 +326,27 @@
         },
         "mutelist": {
             "show_reasons": "show-reasons"
+        },
+        "partners add": {
+            "description": "description",
+            "invite": "invite"
+        },
+        "partners remove": {
+            "partner": "partner"
+        },
+        "partners reset-description": {
+            "partner": "partner"
+        },
+        "partners set-color": {
+            "color": "color"
+        },
+        "partners set-description": {
+            "description": "description",
+            "partner": "partner"
+        },
+        "partners set-invite": {
+            "new_invite": "new-invite",
+            "partner": "partner"
         },
         "permissions": {
             "channel": "channel",
