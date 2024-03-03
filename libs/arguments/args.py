@@ -84,17 +84,18 @@ class CardStyle(str):
         raise arguments_errors.InvalidCardStyleError(argument)
 
 
-class BotOrGuildInvite(commands.Converter):
+class BotOrGuildInviteConverter:
     """Converts a string to a bot invite or a guild invite"""
-
-    async def convert(self, _ctx: "MyContext", argument: str) -> Union[str, int]:
+    @classmethod
+    async def convert(cls, _ctx: "MyContext", argument: str) -> Union[str, int]:
+        "Do the conversion"
         answer = None
         r_invite = re.search(
             r'^https://discord(?:app)?\.com/(?:api/)?oauth2/authorize\?(?:client_id=(\d{17,19})|scope=([a-z\.\+]+?)|(?:permissions|guild_id|disable_guild_select|redirect_uri)=[^&\s]+)(?:&(?:client_id=(\d{17,19})|scope=([a-z\.\+]+?)|(?:permissions|guild_id|disable_guild_select|redirect_uri)=[^&\s]+))*$',
-            argument)
+            argument
+        )
         if r_invite is None:
-            r_invite = re.search(
-                r'(?:discord\.gg|discordapp\.com/invite)/([^\s/]+)', argument)
+            r_invite = re.search(r'(?:discord\.gg|discordapp\.com/invite)/([^\s/]+)', argument)
             if r_invite is not None:
                 answer = r_invite.group(1)
         else:
@@ -106,6 +107,7 @@ class BotOrGuildInvite(commands.Converter):
             raise arguments_errors.InvalidBotOrGuildInviteError(argument)
         return answer
 
+BotOrGuildInvite = Annotated[Union[str, int], BotOrGuildInviteConverter]
 
 class URL:
     "Convert argument to a valid URL"
