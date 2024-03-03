@@ -1,10 +1,13 @@
+import asyncio
 import datetime
 import importlib
 import time
-from typing import Optional, Union
+from typing import Literal, Optional, Union
 
 import aiohttp
 import discord
+from asyncache import cached
+from cachetools import TTLCache
 from discord import app_commands
 from discord.ext import commands, tasks
 
@@ -154,8 +157,11 @@ class Partners(commands.Cog):
         """Get the guilds count of a bot
         None if unknown bot/count not provided"""
         db_count = await self.db_get_bot_guilds(bot_id)
-        async with session.get(f'https://top.gg/api/bots/{bot_id}/stats', headers=self.dbl_headers, timeout=10) as resp:
-            ans: dict = await resp.json()
+        try:
+            async with session.get(f'https://top.gg/api/bots/{bot_id}/stats', headers=self.dbl_headers, timeout=10) as resp:
+                ans: dict = await resp.json()
+        except asyncio.TimeoutError:
+            return db_count
         if 'server_count' in ans:
             api_count: int = ans['server_count']
             if db_count and api_count < db_count*0.95:
@@ -588,6 +594,45 @@ class Partners(commands.Cog):
         count = await self.update_partners(channel)
         await msg.edit(content=await self.bot._(ctx.guild, "partners.reloaded", count=count))
 
+
+    @cached(TTLCache(100, ttl=30))
+    async def _get_partners_for_choice(self, guild_id: int):
+        return await self.db_get_partners_of_guild(guild_id)
+
+    @cached(TTLCache(1_000, ttl=60*5))
+    async def _fetch_name_from_partner(self, partner_type: Literal["bot", "guild"], target: str) -> str:
+        if partner_type == "bot":
+            try:
+                return str(await self.bot.fetch_user(target))
+            except discord.NotFound:
+                return target
+        try:
+            return (await self.bot.fetch_invite(target)).guild.name
+        except discord.NotFound:
+            return target
+
+    @partner_desc.autocomplete("partner_id")
+    @partner_reset_desc.autocomplete("partner_id")
+    @partner_invite.autocomplete("partner_id")
+    @partner_remove.autocomplete("partner_id")
+    async def partner_id_autocomplete(self, ctx: MyContext, current: str):
+        """Autocomplete a partner ID"""
+        current = current.lower()
+        partners = await self._get_partners_for_choice(ctx.guild.id)
+        filtered: list[tuple[bool, str, str]] = []
+        for partner in partners:
+            name = await self._fetch_name_from_partner(partner["type"], partner["target"])
+            if current == str(partner["ID"]) or current in name.lower():
+                filtered.append((
+                    not name.lower().startswith(current),
+                    name,
+                    str(partner["ID"])
+                ))
+        filtered.sort()
+        return [
+            app_commands.Choice(name=name, value=value)
+            for _, name, value in filtered
+        ]
 
 async def setup(bot):
     await bot.add_cog(Partners(bot))
