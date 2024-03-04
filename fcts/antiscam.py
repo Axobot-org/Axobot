@@ -3,7 +3,7 @@ import typing
 
 import discord
 from discord import app_commands
-from discord.ext import commands
+from discord.ext import commands, tasks
 
 from libs.antiscam import AntiScamAgent, Message
 from libs.antiscam.classes import (EMBED_COLORS, MsgReportView,
@@ -24,6 +24,9 @@ def is_immune(member: discord.Member) -> bool:
             or member.guild_permissions.manage_messages
             or member.guild_permissions.manage_guild)
 
+HARMLESS_DELETION_THRESHOLD = 0.005
+HARMLESS_WARNING_THRESHOLD = 0.3
+
 class AntiScam(commands.Cog):
     "Anti scam feature which read every message and detect if they are malicious"
 
@@ -42,7 +45,8 @@ class AntiScam(commands.Cog):
             callback=self.report_context_menu,
         )
         self.bot.tree.add_command(self.report_ctx_menu)
-        self.messages_scanned = 0
+        self.messages_scanned_in_last_minute = 0
+        self.recent_scans: dict[str, PredictionResult] = {}
 
     async def cog_load(self):
         "Load websites list from database"
@@ -66,10 +70,19 @@ class AntiScam(commands.Cog):
                 self.bot.dispatch("error", err, "While loading antiscam domains list")
         self.agent.fetch_websites_locally()
         self.log.info("Loaded %s domain names from local file", len(self.agent.websites_list))
+        self.cleanup_recent_scans_loop.start() # pylint: disable=no-member
 
     async def cog_unload(self):
         "Disable the report context menu"
         self.bot.tree.remove_command(self.report_ctx_menu.name, type=self.report_ctx_menu.type)
+        # pylint: disable=no-member
+        if self.cleanup_recent_scans_loop.is_running():
+            self.cleanup_recent_scans_loop.stop()
+
+    @tasks.loop(hours=3)
+    async def cleanup_recent_scans_loop(self):
+        "Cleanup the recent scans cache every 3 hours"
+        self.recent_scans.clear()
 
     @property
     def report_channel(self) -> discord.TextChannel:
@@ -333,30 +346,42 @@ class AntiScam(commands.Cog):
         ):
             return
         await self.bot.wait_until_ready()
-        if not await self.bot.get_config(msg.guild.id, "anti_scam"):
+        if msg.guild is not None and not await self.bot.get_config(msg.guild.id, "anti_scam"):
             return
-        message: Message = Message.from_raw(msg.content, len(msg.mentions), self.agent.websites_list)
-        if len(message.normd_message.split()) < 3:
-            return
-        self.messages_scanned += 1
-        result = self.agent.predict_bot(message)
-        if result.result > 1:
-            message.category = 0
-            self.log.info("Detected (%s): %s", result.probabilities[2], message.message)
-            if result.probabilities[1] < 0.005: # if probability of not being harmless is less than 0.5%
-                try:
-                    await msg.delete() # try to delete it, silently fails
-                except discord.Forbidden:
-                    pass
-                await self.send_bot_log(msg, deleted=True)
-                self.bot.dispatch("antiscam_delete", msg, result)
+        # if content already analyzed, get the harmless probability from cache
+        if (result := self.recent_scans.get(msg.content)) is not None:
+            if result.probabilities[1] > HARMLESS_WARNING_THRESHOLD:
+                return
+            harmless_probability = result.probabilities[1]
+        else:
+            # if content is new, analyze it
+            message: Message = Message.from_raw(msg.content, len(msg.mentions), self.agent.websites_list)
+            if len(message.normd_message.split()) < 3:
+                return
+            self.messages_scanned_in_last_minute += 1
+            result = self.agent.predict_bot(message)
+            if result.result > 1:
+                message.category = 0
+                self.log.info("Detected (%s): %s", result.probabilities[2], message.message)
+            harmless_probability = result.probabilities[1]
+            if harmless_probability < HARMLESS_DELETION_THRESHOLD:
                 msg_id = await self.db_insert_msg(message)
                 await self.send_report(msg.author, msg_id, message)
-            elif result.probabilities[1] < 0.3:
-                await self.send_bot_log(msg, deleted=False)
-                self.bot.dispatch("antiscam_warn", msg, result)
+            elif harmless_probability < HARMLESS_WARNING_THRESHOLD:
                 msg_id = await self.db_insert_msg(message)
                 await self.send_report(msg.author, msg_id, message)
+            self.recent_scans[msg.content] = result
+        # take action based on the harmless probability
+        if harmless_probability <= HARMLESS_DELETION_THRESHOLD:
+            try:
+                await msg.delete() # try to delete it, silently fails
+            except discord.Forbidden:
+                pass
+            await self.send_bot_log(msg, deleted=True)
+            self.bot.dispatch("antiscam_delete", msg, result)
+        elif harmless_probability < HARMLESS_WARNING_THRESHOLD:
+            await self.send_bot_log(msg, deleted=False)
+            self.bot.dispatch("antiscam_warn", msg, result)
 
     @commands.Cog.listener()
     async def on_interaction(self, interaction: discord.Interaction):
@@ -371,11 +396,8 @@ class AntiScam(commands.Cog):
         except ValueError:
             return
         msg_id = int(msg_id)
-        try:
+        if not interaction.response.is_done():
             await interaction.response.defer()
-        except (discord.NotFound, discord.HTTPException):
-            # the bot already deferred it
-            pass
         if action == 'delete':
             if await self.db_delete_msg(msg_id):
                 await interaction.followup.send("This record has successfully been deleted", ephemeral=True)
