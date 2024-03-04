@@ -1106,17 +1106,18 @@ Cette option affecte tous les serveurs"""
                 self._last_result = ret
                 await ctx.send(f'```py\n{value}{ret}\n```')
 
-    @commands.command(name='execute', hidden=True)
+    @main_msg.command(name="execute")
     @commands.check(checks.is_bot_admin)
     async def sudo(self, ctx: MyContext, who: Union[discord.Member, discord.User], *, command: str):
         """Run a command as another user
         Credits: Rapptz (https://github.com/Rapptz/RoboDanny/blob/rewrite/cogs/admin.py)"""
+        await ctx.defer()
         msg = copy.copy(ctx.message)
         msg.author = who
         msg.content = ctx.prefix + command
         new_ctx = await self.bot.get_context(msg)
         await self.bot.invoke(new_ctx)
-        await self.add_success_reaction(ctx.message)
+        await ctx.send(f"Command executed as {who} with success")
 
     @commands.group(name='bug', hidden=True)
     @commands.check(checks.is_bot_admin)
