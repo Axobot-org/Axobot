@@ -505,8 +505,8 @@ class BotStats(commands.Cog):
             if antiscam_cog := self.bot.get_cog("AntiScam"):
                 cursor.execute(query,
                                (now, 'antiscam.scanned',
-                                antiscam_cog.messages_scanned, 0, 'messages/min', True, self.bot.entity_id))
-                antiscam_cog.messages_scanned = 0
+                                antiscam_cog.messages_scanned_in_last_minute, 0, 'messages/min', True, self.bot.entity_id))
+                antiscam_cog.messages_scanned_in_last_minute = 0
             # antiscam activated count
             antiscam_enabled = await self.db_get_antiscam_enabled_count()
             cursor.execute(query, (now, 'antiscam.activated',antiscam_enabled, 0, 'guilds', False, self.bot.entity_id))
