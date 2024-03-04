@@ -12,7 +12,6 @@
     "invalid-invite": "Invalid invite",
     "invalid-partner": "Partner not found",
     "missing-manage-guild": "Unable to find server invites (missing \"Manage server\" permission)",
-    "missing-reactions": "Permission \"Add reactions\" missing :confused:",
     "no-channel": "You didn't set any partner channel",
     "no-partner": "You don't have any partners",
     "no-partner-2": "No server has a partnership with you",
@@ -26,6 +25,7 @@
         "one": "1 partner has been reloaded",
         "zero": "You don't seem to have any partner"
     },
+    "reset-desc": "The description has been reset!",
     "unknown-error": "An unknown error occurred. Please contact support for more information",
     "unknown-server": "Server partner not found"
 }
