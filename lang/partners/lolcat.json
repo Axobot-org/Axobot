@@ -12,7 +12,6 @@
     "invalid-invite": "Invalid invit",
     "invalid-partner": "Partner naut find",
     "missing-manage-guild": "Unable 2 see server invites (missing 'Manage server' perm)",
-    "missing-reactions": "Perm 'Add reactions' missing :confused:",
     "no-channel": "U didn't have setted any partner channel :sad:",
     "no-partner": "You donnut have any partners",
     "no-partner-2": "No server has sadly a partnership with U. Feels alone.",
@@ -26,6 +25,7 @@
         "one": "1 partner has been reloadd!",
         "zero": "Ups, u dont seem 2 have any partner rn"
     },
+    "reset-desc": "Teh description haz be rezet!",
     "unknown-error": "Un unknown error sadly happenned. Plz contact support if u want more info",
     "unknown-server": "Server partner not find"
 }
