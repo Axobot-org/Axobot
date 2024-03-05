@@ -14,7 +14,7 @@ At first, what does mute mean?
 
 Some may be confused by the use of the word "mute". When we talk about "mute" a Discord member, especially outside of a voice channel, we are talking about removing their permission to send messages. A muted member can therefore no longer send messages in your server, and in some cases can no longer join chat rooms or send feedback.
 
-This feature was first created by third party bots, using specific roles and permissions, as we will describe next. Later, Discord decided to integrate this feature natively, calling it "time-out". This is the same system you see when you click on a member of your server with the "Moderate Members" permission.
+This feature was first created by third party bots, using specific roles and permissions, as we will describe next. Later, Discord decided to integrate this feature natively, calling it "time-out". This is the same system you see when you click on a member of your server with the "Time out Members" permission.
 
 But this native tool has some limitations: it is not possible to precisely manage the permissions of a muted member, for example to allow him to speak in a specific channel (sometimes used to communicate between sanctioned members and the staff). Also, the duration selector in Discord is quite limited, offering you only a predefined choice of durations, which may not suit you.
 

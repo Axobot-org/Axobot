@@ -67,7 +67,7 @@
         "already-mute": "This member is already muted!",
         "already-unmute": "This member isn't muted!",
         "cant-mute": "Oops, it seems that I don't have enough permissions for that... Please give me permission `Manage roles` before continuing.",
-        "cant-timeout": "Oops, I don't have permission for that... Please give me the permission `Moderate members` before continuing, or create a muted role.",
+        "cant-timeout": "Oops, I don't have permission for that... Please give me the permission `Time out members` before continuing, or create a muted role.",
         "list-title-0": "List of muted members of the server \"%{guild}\"",
         "list-title-1": "List of 45 muted members of the server \"%{guild}\"",
         "list-title-2": "List of 60 muted members of the server \"%{guild}\"",
