@@ -3,7 +3,7 @@ from collections import defaultdict
 from typing import Union
 
 import discord
-from discord.ext import commands
+from discord.ext import commands, tasks
 
 from libs.bot_classes import Axobot
 
@@ -15,6 +15,15 @@ class UsersCache(commands.Cog):
         self.bot = bot
         self.file = "users_cache"
         self.last_save: dict[int, int] = defaultdict(int)
+
+    async def cog_load(self):
+        # pylint: disable=no-member
+        self.delete_old_cache_loop.start()
+
+    async def cog_unload(self):
+        # pylint: disable=no-member
+        if self.delete_old_cache_loop.is_running():
+            self.delete_old_cache_loop.stop()
 
     async def register_user(self, user: Union[discord.User, discord.Member]):
         "Register a user into our database"
@@ -30,6 +39,13 @@ VALUES (%s, %s, %s, %s, %s, CURRENT_TIMESTAMP()) ON DUPLICATE KEY UPDATE `userna
         async with self.bot.db_query(query, (user.id, user.name, global_name, avatar_hash, user.bot)):
             pass
 
+
+    @tasks.loop(hours=24)
+    async def delete_old_cache_loop(self):
+        "Remove old cache data (older than 30 days)"
+        query = "DELETE FROM `users_cache` WHERE `last_seen` < DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 30 DAY);"
+        async with self.bot.db_query(query):
+            pass
 
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):

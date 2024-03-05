@@ -85,11 +85,3 @@ class ServerWarningType(Enum):
     # role, user
     TEMP_ROLE_REMOVE_FORBIDDEN = 11
 
-class UsernameChangeRecord:
-    "Record of a username change, mainly used for logs"
-
-    def __init__(self, before: Optional[str], after: Optional[str], is_in_guild: bool, user: Optional[discord.User]=None):
-        self.user = user
-        self.before = before
-        self.after = after
-        self.is_in_guild = is_in_guild

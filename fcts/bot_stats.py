@@ -15,7 +15,7 @@ from discord.ext import commands, tasks
 
 from fcts.tickets import TicketCreationEvent
 from libs.bot_classes import Axobot, MyContext
-from libs.enums import ServerWarningType, UsernameChangeRecord
+from libs.enums import ServerWarningType
 
 try:
     import orjson  # type: ignore
