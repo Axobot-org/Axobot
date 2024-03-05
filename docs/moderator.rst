@@ -182,7 +182,9 @@ Anti-raid
 
 *Not a command, but a server option.*
 
-This option allows you to moderate the entry of your server, with several levels of security. You can enable it with the :code:`/config set anti_raid` command followed by the level you want.
+This option allows you to automatically moderate the newcomers and chat activity in your server, with several levels of security. You can enable it with the :code:`/config set anti_raid` command followed by the level you want.
+
+For your server safety, Axobot will look at three things: the account creation date of newcomers, the spam of users mentions, and the spam of Discord server invitations.
 
 Here is the list of levels:
 
@@ -190,9 +192,12 @@ Here is the list of levels:
     * no filter
 * Smooth
     * kick users with invitations in their nickname
-    * time-out for 20min users sending 30 mentions in a short time
+    * time-out for 1h users sending 5 mentions in a short time
+    * time-out for 30min users sending 20 mentions in a short time
 * Careful
     * kick accounts created less than 2 hours before
+    * time-out for 6h users sending 6 invites in a short time
+    * time-out for 1h users sending 3 invites in a short time
     * time-out for 30min users sending 20 mentions in a short time
     * time-out for 15min users sending 10 mentions in a short time
 * High
@@ -200,13 +205,18 @@ Here is the list of levels:
     * ban accounts created less than 1 hour before for a week
     * kick accounts created less than 12h before
     * kick users sending 20 mentions in a short time
+    * kick users sending 5 invites in a short time
+    * time-out for 3h users sending 5 invites in a short time
     * time-out for 30min users sending 10 mentions in a short time
 * Extreme
-    * ban accounts created less than 3 hours before for a week
+    * ban users sending 5 invites in a short time for 4 weeks
     * ban accounts created less than 1h before for 2 weeks
     * ban users sending 20 mentions in a short time for 2 week
+    * ban accounts created less than 3 hours before for a week
     * kick accounts created less than 24h before
     * kick users sending 15 mentions in a short time
+    * kick users sending 3 invites in a short time
+    * time-out for 3h users sending 2 invites in a minute
     * time-out for 1h users sending 10 mentions in a short time
 
 .. note:: Note that the levels are cumulative: for example level 3 will also have the specificities of levels 1 and 2

@@ -6,7 +6,7 @@ import discord
 from cachetools import TTLCache
 from discord.ext import commands, tasks
 
-from libs.bot_classes import Axobot
+from libs.bot_classes import DISCORD_INVITE_REGEX, Axobot
 from libs.serverconfig.options_list import options
 
 
@@ -20,14 +20,16 @@ class AntiRaid(commands.Cog):
         self.check_cache = TTLCache[tuple[int, int], bool](maxsize=10_000, ttl=60)
         # Cache of mentions sent by users - count of recent mentions, decreased every minute
         self.mentions_score: defaultdict[int, int] = defaultdict(int)
+        # Cache of discord invites sent by users - count of recent mentions, decreased every minute
+        self.invites_score: defaultdict[int, int] = defaultdict(int)
 
     async def cog_load(self):
          # pylint: disable=no-member
-        self.decrease_mentions_count.start()
+        self.decrease_users_scores.start()
 
     async def cog_unload(self):
          # pylint: disable=no-member
-        self.decrease_mentions_count.cancel()
+        self.decrease_users_scores.cancel()
 
     @commands.Cog.listener()
     async def on_member_join(self, member: discord.Member):
@@ -176,7 +178,7 @@ class AntiRaid(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
-        "Check mentions count when a message is sent"
+        "Check mentions/invites count when a message is sent"
         # if the message is not in a guild or the bot can't see the guild
         if not isinstance(message.author, discord.Member) or message.guild.me is None:
             return
@@ -186,13 +188,20 @@ class AntiRaid(commands.Cog):
         # if the antiraid is disabled
         if await self._get_raid_level(message.guild) == 0:
             return
+        # 1. Check mentions
         raw_mentions = [mention for mention in message.raw_mentions if mention != message.author.id]
-        if count := len(raw_mentions):
+        if mentions_count := len(raw_mentions):
             # add users mentions count to the user score
-            self.mentions_score[message.author.id] += count
-        # if score is higher than 0, apply sanctions
+            self.mentions_score[message.author.id] += mentions_count
+        # if mentions score is higher than 0, apply sanctions
         if self.mentions_score[message.author.id] > 0:
             await self.check_mentions_score(message.author)
+        # 2. Check invites
+        if invites_count := len(DISCORD_INVITE_REGEX.findall(message.content)):
+            self.invites_score[message.author.id] += invites_count
+        # if invites score is higher than 0, apply sanctions
+        if self.invites_score[message.author.id] > 0:
+            await self.check_invites_score(message.author)
 
     async def check_mentions_score(self, member: discord.Member):
         "Check if a member has a mentions score higher than the treshold set by the antiraid config, and take actions"
@@ -200,7 +209,7 @@ class AntiRaid(commands.Cog):
         if score == 0:
             return
         level = await self._get_raid_level(member.guild)
-        # if antiraid is disabled,  or bot can't moderate members
+        # if antiraid is disabled, or bot can't moderate members
         if level == 0 or not member.guild.me.guild_permissions.moderate_members:
             return False
         # Level 4
@@ -258,28 +267,111 @@ class AntiRaid(commands.Cog):
                     return True
         # Level 1 or more
         if level >= 1:
-            if score >= 30: # timeout (20min) members with more than 30 mentions
-                duration = timedelta(minutes=20)
+            if score >= 20: # timeout (30min) members with more than 30 mentions
+                duration = timedelta(minutes=30)
                 if await self.timeout(member, await self.bot._(member.guild.id,"logs.reason.mentions"), duration=duration):
                     self.bot.dispatch("antiraid_timeout", member, {
-                        "mentions_treshold": 30, "duration": duration.total_seconds()
+                        "mentions_treshold": 20, "duration": duration.total_seconds()
+                    })
+                    return True
+        return False
+
+
+    async def check_invites_score(self, member: discord.Member):
+        "Check if a member has a invites score higher than the treshold set by the antiraid config, and take actions"
+        score = self.invites_score[member.id]
+        if score == 0:
+            return
+        level = await self._get_raid_level(member.guild)
+        # if antiraid is disabled, or bot can't moderate members
+        if level == 0 or not member.guild.me.guild_permissions.moderate_members:
+            return False
+        # Level 4
+        if level >= 4:
+            if score >= 5: # ban (4w) members with more than 5 invites
+                duration = timedelta(weeks=4)
+                if await self.ban(member, await self.bot._(member.guild.id,"logs.reason.invites"), duration=duration):
+                    self.bot.dispatch("antiraid_ban", member, {
+                        "invites_treshold": 5, "duration": duration.total_seconds()
+                    })
+                    return True
+            if score >= 3: # kick members with more than 3 invites
+                if await self.kick(member, await self.bot._(member.guild.id,"logs.reason.invites")):
+                    self.bot.dispatch("antiraid_kick", member, {
+                        "invites_treshold": 3
+                    })
+                    return True
+            if score >= 2: # timeout (3h) members with more than 2 invites
+                duration = timedelta(hours=3)
+                if await self.timeout(member, await self.bot._(member.guild.id,"logs.reason.invites"), duration=duration):
+                    self.bot.dispatch("antiraid_timeout", member, {
+                        "invites_treshold": 2, "duration": duration.total_seconds()
+                    })
+                    return True
+        # Level 3 or more
+        if level >= 3:
+            if score >= 5: # kick members with more than 5 invites
+                if await self.kick(member, await self.bot._(member.guild.id,"logs.reason.invites")):
+                    self.bot.dispatch("antiraid_kick", member, {
+                        "invites_treshold": 5
+                    })
+                    return True
+            if score >= 3: # timeout (3h) members with more than 3 invites
+                duration = timedelta(hours=3)
+                if await self.timeout(member, await self.bot._(member.guild.id,"logs.reason.invites"), duration=duration):
+                    self.bot.dispatch("antiraid_timeout", member, {
+                        "invites_treshold": 3, "duration": duration.total_seconds()
+                    })
+                    return True
+        # Level 2 or more
+        if level >= 2:
+            if score >= 6: # timeout (6h) members with more than 6 invites
+                duration = timedelta(hours=6)
+                if await self.timeout(member, await self.bot._(member.guild.id,"logs.reason.invites"), duration=duration):
+                    self.bot.dispatch("antiraid_timeout", member, {
+                        "invites_treshold": 6, "duration": duration.total_seconds()
+                    })
+                    return True
+            if score >= 3: # timeout (1h) members with more than 3 invites
+                duration = timedelta(hours=1)
+                if await self.timeout(member, await self.bot._(member.guild.id,"logs.reason.invites"), duration=duration):
+                    self.bot.dispatch("antiraid_timeout", member, {
+                        "invites_treshold": 3, "duration": duration.total_seconds()
+                    })
+                    return True
+        # Level 1 or more
+        if level >= 1:
+            if score >= 5: # timeout (1h) members with more than 5 invites
+                duration = timedelta(hours=1)
+                if await self.timeout(member, await self.bot._(member.guild.id,"logs.reason.invites"), duration=duration):
+                    self.bot.dispatch("antiraid_timeout", member, {
+                        "invites_treshold": 5, "duration": duration.total_seconds()
                     })
                     return True
         return False
 
 
     @tasks.loop(seconds=30)
-    async def decrease_mentions_count(self):
-        "Decrease mentions count by 2every 30 seconds"
-        to_remove: list[int] = []
+    async def decrease_users_scores(self):
+        """Decrease mentions and invites count every 30 seconds"""
+        # Decrease mentions count by 2
+        mentions_users_to_remove: list[int] = []
         for member_id in self.mentions_score:
             self.mentions_score[member_id] -= 2
             if self.mentions_score[member_id] <= 0:
-                to_remove.append(member_id)
-        for member_id in to_remove:
+                mentions_users_to_remove.append(member_id)
+        for member_id in mentions_users_to_remove:
             del self.mentions_score[member_id]
+        # Decrease invites count by 1
+        invites_users_to_remove: list[int] = []
+        for member_id in self.invites_score:
+            self.invites_score[member_id] -= 1
+            if self.invites_score[member_id] <= 0:
+                invites_users_to_remove.append(member_id)
+        for member_id in invites_users_to_remove:
+            del self.invites_score[member_id]
 
-    @decrease_mentions_count.error
+    @decrease_users_scores.error
     async def on_decrease_mentions_count_error(self, error: Exception):
         self.bot.dispatch("error", error, "When calling `decrease_mentions_count` (<@279568324260528128>)")
 
