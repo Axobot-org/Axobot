@@ -47,6 +47,14 @@
         "mute": "umlčet",
         "mute-config": "nastavení-umlčení",
         "mutelist": "seznam-umlčených",
+        "partners add": "přidat",
+        "partners list": "seznam",
+        "partners refresh": "aktualizovat",
+        "partners remove": "odstranit",
+        "partners reset-description": "resetovat-popis",
+        "partners set-color": "nastavit-barvu",
+        "partners set-description": "nastavit-popis",
+        "partners set-invite": "nastavit-pozvánku",
         "permissions": "oprávnění",
         "ping": "ping",
         "poll": "anketa",
@@ -54,8 +62,8 @@
         "profile card-preview": "karta-náhledů",
         "profile config": "nastavení",
         "profile list-card-styles": "seznam-stylů-karet",
-        "Quote": "Citát",
         "quote": "citát",
+        "Quote": "Citát",
         "random-tip": "náhodný-tip",
         "rank": "hodnost",
         "reminders clear": "vyčistit",
@@ -131,6 +139,14 @@
         "minecraft mod": "Získejte informace o jakémkoli modu registrovaném na CurseForge nebo Modrinth",
         "minecraft server": "Získejte informace o jakémkoli Minecraft Java serveru",
         "minecraft skin": "Získejte skin libovolného hráče Minecraft Java",
+        "partners add": "Přidat partnera na váš server",
+        "partners list": "Seznam všech partnerů vašeho serveru",
+        "partners refresh": "Aktualizovat informace partnerů ve vašem určeném kanálu",
+        "partners remove": "Odstranit partnera z vašeho serveru",
+        "partners reset-description": "Resetovat popis partnera",
+        "partners set-color": "Nastavte barvu pro své partnery embedy",
+        "partners set-description": "Editovat popis partnera",
+        "partners set-invite": "Editovat zvaci URL partnera",
         "quote": "Citujte zprávu s pěkně vygenerovaným obrázkem",
         "random-tip": "Získejte náhodný tip nebo zajímavost o botovi",
         "set-xp": "Nastavte XP uživateli na vašem serveru"
@@ -144,6 +160,7 @@
         "event": "Zůčastni se speciálních událostí",
         "minecraft": "Hledat informace o serverech/hráčích/modech z Minecraftu",
         "modlogs": "Povolit nebo zakázat protokoly serveru v určitých kanálech",
+        "partners": "Spravujte partnery vašeho serveru",
         "profile": "Nastavte si bota pro vlastní použití",
         "reminders": "Spravujte nevyřízené připomínky",
         "role": "Několik příkazů ke správě rolí",
@@ -165,6 +182,7 @@
         "event": "událost",
         "minecraft": "minecraft",
         "modlogs": "záznam-moderátorů",
+        "partners": "partneři",
         "profile": "profil",
         "reminders": "připomínky",
         "role": "role",
@@ -308,6 +326,27 @@
         },
         "mutelist": {
             "show_reasons": "ukázat-důvody"
+        },
+        "partners add": {
+            "description": "popis",
+            "invite": "pozvat"
+        },
+        "partners remove": {
+            "partner": "partner"
+        },
+        "partners reset-description": {
+            "partner": "partner"
+        },
+        "partners set-color": {
+            "color": "barva"
+        },
+        "partners set-description": {
+            "description": "popis",
+            "partner": "partner"
+        },
+        "partners set-invite": {
+            "new_invite": "nová-pozvánka",
+            "partner": "partner"
         },
         "permissions": {
             "channel": "kanál",
