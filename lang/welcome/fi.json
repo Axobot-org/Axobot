@@ -1,4 +1,0 @@
-{
-    "error-give-roles": "Mahdotonta antaa rooli '%{r}' uudelle jäsenelle %{u}: ei tarpeeksi käyttöoikeuksia Varmista että minulla on 'Hallinnoi Rooleja' käyttöoikeudet ja että minun rooli on annettavan roolin yläpuolella",
-    "help": "__**Tervetuloa liittymis & lähtö viesti moduuliin**__\nTätä moduulia käytetään konfiguroimaan automaattinen viesti joka kerta kun joku tulee tai lähtee servultasi.\n__** Konfiguraatio**__\n`1-` Jotta voit konfiguroida mihin nämä viestit lähetetään, viestitä `%{p}config set welcome_channel` lisättynä kanava.\n`2-` Jotta voit konfiguroida viestin, kirjoita  `%{p}config set <welcome|leave> <message>`. Tälle viestille voit käyttää variableja:\n- `{user}` Tägää käyttäjän\n- `{server}` näyttää serverin nimen\n- `{owner}` näyttää serverin omistajan nimen\n- `{member_count}` näyttää tämänhetkisen käyttäjämäärän"
-}

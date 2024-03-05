@@ -45,18 +45,6 @@ class BotInfo(commands.Cog):
                         count += 1
         self.codelines = count
 
-    @commands.command(name="admins")
-    async def admin_list(self, ctx: MyContext):
-        """Get the list of the bot administrators
-
-        ..Doc miscellaneous.html#admins"""
-        users_list  = []
-        for user_id in checks.admins_id:
-            if user_id == 552273019020771358:
-                continue
-            users_list.append(self.bot.get_user(user_id).name)
-        await ctx.send(await self.bot._(ctx.channel,"info.admins-list", admins=", ".join(users_list)))
-
     async def get_guilds_count(self, ignored_guilds:list=None) -> int:
         "Get the number of guilds where the bot is"
         if ignored_guilds is None:
@@ -283,59 +271,6 @@ ORDER BY usages DESC LIMIT %(limit)s"""
             text += '/en/develop'
         await ctx.send(text)
 
-    @commands.command(name='changelog',aliases=['changelogs'])
-    @commands.check(checks.database_connected)
-    async def changelog(self, ctx: MyContext, version: str=None):
-        """Get the changelogs of the bot
-
-        ..Example changelog
-
-        ..Example changelog 3.7.0
-
-        ..Doc miscellaneous.html#changelogs"""
-        if version=='list':
-            if not ctx.bot.beta:
-                query = "SELECT `version`, `release_date` FROM `changelogs` WHERE beta=False ORDER BY release_date"
-            else:
-                query = "SELECT `version`, `release_date` FROM `changelogs` ORDER BY release_date"
-            async with self.bot.db_query(query) as query_results:
-                results = query_results
-            desc = "\n".join(reversed([
-                "**v{}:** <t:{:.0f}>".format(row['version'], row['release_date'].timestamp())
-                for row in results
-            ]))
-            last_release_time = None
-            title = await self.bot._(ctx.channel,'info.changelogs.index')
-        else:
-            if version is None:
-                if not ctx.bot.beta:
-                    query = "SELECT *, CONVERT_TZ(`release_date`, @@session.time_zone, '+00:00') AS `utc_release` \
-                        FROM `changelogs` WHERE beta=False ORDER BY release_date DESC LIMIT 1"
-                else:
-                    query = "SELECT *, CONVERT_TZ(`release_date`, @@session.time_zone, '+00:00') AS `utc_release` \
-                        FROM `changelogs` ORDER BY release_date DESC LIMIT 1"
-            else:
-                query = f"SELECT *, CONVERT_TZ(`release_date`, @@session.time_zone, '+00:00') AS `utc_release` \
-                    FROM `changelogs` WHERE `version`='{version}'"
-                if not ctx.bot.beta:
-                    query += " AND `beta`=0"
-            async with self.bot.db_query(query) as query_results:
-                results = query_results
-            if len(results) > 0:
-                used_lang = await self.bot._(ctx.channel,'_used_locale')
-                if used_lang not in results[0].keys():
-                    used_lang = "en"
-                desc = results[0][used_lang]
-                last_release_time = results[0]['utc_release']
-                title = (await self.bot._(ctx.channel,'misc.version')).capitalize() + ' ' + results[0]['version']
-        if len(results) == 0:
-            await ctx.send(await self.bot._(ctx.channel,'info.changelog.notfound'))
-        elif ctx.can_send_embed:
-            embed_color = ctx.bot.get_cog('ServerConfig').embed_color
-            emb = discord.Embed(title=title, description=desc, timestamp=last_release_time, color=embed_color)
-            await ctx.send(embed=emb)
-        else:
-            await ctx.send(desc)
 
     @commands.command(name="prefix")
     async def get_prefix(self, ctx: MyContext):
@@ -351,15 +286,6 @@ ORDER BY usages DESC LIMIT %(limit)s"""
             await ctx.send(embed=emb)
         else:
             await ctx.send(txt+"\n"+prefix)
-
-    @commands.command(name="welcome", aliases=['bvn', 'bienvenue', 'leave'])
-    @commands.cooldown(10, 30, commands.BucketType.channel)
-    async def bvn_help(self, ctx: MyContext):
-        """Help on setting up welcome / leave messages
-
-..Doc infos.html#welcome-message"""
-        config_cmd = await self.bot.get_command_mention("config set")
-        await ctx.send(await self.bot._(ctx.guild, "welcome.help", config_cmd=config_cmd))
 
     @commands.hybrid_command(name="about", aliases=["botinfos", "botinfo"])
     @commands.cooldown(7, 30, commands.BucketType.user)

@@ -1,4 +1,0 @@
-{
-    "error-give-roles": "%{u} adlı yeni üyeye '%{r}' rolünü verilemiyor: bunun için yeterli iznim yok\nLütfen rol hiyerarşisini kontrol edin ve \"Rolleri yönet\" yetkisine sahip olduğumdan emin olun.",
-    "help": "__**Giriş & Çıkış Mesajı Modülüne Hoşgeldiniz**__\n\nBu modül, bir üye sunucunuza her girdiğinde veya sunucudan her çıktığında otomatik bir mesaj göndermek için kullanılır.\n\n__** Yapılandırma**__\n\n`1-` Bu mesajların yazılı olacağı sohbet odasını yapılandırmak için `%{p}config set welcome_channel` komutu ardından kanal adını yazın. (kanalı etiketleyebilir, tam adını veya ID'sini yazabilirsiniz ).\n`2-` Bir mesajı yapılandırmak için `%{p}config set <welcome|leave> <mesaj>` yazın. Bu mesaj için bazı değişkenleri kullanabilirsiniz:\n- `{user}` üyeyi etiketler\n- `{server}` sunucu adını görüntüler\n- `{owner}` sunucu sahibinin adını görüntüler\n- `{member_count}` geçerli üye sayısını görüntüler\n- `{type}` bir \"üye\" veya \"bot\" olduğunu gösterir"
-}
