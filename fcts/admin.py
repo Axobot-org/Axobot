@@ -1076,7 +1076,7 @@ Cette option affecte tous les serveurs"""
     @main_msg.command(name="execute")
     @commands.check(checks.is_bot_admin)
     async def sudo(self, ctx: MyContext, who: Union[discord.Member, discord.User], *, command: str):
-        """Run a command as another user
+        """Exécute une commande en tant qu'un autre utilisateur
         Credits: Rapptz (https://github.com/Rapptz/RoboDanny/blob/rewrite/cogs/admin.py)"""
         await ctx.defer()
         msg = copy.copy(ctx.message)
@@ -1086,27 +1086,25 @@ Cette option affecte tous les serveurs"""
         await self.bot.invoke(new_ctx)
         await ctx.send(f"Command executed as {who} with success")
 
-    @commands.group(name='bug', hidden=True)
+    @main_msg.group(name='bug')
     @commands.check(checks.is_bot_admin)
     async def main_bug(self, ctx: MyContext):
         """Gère la liste des bugs"""
 
     @main_bug.command(name='add')
-    async def bug_add(self, ctx: MyContext,* ,bug: str):
+    async def bug_add(self, ctx: MyContext, french: str, english: str):
         """Ajoute un bug à la liste"""
         channel = ctx.bot.get_channel(929864644678549534) if self.bot.beta else ctx.bot.get_channel(488769283673948175)
         if channel is None:
             return await ctx.send("Salon 488769283673948175 introuvable")
-        text = bug.split('\n')
-        fr_text, en_text = text[0].replace('\\n','\n'), text[1].replace('\\n','\n')
         emb = discord.Embed(title="New bug", timestamp=self.bot.utcnow(), color=13632027)
-        emb.add_field(name='Français', value=fr_text, inline=False)
-        emb.add_field(name='English', value=en_text, inline=False)
+        emb.add_field(name='Français', value=french, inline=False)
+        emb.add_field(name='English', value=english, inline=False)
         await channel.send(embed=emb)
         await self.add_success_reaction(ctx.message)
 
     @main_bug.command(name='fix')
-    async def bug_fix(self, ctx: MyContext, msg_id: int, fixed:bool=True):
+    async def bug_fix(self, ctx: MyContext, msg_id: int, fixed: bool=True):
         """Marque un bug comme étant fixé"""
         chan = ctx.bot.get_channel(929864644678549534) if self.bot.beta else ctx.bot.get_channel(488769283673948175)
         if chan is None:
@@ -1127,33 +1125,27 @@ Cette option affecte tous les serveurs"""
         await msg.edit(embed=emb)
         await self.add_success_reaction(ctx.message)
 
-    @commands.group(name="idea", hidden=True)
+    @main_msg.group(name="idea")
     @commands.check(checks.is_bot_admin)
     async def main_idea(self, ctx: MyContext):
         """Ajouter une idée dans le salon des idées, en français et anglais"""
 
     @main_idea.command(name='add')
-    async def idea_add(self, ctx: MyContext, *, text: str):
+    async def idea_add(self, ctx: MyContext, french: str, english: str):
         """Ajoute une idée à la liste"""
         channel = ctx.bot.get_channel(929864644678549534) if self.bot.beta else ctx.bot.get_channel(488769306524385301)
         if channel is None:
             return await ctx.send("Salon introuvable")
-        text = text.split('\n')
-        try:
-            fr_text, en_text = text[0].replace('\\n','\n'), text[1].replace('\\n','\n')
-        except IndexError:
-            await ctx.send("Il manque le texte anglais")
-            return
         emb = discord.Embed(color=16106019, timestamp=self.bot.utcnow())
-        emb.add_field(name='Français', value=fr_text, inline=False)
-        emb.add_field(name='English', value=en_text, inline=False)
+        emb.add_field(name='Français', value=french, inline=False)
+        emb.add_field(name='English', value=english, inline=False)
         msg = await channel.send(embed=emb)
         for emoji in self.upvote_emojis:
             await msg.add_reaction(emoji)
         await self.add_success_reaction(ctx.message)
 
     @main_idea.command(name='valid')
-    async def idea_valid(self, ctx: MyContext, msg_id:int, valid:bool=True):
+    async def idea_valid(self, ctx: MyContext, msg_id: int, implemented: bool=True):
         """Marque une idée comme étant ajoutée à la prochaine MàJ"""
         chan = ctx.bot.get_channel(929864644678549534) if self.bot.beta else ctx.bot.get_channel(488769306524385301)
         if chan is None:
@@ -1166,7 +1158,7 @@ Cette option affecte tous les serveurs"""
         if len(msg.embeds) != 1:
             return await ctx.send("Nombre d'embeds invalide")
         emb = msg.embeds[0]
-        if valid: # if the idea should be marked as soon-released
+        if implemented: # if the idea should be marked as soon-released
             emb.color = discord.Color(10146593)
         else:
             emb.color = discord.Color(16106019)
