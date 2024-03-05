@@ -231,7 +231,8 @@ VALUES (%(g)s, %(u)s, %(t)s, %(m)s, %(r)s, %(d)s)"
             await ctx.send(await self.bot._(ctx.guild.id, "cases.no-case"))
             return
         if ctx.can_send_embed:
-            author_text = await self.bot._(ctx.guild.id, "cases.display.title", user=user.display_name, user_id=user.id)
+            username = user.global_name or user.name
+            author_text = await self.bot._(ctx.guild.id, "cases.display.title", user=username, user_id=user.id)
             title = await self.bot._(ctx.guild.id,"cases.records_number", nbr=len(cases))
             lang = await self.bot._(ctx.guild.id,'_used_locale')
 
