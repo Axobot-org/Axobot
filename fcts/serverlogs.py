@@ -1,6 +1,5 @@
 import asyncio
 import datetime
-import re
 import time
 from random import random
 from typing import TYPE_CHECKING, Any, Callable, Optional
@@ -14,16 +13,11 @@ from fcts.tickets import TicketCreationEvent
 from libs.antiscam.classes import PredictionResult
 from libs.arguments.args import ServerLog
 from libs.arguments.errors import InvalidServerLogError
-from libs.bot_classes import Axobot, MyContext
+from libs.bot_classes import DISCORD_INVITE_REGEX, Axobot, MyContext
 from libs.checks import checks
 from libs.enums import ServerWarningType
 from libs.formatutils import FormatUtils
 from libs.tips import GuildTip
-
-DISCORD_INVITE = re.compile(
-    r'(?:https?://)?(?:www[.\s])?((?:discord[.\s](?:gg|io|li(?:nk)?)|discord\.me|discordapp\.com/invite\
-        |discord\.com/invite|dsc\.gg)[/\s]{1,3}[\w-]{2,27}(?!\w))'
-)
 
 if TYPE_CHECKING:
     from fcts.cases import Case
@@ -527,7 +521,7 @@ class ServerLogs(commands.Cog):
         Corresponding log: discord_invite"""
         if message.guild is None or message.author == self.bot.user:
             return
-        if (invites := DISCORD_INVITE.findall(message.content)) and (
+        if (invites := DISCORD_INVITE_REGEX.findall(message.content)) and (
                 channel_ids := await self.is_log_enabled(message.guild.id, "discord_invite")):
             emb = discord.Embed(
                 description=f"**[Discord invite]({message.jump_url}) detected in {message.channel.mention}**",
@@ -1074,6 +1068,9 @@ class ServerLogs(commands.Cog):
             # mentions treshold
             if mentions_treshold := data.get("mentions_treshold"):
                 emb.add_field(name="Mentions treshold", value=mentions_treshold)
+            # invites theshold
+            if invites_treshold := data.get("invites_treshold"):
+                emb.add_field(name="Invites treshold", value=invites_treshold)
             # duration
             if duration := data.get("duration"):
                 lang = await self.bot._(member.guild.id, "_used_locale")
@@ -1105,6 +1102,9 @@ Minimum age required by anti-raid: {min_age}"
             # mentions treshold
             if mentions_treshold := data.get("mentions_treshold"):
                 emb.add_field(name="Mentions treshold", value=mentions_treshold)
+            # invites theshold
+            if invites_treshold := data.get("invites_treshold"):
+                emb.add_field(name="Invites treshold", value=invites_treshold)
             # discord invite
             if "discord_invite" in data:
                 emb.add_field(name="Contains a Discord invite in their username", value=self.bot.zws, inline=False)
@@ -1132,6 +1132,9 @@ Minimum age required by anti-raid: {min_age}"
             # mentions treshold
             if mentions_treshold := data.get("mentions_treshold"):
                 emb.add_field(name="Mentions treshold", value=mentions_treshold)
+            # invites theshold
+            if invites_treshold := data.get("invites_treshold"):
+                emb.add_field(name="Invites treshold", value=invites_treshold)
             # discord invite
             if "discord_invite" in data:
                 emb.add_field(name="Contains a Discord invite in their username", value=self.bot.zws, inline=False)

@@ -7,7 +7,8 @@
     "mute": "%{user} (%{userid}) est maintenant muet",
     "reason": {
         "autounmute": "unmute automatique",
-        "invite": "Automod (invitation Discord)",
+        "invite": "Automod (invitation Discord dans son pseudo)",
+        "invites": "Automod (spam d'invitations Discord)",
         "memberchan": "Action automatique (config membercount)",
         "mentions": "Automod (spam de mentions)",
         "unban": "unban par %{user}",
