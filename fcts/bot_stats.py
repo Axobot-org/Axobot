@@ -60,7 +60,6 @@ class BotStats(commands.Cog):
         self.statuspage_header = {"Content-Type": "application/json", "Authorization": "OAuth " + self.bot.others["statuspage"]}
         self.antiscam = {"warning": 0, "deletion": 0}
         self.ticket_events = {"creation": 0}
-        self.usernames = {"guild": 0, "user": 0, "deleted": 0}
         self.emitted_serverlogs: dict[str, int] = {}
         self.serverlogs_audit_search: Optional[tuple[int, int]] = None
         self.last_backup_size: Optional[int] = None
@@ -169,14 +168,6 @@ class BotStats(commands.Cog):
     @commands.Cog.listener()
     async def on_ticket_creation(self, _event: TicketCreationEvent):
         self.ticket_events["creation"] += 1
-
-    @commands.Cog.listener()
-    async def on_username_change_record(self, event: UsernameChangeRecord):
-        "Called when a user change their username/nickname"
-        if event.is_in_guild:
-            self.usernames["guild"] += 1
-        else:
-            self.usernames["user"] += 1
 
     @commands.Cog.listener()
     async def on_server_warning(self, warning_type: ServerWarningType, _guild: discord.Guild, **_kwargs):
