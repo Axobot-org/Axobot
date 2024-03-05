@@ -566,30 +566,6 @@ class Admin(commands.Cog):
                 await ctx.send(f"L'utilisateur {target} a bien été blacklist")
         ctx.bot.get_cog('Utilities').config = None
 
-    @main_msg.command(name="logs")
-    @commands.check(checks.is_bot_admin)
-    async def show_last_logs(self, ctx: MyContext, lines_count: commands.Range[int, 0, 200]=15, *, match=''):
-        """Affiche les <lines> derniers logs ayant <match> dedans"""
-        with open('logs/debug.log','r', encoding='utf-8') as file:
-            lines = file.read().split("\n")
-        msg = ""
-        liste = []
-        i = 1
-        while len(liste) < lines_count and i < min(2000, len(lines)):
-            i += 1
-            if match not in lines[-i] or ctx.message.content in lines[-i]:
-                continue
-            liste.append(lines[-i].replace('`',''))
-        if len(msg) == 0:
-            await ctx.send("No corresponding log found")
-            return
-        for i in liste:
-            if len(msg+i) > 1900:
-                await ctx.send(f"```css\n{msg}\n```")
-                msg = ""
-            if len(i)<1900:
-                msg += "\n" + i.replace('`', '')
-        await ctx.send(f"```css\n{msg}\n```")
 
     @main_msg.command(name="module")
     @commands.check(checks.is_bot_admin)
@@ -731,15 +707,6 @@ Cette option affecte tous les serveurs"""
             await ctx.send(f"L'utilisateur {user} a maintenant les cartes d'xp {', '.join(rankcards)}")
         else:
             await ctx.send(f"L'utilisateur {user} n'a plus aucune catre d'xp spéciale")
-
-    @main_msg.command(name="loop_restart")
-    @commands.check(checks.is_bot_admin)
-    async def loop_restart(self, ctx:MyContext):
-        """Relance la boucle principale"""
-        try:
-            ctx.bot.get_cog("Events").loop.start()
-        except RuntimeError:
-            await ctx.send("La boucle est déjà lancée :wink:")
 
 
     @main_msg.group(name="server")
