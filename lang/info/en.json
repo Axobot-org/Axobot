@@ -7,16 +7,11 @@
         "sponsor": "Make a donation:"
     },
     "about-main": "Hello! I'm %{mention}!\nI'm a bot that allows you to do a lot of things: moderation, xp system, statistics, partners managment and many other super useful commands (and totally pointless ones)!\nYou can start by typing `!help` in this chat to see the list of available commands, then `!config see` will let you see the configuration options.\n\nMy owner (Z_runner) and I would like to thank Awhikax for his support during the various crises, Aragorn1202 for all his ideas and sentences full of good sense, Adri for all these beautiful logos, emojis and profile pics, and the whole translators team for their long work!\n\n:globe_with_meridians: Some links may be useful: %{links}\n\nHave a nice day!",
-    "admins-list": "The administrators of this bot are : %{admins}",
     "bitly_already_shortened": "This url is already shortened!",
     "bitly_long": "Original URL: %{url}",
     "bitly_nobit": "This address is not a bit.ly link!",
     "bitly_short": "Shortened URL: %{url}",
     "cant-see-channel": "Oops, looks like you don't have permission to view this channel. Ask a moderator!",
-    "changelogs": {
-        "index": "List of indexed versions",
-        "notfound": "Unable to find this version"
-    },
     "discordlinks": [
         "Servers status",
         "Discord ToS",
