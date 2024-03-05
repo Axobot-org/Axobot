@@ -226,16 +226,6 @@ You can specify a verification limit by adding a number in argument (up to 1.000
             except commands.CommandError: # user can't use 'say'
                 pass
 
-    @commands.command(name="shuffle", hidden=True)
-    @commands.check(is_fun_enabled)
-    async def shuffle(self, ctx: MyContext, *, name: typing.Union[discord.Member, str]):
-        "Randomize letters in a name"
-        if isinstance(name, discord.User):
-            name = name.display_name
-        characters = list(name)
-        random.shuffle(characters)
-        await ctx.reply("".join(characters), allowed_mentions=discord.AllowedMentions.none())
-
     @commands.command(name="blame", hidden=True)
     @commands.check(is_fun_enabled)
     async def blame(self, ctx: MyContext, name: str):
