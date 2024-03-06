@@ -221,7 +221,7 @@ Here is the list of levels:
 
 .. note:: Note that the levels are cumulative: for example level 3 will also have the specificities of levels 1 and 2
 
-.. warning:: The bot must have access to "`Kick members <perms.html#kick-members>`__" and "`Ban members <perms.html#ban-members>`__" permissions
+.. warning:: The bot must have access to "`Time out members <perms.html#time-out-members>`__",  "`Kick members <perms.html#kick-members>`__" and "`Ban members <perms.html#ban-members>`__" permissions
 
 ---------
 Anti-scam
