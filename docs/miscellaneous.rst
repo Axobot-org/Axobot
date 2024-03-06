@@ -6,14 +6,6 @@ Some commands are difficult to classify in the categories of the site. They are 
 
 Here is the list of these particular commands.
 
-------
-Admins
-------
-
-**Syntax:** :code:`admins`
-
-If you want to quickly know who are the Axobot administrators. Easy to use, quick to read, always up-to-date.
-
 ----------
 Bitly urls
 ----------
@@ -38,17 +30,6 @@ Search by ISBN
 **Syntax:** :code:`book search <ISBN>`
 
 Used to search for a book from its ISBN, and displays its main information. ISBNs of length 10 and 13 are accepted.
-
-
-----------
-Changelogs
-----------
-
-**Syntax:** :code:`changelogs [version]` or :code:`changelogs list`
-
-If you want to know the bot modification log, what has been changed in the last version or an older one, you can use this command. Introduced in version 3.5.5, it allows access to all bot changelogs from this version. For older versions, you will have to go directly to the channels of the official server!
-
-.. note:: Giving the "`Embed Links <perms.html#embed-links>`__" permission to the bot can be useful if you want to get a better rendering. But it's not mandatory!
 
 
 -----
