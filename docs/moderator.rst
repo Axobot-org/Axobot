@@ -192,7 +192,7 @@ Here is the list of levels:
     * no filter
 * Smooth
     * kick users with invitations in their nickname
-    * time-out for 1h users sending 5 mentions in a short time
+    * time-out for 1h users sending 5 invites in a short time
     * time-out for 30min users sending 20 mentions in a short time
 * Careful
     * kick accounts created less than 2 hours before
