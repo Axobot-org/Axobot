@@ -95,12 +95,3 @@ An easy command to get some stats about the bot. Total XP collected by every use
 **Syntax:** :code:`stats commands`
 
 A list of the most used bot commands, sorted in descending order, both over the last 24 hours and since the beginning of the statistics recording!
-
-
----------------
-Welcome message
----------------
-
-**Syntax:** :code:`welcome` or :code:`bvn`
-
-This command helps you to define a message sent automatically by Axobot when a member joins or leaves your server (see the `config <server.html>`_ command). You will find how to select the channel, as well as the variables that can be used in the messages.

@@ -98,7 +98,7 @@ List of every option
 * voice_roles: List of roles given to people being in a voice channel
 * vote_emojis: List of emojis that the bot will have to use when there is a voting message. This case may occur when using the poll command, or in a poll channel.
 * warn_allowed_roles: List of roles allowed to use the `warn <moderator.html#warn>`__ and `cases <moderator.html#handling-cases>`__ commands. By default, none.
-* welcome: Message sent when a member joins your server. Some variables are usable, enter the `welcome <infos.html#welcome>`__ command to see them.
+* welcome: Message sent when a member joins your server.
 * welcome_channel: List of channels where messages when a member joins/leaves the server will be sent. By default, none.
 * welcome_roles: List of roles automatically given to members when they join the server. It is necessary that the bot is above the roles in question, and that it has the permission "Manage roles".
 * xp_rate: Exp modifier, which multiplies the gain of xp by this number. It must be between 0.1 and 3, rounded to the nearest 1/100.
