@@ -1,7 +1,7 @@
 import datetime
 import json
 import logging
-from typing import Any, Generator, Literal, Optional, Union
+from typing import Any, AsyncGenerator, Literal, Optional, Union
 
 import discord
 from discord.ext import commands, tasks
@@ -226,7 +226,7 @@ class BotEvents(commands.Cog):
         "Get some event points every hour"
         await self.subcog.collect_cmd(ctx)
 
-    async def get_user_unlockable_rankcards(self, user: discord.User, points: Optional[int]=None) -> Generator[str, Any, None]:
+    async def get_user_unlockable_rankcards(self, user: discord.User, points: Optional[int]=None) -> AsyncGenerator[str, Any, None]:
         "Get a list of event rank cards that the user can unlock"
         if (users_cog := self.bot.get_cog("Users")) is None:
             return
