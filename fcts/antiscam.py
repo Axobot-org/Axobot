@@ -24,7 +24,7 @@ def is_immune(member: discord.Member) -> bool:
             or member.guild_permissions.manage_messages
             or member.guild_permissions.manage_guild)
 
-HARMLESS_DELETION_THRESHOLD = 0.005
+HARMLESS_DELETION_THRESHOLD = 0.007
 HARMLESS_WARNING_THRESHOLD = 0.3
 
 class AntiScam(commands.Cog):
@@ -364,10 +364,10 @@ class AntiScam(commands.Cog):
                 message.category = 0
                 self.log.info("Detected (%s): %s", result.probabilities[2], message.message)
             harmless_probability = result.probabilities[1]
-            if harmless_probability < HARMLESS_DELETION_THRESHOLD:
+            if harmless_probability <= HARMLESS_DELETION_THRESHOLD:
                 msg_id = await self.db_insert_msg(message)
                 await self.send_report(msg.author, msg_id, message)
-            elif harmless_probability < HARMLESS_WARNING_THRESHOLD:
+            elif harmless_probability <= HARMLESS_WARNING_THRESHOLD:
                 msg_id = await self.db_insert_msg(message)
                 await self.send_report(msg.author, msg_id, message)
             self.recent_scans[msg.content] = result
@@ -379,7 +379,7 @@ class AntiScam(commands.Cog):
                 pass
             await self.send_bot_log(msg, deleted=True)
             self.bot.dispatch("antiscam_delete", msg, result)
-        elif harmless_probability < HARMLESS_WARNING_THRESHOLD:
+        elif harmless_probability <= HARMLESS_WARNING_THRESHOLD:
             await self.send_bot_log(msg, deleted=False)
             self.bot.dispatch("antiscam_warn", msg, result)
 
