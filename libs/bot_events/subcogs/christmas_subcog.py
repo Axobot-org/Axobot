@@ -2,11 +2,11 @@ import datetime as dt
 from collections import defaultdict
 from random import choices, random
 from typing import Optional
-from cachetools import TTLCache
 
 import discord
 import emoji
 from asyncache import cached
+from cachetools import TTLCache
 
 from libs.bot_classes import Axobot
 from libs.bot_events.dict_types import EventData, EventItem, EventType
