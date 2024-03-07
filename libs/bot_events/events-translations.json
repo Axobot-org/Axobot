@@ -8,6 +8,7 @@
             "blurple-2023": "Nous célébrons en ce moment le 8e anniversaire de Discord ! Pour l'occasion, Axobot se met aux couleurs de Discord, le célèbre blurple, et vous propose de récupérer une carte d'XP spéciale anniversaire !\n\nPour cela, il vous suffit de récupérer des points d'événements, en utilisant la commande `event collect` régulièrement ou en redécorant votre serveur avec la commande `blurple`.\n\nJoyeux anniversaire Discord !",
             "halloween-2023": "Le mois d'octobre est là ! Profitez jusqu'au 1er novembre d'une atmosphère ténébreuse, remplie de chauve-souris, de squelettes et de citrouilles.\nProfitez-en pour redécorer votre serveur aux couleurs d'Halloween avec la commande `/halloween lightfy` et ses dérivées, vérifiez que votre avatar soit bien conforme avec la commande `/halloween check`, et récupérez des points d'événements le plus régulièrement possible avec la commande `/event collect`.\n\nLes plus téméraires d'entre vous réussirons peut-être à débloquer la carte d'xp spécial Halloween 2023, que vous pourrez utiliser via la commande `/profile card` !",
             "christmas-2023": "Noël approche ! Pendant le mois de décembre, participez aux festivités en collectant votre récompense chaque jour du calendrier de l'avent, jouez au morpion pour gagner des points d'événement, et récupérez la carte d'XP spécial Noël 2023 le 25 décembre avec `/event collect` !\nLes trois meilleurs participants (hors équipe du bot) gagneront même un **mois d'abonnement Nitro !**",
+            "april-2024": "La journée internationale des poissons fait son retour ! Pendant toute la journée, Axobot fêtera le 1er avril avec des réactions aléatoires sur le thème des poissons, des commandes uniques ainsi que d'autres choses trop cool.\nAvec un peu de chance, vous trouverez peut-être la carte d'xp collector cachée dans les réactions !\n\nPour rappel, les cartes d'xp sont accessibles via ma commande `profile card`",
             "test-2022": "Test event!"
         },
         "events_prices": {
@@ -32,6 +33,9 @@
             "christmas-2023": {
                 "300": "Venez réclamer votre rôle spécial Noël 2023 sur le serveur officiel d'Axobot !",
                 "600": "Débloquez la carte d'xp Noël 2023 le 25 décembre avec `/event collect` !"
+            },
+            "april-2024": {
+                "1": "Débloquez la carte d'xp Avril 2024, obtenable pendant seulement 24h !"
             }
         },
         "events_title": {
@@ -42,6 +46,7 @@
             "blurple-2023": "Joyeux anniversaire Discord !",
             "halloween-2023": "Le temps des citrouilles est arrivé !",
             "christmas-2023": "Joyeux Noël !",
+            "april-2024": "Joyeux 1er avril !",
             "test-2022": "Test event!"
         }
     },
@@ -54,6 +59,7 @@
             "blurple-2023": "We are currently celebrating Discord's 8th anniversary! For the occasion, Axobot is turning Discord's famous blurple color, and offers you to get a special anniversary XP card!\n\nTo do so, all you have to do is collect event points, by using the `event collect` command regularly or by redecorating your server with the `blurple` command.\n\nHappy birthday Discord!",
             "halloween-2023": "October is upon us! Until November 1st, you'll be able to enjoy an atmosphere of darkness, full of bats, skeletons and pumpkins.\nTake advantage of this time to redecorate your server in Halloween colors with the `/halloween lightfy` command and its derivatives, check that your avatar is in tune with the `/halloween check` command, and collect event points as regularly as possible with the `/event collect` command. \nThe most daring among you may even manage to unlock the special Halloween 2023 xp card, which you will be able to use via the `/profile card` command!",
             "christmas-2023": "Christmas is coming! During the month of December, take part in the festivities by collecting your reward each day of the advent calendar, play tic-tac-toe to earn event points, and collect the special Christmas 2023 XP card on December 25 with `/event collect`!\nThe three best participants (excluding the bot staff) will even win **a month's Nitro subscription!**",
+            "april-2024": "International Fish Day is back! Throughout the day, Axobot will be celebrating April 1st with random fish-themed reactions, unique commands and other cool stuff.\nWith a little luck, you might find the hidden collector's XP card in the reactions!\n\nAs a reminder, the XP cards are accessible via my `profile card` command",
             "test-2022": "Test event!"
         },
         "events_prices": {
@@ -78,6 +84,9 @@
             "christmas-2023": {
                 "300": "Come claim your special Christmas 2023 role on the official Axobot server!",
                 "600": "Unlock the Christmas 2023 xp card on December 25 with `/event collect`!"
+            },
+            "april-2024": {
+                "1": "Unlock the April 2024 xp card, obtainable only for 24h!"
             }
         },
         "events_title": {
@@ -88,6 +97,7 @@
             "blurple-2023": "Happy birthday Discord!",
             "halloween-2023": "It's pumpkin time!",
             "christmas-2023": "Merry Christmas!",
+            "april-2024": "Happy April 1st!",
             "test-2022": "Test event!"
         }
     }

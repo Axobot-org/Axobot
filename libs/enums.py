@@ -1,7 +1,4 @@
 from enum import Enum
-from typing import Optional
-
-import discord
 
 
 class RankCardsFlag:
@@ -22,6 +19,7 @@ class RankCardsFlag:
         1 << 12: "blurple23",
         1 << 13: "halloween23",
         1 << 14: "christmas23",
+        1 << 15: "april24",
     }
 
     def flags_to_int(self, flags: list) -> int:
@@ -84,4 +82,3 @@ class ServerWarningType(Enum):
     RSS_TWITTER_DISABLED = 10
     # role, user
     TEMP_ROLE_REMOVE_FORBIDDEN = 11
-
