@@ -4,6 +4,7 @@ from .get_translations import get_events_translations
 from .subcogs.abstract_subcog import AbstractSubcog
 from .subcogs.christmas_subcog import ChristmasSubcog
 from .subcogs.random_collect_subcog import RandomCollectSubcog
+from .subcogs.singlereaction_subcog import SingleReactionSubcog
 
 __all__ = (
     "get_events_translations",
@@ -13,6 +14,7 @@ __all__ = (
     "EventType",
     "EventItemWithCount",
     "AbstractSubcog",
-    "RandomCollectSubcog",
     "ChristmasSubcog",
+    "RandomCollectSubcog",
+    "SingleReactionSubcog",
 )

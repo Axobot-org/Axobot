@@ -1,14 +1,14 @@
 import datetime
 import json
 import logging
-from typing import Any, AsyncGenerator, Literal, Optional, Union
+from typing import AsyncGenerator, Literal, Optional, Union
 
 import discord
 from discord.ext import commands, tasks
 
 from libs.bot_classes import SUPPORT_GUILD_ID, Axobot, MyContext
-from libs.bot_events import (AbstractSubcog, ChristmasSubcog, EventData,
-                             EventRewardRole, EventType)
+from libs.bot_events import (AbstractSubcog, EventData, EventRewardRole,
+                             EventType, SingleReactionSubcog)
 from libs.checks.checks import database_connected
 from libs.formatutils import FormatUtils
 
@@ -30,7 +30,7 @@ class BotEvents(commands.Cog):
         self.coming_event_id: Optional[str] = None
         self.update_current_event()
 
-        self._subcog: AbstractSubcog = ChristmasSubcog(
+        self._subcog: AbstractSubcog = SingleReactionSubcog(
             self.bot, self.current_event, self.current_event_data, self.current_event_id)
 
     @property
@@ -38,7 +38,7 @@ class BotEvents(commands.Cog):
         "Return the subcog populated with the current event data"
         if self._subcog.current_event != self.current_event or self._subcog.current_event_data != self.current_event_data:
             self.log.debug("Updating subcog with new data")
-            self._subcog = ChristmasSubcog(self.bot, self.current_event, self.current_event_data, self.current_event_id)
+            self._subcog = SingleReactionSubcog(self.bot, self.current_event, self.current_event_data, self.current_event_id)
         return self._subcog
 
     async def cog_load(self):
@@ -140,8 +140,7 @@ class BotEvents(commands.Cog):
     async def event_info(self, ctx: MyContext):
         """Get info about the current event"""
         current_event = self.current_event_id
-        lang = await self.bot._(ctx.channel, '_used_locale')
-        lang = 'en' if lang not in ('en', 'fr') else lang
+        lang = await self.subcog.get_event_language(ctx.channel)
         events_desc = self.subcog.translations_data[lang]["events_desc"]
 
         if current_event in events_desc:
@@ -192,10 +191,13 @@ class BotEvents(commands.Cog):
 
     async def get_info_prices_field(self, channel):
         "Get the prices field text for the current event"
-        prices_translations = self.subcog.translations_data["en"]["events_prices"]
+        lang = await self.subcog.get_event_language(channel)
+        prices_translations = self.subcog.translations_data[lang]["events_prices"]
         if self.current_event_id not in prices_translations:
             return await self.bot._(channel, "bot_events.nothing-desc")
         points = await self.bot._(channel, "bot_events.points")
+        if lang == "fr":
+            points += " "
         prices: list[str] = []
         for required_points, description in prices_translations[self.current_event_id].items():
             related_objective = [
@@ -226,7 +228,7 @@ class BotEvents(commands.Cog):
         "Get some event points every hour"
         await self.subcog.collect_cmd(ctx)
 
-    async def get_user_unlockable_rankcards(self, user: discord.User, points: Optional[int]=None) -> AsyncGenerator[str, Any, None]:
+    async def get_user_unlockable_rankcards(self, user: discord.User, points: Optional[int]=None) -> AsyncGenerator[str, None]:
         "Get a list of event rank cards that the user can unlock"
         if (users_cog := self.bot.get_cog("Users")) is None:
             return

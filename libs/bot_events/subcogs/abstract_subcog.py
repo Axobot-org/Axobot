@@ -45,6 +45,13 @@ class AbstractSubcog(ABC):
     async def collect_cmd(self, ctx: MyContext):
         "Collects the daily/hourly reward"
 
+    async def get_event_language(self, translation_source) -> Literal["fr", "en"]:
+        "Find which language to use for the event translations"
+        lang = await self.bot._(translation_source, '_used_locale')
+        if lang in ("fr", "fr2"):
+            return "fr"
+        return "en"
+
     async def generate_user_profile_rank_fields(self, ctx: MyContext, lang: Literal["fr", "en"], user: discord.User):
         "Compute the texts to display in the /event profile command"
         user_rank_query = await self.db_get_event_rank(user.id)

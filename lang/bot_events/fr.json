@@ -45,7 +45,8 @@
     },
     "reaction": {
         "positive": "Félicitations %{user}, tu as trouvé 1 %{item} ! Il a été ajouté à ta collection et t'a fait remporter **%{points} points d'événement** !",
-        "negative": "Oh non, %{user} tu as trouvé 1 %{item} ! Il a été ajouté à ta collection, mais t'a fait perdre **%{points} points d'événement**..."
+        "negative": "Oh non, %{user} tu as trouvé 1 %{item} ! Il a été ajouté à ta collection, mais t'a fait perdre **%{points} points d'événement**...",
+        "neutral": "Tu as trouvé 1 %{item} ! Il a été ajouté à ta collection."
     },
     "soon": "Un événement arrive bientôt ! Surveillez les informations, car il débutera le %{date}",
     "tictactoe": {
