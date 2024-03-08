@@ -9,6 +9,7 @@ from cachetools import TTLCache
 from libs.bot_classes import Axobot
 from libs.bot_events.dict_types import EventData, EventItem, EventType
 from libs.bot_events.subcogs.abstract_subcog import AbstractSubcog
+from libs.formatutils import FormatUtils
 
 
 class SingleReactionSubcog(AbstractSubcog):
@@ -47,12 +48,24 @@ class SingleReactionSubcog(AbstractSubcog):
         item = self.pending_reactions[payload.message_id]
         if payload.emoji.name != item["emoji"]:
             return
+        # find which channel and language to use
+        channel = await self.get_reaction_destination_channel(payload)
+        if channel is None:
+            return
+        translation_source = payload.guild_id or payload.user_id
+        lang = await self.get_event_language(translation_source)
+        # check last collect from this user
+        seconds_since_last_collect = await self.get_seconds_since_last_collect(payload.user_id)
+        if seconds_since_last_collect < self.collect_cooldown:
+            # user is trying to collect too quickly
+            time_remaining = self.collect_cooldown - seconds_since_last_collect
+            remaining = await FormatUtils.time_delta(time_remaining, lang=lang, seconds=time_remaining < 60)
+            await channel.send(await self.bot._(translation_source, "bot_events.reaction.too-quick", time=remaining))
+            return
         del self.pending_reactions[payload.message_id]
         # add item to user collection
         await self.db_add_user_items(payload.user_id, [item["item_id"]])
         # prepare the notification embed
-        translation_source = payload.guild_id or payload.user_id
-        lang = await self.get_event_language(translation_source)
         title = self.translations_data[lang]["events_title"][self.current_event_id]
         desc_key = "bot_events.reaction.neutral"
         name_key = "french_name" if lang in ("fr", "fr2") else "english_name"
@@ -62,19 +75,13 @@ class SingleReactionSubcog(AbstractSubcog):
         embed = discord.Embed(title=title, description=desc, color=self.current_event_data["color"])
         if self.current_event_data["icon"]:
             embed.set_image(url=self.current_event_data["icon"])
-        # get the destination channel
-        if (
-            (channel := self.bot.get_channel(payload.channel_id))
-            and channel.permissions_for(channel.guild.me).send_messages
-            and channel.permissions_for(channel.guild.me).embed_links
-        ):
+        # send the notification in the guild/DM channel
+        if isinstance(channel, discord.abc.PrivateChannel):
+            await channel.send(embed=embed)
+        else:
             await channel.send(embed=embed, delete_after=12)
-            # send the rank card notification if needed
-            await self.bot.get_cog("BotEvents").check_and_send_card_unlocked_notif(channel, payload.user_id)
-        elif (user := self.bot.get_user(payload.user_id)) and user.dm_channel is not None:
-            await user.dm_channel.send(embed=embed)
-            # send the rank card notification if needed
-            await self.bot.get_cog("BotEvents").check_and_send_card_unlocked_notif(user.dm_channel, payload.user_id)
+        # send the rank card notification if needed
+        await self.bot.get_cog("BotEvents").check_and_send_card_unlocked_notif(channel, payload.user_id)
         # add points (and potentially grant reward rank card)
         await self.db_add_collect(payload.user_id, item["points"])
 
@@ -95,6 +102,19 @@ class SingleReactionSubcog(AbstractSubcog):
             return any(trigger in message for trigger in data["triggers"])
         return False
 
+    async def get_reaction_destination_channel(self, payload: discord.RawReactionActionEvent):
+        "Find the correct channel to use when responding to a collect reaction"
+        # get the destination channel
+        if (
+            (channel := self.bot.get_channel(payload.channel_id))
+            and channel.permissions_for(channel.guild.me).send_messages
+            and channel.permissions_for(channel.guild.me).embed_links
+        ):
+            return channel
+        if (user := self.bot.get_user(payload.user_id)) and user.dm_channel is not None:
+            return user.dm_channel
+        return None
+
     @cached(TTLCache(maxsize=1, ttl=60*60*24))
     async def _get_suitable_reaction_items(self):
         "Get the list of items usable in reactions"
@@ -114,21 +134,3 @@ class SingleReactionSubcog(AbstractSubcog):
             items,
             weights=[item["frequency"] for item in items],
         )[0]
-
-    async def db_add_collect(self, user_id: int, points: int):
-        "Add collect points to a user"
-        if not self.bot.database_online or self.bot.current_event is None:
-            return
-        if points:
-            query = "INSERT INTO `event_points` (`user_id`, `collect_points`, `last_collect`, `beta`) \
-                VALUES (%s, %s, CURRENT_TIMESTAMP(), %s) \
-                ON DUPLICATE KEY UPDATE collect_points = collect_points + VALUE(`collect_points`), \
-                    last_collect = CURRENT_TIMESTAMP();"
-            async with self.bot.db_query(query, (user_id, points,  self.bot.beta)):
-                pass
-        if cog := self.bot.get_cog("BotEvents"):
-            try:
-                await cog.reload_event_rankcard(user_id)
-                await cog.reload_event_special_role(user_id)
-            except Exception as err:
-                self.bot.dispatch("error", err)

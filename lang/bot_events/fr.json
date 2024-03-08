@@ -7,23 +7,23 @@
         "today-gifts-late": "Voici les cadeaux du jour, ainsi que des %{days} jours manqués (**%{points} points**) :"
     },
     "collect": {
-        "got-points": "Vous n'avez pas trouvé d'objet intéressant cette fois-ci, mais vous avez tout de même réussi à **gagner %{points} points d'événement** !",
-        "lost-points": "Il semble que vous n'ayez pas trouvé d'objet à collectionner sur votre chemin, et que vous ayez inexplicablement **perdu %{points} points d'événement**...",
+        "got-points": "Tu n'as pas trouvé d'objet intéressant cette fois-ci, mais tu as tout de même réussi à **gagner %{points} points d'événement** !",
+        "lost-points": "Il semble que tu n'ai pas trouvé d'objet à collectionner sur ton chemin, et que tu ai inexplicablement **perdu %{points} points d'événement**...",
         "nothing": "Tu n'as rien trouvé d'intéressant sur ton chemin, espérons que tu auras plus de chance la prochaine fois !",
         "got-items": {
-            "one": "Vous avez trouvé **un %{item}** lors de votre voyage ! (%{points} points d'événement)",
-            "many": "Vous avez trouvé **%{count} objets** lors de votre voyage ! (%{points} points d'événement)"
+            "one": "Tu as trouvé **un %{item}** lors de ton voyage ! (%{points} points d'événement)",
+            "many": "Tu as trouvé **%{count} objets** lors de ton voyage ! (%{points} points d'événement)"
         },
-        "too-quick": "Il est encore trop tôt ! Vous ne pourrez collecter des points d'événement que dans %{time} !",
-        "strike-bonus": "Vous avez obtenu **%{bonus} points bonus** pour avoir utilisé cette commande %{level} fois de suite !"
+        "too-quick": "Il est encore trop tôt ! Tu ne pourras collecter des points d'événement que dans %{time} !",
+        "strike-bonus": "Tu as obtenu **%{bonus} points bonus** pour avoir utilisé cette commande %{level} fois de suite !"
     },
     "collection-empty": {
-        "user": "Votre collection est vide, vous devriez récupérer quelques items !",
+        "user": "Ta collection est vide, tu devrais chercher quelques items !",
         "other": "La collection de %{user} est vide, pour l'instant"
     },
     "collection-more": "... et %{count} autres !",
     "collection-title": {
-        "user": "Votre collection",
+        "user": "Ta collection",
         "other": "Collection de %{user}"
     },
     "events-price-title": "Prix à gagner",
@@ -46,12 +46,13 @@
     "reaction": {
         "positive": "Félicitations %{user}, tu as trouvé 1 %{item} ! Il a été ajouté à ta collection et t'a fait remporter **%{points} points d'événement** !",
         "negative": "Oh non, %{user} tu as trouvé 1 %{item} ! Il a été ajouté à ta collection, mais t'a fait perdre **%{points} points d'événement**...",
-        "neutral": "Tu as trouvé 1 %{item} ! Il a été ajouté à ta collection."
+        "neutral": "Tu as trouvé 1 %{item} ! Il a été ajouté à ta collection.",
+        "too-quick": "Tu as déjà collecté un objet récemment et tu es trop fatigué pour continuer. Tente à nouveau ta chance dans %{time} !"
     },
     "soon": "Un événement arrive bientôt ! Surveillez les informations, car il débutera le %{date}",
     "tictactoe": {
         "reward-title": "Victoire au morpion !",
-        "reward-desc": "En remportant ce match, vous avez gagné **%{points} points d'événement** !"
+        "reward-desc": "En remportant ce match, tu as gagné **%{points} points d'événement** !"
     },
     "tip-title": "Astuce aléatoire",
     "unclassed": "Non classé",
