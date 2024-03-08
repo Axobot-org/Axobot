@@ -288,21 +288,3 @@ the end of the event? Don't forget to join our [support server](https://discord.
             items,
             weights=[item["frequency"] for item in items],
         )[0]
-
-    async def db_add_collect(self, user_id: int, points: int):
-        """Add collect points to a user"""
-        if not self.bot.database_online or self.bot.current_event is None:
-            return
-        if points:
-            query = "INSERT INTO `event_points` (`user_id`, `collect_points`, `last_collect`, `beta`) \
-                VALUES (%s, %s, CURRENT_TIMESTAMP(), %s) \
-                ON DUPLICATE KEY UPDATE collect_points = collect_points + VALUE(`collect_points`), \
-                    last_collect = CURRENT_TIMESTAMP();"
-            async with self.bot.db_query(query, (user_id, points,  self.bot.beta)):
-                pass
-        if cog := self.bot.get_cog("BotEvents"):
-            try:
-                await cog.reload_event_rankcard(user_id)
-                await cog.reload_event_special_role(user_id)
-            except Exception as err:
-                self.bot.dispatch("error", err)
