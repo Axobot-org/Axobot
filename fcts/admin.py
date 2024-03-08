@@ -699,7 +699,7 @@ Cette option affecte tous les serveurs"""
         """Retire une carte d'xp à un utilisateur"""
         rankcards: list[str] = await self.bot.get_cog("Users").get_rankcards(user)
         if rankcard not in rankcards:
-            await ctx.send(f"L'utilisateur {user} n'a déjà pas ce flag")
+            await ctx.send(f"L'utilisateur {user} n'a déjà pas cette carte d'xp")
             return
         rankcards.remove(rankcard)
         await self.bot.get_cog('Users').set_rankcard(user, rankcard, add=False)
