@@ -45,7 +45,8 @@
     },
     "reaction": {
         "positive": "Gratulujeme %{user}, našli jste jeden %{item}! Byl přidán do vaší kolekce a získal jsi ** bodů události%{points}**!",
-        "negative": "Ale ne %{user}, nalezl jsi jeden %{item}! Byl přidán do vaší kolekce, ale ztratil jsi ** body události%{points} **..."
+        "negative": "Ale ne %{user}, nalezl jsi jeden %{item}! Byl přidán do vaší kolekce, ale ztratil jsi ** body události%{points} **...",
+        "neutral": "Našli jste jeden %{item}! Byl přidán do vaší kolekce."
     },
     "soon": "Událost se blíží! Sledujte informace, protože začne %{date}",
     "tictactoe": {
