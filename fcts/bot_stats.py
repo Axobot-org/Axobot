@@ -284,7 +284,7 @@ class BotStats(commands.Cog):
         async with self.bot.db_query(query, (self.bot.beta,), fetchone=True, astuple=True) as query_result:
             if query_result[0] == 0:
                 return
-        # unit, is_sum, entity_id
+        # unit, is_sum, entity_id, beta
         args = ("points", False, self.bot.entity_id, self.bot.beta)
         # Total
         query = "INSERT INTO `statsbot`.`zbot` SELECT %s, %s, SUM(collect_points) AS value, 0, %s, %s, %s FROM `axobot`.`event_points` WHERE `beta` = %s"
@@ -320,6 +320,12 @@ class BotStats(commands.Cog):
     async def db_record_event_points_values(self, now: datetime):
         """Record into the stats table the total, min, max and median event points values,
         as well as the number of users having at least 1 point"""
+        # check if any daily is present
+        query = "SELECT COUNT(*) FROM `axobot`.`event_points` WHERE `beta` = %s"
+        async with self.bot.db_query(query, (self.bot.beta,), fetchone=True, astuple=True) as query_result:
+            if query_result[0] == 0:
+                return
+        # unit, is_sum, entity_id, beta
         args = ("points", False, self.bot.entity_id, self.bot.beta)
         # Total
         query = "INSERT INTO `statsbot`.`zbot` SELECT %s, %s, SUM(`points`) AS value, 0, %s, %s, %s FROM `axobot`.`event_points` WHERE `beta` = %s"
