@@ -243,6 +243,24 @@ class AbstractSubcog(ABC):
         async with self.bot.db_query(query, [arg for item_id in items_ids for arg in (user_id, item_id, self.bot.beta)]):
             pass
 
+    async def db_add_collect(self, user_id: int, points: int):
+        "Add collect points to a user"
+        if not self.bot.database_online or self.bot.current_event is None:
+            return
+        if points:
+            query = "INSERT INTO `event_points` (`user_id`, `collect_points`, `last_collect`, `beta`) \
+                VALUES (%s, %s, CURRENT_TIMESTAMP(), %s) \
+                ON DUPLICATE KEY UPDATE collect_points = collect_points + VALUE(`collect_points`), \
+                    last_collect = CURRENT_TIMESTAMP();"
+            async with self.bot.db_query(query, (user_id, points,  self.bot.beta)):
+                pass
+        if cog := self.bot.get_cog("BotEvents"):
+            try:
+                await cog.reload_event_rankcard(user_id)
+                await cog.reload_event_special_role(user_id)
+            except Exception as err:
+                self.bot.dispatch("error", err)
+
     async def db_get_event_items(self, event_type: EventType) -> list[EventItem]:
         "Get the items to win during a specific event"
         if not self.bot.database_online:
