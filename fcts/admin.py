@@ -611,6 +611,7 @@ Cette option affecte tous les serveurs"""
     @commands.check(checks.is_bot_admin)
     async def admin_flag_list(self, ctx: MyContext, user: discord.User):
         "Liste les flags d'un utilisateur"
+        await ctx.defer()
         userflags: list[str] = sorted(await self.bot.get_cog("Users").get_userflags(user))
         if userflags:
             await ctx.send(f"Liste des flags de {user} : {', '.join(userflags)}")
@@ -627,6 +628,7 @@ Cette option affecte tous les serveurs"""
         """Ajoute un flag à un utilisateur
 
         Flags valides : support, contributor, premium, partner, translator, cookie"""
+        await ctx.defer()
         userflags: list[str] = await self.bot.get_cog("Users").get_userflags(user)
         if flag in userflags:
             await ctx.send(f"L'utilisateur {user} a déjà ce flag !")
@@ -645,6 +647,7 @@ Cette option affecte tous les serveurs"""
         """Retire un flag à un utilisateur
 
         Flags valides : support, contributor, premium, partner, translator, cookie"""
+        await ctx.defer()
         userflags: list[str] = await self.bot.get_cog("Users").get_userflags(user)
         if flag not in userflags:
             await ctx.send(f"L'utilisateur {user} n'a déjà pas ce flag")
@@ -667,6 +670,7 @@ Cette option affecte tous les serveurs"""
     @commands.check(checks.is_bot_admin)
     async def admin_card_list(self, ctx: MyContext, user: discord.User):
         "Liste les cartes d'xp d'un utilisateur"
+        await ctx.defer()
         rankcards: list[str] = sorted(await self.bot.get_cog("Users").get_rankcards(user))
         if rankcards:
             await ctx.send(f"Liste des cartes d'xp de {user} : {', '.join(rankcards)}")
@@ -681,6 +685,7 @@ Cette option affecte tous les serveurs"""
     ])
     async def admin_card_add(self, ctx: MyContext, user: discord.User, rankcard: str):
         """Autorise une carte d'xp à un utilisateur"""
+        await ctx.defer()
         rankcards: list[str] = await self.bot.get_cog("Users").get_rankcards(user)
         if rankcard in rankcards:
             await ctx.send(f"L'utilisateur {user} a déjà cette carte d'xp !")
@@ -697,6 +702,7 @@ Cette option affecte tous les serveurs"""
     ])
     async def admin_card_remove(self, ctx: MyContext, user: discord.User, rankcard: str):
         """Retire une carte d'xp à un utilisateur"""
+        await ctx.defer()
         rankcards: list[str] = await self.bot.get_cog("Users").get_rankcards(user)
         if rankcard not in rankcards:
             await ctx.send(f"L'utilisateur {user} n'a déjà pas cette carte d'xp")
