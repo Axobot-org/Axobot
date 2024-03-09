@@ -179,6 +179,35 @@ class AbstractSubcog(ABC):
             return 1e9
         return (self.bot.utcnow() - last_collect).total_seconds()
 
+    async def add_collect(self, user_id: int, points: int, send_notif_to_channel: Optional[discord.TextChannel] = None):
+        "Add collect points to a user"
+        if not self.bot.database_online or self.bot.current_event is None:
+            return
+        await self.db_add_collect(user_id, points, with_strike=False)
+        if cog := self.bot.get_cog("BotEvents"):
+            try:
+                if send_notif_to_channel:
+                    await cog.check_and_send_card_unlocked_notif(send_notif_to_channel, user_id)
+                await cog.reload_event_rankcard(user_id)
+                await cog.reload_event_special_role(user_id)
+            except Exception as err:
+                self.bot.dispatch("error", err)
+
+    async def add_collect_and_strike(self, user_id: int, points: int, send_notif_to_channel: Optional[discord.TextChannel]=None):
+        """Add collect points to a user and increase the strike level by 1"""
+        if not self.bot.database_online or self.bot.current_event is None:
+            return True
+        await self.db_add_collect(user_id, points, with_strike=True)
+        if cog := self.bot.get_cog("BotEvents"):
+            try:
+                if send_notif_to_channel:
+                    await cog.check_and_send_card_unlocked_notif(send_notif_to_channel, user_id)
+                await cog.reload_event_rankcard(user_id)
+                await cog.reload_event_special_role(user_id)
+            except Exception as err:
+                self.bot.dispatch("error", err)
+        return True
+
     async def db_get_event_top(self, number: int):
         "Get the event points leaderboard containing at max the given number of users"
         if not self.bot.database_online:
@@ -243,23 +272,24 @@ class AbstractSubcog(ABC):
         async with self.bot.db_query(query, [arg for item_id in items_ids for arg in (user_id, item_id, self.bot.beta)]):
             pass
 
-    async def db_add_collect(self, user_id: int, points: int):
-        "Add collect points to a user"
+    async def db_add_collect(self, user_id: int, points: int, with_strike: bool):
+        """Add collect points to a user, and maybe increase the strike level by 1"""
         if not self.bot.database_online or self.bot.current_event is None:
             return
-        if points:
+        if with_strike:
+            query = "INSERT INTO `event_points` (`user_id`, `collect_points`, `strike_level`, `beta`) VALUES (%s, %s, 1, %s) \
+                ON DUPLICATE KEY UPDATE collect_points = collect_points + VALUE(`collect_points`), \
+                    strike_level = strike_level + 1, \
+                    last_collect = CURRENT_TIMESTAMP();"
+        elif points:
             query = "INSERT INTO `event_points` (`user_id`, `collect_points`, `last_collect`, `beta`) \
                 VALUES (%s, %s, CURRENT_TIMESTAMP(), %s) \
                 ON DUPLICATE KEY UPDATE collect_points = collect_points + VALUE(`collect_points`), \
                     last_collect = CURRENT_TIMESTAMP();"
-            async with self.bot.db_query(query, (user_id, points,  self.bot.beta)):
-                pass
-        if cog := self.bot.get_cog("BotEvents"):
-            try:
-                await cog.reload_event_rankcard(user_id)
-                await cog.reload_event_special_role(user_id)
-            except Exception as err:
-                self.bot.dispatch("error", err)
+        else:
+            return
+        async with self.bot.db_query(query, (user_id, points, self.bot.beta)):
+            pass
 
     async def db_get_event_items(self, event_type: EventType) -> list[EventItem]:
         "Get the items to win during a specific event"
