@@ -110,7 +110,10 @@ class RandomCollectSubcog(AbstractSubcog):
             if strike_level and bonus != 0:
                 txt += "\n\n" + \
                     await self.bot._(ctx.channel, 'bot_events.collect.strike-bonus', bonus=bonus, level=strike_level+1)
-            await self.db_add_collect(ctx.author.id, points + bonus, increase_strike=is_strike)
+            if is_strike:
+                await self.add_collect_and_strike(ctx.author.id, points + bonus, send_notif_to_channel=ctx.channel)
+            else:
+                await self.add_collect(ctx.author.id, points + bonus, send_notif_to_channel=ctx.channel)
         # send result
         if ctx.can_send_embed:
             title = self.translations_data[lang]["events_title"][current_event]
@@ -191,32 +194,3 @@ class RandomCollectSubcog(AbstractSubcog):
         query = "SELECT `strike_level` FROM `event_points` WHERE `user_id` = %s AND `beta` = %s;"
         async with self.bot.db_query(query, (user_id, self.bot.beta), fetchone=True) as query_result:
             return query_result["strike_level"] if query_result else 0
-
-    async def db_add_collect(self, user_id: int, points: int, increase_strike: bool):
-        """Add collect points to a user
-        if increase_strike is True, the strike level will be increased by 1, else it will be reset to 0"""
-        try:
-            if not self.bot.database_online or self.bot.current_event is None:
-                return True
-            if increase_strike:
-                query = "INSERT INTO `event_points` (`user_id`, `collect_points`, `strike_level`, `beta`) VALUES (%s, %s, 1, %s) \
-                    ON DUPLICATE KEY UPDATE collect_points = collect_points + VALUE(`collect_points`), \
-                        strike_level = strike_level + 1, \
-                        last_collect = CURRENT_TIMESTAMP();"
-            else:
-                query = "INSERT INTO `event_points` (`user_id`, `collect_points`, `beta`) VALUES (%s, %s, %s) \
-                    ON DUPLICATE KEY UPDATE collect_points = collect_points + VALUE(`collect_points`), \
-                        strike_level = 0, \
-                        last_collect = CURRENT_TIMESTAMP();"
-            async with self.bot.db_query(query, (user_id, points, self.bot.beta)):
-                pass
-            if cog := self.bot.get_cog("BotEvents"):
-                try:
-                    await cog.reload_event_rankcard(user_id)
-                    await cog.reload_event_special_role(user_id)
-                except Exception as err:
-                    self.bot.dispatch("error", err)
-            return True
-        except Exception as err:
-            self.bot.dispatch("error", err)
-            return False

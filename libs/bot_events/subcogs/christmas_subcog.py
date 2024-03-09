@@ -90,6 +90,7 @@ class ChristmasSubcog(AbstractSubcog):
         embed = discord.Embed(title=title, description=desc, color=self.current_event_data["color"])
         if self.current_event_data["icon"]:
             embed.set_image(url=self.current_event_data["icon"])
+        notif_channel = None
         # get the destination channel
         if (
             (channel := self.bot.get_channel(payload.channel_id))
@@ -97,14 +98,12 @@ class ChristmasSubcog(AbstractSubcog):
             and channel.permissions_for(channel.guild.me).embed_links
         ):
             await channel.send(embed=embed, delete_after=12)
-            # send the rank card notification if needed
-            await self.bot.get_cog("BotEvents").check_and_send_card_unlocked_notif(channel, payload.user_id)
+            notif_channel = channel
         elif (user := self.bot.get_user(payload.user_id)) and user.dm_channel is not None:
             await user.dm_channel.send(embed=embed)
-            # send the rank card notification if needed
-            await self.bot.get_cog("BotEvents").check_and_send_card_unlocked_notif(user.dm_channel, payload.user_id)
+            notif_channel = user.dm_channel
         # add points (and potentially grant reward rank card)
-        await self.db_add_collect(payload.user_id, item["points"])
+        await self.add_collect(payload.user_id, item["points"], send_notif_to_channel=notif_channel)
 
     async def profile_cmd(self, ctx, user):
         "Displays the profile of the user"
@@ -171,12 +170,10 @@ class ChristmasSubcog(AbstractSubcog):
             emb.add_field(**await self.get_random_tip_field(ctx.channel))
             emb.set_thumbnail(url="https://cdn-icons-png.flaticon.com/512/4213/4213958.png")
             await ctx.send(embed=emb)
-            # send the rank card notification if needed
-            await self.bot.get_cog("BotEvents").check_and_send_card_unlocked_notif(ctx.channel, ctx.author)
         else:
             await ctx.send(txt)
         # add points (and potentially grant reward rank card)
-        await self.db_add_collect(ctx.author.id, sum(item["points"] for item in gifts))
+        await self.add_collect(ctx.author.id, sum(item["points"] for item in gifts), send_notif_to_channel=ctx.channel)
 
     @cached(TTLCache(maxsize=1, ttl=60*2)) # cache for 2min
     async def today(self):

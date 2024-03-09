@@ -45,6 +45,8 @@ class SingleReactionSubcog(AbstractSubcog):
         "Called when a reaction is added"
         if payload.message_id not in self.pending_reactions:
             return
+        if payload.member and payload.member.bot:
+            return
         item = self.pending_reactions[payload.message_id]
         if payload.emoji.name != item["emoji"]:
             return
@@ -80,10 +82,8 @@ class SingleReactionSubcog(AbstractSubcog):
             await channel.send(embed=embed)
         else:
             await channel.send(embed=embed, delete_after=12)
-        # send the rank card notification if needed
-        await self.bot.get_cog("BotEvents").check_and_send_card_unlocked_notif(channel, payload.user_id)
         # add points (and potentially grant reward rank card)
-        await self.db_add_collect(payload.user_id, item["points"])
+        await self.add_collect(payload.user_id, item["points"], send_notif_to_channel=channel)
 
     async def profile_cmd(self, ctx, user):
         "Displays the profile of the user"
