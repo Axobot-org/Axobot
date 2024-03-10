@@ -12,7 +12,6 @@
     "invalid-invite": "Neplatná pozvánka",
     "invalid-partner": "Partner nebyl nalezen",
     "missing-manage-guild": "Nelze najít pozvánky na server (chybí oprávnění \"Spravovat server\")",
-    "missing-reactions": "Oprávnění \"Přidat reakce\" chybí :confused:",
     "no-channel": "Nenastavili jste žádný partnerský kanál",
     "no-partner": "Nemáte žádného partnera",
     "no-partner-2": "Žádný server s vámi nemá partnerství",
@@ -26,6 +25,7 @@
         "one": "1 partner byl znovu načten",
         "zero": "Zdá se, že nemáte žádného partnera"
     },
+    "reset-desc": "Popis byl resetován!",
     "unknown-error": "Došlo k neznámé chybě. Pro více informací kontaktujte podporu",
     "unknown-server": "Partner serveru nebyl nalezen"
 }

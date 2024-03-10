@@ -67,7 +67,7 @@
         "already-mute": "Tento člen je již umlčen!",
         "already-unmute": "Tento člen není umlčen!",
         "cant-mute": "Jejda, zdá se, že na to nemám dostatečná oprávnění... Prosím, dejte mi oprávnění `Spravovat role` před pokračováním.",
-        "cant-timeout": "Jejda, nemám k tomu oprávnění... Prosím, dej mi oprávnění `Správa členů` před pokračováním, nebo si vytvoř umlčenou roli.",
+        "cant-timeout": "Omlouvám se, nemám oprávnění k provedení této akce. Prosím, udělte mi oprávnění Časově omezit členy nebo vytvořte roli \"Ztlumený\".",
         "list-title-0": "Seznam umlčených členů serveru \"%{guild}\"",
         "list-title-1": "Seznam 45 umlčených členů serveru \"%{guild}\"",
         "list-title-2": "Seznam 60 umlčených členů serveru \"%{guild}\"",

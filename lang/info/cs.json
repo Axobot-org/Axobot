@@ -7,16 +7,11 @@
         "sponsor": "Přispět:"
     },
     "about-main": "Ahoj! Jsem %{mention}!\nJsem bot, který vám umožní spoustu věcí: moderování, systém xp, statistiky, řízení partnerů a mnoho dalších super užitečných příkazů (a úplně zbytečných)!\nMůžete začít zadáním `!help` v tomto chatu, abyste viděli seznam dostupných příkazů, pak `!config see` vám umožní vidět možnosti konfigurace.\n\nMůj majitel (Z_runner) a já bychom chtěli poděkovat Awhikaxovi za jeho podporu během různých krizí, Aragorn1202 za všechny jeho nápady a věty plné zdravého rozumu, Adri za všechna ta krásná loga, emodži a profilové fotky a celému týmu překladatelů za jejich dlouholetou práci!\n\n:globe_with_meridians: Některé odkazy mohou být užitečné: %{links}\n\nPřeji hezký den!",
-    "admins-list": "Správci tohoto bota jsou: %{admins}",
     "bitly_already_shortened": "Tato adresa url je již zkrácena!",
     "bitly_long": "Původní URL: %{url}",
     "bitly_nobit": "Tato adresa není bit.ly odkaz!",
     "bitly_short": "Zkrácená adresa URL: %{url}",
     "cant-see-channel": "Ale né, vypadá to, že nemáte oprávnění k zobrazení tohoto kanálu. Požádejte moderátora!",
-    "changelogs": {
-        "index": "Seznam indexovaných verzí",
-        "notfound": "Nelze najít tuto verzi"
-    },
     "discordlinks": [
         "Stav serverů",
         "Discord ToS",

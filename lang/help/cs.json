@@ -147,15 +147,15 @@
     },
     "cmd-count": {
         "zero": "Žádný příkaz",
-        "one": "1 příkaz\n`%{p}help %{cog}` pro více informací",
-        "many": "Příkazy %{count}\n`%{p}nápověda %{cog}` pro získání seznamu"
+        "one": "1 příkaz\n`/help %{cog}` for more info",
+        "many": "%{count} Příkazy\n`/help %{cog}` pro získání seznamu"
     },
     "cmd-not-found": "Neexistuje žádný příkaz s názvem \"%{cmd}\"",
     "cog-empty-dm": "Žádný příkaz této kategorie není v DM k dispozici!",
     "description": "Popis",
     "embed_title": "Dostupné příkazy pro %{u}",
     "embed_title_dm": "Dostupné příkazy v DM",
-    "footer": "Napište {}help příkaz pro více informací o příkazu",
+    "footer": "Napište '/help command' pro více informací o příkazu",
     "more-subcmds": {
         "one": "a další 1",
         "many": "a %{count} více"
