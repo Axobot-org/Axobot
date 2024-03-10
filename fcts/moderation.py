@@ -1038,7 +1038,7 @@ The 'show_reasons' parameter is used to display the mute reasons.
         return [
             app_commands.Choice(name=emoji, value=emoji_id)
             for _, emoji, emoji_id in options
-        ]
+        ][:25]
 
     @emoji_group.command(name="list")
     @commands.guild_only()
