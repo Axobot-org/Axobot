@@ -45,17 +45,23 @@ class BotInfo(commands.Cog):
                         count += 1
         self.codelines = count
 
+    async def get_ignored_guilds(self) -> list[int]:
+        "Get the list of ignored guild IDs"
+        if self.bot.database_online:
+            if 'banned_guilds' not in self.bot.get_cog('Utilities').config.keys():
+                await self.bot.get_cog('Utilities').get_bot_infos()
+            return [
+                int(x)
+                for x in self.bot.get_cog('Utilities').config['banned_guilds'].split(";")
+                if len(x) > 0
+            ] + self.bot.get_cog('Reloads').ignored_guilds
+        return []
+
     async def get_guilds_count(self, ignored_guilds:list=None) -> int:
         "Get the number of guilds where the bot is"
         if ignored_guilds is None:
             if self.bot.database_online:
-                if 'banned_guilds' not in self.bot.get_cog('Utilities').config.keys():
-                    await self.bot.get_cog('Utilities').get_bot_infos()
-                ignored_guilds = [
-                    int(x)
-                    for x in self.bot.get_cog('Utilities').config['banned_guilds'].split(";")
-                    if len(x) > 0
-                ] + self.bot.get_cog('Reloads').ignored_guilds
+                ignored_guilds = await self.get_ignored_guilds()
             else:
                 return len(self.bot.guilds)
         return len([x for x in self.bot.guilds if x.id not in ignored_guilds])
@@ -85,10 +91,7 @@ class BotInfo(commands.Cog):
         else:
             cpu = 0.0
         # Guilds count
-        ignored_guilds = []
-        if self.bot.database_online:
-            ignored_guilds = [int(x) for x in self.bot.get_cog('Utilities').config['banned_guilds'].split(";") if len(x) > 0]
-        ignored_guilds += self.bot.get_cog('Reloads').ignored_guilds
+        ignored_guilds = await self.get_ignored_guilds()
         len_servers = await self.get_guilds_count(ignored_guilds)
         # Languages
         langs_list = list((await self.bot.get_cog('ServerConfig').get_languages(ignored_guilds)).items())
