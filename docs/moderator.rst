@@ -211,6 +211,7 @@ Here is the list of levels:
 * Extreme
     * ban users sending 5 invites in a short time for 4 weeks
     * ban accounts created less than 1h before for 2 weeks
+    * ban accounts created less than 3 hours before for a week
     * ban users sending 20 mentions in a short time for 2 week
     * ban accounts created less than 3 hours before for a week
     * kick accounts created less than 24h before
