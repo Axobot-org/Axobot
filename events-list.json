@@ -256,10 +256,10 @@
         }
     },
     "april-2024": {
-        "begin": "2024-03-01",
+        "begin": "2024-04-01",
         "end": "2024-04-02",
         "type": "fish",
-        "icon": "https://zrunner.me/cdn/fish22.png",
+        "icon": "https://zrunner.me/cdn/fish24.png",
         "color": 16733391,
         "objectives": [
             {
