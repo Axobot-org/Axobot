@@ -36,7 +36,7 @@ V3_CARDS = {
     "support",
     "blurple23",
     "halloween23",
-    "christmas23"
+    "christmas23",
     "april24",
 }
 
