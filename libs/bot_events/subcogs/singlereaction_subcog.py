@@ -87,7 +87,32 @@ class SingleReactionSubcog(AbstractSubcog):
 
     async def profile_cmd(self, ctx, user):
         "Displays the profile of the user"
-        print("profile_cmd")
+        lang = await self.get_event_language(ctx.channel)
+        events_desc = self.translations_data[lang]["events_desc"]
+
+        # if no event
+        if not self.current_event_id in events_desc:
+            await ctx.send(await self.bot._(ctx.channel, "bot_events.nothing-desc"))
+            if self.current_event_id:
+                self.bot.dispatch("error", ValueError(f"'{self.current_event_id}' has no event description"), ctx)
+            return
+        # if current event has no objectives
+        if not self.current_event_data["objectives"]:
+            cmd_mention = await self.bot.get_command_mention("event info")
+            await ctx.send(await self.bot._(ctx.channel, "bot_events.no-objectives", cmd=cmd_mention))
+            return
+
+        await ctx.defer()
+
+        title = await self.bot._(ctx.channel, "bot_events.rank-title")
+        desc = await self.bot._(ctx.channel, "bot_events.xp-howto")
+
+        emb = discord.Embed(title=title, description=desc, color=self.current_event_data["color"])
+        emb.set_author(name=user.global_name, icon_url=user.display_avatar.replace(static_format="png", size=32))
+        for field in await self.generate_user_profile_rank_fields(ctx, lang, user):
+            emb.add_field(**field)
+        emb.add_field(**await self.generate_user_profile_collection_field(ctx, user))
+        await ctx.send(embed=emb)
 
     async def collect_cmd(self, ctx):
         "Collects the daily/hourly reward"
