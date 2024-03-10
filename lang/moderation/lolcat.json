@@ -67,7 +67,7 @@
         "already-mute": "Dis membr iz 'lready mute!",
         "already-unmute": "This mber iznt muted!",
         "cant-mute": "Ooops, 't seemz dat I dont haz enough perms for that.... Plz give me perm `Manage roles` :eyes:",
-        "cant-timeout": "Oops, I cannot du that. Plz givme \"moderate members\" perms or create a muted rawl",
+        "cant-timeout": "Oops, I cannot du that. Plz givme \"Timeout members\" perms or create a muted role urself.",
         "list-title-0": "List ov mutd people in serv \"%{guild}\"",
         "list-title-1": "List ov a few (45) muted members of ur server \"%{guild}\"",
         "list-title-2": "Lits ov 60 muted members of dat guild \"%{guild}\"",

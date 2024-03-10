@@ -32,6 +32,7 @@
     "nothing-prices": "There's no thing 2 gain 4 this event :confused:",
     "no-objectives": "Dis event has no goal, no life meaning, nothing. At this point I wonder who am I, really.\nBut maybe %{cmd} would be more useful.",
     "objectives": "Objectives",
+    "ocean-cooldown": "Hooman, da ocean has bestowed its gifts upon you. Return in %{time} for anudder dose of sea treasures.",
     "points": "pts",
     "points-total": "Total pts",
     "position-global": "Globol rank",
@@ -45,7 +46,8 @@
     },
     "reaction": {
         "positive": "GG %{user}, u just got 1 %{item}! It got added 2 ur bag, and gave u **%{points} events points** yay!",
-        "negative": "Oh no %{user}, looks like u fund 1 %{item}! 'got added 2 ur bag, but made u lost **%{points} event points** :ohno:"
+        "negative": "Oh no %{user}, looks like u fund 1 %{item}! 'got added 2 ur bag, but made u lost **%{points} event points** :ohno:",
+        "neutral": "Hey lucky you! U just found 1 %{item}, got added 2 ur bag."
     },
     "soon": "Hey hey hey! ur too soon, try checking on %{date}! :hype:  ",
     "tictactoe": {

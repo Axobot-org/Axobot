@@ -9,8 +9,24 @@
         "label": "Šablona zprávy",
         "modal-success": "Ukládáme Vaše změny...",
         "placeholder": "Zde zadejte šablonu zprávy",
-        "previous": "Aktuální zpráva obsahuje  \n```\n%{text}\n```",
-        "text-version": "Zadejte prosím text, který bude použit při vytváření nového příspěvku. Můžete použít několik proměnných, z nichž zde je seznam:\n- `{author}`: autor příspěvku\n- `{channel}`: název kanálu (obvykle stejný jako autor)\n- `{date}`: datum příspěvku (UTC)\n- `{link}` nebo `{url}`: odkaz na příspěvek\n- `{logo}`: emoji reprezentující typ příspěvku (web, Twitter, YouTube...)\n- `{mentions}`: seznam zmíněných rolí\n- `{title}`: název příspěvku"
+        "confirmation": {
+            "current-structure": "Zde je aktuální struktura vašeho kanálu. Můžete jej upravit kliknutím na tlačítko '%{button_label}'.",
+            "variables-title": "Dostupné proměnné",
+            "variables-explanation": "Ve své šabloně zpráv můžete použít následující proměnné:",
+            "variables": {
+                "author": "`{author}`: autor příspěvku",
+                "channel": "`{channel}`: název kanálu (obvykle stejný jako autor)",
+                "date": "`{date}`: datum příspěvku pomocí značky Discord data",
+                "long_date": "`{long_date}`: datum příspěvku v UTC pomocí rozšířeného statického formátu",
+                "timestamp": "`{timestamp}`: Unixový čas příspěvku v sekundách, použitelný ve značce časové značky Discord",
+                "link": "`{link}` nebo `{url}`: odkaz na příspěvek",
+                "logo": "`{logo}`: emoji reprezentující typ příspěvku (web, Reddit, YouTube...)",
+                "mentions": "`{mentions}`: seznam zmíněných rolí",
+                "title": "`{title}`: název příspěvku",
+                "full_text": "`{full_text}`: úplný text příspěvku, pokud je k dispozici",
+                "description": "`{description}`: popis/shrnutí příspěvku, pokud je k dispozici"
+            }
+        }
     },
     "choose-delete": "Vyberte prosím kanály k odstranění",
     "choose-disable": "Prosím vyberte kanály k vypnutí",

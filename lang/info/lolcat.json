@@ -7,16 +7,11 @@
         "sponsor": "Give money:"
     },
     "about-main": "Ho hi hello! I'm %{mention} !\n\nIm a boat that alow you 2 do a loooooot of tings: modration, a' xp systèm, partnre managmnt, stATIstics & many oder super mega *wow* usefull commandz (and totlly pointlesz wanes)! \nU can strt by tipyng `!help` in dis tchat to se the llst for availabl kommands, then `!config see` wil LEtz you see teh configurashun optionz (a website ar in prePARtion)? \n\nOf helpin me in the creetion of the boat, my ownr Z an I wouLd like to tahnk Awhikax 4 hiz suport durin the variouz cryzes, Aragorn1202 of al hees idees and sentencez full for goob sence, Adri fr all dese beautifool loGoz, èmojiz nd profil picts, and the whole translators tim 4 they woark!\n\n:globe_with_meridians: Sum linqs can bee usefull:%{links}\n\nHas a nice dayz !",
-    "admins-list": "My super-cool admins are : %{admins}",
     "bitly_already_shortened": "lol no, no recursivity allowed there!",
     "bitly_long": "Slow link: %{url}",
     "bitly_nobit": "HAHA NOPE, dat's not a bit.ly link!",
     "bitly_short": "Quick linq: %{url}",
     "cant-see-channel": "Uhh nope, ur not allowed to see that!",
-    "changelogs": {
-        "index": "List of indexed versions",
-        "notfound": "Srry but i cannot find das version"
-    },
     "discordlinks": [
         "Servers status",
         "Discord ToS",

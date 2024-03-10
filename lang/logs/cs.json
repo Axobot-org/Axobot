@@ -7,7 +7,8 @@
     "mute": "%{user} (%{userid}) je nyní umlčen",
     "reason": {
         "autounmute": "automatické zapnutí ztlumení",
-        "invite": "Automatický (Discord pozvání)",
+        "invite": "Automod (Discord pozvánka na jejich uživatelské jméno)",
+        "invites": "Automod (spamování odkazů na Discord)",
         "memberchan": "Automatizovaná akce (konfigurační členský účet)",
         "mentions": "Automod (příliš mnoho poznámek)",
         "unban": "odbanován uživatelem %{user}",
