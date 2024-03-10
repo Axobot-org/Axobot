@@ -62,7 +62,7 @@ class SingleReactionSubcog(AbstractSubcog):
             # user is trying to collect too quickly
             time_remaining = self.collect_cooldown - seconds_since_last_collect
             remaining = await FormatUtils.time_delta(time_remaining, lang=lang, seconds=time_remaining < 60)
-            await channel.send(await self.bot._(translation_source, "bot_events.reaction.too-quick", time=remaining))
+            await channel.send(await self.bot._(translation_source, "bot_events.ocean-cooldown", time=remaining))
             return
         del self.pending_reactions[payload.message_id]
         # add item to user collection
