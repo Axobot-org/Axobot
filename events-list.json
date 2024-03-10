@@ -283,7 +283,9 @@
                 "fake news",
                 "fool",
                 "luck",
-                "chance"
+                "chance",
+                "axolotl",
+                "axobot"
             ],
             "probability": 0.18
         }
