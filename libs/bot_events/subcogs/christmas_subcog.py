@@ -107,8 +107,7 @@ class ChristmasSubcog(AbstractSubcog):
 
     async def profile_cmd(self, ctx, user):
         "Displays the profile of the user"
-        lang = await self.bot._(ctx.channel, '_used_locale')
-        lang = 'en' if lang not in ('en', 'fr') else lang
+        lang = await self.get_event_language(ctx.channel)
         events_desc = self.translations_data[lang]["events_desc"]
 
         # if no event
@@ -141,8 +140,7 @@ class ChristmasSubcog(AbstractSubcog):
     async def collect_cmd(self, ctx):
         "Collect your daily reward"
         current_event = self.current_event_id
-        lang = await self.bot._(ctx.channel, '_used_locale')
-        lang = 'en' if lang not in ('en', 'fr') else lang
+        lang = await self.get_event_language(ctx.channel)
         events_desc = self.translations_data[lang]["events_desc"]
         # if no event
         if not current_event in events_desc:
