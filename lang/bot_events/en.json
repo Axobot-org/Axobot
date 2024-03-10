@@ -32,6 +32,7 @@
     "nothing-prices": "There is nothing to gain for this event :confused:",
     "no-objectives": "This event has no points objective, no need for a farm for once!\nSee the command %{cmd} for more information.",
     "objectives": "Objectives",
+    "ocean-cooldown": "The ocean has been generous enough to you for now. Come back in %{time} and try to receive its blessing.",
     "points": "points",
     "points-total": "Total points",
     "position-global": "Global position",
@@ -46,8 +47,7 @@
     "reaction": {
         "positive": "Congrats %{user}, you have found one %{item}! It has been added to your collection, and you earned **%{points} event points**!",
         "negative": "Oh no %{user}, you have found one %{item}! It has been added to your collection, but you lost **%{points} event points**...",
-        "neutral": "You found one %{item}! It has been added to your collection.",
-        "too-quick": "You've already collected an item recently and are too tired to continue. Try your luck again in %{time}!"
+        "neutral": "You found one %{item}! It has been added to your collection."
     },
     "soon": "An event is coming soon! Watch for information as it will begin on %{date}",
     "tictactoe": {
