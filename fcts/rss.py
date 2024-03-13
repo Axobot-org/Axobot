@@ -883,8 +883,9 @@ class Rss(commands.Cog):
             )
             feeds = [f for f in await self.db_get_guild_feeds(ctx.guild.id) if f.enabled]
             await self.refresh_feeds(ctx.guild.id)
-            await ctx.send(await self.bot._(ctx.guild.id,"rss.guild-complete", count=len(feeds), time=round(time.time()-start,1)))
-            await msg.delete(delay=0)
+            await msg.edit(
+                content=await self.bot._(ctx.guild.id,"rss.guild-complete", count=len(feeds), time=round(time.time()-start,1))
+            )
         except Exception as err:
             await ctx.send(await self.bot._(ctx.guild.id,"rss.guild-error", err=err))
 
