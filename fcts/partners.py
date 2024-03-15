@@ -172,8 +172,11 @@ class Partners(commands.Cog):
     async def get_bot_owners(self, bot_id:int, session:aiohttp.ClientSession) -> list[Union[discord.User, int]]:
         """Get the owners list of a bot
         Empty list if unknown bot/owners not provided"""
-        async with session.get(f'https://top.gg/api/bots/{bot_id}', headers=self.dbl_headers, timeout=10) as resp:
-            ans: dict = await resp.json()
+        try:
+            async with session.get(f'https://top.gg/api/bots/{bot_id}', headers=self.dbl_headers, timeout=10) as resp:
+                ans: dict = await resp.json()
+        except asyncio.TimeoutError:
+            return []
         owners = []
         if 'owners' in ans:
             for owner_id in ans['owners']:
