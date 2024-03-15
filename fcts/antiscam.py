@@ -375,7 +375,7 @@ class AntiScam(commands.Cog):
         if harmless_probability <= HARMLESS_DELETION_THRESHOLD:
             try:
                 await msg.delete() # try to delete it, silently fails
-            except discord.Forbidden:
+            except (discord.Forbidden, discord.NotFound):
                 pass
             await self.send_bot_log(msg, deleted=True)
             self.bot.dispatch("antiscam_delete", msg, result)
