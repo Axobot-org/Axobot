@@ -1,6 +1,8 @@
-from typing import Optional, TypedDict, Union
+import inspect
+from typing import Callable, Optional, TypedDict, Union, get_type_hints
 
 import discord
+from discord.ext import commands
 
 from libs.bot_classes import MyContext
 from libs.translator import LOCALES_MAP
@@ -11,6 +13,10 @@ class FieldData(TypedDict):
     name: str
     value: str
     inline: bool
+
+_IGNORED_CHECK_NAMES = {
+    '_create_cooldown_decorator',
+}
 
 def get_embed_color(ctx: MyContext):
     "Get the color to use for help embeds"
@@ -48,6 +54,79 @@ async def extract_info(raw_description: str) -> tuple[Optional[str], list[str], 
         x if len(x) > 0 else None
         for x in ("\n\n".join(description), examples, doc)
     )
+
+async def generate_warnings_field(ctx: MyContext, command: Union[commands.Command, commands.Group]) -> Optional[FieldData]:
+    "Generate an embed field to list warnings and checks about a command usage"
+    if isinstance(command, commands.Group):
+        return None
+    warnings: list[str] = []
+    if isinstance(command, commands.Command) and not command.enabled:
+        warnings.append(await ctx.bot._(ctx.channel, "help.not-enabled"))
+    if len(command.checks) > 0:
+        for check in command.checks:
+            try:
+                check_name = await _extract_check_name(check)
+                if check_name in _IGNORED_CHECK_NAMES:
+                    continue
+                check_msg_tr = await ctx.bot._(ctx.channel, f'help.check-desc.{check_name}')
+                if 'help.check-desc' in check_msg_tr: # translation was not found
+                    ctx.bot.dispatch("error", ValueError(f"No description for help check {check_name} ({check})"))
+                    continue
+                if await _run_check_function(ctx, check):
+                    warnings.append("✅ " + check_msg_tr[0])
+                else:
+                    warnings.append('❌ ' + check_msg_tr[1])
+            except Exception as err:
+                ctx.bot.dispatch("error", err)
+    if len(warnings) > 0:
+        return {
+            "name": await ctx.bot._(ctx.channel, "help.warning"),
+            "value": "\n".join(warnings),
+            "inline": False
+        }
+
+async def _extract_check_name(check: Callable) -> str:
+    "Get the name of a check"
+    if 'guild_only.<locals>.predicate' in str(check):
+        return 'guild_only'
+    if 'is_owner.<locals>.predicate' in str(check):
+        return 'is_owner'
+    if 'bot_has_permissions.<locals>.predicate' in str(check):
+        return 'bot_has_permissions'
+    if '_has_permissions.<locals>.predicate' in str(check):
+        return 'has_permissions'
+    return check.__qualname__.split('.')[0]
+
+async def _run_check_function(ctx: MyContext, check: Callable) -> bool:
+    # get type of expected argument
+    sig = inspect.signature(check)
+    first_param_name = list(sig.parameters.keys())[0]
+    try:
+        original_param_type = get_type_hints(check).get(first_param_name)
+    except NameError:
+        original_param_type = sig.parameters[first_param_name].annotation
+    # if the type couldn't be parsed by the inspect module, map it from its name
+    if isinstance(original_param_type, str):
+        if "Context" in original_param_type:
+            original_param_type = commands.Context
+        elif "Interaction" in original_param_type:
+            original_param_type = discord.Interaction
+    # check if parameter is Union
+    if getattr(original_param_type, "__origin__", None) == Union:
+        param_types = original_param_type.__args__
+    else:
+        # else, use the original type
+        param_types = [original_param_type]
+    # check against each possible type
+    for param_type in param_types:
+        if ctx.interaction and issubclass(param_type, discord.Interaction):
+            return await discord.utils.maybe_coroutine(check, ctx.interaction)
+        if issubclass(param_type, commands.Context):
+            return await discord.utils.maybe_coroutine(check, ctx)
+    # if no type matched, dispatch an error
+    ctx.bot.dispatch("error", ValueError(f"Unknown type for check {check} ({param_types})"))
+    return False
+
 
 async def get_send_callback(ctx: MyContext):
     "Get a function to call to send the command result"
