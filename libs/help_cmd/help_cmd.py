@@ -9,8 +9,8 @@ from .txt_cmd_utils import (get_command_desc_translation,
                             get_command_description,
                             get_command_name_translation,
                             get_command_signature)
-from .utils import (FieldData, get_embed_color, get_embed_footer,
-                    get_send_callback)
+from .utils import (FieldData, generate_warnings_field, get_embed_color,
+                    get_embed_footer, get_send_callback)
 
 if TYPE_CHECKING:
     from fcts.help_cmd import Help as HelpCog
@@ -60,7 +60,7 @@ async def _generate_command_fields(cog: "HelpCog", ctx: MyContext, command: comm
     if aliases_field := await _generate_aliases_field(ctx, command):
         fields.append(aliases_field)
     # Disabled and checks
-    if warnings_field := await _generate_warnings_field(ctx, command):
+    if warnings_field := await generate_warnings_field(ctx, command):
         fields.append(warnings_field)
     # Documentation URL
     if doc is not None:
@@ -115,48 +115,6 @@ async def _generate_subcommands_field(ctx: MyContext, cmd: commands.Group) -> Op
         return {
             "name": await ctx.bot._(ctx.channel, "help.subcmds"),
             "value": subcmds,
-            "inline": False
-        }
-
-async def _generate_warnings_field(ctx: MyContext, command: commands.Command) -> Optional[FieldData]:
-    "Generate an embed field to list warnings and checks about a command usage"
-    # Is enabled
-    warnings: list[str] = []
-    if not command.enabled:
-        warnings.append(await ctx.bot._(ctx.channel, "help.not-enabled"))
-    if len(command.checks) > 0:
-        maybe_coro = discord.utils.maybe_coroutine
-        for check in command.checks:
-            try:
-                if 'guild_only.<locals>.predicate' in str(check):
-                    check_name = 'guild_only'
-                elif 'is_owner.<locals>.predicate' in str(check):
-                    check_name = 'is_owner'
-                elif 'bot_has_permissions.<locals>.predicate' in str(check):
-                    check_name = 'bot_has_permissions'
-                elif '_has_permissions.<locals>.predicate' in str(check):
-                    check_name = 'has_permissions'
-                else:
-                    check_name = check.__name__
-                check_msg_tr = await ctx.bot._(ctx.channel, f'help.check-desc.{check_name}')
-                if 'help.check-desc' not in check_msg_tr:
-                    try:
-                        pass_check = await maybe_coro(check, ctx)
-                    except Exception:
-                        pass_check = False
-                    if pass_check:
-                        warnings.append(
-                            "✅ "+check_msg_tr[0])
-                    else:
-                        warnings.append('❌ '+check_msg_tr[1])
-                else:
-                    ctx.bot.dispatch("error", ValueError(f"No description for help check {check_name} ({check})"))
-            except Exception as err:
-                ctx.bot.dispatch("error", err, f"While checking {check} in help")
-    if warnings:
-        return {
-            "name": await ctx.bot._(ctx.channel, "help.warning"),
-            "value": "\n".join(warnings),
             "inline": False
         }
 
