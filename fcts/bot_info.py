@@ -111,7 +111,7 @@ class BotInfo(commands.Cog):
         # RSS messages within 24h
         rss_msg_24h = await self.bot.get_cog("BotStats").get_sum_stats("rss.messages", 60*24)
         # number formatter
-        lang = await self.bot._(ctx.guild.id,"_used_locale")
+        lang = await self.bot._(ctx.channel, "_used_locale")
         async def n_format(nbr: Union[int, float, None]):
             return await FormatUtils.format_nbr(nbr, lang) if nbr is not None else "0"
         # Generating message
