@@ -274,7 +274,7 @@ class Axobot(commands.bot.AutoShardedBot):
 
     @property
     def db_query(self):
-        return create_database_query(self.cnx_axobot)
+        return create_database_query(self, self.cnx_axobot)
 
     class SafeDict(dict):
         def __missing__(self, key):
