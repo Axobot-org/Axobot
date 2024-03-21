@@ -42,9 +42,9 @@ Modify
 
 This subcommand allows you to modify the value of an option. Just enter the exact name of the option and its value. A validation message will then be sent if the request has been correctly executed.
 
-If the value contains several objects, such as a list of roles or channels, they must be separated by commas, like this: :code:`config set clear_allowed_roles Admin, Moderators, Special role for Special people`. Please note that not all configurations support multiple values (for example, it is not possible to have multiple prefixes).
+If the value contains several objects, such as a list of roles or channels, they must be separated by spaces, like this: :code:`config set clear_allowed_roles Admin Moderators @Special`. Please note that not all configurations support multiple values (for example, it is not possible to have multiple prefixes).
 
-.. note:: When the value takes the form of roles, for more comfort you are not obliged to mention them: the exact name or the identifier of the role is enough. The same goes for chanels.
+.. note:: When the value takes the form of roles, for more comfort you are not obliged to mention them: the exact name (as long as it doesn't contain spaces) or the identifier of the role is enough. The same goes for channels or emojis.
 
 
 
