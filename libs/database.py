@@ -1,5 +1,6 @@
 import logging
 import sys
+import time
 from types import GeneratorType
 from typing import TYPE_CHECKING, Union
 
@@ -10,8 +11,10 @@ from mysql.connector.cursor import RE_PY_PARAM, _bytestr_format_dict, _ParamSubs
 if TYPE_CHECKING:
     from mysql.connector.connection_cext import CMySQLConnection, CMySQLCursor
 
+    from libs.bot_classes.axobot import Axobot
 
-def create_database_query(cnx_axobot: Union[MySQLConnection, 'CMySQLConnection']):
+
+def create_database_query(bot: "Axobot", cnx_axobot: Union[MySQLConnection, 'CMySQLConnection']):
     """Create a database query object using a specific database connector"""
 
     class DatabaseQuery:
@@ -101,6 +104,8 @@ def create_database_query(cnx_axobot: Union[MySQLConnection, 'CMySQLConnection']
             query_for_logs = await self._format_query()
             self.log.debug("%s", query_for_logs)
 
+            start_time = time.time()
+
             try:
                 execute_result = self.cursor.execute(self.query, self.args, multi=self.multi)
             except errors.ProgrammingError as err:
@@ -126,10 +131,17 @@ def create_database_query(cnx_axobot: Union[MySQLConnection, 'CMySQLConnection']
                 else:
                     result = self.cursor.lastrowid
 
+            await self._save_execution_time(start_time)
             return result
 
         async def __aexit__(self, exc_type, value, traceback):
             if self.cursor is not None:
                 self.cursor.close()
+
+        async def _save_execution_time(self, start_time: float):
+            if cog := bot.get_cog("BotStats"):
+                delta_ms = (time.time() - start_time) * 1000
+                cog.sql_performance_records.append(delta_ms)
+
 
     return DatabaseQuery
