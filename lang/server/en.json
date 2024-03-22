@@ -120,6 +120,7 @@
         "leave": "Message sent when a member leaves: %{value}",
         "levelup_channel": "Channel where levelup messages are sent: %{value}",
         "levelup_msg": "Message sent when a member earns an xp level: %{value}",
+        "levelup_silent_mention": "Should the levelup mesage be silent (i.e. without notification)? %{value}",
         "membercounter": "Channel displaying your member count in its name: %{value}",
         "mute_allowed_roles": "List of roles that can use the \"mute\" command: %{value}",
         "muted_role": "Used role to mute members: %{value}",
