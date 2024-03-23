@@ -46,11 +46,11 @@ Wanna do a cool party for a birthday? Get a random gif with this simple command!
 Blame
 -----
 
-**Syntax:** :code:`blame <name|list>`
+**Syntax:** :code:`fun blame <name>`
 
 You've probably already gotten a chance to get mad at someone. It doesn't matter why. And since it's always better to do it together, you may like to protest collectively against a common evil. This command therefore allows you to blame someone without getting tired of spamming. You just have to enter a name and hope that its custom message exists in our database, and we'll be happy to irritate ourselves for you.
 
-You can access even more names by being on some secret servers! Enter the :code:`list` argument to see which ones you have unlocked.
+You can access even more names by being on some secret servers! Use the autocompletion to see which ones you have unlocked.
 
 .. note:: Currently only a bunch of images exist, but if you have others to propose (that respect the theme), come see us!
 
@@ -78,7 +78,7 @@ Just a random cat picture. Nothing else. But they're so cuuuuute.
 Count messages
 --------------
 
-**Syntax:** :code:`count_msg [limit] [user] [channel]`
+**Syntax:** :code:`fun count-messages [limit] [user] [channel]`
 
 A nice little order that counts the number of messages in the history of this channel posted by someone. The limit corresponds to the number of messages to study in the chat, 1000 by default. And since some very old chats can have a very many many many MANY many messages (yes, 5 times *many*), we have a set limit on the number of messages you wish to search.
 
@@ -87,20 +87,10 @@ If no user is given as parameter, Axobot will count your own messages. Same for 
 .. warning:: It seems obvious, but the bot needs "`Read message history <perms.html#read-message-history>`__" permission to read the messages history...
 
 
-Congrats
---------
-
-**Syntax:** :code:`gg`
-
-This is a nice little gif to use when you want to congratulate your friend. And remember to thank Gilderoy Lockhart for his charming smile!
-
-.. warning:: Axobot needs "`Attach files <perms.html#attach-files>`__" permission to send this nice message.
-
-
 Kill
 ----
 
-**Syntax:** :code:`kill [name]`
+**Syntax:** :code:`fun kill [name]`
 
 If you want to express your hatred or displeasure towards someone or something, but in a fun way, this command is for you. The bot will take a random death sentence from a long selection and insert the subject of your anger into it to create a simple and effective message. Try it at least once!
 
@@ -150,16 +140,6 @@ NASA
 If you want to see beautiful images from space, this command will suit you perfectly. It uses the official NASA API to get the Astronomy Picture of the Day, as well as a description of this image. Great for putting your head in the stars.
 
 .. warning:: The only permission needed to grant the bot is "`Embed Links <perms.html#embed-links>`__".
-
-
-Nope
-----
-
-**Syntax:** :code:`nope`
-
-A small command to use when you do not agree with your interlocutor. Small, but it has the merit to be clear and to quickly cut short the discussion. And even better, if you have permission to use the `say <server.html#list-of-every-option>`__ command, your invocation message will be deleted ! *Camouflage activated!*
-
-.. warning:: Axobot needs "`Attach files <perms.html#attach-files>`__" permission to send its message, and "`Manage messages <perms.html#manage-messages>`__" to delete yours.
 
 
 Nuke
@@ -226,26 +206,6 @@ Any of you like pizza here? Those beautiful dripping pieces of melted cheese and
 .. warning:: Yup. Here too, the bot needs "`Attach files <perms.html#attach-files>`__" permission to send this gif.
 
 
-Pong
-----
-
-**Syntax:** :code:`pong`
-
-This is probably the most useless command in the bot. Try it, you may (maybe) not be disappointed!
-
-
-Ragequit
---------
-
-**Syntax:** :code:`ragequit`
-
-Basically this command was designed for the sole use of the Creator. But since everyone has the right to get mad at something (and not just Python code), he decided to leave it open access. It's up to you to make good use of it!
-
-.. warning::
-    * The bot needs "`Attach files <perms.html#attach-files>`__" permission to send these images.
-    * We do not own the copyright of each of the images used in this command. If you want to design an image specially for Axobot, and are ready to give us all rights, thank you to contact us as soon as possible!
-
-
 React
 -----
 
@@ -260,43 +220,14 @@ All reactions work, whether they are Discord or server reactions. All you have t
 .. warning:: To find the message, Axobot must have "`Read Message History <perms.html#read-message-history>`__" permission, and "`Add Reactions <perms.html#add-reactions>`__" permission to add reactions.
 
 
-Reverse
--------
-
-**Syntax:** :code:`reverse <text>`
-
-If you want to practice working for a top secret organization, or just have fun with friends, you will surely find use for this command. Basically, it simply reverses all the letters in your message, so that the first one is the last one and vice versa. Probably not worth the FBI techniques, but it's a good start, isn't it?
-
 Roll
 ----
 
-**Syntax:** :code:`roll <options>`
+**Syntax:** :code:`fun roll <options>`
 
 If you can't agree with your friends, or if you want to leave the decision of a difficult choice to chance, this command will surely delight you. It allows you to select an option randomly from a list of options you provide, separated by commas (`,`). And you can put as many choices as you need!
 
-Example: :code:`roll a little, a lot;, passionately, madly, not at all!`
-
-
-Run
----
-
-**Syntax:** :code:`run`
-
-Just... run... very... fast... ε=ε=ε=┏( >_<)┛
-
-If you're tired of running, make the bot run for you!
-
-.. note:: No specific permission is required!
-
-
-Shrug
------
-
-**Syntax:** :code:`shrug`
-
-Don't know the answer to a question? This is the opportunity to express it with a pretty gif straight out of our image bank! A simple command, but one which can be fun.
-
-.. warning:: Axobot needs "`Attach files <perms.html#attach-files>`__" permission to send any gif.
+Example: :code:`fun roll a little, a lot, passionately, madly, not at all!`
 
 
 Thanos
