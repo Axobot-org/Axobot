@@ -2,7 +2,7 @@
 🗞️ Rss
 ======
 
-More and more bots offer the feature to follow news feeds, sometimes `rss atom feeds <https://en.wikipedia.org/wiki/RSS>`__,but most often Twitter or YouTube profiles. Axobot allows you to track any rss/atom feed, as well as any Twitter/YouTube/Twitch/DeviantArt channel. For Reddit feeds, you can search for the url of the rss feed, but a command will be created to make your life easier!
+More and more bots offer the feature to follow news feeds, sometimes `RSS feeds <https://en.wikipedia.org/wiki/RSS>`__, but most often YouTube channels or Reddit communities. Axobot allows you to track any RSS/atom feed, as well as any YouTube/Twitch/DeviantArt channel.
 
 With this bot you have two possibilities to follow a feed: manually request the last post, or configure an automatic follow-up in a text channel. In the case of automatic tracking, Axobot will scan all feeds every ten minutes to check for new posts, sending them in if there are any. Just be careful: this automatic tracking costs a lot of resources to the bot, so you are limited to 10 automatic feeds per server!
 
@@ -14,7 +14,7 @@ See the last post
 
 **Syntax:** :code:`last-post <name|link> [youtube|twitch|deviant|web]`
 
-This command allows you to see the last post of a youtube channel, a user on Twitter or Twitch or DeviantArt, or from any valid RSS feed. If you provide a full URL, the bot will automatically detect the type of feed. If you only provide the name of the channel, you will have to specify the type of feed.
+This command allows you to see the last post of a youtube channel, a user on Twitch or DeviantArt, or from any valid RSS feed. If you provide a full URL, the bot will automatically detect the type of feed. If you only provide the name of the channel, you will have to specify the type of feed.
 
 .. note:: No specific permission is required for this command. Remember to allow the use of external emojis to get a prettier look.
 
@@ -27,7 +27,7 @@ Follow a feed
 
 If you want to automatically track an rss feed, this command should be used. You can only track a maximum feeds, which will be reloaded every 20 minutes. Note that Minecraft server tracing also counts as an rss feed, and therefore will cost you a slot (which are currently limited to 10 per server).
 
-For Twitter and YouTube channels, simply give the link of the channel, so that the bot automatically detects the type and name of the channel. If no type is recognized, the 'web' type will be selected.
+For YouTube channels, simply give the link of the channel, so that the bot automatically detects the type and name of the channel. If no type is recognized, the 'web' type will be selected.
 
 .. note:: To post a message, the bot does not need any specific permission. But if it's a Minecraft server feed (see the `corresponding section <minecraft.html>`__), don't forget the "`Read message history <perms.html#read-message-history>`__" permission!
 
@@ -78,7 +78,7 @@ If the rss feed ID is not given, the bot will open a menu to select it. And for 
     - :code:`{long_date}`: the post date in UTC, using extended static format
     - :code:`{timestamp}`: the `Unix time <https://en.wikipedia.org/wiki/Unix_time>`__ in seconds, usable in `Discord timestamp markdown <https://discord.com/developers/docs/reference#message-formatting-timestamp-styles>`__
     - :code:`{link}` or :code:`{url}`: a link to the post
-    - :code:`{logo}`: an emoji representing the type of post (web, Twitter, YouTube...)
+    - :code:`{logo}`: an emoji representing the type of post (web, YouTube, Reddit...)
     - :code:`{mentions}`: the list of mentioned roles
     - :code:`{title}`: the title of the post
     - :code:`{full_text}`: the full text of the post
