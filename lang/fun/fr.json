@@ -30,6 +30,11 @@
     "embed-invalid-channel": "Impossible d'envoyer des messages dans ce salon",
     "embed-invalid-image": "L'url saisie pour l'image est invalide",
     "error": "Une erreur est survenue: `%{err}`",
+    "flip": {
+        "tails": "Pile !",
+        "heads": "Face !",
+        "edge": "Oups, la pièce est tombée sur la tranche !"
+    },
     "fun-list": "Voici la liste des commandes fun disponibles :",
     "invalid-city": "Nom de ville invalide",
     "kills-list": [
@@ -104,12 +109,12 @@
         "Désolé, il y a plus de 3 flocons de neige: nous sommes coincés au garage",
         "Il va falloir attendre la fin de notre grève... Comment ça, vous n'êtes pas au courant ?! Ça fait pourtant bien deux mois que nous avons commencé !"
     ],
-    "piece-0": [
-        "Pile !",
-        "Face !"
-    ],
-    "piece-1": "Raté, c'est tombé sur la tranche !",
     "react-0": "Impossible de trouver le message correspondant. Il faut rentrer l'ID du message en 1er argument, et l'émoji en 2e :upside_down:\n Vérifiez aussi que je possède la permission de lire l'historique des messages !",
+    "react-done": {
+        "one": "Réaction ajoutée !",
+        "many": "Réactions ajoutées !"
+    },
+    "say-done": "Message envoyé !",
     "say-no-perm": "Vous ne possédez pas la permission d'envoyer des messages dans le salon %{channel}",
     "thanos": [
         "{0} a été épargné par Thanos",
