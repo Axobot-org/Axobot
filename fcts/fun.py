@@ -2,17 +2,15 @@ import datetime
 import importlib
 import random
 import re
-import string
-from difflib import get_close_matches
 from math import ceil
-from typing import TYPE_CHECKING, Any, Optional, Union
+from typing import TYPE_CHECKING, Any, Literal, Optional, Union
 
 import aiohttp
-from asyncache import cached
 import autopep8
-from cachetools import TTLCache
 import discord
 import geocoder
+from asyncache import cached
+from cachetools import TTLCache
 from discord import app_commands
 from discord.ext import commands
 from pytz import timezone
@@ -229,194 +227,120 @@ You can specify a verification limit by adding a number in argument (up to 1.000
             tries += 1
         await interaction.response.send_message(msg.format(attacker=author, victim=victime, ex=ex))
 
-    @commands.command(name="cat", hidden=True)
-    @commands.cooldown(5, 7, commands.BucketType.user)
-    @commands.check(is_fun_enabled)
-    async def cat_gif(self, ctx: MyContext):
-        """Wow... So cuuuute !
-
-        ..Doc fun.html#cat"""
-        await ctx.send(random.choice([
-            'https://images6.fanpop.com/image/photos/40800000/tummy-rub-kitten-animated-gif-cute-kittens-40838484-380-227.gif',
-            'https://25.media.tumblr.com/7774fd7794d99b5998318ebd5438ba21/tumblr_n2r7h35U211rudcwro1_400.gif',
-            'https://tenor.com/view/seriously-seriously-cat-cat-really-cat-really-look-cat-look-gif-22182662',
-            'http://coquelico.c.o.pic.centerblog.net/chat-peur.gif',
-            'https://tenor.com/view/nope-bye-cat-leave-done-gif-12387359',
-            'https://tenor.com/view/cute-cat-kitten-kitty-pussy-cat-gif-16577050',
-            'https://tenor.com/view/cat-box-gif-18395469',
-            'https://tenor.com/view/pile-cats-cute-silly-meowtain-gif-5791255',
-            'https://tenor.com/view/cat-fight-cats-cat-love-pet-lover-pelea-gif-13002823369159732311',
-            'https://tenor.com/view/cat-disapear-cat-snow-cat-jump-fail-cat-fun-jump-cats-gif-17569677',
-            'https://tenor.com/view/black-cat-tiny-cat-smol-kitten-airplane-ears-cutie-pie-gif-23391953',
-            'https://tenor.com/view/cat-cats-catsoftheinternet-biting-tale-cat-bite-gif-23554005',
-            'https://tenor.com/view/on-my-way-cat-run-cat-on-my-way-cat-cat-on-my-way-gif-26471384',
-            'https://tenor.com/view/cat-cat-activity-goober-goober-cat-silly-cat-gif-186256394908832033',
-            'https://tenor.com/view/cat-stacked-kittens-kitty-pussy-cats-gif-16220908',
-            'https://tenor.com/view/cute-cat-cats-cats-of-the-internet-cattitude-gif-17600906',
-            'https://tenor.com/view/cat-scared-hide-terrified-frightened-gif-17023981',
-            'https://tenor.com/view/cat-running-away-escape-getaway-bye-gif-16631286',
-            'https://tenor.com/view/bye-cat-box-tight-face-bored-cat-gif-7986182'
-        ]))
-
-    @commands.command(name="happy-birthday", hidden=True, aliases=['birthday', 'hb'])
-    @commands.check(is_fun_enabled)
-    async def birthday_gif(self, ctx: MyContext):
-        """How many candles this year?
-
-        ..Doc fun.html#birthdays"""
-        await ctx.send(random.choice(['https://tenor.com/view/happy-birthday-cat-cute-birthday-cake-second-birthday-gif-16100991',
-        'https://tenor.com/view/happy-birthday-birthday-cake-goat-licking-lick-gif-15968273',
-        'https://tenor.com/view/celebracion-gif-4928008',
-        'https://tenor.com/view/kitty-birthday-birthday-kitty-happy-birthday-happy-birthday-to-you-hbd-gif-13929089',
-        'https://tenor.com/view/happy-birthday-happy-birthday-to-you-hbd-birthday-celebrate-gif-13366300']))
-
-    @commands.command(name="wink", hidden=True)
-    @commands.check(is_fun_enabled)
-    async def wink_gif(self, ctx: MyContext):
-        "Haha so funny"
-        await ctx.send(random.choice([
-            'https://tenor.com/view/dr-strange-wink-smirk-trust-me-gif-24332472',
-            'https://tenor.com/view/wink-smile-laugh-wandavision-gif-20321476',
-            'https://tenor.com/view/rowan-atkinson-mr-bean-trying-to-flirt-wink-gif-16439423',
-            'https://tenor.com/view/winking-james-franco-actor-wink-handsome-gif-17801047',
-            'https://tenor.com/view/clin-doeil-wink-playboy-wink-funny-wink-clin-oeil-gif-24871407',
-            'https://tenor.com/view/wink-got-it-dude-rocket-raccoon-hint-gotcha-gif-23822337'
-        ]))
-
-    @commands.command(name="bigtext",hidden=True)
-    @commands.check(is_fun_enabled)
-    async def big_text(self, ctx: MyContext, *, text: str):
-        """If you wish to write bigger
-
-        ..Example bigtext Hi world! I'm 69?!
-
-        ..Doc fun.html#bigtext"""
-        content = await commands.clean_content().convert(ctx, text)
-        text = ""
-        Em = self.bot.emojis_manager
-        mentions = [x.group(1) for x in re.finditer(r'(<(?:@!?&?|#|a?:[a-zA-Z0-9_]+:)\d+>)',ctx.message.content)]
-        content = "¬¬".join(content.split("\n"))
-        for x in mentions:
-            content = content.replace(x,'¤¤')
-        for l in content:
-            l = l.lower()
-            if l in string.ascii_letters:
-                item = discord.utils.get(ctx.bot.emojis,id=Em.alphabet[string.ascii_letters.index(l)])
-            elif l in string.digits:
-                item = discord.utils.get(ctx.bot.emojis,id=Em.numbers[int(l)])
-            else:
-                try:
-                    item = discord.utils.get(ctx.bot.emojis,id=Em.chars[l])
-                except KeyError:
-                    item = l
-            text += str(item) + '¬'
-        text = text.replace("¬¬","\n")
-        for m in mentions:
-            text = text.replace('¤¬¤', m, 1)
-        text = text.split('¬')[:-1]
-        text1 = list()
-        for line in text:
-            text1.append(line)
-            caract = len("".join(text1))
-            if caract > 1970:
-                await ctx.send("".join(text1))
-                text1 = []
-        if text1 != []:
-            await ctx.send(''.join(text1))
-        try:
-            if ctx.bot.database_online and await self.bot.get_cog("ServerConfig").check_member_config_permission(ctx.author, "say_allowed_roles"):
-                await ctx.message.delete(delay=0)
-        except commands.CommandError: # user can't use 'say'
-            pass
-        self.bot.log.debug("{} used bigtext to say {}".format(ctx.author.id,text))
-
-    @commands.command(name="money",hidden=True)
-    @commands.cooldown(1, 15, commands.BucketType.user)
-    @commands.cooldown(10, 60, commands.BucketType.guild)
-    @commands.check(is_fun_enabled)
-    async def money(self, ctx: MyContext):
-        """Money gif. Cuz we all love money, don't we?
-
-        ..Doc fun.html#money"""
-        await ctx.send(file=await self.utilities.find_img('money.gif'))
-
-    @commands.command(name="pibkac",hidden=True)
-    @commands.check(is_fun_enabled)
-    async def pibkac(self, ctx: MyContext):
-        """Where comes that bug from?
-
-        ..Doc fun.html#pibkac"""
-        await ctx.send(file=await self.utilities.find_img('pibkac.png'))
-
-    @commands.command(name="osekour",hidden=True,aliases=['helpme','ohmygod'])
-    @commands.check(is_fun_enabled)
-    async def osekour(self, ctx: MyContext):
+    @fun_main.command(name="helpme")
+    async def osekour(self, interaction: discord.Interaction):
         """Does anyone need help?
 
         ..Doc fun.html#heeelp"""
-        l = await self.bot._(ctx.channel,"fun.osekour")
-        await ctx.send(random.choice(l))
+        messages = await self.bot._(interaction,"fun.osekour")
+        await interaction.response.send_message(random.choice(messages))
 
-    @commands.command(name="say")
-    @commands.guild_only()
-    @commands.check(can_say)
-    async def say(self, ctx: MyContext, channel: Union[discord.TextChannel, discord.Thread, None] = None, *, text):
+    @fun_main.command(name="gif")
+    async def gif(self, interaction: discord.Interaction, category: Literal["cat", "birthday", "wink"]):
+        "Send a random gif from a category!"
+        if category == "cat":
+            gif = random.choice([
+                # pylint: disable=line-too-long
+                'https://images6.fanpop.com/image/photos/40800000/tummy-rub-kitten-animated-gif-cute-kittens-40838484-380-227.gif',
+                'https://25.media.tumblr.com/7774fd7794d99b5998318ebd5438ba21/tumblr_n2r7h35U211rudcwro1_400.gif',
+                'https://tenor.com/view/seriously-seriously-cat-cat-really-cat-really-look-cat-look-gif-22182662',
+                'http://coquelico.c.o.pic.centerblog.net/chat-peur.gif',
+                'https://tenor.com/view/nope-bye-cat-leave-done-gif-12387359',
+                'https://tenor.com/view/cute-cat-kitten-kitty-pussy-cat-gif-16577050',
+                'https://tenor.com/view/cat-box-gif-18395469',
+                'https://tenor.com/view/pile-cats-cute-silly-meowtain-gif-5791255',
+                'https://tenor.com/view/cat-fight-cats-cat-love-pet-lover-pelea-gif-13002823369159732311',
+                'https://tenor.com/view/cat-disapear-cat-snow-cat-jump-fail-cat-fun-jump-cats-gif-17569677',
+                'https://tenor.com/view/black-cat-tiny-cat-smol-kitten-airplane-ears-cutie-pie-gif-23391953',
+                'https://tenor.com/view/cat-cats-catsoftheinternet-biting-tale-cat-bite-gif-23554005',
+                'https://tenor.com/view/on-my-way-cat-run-cat-on-my-way-cat-cat-on-my-way-gif-26471384',
+                'https://tenor.com/view/cat-cat-activity-goober-goober-cat-silly-cat-gif-186256394908832033',
+                'https://tenor.com/view/cat-stacked-kittens-kitty-pussy-cats-gif-16220908',
+                'https://tenor.com/view/cute-cat-cats-cats-of-the-internet-cattitude-gif-17600906',
+                'https://tenor.com/view/cat-scared-hide-terrified-frightened-gif-17023981',
+                'https://tenor.com/view/cat-running-away-escape-getaway-bye-gif-16631286',
+                'https://tenor.com/view/bye-cat-box-tight-face-bored-cat-gif-7986182'
+            ])
+        elif category == "birthday":
+            gif = random.choice([
+                'https://tenor.com/view/happy-birthday-cat-cute-birthday-cake-second-birthday-gif-16100991',
+                'https://tenor.com/view/happy-birthday-birthday-cake-goat-licking-lick-gif-15968273',
+                'https://tenor.com/view/celebracion-gif-4928008',
+                'https://tenor.com/view/kitty-birthday-birthday-kitty-happy-birthday-happy-birthday-to-you-hbd-gif-13929089',
+                'https://tenor.com/view/happy-birthday-happy-birthday-to-you-hbd-birthday-celebrate-gif-13366300'
+            ])
+        elif category == "wink":
+            gif = random.choice([
+                'https://tenor.com/view/dr-strange-wink-smirk-trust-me-gif-24332472',
+                'https://tenor.com/view/wink-smile-laugh-wandavision-gif-20321476',
+                'https://tenor.com/view/rowan-atkinson-mr-bean-trying-to-flirt-wink-gif-16439423',
+                'https://tenor.com/view/winking-james-franco-actor-wink-handsome-gif-17801047',
+                'https://tenor.com/view/clin-doeil-wink-playboy-wink-funny-wink-clin-oeil-gif-24871407',
+                'https://tenor.com/view/wink-got-it-dude-rocket-raccoon-hint-gotcha-gif-23822337'
+            ])
+        else:
+            raise ValueError("Invalid category: "+category)
+        await interaction.response.send_message(gif)
+
+    @fun_main.command(name="pibkac")
+    async def pibkac(self, interaction: discord.Interaction):
+        """Where does that bug come from?
+
+        ..Doc fun.html#pibkac"""
+        await interaction.response.send_message(file=await self.utilities.find_img('pibkac.png'))
+
+    @fun_main.command(name="flip")
+    async def piece(self, interaction: discord.Interaction):
+        """Heads or tails?
+
+        ..Doc fun.html#piece"""
+        if random.random() < 0.04:
+            result = "fun.flip.edge"
+        elif random.random() < 0.5:
+            result = "fun.flip.heads"
+        else:
+            result = "fun.flip.tails"
+        await interaction.response.send_message(await self.bot._(interaction, result))
+
+    @app_commands.command(name="say")
+    @app_commands.guild_only()
+    async def say(self, interaction: discord.Interaction, text: str,
+                  channel: Union[discord.TextChannel, discord.Thread, None] = None):
         """Let the bot say something for you
         You can specify a channel where the bot must send this message. If channel is None, the current channel will be used
 
-        ..Example say #chat Hi I'm invading Earth
+        ..Example say Hi I'm invading Earth #chat
 
         ..Example say Booh!
 
         ..Doc miscellaneous.html#say"""
         if channel is None:
-            channel = ctx.channel
-        elif not ((
-            channel.permissions_for(ctx.author).read_messages and
-            channel.permissions_for(ctx.author).send_messages and
-            channel.guild == ctx.guild
-        ) or await self.bot.get_cog('Admin').check_if_god(ctx)):
-            await ctx.send(await self.bot._(ctx.guild, 'fun.say-no-perm', channel=channel.mention))
+            channel = interaction.channel
+        if not (
+            channel.permissions_for(interaction.user).read_messages and
+            channel.permissions_for(interaction.user).send_messages and
+            channel.guild == interaction.guild
+        ):
+            await interaction.response.send_message(await self.bot._(interaction, "fun.say-no-perm", channel=channel.mention))
+            return
+        if not channel.permissions_for(interaction.guild.me).send_messages:
+            error = await self.bot._(interaction, "fun.no-say")
+            error += random.choice([' :confused:', '', '', ''])
+            await interaction.response.send_message(error)
             return
         if self.bot.zombie_mode:
             return
-        if m := re.search(r"(?:i am|i'm) ([\w\s]+)", text, re.DOTALL | re.IGNORECASE):
-            if m.group(1).lower() != "a bot":
-                first_words = ['dumb', 'really dumb','stupid', 'gay', 'idiot', 'shit', 'trash']
-                words = []
-                for w in first_words:
-                    words += [w, w+' bot', w.upper()]
-                if word := get_close_matches(m.group(1), words, n=1, cutoff=0.8):
-                    await ctx.send(f"Yeah we know you are {word[0]}")
-                    return
-        try:
-            if not channel.permissions_for(ctx.guild.me).send_messages:
-                return await ctx.send(str(await self.bot._(ctx.guild.id, 'fun', 'no-say'))+random.choice([' :confused:', '', '', '']))
-            await channel.send(text)
-            await ctx.message.delete(delay=0)
-        except discord.Forbidden:
-            pass
+        await channel.send(text)
+        await interaction.response.send_message(await self.bot._(interaction, "fun.say-done"), ephemeral=True)
 
-    @commands.command(name="me", hidden=True)
-    @commands.check(is_fun_enabled)
-    async def me(self, ctx: MyContext, *, text: str):
-        """No U
-
-        ..Doc fun.html#me"""
-        text = f"*{ctx.author.display_name} {text}*"
-        await ctx.send(text)
-        try:
-            if (
-                self.bot.database_online
-                and await self.bot.get_cog("ServerConfig").check_member_config_permission(ctx.author, "say_allowed_roles")
-            ):
-                await ctx.message.delete(delay=0)
-        except commands.CommandError:  # user can't use 'say'
-            pass
-
-    @commands.command(name="react")
-    @commands.check(can_say)
-    async def react(self, ctx:MyContext, message:discord.Message, *, reactions):
+    @app_commands.command(name="react")
+    @app_commands.guild_only()
+    @app_commands.default_permissions(manage_messages=True)
+    @app_commands.describe(
+        message="The URL of the message to react to",
+        reactions="A space-separated list of custom or unicode emojis to react with"
+    )
+    async def react(self, interaction: discord.Interaction, message: args.MessageArgument, reactions: str):
         """Add reaction(s) to a message. Server emojis also work.
 
         ..Example react 375246790301057024-790177026232811531 :ok:
@@ -425,47 +349,28 @@ You can specify a verification limit by adding a number in argument (up to 1.000
 
         ..Doc fun.html#react"""
         channel = message.channel
-        if not (channel.permissions_for(ctx.author).read_messages and channel.permissions_for(ctx.author).add_reactions and (channel.guild is None or channel.guild==ctx.guild)):
-            await ctx.send(await self.bot._(ctx.channel,"fun.say-no-perm",channel=channel.mention))
+        if not (
+            channel.permissions_for(interaction.user).read_messages
+            and channel.permissions_for(interaction.user).add_reactions
+            and (channel.guild is None or channel.guild==interaction.guild)
+        ):
+            await interaction.response.send_message(await self.bot._(interaction, "fun.say-no-perm", channel=channel.mention))
             return
-        for r in reactions.split():
+        await interaction.response.defer(ephemeral=True)
+        ctx = await MyContext.from_interaction(interaction)
+        count = 0
+        for reaction in reactions.split():
             try:
-                err = await commands.EmojiConverter().convert(ctx,r)
-                await message.add_reaction(err)
+                emoji = await args.DiscordOrUnicodeEmojiConverter.convert(ctx, reaction)
+                await message.add_reaction(emoji)
             except (discord.Forbidden, commands.BadArgument):
                 try:
-                    await message.add_reaction(r)
+                    await message.add_reaction(reaction)
                 except discord.errors.HTTPException:
-                    await ctx.send(await self.bot._(ctx.channel,"fun.no-emoji"))
+                    await interaction.followup.send(content=await self.bot._(interaction, "fun.no-emoji"))
                     return
-                except Exception as err:
-                    self.bot.dispatch("command_error", ctx, err)
-                    continue
-        await ctx.message.delete(delay=0)
-
-    @commands.command(name="nuke",hidden=True)
-    @commands.check(is_fun_enabled)
-    async def nuke(self, ctx: MyContext):
-        """BOOOM
-
-        ..Doc fun.html#nuke"""
-        await ctx.send(file=await self.utilities.find_img('nuke.gif'))
-
-    @commands.command(name="pikachu",hidden=True)
-    @commands.check(is_fun_enabled)
-    async def pikachu(self, ctx: MyContext):
-        """Pika-pika ?
-
-        ..Doc fun.html#pikachu"""
-        await ctx.send(file=await self.utilities.find_img(random.choice(['cookie-pikachu.gif','pika1.gif'])))
-
-    @commands.command(name="pizza",hidden=True)
-    @commands.check(is_fun_enabled)
-    async def pizza(self, ctx: MyContext):
-        """Hey, do U want some pizza?
-
-        ..Doc fun.html#pizza"""
-        await ctx.send(file=await self.utilities.find_img('pizza.gif'))
+            count += 1
+        await interaction.followup.send(content=await self.bot._(interaction, "fun.react-done", count=count))
 
     @commands.command(name="google", hidden=True, aliases=['lmgtfy'])
     @commands.check(is_fun_enabled)
@@ -476,34 +381,6 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         link = "https://lmgtfy.com/?q="+search.replace("\n","+").replace(" ","+")
         await ctx.send('<'+link+'>')
         await ctx.message.delete(delay=0)
-
-    @commands.command(name="loading",hidden=True)
-    @commands.check(is_fun_enabled)
-    async def loading(self, ctx: MyContext):
-        """time goes by soooo slowly...
-
-        ..Doc fun.html#loading"""
-        await ctx.send(file=await self.utilities.find_img('loading.gif'))
-
-    @commands.command(name="thanos",hidden=True)
-    @commands.check(is_fun_enabled)
-    async def thanos(self, ctx: MyContext, *, name: str = None):
-        """SNAP! Will you be lucky enough to survive?
-
-        ..Doc fun.html#thanos"""
-        name = name or ctx.author.mention
-        await ctx.send(random.choice(await self.bot._(ctx.channel,"fun.thanos")).format(name))
-
-    @commands.command(name="piece", hidden=True, aliases=['coin','flip'])
-    @commands.check(is_fun_enabled)
-    async def piece(self, ctx: MyContext):
-        """Heads or tails?
-
-        ..Doc fun.html#piece"""
-        if random.random() < 0.04:
-            await ctx.send(await self.bot._(ctx.channel,"fun.piece-1"))
-        else:
-            await ctx.send(random.choice(await self.bot._(ctx.channel,"fun.piece-0")))
 
     @commands.command(name="weather", aliases=['météo'])
     @commands.cooldown(4, 30, type=commands.BucketType.guild)

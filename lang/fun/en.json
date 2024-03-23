@@ -30,6 +30,11 @@
     "embed-invalid-channel": "Cannot send messages in this channel",
     "embed-invalid-image": "The url entered as image is invalid",
     "error": "An error has occurred: `%{err}`",
+    "flip": {
+        "tails": "Tails !",
+        "heads": "Heads !",
+        "edge": "Oops, the coin landed on its edge!"
+    },
     "fun-list": "Here is the list of available fun commands:",
     "invalid-city": "Invalid city :confused:",
     "kills-list": [
@@ -107,12 +112,12 @@
         "Sorry, there are more than 3 snowflakes: we're stuck in the garage",
         "We'll have to wait until the end of our strike... Are you saying you don't know?! It's been two months since we started!"
     ],
-    "piece-0": [
-        "Tails!",
-        "Heads!"
-    ],
-    "piece-1": "Failed, it fell on the edge!",
     "react-0": "Unable to find the corresponding message. You must enter the message ID in the first argument, and the emoji in the second :upside_down:\n Also check that I have permission to read the message history!",
+    "react-done": {
+        "one": "Reaction added!",
+        "many": "Reactions added!"
+    },
+    "say-done": "Message sent!",
     "say-no-perm": "You do not have permission to send messages in the channel %{channel}",
     "thanos": [
         "{0} was spared by Thanos",
