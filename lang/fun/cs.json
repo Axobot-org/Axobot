@@ -30,6 +30,11 @@
     "embed-invalid-channel": "Nelze odeslat zprávy do tohoto kanálu",
     "embed-invalid-image": "Adresa obrátku url je neplatná",
     "error": "Došlo k chybě: `%{err}`",
+    "flip": {
+        "tails": "Ocasy !",
+        "heads": "Hlavy !",
+        "edge": "Oops, mince dopadla na hranu!"
+    },
     "fun-list": "Zde je seznam dostupných zábavných příkazů:",
     "invalid-city": "Neplatné město :confused:",
     "kills-list": [
@@ -107,12 +112,12 @@
         "Je nám líto, sněhových vloček je více než 3: uvízli jsme v garáži",
         "Budeme muset počkat až do konce stávky... Říkáte, že nevíte?! Už jsou to dva měsíce, co jsme začali!"
     ],
-    "piece-0": [
-        "Ocasi!",
-        "Hlavy!"
-    ],
-    "piece-1": "Selhal, spadl na okraj!",
     "react-0": "Nelze najít odpovídající zprávu. Do prvního argumentu musíte zadat ID zprávy a do druhého emoji :upside_down:\nZkontrolujte také, zda mám oprávnění číst historii zpráv!",
+    "react-done": {
+        "one": "Reakce přidána!",
+        "many": "Reakce přidány!"
+    },
+    "say-done": "Zpráva byla odeslána!",
     "say-no-perm": "Nemáte oprávnění k odesílání zpráv v kanálu %{channel}",
     "thanos": [
         "{0} byl Thanosem ušetřen",
