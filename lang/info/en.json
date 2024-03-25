@@ -12,18 +12,6 @@
     "bitly_nobit": "This address is not a bit.ly link!",
     "bitly_short": "Shortened URL: %{url}",
     "cant-see-channel": "Oops, looks like you don't have permission to view this channel. Ask a moderator!",
-    "discordlinks": [
-        "Servers status",
-        "Discord ToS",
-        "Report a bug/user",
-        "Suggest something to Discord",
-        "Selfbots article",
-        "ToS for bot devs",
-        "How to find an ID",
-        "Minimum legal age for using Discord by country",
-        "Prohibited use of BetterDiscord",
-        "Every Discord downloads"
-    ],
     "docs": "Here is the link to the bot documentation:",
     "info": {
         "categ-0": "Category",
