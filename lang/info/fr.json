@@ -12,18 +12,6 @@
     "bitly_nobit": "Cette adresse n'est pas un lien bit.ly !",
     "bitly_short": "URL raccourcie : %{url}",
     "cant-see-channel": "Oups, il semble que vous n'avez pas la permission de voir ce salon. Demandez à un modérateur !",
-    "discordlinks": [
-        "Status des serveurs",
-        "CGU de Discord",
-        "Rapporter un bug ou un utilisateur",
-        "Proposer une idée à Discord",
-        "Explication des selfbots",
-        "CGU pour les développeurs de bot",
-        "Comment trouver un ID",
-        "Âge minimal d'utilisation de Discord par pays",
-        "Utilisation prohibée de BetterDiscord",
-        "Liste des téléchargements Discord"
-    ],
     "docs": "Voici le lien vers la documentation du bot :",
     "info": {
         "categ-0": "Catégorie",

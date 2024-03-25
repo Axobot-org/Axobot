@@ -45,38 +45,6 @@ Each argument is presented in the form :code:`name="value"`. If you want a line 
 .. warning:: Hey, this may sound weird, but Axobot needs "`Embed Links <perms.html#embed-links>`__" permission to send embeds...
 
 
---------------
-Hour & Weather
---------------
-
-**Syntax:** :code:`hour <city>`
-
-**Syntax:** :code:`weather <city>`
-
-With these two commands, you can get the time (and timezone) or weather for any city in the world! All you have to do is enter the name of the city, preferably in English format (London instead of Londres for example), and the magic does the rest!
-
-.. note:: For the `weather` command, it is better to give the "`Embed Links <perms.html#embed-links>`__" permission to the bot, to get a better rendering. But it's not mandatory!
-
-
---------
-Markdown
---------
-
-**Syntax:** :code:`markdown`
-
-The markdown is a set of formatting rules used everywhere, such as on GitHub or Discord. This command gives you these formatting rules, which will allow you to display spoilers, code blocks, or just simple strikethrough or italicized text.
-
-.. warning:: Warning, this command contains an invitation link to the information server on the code blocks.
-
-
-------------------------
-Python formatting (pep8)
-------------------------
-
-**Syntax:** :code:`pep8 <code>`
-
-Python's formatting conventions can sometimes be difficult to remember. Summaries exist on the internet, but there are several hundred rules, all more or less specific to their use cases. That's why Axobot offers you to automatically format your Python code following the "PEP 8" (PEP for Python Extension Proposal) rules with a simple command.
-
 
 ---------
 Reminders

@@ -74,10 +74,7 @@
         "emoji": "👀",
         "commands": [
             "book",
-            "discordjobs",
-            "discordstatus",
             "embed",
-            "pep8",
             "react",
             "remindme",
             "reminders"
@@ -86,19 +83,16 @@
     "fun": {
         "emoji": "🎳",
         "commands": [
-            "arapproved",
             "bitly",
             "cookie",
             "event",
             "minecraft",
-            "nasa",
             "tic-tac-toe",
             "fish",
             "fun",
             "hour",
             "say",
-            "poll",
-            "weather"
+            "poll"
         ]
     },
     "translators": {

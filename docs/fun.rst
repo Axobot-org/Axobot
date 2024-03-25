@@ -13,15 +13,6 @@ However, if too much fun bothers you, this option can be disabled at any time wi
 List of every command
 ---------------------
 
-AFK
----
-
-**Syntax:** :code:`afk [reason]` or :code:`unafk`
-
-This command will be useful if you are often busy doing something while Discord is open. The principle is to put a tag [AFK] (which means Away From Keyboard) on you and notify anyone who tries to mention you. So there is a command to put you in AFK mode (the reason is optional, it will be indicated to people who are trying to mention you), and another command to exit AFK mode.
-
-.. note:: Note that even if the system is specific to each server (it works with your nickname), the reason is global: if you change the reason in one server, it will be effective on all other servers having you as AFK!
-
 
 Blame
 -----
@@ -40,11 +31,11 @@ You can access even more names by being on some secret servers! Use the autocomp
 Bubble-wrap
 -----------
 
-**Syntax:** :code:`bubble-wrap [width=10] [height=15]` (aliases: papier-bulle, bw)
+**Syntax:** :code:`fun bubble-wrap [width=10] [height=15]`
 
 Just bubble wrap. Which pops when you squeeze it. That's all. #Just4Fun
 
-Width should be between 1 and 150, height between 1 and 50.
+Width has to be between 1 and 150, and height between 1 and 50.
 
 
 Count messages
@@ -67,6 +58,15 @@ Flip a coin
 Use it if you need to flip a coin, but you don't have any money to show in front of your computer's camera. Also, like real life, the piece can also fall on the edge! Isn't that great?
 
 
+----
+Hour
+----
+
+**Syntax:** :code:`fun hour <city>`
+
+With this simple command, you can get the time (and timezone) of any city in the world! All you have to do is enter the name of the city, preferably in English format (London instead of Londres for example), and the magic does the rest!
+
+
 Kill
 ----
 
@@ -78,25 +78,17 @@ If you want to express your hatred or displeasure towards someone or something, 
 Lmgtfy
 ------
 
-**Syntax:** :code:`google <search>`
+**Syntax:** :code:`fun google <search>`
 
 Yes, that name is unpronounceable. On the other hand, commands are executed on written channels, not voice, so that's good. And, for use, refer to the website: "For all those people who find it more convenient to bother you with their question rather than search it for themselves."
 
 .. warning:: Axobot needs "`Manage messages <perms.html#manage-messages>`__" permission to delete the invocative message.
 
 
-Me
----
-
-**Syntax:** :code:`me <text>`
-
-When you need the bot to talk about you, like *"Z_runner runs away very fast"*, use this command.
-
-
 NASA
 ----
 
-**Syntax:** :code:`nasa`
+**Syntax:** :code:`fun nasa`
 
 If you want to see beautiful images from space, this command will suit you perfectly. It uses the official NASA API to get the Astronomy Picture of the Day, as well as a description of this image. Great for putting your head in the stars.
 
@@ -109,16 +101,6 @@ HEEELP
 **Syntax:** :code:`fun helpme`
 
 If you need the bot to help you, type this command and see which random answer it will come out! But don't expect a miracle, it's just for fun.
-
-
-Party
------
-
-**Syntax:** :code:`party`
-
-Do you party often at home? If so, you have enough power to prove it with this command. And if not, she'll just put some good humor in the chat!
-
-.. warning:: Two permissions are required for this command: "`Attach files <perms.html#attach-files>`__" and "`Use external emojis <perms.html#use-external-emojis>`__".
 
 
 Pibkac
