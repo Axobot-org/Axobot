@@ -67,10 +67,6 @@ Option 'animated_card'
 
 This option allows you to enable the rendering of your xp card in .gif format if you have an animated profile image. Since the image processing time is much longer, with reduced quality, this option is disabled by default.
 
-Option 'auto_unafk'
-===================
-
-This option has been designed for people who don't want to manually type the `unafk` command as soon as they are back. So by activating this system, Axobot will automatically remove the AFK tag from you as soon as you send a message. As simple as that!
 
 Option 'show_tips'
 ==================

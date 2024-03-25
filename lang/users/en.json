@@ -12,10 +12,6 @@
             "false": "Your xp card won't be animated even if you use an animated avatar (faster rendering)",
             "true": "Your xp card will be animated when you have an animated avatar (slower rendering)"
         },
-        "auto_unafk": {
-            "false": "You must remove the AFK tag yourself",
-            "true": "I'll remove the AFK tag from you as soon as you send a message"
-        },
         "show_tips": {
             "false": "You will no longer receive tips from the bot",
             "true": "You will casually receive tips from the bot"
