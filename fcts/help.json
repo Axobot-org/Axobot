@@ -86,7 +86,6 @@
     "fun": {
         "emoji": "🎳",
         "commands": [
-            "afk",
             "arapproved",
             "bitly",
             "cookie",
@@ -98,7 +97,6 @@
             "fun",
             "hour",
             "say",
-            "unafk",
             "poll",
             "weather"
         ]
