@@ -1,12 +1,4 @@
 {
-    "afk": {
-        "afk-done": "You are now AFK",
-        "afk-user-noreason": "This user is AFK!",
-        "afk-user-reason": "This member is AFK! Reason: %{reason}",
-        "no-perm": "Oops, I cannot change your nickname :confused: I will try to remember, but I could forget that you're afk",
-        "unafk-cant": "You aren't AFK!",
-        "unafk-done": "You aren't AFK anymore"
-    },
     "bbw-too-many": "Oops, the grid is too big for Discord :confused:",
     "blame-0": "List of available names for **%{user}**",
     "cookie": "%{user} offered a box of cookies to <@375598088850505728>! %{emoji}",
@@ -18,8 +10,32 @@
         "result-you": "On the last %{limit} posts, you have posted %{x} messages (%{p}%%)",
         "too-much": "You wanna blow up Discord! %{e} For obvious performance reasons, I will impose a limit of %{l} messages."
     },
-    "discordjobs-count": "%{c} offers found",
-    "discordjobs-title": "Jobs available at Discord",
+    "discordjobs": {
+        "all-count": {
+            "zero": "No offers listed",
+            "one": "1 offer listed",
+            "many": "%{count} offers listed"
+        },
+        "filtered-count": {
+            "zero": "No offers found that match your search",
+            "one": "1 offer found that match your search",
+            "many": "%{count} offers found that match your search"
+        },
+        "title": "Jobs available at Discord"
+    },
+    "discordlinks": {
+        "title": "Some useful links",
+        "server-status": "Servers status",
+        "tos": "Discord Terms of Service",
+        "bug-report": "Report a bug/user",
+        "feedback": "Suggestions/Feedback",
+        "selfbot": "Selfbot policy",
+        "dev-tos": "ToS for developers",
+        "how-id": "How to find an ID",
+        "age-requirement": "Minimum legal age for using Discord, by country",
+        "betterdiscord": "Prohibited use of BetterDiscord",
+        "downloads": "Every Discord app download"
+    },
     "discordstatus-exists": "There is currently one %{impact} incident in progress on Discord: %{title}",
     "discordstatus-impacts": {
         "major": "major",
@@ -35,7 +51,7 @@
         "heads": "Heads !",
         "edge": "Oops, the coin landed on its edge!"
     },
-    "fun-list": "Here is the list of available fun commands:",
+    "hour-result": "%{date} (%{tzname})\nTimezone name: %{tzlocation}\nlatitude: %{lat} - longitude: %{long}",
     "invalid-city": "Invalid city :confused:",
     "kills-list": [
         "***BOUM!*** {victim} fell into a trap placed by {attacker}!",
@@ -89,15 +105,11 @@
         "{victim} ventured into the haunted mansion and never returned.",
         "{attacker} activated an ancient curse, causing {victim}'s soul to be trapped forever."
     ],
-    "markdown": "__**Markdown Rules** on *Discord*__\n\n`*italics*` = *italics*\n`__underline__` = __underline__\n`**bold**` = **bold**\n`***bold italics***` = ***bold italics***\n`~~strikeout~~` = ~~strikeout~~\n`__*underline italics*__` = __*underline italics*__\n`__**underline bold**__` = __**underline bold**__\n`__***underline bold italics***__` = __***underline bold italics***__\n`||spoiler||` = ||spoiler||\n> quote = `> quote`\n\\`code\\` = `code`\n \\ to ignore\n\nFor code blocks, cf <https://discord.gg/DGahTNn>",
     "nasa-none": "Oops, I'm unable to retrieve the information from NASA at the moment. Try again in a few minutes :confused:",
-    "no-database": "As our database is offline, access to fun commands is restricted to people with permission \"Manage Server\"",
     "no-embed-perm": "I don't have permission to \"Embed links\" :confused:",
     "no-emoji": "Unable to find this emoji!",
-    "no-fun": "Fun commands have been disabled on this server. To see their list, look at https://axobot.rtfd.io/en/latest/fun.html",
     "no-roll": "No choice found",
     "no-say": "Unable to send any message in this channel",
-    "no-voicechan": "You must be in a vocal channel in order to use this command.",
     "not-enough-roll": "There must be at least two distinct elements",
     "osekour": [
         "Wait, I'm finishing watching my movie.",
@@ -119,10 +131,6 @@
     },
     "say-done": "Message sent!",
     "say-no-perm": "You do not have permission to send messages in the channel %{channel}",
-    "thanos": [
-        "{0} was spared by Thanos",
-        "Thanos decided to reduce {0} to ashes. For the good of humanity...."
-    ],
     "tip-list": [
         "Did you know? There are several languages for the bot, including one very fun to test: lolcat",
         "Pro-tip: to change the bot language, use the command %{config_cmd}!",

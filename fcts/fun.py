@@ -2,11 +2,11 @@ import datetime
 import importlib
 import random
 import re
+import urllib.parse
 from math import ceil
-from typing import TYPE_CHECKING, Any, Literal, Optional, Union
+from typing import Any, Literal, Optional, Union
 
 import aiohttp
-import autopep8
 import discord
 import geocoder
 from asyncache import cached
@@ -25,13 +25,6 @@ from libs.paginator import Paginator
 
 importlib.reload(checks)
 importlib.reload(args)
-
-if TYPE_CHECKING:
-    from fcts.utilities import Utilities
-
-cmds_list = ['count_msg', 'ragequit', 'pong', 'run', 'nope', 'blame', 'party', 'bigtext', 'shrug', 'gg', 'money', 'pibkac',
-             'osekour', 'me', 'kill', 'cat', 'happy-birthday', 'rekt', 'thanos', 'nuke', 'pikachu', 'pizza', 'google',
-             'loading', 'piece', 'roll', 'afk', 'bubble-wrap', 'reverse', 'wink']
 
 
 def flatten_list(first_list: list) -> list:
@@ -56,15 +49,14 @@ class Fun(commands.Cog):
         self.bot = bot
         self.file = "fun"
         self.tf = TimezoneFinder()
-        self.afk_guys: dict[int, str] = {}
         self.nasa_pict: Optional[dict[str, Any]] = None
 
     @property
-    def utilities(self) -> 'Utilities':
+    def utilities(self):
         return self.bot.get_cog("Utilities")
 
-    async def is_on_guild(self, user_id: int, guild_id: int):
-        "Check if a member is part of a guild"
+    async def is_in_guild(self, user_id: int, guild_id: int):
+        "Check if a user is part of a guild"
         if self.bot.beta:
             return True
         # Zrunner, someone, Awhikax
@@ -182,11 +174,11 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         l3 = ['awhikax','aragorn','adri','zrunner'] # Axobot official server
         l4 = ['benny'] # benny server
         available_names = l1
-        if await self.is_on_guild(user_id, 391968999098810388): # fr-minecraft
+        if await self.is_in_guild(user_id, 391968999098810388): # fr-minecraft
             available_names += l2
-        if await self.is_on_guild(user_id, SUPPORT_GUILD_ID.id): # Axobot server
+        if await self.is_in_guild(user_id, SUPPORT_GUILD_ID.id): # Axobot server
             available_names += l3
-        if await self.is_on_guild(user_id, 523525264517496834): # Benny Support
+        if await self.is_in_guild(user_id, 523525264517496834): # Benny Support
             available_names += l4
         return available_names
 
@@ -304,6 +296,11 @@ You can specify a verification limit by adding a number in argument (up to 1.000
 
     @app_commands.command(name="say")
     @app_commands.guild_only()
+    @app_commands.default_permissions(manage_messages=True)
+    @app_commands.describe(
+        text="The text to send",
+        channel="The channel where the bot must send the message"
+    )
     async def say(self, interaction: discord.Interaction, text: str,
                   channel: Union[discord.TextChannel, discord.Thread, None] = None):
         """Let the bot say something for you
@@ -372,136 +369,52 @@ You can specify a verification limit by adding a number in argument (up to 1.000
             count += 1
         await interaction.followup.send(content=await self.bot._(interaction, "fun.react-done", count=count))
 
-    @commands.command(name="google", hidden=True, aliases=['lmgtfy'])
-    @commands.check(is_fun_enabled)
-    async def lmgtfy(self,ctx,*,search):
+    @fun_main.command(name="google")
+    @app_commands.checks.cooldown(2, 10)
+    async def lmgtfy(self, interaction: discord.Interaction, search: str):
         """How to use Google
 
         ..Doc fun.html#lmgtfy"""
-        link = "https://lmgtfy.com/?q="+search.replace("\n","+").replace(" ","+")
-        await ctx.send('<'+link+'>')
-        await ctx.message.delete(delay=0)
+        link = "https://lmgtfy2.com/query/?q=" + urllib.parse.quote_plus(search)
+        await interaction.response.send_message('<'+link+'>')
 
-    @commands.command(name="weather", aliases=['météo'])
-    @commands.cooldown(4, 30, type=commands.BucketType.guild)
-    async def weather(self, ctx:MyContext, *, city:str):
-        """Get the weather of a city
-        You need to provide the city name in english
-
-        ..Example weather Tokyo
-
-        ..Doc miscellaneous.html#hour-weather"""
-        city = city.replace(" ","%20")
-        async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=30)) as session:
-            async with session.get("https://welcomer.glitch.me/weather?city="+city) as resp:
-                if resp.status == 200:
-                    if resp.content_type == 'image/png':
-                        if ctx.channel.permissions_for(ctx.me).embed_links:
-                            emb = discord.Embed()
-                            emb.set_image(url="https://welcomer.glitch.me/weather?city="+city)
-                            emb.set_footer(text="From https://welcomer.glitch.me/weather")
-                            return await ctx.send(embed=emb)
-                        else:
-                            return await ctx.send("https://welcomer.glitch.me/weather?city="+city)
-        await ctx.send(await self.bot._(ctx.channel,"fun.invalid-city"))
-
-    @commands.command(name="hour")
-    @commands.cooldown(4, 50, type=commands.BucketType.guild)
-    async def hour(self, ctx: MyContext, *, city: str):
+    @fun_main.command(name="hour")
+    @app_commands.checks.cooldown(4, 40)
+    async def hour(self, interaction: discord.Interaction, city: app_commands.Range[str, 1, 100]):
         """Get the hour of a city
 
         ..Example hour Paris
 
         ..Doc miscellaneous.html#hour-weather"""
+        await interaction.response.defer()
         g = geocoder.arcgis(city)
         if not g.ok:
-            return await ctx.send(await self.bot._(ctx.channel, "fun.invalid-city"))
+            await interaction.followup.send(content=await self.bot._(interaction, "fun.invalid-city"))
+            return
         tz_name: Optional[str] = self.tf.timezone_at_land(lat=g.json['lat'], lng=g.json['lng'])
         if tz_name is None:
-            return await ctx.send(await self.bot._(ctx.channel, "fun.uninhabited-city"))
+            await interaction.followup.send(content=await self.bot._(interaction, "fun.uninhabited-city"))
+            return
         tz_obj = timezone(tz_name)
         date = datetime.datetime.now(tz_obj)
-        format_d = await FormatUtils.date(date,lang=await self.bot._(ctx.channel, "_used_locale"))
+        format_d = await FormatUtils.date(date, lang=await self.bot._(interaction, "_used_locale"))
         address = g.current_result.address
         latitude = round(g.json['lat'],2)
         longitude = round(g.json['lng'],2)
-        await ctx.send(f"**{tz_name}**:\n{format_d} ({date.tzname()})\n ({address} - lat: {latitude} - long: {longitude})")
-
-    @commands.command(name='afk')
-    @commands.check(is_fun_enabled)
-    @commands.guild_only()
-    async def afk(self, ctx: MyContext, *, reason=""):
-        """Mark you AFK
-        You'll get a nice nickname, because nicknames are cool, aren't they?
-
-        ..Doc fun.html#afk"""
-        try:
-            self.afk_guys[ctx.author.id] = reason
-            if (not ctx.author.display_name.endswith(' [AFK]')) and len(ctx.author.display_name)<26:
-                await ctx.author.edit(nick=ctx.author.display_name+" [AFK]")
-            await ctx.send(await self.bot._(ctx.guild.id,"fun.afk.afk-done"))
-        except discord.errors.Forbidden:
-            return await ctx.send(await self.bot._(ctx.guild.id,"fun.afk.no-perm"))
-
-    async def user_is_afk(self, user: discord.User) -> bool:
-        "Check if a user is currently afk"
-        cond = user.id in self.afk_guys
-        if cond:
-            return True
-        return isinstance(user, discord.Member) and user.nick and user.nick.endswith(' [AFK]')
-
-    @commands.command(name='unafk')
-    @commands.check(is_fun_enabled)
-    @commands.guild_only()
-    async def unafk(self, ctx: MyContext):
-        """Remove you from the AFK system
-        Welcome back dude
-
-        ..Doc fun.html#afk"""
-        if await self.user_is_afk(ctx.author):
-            del self.afk_guys[ctx.author.id]
-            await ctx.send(await self.bot._(ctx.guild.id,"fun.afk.unafk-done"))
-            if ctx.author.nick and ctx.author.nick.endswith(" [AFK]"):
-                try:
-                    await ctx.author.edit(nick=ctx.author.display_name.replace(" [AFK]",''))
-                except discord.errors.Forbidden:
-                    pass
-        else:
-            await ctx.send(await self.bot._(ctx.guild.id,"fun.afk.unafk-cant"))
-
-    @commands.Cog.listener()
-    async def on_message(self, msg: discord.Message):
-        "Run the AFK check when a message is sent"
-        if msg.guild:
-            await self.check_afk(msg)
-
-    async def check_afk(self, msg: discord.Message):
-        """Check if someone pinged is afk"""
-        if msg.author.bot:
-            return
-        ctx = await self.bot.get_context(msg)
-        if not await is_fun_enabled(ctx):
-            return
-        if self.bot.zombie_mode:
-            return
-        # send a message if someone is afk and the bot can speak
-        if msg.channel.permissions_for(msg.guild.me).send_messages:
-            for member in msg.mentions:
-                if await self.user_is_afk(member) and member != msg.author:
-                    if member.id not in self.afk_guys or len(self.afk_guys[member.id]) == 0:
-                        await msg.channel.send(await self.bot._(msg.guild.id,"fun.afk.afk-user-noreason"))
-                    else:
-                        await msg.channel.send(
-                            await self.bot._(msg.guild.id,"fun.afk.afk-user-reason",reason=self.afk_guys[member.id])
-                        )
-        # auto unafk if the author was afk and has enabled it
-        if isinstance(ctx.author, discord.Member) and not await checks.is_a_cmd(msg, self.bot):
-            if (ctx.author.nick and ctx.author.nick.endswith(' [AFK]')) or ctx.author.id in self.afk_guys:
-                user_config = await self.bot.get_cog("Users").db_get_user_config(ctx.author.id, "auto_unafk")
-                if user_config is False:
-                    return
-                await self.unafk(ctx)
-
+        text = await self.bot._(
+            interaction, "fun.hour-result",
+            date=format_d,
+            tzname=date.tzname(),
+            tzlocation=tz_name,
+            lat=latitude,
+            long=longitude
+        )
+        embed = discord.Embed(
+            title=address,
+            description=text,
+            color=discord.Colour.blurple()
+        )
+        await interaction.followup.send(embed=embed)
 
     @commands.command(name="embed",hidden=False)
     @commands.check(checks.has_embed_links)
@@ -586,22 +499,11 @@ You can specify a verification limit by adding a number in argument (up to 1.000
                 pass
 
 
-    @commands.command(name="markdown")
-    async def markdown(self, ctx: MyContext):
-        """Get help about markdown in Discord
-
-        ..Doc miscellaneous.html#markdown"""
-        txt = await self.bot._(ctx.channel,"fun.markdown")
-        if ctx.can_send_embed:
-            await ctx.send(embed=discord.Embed(description=txt))
-        else:
-            await ctx.send(txt)
-
-
-    @commands.command(name="bubble-wrap", aliases=["papier-bulle", "bw"], hidden=True)
-    @commands.cooldown(5,30,commands.BucketType.channel)
-    @commands.cooldown(5,60,commands.BucketType.user)
-    async def bubblewrap(self, ctx:MyContext, width:int=10, height:int=15):
+    @fun_main.command(name="bubble-wrap")
+    @app_commands.checks.cooldown(5, 30)
+    async def bubblewrap(self, interaction: discord.Interaction,
+                         width: app_commands.Range[int, 1, 150]=10,
+                         height: app_commands.Range[int, 1, 50]=15):
         """Just bubble wrap. Which pops when you squeeze it. That's all.
 
         Width should be between 1 and 150, height between 1 and 50.
@@ -612,24 +514,23 @@ You can specify a verification limit by adding a number in argument (up to 1.000
 
         ..Doc fun.html#bubble-wrap
         """
-        width = min(max(1, width), 150)
-        height = min(max(1, height), 50)
         p = "||pop||"
         txt = "\n".join([p*width]*height)
         if len(txt) > 2000:
-            await ctx.send(await self.bot._(ctx.channel, "fun.bbw-too-many"))
+            await interaction.response.send_message(await self.bot._(interaction, "fun.bbw-too-many"))
             return
-        await ctx.send(txt)
+        await interaction.response.send_message(txt)
 
-    @commands.command(name="nasa")
-    @commands.check(checks.bot_can_embed)
-    @commands.cooldown(5, 60, commands.BucketType.channel)
-    async def nasa(self, ctx: MyContext):
+    @fun_main.command(name="nasa")
+    @app_commands.checks.cooldown(1, 10)
+    async def nasa(self, interaction: discord.Interaction):
         """Send the Picture of The Day by NASA
 
         ..Doc fun.html#nasa"""
         def get_date(raw_str: str):
             return datetime.datetime.strptime(raw_str, "%Y-%m-%d").replace(tzinfo=datetime.timezone.utc)
+
+        await interaction.response.defer()
         if self.nasa_pict is None \
                 or 'date' not in self.nasa_pict \
                 or (self.bot.utcnow()-get_date(self.nasa_pict["date"])).total_seconds() > 86400:
@@ -640,118 +541,132 @@ You can specify a verification limit by adding a number in argument (up to 1.000
             if all(field in data for field in ['title', 'url', 'explanation', 'date']):
                 self.nasa_pict = data
         if self.nasa_pict is None:
-            await ctx.send(await self.bot._(ctx.channel, "fun.nasa-none"))
+            await interaction.followup.send(content=await self.bot._(interaction, "fun.nasa-none"))
             return
         emb = discord.Embed(
             title=self.nasa_pict["title"],
             url=self.nasa_pict["hdurl"] if self.nasa_pict["media_type"]=="image" else self.nasa_pict["url"],
             description=self.nasa_pict["explanation"],
-            timestamp=get_date(self.nasa_pict["date"]))
+            timestamp=get_date(self.nasa_pict["date"]),
+            color=0x0033cc
+        )
         emb.set_image(url=self.nasa_pict['url'])
         emb.set_footer(text="Credits: " + self.nasa_pict.get("copyright", "Not copyrighted"))
-        await ctx.send(embed=emb)
+        await interaction.followup.send(embed=emb)
 
-    @commands.command(name="discordjobs", aliases=['discord_jobs', 'jobs.gg'])
-    @commands.cooldown(2, 60, commands.BucketType.channel)
-    async def discord_jobs(self, ctx: MyContext, *, query: str = None):
+    @fun_main.command(name="discord-jobs")
+    @app_commands.checks.cooldown(2, 20)
+    @app_commands.rename(query="filter")
+    async def discord_jobs(self, interaction: discord.Interaction, query: Optional[str] = None):
         """Get the list of available jobs in Discord
 
         ..Example discordjobs
 
         ..Example discordjobs marketing"""
+        await interaction.response.defer()
         async with aiohttp.ClientSession() as session:
             async with session.get("https://api.greenhouse.io/v1/boards/discord/jobs") as r:
                 data = await r.json()
-        if query is not None:
+        if query is None:
+            jobs = data['jobs']
+            desc = await self.bot._(interaction, "fun.discordjobs.all-count", count=len(jobs))
+        else:
             query = query.lower()
             jobs = [
                 x for x in data['jobs']
-                if query in x['location']['name'].lower() or query == x['id'] or query in x['title'].lower()
+                if (
+                    query in x['location']['name'].lower()
+                    or query == x['id']
+                    or query in x['title'].lower()
+                )
             ]
-        else:
-            jobs = data['jobs']
-        f_jobs = [
-            f"[{x['title'] if len(x['title'])<50 else x['title'][:49]+'…'}]({x['absolute_url']})" for x in jobs
+            desc = await self.bot._(interaction, "fun.discordjobs.filtered-count", count=len(jobs))
+        formatted_jobs = [
+            f"[{x['title'] if len(x['title'])<50 else x['title'][:49]+'…'}]({x['absolute_url']})"
+            for x in jobs
         ]
-        if ctx.can_send_embed:
-            _title = await self.bot._(ctx.channel, "fun.discordjobs-title")
-            class JobsPaginator(Paginator):
-                "Paginator used to display jobs offers"
-                async def get_page_count(self) -> int:
-                    return ceil(len(f_jobs)/30)
+        _title = await self.bot._(interaction, "fun.discordjobs.title")
+        class JobsPaginator(Paginator):
+            "Paginator used to display jobs offers"
+            async def get_page_count(self) -> int:
+                return ceil(len(formatted_jobs)/30)
 
-                async def get_page_content(self, interaction: discord.Interaction, page: int):
-                    "Create one page"
-                    # to_display = f_jobs[(page-1)*30:page*30]
-                    desc = await self.client._(ctx.channel, "fun.discordjobs-count", c=len(f_jobs))
-                    emb = discord.Embed(title=_title, color=7506394, url="https://dis.gd/jobs", description=desc)
-                    page_start, page_end = (page-1)*30, min(page*30, len(f_jobs))
-                    for i in range(page_start, page_end, 10):
-                        column_start, column_end = i+1, min(i+10, len(f_jobs))
-                        emb.add_field(name=f"{column_start}-{column_end}", value="\n".join(f_jobs[i:i+10]))
-                    footer = f"Page {page}/{await self.get_page_count()}"
-                    emb.set_footer(text=footer)
-                    return {
-                        "embed": emb
-                    }
+            async def get_page_content(self, interaction: discord.Interaction, page: int):
+                "Create one page"
+                emb = discord.Embed(
+                    title=_title,
+                    description=desc,
+                    color=discord.Colour.blurple(),
+                    url="https://dis.gd/jobs",
+                )
+                page_start, page_end = (page-1)*30, min(page*30, len(formatted_jobs))
+                for i in range(page_start, page_end, 10):
+                    column_start, column_end = i+1, min(i+10, len(formatted_jobs))
+                    emb.add_field(name=f"{column_start}-{column_end}", value="\n".join(formatted_jobs[i:i+10]))
+                footer = f"Page {page}/{await self.get_page_count()}"
+                emb.set_footer(text=footer)
+                return {
+                    "embed": emb
+                }
 
-            if len(f_jobs) < 30:
-                emb = discord.Embed(title=_title, color=7506394, url="https://dis.gd/jobs")
-                emb.description = await self.bot._(ctx.channel, "fun.discordjobs-count", c=len(f_jobs))
-                for i in range(0, len(f_jobs), 10):
-                    emb.add_field(name=self.bot.zws, value="\n".join(f_jobs[i:i+10]))
-                await ctx.send(embed=emb)
-            else:
-                _quit = await self.bot._(ctx.guild, "misc.quit")
-                view = JobsPaginator(self.bot, ctx.author, stop_label=_quit.capitalize())
-                await view.send_init(ctx)
+        if len(formatted_jobs) < 30:
+            emb = discord.Embed(
+                title=_title,
+                description=desc,
+                color=discord.Colour.blurple(),
+                url="https://dis.gd/jobs"
+            )
+            for i in range(0, len(formatted_jobs), 10):
+                emb.add_field(name=self.bot.zws, value="\n".join(formatted_jobs[i:i+10]))
+            await interaction.followup.send(embed=emb)
         else:
-            await ctx.send("\n".join(f_jobs[:20]))
+            _quit = await self.bot._(interaction, "misc.quit")
+            view = JobsPaginator(self.bot, interaction.user, stop_label=_quit.capitalize())
+            await view.send_init(interaction)
 
-    @commands.command(name="discordlinks",aliases=['discord','discordurls'])
-    async def discord_links(self, ctx: MyContext):
+    @fun_main.command(name="discord-links")
+    async def discord_links(self, interaction: discord.Interaction):
         """Get some useful links about Discord"""
-        l = await self.bot._(ctx.channel,'info.discordlinks')
-        links = ["https://dis.gd/status","https://dis.gd/tos","https://dis.gd/report","https://dis.gd/feedback","https://support.discord.com/hc/en-us/articles/115002192352","https://discord.com/developers/docs/legal","https://support.discord.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID-","https://support.discord.com/hc/en-us/articles/360040724612", " https://twitter.com/discordapp/status/1060411427616444417", "https://support.discord.com/hc/en-us/articles/360035675191"]
-        if ctx.can_send_embed:
-            txt = "\n".join(['['+l[i]+']('+links[i]+')' for i in range(len(l))])
-            em = discord.Embed(description=txt)
-            em.set_footer(text=ctx.author, icon_url=ctx.author.display_avatar)
-            await ctx.send(embed=em)
-        else:
-            txt = "\n".join([f'• {l[i]}: <{links[i]}>' for i in range(len(l))])
-            await ctx.send(txt)
+        links = {
+            "server-status": "https://dis.gd/status",
+            "tos": "https://dis.gd/tos",
+            "bug-report": "https://dis.gd/report",
+            "feedback": "https://dis.gd/feedback",
+            "selfbot": "https://support.discord.com/hc/en-us/articles/115002192352",
+            "dev-tos": "https://discord.com/developers/docs/legal",
+            "how-id": "https://support.discord.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID-",
+            "age-requirement": "https://support.discord.com/hc/en-us/articles/360040724612",
+            "betterdiscord": "https://twitter.com/discordapp/status/1060411427616444417",
+            "downloads": "https://support.discord.com/hc/en-us/articles/360035675191",
+        }
+        translations_list: list[str] = []
+        for url_id, link in links.items():
+            name = await self.bot._(interaction, f"fun.discordlinks.{url_id}")
+            translations_list.append(f"- [{name}]({link})")
+        em = discord.Embed(
+            title=await self.bot._(interaction, "fun.discordlinks.title"),
+            description="\n".join(translations_list),
+            color=discord.Colour.blurple()
+        )
+        await interaction.response.send_message(embed=em)
 
-    @commands.command(name="discordstatus", aliases=['discord_status', 'status.gg'])
-    @commands.cooldown(2, 60, commands.BucketType.channel)
-    async def discord_status(self, ctx: MyContext):
-        """Know if Discord currently has a technical issue"""
+    @fun_main.command(name="discord-status")
+    @app_commands.checks.cooldown(2, 60)
+    async def discord_status(self, interaction: discord.Interaction):
+        "Check if Discord is experiencing some technical issues"
+        await interaction.response.defer()
         async with aiohttp.ClientSession() as session:
             async with session.get("https://discordstatus.com/api/v2/incidents.json") as r:
                 data = await r.json()
         last_incident = data['incidents'][0]
         if last_incident['resolved_at'] is None:
-            impact = await self.bot._(ctx.channel, "fun.discordstatus-impacts."+last_incident['impact'])
+            impact = await self.bot._(interaction, "fun.discordstatus-impacts."+last_incident['impact'])
             title = f"**{last_incident['name']}** (<{last_incident['shortlink']}>)"
-            await ctx.send(await self.bot._(ctx.channel, "fun.discordstatus-exists", impact=impact, title=title))
+            await interaction.followup.send(await self.bot._(interaction, "fun.discordstatus-exists", impact=impact, title=title))
         else:
             last_date = datetime.datetime.strptime(last_incident['resolved_at'], '%Y-%m-%dT%H:%M:%S.%f%z')
             last_date = f"<t:{round(last_date.timestamp())}:F>"
-            await ctx.send(await self.bot._(ctx.channel, "fun.discordstatus-nothing", date=last_date))
-
-    @commands.command(name="pep8", aliases=['autopep8'])
-    @commands.cooldown(3, 30, commands.BucketType.user)
-    async def autopep8_cmd(self, ctx: MyContext, *, code: str):
-        """Auto format your Python code according to PEP8 guidelines"""
-        if code.startswith('```') and code.endswith('```'):
-            code = '\n'.join(code.split('\n')[1:-1])
-        elif code.startswith('`') and code.endswith('`'):
-            code = code[1:-1]
-        code = autopep8.fix_code(code, {
-            "aggressive": 3,
-            "ignore": set()
-        }).strip()
-        await ctx.send(f"```py\n{code}\n```")
+            await interaction.followup.send(await self.bot._(interaction, "fun.discordstatus-nothing", date=last_date))
 
     @commands.command(name="avatar", aliases=['pfp'])
     @commands.cooldown(2, 10, commands.BucketType.user)
