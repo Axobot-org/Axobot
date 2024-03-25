@@ -32,11 +32,15 @@ class Paginator(ui.View):
         self.page = 1
         self.children[2].label = stop_label
 
-    async def send_init(self, ctx: MyContext):
+    async def send_init(self, ctx: Union[MyContext, Interaction]):
         "Build the first page, before anyone actually click"
         contents = await self.get_page_content(None, self.page)
         await self._update_buttons()
-        return await ctx.send(**contents, view=self)
+        if isinstance(ctx, MyContext):
+            return await ctx.send(**contents, view=self)
+        if ctx.response.is_done():
+            return await ctx.followup.send(**contents, view=self)
+        return await ctx.response.send_message(**contents, view=self)
 
     async def get_page_content(self, interaction: Interaction, page: int) -> dict[str, Any]:
         "Build the page content given the page number and source interaction"
