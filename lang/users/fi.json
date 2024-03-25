@@ -12,10 +12,6 @@
             "false": "Et ole tällä hetkellä hyväksymässä animoitua korttia. Kiitos!",
             "true": "Voit nyt käyttää animoituja xp kortteja  (hitaampi renderaaminen)"
         },
-        "auto_unafk": {
-            "false": "Sinun täytyy poistaa AFK merkki itse",
-            "true": "Minä poistan AFK merkin sinulta heti kun lähetät viestin"
-        },
         "show_tips": {
             "false": "Et enää saa vinkkejä botilta",
             "true": "Saat satunnaisesti vinkkejä botilta"
