@@ -1,12 +1,4 @@
 {
-    "afk": {
-        "afk-done": "Nyní jste AFK",
-        "afk-user-noreason": "Tento uživatel je AFK!",
-        "afk-user-reason": "Tento člen je AFK! Důvod: %{reason}",
-        "no-perm": "Ale né, nemohu zmenit tvou přezdívku :confused: vzpomenu si hned, jen co nebudeš afk",
-        "unafk-cant": "Nyní už nejste AFK!",
-        "unafk-done": "Již nejste AFK"
-    },
     "bbw-too-many": "Ale né, mřížka je příliš velká pro Discord :confused:",
     "blame-0": "Seznam dostupných jmen pro **%{user}**",
     "cookie": "%{user} nabídl krabici cookies na <@375598088850505728>! %{emoji}",
@@ -18,8 +10,32 @@
         "result-you": "V rámci poslední %{limit} zpráv, jste poslal %{x} zpráv (%{p}%%)",
         "too-much": "Chcete vyhodit do povětří Discord! %{e} Z pochopitelných důvodů výkonu zavedu limit %{l} zpráv."
     },
-    "discordjobs-count": "Nalezeno %{c} nabídek",
-    "discordjobs-title": "Nabídky práce v Discordu",
+    "discordjobs": {
+        "all-count": {
+            "zero": "Žádné nabídky",
+            "one": "1 uvedená nabídka",
+            "many": "%{count} nabídek uvedeno"
+        },
+        "filtered-count": {
+            "zero": "Nenalezeny žádné nabídky odpovídající vašemu hledání",
+            "one": "Byla nalezena jedna nabídka odpovídající vašemu hledání",
+            "many": "Nalezeno %{count} nabídek odpovídajících vašemu hledání"
+        },
+        "title": "Pracovní příležitosti dostupné v Discordu"
+    },
+    "discordlinks": {
+        "title": "Některé užitečné odkazy",
+        "server-status": "Stav serveru",
+        "tos": "Podmínky služby Discord",
+        "bug-report": "Nahlásit chybu/uživatele",
+        "feedback": "Návrhy/Zpětná vazba",
+        "selfbot": "Pravidla pro používání Selfbotu",
+        "dev-tos": "Api pro vývojáře",
+        "how-id": "Jak najít ID",
+        "age-requirement": "Minimální zákonný věk pro používání Discordu, podle země",
+        "betterdiscord": "Zakázáno používat BetterDiscord",
+        "downloads": "Každé stahování aplikace Discord"
+    },
     "discordstatus-exists": "V současné době probíhá jeden %{impact} incident na Discordu: %{title}",
     "discordstatus-impacts": {
         "major": "závažná",
@@ -35,7 +51,7 @@
         "heads": "Hlavy !",
         "edge": "Oops, mince dopadla na hranu!"
     },
-    "fun-list": "Zde je seznam dostupných zábavných příkazů:",
+    "hour-result": "%{date} (%{tzname})\nNázev časového pásma: %{tzlocation}\nzeměpisná šířka: %{lat} - zeměpisná délka: %{long}",
     "invalid-city": "Neplatné město :confused:",
     "kills-list": [
         "***MÁM TĚ!*** {victim} padl do pasti nastražené {attacker}!",
@@ -89,15 +105,11 @@
         "{victim} se vydal do chlebené špenátu a nikdy se nevrátil.",
         "{attacker} aktivoval starověkou kletbu, která způsobila, že duše {victim} byla uvězněna navždy."
     ],
-    "markdown": "__**Markdown Rules** on *Discord*__\n\n`*italics*` = *italics*\n`__underline__` = __underline__\n`**bold**` = **bold**\n`***bold italics***` = ***bold italics***\n`~~strikeout~~` = ~~strikeout~~\n`__*underline italics*__` = __*underline italics*__\n`__**underline bold**__` = __**underline bold**__\n`__***underline bold italics***__` = __***underline bold italics***__\n`||spoiler||` = ||spoiler||\n> quote = `> quote`\n\\`code\\` = `code`\n \\ to ignore\n\nFor code blocks, cf <https://discord.gg/DGahTNn>",
     "nasa-none": "Ale né, momentálně nejsem schopen získat informace z NASA. Zkuste to znovu za pár minut :confused:",
-    "no-database": "Jelikož je naše databáze offline, přístup k zábavným příkazům je omezen na osoby s oprávněním \"Spravovat server\"",
     "no-embed-perm": "Nemám oprávnění k \"Vložit odkazy\" :confused:",
     "no-emoji": "Nelze najít tento emoji!",
-    "no-fun": "Zábavné příkazy byly zakázány na tomto serveru. Chcete-li zobrazit jejich seznam, podívejte se na https://axobot.rtfd.io/en/latest/fun.html",
     "no-roll": "Nebyla nalezena žádná volba",
     "no-say": "Nelze odeslat žádnou zprávu v tomto kanálu",
-    "no-voicechan": "Musíte být v hlasovém kanálu, abyste mohli použít tento příkaz.",
     "not-enough-roll": "Musí existovat alespoň dva odlišné prvky",
     "osekour": [
         "Počkejte, dokončuji sledování mého filmu.",
@@ -119,10 +131,6 @@
     },
     "say-done": "Zpráva byla odeslána!",
     "say-no-perm": "Nemáte oprávnění k odesílání zpráv v kanálu %{channel}",
-    "thanos": [
-        "{0} byl Thanosem ušetřen",
-        "Thanos se rozhodl zredukovat {0} na popel. Pro dobro lidstva...."
-    ],
     "tip-list": [
         "Věděli jste, že? Existuje několik jazyků pro bota, včetně jednoho velmi zábavného, můžete vyzkoušet: lolcat",
         "Pro-tip: pro změnu jazyka bot použijte příkaz %{config_cmd}!",
