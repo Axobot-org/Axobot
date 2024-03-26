@@ -610,7 +610,7 @@ class BotStats(commands.Cog):
     @tasks.loop(minutes=4)
     async def status_loop(self):
         "Send average latency to axobot.statuspage.io every 4min"
-        if self.bot.user.id != 486896267788812288 or not self.bot.internal_loop_enabled:
+        if self.bot.entity_id != 2 or not self.bot.internal_loop_enabled:
             return
         now = self.bot.utcnow()
         average = await self.get_list_usage(self.latency_records)
