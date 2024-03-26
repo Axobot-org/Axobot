@@ -19,7 +19,6 @@ from timezonefinder import TimezoneFinder
 from libs.arguments import args
 from libs.bot_classes import SUPPORT_GUILD_ID, Axobot, MyContext
 from libs.checks import checks
-from libs.checks.checks import is_fun_enabled
 from libs.formatutils import FormatUtils
 from libs.paginator import Paginator
 
@@ -69,7 +68,6 @@ class Fun(commands.Cog):
 
     @commands.command(name="cookie", aliases=['cookies', 'crustulum'], hidden=True)
     @commands.check(can_use_cookie)
-    @commands.check(is_fun_enabled)
     async def cookie(self, ctx: MyContext):
         """COOKIE !!!"""
         if ctx.author.id == 375598088850505728:
