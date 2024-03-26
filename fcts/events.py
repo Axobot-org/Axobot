@@ -262,18 +262,18 @@ class Events(commands.Cog):
         answers: list[str] = []
         self.bot.log.info("Sending server count to bots lists APIs...")
         try:
-            guild_count = await self.bot.get_cog('BotInfo').get_guilds_count()
+            guild_count = await self.bot.get_cog("BotInfo").get_guilds_count()
         except Exception as err:
             self.bot.dispatch("error", err, "Fetching guild count")
             guild_count = len(self.bot.guilds)
         session = aiohttp.ClientSession(loop=self.bot.loop)
         try:# https://top.gg/bot/1048011651145797673
-            payload = {'server_count': guild_count}
+            payload = {"server_count": guild_count}
             headers={
-                'Authorization': self.bot.dbl_token
+                "Authorization": self.bot.dbl_token
             }
-            async with session.post(f'https://top.gg/api/bots/{self.bot.user.id}/stats' ,data=payload, headers=headers) as resp:
-                self.bot.log.debug(f'top.gg returned {resp.status} for {payload}')
+            async with session.post(f"https://top.gg/api/bots/{self.bot.user.id}/stats", json=payload, headers=headers) as resp:
+                self.bot.log.debug(f"top.gg returned {resp.status} for {payload}")
                 answers.append(f"top.gg: {resp.status}")
         except Exception as err:
             answers.append("top.gg: 0")
@@ -281,14 +281,14 @@ class Events(commands.Cog):
         if self.bot.entity_id == 2:
             try: # https://discordbotlist.com/api/v1/bots/1048011651145797673/stats
                 payload = json.dumps({
-                    'guilds': guild_count
+                    "guilds": guild_count
                 })
                 headers = {
-                    'Authorization': self.bot.others["discordbotlist_axobot"],
-                    'Content-Type': 'application/json'
+                    "Authorization": self.bot.others["discordbotlist_axobot"],
                 }
-                async with session.post(f'https://discordbotlist.com/api/v1/bots/{self.bot.user.id}/stats', data=payload, headers=headers) as resp:
-                    self.bot.log.debug(f'discordbotlist returned {resp.status} for {payload}')
+                async with session.post(f"https://discordbotlist.com/api/v1/bots/{self.bot.user.id}/stats",
+                                        json=payload, headers=headers) as resp:
+                    self.bot.log.debug(f"discordbotlist returned {resp.status} for {payload}")
                     answers.append(f"discordbotlist: {resp.status}")
             except Exception as err:
                 answers.append("discordbotlist: 0")
@@ -296,7 +296,7 @@ class Events(commands.Cog):
         await session.close()
         answers = ' - '.join(answers)
         delta_time = round(time.time()-start_time, 3)
-        emb = discord.Embed(description=f'**Guilds count updated** in {delta_time}s\n{answers}', color=7229109, timestamp=self.bot.utcnow())
+        emb = discord.Embed(description=f"**Guilds count updated** in {delta_time}s\n{answers}", color=7229109, timestamp=self.bot.utcnow())
         emb.set_author(name=self.bot.user, icon_url=self.bot.user.display_avatar)
         await self.bot.send_embed(emb, url="loop")
         self.dbl_last_sending = datetime.datetime.now()
