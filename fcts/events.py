@@ -267,7 +267,7 @@ class Events(commands.Cog):
             self.bot.dispatch("error", err, "Fetching guild count")
             guild_count = len(self.bot.guilds)
         session = aiohttp.ClientSession(loop=self.bot.loop)
-        try:# https://top.gg/bot/486896267788812288
+        try:# https://top.gg/bot/1048011651145797673
             payload = {'server_count': guild_count}
             headers={
                 'Authorization': self.bot.dbl_token
