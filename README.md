@@ -50,6 +50,4 @@ This program is subject to a **MIT-type license**, which means that you are free
 
 [![Discord Bots](https://top.gg/api/widget/1048011651145797673.svg)](https://top.gg/bot/1048011651145797673)
 
-[![Bots on Discord](https://bots.ondiscord.xyz/bots/486896267788812288/embed)](https://bots.ondiscord.xyz/bots/486896267788812288)
-
 [![Discord bot list](https://discordbotlist.com/api/v1/bots/1048011651145797673/widget)](https://discordbotlist.com/bots/axobot-3022)

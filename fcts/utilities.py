@@ -167,7 +167,7 @@ class Utilities(commands.Cog):
         """check if a user voted on any bots list website"""
         votes = []
         async with aiohttp.ClientSession() as session:
-            try:  # https://top.gg/bot/486896267788812288
+            try:  # https://top.gg/bot/1048011651145797673
                 async with session.get(
                     f'https://top.gg/api/bots/{self.bot.user.id}/check?userId={userid}',
                     headers={'Authorization': str(self.bot.dbl_token)}
