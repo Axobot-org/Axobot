@@ -24,7 +24,7 @@ async def help_all_command(cog: "HelpCog", ctx: MyContext):
     if ctx.guild is None:
         title = await cog.bot._(ctx.channel, "help.embed_title_dm")
     else:
-        title = await cog.bot._(ctx.channel, "help.embed_title", u=ctx.author.display_name)
+        title = await cog.bot._(ctx.channel, "help.embed_title")
     embed_color = get_embed_color(ctx)
     embed = discord.Embed(title=title, color=embed_color)
     embed.set_footer(text=await get_embed_footer(ctx))
