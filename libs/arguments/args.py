@@ -268,3 +268,13 @@ class MessageTransformer(discord.app_commands.Transformer): # pylint: disable=ab
         return await commands.MessageConverter().convert(ctx, value) # pylint: disable=protected-access
 
 MessageArgument = discord.app_commands.Transform[discord.Message, MessageTransformer]
+
+class ColorTransformer(discord.app_commands.Transformer): # pylint: disable=abstract-method
+    "Convert a string argument in an interaction usage to a valid discord Color"
+
+    async def transform(self, interaction, value, /):
+        "Do the conversion"
+        ctx = await commands.Context.from_interaction(interaction)
+        return await commands.ColourConverter().convert(ctx, value) # pylint: disable=protected-access
+
+ColorArgument = discord.app_commands.Transform[discord.Colour, ColorTransformer]

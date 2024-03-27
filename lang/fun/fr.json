@@ -45,6 +45,7 @@
     "discordstatus-nothing": "Rien à signaler pour le moment !\nLa dernière panne connue était le %{date}",
     "embed-invalid-channel": "Impossible d'envoyer des messages dans ce salon",
     "embed-invalid-image": "L'url saisie pour l'image est invalide",
+    "embed-sent": "L'embed a bien été envoyé ! %{message_url}",
     "error": "Une erreur est survenue: `%{err}`",
     "flip": {
         "tails": "Pile !",
