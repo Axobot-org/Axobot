@@ -616,18 +616,18 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         ):
         """Use the bot to send a custom embed
 
-        Available keys:
-            - title: the title of the embed [256 characters]
-            - content: the text inside the box [2048 characters]
-            - url: a well-formed url clickable via the title
-            - footer: a little text at the bottom of the box [90 characters]
-            - image: a well-formed url redirects to an image
-            - color: the color of the embed bar (#hex or int)
-        If you want to use lines break in the texts, use the special character `\\n`
+Available options:
+- title: the title of the embed [256 characters]
+- content: the text inside the box [2048 characters]
+- url: a well-formed url clickable via the title
+- footer: a little text at the bottom of the box [90 characters]
+- image: a well-formed url redirects to an image
+- color: the color of the embed bar (#hex or int)
+If you want to use lines break in the texts, use the special character `\\n`
 
-        ..Example embed #announcements title="Special update!" content="We got an amazing thing for you!\\nPlease check blah blah..." color="#FF0022"
+..Example embed #announcements title="Special update!" content="We got an amazing thing for you!\\nPlease check blah blah..." color="#FF0022"
 
-        ..Doc miscellaneous.html#embed
+..Doc miscellaneous.html#embed
         """
         destination = channel or interaction.channel
         if not (
