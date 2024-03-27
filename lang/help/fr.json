@@ -151,7 +151,7 @@
     "cmd-not-found": "Aucune commande nommée \"%{cmd}\"",
     "cog-empty-dm": "Aucune commande de ce module n'est disponible en MP !",
     "description": "Description",
-    "embed_title": "Liste des commandes disponibles pour %{u}",
+    "embed_title": "Liste des commandes disponibles",
     "embed_title_dm": "Liste des commandes disponibles en MP",
     "footer": "Entrez '/help commande' pour plus d'informations sur une commande",
     "more-subcmds": {
