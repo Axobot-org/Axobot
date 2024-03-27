@@ -151,8 +151,8 @@
     "cmd-not-found": "There is no command named \"%{cmd}\"",
     "cog-empty-dm": "No command of this category is available in DM!",
     "description": "Description",
-    "embed_title": "Available commands for %{u}",
-    "embed_title_dm": "Available commands in DM",
+    "embed_title": "Available commands",
+    "embed_title_dm": "Commands available in DM",
     "footer": "Type '/help command' for more info on a command",
     "more-subcmds": {
         "one": "and 1 more",
