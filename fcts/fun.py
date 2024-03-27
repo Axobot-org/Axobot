@@ -1,7 +1,6 @@
 import datetime
 import importlib
 import random
-import re
 import urllib.parse
 from math import ceil
 from typing import Any, Literal, Optional, Union
@@ -414,89 +413,6 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         )
         await interaction.followup.send(embed=embed)
 
-    @commands.command(name="embed",hidden=False)
-    @commands.check(checks.has_embed_links)
-    @commands.check(can_say)
-    @commands.guild_only()
-    async def send_embed(self, ctx: MyContext, *, arguments):
-        """Send an embed
-        Syntax: !embed [channel] key1=\"value 1\" key2=\"value 2\"
-
-        Available keys:
-            - title: the title of the embed [256 characters]
-            - content: the text inside the box [2048 characters]
-            - url: a well-formed url clickable via the title
-            - footer: a little text at the bottom of the box [90 characters]
-            - image: a well-formed url redirects to an image
-            - color: the color of the embed bar (#hex or int)
-        If you want to use quotation marks in the texts, it is possible to escape them thanks to the backslash (`\\"`)
-
-        You can send the embed to a specific channel by mentionning it at the beginning of the arguments
-
-        ..Example embed #announcements title="Special update!" content="We got an amazing thing for you!\\nPlease check blah blah..." color="#FF0022"
-
-        ..Doc miscellaneous.html#embed
-        """
-        channel = None
-        r = re.search(r'<#(\d+)>', arguments.split(" ")[0])
-        if r is not None:
-            arguments = " ".join(arguments.split(" ")[1:])
-            channel = ctx.guild.get_channel_or_thread(int(r.group(1)))
-        arguments = await args.arguments().convert(ctx, arguments)
-        if len(arguments) == 0:
-            raise commands.errors.MissingRequiredArgument(ctx.command.clean_params['arguments'])
-        destination = ctx.channel if channel is None else channel
-        if not (destination.permissions_for(ctx.author).read_messages and destination.permissions_for(ctx.author).send_messages):
-            await ctx.send(await self.bot._(ctx.guild,"fun.say-no-perm",channel=destination.mention))
-            return
-        if not destination.permissions_for(ctx.guild.me).send_messages:
-            return await ctx.send(await self.bot._(ctx.channel,"fun.embed-invalid-channel"))
-        if not destination.permissions_for(ctx.guild.me).embed_links:
-            return await ctx.send(await self.bot._(ctx.channel,"fun.no-embed-perm"))
-        embed_color = ctx.bot.get_cog('ServerConfig').embed_color
-        k = {'title': "", 'content': "", 'url': '',
-             'footer': "", 'image': '', 'color': embed_color}
-        for key, value in arguments.items():
-            # replace description and colour fields
-            if key == "description":
-                key = "content"
-            elif key == "colour":
-                key = "color"
-            # limit title length
-            if key == 'title':
-                k['title'] = value[:255]
-            # limit footer length
-            elif key == 'footer':
-                k['footer'] = value[:90]
-            # replace \n with real newlines in content
-            elif key == "content":
-                k[key] = value.replace("\\n", "\n")
-            # eval embed color
-            elif key == "color":
-                if color := await commands.ColourConverter().convert(ctx, value):
-                    k['color'] = color
-            # add url and image links
-            elif key in {'url', 'image'} and value.startswith("http"):
-                k[key] = value
-        emb = discord.Embed(title=k['title'], description=k['content'], url=k['url'], color=k['color'])
-        emb.set_author(name=ctx.author, icon_url=ctx.author.display_avatar)
-        if "image" in k:
-            emb.set_thumbnail(url=k['image'])
-        if "footer" in k:
-            emb.set_footer(text=k['footer'])
-        try:
-            await destination.send(embed=emb)
-        except Exception as err:
-            if isinstance(err,discord.errors.HTTPException) and "In embed.thumbnail.url: Not a well formed URL" in str(err):
-                return await ctx.send(await self.bot._(ctx.channel, "fun.embed-invalid-image"))
-            await ctx.send(await self.bot._(ctx.channel,"fun.error", err=err))
-        if channel is not None:
-            try:
-                await ctx.message.delete()
-            except discord.Forbidden:
-                pass
-
-
     @fun_main.command(name="bubble-wrap")
     @app_commands.checks.cooldown(5, 30)
     async def bubblewrap(self, interaction: discord.Interaction,
@@ -666,13 +582,100 @@ You can specify a verification limit by adding a number in argument (up to 1.000
             last_date = f"<t:{round(last_date.timestamp())}:F>"
             await interaction.followup.send(await self.bot._(interaction, "fun.discordstatus-nothing", date=last_date))
 
-    @commands.command(name="avatar", aliases=['pfp'])
-    @commands.cooldown(2, 10, commands.BucketType.user)
-    async def avatar(self, ctx: MyContext, user: Optional[discord.User]):
-        """Get the avatar of a user"""
+    @fun_main.command(name="avatar")
+    @app_commands.checks.cooldown(2, 10)
+    async def avatar(self, interaction: discord.Interaction, user: Optional[discord.User]):
+        """Get the avatar URL of any user"""
         if user is None:
-            user = ctx.author
-        await ctx.send(user.display_avatar.url)
+            user = interaction.user
+        await interaction.response.send_message(user.display_avatar.url)
+
+
+    @app_commands.command(name="embed")
+    @app_commands.default_permissions(manage_messages=True)
+    @app_commands.guild_only()
+    @app_commands.describe(
+        channel="The channel where the bot must send the embed",
+        title="The title of the embed",
+        content="The main text inside the box",
+        url="The URL opening when the title is clicked",
+        footer="The small text at the bottom of the box",
+        image_url="The URL of a large image to display at the bottom of the embed",
+        thumbnail_url="The URL of a small image to display at the top right of the embed",
+        color="The color of the embed bar"
+    )
+    async def send_embed(self, interaction: discord.Interaction,
+                         channel: Optional[discord.TextChannel]=None,
+                         title: Optional[app_commands.Range[str, 1, 256]]=None,
+                         content: Optional[app_commands.Range[str, 1, 2048]]=None,
+                         url: Optional[app_commands.Range[str, 5, 256]]=None,
+                         footer: Optional[app_commands.Range[str, 1, 90]]=None,
+                         image_url: Optional[app_commands.Range[str, 5, 256]]=None,
+                         thumbnail_url: Optional[app_commands.Range[str, 5, 256]]=None,
+                         color: Optional[args.ColorTransformer]=None
+        ):
+        """Use the bot to send a custom embed
+
+        Available keys:
+            - title: the title of the embed [256 characters]
+            - content: the text inside the box [2048 characters]
+            - url: a well-formed url clickable via the title
+            - footer: a little text at the bottom of the box [90 characters]
+            - image: a well-formed url redirects to an image
+            - color: the color of the embed bar (#hex or int)
+        If you want to use lines break in the texts, use the special character `\\n`
+
+        ..Example embed #announcements title="Special update!" content="We got an amazing thing for you!\\nPlease check blah blah..." color="#FF0022"
+
+        ..Doc miscellaneous.html#embed
+        """
+        destination = channel or interaction.channel
+        if not (
+            destination.permissions_for(interaction.user).read_messages
+            and destination.permissions_for(interaction.user).send_messages
+        ):
+            return await interaction.response.send_message(
+                await self.bot._(interaction, "fun.say-no-perm", channel=destination.mention),
+                ephemeral=True
+            )
+        if not destination.permissions_for(interaction.guild.me).send_messages:
+            return await interaction.response.send_message(
+                await self.bot._(interaction, "fun.embed-invalid-channel"),
+                ephemeral=True
+            )
+        if not destination.permissions_for(interaction.guild.me).embed_links:
+            return await interaction.response.send_message(
+                await self.bot._(interaction, "fun.no-embed-perm"),
+                ephemeral=True
+            )
+        await interaction.response.defer(ephemeral=True)
+        default_color = self.bot.get_cog('ServerConfig').embed_color
+        emb = discord.Embed(
+            title=title,
+            description=content.replace("\\n", "\n"),
+            url=url,
+            color=color or default_color,
+        )
+        emb.set_author(name=interaction.user, icon_url=interaction.user.display_avatar)
+        if image_url:
+            emb.set_image(url=image_url)
+        if thumbnail_url:
+            emb.set_thumbnail(url=thumbnail_url)
+        if footer:
+            emb.set_footer(text=footer)
+        try:
+            msg = await destination.send(embed=emb)
+        except discord.errors.HTTPException as err:
+            if err.code == 400:
+                await interaction.followup.send(
+                    await self.bot._(interaction.response.send_message, "fun.embed-invalid-image")
+                )
+            else:
+                await interaction.followup.send(await self.bot._(interaction.response.send_message, "fun.error", err=err))
+            return
+        await interaction.followup.send(
+            await self.bot._(interaction, "fun.embed-sent", message_url=msg.jump_url)
+        )
 
 
 async def setup(bot):
