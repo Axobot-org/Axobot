@@ -2,12 +2,10 @@
     "aliases": "Aliases",
     "categories": {
         "data": "data",
-        "fun": "fun",
         "moderation": "moderation",
         "other": "others",
         "server-settings": "server settings",
         "staff": "bot staff",
-        "translators": "translation team",
         "unclassed": "Unclassed",
         "users-info": "Users information"
     },

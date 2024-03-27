@@ -49,7 +49,7 @@
             "config",
             "emoji",
             "mute-config",
-            "partner",
+            "partners",
             "pin",
             "role",
             "roles-react",
@@ -62,42 +62,28 @@
     "users-info": {
         "emoji": "👥",
         "commands": [
-            "avatar",
             "permissions",
             "profile",
             "rank",
-            "top",
-            "usernames"
+            "top"
         ]
     },
     "other": {
         "emoji": "👀",
         "commands": [
-            "embed",
-            "react",
-            "remindme",
-            "reminders"
-        ]
-    },
-    "fun": {
-        "emoji": "🎳",
-        "commands": [
             "bitly",
+            "embed",
+            "reminders",
             "cookie",
             "event",
             "minecraft",
-            "tic-tac-toe",
-            "fish",
             "fun",
-            "hour",
+            "poll",
+            "quote",
+            "react",
+            "remindme",
             "say",
-            "poll"
-        ]
-    },
-    "translators": {
-        "emoji": "🖋️",
-        "commands": [
-            "translators"
+            "tic-tac-toe"
         ]
     },
     "staff": {
@@ -105,15 +91,10 @@
         "commands": [
             "add_cog",
             "admin",
-            "bug",
             "del_cog",
             "eval",
-            "execute",
             "find",
-            "idea",
-            "msg",
             "rss_loop",
-            "spoil",
             "test"
         ]
     },
