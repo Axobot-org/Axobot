@@ -229,22 +229,6 @@ ORDER BY usages DESC LIMIT %(limit)s"""
         else:
             await ctx.send(f"**{title}**\n{desc}\n\n{title_total}:\n{text_total}\n\n{title_24h}:\n{text_24h}")
 
-
-    @commands.command(name="pig", hidden=True)
-    async def pig(self, ctx: MyContext):
-        """Get bot latency
-        You can also use this command to ping any other server"""
-        msg = await ctx.send("Pig...")
-        bot_delta = (msg.created_at - ctx.message.created_at).total_seconds()
-        try:
-            api_latency = round(self.bot.latency*1000)
-        except OverflowError:
-            api_latency = "∞"
-        await msg.edit(content=await self.bot._(ctx.channel, "info.ping.pig",
-                                                bot=round(bot_delta*1000),
-                                                api=api_latency)
-                       )
-
     @commands.hybrid_command(name="ping", aliases=['rep'])
     @commands.cooldown(5, 45, commands.BucketType.guild)
     async def rep(self, ctx: MyContext, ):
