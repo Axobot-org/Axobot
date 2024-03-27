@@ -25,7 +25,6 @@ Axobot is a multifunction Discord bot, which allows among other things to :
 - make mini games such as a crab
 - make server animations: voting and polling, rss feed tracking, roles reactions, partners managment etc
 - search for Minecraft game elements: blocks, entities, advancements, commands...
-- search for a book and manage your library
 
 and many other things, which the list is constantly evolving.
 
