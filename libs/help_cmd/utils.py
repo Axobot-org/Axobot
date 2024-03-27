@@ -2,6 +2,7 @@ import inspect
 from typing import Callable, Optional, TypedDict, Union, get_type_hints
 
 import discord
+from discord import app_commands
 from discord.ext import commands
 
 from libs.bot_classes import MyContext
@@ -55,9 +56,12 @@ async def extract_info(raw_description: str) -> tuple[Optional[str], list[str], 
         for x in ("\n\n".join(description), examples, doc)
     )
 
-async def generate_warnings_field(ctx: MyContext, command: Union[commands.Command, commands.Group]) -> Optional[FieldData]:
+async def generate_warnings_field(
+        ctx: MyContext,
+        command: Union[app_commands.Command, app_commands.Group, commands.Command, commands.Group]
+    ) -> Optional[FieldData]:
     "Generate an embed field to list warnings and checks about a command usage"
-    if isinstance(command, commands.Group):
+    if isinstance(command, (app_commands.Group, commands.Group)):
         return None
     warnings: list[str] = []
     if isinstance(command, commands.Command) and not command.enabled:
