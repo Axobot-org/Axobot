@@ -73,7 +73,6 @@
     "other": {
         "emoji": "👀",
         "commands": [
-            "book",
             "embed",
             "react",
             "remindme",

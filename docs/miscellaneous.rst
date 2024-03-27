@@ -15,23 +15,6 @@ Bitly urls
 Bitly is a famous website for shortening web addresses (aka url). With this command you can create a shortcut yourself instantly using their services, and see to which address a bit.ly link refers without having to click on it. Practical, isn't it?
 
 
-----
-Book
-----
-
-This command allows you to manage your own library, saving your books easily. You can also only use the search function, for example to share a specific book with your Discord friends. Anything is possible!
-
-
-.. warning:: This command is under construction, and is therefore only in its early stages. Feel free to give your ideas on the official `bot server <https://discord.gg/N55zY88>`__!
-
-Search by ISBN
---------------
-
-**Syntax:** :code:`book search <ISBN>`
-
-Used to search for a book from its ISBN, and displays its main information. ISBNs of length 10 and 13 are accepted.
-
-
 -----
 Embed
 -----
@@ -43,7 +26,6 @@ This command is particularly useful if the 'say' command is no longer enough for
 Each argument is presented in the form :code:`name="value"`. If you want a line break, you can use the character :code:`\\n`, and if you want to use quotation marks without closing the argument, you will have to escape them (with a \ in front). To better understand how it works, here is an example of how to use it: :code:`embed title="Here is my title!" content="Blah blah \\nBlah ?" footer="Do you mean \\"Text\\"? "`
 
 .. warning:: Hey, this may sound weird, but Axobot needs "`Embed Links <perms.html#embed-links>`__" permission to send embeds...
-
 
 
 ---------

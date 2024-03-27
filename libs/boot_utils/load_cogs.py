@@ -27,7 +27,6 @@ async def load_cogs(bot: "Axobot"):
         'fcts.fun',
         # 'fcts.halloween',
         'fcts.info',
-        'fcts.library',
         'fcts.minecraft',
         'fcts.moderation',
         'fcts.partners',
