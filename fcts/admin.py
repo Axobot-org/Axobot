@@ -33,7 +33,7 @@ if TYPE_CHECKING:
     from fcts.antiscam import AntiScam
 
 
-AvailableGitBranches = Literal["main", "develop", "release-candidate"]
+AvailableGitBranches = Literal["main", "develop"]
 
 
 def cleanup_code(content: str):
