@@ -120,6 +120,7 @@
         "leave": "Zpráva odeslána, když člen odejde z funkce: %{value}",
         "levelup_channel": "Kanál, ve kterém jsou odeslány zprávy o zvýšení úrovně: %{value}",
         "levelup_msg": "Zpráva odeslána, když člen získá xp úroveň: %{value}",
+        "levelup_silent_mention": "Má být zpráva o zvýšení úrovně tichá (tj. bez oznámení)? %{value}",
         "membercounter": "Kanál zobrazující počet vašich členů v názvu: %{value}",
         "mute_allowed_roles": "Seznam rolí, které mohou použít příkaz \"umlčení\": %{value}",
         "muted_role": "Používá se role k umlčení členů: %{value}",

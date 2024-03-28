@@ -1,12 +1,4 @@
 {
-    "afk": {
-        "afk-done": "U'r now AFK",
-        "afk-user-noreason": "This usr is AFK!",
-        "afk-user-reason": "Taht member iz AFK, 'cuz %{reason}",
-        "no-perm": "Oops, I can't change Ur nickname :confused: I'll try to remember :/",
-        "unafk-cant": "U'r aren't AFK!",
-        "unafk-done": "U'rn't anymore AFK"
-    },
     "bbw-too-many": "Oops, dat grid's too big 4 Discord :upside_down:",
     "blame-0": "Lizt ov availabl namz 4 **%{user}**",
     "cookie": "%{user} gave <@375598088850505728> a box ov COOKIES! %{emoji}",
@@ -18,8 +10,32 @@
         "result-you": "On teh last %{limit} posts, U has postd %{x} msgs (%{p}%%)",
         "too-much": "You wanna blow up Discord! %{e} For obvious performance reasons, I'm gonna impose limit ov %{l} msgz."
     },
-    "discordjobs-count": "%{c} available house",
-    "discordjobs-title": "cool Jobs @Discord",
+    "discordjobs": {
+        "all-count": {
+            "zero": "Nuthin found",
+            "one": "1 job found",
+            "many": "%{count} jobs found"
+        },
+        "filtered-count": {
+            "zero": "Uh, nuthing match ur request",
+            "one": "1 job match ur request",
+            "many": "%{count} jobs match ur request"
+        },
+        "title": "cool Jobs @Discord"
+    },
+    "discordlinks": {
+        "title": "some kewl links",
+        "server-status": "Is discord brokn?",
+        "tos": "Some legal things",
+        "bug-report": "Report smth 2 discord",
+        "feedback": "Suggest smth 2 discord",
+        "selfbot": "Why selfbots are a no-no",
+        "dev-tos": "More legal things for devs",
+        "how-id": "How 2 find ur ID",
+        "age-requirement": "Minimum legal Discordian age, per places",
+        "betterdiscord": "Not-good use ov BetterDiscord",
+        "downloads": "Discord brokn apps list"
+    },
     "discordstatus-exists": "UwU Discord broke :sad_trumpet_noise: check more at %{title}",
     "discordstatus-impacts": {
         "major": "major",
@@ -29,8 +45,14 @@
     "discordstatus-nothing": "Discord iz workin fine!\nLast big bug waz at %{date}",
     "embed-invalid-channel": "Cannt send messages in dat chan...",
     "embed-invalid-image": "The url entered as image is invalid",
+    "embed-sent": "Ur thing is published! %{message_url}",
     "error": "A' error went wrong: `%{err}`",
-    "fun-list": "Her iz the list ov available fun commandz:",
+    "flip": {
+        "tails": "Tails !",
+        "heads": "Heads !",
+        "edge": "Oh no, my coin fellt in a hole!"
+    },
+    "hour-result": "%{date} (%{tzname})\nTZ name: %{tzlocation}\nGPS numbers: %{lat} - %{long}",
     "invalid-city": "Invalid place name :confused:",
     "kills-list": [
         "***BOUM !*** {victim} fel unto a trapp made by {attacker} !",
@@ -84,15 +106,11 @@
         "{victim} ventured into da haunted mansion and never returned.",
         "{attacker} activated an ancient curse, makin' {victim}'s soul trapped forever."
     ],
-    "markdown": "__**Markdown Rules** on *Discord*__\n\n`*italics*` = *italics*\n`__underline__` = __underline__\n`**bold**` = **bold**\n`***bold italics***` = ***bold italics***\n`~~strikeout~~` = ~~strikeout~~\n`__*underline italics*__` = __*underline italics*__\n`__**underline bold**__` = __**underline bold**__\n`__***underline bold italics***__` = __***underline bold italics***__\n`||spoiler||` = ||spoiler||\n> quote = `> quote`\n\\`code\\` = `code`\n\\\\ to ignore\n                \nFor code blocks, cf <https://discord.gg/DGahTNn>",
     "nasa-none": "Oops, I can't find gud picts of bautiful stars for now, plz try later :crying_cat_face:",
-    "no-database": "As our data ar offline, access to funz commandz iz restricted to guys with permishun \"Manage Server\"",
     "no-embed-perm": "I dont haz permishun 2 \"Embed links\" :confused:",
     "no-emoji": "Unable 2 find tihs emote :eyes:",
-    "no-fun": "Fun comands haz beeen disabld on dis server. 2 C their list, look at https://axobot.rtfd.io/en/latest/fun.html",
     "no-roll": "Hmm I don't see any choice lol",
     "no-say": "Unable 2 send any message in tish channel",
-    "no-voicechan": "Wait, U forgot teh vocal channel? :eyes:",
     "not-enough-roll": "U should seriusly learn 2 count to 2, 't can be useful :bongocat:",
     "osekour": [
         "Oh hum wait, Im finshin watchin mi movi.",
@@ -107,17 +125,13 @@
         "Shurry, ther is moar dan tree snowflakz: wuz stuck in teh garaeg",
         "Well haz 2 wait til teh end ov r striek.. R u sayin you dun't knoe?! iz been 2 monfz sinec we startd pliz!"
     ],
-    "piece-0": [
-        "Tails!",
-        "Heads!"
-    ],
-    "piece-1": "Faild, 't fell on teh edge!",
     "react-0": "Unable 2 find teh correspondin mssage. U must giv teh mesage ID in da furst argumnt, an teh emoji in da secondz :upside_down:\n Also check dat I haz permishun 2 reed msgs hystory!",
+    "react-done": {
+        "one": "Ive made the thing!",
+        "many": "Ive added the things!"
+    },
+    "say-done": "Ive sent the thing!",
     "say-no-perm": "LMAO dont try 2 cheat and first get perm in %{channel} pls",
-    "thanos": [
-        "{0} wus spard by Thanos",
-        "Tahnos decidd 2 reduce {0} to ashes. 4 the gud ov humanity...."
-    ],
     "tip-list": [
         "Did you know? There are several languages for the bot, including one very fun to test: lolcat",
         "Pro-tip: to change the bot language, use %{config_cmd}!",

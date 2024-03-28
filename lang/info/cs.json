@@ -12,18 +12,6 @@
     "bitly_nobit": "Tato adresa není bit.ly odkaz!",
     "bitly_short": "Zkrácená adresa URL: %{url}",
     "cant-see-channel": "Ale né, vypadá to, že nemáte oprávnění k zobrazení tohoto kanálu. Požádejte moderátora!",
-    "discordlinks": [
-        "Stav serverů",
-        "Discord ToS",
-        "Nahlásit chybu/uživatele",
-        "Navrhněte něco Discordu",
-        "Článek Selfbots",
-        "ToS pro boty",
-        "Jak najít ID",
-        "Minimální zákonný věk pro používání programu Discord podle zemí",
-        "Zakázané použití BetterDiscord",
-        "Každé stažení Discordu"
-    ],
     "docs": "Zde je odkaz na dokumentaci bota:",
     "info": {
         "categ-0": "Kategorie",
