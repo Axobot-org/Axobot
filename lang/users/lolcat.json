@@ -12,10 +12,6 @@
             "false": "Ur xp card iz now static even w/ animated pfp (faster answer yeaaaah)",
             "true": "Ur xp card will naw b moving if u have an animatd pfp (may be slawer :/)"
         },
-        "auto_unafk": {
-            "false": "U do ur own job, okay?",
-            "true": "I'll help u, no worries :green_heart:"
-        },
         "show_tips": {
             "false": "U'll no longer get super cool tips from me",
             "true": "I'll make sure to help u with super cool tips from now"

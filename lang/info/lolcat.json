@@ -12,18 +12,6 @@
     "bitly_nobit": "HAHA NOPE, dat's not a bit.ly link!",
     "bitly_short": "Quick linq: %{url}",
     "cant-see-channel": "Uhh nope, ur not allowed to see that!",
-    "discordlinks": [
-        "Servers status",
-        "Discord ToS",
-        "Report a bug/user",
-        "Suggest something to Discord",
-        "Selfbots article",
-        "ToS for bot devs",
-        "How 2 find 1 ID",
-        "Minimum legal Discordian age / places",
-        "Not-good use ov BetterDiscord (like, eww)",
-        "Discord brokn things list"
-    ],
     "docs": "Her'z teh link 2 the bot doc:",
     "info": {
         "categ-0": "Categori",
