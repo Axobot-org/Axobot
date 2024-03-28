@@ -51,11 +51,11 @@ class Admin(commands.Cog):
         self.bot = bot
         self.file = "admin"
         self.emergency_time = 15.0
-        self.update: dict[Literal['fr', 'en'], Optional[str]]
+        self.update: dict[Literal["fr", "en"], Optional[str]]
         if self.bot.beta:
-            self.update = {'fr':'Foo','en':'Bar'}
+            self.update = {"fr": "Foo", "en": "Bar"}
         else:
-            self.update = {'fr':None,'en':None}
+            self.update = {"fr": None, "en": None}
         try:
             self.utilities = self.bot.get_cog("Utilities")
         except KeyError:
@@ -202,7 +202,7 @@ class Admin(commands.Cog):
     @commands.check(checks.is_bot_admin)
     async def update_config(self, ctx: MyContext, send: bool=False):
         """Préparer/lancer un message de mise à jour
-        Ajouter 'send' en argument déclenche la procédure pour l'envoyer à tous les serveurs"""
+        Ajouter "send" en argument déclenche la procédure pour l'envoyer à tous les serveurs"""
         if send:
             await self.send_updates(ctx)
             return
@@ -212,11 +212,11 @@ class Admin(commands.Cog):
         for language in self.update:
             await ctx.send(f"Message en {language} ?")
             try:
-                msg = await ctx.bot.wait_for('message', check=check, timeout=60)
+                msg = await ctx.bot.wait_for("message", check=check, timeout=60)
             except asyncio.TimeoutError:
-                return await ctx.send('Trop tard !')
-            if msg.content.lower() in ['none','annuler','stop','oups']:
-                return await ctx.send('Annulé !')
+                return await ctx.send("Trop tard !")
+            if msg.content.lower() in ["none", "annuler", "stop", "oups"]:
+                return await ctx.send("Annulé !")
             self.update[language] = msg.content
         if msg:
             await self.add_success_reaction(msg)
@@ -250,14 +250,14 @@ class Admin(commands.Cog):
             return
         count = 0
         for guild in ctx.bot.guilds:
-            channel: Optional[discord.TextChannel] = await ctx.bot.get_config(guild.id, 'bot_news')
+            channel: Optional[discord.TextChannel] = await ctx.bot.get_config(guild.id, "bot_news")
             if channel is None:
                 # no channel configured
                 continue
-            lang: Optional[str] = await ctx.bot.get_config(guild.id, 'language')
+            lang: Optional[str] = await ctx.bot.get_config(guild.id, "language")
             if lang not in self.update:
-                lang = 'fr' if lang == 'fr2' else 'en'
-            mentions_roles: list[discord.Role] = await self.bot.get_config(guild.id, 'update_mentions') or []
+                lang = "fr" if lang == "fr2" else "en"
+            mentions_roles: list[discord.Role] = await self.bot.get_config(guild.id, "update_mentions") or []
             mentions = " ".join(x.mention for x in mentions_roles if x is not None)
             allowed_mentions = discord.AllowedMentions(everyone=False, roles=True)
             try:
@@ -270,15 +270,15 @@ class Admin(commands.Cog):
                 fr_chan = guild.get_channel(494870602146906113)
                 if fr_chan != channel:
                     # special treatment for the French channel in the bot support server
-                    await fr_chan.send(self.update['fr'] + "\n\n<@&1092557246921179257>", allowed_mentions=allowed_mentions)
+                    await fr_chan.send(self.update["fr"] + "\n\n<@&1092557246921179257>", allowed_mentions=allowed_mentions)
                     count += 1
 
         await ctx.send(f"Message envoyé dans {count} salons !")
         # add changelog in the database
         query = "INSERT INTO `changelogs` (`version`, `release_date`, `fr`, `en`, `beta`) VALUES (%(v)s, %(r)s, %(fr)s, %(en)s, %(b)s) ON DUPLICATE KEY UPDATE `fr` = %(fr)s, `en` = %(en)s;"
         args = {
-            'v': conf.release, 'r': ctx.message.created_at, 'b': self.bot.beta,
-            'fr': self.update['fr'], 'en': self.update['en']
+            "v": conf.release, "r": ctx.message.created_at, "b": self.bot.beta,
+            "fr": self.update["fr"], "en": self.update["en"]
         }
         async with self.bot.db_query(query, args):
             pass
@@ -302,7 +302,7 @@ class Admin(commands.Cog):
         msg = await ctx.send("Nettoyage de l'espace de travail...")
         await self.cleanup_workspace()
         await msg.edit(content="Bot en voie d'extinction")
-        await self.bot.change_presence(status=discord.Status('offline'))
+        await self.bot.change_presence(status=discord.Status("offline"))
         self.bot.log.info("Closing Discord connection")
         await self.bot.close()
 
@@ -312,9 +312,9 @@ class Admin(commands.Cog):
             if folder_name.startswith("./env"):
                 continue
             for filename in filenames:
-                if filename.endswith('.pyc'):
+                if filename.endswith(".pyc"):
                     os.unlink(folder_name+'/'+filename)
-            if folder_name.endswith('__pycache__'):
+            if folder_name.endswith("__pycache__"):
                 os.rmdir(folder_name)
         if self.bot.database_online:
             self.bot.close_database_cnx()
@@ -486,7 +486,7 @@ class Admin(commands.Cog):
                 user = self.bot.get_user(user_id)
                 if user.dm_channel is None:
                     await user.create_dm()
-                emoji = self.bot.emojis_manager.customs['red_warning']
+                emoji = self.bot.emojis_manager.customs["red_warning"]
                 msg = await user.dm_channel.send(
                     f"{emoji} La procédure d'urgence vient d'être activée. Si vous souhaitez l'annuler, veuillez \
                         cliquer sur la réaction ci-dessous dans les {timeout} secondes qui suivent l'envoi de ce message."
@@ -498,7 +498,7 @@ class Admin(commands.Cog):
         def check(_, user: discord.User):
             return user.id in checks.admins_id
         try:
-            await self.bot.wait_for('reaction_add', timeout=timeout, check=check)
+            await self.bot.wait_for("reaction_add", timeout=timeout, check=check)
         except asyncio.TimeoutError:
             owners = set()
             guilds_count = 0
@@ -514,7 +514,7 @@ class Admin(commands.Cog):
                 except discord.HTTPException:
                     continue
             chan: discord.TextChannel = await self.bot.get_channel(500674177548812306)
-            emoji = self.bot.emojis_manager.customs['red_alert']
+            emoji = self.bot.emojis_manager.customs["red_alert"]
             await chan.send(
                 f"{emoji} Prodédure d'urgence déclenchée : {guilds_count} serveurs quittés - {len(owners)} propriétaires prévenus"
             )
@@ -532,11 +532,11 @@ class Admin(commands.Cog):
     async def add_ignoring(self, ctx: MyContext, target_id: str):
         """Ajoute un serveur ou un utilisateur dans la liste des utilisateurs/serveurs ignorés"""
         int_target_id = int(target_id)
-        utils = ctx.bot.get_cog('Utilities')
+        utils = ctx.bot.get_cog("Utilities")
         if utils is None:
             await ctx.send("Unable to find Utilities cog")
             return
-        config = await ctx.bot.get_cog('Utilities').get_bot_infos()
+        config = await ctx.bot.get_cog("Utilities").get_bot_infos()
         if config is None:
             await ctx.send("The config dictionnary has not been initialized")
             return
@@ -546,26 +546,26 @@ class Admin(commands.Cog):
             await ctx.send("Unable to find any guild or user with this ID")
             return
         if isinstance(target, discord.Guild):
-            servs: list[str] = config['banned_guilds'].split(';')
+            servs: list[str] = config["banned_guilds"].split(';')
             if str(target) in servs:
                 servs.remove(str(target))
-                await utils.edit_bot_infos(self.bot.user.id,[('banned_guilds',';'.join(servs))])
+                await utils.edit_bot_infos(self.bot.user.id,[("banned_guilds",';'.join(servs))])
                 await ctx.send(f"Le serveur {target.name} n'est plus blacklisté")
             else:
                 servs.append(str(target.id))
-                await utils.edit_bot_infos(self.bot.user.id,[('banned_guilds',';'.join(servs))])
+                await utils.edit_bot_infos(self.bot.user.id,[("banned_guilds",';'.join(servs))])
                 await ctx.send(f"Le serveur {target.name} a bien été blacklist")
         else:
-            usrs: list[str] = config['banned_users'].split(';')
+            usrs: list[str] = config["banned_users"].split(';')
             if str(target.id) in usrs:
                 usrs.remove(str(target.id))
-                await utils.edit_bot_infos(self.bot.user.id,[('banned_users',';'.join(usrs))])
+                await utils.edit_bot_infos(self.bot.user.id,[("banned_users",';'.join(usrs))])
                 await ctx.send(f"L'utilisateur {target} n'est plus blacklisté")
             else:
                 usrs.append(str(target.id))
-                await utils.edit_bot_infos(self.bot.user.id,[('banned_users',';'.join(usrs))])
+                await utils.edit_bot_infos(self.bot.user.id,[("banned_users",';'.join(usrs))])
                 await ctx.send(f"L'utilisateur {target} a bien été blacklist")
-        ctx.bot.get_cog('Utilities').config = None
+        ctx.bot.get_cog("Utilities").config = None
 
 
     @main_msg.command(name="module")
@@ -599,9 +599,9 @@ Cette option affecte tous les serveurs"""
             else:
                 await ctx.send("Le comptage de fichiers ouverts est mainenant désactivé")
         else:
-            await ctx.send('Module introuvable')
+            await ctx.send("Module introuvable")
 
-    @main_msg.group(name="flag", aliases=['flags'])
+    @main_msg.group(name="flag", aliases=["flags"])
     @commands.check(checks.is_bot_admin)
     async def admin_flag(self, ctx: MyContext):
         "Ajoute ou retire un attribut à un utilisateur"
@@ -692,7 +692,7 @@ Cette option affecte tous les serveurs"""
             await ctx.send(f"L'utilisateur {user} a déjà cette carte d'xp !")
             return
         rankcards.append(rankcard)
-        await self.bot.get_cog('Users').set_rankcard(user, rankcard, add=True)
+        await self.bot.get_cog("Users").set_rankcard(user, rankcard, add=True)
         await ctx.send(f"L'utilisateur {user} a maintenant les cartes d'xp {', '.join(rankcards)}")
 
     @admin_rankcard.command(name="remove")
@@ -709,7 +709,7 @@ Cette option affecte tous les serveurs"""
             await ctx.send(f"L'utilisateur {user} n'a déjà pas cette carte d'xp")
             return
         rankcards.remove(rankcard)
-        await self.bot.get_cog('Users').set_rankcard(user, rankcard, add=False)
+        await self.bot.get_cog("Users").set_rankcard(user, rankcard, add=False)
         if rankcards:
             await ctx.send(f"L'utilisateur {user} a maintenant les cartes d'xp {', '.join(rankcards)}")
         else:
@@ -821,11 +821,11 @@ Cette option affecte tous les serveurs"""
         if activity_type == "play":
             new_activity = discord.Game(name=text)
         elif activity_type == "watch":
-            new_activity = discord.Activity(type=discord.ActivityType.watching, name=text, timestamps={'start':time.time()})
+            new_activity = discord.Activity(type=discord.ActivityType.watching, name=text, timestamps={"start":time.time()})
         elif activity_type == "listen":
-            new_activity = discord.Activity(type=discord.ActivityType.listening, name=text, timestamps={'start':time.time()})
+            new_activity = discord.Activity(type=discord.ActivityType.listening, name=text, timestamps={"start":time.time()})
         elif activity_type == "stream":
-            new_activity = discord.Activity(type=discord.ActivityType.streaming, name=text, timestamps={'start':time.time()})
+            new_activity = discord.Activity(type=discord.ActivityType.streaming, name=text, timestamps={"start":time.time()})
         else:
             await ctx.send("Sélectionnez *play*, *watch*, *listen* ou *stream* suivi du nom")
             return
@@ -851,7 +851,7 @@ Cette option affecte tous les serveurs"""
             test.results.share()
         if method == "image":
             result = test.results.dict()
-            await msg.edit(content=f"{result['server']['sponsor']} - ping {result['server']['latency']}ms\n{result['share']}")
+            await msg.edit(content=f"""{result["server"]["sponsor"]} - ping {result["server"]["latency"]}ms\n{result["share"]}""")
         elif method == "json":
             result = test.results.json(pretty=True)
             await msg.edit(content=f"```json\n{result}\n```")
@@ -873,7 +873,7 @@ Cette option affecte tous les serveurs"""
             await ctx.send("Got a timeout")
             return
         txt = f"feeds.keys()\n```py\n{feed.keys()}\n```"
-        if 'bozo_exception' in feed:
+        if "bozo_exception" in feed:
             txt += f"\nException ({feed['bozo']}): {feed['bozo_exception']}"
             return await ctx.send(txt)
         if len(str(feed.feed)) < 1400-len(txt):
@@ -885,7 +885,7 @@ Cette option affecte tous les serveurs"""
                 txt += f"feeds.entries[0]\n```py\n{feed.entries[0]}\n```"
             else:
                 txt += f"feeds.entries[0].keys()\n```py\n{feed.entries[0].keys()}\n```"
-        if arguments is not None and 'feeds' in arguments and 'ctx' not in arguments:
+        if arguments is not None and "feeds" in arguments and "ctx" not in arguments:
             txt += f"\n{arguments}\n```py\n{eval(arguments)}\n```" # pylint: disable=eval-used
         try:
             await ctx.send(txt)
@@ -897,50 +897,50 @@ Cette option affecte tous les serveurs"""
             ok_ = "<:greencheck:513105826555363348>"
             notok_ = "<:redcheck:513105827817717762>"
             nothing_ = "<:_nothing:446782476375949323>"
-            txt = ['**__Analyse :__**','']
+            txt = ["**__Analyse :__**", '']
             if feed.status >= 400:
                 txt.append(f"{notok_} Status code: {feed.status}")
-            if not url.startswith('https://'):
+            if not url.startswith("https://"):
                 txt.append(f"{notok_} Not https")
             youtube_rss = self.bot.get_cog("Rss").youtube_rss
-            if 'link' not in feed.feed:
+            if "link" not in feed.feed:
                 txt.append(notok_+" No 'link' var")
-            elif yt_account := await youtube_rss.get_channel_by_any_url(feed.feed['link']):
+            elif yt_account := await youtube_rss.get_channel_by_any_url(feed.feed["link"]):
                 txt.append("<:youtube:447459436982960143>  " + yt_account)
-            elif 'link' in feed.feed.keys():
+            elif "link" in feed.feed.keys():
                 txt.append(f":newspaper:  <{feed.feed['link']}>")
             else:
                 txt.append(":newspaper:  No 'link' var")
             txt.append(f"Entrées : {len(feed.entries)}")
             if len(feed.entries) > 0:
                 entry = feed.entries[0]
-                if 'title' in entry:
+                if "title" in entry:
                     txt.append(nothing_+ok_+" title: ")
-                    if len(entry['title'].split('\n')) > 1:
-                        txt[-1] += entry['title'].split('\n')[0]+"..."
+                    if len(entry["title"].split('\n')) > 1:
+                        txt[-1] += entry["title"].split('\n')[0]+"..."
                     else:
-                        txt[-1] += entry['title']
+                        txt[-1] += entry["title"]
                 else:
                     txt.append(nothing_+notok_+' title')
-                if 'published_parsed' in entry:
+                if "published_parsed" in entry:
                     txt.append(nothing_+ok_+" published_parsed")
-                elif 'published' in entry:
+                elif "published" in entry:
                     txt.append(nothing_+ok_+" published")
-                elif 'updated_parsed' in entry:
+                elif "updated_parsed" in entry:
                     txt.append(nothing_+ok_+" updated_parsed")
                 else:
                     txt.append(nothing_+notok_+' date')
-                if 'author' in entry:
-                    txt.append(nothing_+ok_+" author: "+entry['author'])
+                if "author" in entry:
+                    txt.append(nothing_+ok_+" author: "+entry["author"])
                 else:
                     txt.append(nothing_+notok_+' author')
-                if 'content' in entry:
+                if "content" in entry:
                     txt.append(nothing_+ok_+" content")
-                elif 'summary' in entry:
+                elif "summary" in entry:
                     txt.append(nothing_+ok_+" summary (as main content)")
                 else:
                     txt.append(nothing_+notok_+' content')
-                if 'content' in entry and 'summary' in entry:
+                if "content" in entry and "summary" in entry:
                     txt.append(nothing_+ok_+" summary")
                 else:
                     txt.append(nothing_+notok_+' summary (as description)')
@@ -1040,45 +1040,45 @@ Cette option affecte tous les serveurs"""
         """Evaluates a code
         Credits: Rapptz (https://github.com/Rapptz/RoboDanny/blob/rewrite/cogs/admin.py)"""
         env = {
-            'bot': self.bot,
-            'ctx': ctx,
-            'channel': ctx.channel,
-            'author': ctx.author,
-            'guild': ctx.guild,
-            'message': ctx.message,
-            '_': self._last_result
+            "bot": self.bot,
+            "ctx": ctx,
+            "channel": ctx.channel,
+            "author": ctx.author,
+            "guild": ctx.guild,
+            "message": ctx.message,
+            "_": self._last_result
         }
         env.update(globals())
 
         body = cleanup_code(body)
         stdout = io.StringIO()
         try:
-            to_compile = f'async def func():\n{textwrap.indent(body, "  ")}'
+            to_compile = f"async def func():\n{textwrap.indent(body, '  ')}"
         except Exception as err:
             self.bot.dispatch("error", err, ctx)
             return
         try:
             exec(to_compile, env) # pylint: disable=exec-used
         except Exception as err:
-            return await ctx.send(f'```py\n{err.__class__.__name__}: {err}\n```')
+            return await ctx.send(f"```py\n{err.__class__.__name__}: {err}\n```")
 
-        func = env['func']
+        func = env["func"]
         try:
             with redirect_stdout(stdout):
                 ret = await func()
         except Exception as err:
             value = stdout.getvalue()
-            await ctx.send(f'```py\n{value}{traceback.format_exc()[:1990]}\n```')
+            await ctx.send(f"```py\n{value}{traceback.format_exc()[:1990]}\n```")
         else:
             value = stdout.getvalue()
             await self.add_success_reaction(ctx.message)
 
             if ret is None:
                 if value:
-                    await ctx.send(f'```py\n{value}\n```')
+                    await ctx.send(f"```py\n{value}\n```")
             else:
                 self._last_result = ret
-                await ctx.send(f'```py\n{value}{ret}\n```')
+                await ctx.send(f"```py\n{value}{ret}\n```")
 
     @main_msg.command(name="execute")
     @commands.check(checks.is_bot_admin)
