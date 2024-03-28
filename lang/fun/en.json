@@ -45,6 +45,7 @@
     "discordstatus-nothing": "Nothing to report at this time!\nThe last known issue was on %{date}",
     "embed-invalid-channel": "Cannot send messages in this channel",
     "embed-invalid-image": "The url entered as image is invalid",
+    "embed-sent": "The embed has been sent! %{message_url}",
     "error": "An error has occurred: `%{err}`",
     "flip": {
         "tails": "Tails !",
