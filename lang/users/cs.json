@@ -12,10 +12,6 @@
             "false": "Vaše xp karta nebude animovaná, ani když použijete animovaného avatara (rychlejší vykreslování)",
             "true": "Vaše xp karta bude animována, když budete mít animovaný avatar (pomalejší vykreslení)"
         },
-        "auto_unafk": {
-            "false": "Musíte odebrat samotný AFK tag",
-            "true": "Odstraním značku/tag AFK, jakmile odešlete zprávu"
-        },
         "show_tips": {
             "false": "Od bota již nebudete dostávat tipy",
             "true": "Obdržíte náhodně tipy od bota"
