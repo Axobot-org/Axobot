@@ -15,67 +15,17 @@ Bitly urls
 Bitly is a famous website for shortening web addresses (aka url). With this command you can create a shortcut yourself instantly using their services, and see to which address a bit.ly link refers without having to click on it. Practical, isn't it?
 
 
-----
-Book
-----
-
-This command allows you to manage your own library, saving your books easily. You can also only use the search function, for example to share a specific book with your Discord friends. Anything is possible!
-
-
-.. warning:: This command is under construction, and is therefore only in its early stages. Feel free to give your ideas on the official `bot server <https://discord.gg/N55zY88>`__!
-
-Search by ISBN
---------------
-
-**Syntax:** :code:`book search <ISBN>`
-
-Used to search for a book from its ISBN, and displays its main information. ISBNs of length 10 and 13 are accepted.
-
-
 -----
 Embed
 -----
 
-**Syntax:** :code:`embed <args>`
+**Syntax:** :code:`embed [channel] [title] [content] [url] [footer] [image_url] [thumbnail_url] [color]`
 
-This command is particularly useful if the 'say' command is no longer enough for you, if you want something even bigger, with colors, images and everything that goes with it. You can send embeds (these pretty rectangles with colored bars), by customizing the title, content, image, title url, color and footer text!
+This command is particularly useful if the 'say' command is no longer enough for you, if you want something even bigger, with colors, images and everything that goes with it. You can send embeds (these pretty boxes with colored bars), by customizing the title, content, image, title url, bar color and footer text!
 
-Each argument is presented in the form :code:`name="value"`. If you want a line break, you can use the character :code:`\\n`, and if you want to use quotation marks without closing the argument, you will have to escape them (with a \ in front). To better understand how it works, here is an example of how to use it: :code:`embed title="Here is my title!" content="Blah blah \\nBlah ?" footer="Do you mean \\"Text\\"? "`
+Oh by the way, if you want a line break in your embed content, you can use the character :code:`\\n`, as Discord doesn't support line breaks in slash commands.
 
 .. warning:: Hey, this may sound weird, but Axobot needs "`Embed Links <perms.html#embed-links>`__" permission to send embeds...
-
-
---------------
-Hour & Weather
---------------
-
-**Syntax:** :code:`hour <city>`
-
-**Syntax:** :code:`weather <city>`
-
-With these two commands, you can get the time (and timezone) or weather for any city in the world! All you have to do is enter the name of the city, preferably in English format (London instead of Londres for example), and the magic does the rest!
-
-.. note:: For the `weather` command, it is better to give the "`Embed Links <perms.html#embed-links>`__" permission to the bot, to get a better rendering. But it's not mandatory!
-
-
---------
-Markdown
---------
-
-**Syntax:** :code:`markdown`
-
-The markdown is a set of formatting rules used everywhere, such as on GitHub or Discord. This command gives you these formatting rules, which will allow you to display spoilers, code blocks, or just simple strikethrough or italicized text.
-
-.. warning:: Warning, this command contains an invitation link to the information server on the code blocks.
-
-
-------------------------
-Python formatting (pep8)
-------------------------
-
-**Syntax:** :code:`pep8 <code>`
-
-Python's formatting conventions can sometimes be difficult to remember. Summaries exist on the internet, but there are several hundred rules, all more or less specific to their use cases. That's why Axobot offers you to automatically format your Python code following the "PEP 8" (PEP for Python Extension Proposal) rules with a simple command.
 
 
 ---------

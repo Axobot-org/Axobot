@@ -234,6 +234,7 @@ class Xp(commands.Cog):
             random=item,
             username=msg.author.display_name
         ))
+        silent_message: bool = await self.bot.get_config(msg.guild.id, "levelup_silent_mention")
         if isinstance(destination, discord.DMChannel) and msg.guild:
             embed = discord.Embed(
                 title=await self.bot._(destination, "xp.levelup-dm.title"),
@@ -242,9 +243,9 @@ class Xp(commands.Cog):
             )
             footer = await self.bot._(destination, "xp.levelup-dm.footer", servername=msg.guild.name)
             embed.set_footer(text=footer, icon_url=msg.guild.icon)
-            await destination.send(embed=embed)
+            await destination.send(embed=embed, silent=silent_message)
         else:
-            await destination.send(text)
+            await destination.send(text, silent=silent_message)
 
     async def check_spam(self, text: str):
         """Vérifie si un text contient du spam"""

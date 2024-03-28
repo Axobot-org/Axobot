@@ -111,7 +111,7 @@ class BotInfo(commands.Cog):
         # RSS messages within 24h
         rss_msg_24h = await self.bot.get_cog("BotStats").get_sum_stats("rss.messages", 60*24)
         # number formatter
-        lang = await self.bot._(ctx.guild.id,"_used_locale")
+        lang = await self.bot._(ctx.channel, "_used_locale")
         async def n_format(nbr: Union[int, float, None]):
             return await FormatUtils.format_nbr(nbr, lang) if nbr is not None else "0"
         # Generating message
@@ -228,22 +228,6 @@ ORDER BY usages DESC LIMIT %(limit)s"""
             await ctx.send(embed=emb)
         else:
             await ctx.send(f"**{title}**\n{desc}\n\n{title_total}:\n{text_total}\n\n{title_24h}:\n{text_24h}")
-
-
-    @commands.command(name="pig", hidden=True)
-    async def pig(self, ctx: MyContext):
-        """Get bot latency
-        You can also use this command to ping any other server"""
-        msg = await ctx.send("Pig...")
-        bot_delta = (msg.created_at - ctx.message.created_at).total_seconds()
-        try:
-            api_latency = round(self.bot.latency*1000)
-        except OverflowError:
-            api_latency = "∞"
-        await msg.edit(content=await self.bot._(ctx.channel, "info.ping.pig",
-                                                bot=round(bot_delta*1000),
-                                                api=api_latency)
-                       )
 
     @commands.hybrid_command(name="ping", aliases=['rep'])
     @commands.cooldown(5, 45, commands.BucketType.guild)

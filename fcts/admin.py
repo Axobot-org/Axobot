@@ -105,7 +105,7 @@ class Admin(commands.Cog):
         except discord.DiscordException:
             pass
 
-    @commands.hybrid_group(name='admin', hidden=True)
+    @commands.hybrid_group(name="admin", hidden=True)
     @discord.app_commands.guilds(PRIVATE_GUILD_ID)
     @discord.app_commands.default_permissions(administrator=True)
     @commands.check(checks.is_bot_admin)
@@ -295,7 +295,7 @@ class Admin(commands.Cog):
             text += f"- {cog.file} ({cog_name}) \n"
         await ctx.send(text)
 
-    @main_msg.command(name='shutdown')
+    @main_msg.command(name="shutdown")
     @commands.check(checks.is_bot_admin)
     async def shutdown(self, ctx: MyContext):
         """Eteint le bot"""
@@ -529,8 +529,9 @@ class Admin(commands.Cog):
 
     @main_msg.command(name="ignore")
     @commands.check(checks.is_bot_admin)
-    async def add_ignoring(self, ctx: MyContext, target_id: int):
+    async def add_ignoring(self, ctx: MyContext, target_id: str):
         """Ajoute un serveur ou un utilisateur dans la liste des utilisateurs/serveurs ignorés"""
+        int_target_id = int(target_id)
         utils = ctx.bot.get_cog('Utilities')
         if utils is None:
             await ctx.send("Unable to find Utilities cog")
@@ -539,8 +540,8 @@ class Admin(commands.Cog):
         if config is None:
             await ctx.send("The config dictionnary has not been initialized")
             return
-        if not (target := self.bot.get_guild(target_id)):
-            target = self.bot.get_user(target_id)
+        if not (target := self.bot.get_guild(int_target_id)):
+            target = self.bot.get_user(int_target_id)
         if target is None:
             await ctx.send("Unable to find any guild or user with this ID")
             return
@@ -573,19 +574,19 @@ class Admin(commands.Cog):
     async def enable_module(self, ctx: MyContext, module: Literal["xp", "rss", "stats", "files-count"], enable: bool):
         """Active ou désactive un module (xp/rss/alerts)
 Cette option affecte tous les serveurs"""
-        if module=='xp':
+        if module == "xp":
             self.bot.xp_enabled = enable
             if enable:
                 await ctx.send("L'xp est mainenant activée")
             else:
                 await ctx.send("L'xp est mainenant désactivée")
-        elif module=='rss':
+        elif module == "rss":
             self.bot.rss_enabled = enable
             if enable:
                 await ctx.send("Les flux RSS sont mainenant activée")
             else:
                 await ctx.send("Les flux RSS sont mainenant désactivée")
-        elif module == 'alerts':
+        elif module == "alerts":
             self.bot.stats_enabled = enable
             if enable:
                 await ctx.send("Le système de log de statistiques est mainenant activé")
@@ -784,7 +785,7 @@ Cette option affecte tous les serveurs"""
 
     @main_botserv.command(name="best_ideas")
     @commands.check(checks.is_bot_admin)
-    async def best_ideas(self, ctx: MyContext, number:int=10):
+    async def best_ideas(self, ctx: MyContext, number: int=10):
         """Donne la liste des 10 meilleures idées"""
         bot_msg = await ctx.send("Chargement des idées...")
         server = self.bot.get_guild(SUPPORT_GUILD_ID.id if not self.bot.beta else PRIVATE_GUILD_ID.id)
@@ -893,9 +894,9 @@ Cette option affecte tous les serveurs"""
             await ctx.send("`Error`: "+str(err))
             print(txt)
         if arguments is None:
-            ok_ = '<:greencheck:513105826555363348>'
-            notok_ = '<:redcheck:513105827817717762>'
-            nothing_ = '<:_nothing:446782476375949323>'
+            ok_ = "<:greencheck:513105826555363348>"
+            notok_ = "<:redcheck:513105827817717762>"
+            nothing_ = "<:_nothing:446782476375949323>"
             txt = ['**__Analyse :__**','']
             if feed.status >= 400:
                 txt.append(f"{notok_} Status code: {feed.status}")
@@ -1033,7 +1034,7 @@ Cette option affecte tous les serveurs"""
         await ctx.send("\n".join(result))
 
 
-    @commands.command(name='eval', hidden=True)
+    @commands.command(name="eval", hidden=True)
     @commands.check(checks.is_bot_admin)
     async def _eval(self, ctx: MyContext, *, body: str):
         """Evaluates a code
@@ -1092,25 +1093,25 @@ Cette option affecte tous les serveurs"""
         await self.bot.invoke(new_ctx)
         await ctx.send(f"Command executed as {who} with success")
 
-    @main_msg.group(name='bug')
+    @main_msg.group(name="bug")
     @commands.check(checks.is_bot_admin)
     async def main_bug(self, ctx: MyContext):
         """Gère la liste des bugs"""
 
-    @main_bug.command(name='add')
+    @main_bug.command(name="add")
     async def bug_add(self, ctx: MyContext, french: str, english: str):
         """Ajoute un bug à la liste"""
         channel = ctx.bot.get_channel(929864644678549534) if self.bot.beta else ctx.bot.get_channel(488769283673948175)
         if channel is None:
             return await ctx.send("Salon 488769283673948175 introuvable")
         emb = discord.Embed(title="New bug", timestamp=self.bot.utcnow(), color=13632027)
-        emb.add_field(name='Français', value=french, inline=False)
-        emb.add_field(name='English', value=english, inline=False)
+        emb.add_field(name="Français", value=french, inline=False)
+        emb.add_field(name="English", value=english, inline=False)
         await channel.send(embed=emb)
         await self.add_success_reaction(ctx.message)
 
-    @main_bug.command(name='fix')
-    async def bug_fix(self, ctx: MyContext, msg_id: int, fixed: bool=True):
+    @main_bug.command(name="fix")
+    async def bug_fix(self, ctx: MyContext, msg_id: str, fixed: bool=True):
         """Marque un bug comme étant fixé"""
         chan = ctx.bot.get_channel(929864644678549534) if self.bot.beta else ctx.bot.get_channel(488769283673948175)
         if chan is None:
@@ -1136,22 +1137,22 @@ Cette option affecte tous les serveurs"""
     async def main_idea(self, ctx: MyContext):
         """Ajouter une idée dans le salon des idées, en français et anglais"""
 
-    @main_idea.command(name='add')
+    @main_idea.command(name="add")
     async def idea_add(self, ctx: MyContext, french: str, english: str):
         """Ajoute une idée à la liste"""
         channel = ctx.bot.get_channel(929864644678549534) if self.bot.beta else ctx.bot.get_channel(488769306524385301)
         if channel is None:
             return await ctx.send("Salon introuvable")
         emb = discord.Embed(color=16106019, timestamp=self.bot.utcnow())
-        emb.add_field(name='Français', value=french, inline=False)
-        emb.add_field(name='English', value=english, inline=False)
+        emb.add_field(name="Français", value=french, inline=False)
+        emb.add_field(name="English", value=english, inline=False)
         msg = await channel.send(embed=emb)
         for emoji in self.upvote_emojis:
             await msg.add_reaction(emoji)
         await self.add_success_reaction(ctx.message)
 
-    @main_idea.command(name='valid')
-    async def idea_valid(self, ctx: MyContext, msg_id: int, implemented: bool=True):
+    @main_idea.command(name="valid")
+    async def idea_valid(self, ctx: MyContext, msg_id: str, implemented: bool=True):
         """Marque une idée comme étant ajoutée à la prochaine MàJ"""
         chan = ctx.bot.get_channel(929864644678549534) if self.bot.beta else ctx.bot.get_channel(488769306524385301)
         if chan is None:

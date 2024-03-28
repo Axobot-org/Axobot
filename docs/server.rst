@@ -42,9 +42,9 @@ Modify
 
 This subcommand allows you to modify the value of an option. Just enter the exact name of the option and its value. A validation message will then be sent if the request has been correctly executed.
 
-If the value contains several objects, such as a list of roles or channels, they must be separated by commas, like this: :code:`config set clear_allowed_roles Admin, Moderators, Special role for Special people`. Please note that not all configurations support multiple values (for example, it is not possible to have multiple prefixes).
+If the value contains several objects, such as a list of roles or channels, they must be separated by spaces, like this: :code:`config set clear_allowed_roles Admin Moderators @Special`. Please note that not all configurations support multiple values (for example, it is not possible to have multiple prefixes).
 
-.. note:: When the value takes the form of roles, for more comfort you are not obliged to mention them: the exact name or the identifier of the role is enough. The same goes for chanels.
+.. note:: When the value takes the form of roles, for more comfort you are not obliged to mention them: the exact name (as long as it doesn't contain spaces) or the identifier of the role is enough. The same goes for channels or emojis.
 
 
 
@@ -75,6 +75,7 @@ List of every option
 * leave: Message sent when a member leave your server. Some variables are usable, the same as for the welcome message.
 * levelup_channel: Channel where the bot will send every levelup announcement message. It can be either a text channel, or "none" for no channel (Axobot won't send any levelup channel), or "any" if you want it in the same channel as the message. Default to any.
 * levelup_msg: Message to send when someone reaches a new XP level. You can use :code:`{level}` variable to include the reached level, and :code:`{user}` to mention the user (or `{username}` if you only want the name). Default is a random sentence.
+* levelup_silent_mention: Boolean indicating whether the mention in the levelup message should be silent or not. Default is :code:`False`.
 * membercounter: A voice salon whose name displays the number of members on the server
 * mute_allowed_roles: List of roles allowed to use the `mute <moderator.html#mute-unmute>`__ command. By default, none.
 * muted_role: Role used to mute your members. If no role is specified, Axobot will check for any role called "muted", and create one if needed, with basic permissions.
@@ -130,6 +131,8 @@ There are several ways to customize your xp system. In particular, you have a fe
 - **Prevent xp for some roles:** you can also prevent some roles from earning xp via the :code:`noxp_roles` option, which contains a list of all roles that can't earn any experience points.
 
 - **Select a channel where to send levelup messages:** sometimes levelup messages can be a bit spammy. So you have an option to select a single channel where to send level up messages. It is also possible to disable these messages via the same option. Enter the command :code:`config set levelup_channel` followed by the name of your channel, or an other special value ("none" to disable the message, "any" to select the current channel, or "dm" to send in the user's Direct Messages).
+
+- **Silent mention in levelup messages:** when mentionning a user in a message, by default Discord sends a notification to the user. If you want to avoid this, you can set the option :code:`levelup_silent_mention` to true. The mention will then be silent, but the user will still get the red dot indicator.
 
 
 

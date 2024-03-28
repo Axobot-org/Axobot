@@ -1,17 +1,16 @@
 import datetime
 import importlib
-import operator
 import random
-import re
-import string
-import typing
-from difflib import get_close_matches
+import urllib.parse
 from math import ceil
+from typing import Any, Literal, Optional, Union
 
 import aiohttp
-import autopep8
 import discord
 import geocoder
+from asyncache import cached
+from cachetools import TTLCache
+from discord import app_commands
 from discord.ext import commands
 from pytz import timezone
 from timezonefinder import TimezoneFinder
@@ -19,19 +18,11 @@ from timezonefinder import TimezoneFinder
 from libs.arguments import args
 from libs.bot_classes import SUPPORT_GUILD_ID, Axobot, MyContext
 from libs.checks import checks
-from libs.checks.checks import is_fun_enabled
 from libs.formatutils import FormatUtils
 from libs.paginator import Paginator
 
 importlib.reload(checks)
 importlib.reload(args)
-
-if typing.TYPE_CHECKING:
-    from fcts.utilities import Utilities
-
-cmds_list = ['count_msg', 'ragequit', 'pong', 'run', 'nope', 'blame', 'party', 'bigtext', 'shrug', 'gg', 'money', 'pibkac',
-             'osekour', 'me', 'kill', 'cat', 'happy-birthday', 'rekt', 'thanos', 'nuke', 'pikachu', 'pizza', 'google',
-             'loading', 'piece', 'roll', 'afk', 'bubble-wrap', 'reverse', 'wink']
 
 
 def flatten_list(first_list: list) -> list:
@@ -41,8 +32,7 @@ async def can_say(ctx: MyContext):
     "Check if a user can use the 'say' cmd"
     if not ctx.bot.database_online:
         return ctx.channel.permissions_for(ctx.author).administrator
-    else:
-        return await ctx.bot.get_cog("ServerConfig").check_member_config_permission(ctx.author, "say_allowed_roles")
+    return await ctx.bot.get_cog("ServerConfig").check_member_config_permission(ctx.author, "say_allowed_roles")
 
 async def can_use_cookie(ctx: MyContext) -> bool:
     "Check if a user can use the 'cookie' cmd"
@@ -57,75 +47,26 @@ class Fun(commands.Cog):
         self.bot = bot
         self.file = "fun"
         self.tf = TimezoneFinder()
-        self.afk_guys = dict()
-        self.nasa_pict:dict = None
+        self.nasa_pict: Optional[dict[str, Any]] = None
 
     @property
-    def utilities(self) -> 'Utilities':
+    def utilities(self):
         return self.bot.get_cog("Utilities")
 
-    async def is_on_guild(self, user: discord.Member, guild_id: int):
-        "Check if a member is part of a guild"
-        if self.bot.user.id == 436835675304755200:
+    async def is_in_guild(self, user_id: int, guild_id: int):
+        "Check if a user is part of a guild"
+        if self.bot.beta:
             return True
         # Zrunner, someone, Awhikax
-        if user.id in {279568324260528128, 392766377078816789, 281404141841022976}:
+        if user_id in {279568324260528128, 392766377078816789, 281404141841022976}:
             return True
-        server = self.bot.get_guild(guild_id)
-        if server is not None:
-            return user in server.members
+        guild = self.bot.get_guild(guild_id)
+        if guild is not None:
+            return (await guild.fetch_member(user_id)) is not None
         return False
-
-    @commands.command(name='fun')
-    async def main(self, ctx: MyContext):
-        """Get a list of all fun commands
-
-        ..Doc fun.html"""
-        if not await is_fun_enabled(ctx):
-            if ctx.bot.database_online:
-                await ctx.send(await self.bot._(ctx.channel,"fun.no-fun"))
-            else:
-                await ctx.send(await self.bot._(ctx.channel,"fun.no-database"))
-            return
-        title = await self.bot._(ctx.channel,"fun.fun-list")
-        if self.bot.current_event=="fish":
-            title = ":fish: "+title
-        text = ""
-        for cmd in sorted(self.get_commands(),key=operator.attrgetter('name')):
-            if cmd.name in cmds_list and cmd.enabled:
-                if cmd.help is not None:
-                    text+="\n- {} *({})*".format(cmd.name,cmd.help.split('\n')[0])
-                else:
-                    text+="\n- {}".format(cmd.name)
-                if isinstance(cmd, commands.core.Group):
-                    for cmds in cmd.commands:
-                        text+="\n    - {} *({})*".format(cmds.name,cmds.help)
-        if ctx.can_send_embed:
-            emb = discord.Embed(title=title, description=text, color=ctx.bot.get_cog('Help').help_color, timestamp=ctx.message.created_at)
-            emb.set_footer(text=ctx.author, icon_url=ctx.author.display_avatar)
-            return await ctx.send(embed=emb)
-        await ctx.send(title+text)
-
-    @commands.command(name='roll',hidden=True)
-    @commands.check(is_fun_enabled)
-    async def roll(self, ctx: MyContext, *, options: str):
-        """Selects an option at random from a given list
-        The options must be separated by a comma `,`
-
-        ..Example roll Play Minecraft, play Star Citizens, do homeworks
-
-        ..Doc fun.html#roll"""
-        possibilities = list({x for x in [x.strip() for x in options.split(',')] if len(x) > 0})
-        if len(possibilities) == 0:
-            return await ctx.send(await self.bot._(ctx.channel,"fun.no-roll"))
-        elif len(possibilities) == 1:
-            return await ctx.send(await self.bot._(ctx.channel,"fun.not-enough-roll"))
-        choosen = random.choice(possibilities)
-        await ctx.send(choosen)
 
     @commands.command(name="cookie", aliases=['cookies', 'crustulum'], hidden=True)
     @commands.check(can_use_cookie)
-    @commands.check(is_fun_enabled)
     async def cookie(self, ctx: MyContext):
         """COOKIE !!!"""
         if ctx.author.id == 375598088850505728:
@@ -138,392 +79,262 @@ class Fun(commands.Cog):
                 msg = await self.bot._(ctx.guild, "fun.cookie", user=ctx.author.mention, emoji=emoji)
             await ctx.send(msg)
 
-    @commands.command(name="reverse", hidden=True)
-    @commands.check(is_fun_enabled)
-    async def reverse(self, ctx: MyContext, *, text: str):
-        """Reverse the letters of a message
 
-        ..Doc fun.html#reverse"""
-        await ctx.send(text[::-1], allowed_mentions=discord.AllowedMentions.none())
+    fun_main = app_commands.Group(
+        name="fun",
+        description="A collection of useless commands",
+    )
 
-    @commands.command(name="count_msg",hidden=True)
-    @commands.check(is_fun_enabled)
-    @commands.cooldown(5, 30, commands.BucketType.channel)
-    @commands.cooldown(8, 60, commands.BucketType.guild)
-    async def count(self, ctx:MyContext, limit:typing.Optional[int]=1000, user:typing.Optional[discord.User]=None, channel:typing.Optional[discord.TextChannel]=None):
+    @fun_main.command(name="roll")
+    @app_commands.describe(options="A comma-separated list of possibilities")
+    async def roll(self, interaction: discord.Interaction, *, options: str):
+        """Selects an option randomly from a given list.
+        The options must be separated by a comma `,`
+
+        ..Example fun roll Play Minecraft, play Star Citizens, do homeworks
+
+        ..Doc fun.html#roll"""
+        possibilities = list({x for x in [x.strip() for x in options.split(',')] if len(x) > 0})
+        if len(possibilities) == 0:
+            return await interaction.response.send_message(await self.bot._(interaction, "fun.no-roll"))
+        if len(possibilities) == 1:
+            return await interaction.response.send_message(await self.bot._(interaction, "fun.not-enough-roll"))
+        choosen = random.choice(possibilities)
+        await interaction.response.send_message(choosen)
+
+    @fun_main.command(name="count-messages")
+    @app_commands.checks.cooldown(3, 30)
+    async def count(self, interaction: discord.Interaction, limit: Optional[app_commands.Range[int, 10, 1_000]]=100,
+                    user: Optional[discord.User]=None, channel: Optional[discord.TextChannel]=None):
         """Count the number of messages sent by the user in one channel
 You can specify a verification limit by adding a number in argument (up to 1.000.000)
 
-        ..Example count_msg
+        ..Example fun count-messages
 
-        ..Example count_msg Z_runner #announcements
+        ..Example fun count-messages Z_runner #announcements
 
-        ..Example count_msg 300 someone
+        ..Example fun count-messages 300 someone
 
         ..Doc fun.html#count-messages"""
-        MAX = 15_000
         if channel is None:
-            channel = ctx.channel
-        if not channel.permissions_for(ctx.author).read_message_history:
-            await ctx.send(await self.bot._(ctx.channel,"fun.count.forbidden"))
+            channel = interaction.channel
+        if not channel.permissions_for(interaction.user).read_message_history:
+            await interaction.response.send_message(await self.bot._(interaction, "fun.count.forbidden"))
             return
-        if limit > MAX:
-            await ctx.send(await self.bot._(ctx.channel,"fun.count.too-much",l=MAX,e=self.bot.emojis_manager.customs['wat']))
-            return
-        if ctx.guild is not None and not channel.permissions_for(ctx.guild.me).read_message_history:
-            await ctx.send(await self.bot._(channel,"fun.count.missing-perms"))
+        if interaction.guild is not None and not channel.permissions_for(interaction.guild.me).read_message_history:
+            await interaction.response.send_message(await self.bot._(interaction, "fun.count.missing-perms"))
             return
         if user is None:
-            user = ctx.author
+            user = interaction.user
         counter = 0
-        tmp = await ctx.send(await self.bot._(ctx.channel,"fun.count.counting"))
+        await interaction.response.send_message(await self.bot._(interaction,"fun.count.counting"))
         total_count = 0
         async for log in channel.history(limit=limit):
             total_count += 1
             if log.author == user:
                 counter += 1
         result = round(counter*100/total_count,2)
-        if user == ctx.author:
-            await tmp.edit(content = await self.bot._(ctx.channel,"fun.count.result-you",limit=total_count,x=counter,p=result))
+        if user == interaction.user:
+            await interaction.edit_original_response(
+                content=await self.bot._(interaction, "fun.count.result-you", limit=total_count, x=counter, p=result)
+            )
         else:
-            await tmp.edit(content = await self.bot._(ctx.channel,"fun.count.result-user", limit=total_count,user=user.display_name,x=counter,p=result))
+            await interaction.edit_original_response(
+                content=await self.bot._(interaction, "fun.count.result-user", limit=total_count, user=user.display_name,
+                                         x=counter, p=result)
+            )
 
-    @commands.command(name="ragequit", hidden=True)
-    @commands.check(is_fun_enabled)
-    async def ragequit(self, ctx: MyContext):
-        """To use when you get angry
-
-        ..Doc fun.html#ragequit"""
-        await ctx.send(file=await self.utilities.find_img('ragequit{0}.gif'.format(random.randint(1,6))))
-
-    @commands.command(name="run", hidden=True)
-    @commands.check(is_fun_enabled)
-    async def run(self, ctx: MyContext):
-        """"Just... run... very... fast
-
-        ..Doc fun.html#run"""
-        await ctx.send("ε=ε=ε=┏( >_<)┛")
-
-    @commands.command(name="pong", hidden=True)
-    @commands.check(is_fun_enabled)
-    async def pong(self, ctx: MyContext):
-        """Ping !
-
-        ..Doc fun.html#pong"""
-        await ctx.send("Ping !")
-
-    @commands.command(name="nope",hidden=True)
-    @commands.check(is_fun_enabled)
-    async def nope(self, ctx: MyContext):
-        """Use this when you do not agree with someone else
-
-        ..Doc fun.html#nope"""
-        await ctx.send(file=await self.utilities.find_img('nope.png'))
-        if self.bot.database_online:
-            try:
-                if await self.bot.get_cog("ServerConfig").check_member_config_permission(ctx.author, "say_allowed_roles"):
-                    await ctx.message.delete(delay=0)
-            except commands.CommandError: # user can't use 'say'
-                pass
-
-    @commands.command(name="blame", hidden=True)
-    @commands.check(is_fun_enabled)
-    async def blame(self, ctx: MyContext, name: str):
+    @fun_main.command(name="blame")
+    async def blame(self, interaction: discord.Interaction, name: str):
         """Blame someone
         Use 'blame list' command to see every available name *for you*
 
-        ..Example blame discord
+        ..Example fun blame discord
 
         ..Doc fun.html#blame"""
+        name = name.lower()
+        await interaction.response.defer()
+        available_names = await self._get_blame_available_names(interaction.user.id)
+        if name in available_names:
+            await interaction.followup.send(file=await self.utilities.find_img(f'blame-{name}.png'))
+            return
+        if name not in available_names:
+            txt = "- "+"\n- ".join(sorted(available_names))
+            title = await self.bot._(interaction, "fun.blame-0", user=interaction.user)
+            emb = discord.Embed(title=title, description=txt, color=self.bot.get_cog("Help").help_color)
+            await interaction.followup.send(embed=emb)
+
+    @cached(TTLCache(1_000, 3600))
+    async def _get_blame_available_names(self, user_id: int):
         l1 = ['discord','mojang','zbot','google','youtube', 'twitter'] # everyone
         l2 = ['tronics','patate','neil','reddemoon','aragorn1202','platon'] # fr-minecraft semi-public server
         l3 = ['awhikax','aragorn','adri','zrunner'] # Axobot official server
         l4 = ['benny'] # benny server
-        name = name.lower()
-        if name in l1:
-            await ctx.send(file=await self.utilities.find_img(f'blame-{name}.png'))
-        elif name in l2:
-            if await self.is_on_guild(ctx.author, 391968999098810388): # fr-minecraft
-                await ctx.send(file=await self.utilities.find_img(f'blame-{name}.png'))
-        elif name in l3:
-            if await self.is_on_guild(ctx.author, SUPPORT_GUILD_ID.id): # Axobot server
-                await ctx.send(file=await self.utilities.find_img(f'blame-{name}.png'))
-        elif name in l4:
-            if await self.is_on_guild(ctx.author, 523525264517496834): # Benny Support
-                await ctx.send(file=await self.utilities.find_img(f'blame-{name}.png'))
-        elif name in ['help','list']:
-            available_names = l1
-            if await self.is_on_guild(ctx.author, 391968999098810388): # fr-minecraft
-                available_names += l2
-            if await self.is_on_guild(ctx.author, SUPPORT_GUILD_ID.id): # Axobot server
-                available_names += l3
-            if await self.is_on_guild(ctx.author, 523525264517496834): # Benny Support
-                available_names += l4
-            txt = "- "+"\n- ".join(sorted(available_names))
-            title = await self.bot._(ctx.channel, "fun.blame-0", user=ctx.author)
-            if ctx.can_send_embed:
-                emb = discord.Embed(title=title, description=txt, color=self.bot.get_cog("Help").help_color)
-                await ctx.send(embed=emb)
-            else:
-                await ctx.send(f"__{title}:__\n\n{txt}")
+        available_names = l1
+        if await self.is_in_guild(user_id, 391968999098810388): # fr-minecraft
+            available_names += l2
+        if await self.is_in_guild(user_id, SUPPORT_GUILD_ID.id): # Axobot server
+            available_names += l3
+        if await self.is_in_guild(user_id, 523525264517496834): # Benny Support
+            available_names += l4
+        return available_names
 
-    @commands.command(name="kill",hidden=True)
-    @commands.guild_only()
-    @commands.check(is_fun_enabled)
-    async def kill(self, ctx: MyContext, *, name: typing.Optional[str]=None):
+    @blame.autocomplete("name")
+    async def blame_autocomplete(self, interaction: discord.Interaction, current: str):
+        "Autocomplete for the blame command"
+        current = current.lower()
+        available_names = await self._get_blame_available_names(interaction.user.id)
+        filtered = [
+            (not name.startswith(current), name)
+            for name in available_names
+            if current in name
+        ]
+        filtered.sort()
+        return [
+            app_commands.Choice(name=name, value=name)
+            for _, name in filtered
+        ]
+
+    @fun_main.command(name="kill")
+    async def kill(self, interaction: discord.Interaction, *, name: Optional[str]=None):
         """Just try to kill someone with a fun message
 
         ..Example kill herobrine
 
         ..Doc fun.html#kill"""
         if name is None:
-            victime = ctx.author.display_name
+            victime = interaction.user.display_name
         else:
             victime = name
         ex = victime.replace(" ", "_")
-        author = ctx.author.mention
-        possibilities = await self.bot._(ctx.channel, "fun.kills-list")
+        author = interaction.user.mention
+        possibilities = await self.bot._(interaction, "fun.kills-list")
         msg = random.choice(possibilities)
         tries = 0
-        while '{attacker}' in msg and name is None and tries<50:
+        while '{attacker}' in msg and name is None and tries < 50:
             msg = random.choice(possibilities)
             tries += 1
-        await ctx.send(msg.format(attacker=author, victim=victime, ex=ex))
+        await interaction.response.send_message(msg.format(attacker=author, victim=victime, ex=ex))
 
-    @commands.command(name="arapproved",aliases=['arapprouved'], hidden=True)
-    @commands.check(lambda ctx: ctx.author.id in [375598088850505728,279568324260528128])
-    async def arapproved(self, ctx: MyContext):
-        "If you don't know why this exists, it's probably not for you"
-        await ctx.send(file=await self.utilities.find_img("arapproved.png"))
-
-    @commands.command(name='party',hidden=True)
-    @commands.check(is_fun_enabled)
-    async def party(self, ctx: MyContext):
-        """Sends a random image to make the server happier
-
-        ..Doc fun.html#party"""
-        r = random.randrange(5)+1
-        if r == 1:
-            await ctx.send(file=await self.utilities.find_img('cameleon.gif'))
-        elif r == 2:
-            await ctx.send(file=await self.utilities.find_img('discord_party.gif'))
-        elif r == 3:
-            await ctx.send(file=await self.utilities.find_img('parrot.gif'))
-        elif r == 4:
-            e = self.bot.emojis_manager.customs['blob_dance']
-            await ctx.send(e*5)
-        elif r == 5:
-            await ctx.send(file=await self.utilities.find_img('cameleon.gif'))
-
-    @commands.command(name="cat", hidden=True)
-    @commands.cooldown(5, 7, commands.BucketType.user)
-    @commands.check(is_fun_enabled)
-    async def cat_gif(self, ctx: MyContext):
-        """Wow... So cuuuute !
-
-        ..Doc fun.html#cat"""
-        await ctx.send(random.choice([
-            'https://images6.fanpop.com/image/photos/40800000/tummy-rub-kitten-animated-gif-cute-kittens-40838484-380-227.gif',
-            'https://25.media.tumblr.com/7774fd7794d99b5998318ebd5438ba21/tumblr_n2r7h35U211rudcwro1_400.gif',
-            'https://tenor.com/view/seriously-seriously-cat-cat-really-cat-really-look-cat-look-gif-22182662',
-            'http://coquelico.c.o.pic.centerblog.net/chat-peur.gif',
-            'https://tenor.com/view/nope-bye-cat-leave-done-gif-12387359',
-            'https://tenor.com/view/cute-cat-kitten-kitty-pussy-cat-gif-16577050',
-            'https://tenor.com/view/cat-box-gif-18395469',
-            'https://tenor.com/view/pile-cats-cute-silly-meowtain-gif-5791255',
-            'https://tenor.com/view/cat-fight-cats-cat-love-pet-lover-pelea-gif-13002823369159732311',
-            'https://tenor.com/view/cat-disapear-cat-snow-cat-jump-fail-cat-fun-jump-cats-gif-17569677',
-            'https://tenor.com/view/black-cat-tiny-cat-smol-kitten-airplane-ears-cutie-pie-gif-23391953',
-            'https://tenor.com/view/cat-cats-catsoftheinternet-biting-tale-cat-bite-gif-23554005',
-            'https://tenor.com/view/on-my-way-cat-run-cat-on-my-way-cat-cat-on-my-way-gif-26471384',
-            'https://tenor.com/view/cat-cat-activity-goober-goober-cat-silly-cat-gif-186256394908832033',
-            'https://tenor.com/view/cat-stacked-kittens-kitty-pussy-cats-gif-16220908',
-            'https://tenor.com/view/cute-cat-cats-cats-of-the-internet-cattitude-gif-17600906',
-            'https://tenor.com/view/cat-scared-hide-terrified-frightened-gif-17023981',
-            'https://tenor.com/view/cat-running-away-escape-getaway-bye-gif-16631286',
-            'https://tenor.com/view/bye-cat-box-tight-face-bored-cat-gif-7986182'
-        ]))
-
-    @commands.command(name="happy-birthday", hidden=True, aliases=['birthday', 'hb'])
-    @commands.check(is_fun_enabled)
-    async def birthday_gif(self, ctx: MyContext):
-        """How many candles this year?
-
-        ..Doc fun.html#birthdays"""
-        await ctx.send(random.choice(['https://tenor.com/view/happy-birthday-cat-cute-birthday-cake-second-birthday-gif-16100991',
-        'https://tenor.com/view/happy-birthday-birthday-cake-goat-licking-lick-gif-15968273',
-        'https://tenor.com/view/celebracion-gif-4928008',
-        'https://tenor.com/view/kitty-birthday-birthday-kitty-happy-birthday-happy-birthday-to-you-hbd-gif-13929089',
-        'https://tenor.com/view/happy-birthday-happy-birthday-to-you-hbd-birthday-celebrate-gif-13366300']))
-
-    @commands.command(name="wink", hidden=True)
-    @commands.check(is_fun_enabled)
-    async def wink_gif(self, ctx: MyContext):
-        "Haha so funny"
-        await ctx.send(random.choice([
-            'https://tenor.com/view/dr-strange-wink-smirk-trust-me-gif-24332472',
-            'https://tenor.com/view/wink-smile-laugh-wandavision-gif-20321476',
-            'https://tenor.com/view/rowan-atkinson-mr-bean-trying-to-flirt-wink-gif-16439423',
-            'https://tenor.com/view/winking-james-franco-actor-wink-handsome-gif-17801047',
-            'https://tenor.com/view/clin-doeil-wink-playboy-wink-funny-wink-clin-oeil-gif-24871407',
-            'https://tenor.com/view/wink-got-it-dude-rocket-raccoon-hint-gotcha-gif-23822337'
-        ]))
-
-    @commands.command(name="bigtext",hidden=True)
-    @commands.check(is_fun_enabled)
-    async def big_text(self, ctx: MyContext, *, text: str):
-        """If you wish to write bigger
-
-        ..Example bigtext Hi world! I'm 69?!
-
-        ..Doc fun.html#bigtext"""
-        content = await commands.clean_content().convert(ctx, text)
-        text = ""
-        Em = self.bot.emojis_manager
-        mentions = [x.group(1) for x in re.finditer(r'(<(?:@!?&?|#|a?:[a-zA-Z0-9_]+:)\d+>)',ctx.message.content)]
-        content = "¬¬".join(content.split("\n"))
-        for x in mentions:
-            content = content.replace(x,'¤¤')
-        for l in content:
-            l = l.lower()
-            if l in string.ascii_letters:
-                item = discord.utils.get(ctx.bot.emojis,id=Em.alphabet[string.ascii_letters.index(l)])
-            elif l in string.digits:
-                item = discord.utils.get(ctx.bot.emojis,id=Em.numbers[int(l)])
-            else:
-                try:
-                    item = discord.utils.get(ctx.bot.emojis,id=Em.chars[l])
-                except KeyError:
-                    item = l
-            text += str(item) + '¬'
-        text = text.replace("¬¬","\n")
-        for m in mentions:
-            text = text.replace('¤¬¤', m, 1)
-        text = text.split('¬')[:-1]
-        text1 = list()
-        for line in text:
-            text1.append(line)
-            caract = len("".join(text1))
-            if caract > 1970:
-                await ctx.send("".join(text1))
-                text1 = []
-        if text1 != []:
-            await ctx.send(''.join(text1))
-        try:
-            if ctx.bot.database_online and await self.bot.get_cog("ServerConfig").check_member_config_permission(ctx.author, "say_allowed_roles"):
-                await ctx.message.delete(delay=0)
-        except commands.CommandError: # user can't use 'say'
-            pass
-        self.bot.log.debug("{} used bigtext to say {}".format(ctx.author.id,text))
-
-    @commands.command(name="shrug",hidden=True)
-    @commands.check(is_fun_enabled)
-    async def shrug(self, ctx: MyContext):
-        """Don't you know? Neither do I
-
-        ..Doc fun.html#shrug"""
-        await ctx.send(file=await self.utilities.find_img('shrug.gif'))
-
-    @commands.command(name="rekt",hidden=True)
-    @commands.check(is_fun_enabled)
-    async def rekt(self, ctx: MyContext):
-        await ctx.send(file=await self.utilities.find_img('rekt.jpg'))
-
-    @commands.command(name="gg",hidden=True)
-    @commands.check(is_fun_enabled)
-    async def gg(self, ctx: MyContext):
-        """Congrats! You just found something!
-
-        ..Doc fun.html#congrats"""
-        await ctx.send(file=await self.utilities.find_img('gg.gif'))
-
-    @commands.command(name="money",hidden=True)
-    @commands.cooldown(1, 15, commands.BucketType.user)
-    @commands.cooldown(10, 60, commands.BucketType.guild)
-    @commands.check(is_fun_enabled)
-    async def money(self, ctx: MyContext):
-        """Money gif. Cuz we all love money, don't we?
-
-        ..Doc fun.html#money"""
-        await ctx.send(file=await self.utilities.find_img('money.gif'))
-
-    @commands.command(name="pibkac",hidden=True)
-    @commands.check(is_fun_enabled)
-    async def pibkac(self, ctx: MyContext):
-        """Where comes that bug from?
-
-        ..Doc fun.html#pibkac"""
-        await ctx.send(file=await self.utilities.find_img('pibkac.png'))
-
-    @commands.command(name="osekour",hidden=True,aliases=['helpme','ohmygod'])
-    @commands.check(is_fun_enabled)
-    async def osekour(self, ctx: MyContext):
+    @fun_main.command(name="helpme")
+    async def osekour(self, interaction: discord.Interaction):
         """Does anyone need help?
 
         ..Doc fun.html#heeelp"""
-        l = await self.bot._(ctx.channel,"fun.osekour")
-        await ctx.send(random.choice(l))
+        messages = await self.bot._(interaction,"fun.osekour")
+        await interaction.response.send_message(random.choice(messages))
 
-    @commands.command(name="say")
-    @commands.guild_only()
-    @commands.check(can_say)
-    async def say(self, ctx:MyContext, channel:typing.Optional[typing.Union[discord.TextChannel, discord.Thread]] = None, *, text):
+    @fun_main.command(name="gif")
+    async def gif(self, interaction: discord.Interaction, category: Literal["cat", "birthday", "wink"]):
+        "Send a random gif from a category!"
+        if category == "cat":
+            gif = random.choice([
+                # pylint: disable=line-too-long
+                'https://images6.fanpop.com/image/photos/40800000/tummy-rub-kitten-animated-gif-cute-kittens-40838484-380-227.gif',
+                'https://25.media.tumblr.com/7774fd7794d99b5998318ebd5438ba21/tumblr_n2r7h35U211rudcwro1_400.gif',
+                'https://tenor.com/view/seriously-seriously-cat-cat-really-cat-really-look-cat-look-gif-22182662',
+                'http://coquelico.c.o.pic.centerblog.net/chat-peur.gif',
+                'https://tenor.com/view/nope-bye-cat-leave-done-gif-12387359',
+                'https://tenor.com/view/cute-cat-kitten-kitty-pussy-cat-gif-16577050',
+                'https://tenor.com/view/cat-box-gif-18395469',
+                'https://tenor.com/view/pile-cats-cute-silly-meowtain-gif-5791255',
+                'https://tenor.com/view/cat-fight-cats-cat-love-pet-lover-pelea-gif-13002823369159732311',
+                'https://tenor.com/view/cat-disapear-cat-snow-cat-jump-fail-cat-fun-jump-cats-gif-17569677',
+                'https://tenor.com/view/black-cat-tiny-cat-smol-kitten-airplane-ears-cutie-pie-gif-23391953',
+                'https://tenor.com/view/cat-cats-catsoftheinternet-biting-tale-cat-bite-gif-23554005',
+                'https://tenor.com/view/on-my-way-cat-run-cat-on-my-way-cat-cat-on-my-way-gif-26471384',
+                'https://tenor.com/view/cat-cat-activity-goober-goober-cat-silly-cat-gif-186256394908832033',
+                'https://tenor.com/view/cat-stacked-kittens-kitty-pussy-cats-gif-16220908',
+                'https://tenor.com/view/cute-cat-cats-cats-of-the-internet-cattitude-gif-17600906',
+                'https://tenor.com/view/cat-scared-hide-terrified-frightened-gif-17023981',
+                'https://tenor.com/view/cat-running-away-escape-getaway-bye-gif-16631286',
+                'https://tenor.com/view/bye-cat-box-tight-face-bored-cat-gif-7986182'
+            ])
+        elif category == "birthday":
+            gif = random.choice([
+                'https://tenor.com/view/happy-birthday-cat-cute-birthday-cake-second-birthday-gif-16100991',
+                'https://tenor.com/view/happy-birthday-birthday-cake-goat-licking-lick-gif-15968273',
+                'https://tenor.com/view/celebracion-gif-4928008',
+                'https://tenor.com/view/kitty-birthday-birthday-kitty-happy-birthday-happy-birthday-to-you-hbd-gif-13929089',
+                'https://tenor.com/view/happy-birthday-happy-birthday-to-you-hbd-birthday-celebrate-gif-13366300'
+            ])
+        elif category == "wink":
+            gif = random.choice([
+                'https://tenor.com/view/dr-strange-wink-smirk-trust-me-gif-24332472',
+                'https://tenor.com/view/wink-smile-laugh-wandavision-gif-20321476',
+                'https://tenor.com/view/rowan-atkinson-mr-bean-trying-to-flirt-wink-gif-16439423',
+                'https://tenor.com/view/winking-james-franco-actor-wink-handsome-gif-17801047',
+                'https://tenor.com/view/clin-doeil-wink-playboy-wink-funny-wink-clin-oeil-gif-24871407',
+                'https://tenor.com/view/wink-got-it-dude-rocket-raccoon-hint-gotcha-gif-23822337'
+            ])
+        else:
+            raise ValueError("Invalid category: "+category)
+        await interaction.response.send_message(gif)
+
+    @fun_main.command(name="pibkac")
+    async def pibkac(self, interaction: discord.Interaction):
+        """Where does that bug come from?
+
+        ..Doc fun.html#pibkac"""
+        await interaction.response.send_message(file=await self.utilities.find_img('pibkac.png'))
+
+    @fun_main.command(name="flip")
+    async def piece(self, interaction: discord.Interaction):
+        """Heads or tails?
+
+        ..Doc fun.html#piece"""
+        if random.random() < 0.04:
+            result = "fun.flip.edge"
+        elif random.random() < 0.5:
+            result = "fun.flip.heads"
+        else:
+            result = "fun.flip.tails"
+        await interaction.response.send_message(await self.bot._(interaction, result))
+
+    @app_commands.command(name="say")
+    @app_commands.guild_only()
+    @app_commands.default_permissions(manage_messages=True)
+    @app_commands.describe(
+        text="The text to send",
+        channel="The channel where the bot must send the message"
+    )
+    async def say(self, interaction: discord.Interaction, text: str,
+                  channel: Union[discord.TextChannel, discord.Thread, None] = None):
         """Let the bot say something for you
         You can specify a channel where the bot must send this message. If channel is None, the current channel will be used
 
-        ..Example say #chat Hi I'm invading Earth
+        ..Example say Hi I'm invading Earth #chat
 
         ..Example say Booh!
 
         ..Doc miscellaneous.html#say"""
         if channel is None:
-            channel = ctx.channel
-        elif not ((
-            channel.permissions_for(ctx.author).read_messages and
-            channel.permissions_for(ctx.author).send_messages and
-            channel.guild == ctx.guild
-        ) or await self.bot.get_cog('Admin').check_if_god(ctx)):
-            await ctx.send(await self.bot._(ctx.guild, 'fun.say-no-perm', channel=channel.mention))
+            channel = interaction.channel
+        if not (
+            channel.permissions_for(interaction.user).read_messages and
+            channel.permissions_for(interaction.user).send_messages and
+            channel.guild == interaction.guild
+        ):
+            await interaction.response.send_message(await self.bot._(interaction, "fun.say-no-perm", channel=channel.mention))
+            return
+        if not channel.permissions_for(interaction.guild.me).send_messages:
+            error = await self.bot._(interaction, "fun.no-say")
+            error += random.choice([' :confused:', '', '', ''])
+            await interaction.response.send_message(error)
             return
         if self.bot.zombie_mode:
             return
-        if m := re.search(r"(?:i am|i'm) ([\w\s]+)", text, re.DOTALL | re.IGNORECASE):
-            if m.group(1).lower() != "a bot":
-                first_words = ['dumb', 'really dumb','stupid', 'gay', 'idiot', 'shit', 'trash']
-                words = []
-                for w in first_words:
-                    words += [w, w+' bot', w.upper()]
-                if word := get_close_matches(m.group(1), words, n=1, cutoff=0.8):
-                    await ctx.send(f"Yeah we know you are {word[0]}")
-                    return
-        try:
-            if not channel.permissions_for(ctx.guild.me).send_messages:
-                return await ctx.send(str(await self.bot._(ctx.guild.id, 'fun', 'no-say'))+random.choice([' :confused:', '', '', '']))
-            await channel.send(text)
-            await ctx.message.delete(delay=0)
-        except discord.Forbidden:
-            pass
+        await channel.send(text)
+        await interaction.response.send_message(await self.bot._(interaction, "fun.say-done"), ephemeral=True)
 
-    @commands.command(name="me", hidden=True)
-    @commands.check(is_fun_enabled)
-    async def me(self, ctx: MyContext, *, text: str):
-        """No U
-
-        ..Doc fun.html#me"""
-        text = f"*{ctx.author.display_name} {text}*"
-        await ctx.send(text)
-        try:
-            if (
-                self.bot.database_online
-                and await self.bot.get_cog("ServerConfig").check_member_config_permission(ctx.author, "say_allowed_roles")
-            ):
-                await ctx.message.delete(delay=0)
-        except commands.CommandError:  # user can't use 'say'
-            pass
-
-    @commands.command(name="react")
-    @commands.check(can_say)
-    async def react(self, ctx:MyContext, message:discord.Message, *, reactions):
+    @app_commands.command(name="react")
+    @app_commands.guild_only()
+    @app_commands.default_permissions(manage_messages=True)
+    @app_commands.describe(
+        message="The URL of the message to react to",
+        reactions="A space-separated list of custom or unicode emojis to react with"
+    )
+    async def react(self, interaction: discord.Interaction, message: args.MessageArgument, reactions: str):
         """Add reaction(s) to a message. Server emojis also work.
 
         ..Example react 375246790301057024-790177026232811531 :ok:
@@ -532,305 +343,81 @@ You can specify a verification limit by adding a number in argument (up to 1.000
 
         ..Doc fun.html#react"""
         channel = message.channel
-        if not (channel.permissions_for(ctx.author).read_messages and channel.permissions_for(ctx.author).add_reactions and (channel.guild is None or channel.guild==ctx.guild)):
-            await ctx.send(await self.bot._(ctx.channel,"fun.say-no-perm",channel=channel.mention))
+        if not (
+            channel.permissions_for(interaction.user).read_messages
+            and channel.permissions_for(interaction.user).add_reactions
+            and (channel.guild is None or channel.guild==interaction.guild)
+        ):
+            await interaction.response.send_message(await self.bot._(interaction, "fun.say-no-perm", channel=channel.mention))
             return
-        for r in reactions.split():
+        await interaction.response.defer(ephemeral=True)
+        ctx = await MyContext.from_interaction(interaction)
+        count = 0
+        for reaction in reactions.split():
             try:
-                err = await commands.EmojiConverter().convert(ctx,r)
-                await message.add_reaction(err)
+                emoji = await args.DiscordOrUnicodeEmojiConverter.convert(ctx, reaction)
+                await message.add_reaction(emoji)
             except (discord.Forbidden, commands.BadArgument):
                 try:
-                    await message.add_reaction(r)
+                    await message.add_reaction(reaction)
                 except discord.errors.HTTPException:
-                    await ctx.send(await self.bot._(ctx.channel,"fun.no-emoji"))
+                    await interaction.followup.send(content=await self.bot._(interaction, "fun.no-emoji"))
                     return
-                except Exception as err:
-                    self.bot.dispatch("command_error", ctx, err)
-                    continue
-        await ctx.message.delete(delay=0)
+            count += 1
+        await interaction.followup.send(content=await self.bot._(interaction, "fun.react-done", count=count))
 
-    @commands.command(name="nuke",hidden=True)
-    @commands.check(is_fun_enabled)
-    async def nuke(self, ctx: MyContext):
-        """BOOOM
-
-        ..Doc fun.html#nuke"""
-        await ctx.send(file=await self.utilities.find_img('nuke.gif'))
-
-    @commands.command(name="pikachu",hidden=True)
-    @commands.check(is_fun_enabled)
-    async def pikachu(self, ctx: MyContext):
-        """Pika-pika ?
-
-        ..Doc fun.html#pikachu"""
-        await ctx.send(file=await self.utilities.find_img(random.choice(['cookie-pikachu.gif','pika1.gif'])))
-
-    @commands.command(name="pizza",hidden=True)
-    @commands.check(is_fun_enabled)
-    async def pizza(self, ctx: MyContext):
-        """Hey, do U want some pizza?
-
-        ..Doc fun.html#pizza"""
-        await ctx.send(file=await self.utilities.find_img('pizza.gif'))
-
-    @commands.command(name="google", hidden=True, aliases=['lmgtfy'])
-    @commands.check(is_fun_enabled)
-    async def lmgtfy(self,ctx,*,search):
+    @fun_main.command(name="google")
+    @app_commands.checks.cooldown(2, 10)
+    async def lmgtfy(self, interaction: discord.Interaction, search: str):
         """How to use Google
 
         ..Doc fun.html#lmgtfy"""
-        link = "https://lmgtfy.com/?q="+search.replace("\n","+").replace(" ","+")
-        await ctx.send('<'+link+'>')
-        await ctx.message.delete(delay=0)
+        link = "https://lmgtfy2.com/query/?q=" + urllib.parse.quote_plus(search)
+        await interaction.response.send_message('<'+link+'>')
 
-    @commands.command(name="loading",hidden=True)
-    @commands.check(is_fun_enabled)
-    async def loading(self, ctx: MyContext):
-        """time goes by soooo slowly...
-
-        ..Doc fun.html#loading"""
-        await ctx.send(file=await self.utilities.find_img('loading.gif'))
-
-    @commands.command(name="thanos",hidden=True)
-    @commands.check(is_fun_enabled)
-    async def thanos(self, ctx: MyContext, *, name: str = None):
-        """SNAP! Will you be lucky enough to survive?
-
-        ..Doc fun.html#thanos"""
-        name = name or ctx.author.mention
-        await ctx.send(random.choice(await self.bot._(ctx.channel,"fun.thanos")).format(name))
-
-    @commands.command(name="piece", hidden=True, aliases=['coin','flip'])
-    @commands.check(is_fun_enabled)
-    async def piece(self, ctx: MyContext):
-        """Heads or tails?
-
-        ..Doc fun.html#piece"""
-        if random.random() < 0.04:
-            await ctx.send(await self.bot._(ctx.channel,"fun.piece-1"))
-        else:
-            await ctx.send(random.choice(await self.bot._(ctx.channel,"fun.piece-0")))
-
-    @commands.command(name="weather", aliases=['météo'])
-    @commands.cooldown(4, 30, type=commands.BucketType.guild)
-    async def weather(self, ctx:MyContext, *, city:str):
-        """Get the weather of a city
-        You need to provide the city name in english
-
-        ..Example weather Tokyo
-
-        ..Doc miscellaneous.html#hour-weather"""
-        city = city.replace(" ","%20")
-        async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=30)) as session:
-            async with session.get("https://welcomer.glitch.me/weather?city="+city) as resp:
-                if resp.status == 200:
-                    if resp.content_type == 'image/png':
-                        if ctx.channel.permissions_for(ctx.me).embed_links:
-                            emb = discord.Embed()
-                            emb.set_image(url="https://welcomer.glitch.me/weather?city="+city)
-                            emb.set_footer(text="From https://welcomer.glitch.me/weather")
-                            return await ctx.send(embed=emb)
-                        else:
-                            return await ctx.send("https://welcomer.glitch.me/weather?city="+city)
-        await ctx.send(await self.bot._(ctx.channel,"fun.invalid-city"))
-
-    @commands.command(name="hour")
-    @commands.cooldown(4, 50, type=commands.BucketType.guild)
-    async def hour(self, ctx: MyContext, *, city: str):
+    @fun_main.command(name="hour")
+    @app_commands.checks.cooldown(4, 40)
+    async def hour(self, interaction: discord.Interaction, city: app_commands.Range[str, 1, 100]):
         """Get the hour of a city
 
         ..Example hour Paris
 
         ..Doc miscellaneous.html#hour-weather"""
+        await interaction.response.defer()
         g = geocoder.arcgis(city)
         if not g.ok:
-            return await ctx.send(await self.bot._(ctx.channel, "fun.invalid-city"))
-        tz_name: typing.Optional[str] = self.tf.timezone_at_land(lat=g.json['lat'], lng=g.json['lng'])
+            await interaction.followup.send(content=await self.bot._(interaction, "fun.invalid-city"))
+            return
+        tz_name: Optional[str] = self.tf.timezone_at_land(lat=g.json['lat'], lng=g.json['lng'])
         if tz_name is None:
-            return await ctx.send(await self.bot._(ctx.channel, "fun.uninhabited-city"))
+            await interaction.followup.send(content=await self.bot._(interaction, "fun.uninhabited-city"))
+            return
         tz_obj = timezone(tz_name)
         date = datetime.datetime.now(tz_obj)
-        format_d = await FormatUtils.date(date,lang=await self.bot._(ctx.channel, "_used_locale"))
+        format_d = await FormatUtils.date(date, lang=await self.bot._(interaction, "_used_locale"))
         address = g.current_result.address
         latitude = round(g.json['lat'],2)
         longitude = round(g.json['lng'],2)
-        await ctx.send(f"**{tz_name}**:\n{format_d} ({date.tzname()})\n ({address} - lat: {latitude} - long: {longitude})")
+        text = await self.bot._(
+            interaction, "fun.hour-result",
+            date=format_d,
+            tzname=date.tzname(),
+            tzlocation=tz_name,
+            lat=latitude,
+            long=longitude
+        )
+        embed = discord.Embed(
+            title=address,
+            description=text,
+            color=discord.Colour.blurple()
+        )
+        await interaction.followup.send(embed=embed)
 
-    @commands.command(name='afk')
-    @commands.check(is_fun_enabled)
-    @commands.guild_only()
-    async def afk(self, ctx: MyContext, *, reason=""):
-        """Mark you AFK
-        You'll get a nice nickname, because nicknames are cool, aren't they?
-
-        ..Doc fun.html#afk"""
-        try:
-            self.afk_guys[ctx.author.id] = reason
-            if (not ctx.author.display_name.endswith(' [AFK]')) and len(ctx.author.display_name)<26:
-                await ctx.author.edit(nick=ctx.author.display_name+" [AFK]")
-            await ctx.send(await self.bot._(ctx.guild.id,"fun.afk.afk-done"))
-        except discord.errors.Forbidden:
-            return await ctx.send(await self.bot._(ctx.guild.id,"fun.afk.no-perm"))
-
-    async def user_is_afk(self, user: discord.User) -> bool:
-        "Check if a user is currently afk"
-        cond = user.id in self.afk_guys
-        if cond:
-            return True
-        return isinstance(user, discord.Member) and user.nick and user.nick.endswith(' [AFK]')
-
-    @commands.command(name='unafk')
-    @commands.check(is_fun_enabled)
-    @commands.guild_only()
-    async def unafk(self, ctx: MyContext):
-        """Remove you from the AFK system
-        Welcome back dude
-
-        ..Doc fun.html#afk"""
-        if await self.user_is_afk(ctx.author):
-            del self.afk_guys[ctx.author.id]
-            await ctx.send(await self.bot._(ctx.guild.id,"fun.afk.unafk-done"))
-            if ctx.author.nick and ctx.author.nick.endswith(" [AFK]"):
-                try:
-                    await ctx.author.edit(nick=ctx.author.display_name.replace(" [AFK]",''))
-                except discord.errors.Forbidden:
-                    pass
-        else:
-            await ctx.send(await self.bot._(ctx.guild.id,"fun.afk.unafk-cant"))
-
-    @commands.Cog.listener()
-    async def on_message(self, msg: discord.Message):
-        if msg.guild:
-            await self.check_afk(msg)
-
-    async def check_afk(self, msg: discord.Message):
-        """Check if someone pinged is afk"""
-        if msg.author.bot:
-            return
-        ctx = await self.bot.get_context(msg)
-        if not await is_fun_enabled(ctx):
-            return
-        if self.bot.zombie_mode:
-            return
-        # send a message if someone is afk and the bot can speak
-        if msg.channel.permissions_for(msg.guild.me).send_messages:
-            for member in msg.mentions:
-                if await self.user_is_afk(member) and member != msg.author:
-                    if member.id not in self.afk_guys or len(self.afk_guys[member.id]) == 0:
-                        await msg.channel.send(await self.bot._(msg.guild.id,"fun.afk.afk-user-noreason"))
-                    else:
-                        await msg.channel.send(
-                            await self.bot._(msg.guild.id,"fun.afk.afk-user-reason",reason=self.afk_guys[member.id])
-                        )
-        # auto unafk if the author was afk and has enabled it
-        if isinstance(ctx.author, discord.Member) and not await checks.is_a_cmd(msg, self.bot):
-            if (ctx.author.nick and ctx.author.nick.endswith(' [AFK]')) or ctx.author.id in self.afk_guys:
-                user_config = await self.bot.get_cog("Users").db_get_user_config(ctx.author.id, "auto_unafk")
-                if user_config is False:
-                    return
-                await self.unafk(ctx)
-
-
-    @commands.command(name="embed",hidden=False)
-    @commands.check(checks.has_embed_links)
-    @commands.check(can_say)
-    @commands.guild_only()
-    async def send_embed(self, ctx: MyContext, *, arguments):
-        """Send an embed
-        Syntax: !embed [channel] key1=\"value 1\" key2=\"value 2\"
-
-        Available keys:
-            - title: the title of the embed [256 characters]
-            - content: the text inside the box [2048 characters]
-            - url: a well-formed url clickable via the title
-            - footer: a little text at the bottom of the box [90 characters]
-            - image: a well-formed url redirects to an image
-            - color: the color of the embed bar (#hex or int)
-        If you want to use quotation marks in the texts, it is possible to escape them thanks to the backslash (`\\"`)
-
-        You can send the embed to a specific channel by mentionning it at the beginning of the arguments
-
-        ..Example embed #announcements title="Special update!" content="We got an amazing thing for you!\\nPlease check blah blah..." color="#FF0022"
-
-        ..Doc miscellaneous.html#embed
-        """
-        channel = None
-        r = re.search(r'<#(\d+)>', arguments.split(" ")[0])
-        if r is not None:
-            arguments = " ".join(arguments.split(" ")[1:])
-            channel = ctx.guild.get_channel_or_thread(int(r.group(1)))
-        arguments = await args.arguments().convert(ctx, arguments)
-        if len(arguments) == 0:
-            raise commands.errors.MissingRequiredArgument(ctx.command.clean_params['arguments'])
-        destination = ctx.channel if channel is None else channel
-        if not (destination.permissions_for(ctx.author).read_messages and destination.permissions_for(ctx.author).send_messages):
-            await ctx.send(await self.bot._(ctx.guild,"fun.say-no-perm",channel=destination.mention))
-            return
-        if not destination.permissions_for(ctx.guild.me).send_messages:
-            return await ctx.send(await self.bot._(ctx.channel,"fun.embed-invalid-channel"))
-        if not destination.permissions_for(ctx.guild.me).embed_links:
-            return await ctx.send(await self.bot._(ctx.channel,"fun.no-embed-perm"))
-        embed_color = ctx.bot.get_cog('ServerConfig').embed_color
-        k = {'title': "", 'content': "", 'url': '',
-             'footer': "", 'image': '', 'color': embed_color}
-        for key, value in arguments.items():
-            # replace description and colour fields
-            if key == "description":
-                key = "content"
-            elif key == "colour":
-                key = "color"
-            # limit title length
-            if key == 'title':
-                k['title'] = value[:255]
-            # limit footer length
-            elif key == 'footer':
-                k['footer'] = value[:90]
-            # replace \n with real newlines in content
-            elif key == "content":
-                k[key] = value.replace("\\n", "\n")
-            # eval embed color
-            elif key == "color":
-                if color := await commands.ColourConverter().convert(ctx, value):
-                    k['color'] = color
-            # add url and image links
-            elif key in {'url', 'image'} and value.startswith("http"):
-                k[key] = value
-        emb = discord.Embed(title=k['title'], description=k['content'], url=k['url'], color=k['color'])
-        emb.set_author(name=ctx.author, icon_url=ctx.author.display_avatar)
-        if "image" in k:
-            emb.set_thumbnail(url=k['image'])
-        if "footer" in k:
-            emb.set_footer(text=k['footer'])
-        try:
-            await destination.send(embed=emb)
-        except Exception as err:
-            if isinstance(err,discord.errors.HTTPException) and "In embed.thumbnail.url: Not a well formed URL" in str(err):
-                return await ctx.send(await self.bot._(ctx.channel, "fun.embed-invalid-image"))
-            await ctx.send(await self.bot._(ctx.channel,"fun.error", err=err))
-        if channel is not None:
-            try:
-                await ctx.message.delete()
-            except discord.Forbidden:
-                pass
-
-
-    @commands.command(name="markdown")
-    async def markdown(self, ctx: MyContext):
-        """Get help about markdown in Discord
-
-        ..Doc miscellaneous.html#markdown"""
-        txt = await self.bot._(ctx.channel,"fun.markdown")
-        if ctx.can_send_embed:
-            await ctx.send(embed=discord.Embed(description=txt))
-        else:
-            await ctx.send(txt)
-
-
-    @commands.command(name="bubble-wrap", aliases=["papier-bulle", "bw"], hidden=True)
-    @commands.cooldown(5,30,commands.BucketType.channel)
-    @commands.cooldown(5,60,commands.BucketType.user)
-    async def bubblewrap(self, ctx:MyContext, width:int=10, height:int=15):
+    @fun_main.command(name="bubble-wrap")
+    @app_commands.checks.cooldown(5, 30)
+    async def bubblewrap(self, interaction: discord.Interaction,
+                         width: app_commands.Range[int, 1, 150]=10,
+                         height: app_commands.Range[int, 1, 50]=15):
         """Just bubble wrap. Which pops when you squeeze it. That's all.
 
         Width should be between 1 and 150, height between 1 and 50.
@@ -841,24 +428,23 @@ You can specify a verification limit by adding a number in argument (up to 1.000
 
         ..Doc fun.html#bubble-wrap
         """
-        width = min(max(1, width), 150)
-        height = min(max(1, height), 50)
         p = "||pop||"
         txt = "\n".join([p*width]*height)
         if len(txt) > 2000:
-            await ctx.send(await self.bot._(ctx.channel, "fun.bbw-too-many"))
+            await interaction.response.send_message(await self.bot._(interaction, "fun.bbw-too-many"))
             return
-        await ctx.send(txt)
+        await interaction.response.send_message(txt)
 
-    @commands.command(name="nasa")
-    @commands.check(checks.bot_can_embed)
-    @commands.cooldown(5, 60, commands.BucketType.channel)
-    async def nasa(self, ctx: MyContext):
+    @fun_main.command(name="nasa")
+    @app_commands.checks.cooldown(1, 10)
+    async def nasa(self, interaction: discord.Interaction):
         """Send the Picture of The Day by NASA
 
         ..Doc fun.html#nasa"""
         def get_date(raw_str: str):
             return datetime.datetime.strptime(raw_str, "%Y-%m-%d").replace(tzinfo=datetime.timezone.utc)
+
+        await interaction.response.defer()
         if self.nasa_pict is None \
                 or 'date' not in self.nasa_pict \
                 or (self.bot.utcnow()-get_date(self.nasa_pict["date"])).total_seconds() > 86400:
@@ -869,126 +455,227 @@ You can specify a verification limit by adding a number in argument (up to 1.000
             if all(field in data for field in ['title', 'url', 'explanation', 'date']):
                 self.nasa_pict = data
         if self.nasa_pict is None:
-            await ctx.send(await self.bot._(ctx.channel, "fun.nasa-none"))
+            await interaction.followup.send(content=await self.bot._(interaction, "fun.nasa-none"))
             return
         emb = discord.Embed(
             title=self.nasa_pict["title"],
             url=self.nasa_pict["hdurl"] if self.nasa_pict["media_type"]=="image" else self.nasa_pict["url"],
             description=self.nasa_pict["explanation"],
-            timestamp=get_date(self.nasa_pict["date"]))
+            timestamp=get_date(self.nasa_pict["date"]),
+            color=0x0033cc
+        )
         emb.set_image(url=self.nasa_pict['url'])
         emb.set_footer(text="Credits: " + self.nasa_pict.get("copyright", "Not copyrighted"))
-        await ctx.send(embed=emb)
+        await interaction.followup.send(embed=emb)
 
-    @commands.command(name="discordjobs", aliases=['discord_jobs', 'jobs.gg'])
-    @commands.cooldown(2, 60, commands.BucketType.channel)
-    async def discord_jobs(self, ctx: MyContext, *, query: str = None):
+    @fun_main.command(name="discord-jobs")
+    @app_commands.checks.cooldown(2, 20)
+    @app_commands.rename(query="filter")
+    async def discord_jobs(self, interaction: discord.Interaction, query: Optional[str] = None):
         """Get the list of available jobs in Discord
 
         ..Example discordjobs
 
         ..Example discordjobs marketing"""
+        await interaction.response.defer()
         async with aiohttp.ClientSession() as session:
             async with session.get("https://api.greenhouse.io/v1/boards/discord/jobs") as r:
                 data = await r.json()
-        if query is not None:
+        if query is None:
+            jobs = data['jobs']
+            desc = await self.bot._(interaction, "fun.discordjobs.all-count", count=len(jobs))
+        else:
             query = query.lower()
             jobs = [
                 x for x in data['jobs']
-                if query in x['location']['name'].lower() or query == x['id'] or query in x['title'].lower()
+                if (
+                    query in x['location']['name'].lower()
+                    or query == x['id']
+                    or query in x['title'].lower()
+                )
             ]
-        else:
-            jobs = data['jobs']
-        f_jobs = [
-            f"[{x['title'] if len(x['title'])<50 else x['title'][:49]+'…'}]({x['absolute_url']})" for x in jobs
+            desc = await self.bot._(interaction, "fun.discordjobs.filtered-count", count=len(jobs))
+        formatted_jobs = [
+            f"[{x['title'] if len(x['title'])<50 else x['title'][:49]+'…'}]({x['absolute_url']})"
+            for x in jobs
         ]
-        if ctx.can_send_embed:
-            _title = await self.bot._(ctx.channel, "fun.discordjobs-title")
-            class JobsPaginator(Paginator):
-                "Paginator used to display jobs offers"
-                async def get_page_count(self) -> int:
-                    return ceil(len(f_jobs)/30)
+        _title = await self.bot._(interaction, "fun.discordjobs.title")
+        class JobsPaginator(Paginator):
+            "Paginator used to display jobs offers"
+            async def get_page_count(self) -> int:
+                return ceil(len(formatted_jobs)/30)
 
-                async def get_page_content(self, interaction: discord.Interaction, page: int):
-                    "Create one page"
-                    # to_display = f_jobs[(page-1)*30:page*30]
-                    desc = await self.client._(ctx.channel, "fun.discordjobs-count", c=len(f_jobs))
-                    emb = discord.Embed(title=_title, color=7506394, url="https://dis.gd/jobs", description=desc)
-                    page_start, page_end = (page-1)*30, min(page*30, len(f_jobs))
-                    for i in range(page_start, page_end, 10):
-                        column_start, column_end = i+1, min(i+10, len(f_jobs))
-                        emb.add_field(name=f"{column_start}-{column_end}", value="\n".join(f_jobs[i:i+10]))
-                    footer = f"Page {page}/{await self.get_page_count()}"
-                    emb.set_footer(text=footer)
-                    return {
-                        "embed": emb
-                    }
+            async def get_page_content(self, interaction: discord.Interaction, page: int):
+                "Create one page"
+                emb = discord.Embed(
+                    title=_title,
+                    description=desc,
+                    color=discord.Colour.blurple(),
+                    url="https://dis.gd/jobs",
+                )
+                page_start, page_end = (page-1)*30, min(page*30, len(formatted_jobs))
+                for i in range(page_start, page_end, 10):
+                    column_start, column_end = i+1, min(i+10, len(formatted_jobs))
+                    emb.add_field(name=f"{column_start}-{column_end}", value="\n".join(formatted_jobs[i:i+10]))
+                footer = f"Page {page}/{await self.get_page_count()}"
+                emb.set_footer(text=footer)
+                return {
+                    "embed": emb
+                }
 
-            if len(f_jobs) < 30:
-                emb = discord.Embed(title=_title, color=7506394, url="https://dis.gd/jobs")
-                emb.description = await self.bot._(ctx.channel, "fun.discordjobs-count", c=len(f_jobs))
-                for i in range(0, len(f_jobs), 10):
-                    emb.add_field(name=self.bot.zws, value="\n".join(f_jobs[i:i+10]))
-                await ctx.send(embed=emb)
-            else:
-                _quit = await self.bot._(ctx.guild, "misc.quit")
-                view = JobsPaginator(self.bot, ctx.author, stop_label=_quit.capitalize())
-                await view.send_init(ctx)
+        if len(formatted_jobs) < 30:
+            emb = discord.Embed(
+                title=_title,
+                description=desc,
+                color=discord.Colour.blurple(),
+                url="https://dis.gd/jobs"
+            )
+            for i in range(0, len(formatted_jobs), 10):
+                emb.add_field(name=self.bot.zws, value="\n".join(formatted_jobs[i:i+10]))
+            await interaction.followup.send(embed=emb)
         else:
-            await ctx.send("\n".join(f_jobs[:20]))
+            _quit = await self.bot._(interaction, "misc.quit")
+            view = JobsPaginator(self.bot, interaction.user, stop_label=_quit.capitalize())
+            await view.send_init(interaction)
 
-    @commands.command(name="discordlinks",aliases=['discord','discordurls'])
-    async def discord_links(self, ctx: MyContext):
+    @fun_main.command(name="discord-links")
+    async def discord_links(self, interaction: discord.Interaction):
         """Get some useful links about Discord"""
-        l = await self.bot._(ctx.channel,'info.discordlinks')
-        links = ["https://dis.gd/status","https://dis.gd/tos","https://dis.gd/report","https://dis.gd/feedback","https://support.discord.com/hc/en-us/articles/115002192352","https://discord.com/developers/docs/legal","https://support.discord.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID-","https://support.discord.com/hc/en-us/articles/360040724612", " https://twitter.com/discordapp/status/1060411427616444417", "https://support.discord.com/hc/en-us/articles/360035675191"]
-        if ctx.can_send_embed:
-            txt = "\n".join(['['+l[i]+']('+links[i]+')' for i in range(len(l))])
-            em = discord.Embed(description=txt)
-            em.set_footer(text=ctx.author, icon_url=ctx.author.display_avatar)
-            await ctx.send(embed=em)
-        else:
-            txt = "\n".join([f'• {l[i]}: <{links[i]}>' for i in range(len(l))])
-            await ctx.send(txt)
+        links = {
+            "server-status": "https://dis.gd/status",
+            "tos": "https://dis.gd/tos",
+            "bug-report": "https://dis.gd/report",
+            "feedback": "https://dis.gd/feedback",
+            "selfbot": "https://support.discord.com/hc/en-us/articles/115002192352",
+            "dev-tos": "https://discord.com/developers/docs/legal",
+            "how-id": "https://support.discord.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID-",
+            "age-requirement": "https://support.discord.com/hc/en-us/articles/360040724612",
+            "betterdiscord": "https://twitter.com/discordapp/status/1060411427616444417",
+            "downloads": "https://support.discord.com/hc/en-us/articles/360035675191",
+        }
+        translations_list: list[str] = []
+        for url_id, link in links.items():
+            name = await self.bot._(interaction, f"fun.discordlinks.{url_id}")
+            translations_list.append(f"- [{name}]({link})")
+        em = discord.Embed(
+            title=await self.bot._(interaction, "fun.discordlinks.title"),
+            description="\n".join(translations_list),
+            color=discord.Colour.blurple()
+        )
+        await interaction.response.send_message(embed=em)
 
-    @commands.command(name="discordstatus", aliases=['discord_status', 'status.gg'])
-    @commands.cooldown(2, 60, commands.BucketType.channel)
-    async def discord_status(self, ctx: MyContext):
-        """Know if Discord currently has a technical issue"""
+    @fun_main.command(name="discord-status")
+    @app_commands.checks.cooldown(2, 60)
+    async def discord_status(self, interaction: discord.Interaction):
+        "Check if Discord is experiencing some technical issues"
+        await interaction.response.defer()
         async with aiohttp.ClientSession() as session:
             async with session.get("https://discordstatus.com/api/v2/incidents.json") as r:
                 data = await r.json()
         last_incident = data['incidents'][0]
         if last_incident['resolved_at'] is None:
-            impact = await self.bot._(ctx.channel, "fun.discordstatus-impacts."+last_incident['impact'])
+            impact = await self.bot._(interaction, "fun.discordstatus-impacts."+last_incident['impact'])
             title = f"**{last_incident['name']}** (<{last_incident['shortlink']}>)"
-            await ctx.send(await self.bot._(ctx.channel, "fun.discordstatus-exists", impact=impact, title=title))
+            await interaction.followup.send(await self.bot._(interaction, "fun.discordstatus-exists", impact=impact, title=title))
         else:
             last_date = datetime.datetime.strptime(last_incident['resolved_at'], '%Y-%m-%dT%H:%M:%S.%f%z')
             last_date = f"<t:{round(last_date.timestamp())}:F>"
-            await ctx.send(await self.bot._(ctx.channel, "fun.discordstatus-nothing", date=last_date))
+            await interaction.followup.send(await self.bot._(interaction, "fun.discordstatus-nothing", date=last_date))
 
-    @commands.command(name="pep8", aliases=['autopep8'])
-    @commands.cooldown(3, 30, commands.BucketType.user)
-    async def autopep8_cmd(self, ctx: MyContext, *, code: str):
-        """Auto format your Python code according to PEP8 guidelines"""
-        if code.startswith('```') and code.endswith('```'):
-            code = '\n'.join(code.split('\n')[1:-1])
-        elif code.startswith('`') and code.endswith('`'):
-            code = code[1:-1]
-        code = autopep8.fix_code(code, {
-            "aggressive": 3,
-            "ignore": set()
-        }).strip()
-        await ctx.send(f"```py\n{code}\n```")
-
-    @commands.command(name="avatar", aliases=['pfp'])
-    @commands.cooldown(2, 10, commands.BucketType.user)
-    async def avatar(self, ctx: MyContext, user: typing.Optional[discord.User]):
-        """Get the avatar of a user"""
+    @fun_main.command(name="avatar")
+    @app_commands.checks.cooldown(2, 10)
+    async def avatar(self, interaction: discord.Interaction, user: Optional[discord.User]):
+        """Get the avatar URL of any user"""
         if user is None:
-            user = ctx.author
-        await ctx.send(user.display_avatar.url)
+            user = interaction.user
+        await interaction.response.send_message(user.display_avatar.url)
+
+
+    @app_commands.command(name="embed")
+    @app_commands.default_permissions(manage_messages=True)
+    @app_commands.guild_only()
+    @app_commands.describe(
+        channel="The channel where the bot must send the embed",
+        title="The title of the embed",
+        content="The main text inside the box",
+        url="The URL opening when the title is clicked",
+        footer="The small text at the bottom of the box",
+        image_url="The URL of a large image to display at the bottom of the embed",
+        thumbnail_url="The URL of a small image to display at the top right of the embed",
+        color="The color of the embed bar"
+    )
+    async def send_embed(self, interaction: discord.Interaction,
+                         channel: Optional[discord.TextChannel]=None,
+                         title: Optional[app_commands.Range[str, 1, 256]]=None,
+                         content: Optional[app_commands.Range[str, 1, 2048]]=None,
+                         url: Optional[app_commands.Range[str, 5, 256]]=None,
+                         footer: Optional[app_commands.Range[str, 1, 90]]=None,
+                         image_url: Optional[app_commands.Range[str, 5, 256]]=None,
+                         thumbnail_url: Optional[app_commands.Range[str, 5, 256]]=None,
+                         color: Optional[args.ColorTransformer]=None
+        ):
+        """Use the bot to send a custom embed
+
+Available options:
+- title: the title of the embed [256 characters]
+- content: the text inside the box [2048 characters]
+- url: a well-formed url clickable via the title
+- footer: a little text at the bottom of the box [90 characters]
+- image: a well-formed url redirects to an image
+- color: the color of the embed bar (#hex or int)
+If you want to use lines break in the texts, use the special character `\\n`
+
+..Example embed #announcements title="Special update!" content="We got an amazing thing for you!\\nPlease check blah blah..." color="#FF0022"
+
+..Doc miscellaneous.html#embed
+        """
+        destination = channel or interaction.channel
+        if not (
+            destination.permissions_for(interaction.user).read_messages
+            and destination.permissions_for(interaction.user).send_messages
+        ):
+            return await interaction.response.send_message(
+                await self.bot._(interaction, "fun.say-no-perm", channel=destination.mention),
+                ephemeral=True
+            )
+        if not destination.permissions_for(interaction.guild.me).send_messages:
+            return await interaction.response.send_message(
+                await self.bot._(interaction, "fun.embed-invalid-channel"),
+                ephemeral=True
+            )
+        if not destination.permissions_for(interaction.guild.me).embed_links:
+            return await interaction.response.send_message(
+                await self.bot._(interaction, "fun.no-embed-perm"),
+                ephemeral=True
+            )
+        await interaction.response.defer(ephemeral=True)
+        default_color = self.bot.get_cog('ServerConfig').embed_color
+        emb = discord.Embed(
+            title=title,
+            description=content.replace("\\n", "\n"),
+            url=url,
+            color=color or default_color,
+        )
+        emb.set_author(name=interaction.user, icon_url=interaction.user.display_avatar)
+        if image_url:
+            emb.set_image(url=image_url)
+        if thumbnail_url:
+            emb.set_thumbnail(url=thumbnail_url)
+        if footer:
+            emb.set_footer(text=footer)
+        try:
+            msg = await destination.send(embed=emb)
+        except discord.errors.HTTPException as err:
+            if err.code == 400:
+                await interaction.followup.send(
+                    await self.bot._(interaction.response.send_message, "fun.embed-invalid-image")
+                )
+            else:
+                await interaction.followup.send(await self.bot._(interaction.response.send_message, "fun.error", err=err))
+            return
+        await interaction.followup.send(
+            await self.bot._(interaction, "fun.embed-sent", message_url=msg.jump_url)
+        )
 
 
 async def setup(bot):

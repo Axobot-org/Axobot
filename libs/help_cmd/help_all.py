@@ -1,11 +1,10 @@
 from typing import TYPE_CHECKING, Iterable
 
 import discord
-from discord.ext import commands
 
 from libs.bot_classes import MyContext
 
-from .txt_cmd_utils import get_command_inline_desc
+from .slash_cmd_utils import get_command_inline_desc
 from .utils import (FieldData, get_embed_color, get_embed_footer,
                     get_send_callback)
 
@@ -13,18 +12,19 @@ if TYPE_CHECKING:
     from fcts.help_cmd import Help as HelpCog
 
 
-def sort_by_name(cmd: commands.Command):
+def sort_by_name(cmd: discord.app_commands.Command):
     return cmd.name
 
 async def help_all_command(cog: "HelpCog", ctx: MyContext):
     "Show all commands and groups"
     send = await get_send_callback(ctx)
     compress: bool = await cog.bot.get_config(ctx.guild.id, 'compress_help') if ctx.guild else False
-    fields = await all_commands(cog, ctx, cog.bot.commands, compress=compress)
+    commands = cog.bot.tree.get_commands(guild=None, type=discord.AppCommandType.chat_input)
+    fields = await all_commands(cog, ctx, commands, compress=compress)
     if ctx.guild is None:
         title = await cog.bot._(ctx.channel, "help.embed_title_dm")
     else:
-        title = await cog.bot._(ctx.channel, "help.embed_title", u=ctx.author.display_name)
+        title = await cog.bot._(ctx.channel, "help.embed_title")
     embed_color = get_embed_color(ctx)
     embed = discord.Embed(title=title, color=embed_color)
     embed.set_footer(text=await get_embed_footer(ctx))
@@ -33,20 +33,13 @@ async def help_all_command(cog: "HelpCog", ctx: MyContext):
     await send(embed=embed)
 
 
-async def all_commands(cog: "HelpCog", ctx: MyContext, commands_list: Iterable[commands.Command],
+async def all_commands(cog: "HelpCog", ctx: MyContext, commands_list: Iterable[discord.app_commands.Command],
                         compress: bool) -> list[FieldData]:
     "Generate embed fields to describe all commands, grouped by category"
     categories: dict[str, list[str]] = { x: [] for x in cog.commands_data.keys() }
     commands_list = sorted(list(commands_list), key=sort_by_name)
     # group commands by category
     for command in commands_list:
-        try:
-            if command.hidden or not command.enabled:
-                continue
-            if not await command.can_run(ctx):
-                continue
-        except commands.CommandError:
-            continue
         if compress:
             cmd_desc = ""
         else:

@@ -54,6 +54,7 @@ class SingleReactionSubcog(AbstractSubcog):
         channel = await self.get_reaction_destination_channel(payload)
         if channel is None:
             return
+        delete_after = 12 if isinstance(channel, discord.abc.PrivateChannel) else None
         translation_source = payload.guild_id or payload.user_id
         lang = await self.get_event_language(translation_source)
         # check last collect from this user
@@ -62,7 +63,10 @@ class SingleReactionSubcog(AbstractSubcog):
             # user is trying to collect too quickly
             time_remaining = self.collect_cooldown - seconds_since_last_collect
             remaining = await FormatUtils.time_delta(time_remaining, lang=lang, seconds=time_remaining < 60)
-            await channel.send(await self.bot._(translation_source, "bot_events.ocean-cooldown", time=remaining))
+            await channel.send(
+                await self.bot._(translation_source, "bot_events.ocean-cooldown", time=remaining),
+                delete_after=delete_after
+            )
             return
         del self.pending_reactions[payload.message_id]
         # add item to user collection
@@ -78,10 +82,7 @@ class SingleReactionSubcog(AbstractSubcog):
         if self.current_event_data["icon"]:
             embed.set_image(url=self.current_event_data["icon"])
         # send the notification in the guild/DM channel
-        if isinstance(channel, discord.abc.PrivateChannel):
-            await channel.send(embed=embed)
-        else:
-            await channel.send(embed=embed, delete_after=12)
+        await channel.send(embed=embed, delete_after=delete_after)
         # add points (and potentially grant reward rank card)
         await self.add_collect(payload.user_id, item["points"], send_notif_to_channel=channel)
 

@@ -1,12 +1,4 @@
 {
-    "afk": {
-        "afk-done": "Vous êtes maintenant AFK",
-        "afk-user-noreason": "Ce membre est AFK !",
-        "afk-user-reason": "Ce membre est AFK, pour la raison %{reason}",
-        "no-perm": "Oops, je ne peux pas modifier votre pseudo :confused: Je vais essayer de m'en souvenir, mais il se peut que j'oublie que vous êtes AFK",
-        "unafk-cant": "Vous n'êtes pas AFK !",
-        "unafk-done": "Vous n'êtes maintenant plus AFK"
-    },
     "bbw-too-many": "Oups, la grille est trop grande pour Discord :confused:",
     "blame-0": "Liste des noms disponibles pour **%{user}**",
     "cookie": "%{user} a offert une boîte de cookies à <@375598088850505728> ! %{emoji}",
@@ -18,8 +10,32 @@
         "result-you": "Sur les %{limit} derniers messages, vous en avez posté %{x} (%{p}%%)",
         "too-much": "Mais vous voulez faire exploser Discord ! %{e} Pour des raisons évidentes de performances, je vais vous imposer une limite à %{l} messages."
     },
-    "discordjobs-count": "%{c} offres trouvées",
-    "discordjobs-title": "Postes disponibles chez Discord",
+    "discordjobs": {
+        "all-count": {
+            "zero": "Aucune offre listée",
+            "one": "1 offre listée",
+            "many": "%{count} offres listées"
+        },
+        "filtered-count": {
+            "zero": "Aucune offre trouvée correspondant à votre recherche",
+            "one": "1 offre trouvée correspondant à votre recherche",
+            "many": "%{count} offres trouvées correspondant à votre recherche"
+        },
+        "title": "Offres d'emploi chez Discord"
+    },
+    "discordlinks": {
+        "title": "Quelques liens utiles",
+        "server-status": "Statut des serveurs",
+        "tos": "Conditions Générales d'Utilisation de Discord",
+        "bug-report": "Signaler un bug ou un utilisateur",
+        "feedback": "Forum de suggestions",
+        "selfbot": "Explication des selfbots",
+        "dev-tos": "CGU pour les développeurs",
+        "how-id": "Comment trouver un ID Discord",
+        "age-requirement": "Âge minimal d'utilisation de Discord, par pays",
+        "betterdiscord": "Interdiction d'utilisation de BetterDiscord",
+        "downloads": "Téléchargements des clients Discord"
+    },
     "discordstatus-exists": "Il y a actuellement un incident %{impact} en cours sur Discord : %{title}",
     "discordstatus-impacts": {
         "major": "majeur",
@@ -29,8 +45,14 @@
     "discordstatus-nothing": "Rien à signaler pour le moment !\nLa dernière panne connue était le %{date}",
     "embed-invalid-channel": "Impossible d'envoyer des messages dans ce salon",
     "embed-invalid-image": "L'url saisie pour l'image est invalide",
+    "embed-sent": "L'embed a bien été envoyé ! %{message_url}",
     "error": "Une erreur est survenue: `%{err}`",
-    "fun-list": "Voici la liste des commandes fun disponibles :",
+    "flip": {
+        "tails": "Pile !",
+        "heads": "Face !",
+        "edge": "Oups, la pièce est tombée sur la tranche !"
+    },
+    "hour-result": "%{date} (%{tzname})\nNom du fuseau : %{tzlocation}\nlatitude : %{lat} - longitude : %{long}",
     "invalid-city": "Nom de ville invalide",
     "kills-list": [
         "***BOUM !*** {victim} est tombé dans un piège posé par {attacker} !",
@@ -81,15 +103,11 @@
         "{victim} a sous-estimé la puissance des tourelles.",
         "Le gâteau était un mensonge, tout comme la chance de survie de {victim}."
     ],
-    "markdown": "__**Règles du Markdown** sur *Discord*__\n\n`*italique*` = *italique*\n`__souligné__` = __souligné__\n`**gras**` = **gras**\n`***gras italique***` = ***gras italique***\n`~~barré~~` = ~~barré~~\n`__*souligné italique*__` = __*souligné italique*__\n`__**souligné gras**__` = __**souligné gras**__\n`__***souligné gras italique***__` = __***souligné gras italique***__\n`||spoiler||` = ||spoiler||\n> citation = `> citation`\n\\`code\\` = `code`\n\\\\ pour ignorer\n\nPour les blocs de code, cf <https://discord.gg/DGahTNn>",
     "nasa-none": "Oups, impossible de récupérer les informations de la NASA pour le moment. Réessayez dans quelques minutes :confused:",
-    "no-database": "Notre base de donnée étant hors ligne, l'accès aux commandes fun est restreint aux personnes ayant la permission de Gérer le Serveur",
     "no-embed-perm": "Je ne possède pas la permission \"Intégrer des liens\" :confused:",
     "no-emoji": "Impossible de trouver cet emoji !",
-    "no-fun": "Les commandes fun ont été désactivées sur ce serveur. Pour voir leur liste, regardez https://axobot.rtfd.io/en/latest/fun.html",
     "no-roll": "Aucun élément trouvé",
     "no-say": "Impossible d'envoyer un message dans ce salon",
-    "no-voicechan": "Vous devez être connecté à un salon vocal pour utiliser cette commande.",
     "not-enough-roll": "Il vous faut au moins deux éléments distincts",
     "osekour": [
         "Attends, je finis de regarder mon film",
@@ -104,17 +122,13 @@
         "Désolé, il y a plus de 3 flocons de neige: nous sommes coincés au garage",
         "Il va falloir attendre la fin de notre grève... Comment ça, vous n'êtes pas au courant ?! Ça fait pourtant bien deux mois que nous avons commencé !"
     ],
-    "piece-0": [
-        "Pile !",
-        "Face !"
-    ],
-    "piece-1": "Raté, c'est tombé sur la tranche !",
     "react-0": "Impossible de trouver le message correspondant. Il faut rentrer l'ID du message en 1er argument, et l'émoji en 2e :upside_down:\n Vérifiez aussi que je possède la permission de lire l'historique des messages !",
+    "react-done": {
+        "one": "Réaction ajoutée !",
+        "many": "Réactions ajoutées !"
+    },
+    "say-done": "Message envoyé !",
     "say-no-perm": "Vous ne possédez pas la permission d'envoyer des messages dans le salon %{channel}",
-    "thanos": [
-        "{0} a été épargné par Thanos",
-        "Thanos a décidé de réduire {0} en cendres. Pour le bien de l'humanité..."
-    ],
     "tip-list": [
         "Le saviez-vous ? Il existe plusieurs langues pour le bot, dont une très amusante à tester : le lolcat",
         "Pro-tip : pour changer la langue du bot, utilisez la commande %{config_cmd} !",

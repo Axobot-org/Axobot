@@ -57,6 +57,7 @@ class BotStats(commands.Cog):
         self.bot_cpu_records: list[float] = []
         self.total_cpu_records: list[float] = []
         self.latency_records: list[int] = []
+        self.sql_performance_records: list[float] = []
         self.statuspage_header = {"Content-Type": "application/json", "Authorization": "OAuth " + self.bot.others["statuspage"]}
         self.antiscam = {"warning": 0, "deletion": 0}
         self.ticket_events = {"creation": 0}
@@ -151,7 +152,7 @@ class BotStats(commands.Cog):
     async def record_open_files_error(self, error: Exception):
         self.bot.dispatch("error", error, "When checking process open files")
 
-    async def get_list_usage(self, origin: list):
+    async def get_list_usage(self, origin: list[float]):
         "Calculate the average list value"
         if len(origin) > 0:
             avg = round(sum(origin)/len(origin), 1)
@@ -469,13 +470,20 @@ class BotStats(commands.Cog):
             # Latency
             if latency := await self.get_list_usage(self.latency_records):
                 cursor.execute(query, (now, 'perf.latency', latency, 1, 'ms', False, self.bot.entity_id))
+                self.latency_records.clear()
+            # SQL queries count / performances
+            if sql_perf := await self.get_list_usage(self.sql_performance_records):
+                sql_count = len(self.sql_performance_records)
+                cursor.execute(query, (now, 'perf.sql_count', sql_count, 0, 'queries/min', True, self.bot.entity_id))
+                cursor.execute(query, (now, 'perf.sql', sql_perf, 1, 'ms', False, self.bot.entity_id))
+                self.sql_performance_records.clear()
             # CPU usage
-            bot_cpu = await self.get_list_usage(self.bot_cpu_records)
-            if bot_cpu is not None:
+            if bot_cpu := await self.get_list_usage(self.bot_cpu_records):
                 cursor.execute(query, (now, 'perf.bot_cpu', bot_cpu, 1, '%', False, self.bot.entity_id))
-            total_cpu = await self.get_list_usage(self.total_cpu_records)
-            if total_cpu is not None:
+                self.bot_cpu_records.clear()
+            if total_cpu := await self.get_list_usage(self.total_cpu_records):
                 cursor.execute(query, (now, 'perf.total_cpu', total_cpu, 1, '%', False, self.bot.entity_id))
+                self.total_cpu_records.clear()
             # RAM usage
             bot_ram = round(self.process.memory_info()[0] / 2.**30, 3)
             cursor.execute(query, (now, 'perf.bot_ram', bot_ram, 1, 'Gb', False, self.bot.entity_id))
@@ -602,7 +610,7 @@ class BotStats(commands.Cog):
     @tasks.loop(minutes=4)
     async def status_loop(self):
         "Send average latency to axobot.statuspage.io every 4min"
-        if self.bot.user.id != 486896267788812288 or not self.bot.internal_loop_enabled:
+        if self.bot.entity_id != 2 or not self.bot.internal_loop_enabled:
             return
         now = self.bot.utcnow()
         average = await self.get_list_usage(self.latency_records)

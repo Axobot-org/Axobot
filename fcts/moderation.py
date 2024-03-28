@@ -634,7 +634,7 @@ The 'days_to_delete' option represents the number of days worth of messages to d
     async def unban(self, ctx: MyContext, user: str, *, reason: Optional[str]=None):
         """Unban someone
 
-..Example unban 486896267788812288 Nice enough
+..Example unban 1048011651145797673 Nice enough
 
 ..Doc moderator.html#ban-unban"""
         input_user = user

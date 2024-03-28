@@ -115,6 +115,7 @@
         "leave": "Message envoyé lorsqu'un membre repart : %{value}",
         "levelup_channel": "Salon dans lequel sont envoyés les messages de passage de niveau : %{value}",
         "levelup_msg": "Message envoyé lorsqu'un membre gagne un niveau d'xp : %{value}",
+        "levelup_silent_mention": "Le message d'augmentation de niveau doit-il être silencieux (i.e. sans notification) ? %{value}",
         "membercounter": "Salon affichant dans son nom le nombre de membres : %{value}",
         "mute_allowed_roles": "Liste des rôles qui peuvent utiliser la commande 'mute' : %{value}",
         "muted_role": "Rôle utilisé pour rendre les gens muets : %{value}",

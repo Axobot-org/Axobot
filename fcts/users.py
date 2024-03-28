@@ -17,7 +17,6 @@ importlib.reload(checks)
 
 user_options_list = {
     "animated_card": False,
-    "auto_unafk": False,
     "show_tips": True,
 }
 
@@ -257,7 +256,6 @@ class Users(commands.Cog):
         """Modify any config option
         Here you can enable or disable one of the users option that Axobot has, which are:
         - animated_card: Display an animated rank card if your pfp is a gif (way slower rendering)
-        - auto_unafk: Automatically remove your AFK mode
         - show_tips: Show tips when you use some specific command
 
         Value can only be a boolean (true/false)
