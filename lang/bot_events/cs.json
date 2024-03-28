@@ -32,6 +32,7 @@
     "nothing-prices": "Za tuto událost nelze nic získat :confused:",
     "no-objectives": "Tato událost nemá žádný bodový cíl, není potřeba farmit!\nDalší informace naleznete v příkazu %{cmd}.",
     "objectives": "Cíle",
+    "ocean-cooldown": "Oceán ti zatím byl dostatečně štědrý. Vrať se za %{time} a zkuste získat jeho požehnání.",
     "points": "body",
     "points-total": "Celkem bodů",
     "position-global": "Celková pozice",
@@ -46,8 +47,7 @@
     "reaction": {
         "positive": "Gratulujeme %{user}, našli jste jeden %{item}! Byl přidán do vaší kolekce a získal jsi ** bodů události%{points}**!",
         "negative": "Ale ne %{user}, nalezl jsi jeden %{item}! Byl přidán do vaší kolekce, ale ztratil jsi ** body události%{points} **...",
-        "neutral": "Našli jste jeden %{item}! Byl přidán do vaší kolekce.",
-        "too-quick": "Nedávno jste již sebrali předmět a jste příliš unaveni, abyste mohli pokračovat. Zkuste to znovu v %{time}!"
+        "neutral": "Našli jste jeden %{item}! Byl přidán do vaší kolekce."
     },
     "soon": "Událost se blíží! Sledujte informace, protože začne %{date}",
     "tictactoe": {

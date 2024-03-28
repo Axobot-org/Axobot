@@ -120,6 +120,7 @@
         "leave": "Mesae sen when an meberz leave: %{value}",
         "levelup_channel": "Chat were lvlup msgs are sent: %{value}",
         "levelup_msg": "Cool text sent when a member gets 1 xp lvl: %{value}",
+        "levelup_silent_mention": "Shuld the levelup thing avoid notifications? %{value}",
         "membercounter": "Channel dis-playin nmberz from memberz in iz nayme: %{value}",
         "mute_allowed_roles": "Lis of roles dat kan us the 'mute' commmand: %{value}",
         "muted_role": "Usd role 2 mute people : %{value}",
