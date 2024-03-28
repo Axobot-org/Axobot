@@ -45,6 +45,7 @@
     "discordstatus-nothing": "V tuto chvíli není co hlásit!\nPoslední známý problému byl dne %{date}",
     "embed-invalid-channel": "Nelze odeslat zprávy do tohoto kanálu",
     "embed-invalid-image": "Adresa obrátku url je neplatná",
+    "embed-sent": "Embed objekt byl odeslán! %{message_url}",
     "error": "Došlo k chybě: `%{err}`",
     "flip": {
         "tails": "Ocasy !",
