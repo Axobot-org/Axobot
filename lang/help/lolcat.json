@@ -151,8 +151,8 @@
     "cmd-not-found": "Dere are no comand naymme \"%{cmd}\"",
     "cog-empty-dm": "Uhh no, dat box has no cmd for here :/ try in ur serv",
     "description": "Smol text",
-    "embed_title": "Cmds list 4 %{u}",
-    "embed_title_dm": "Cmds list 4 here only",
+    "embed_title": "Cmds list",
+    "embed_title_dm": "Things u can do in DM",
     "footer": "Type '/help cmd' 4 + info abawt any command",
     "more-subcmds": {
         "one": "+ 1",
