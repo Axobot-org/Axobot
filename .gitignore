@@ -23,6 +23,7 @@ env/
 ._*
 translation/*
 docs/_*
+docs/changelog.rst
 rankcards_update.json
 *-cache.json
 *.tar

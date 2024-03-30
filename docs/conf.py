@@ -15,8 +15,11 @@
 #
 import os
 import sys
+from changelog_generation import generate_changelog_file
 
 sys.path.insert(0, os.path.abspath('.'))
+
+generate_changelog_file("changelog.rst")
 
 # -- Project information -----------------------------------------------------
 
