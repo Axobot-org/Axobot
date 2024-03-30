@@ -97,6 +97,11 @@ And even more!
 
 .. toctree::
    :maxdepth: 1
+
+   changelog
+
+.. toctree::
+   :maxdepth: 1
    :caption: 💬 Our articles
 
    articles/v4
