@@ -52,6 +52,9 @@ def _generate_version_note(note: VersionNote):
         ))
     # create the reStructuredText section
     text = f"""
+
+.. _v{version}:
+
 {version}
 {'=' * len(version)}
 
