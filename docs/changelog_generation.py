@@ -41,6 +41,8 @@ def _generate_version_note(note: VersionNote):
         version = re.search(r"Update (\d+\.\d+\.\d+)", content).group(1)
     except AttributeError:
         return _convert_to_rst(content)
+    # format the release date
+    date = _format_date(note["release_date"])
     # extract the section titles and contents
     sections: list[tuple[str, str]] = []
     for match in re.finditer(r"\n\n(?:## |__)(?P<title>[^\n_]+)_{0,2}\n(?P<content>(?:.+|\n\*)+)", content):
@@ -53,7 +55,7 @@ def _generate_version_note(note: VersionNote):
 {version}
 {'=' * len(version)}
 
-*Released on {note["release_date"]}*
+*Released on {date}*
 
 """
     for title, content in sections:
@@ -63,6 +65,10 @@ def _generate_version_note(note: VersionNote):
 def _strip_lines(text: str):
     "Strip leading and trailing whitespace from every line in a string"
     return "\n".join(line.strip() for line in text.splitlines())
+
+def _format_date(raw_date: str):
+    "Format a date in the ISO format to the more readable year-month-day format"
+    return raw_date.split("T")[0]
 
 def _convert_to_rst(text: str):
     "Convert a markdown release note to reStructuredText format"
