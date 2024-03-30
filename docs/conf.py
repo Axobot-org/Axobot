@@ -15,9 +15,10 @@
 #
 import os
 import sys
-from changelog_generation import generate_changelog_file
 
 sys.path.insert(0, os.path.abspath('.'))
+
+from changelog_generation import generate_changelog_file
 
 generate_changelog_file("changelog.rst")
 
@@ -170,6 +171,6 @@ texinfo_documents = [
 html_theme_options = {
     "toc_title": "On this page",
     "show_toc_level": 2,
-    "repository_url": "https://github.com/ZRunner/Zbot",
+    "repository_url": "https://github.com/ZRunner/Axobot",
     "use_repository_button": True,
 }

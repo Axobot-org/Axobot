@@ -22,10 +22,11 @@ def _generate_changelog_text():
     response.raise_for_status()
     data: list[VersionNote] = response.json()
     text = """:og:description: Find here the list of every release of Axobot!
+:html_theme.sidebar_secondary.remove:
 
-=============
-Release notes
-=============
+================
+📰 Release notes
+================
 """
     for note in data:
         text += "\n" + _generate_version_note(note) + "\n"
