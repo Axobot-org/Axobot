@@ -18,9 +18,13 @@ import sys
 
 sys.path.insert(0, os.path.abspath('.'))
 
-from changelog_generation import generate_changelog_file
-
-generate_changelog_file("changelog.rst")
+try:
+    from changelog_generation import generate_changelog_file
+except ImportError:
+    pass
+else:
+    print("Generating the changelog file...")
+    generate_changelog_file("changelog.rst")
 
 # -- Project information -----------------------------------------------------
 
