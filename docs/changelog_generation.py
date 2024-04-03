@@ -38,7 +38,7 @@ def _generate_version_note(note: VersionNote):
     content = _strip_lines(note["content"])
     # extract the version number
     try:
-        version = re.search(r"Update (\d+\.\d+\.\d+)", content).group(1)
+        version = re.search(r"Update (\d+\.\d+\.\d+[a-z]?)", content).group(1)
     except AttributeError:
         return _convert_to_rst(content)
     # format the release date
