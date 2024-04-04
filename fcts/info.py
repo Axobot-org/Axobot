@@ -1039,7 +1039,7 @@ class Info(commands.Cog):
                     guild = x
                     break
         if isinstance(guild, str) or guild is None:
-            await interaction.response.send_message("Unknown server")
+            await interaction.followup.send("Unknown server")
             return
         # Bots
         bots = len([x for x in guild.members if x.bot])
