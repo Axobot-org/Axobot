@@ -91,7 +91,7 @@ class RolesReact(commands.Cog):
                 member = await getch_member(msg.guild, payload.user_id)
                 if member is None:
                     return
-                await self.give_remove_role(member, role, msg.guild, msg.channel, is_adding, ignore_success=True)
+                await self.give_remove_role(member, role, msg.guild, msg.channel, is_adding)
         except discord.DiscordException as err:
             self.bot.dispatch("error", err)
 
@@ -155,23 +155,20 @@ class RolesReact(commands.Cog):
 
     async def give_remove_role(self, user: discord.Member, role: discord.Role, guild: discord.Guild,
                                channel: Union[discord.TextChannel, discord.Thread], give: bool = True,
-                               ignore_success: bool = False, ignore_failure: bool = False):
+                               ignore_failure: bool = False):
         """Add or remove a role to a user if possible"""
         if self.bot.zombie_mode:
             return
         if not ignore_failure:
-            if role in user.roles and give:
-                if not ignore_success:
-                    await channel.send(await self.bot._(guild.id, "roles_react.already-have"))
+            if (role in user.roles and give) or (role not in user.roles and not give):
                 return
-            elif not (role in user.roles or give):
-                if not ignore_success:
-                    await channel.send(await self.bot._(guild.id, "roles_react.already-dont-have"))
+            try:
+                if not guild.me.guild_permissions.manage_roles:
+                    return await channel.send(await self.bot._(guild.id, 'moderation.mute.cant-mute'))
+                if role.position >= guild.me.top_role.position:
+                    return await channel.send(await self.bot._(guild.id, 'moderation.role.too-high', r=role.name))
+            except discord.Forbidden:
                 return
-            if not guild.me.guild_permissions.manage_roles:
-                return await channel.send(await self.bot._(guild.id, 'moderation.mute.cant-mute'))
-            if role.position >= guild.me.top_role.position:
-                return await channel.send(await self.bot._(guild.id, 'moderation.role.too-high', r=role.name))
         if stats_cog := self.bot.get_cog("BotStats"):
             stats_cog.role_reactions["added" if give else "removed"] += 1
         try:
@@ -183,11 +180,6 @@ class RolesReact(commands.Cog):
             pass
         except Exception as err:
             self.bot.dispatch("error", err)
-        else:
-            if not ignore_success:
-                await channel.send(
-                    await self.bot._(guild.id, "roles_react.role-given" if give else "roles_react.role-lost", r=role.name)
-                )
 
     async def get_emoji_display_form(self, guild: discord.Guild, raw_emoji: str):
         """Returns the emoji in a displayable form"""
