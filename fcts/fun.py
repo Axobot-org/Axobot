@@ -62,7 +62,11 @@ class Fun(commands.Cog):
             return True
         guild = self.bot.get_guild(guild_id)
         if guild is not None:
-            return (await guild.fetch_member(user_id)) is not None
+            try:
+                await guild.fetch_member(user_id)
+                return True
+            except discord.HTTPException:
+                pass
         return False
 
     @commands.command(name="cookie", aliases=['cookies', 'crustulum'], hidden=True)
