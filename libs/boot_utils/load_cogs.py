@@ -33,7 +33,6 @@ async def load_cogs(bot: "Axobot"):
         'fcts.perms',
         'fcts.poll',
         'fcts.quote',
-        'fcts.reloads',
         'fcts.roles_management',
         'fcts.roles_react',
         'fcts.rss',

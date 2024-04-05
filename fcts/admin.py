@@ -1,6 +1,7 @@
 import asyncio
 import copy
 import datetime
+import importlib
 import io
 import os
 import sys
@@ -285,14 +286,103 @@ class Admin(commands.Cog):
             self.update[language] = None
 
 
-    @admin_group.command(name="cogs")
+    @admin_group.group(name="cog")
     @commands.check(checks.is_bot_admin)
-    async def cogs_list(self, ctx: MyContext):
+    async def cogs_group(self, ctx: MyContext):
         """Voir la liste de tout les cogs"""
         text = ""
         for cog_name, cog in self.bot.cogs.items():
             text += f"- {cog.file} ({cog_name}) \n"
         await ctx.send(text)
+
+    @cogs_group.command(name="load")
+    @commands.check(checks.is_bot_admin)
+    async def add_cog(self, ctx: MyContext, name: str):
+        """Ajouter un cog au bot"""
+        try:
+            await self.bot.load_extension('fcts.'+name)
+            await ctx.send(f"Module '{name}' ajouté !")
+            self.bot.log.info("Extension %s loaded", name)
+        except Exception as err:
+            await ctx.send(str(err))
+
+    @cogs_group.command("unload")
+    @commands.check(checks.is_bot_admin)
+    async def rm_cog(self, ctx: MyContext, name: str):
+        """Enlever un cog au bot"""
+        try:
+            await self.bot.unload_extension('fcts.'+name)
+            await ctx.send(f"Module '{name}' désactivé !")
+            self.bot.log.info("Extension %s unloaded", name)
+        except Exception as err:
+            await ctx.send(str(err))
+
+    @cogs_group.command(name="reload")
+    @commands.check(checks.is_bot_admin)
+    async def reload_cog(self, ctx: MyContext, *, cog: str):
+        """Recharge un module"""
+        cogs = cog.split(" ")
+        if len(cogs)==1 and cogs[0]=='all':
+            cogs = sorted([x.file for x in self.bot.cogs.values()])
+        reloaded_cogs = []
+        for cog in cogs:
+            if not cog.startswith("fcts."):
+                fcog = "fcts."+cog
+            else:
+                fcog = cog
+            try:
+                await self.bot.reload_extension(fcog)
+            except ModuleNotFoundError:
+                await ctx.send(f"Cog {cog} can't be found")
+            except commands.errors.ExtensionNotLoaded :
+                try:
+                    flib = importlib.import_module(cog)
+                    importlib.reload(flib)
+                except ModuleNotFoundError:
+                    await ctx.send(f"Cog {cog} was never loaded")
+                else:
+                    self.bot.log.info("Lib %s reloaded", cog)
+                    await ctx.send(f"Lib {cog} reloaded")
+            except Exception as err:
+                self.bot.dispatch("error", err, ctx)
+                await ctx.send(f'**`ERROR:`** {type(err).__name__} - {err}')
+            else:
+                self.bot.log.info("Extension %s reloaded", cog)
+                reloaded_cogs.append(cog)
+            if cog == 'utilities':
+                await self.bot.get_cog('Utilities').on_ready()
+        if len(reloaded_cogs) > 0:
+            await ctx.send(f"These cogs has successfully reloaded: {', '.join(reloaded_cogs)}")
+            if info_cog := self.bot.get_cog("BotInfo"):
+                await info_cog.refresh_code_lines_count()
+
+    @reload_cog.autocomplete("cog")
+    async def reload_cog_autocom(self, _: discord.Interaction, current: str):
+        "Autocompletion for the cog name"
+        if " " in current:
+            fixed, current = current.rsplit(" ", maxsplit=1)
+        else:
+            fixed = None
+        data: list[tuple[str, str]] = [
+            (cog.qualified_name, cog.file if hasattr(cog, "file") else cog.qualified_name)
+            for cog in self.bot.cogs.values()
+        ]
+        filtered = [
+            cog for cog in data
+            if current.lower() in cog[0].lower() or current.lower() in cog[1].lower()
+        ]
+        if len(filtered) == 0:
+            filtered = [(current, current)]
+        if fixed:
+            filtered = [
+                (fixed + " " + cog[0], fixed + " " + cog[1])
+                for cog in filtered
+            ]
+        filtered.sort()
+        return [
+            discord.app_commands.Choice(name=cog[0], value=cog[1])
+            for cog in filtered
+        ][:25]
 
     @admin_group.command(name="shutdown")
     @commands.check(checks.is_bot_admin)
@@ -348,41 +438,6 @@ class Admin(commands.Cog):
             await msg.edit(content=msg.content+"\nInstallation des dépendances...")
             os.system("pip install -qr requirements.txt")
             msg = await msg.edit(content=msg.content+"\nDépendances installées")
-
-    @admin_group.command(name="reload")
-    @commands.check(checks.is_bot_admin)
-    async def reload_cog(self, ctx: MyContext, *, cog: str):
-        """Recharge un module"""
-        cogs = cog.split(" ")
-        await self.bot.get_cog("Reloads").reload_cogs(ctx,cogs)
-
-    @reload_cog.autocomplete("cog")
-    async def reload_cog_autocom(self, _: discord.Interaction, current: str):
-        "Autocompletion for the cog name"
-        if " " in current:
-            fixed, current = current.rsplit(" ", maxsplit=1)
-        else:
-            fixed = None
-        data: list[tuple[str, str]] = [
-            (cog.qualified_name, cog.file if hasattr(cog, "file") else cog.qualified_name)
-            for cog in self.bot.cogs.values()
-        ]
-        filtered = [
-            cog for cog in data
-            if current.lower() in cog[0].lower() or current.lower() in cog[1].lower()
-        ]
-        if len(filtered) == 0:
-            filtered = [(current, current)]
-        if fixed:
-            filtered = [
-                (fixed + " " + cog[0], fixed + " " + cog[1])
-                for cog in filtered
-            ]
-        filtered.sort()
-        return [
-            discord.app_commands.Choice(name=cog[0], value=cog[1])
-            for cog in filtered
-        ][:25]
 
     @admin_group.command(name="membercounter")
     @commands.check(checks.is_bot_admin)
