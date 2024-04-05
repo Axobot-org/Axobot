@@ -1607,34 +1607,6 @@ class Rss(commands.Cog):
         "When the loop fails"
         self.bot.dispatch("error", error, "RSS main loop has stopped <@279568324260528128>")
 
-
-    @commands.command(name="rss_loop",hidden=True)
-    @commands.check(checks.is_bot_admin)
-    async def rss_loop_admin(self, ctx: MyContext, new_state: Literal["start", "stop", "once"]):
-        """Manage the rss loop
-        new_state can be start, stop or once"""
-        if not ctx.bot.database_online:
-            emoji = random.choice(["crétin ?","? Tu ferais mieux de fixer tes bugs","?","? :rofl:","?"])
-            return await ctx.send("Lol, t'as oublié que la base de donnée était hors ligne " + emoji)
-        if new_state == "start":
-            try:
-                self.rss_loop.start() # pylint: disable=no-member
-            except RuntimeError:
-                await ctx.send("La boucle est déjà en cours !")
-            else:
-                await ctx.send("Boucle rss relancée !")
-        elif new_state == "stop":
-            self.rss_loop.cancel() # pylint: disable=no-member
-            self.log.info(" RSS loop force-stopped by an admin")
-            await ctx.send("Boucle rss arrêtée de force !")
-        elif new_state == "once":
-            if self.loop_processing:
-                await ctx.send("Une boucle rss est déjà en cours !")
-            else:
-                await ctx.send("Et hop ! Une itération de la boucle en cours !")
-                self.log.info(" RSS loop forced by an admin")
-                await self.refresh_feeds()
-
     async def send_log(self, text: str, guild: discord.Guild):
         """Send a log to the logging channel"""
         try:
