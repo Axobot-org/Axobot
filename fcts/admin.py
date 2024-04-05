@@ -12,7 +12,6 @@ from contextlib import redirect_stdout
 from typing import TYPE_CHECKING, Literal, Optional, Union
 
 import discord
-import speedtest
 from asyncache import cached
 from cachetools import TTLCache
 from discord.ext import commands
@@ -109,12 +108,12 @@ class Admin(commands.Cog):
     @discord.app_commands.guilds(PRIVATE_GUILD_ID)
     @discord.app_commands.default_permissions(administrator=True)
     @commands.check(checks.is_bot_admin)
-    async def main_msg(self, ctx: MyContext):
+    async def admin_group(self, ctx: MyContext):
         """Commandes réservées aux administrateurs du bot"""
         if ctx.subcommand_passed is None:
             await ctx.send_help("admin")
 
-    @main_msg.command(name="send-msg")
+    @admin_group.command(name="send-msg")
     @commands.check(checks.is_bot_admin)
     async def send_msg(self, ctx: MyContext, user: discord.User, message: str):
         "Send a DM to any user the bot can reach"
@@ -122,7 +121,7 @@ class Admin(commands.Cog):
         await user.send(message)
         await ctx.send(content="Done!")
 
-    @main_msg.command(name="sync")
+    @admin_group.command(name="sync")
     @commands.check(checks.is_bot_admin)
     async def sync_app_commands(self, ctx: MyContext, scope: Literal["global", "staff-server", "public-server"]):
         "Sync app commands for either global or staff server scope"
@@ -150,7 +149,7 @@ class Admin(commands.Cog):
         await self.bot.send_embed(emb)
         await ctx.send(txt + '!')
 
-    @main_msg.command(name="god")
+    @admin_group.command(name="god")
     @commands.check(checks.is_bot_admin)
     @commands.guild_only()
     async def enable_god_mode(self, ctx: MyContext, enable:bool=True):
@@ -171,7 +170,7 @@ class Admin(commands.Cog):
                 await ctx.send("Ce mode n'est pas actif ici",delete_after=3)
         await ctx.message.delete(delay=0)
 
-    @main_msg.command(name="faq")
+    @admin_group.command(name="faq")
     @commands.check(checks.is_bot_admin)
     async def send_faq(self, ctx: MyContext):
         "Update the FAQ channels from the private preparation channels"
@@ -198,7 +197,7 @@ class Admin(commands.Cog):
         await self.add_success_reaction(ctx.message)
 
 
-    @main_msg.command(name="update")
+    @admin_group.command(name="update")
     @commands.check(checks.is_bot_admin)
     async def update_config(self, ctx: MyContext, send: bool=False):
         """Préparer/lancer un message de mise à jour
@@ -286,7 +285,7 @@ class Admin(commands.Cog):
             self.update[language] = None
 
 
-    @main_msg.command(name="cogs")
+    @admin_group.command(name="cogs")
     @commands.check(checks.is_bot_admin)
     async def cogs_list(self, ctx: MyContext):
         """Voir la liste de tout les cogs"""
@@ -295,7 +294,7 @@ class Admin(commands.Cog):
             text += f"- {cog.file} ({cog_name}) \n"
         await ctx.send(text)
 
-    @main_msg.command(name="shutdown")
+    @admin_group.command(name="shutdown")
     @commands.check(checks.is_bot_admin)
     async def shutdown(self, ctx: MyContext):
         """Eteint le bot"""
@@ -319,7 +318,7 @@ class Admin(commands.Cog):
         if self.bot.database_online:
             self.bot.close_database_cnx()
 
-    @main_msg.command(name="reboot")
+    @admin_group.command(name="reboot")
     @commands.check(checks.is_bot_admin)
     async def restart_bot(self, ctx: MyContext):
         """Relance le bot"""
@@ -328,7 +327,7 @@ class Admin(commands.Cog):
         self.bot.log.info("Redémarrage du bot")
         os.execl(sys.executable, sys.executable, *sys.argv)
 
-    @main_msg.command(name="pull")
+    @admin_group.command(name="pull")
     @commands.check(checks.is_bot_admin)
     async def git_pull(self, ctx: MyContext, branch: Optional[AvailableGitBranches]=None, install_requirements: bool=False):
         """Pull du code depuis le dépôt git"""
@@ -350,7 +349,7 @@ class Admin(commands.Cog):
             os.system("pip install -qr requirements.txt")
             msg = await msg.edit(content=msg.content+"\nDépendances installées")
 
-    @main_msg.command(name="reload")
+    @admin_group.command(name="reload")
     @commands.check(checks.is_bot_admin)
     async def reload_cog(self, ctx: MyContext, *, cog: str):
         """Recharge un module"""
@@ -385,7 +384,7 @@ class Admin(commands.Cog):
             for cog in filtered
         ][:25]
 
-    @main_msg.command(name="membercounter")
+    @admin_group.command(name="membercounter")
     @commands.check(checks.is_bot_admin)
     async def membercounter(self, ctx: MyContext):
         """Recharge tout ces salons qui contiennent le nombre de membres, pour tout les serveurs"""
@@ -398,7 +397,7 @@ class Admin(commands.Cog):
         else:
             await ctx.send("Impossible de faire ceci, la base de donnée est inaccessible")
 
-    @main_msg.command(name="config")
+    @admin_group.command(name="config")
     @commands.check(checks.is_bot_admin)
     async def admin_sconfig_see(self, ctx: MyContext, guild: discord.Guild, option: Optional[str]=None):
         """Affiche les options d'un serveur"""
@@ -410,7 +409,7 @@ class Admin(commands.Cog):
         else:
             await self.bot.get_cog("ServerConfig").send_specific_config(guild, ctx, option)
 
-    @main_msg.group(name="database", aliases=["db"])
+    @admin_group.group(name="database", aliases=["db"])
     @commands.check(checks.is_bot_admin)
     async def admin_db(self, _ctx: MyContext):
         "Commandes liées à la base de données"
@@ -468,7 +467,7 @@ class Admin(commands.Cog):
         ][:25]
 
 
-    @main_msg.command(name="emergency", with_app_command=False)
+    @admin_group.command(name="emergency", with_app_command=False)
     @commands.check(checks.is_bot_admin)
     async def emergency_cmd(self, ctx: MyContext):
         """Déclenche la procédure d'urgence
@@ -527,7 +526,7 @@ class Admin(commands.Cog):
                 self.bot.dispatch("error", err, None)
         return "Qui a appuyé sur le bouton rouge ? :thinking:"
 
-    @main_msg.command(name="ignore")
+    @admin_group.command(name="ignore")
     @commands.check(checks.is_bot_admin)
     async def add_ignoring(self, ctx: MyContext, target_id: str):
         """Ajoute un serveur ou un utilisateur dans la liste des utilisateurs/serveurs ignorés"""
@@ -568,7 +567,7 @@ class Admin(commands.Cog):
         ctx.bot.get_cog("Utilities").config = None
 
 
-    @main_msg.command(name="module")
+    @admin_group.command(name="module")
     @commands.check(checks.is_bot_admin)
     @discord.app_commands.describe(enable="Should we enable or disable this module")
     async def enable_module(self, ctx: MyContext, module: Literal["xp", "rss", "stats", "files-count"], enable: bool):
@@ -601,7 +600,7 @@ Cette option affecte tous les serveurs"""
         else:
             await ctx.send("Module introuvable")
 
-    @main_msg.group(name="flag", aliases=["flags"])
+    @admin_group.group(name="flag", aliases=["flags"])
     @commands.check(checks.is_bot_admin)
     async def admin_flag(self, ctx: MyContext):
         "Ajoute ou retire un attribut à un utilisateur"
@@ -660,7 +659,7 @@ Cette option affecte tous les serveurs"""
         else:
             await ctx.send(f"L'utilisateur {user} n'a plus aucun flag")
 
-    @main_msg.group(name="rankcard")
+    @admin_group.group(name="rankcard")
     @commands.check(checks.is_bot_admin)
     async def admin_rankcard(self, ctx: MyContext):
         "Ajoute ou retire une carte d'xp à un utilisateur"
@@ -716,7 +715,7 @@ Cette option affecte tous les serveurs"""
             await ctx.send(f"L'utilisateur {user} n'a plus aucune catre d'xp spéciale")
 
 
-    @main_msg.group(name="server")
+    @admin_group.group(name="server")
     @commands.check(checks.is_bot_admin)
     async def main_botserv(self, ctx: MyContext):
         """Quelques commandes liées au serveur officiel"""
@@ -813,7 +812,7 @@ Cette option affecte tous les serveurs"""
         except discord.HTTPException:
             await ctx.send("Le message est trop long pour être envoyé !")
 
-    @main_msg.command(name="activity")
+    @admin_group.command(name="activity")
     @commands.check(checks.is_bot_admin)
     @discord.app_commands.rename(activity_type="type")
     async def change_activity(self, ctx: MyContext, activity_type: Literal["play", "watch", "listen", "stream"], *, text: str):
@@ -833,36 +832,7 @@ Cette option affecte tous les serveurs"""
         if not ctx.interaction:
             await ctx.message.delete()
 
-    @main_msg.command(name="speedtest")
-    @commands.check(checks.is_bot_admin)
-    async def speedtest(self, ctx: MyContext, method: Literal["dict", "csv", "json", "image"] = "image"):
-        """Fais un speedtest du vps
-        Les méthodes possibles sont: dict, json, csv"""
-        if method != "image" and (not hasattr(speedtest.SpeedtestResults, method)):
-            await ctx.send("Méthode invalide")
-            return
-        msg = await ctx.send("Début de l'analyse...")
-        test = speedtest.Speedtest()
-        test.get_servers()
-        test.get_best_server()
-        test.download()
-        test.upload(pre_allocate=False)
-        if method == "image":
-            test.results.share()
-        if method == "image":
-            result = test.results.dict()
-            await msg.edit(content=f"""{result["server"]["sponsor"]} - ping {result["server"]["latency"]}ms\n{result["share"]}""")
-        elif method == "json":
-            result = test.results.json(pretty=True)
-            await msg.edit(content=f"```json\n{result}\n```")
-        elif method == "dict":
-            result = test.results.dict()
-            await msg.edit(content=f"```py\n{result}\n```")
-        else:
-            result = getattr(test.results, method)()
-            await msg.edit(content=str(result))
-
-    @main_msg.command(name="test-rss-url")
+    @admin_group.command(name="test-rss-url")
     @commands.check(checks.is_bot_admin)
     async def test_rss_url(self, ctx: MyContext, url: str, *, arguments=None):
         """Teste une url rss"""
@@ -946,7 +916,7 @@ Cette option affecte tous les serveurs"""
                     txt.append(nothing_+notok_+' summary (as description)')
             await ctx.send("\n".join(txt))
 
-    @main_msg.group(name="antiscam")
+    @admin_group.group(name="antiscam")
     @commands.check(checks.is_bot_admin)
     async def main_antiscam(self, ctx: MyContext):
         "Gère le modèle d'anti-scam"
@@ -1080,7 +1050,7 @@ Cette option affecte tous les serveurs"""
                 self._last_result = ret
                 await ctx.send(f"```py\n{value}{ret}\n```")
 
-    @main_msg.command(name="execute")
+    @admin_group.command(name="execute")
     @commands.check(checks.is_bot_admin)
     async def sudo(self, ctx: MyContext, who: Union[discord.Member, discord.User], *, command: str):
         """Exécute une commande en tant qu'un autre utilisateur
@@ -1093,7 +1063,35 @@ Cette option affecte tous les serveurs"""
         await self.bot.invoke(new_ctx)
         await ctx.send(f"Command executed as {who} with success")
 
-    @main_msg.group(name="bug")
+    @admin_group.command(name="rss-loop")
+    @commands.check(checks.is_bot_admin)
+    async def rss_loop(self, ctx: MyContext, new_state: Literal["start", "stop", "run-once"]):
+        """Start or stop the RSS refresh loop"""
+        if not ctx.bot.database_online:
+            return await ctx.send("Lol, t'as oublié que la base de donnée était hors ligne ?")
+        cog = self.bot.get_cog("Rss")
+        if cog is None:
+            return await ctx.send("Le module RSS n'est pas chargé !")
+        if new_state == "start":
+            try:
+                cog.rss_loop.start() # pylint: disable=no-member
+            except RuntimeError:
+                await ctx.send("La boucle est déjà en cours !")
+            else:
+                await ctx.send("Boucle rss relancée !")
+        elif new_state == "stop":
+            cog.rss_loop.cancel() # pylint: disable=no-member
+            cog.log.info(" RSS loop force-stopped by an admin")
+            await ctx.send("Boucle rss arrêtée de force !")
+        elif new_state == "run-once":
+            if cog.loop_processing:
+                await ctx.send("Une boucle rss est déjà en cours !")
+            else:
+                await ctx.send("Et hop ! Une itération de la boucle en cours !")
+                cog.log.info(" RSS loop forced by an admin")
+                await cog.refresh_feeds()
+
+    @admin_group.group(name="bug")
     @commands.check(checks.is_bot_admin)
     async def main_bug(self, ctx: MyContext):
         """Gère la liste des bugs"""
@@ -1132,7 +1130,7 @@ Cette option affecte tous les serveurs"""
         await msg.edit(embed=emb)
         await self.add_success_reaction(ctx.message)
 
-    @main_msg.group(name="idea")
+    @admin_group.group(name="idea")
     @commands.check(checks.is_bot_admin)
     async def main_idea(self, ctx: MyContext):
         """Ajouter une idée dans le salon des idées, en français et anglais"""

@@ -19,7 +19,6 @@ psutil>=5.8
 python-dateutil
 pytz
 rembg~=2.0.0
-speedtest-cli>=2.1.3
 timezonefinder
 
 # Antiscam training
