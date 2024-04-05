@@ -9,6 +9,7 @@ from discord.ext import commands
 
 from docs import conf
 from libs.bot_classes import Axobot, MyContext
+from libs.bot_classes.consts import IGNORED_GUILDS
 from libs.checks import checks
 from libs.formatutils import FormatUtils
 
@@ -54,7 +55,7 @@ class BotInfo(commands.Cog):
                 int(x)
                 for x in self.bot.get_cog('Utilities').config['banned_guilds'].split(";")
                 if len(x) > 0
-            ] + self.bot.get_cog('Reloads').ignored_guilds
+            ] + IGNORED_GUILDS
         return []
 
     async def get_guilds_count(self, ignored_guilds:list=None) -> int:
