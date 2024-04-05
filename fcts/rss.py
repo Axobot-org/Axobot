@@ -1377,7 +1377,7 @@ class Rss(commands.Cog):
         "Send a RSS message into its Discord channel, with the corresponding mentions"
         content = await obj.create_msg()
         if self.bot.zombie_mode:
-            return False
+            return True
         allowed_mentions = discord.AllowedMentions(everyone=False, roles=[
             discord.Object(id=int(role_id)) for role_id in obj.feed.role_ids
         ])
@@ -1390,9 +1390,6 @@ class Rss(commands.Cog):
                 await channel.send(content, allowed_mentions=allowed_mentions, silent=obj.feed.silent_mention)
             return True
         except discord.HTTPException as err:
-            self.log.info("Cannot send message on channel %s: %s", channel.id, err)
-            self.bot.dispatch("error", err, f"While sending feed {obj.feed.feed_id} on channel {channel.id}")
-        except Exception as err:
             self.log.info("Cannot send message on channel %s: %s", channel.id, err)
             self.bot.dispatch("error", err, f"While sending feed {obj.feed.feed_id} on channel {channel.id}")
         return False
@@ -1459,6 +1456,8 @@ class Rss(commands.Cog):
             if isinstance(objs, (str, type(None), int)) or len(objs) == 0:
                 return True
             elif isinstance(objs, list):
+                if len(objs) == 0:
+                    return True
                 # update cache
                 self.cache[feed.link] = objs
                 latest_post_date = None
@@ -1485,11 +1484,11 @@ class Rss(commands.Cog):
                             sent_messages += 1
                     latest_post_date = obj.date
                     latest_entry_id = obj.entry_id
-                if isinstance(latest_post_date, datetime.datetime):
+                if sent_messages > 0 and isinstance(latest_post_date, datetime.datetime):
                     await self._update_feed_last_entry(feed.feed_id, latest_post_date, latest_entry_id)
                 if should_send_stats and sent_messages and (statscog := self.bot.get_cog("BotStats")):
                     statscog.rss_stats['messages'] += sent_messages
-                return True
+                return sent_messages > 0
             else:
                 return True
         except Exception as err:
