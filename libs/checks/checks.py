@@ -176,11 +176,11 @@ async def is_a_cmd(msg: discord.Message, bot: commands.Bot) -> bool:
         is_cmd = is_cmd or msg.content.startswith(p)
     return is_cmd
 
-async def is_ttt_enabled(ctx: MyContext) -> bool:
+async def is_ttt_enabled(interaction: discord.Interaction) -> bool:
     "Check if the tic-tac-toe game is enabled in a given context"
-    if ctx.guild is None:
+    if interaction.guild is None:
         return True
-    return await ctx.bot.get_config(ctx.guild.id, "ttt_display") != "disabled"
+    return await interaction.client.get_config(interaction.guild_id, "ttt_display") != "disabled"
 
 
 async def is_voice_message(interaction: discord.Interaction):
