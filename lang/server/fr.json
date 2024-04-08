@@ -25,11 +25,6 @@
             "any": "n'importe quel salon",
             "dm": "en message privé"
         },
-        "ttt_display": {
-            "disabled": "désactivé",
-            "short": "compressé",
-            "normal": "normal"
-        },
         "xp_type": {
             "global": "global",
             "mee6-like": "mee6-like",
@@ -107,6 +102,7 @@
         "delete_welcome_on_quick_leave": "Supprimer le message de bienvenue lorsqu'un membre quitte le serveur juste après avoir rejoint ? %{value}",
         "description": "Description du serveur :\n %{value}",
         "enable_fun": "Les commandes répertoriées dans la commande `!fun` sont-elles activées ? %{value}",
+        "enable_ttt": "Les membres du serveur peuvent-ils jouer au morpion ? %{value}",
         "enable_xp": "Le système d'xp doit-il être activé ? %{value}",
         "help_in_dm": "Envoyer le message d'aide en messages privés ? %{value}",
         "hunter": "Liste des salons dans lesquels le jeu *Hunter* est actif : %{value}",
@@ -135,7 +131,6 @@
         "streaming_channel": "Salon où envoyer les notifications de live : %{value}",
         "stream_mention": "Rôle à mentionner lorsqu'un live débute : %{value}",
         "streaming_role": "Rôle donné aux membres autorisés lorsqu'ils sont en live : %{value}",
-        "ttt_display": "Mode d'utilisation du morpion : %{value}",
         "ttt_emojis": "Emojis utilisé pour jouer au morpion : %{value}",
         "update_mentions": "Rôles mentionnés lors d'une mise à jour du bot : %{value}",
         "verification_role": "Rôles enlevés lorsqu'un joueur s'authentifie avec la commande `verify` : %{value}",

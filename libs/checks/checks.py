@@ -180,7 +180,7 @@ async def is_ttt_enabled(interaction: discord.Interaction) -> bool:
     "Check if the tic-tac-toe game is enabled in a given context"
     if interaction.guild is None:
         return True
-    return await interaction.client.get_config(interaction.guild_id, "ttt_display") != "disabled"
+    return await interaction.client.get_config(interaction.guild_id, "enable_ttt")
 
 
 async def is_voice_message(interaction: discord.Interaction):

@@ -68,6 +68,7 @@ List of every option
 * delete_welcome_on_quick_leave: Boolean indicating whether the welcome message should be deleted if the member leaves the server quickly. Default is :code:`False`.
 * description: Description of the server, used for the `info server <infos.html#info>`__ command and potential partners. Default empty.
 * enable_fun: Boolean indicating if the fun part (documentation in preparation) is activated. If so, all commands in this section will be available. Default is :code:`True`.
+* enable_ttt:Boolean indicating if members of your server can play tic-tac-toe. Default is :code:`True`.
 * enable_xp: Boolean indicating whether the xp system is activated. Default is :code:`True`.
 * help_in_dm: Boolean indicating whether the help command message should be sent as a private message or not. If the value is set to :code:`True`, the message will be sent in DM or as an ephemeral message.
 * kick_allowed_roles: List of roles allowed to use the `kick <moderator.html#kick>`__ command. By default, none.
@@ -90,7 +91,6 @@ List of every option
 * rank_in_dm: Boolean indicating whether the rank command message should be sent as a private message or not. If the value is set to :code:`True`, the message will be sent in DM or as an ephemeral message.
 * say_allowed_roles: List of roles allowed to use the `say` command. By default, none.
 * slowmode_allowed_roles: List of roles allowed to use the `slowmode <moderator.html#slowmode>`__ and `freeze <moderator.html#freeze>`__ commands. By default, none.
-* ttt_display: How to use the tic-tac-toe game. "Disabled" will prevent your users from playing it, "normal" will use it as usual and "short" will avoid spam messages.
 * ttt_emojis: List of emojis used to play on tic-tac-toe. Two emojis must be entered: one for the bot, and one for the player. Discord emojis as well as server emojis can work.
 * update_mentions: A list of roles which will be mentioned in each update changelog. You can enable those changelogs with the `bot_news` option. Default to None.
 * voice_category: Category used by the automated voice channels system (see `below <server.html#voice-channels-managment>`__)
