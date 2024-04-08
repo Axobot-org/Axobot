@@ -1,13 +1,8 @@
 {
     "already-playing": "Vous avez déjà une partie en cours !",
     "bot-begin": "Allez hop, je commence !",
-    "game-removed": "Vous avez correctement quitté la partie",
-    "not-playing": "Vous n'avez aucune partie en cours",
     "nul": "Match nul, personne n'a gagné...",
-    "pion-1": "Il y a déjà un pion sur cette case !",
-    "pion-2": "Case saisie invalide !",
-    "tip": "\n*Pour jouer, il suffit de taper un nombre entre 1 et 9, correspondant à la case choisie. Je joue les %{symb1}, toi les %{symb2}*",
-    "too-late": "Vous avez mis trop de temps à vous décider. Fin de la partie !",
+    "tip": "\n*Pour jouer, il suffit de cliquer sur une case vide. Je joue les %{symb1}, toi les %{symb2}*",
     "user-begin": "{}, à toi de commencer !",
     "win-bot": "J'ai gagné ! Fin du match !",
     "win-user": "Bien joué, %{user} a gagné !"
