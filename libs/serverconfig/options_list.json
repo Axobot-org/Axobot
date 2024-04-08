@@ -63,6 +63,11 @@
         "default": true,
         "is_listed": true
     },
+    "enable_ttt": {
+        "type": "boolean",
+        "default": true,
+        "is_listed": true
+    },
     "enable_xp": {
         "type": "boolean",
         "default": false,
@@ -277,12 +282,6 @@
         "allow_integrated_roles": false,
         "allow_everyone": false,
         "default": null,
-        "is_listed": true
-    },
-    "ttt_display": {
-        "type": "enum",
-        "values": ["disabled", "short", "normal"],
-        "default": "normal",
         "is_listed": true
     },
     "ttt_emojis": {

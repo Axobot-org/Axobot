@@ -84,13 +84,11 @@ If you want to talk through the bot, as if it were sending your messages, this c
 Tic-tac-toe
 -----------
 
-**Syntax:** :code:`tic-tac-toe` (alias :code:`morpion`) or :code:`tic-tac-toe leave`
+**Syntax:** :code:`tic-tac-toe`
 
-Yes, we did it! A first mini-game for our bot, the crab! You can play against the bot in this fast and simplistic game, just by entering the command and following the instructions (enter a number between 1 and 9 corresponding to the chosen cell). And the best part is that the only special permission required is to use the external emojis!
+Yes, we did it! A first mini-game for our bot, the tic-tac-toe! You can play against the bot in this fast and simplistic game, just by entering the command and clicking on empty cells.
 
-By using the *leave* argument you can instantly stop a game. This can be useful if you are stuck by a bug and can't join a game for example.
-
-.. note:: If you want to disable the game in your server, or only to reduce the amount of messages sent, you can edit your "ttt_display" `config option <server.html#list-of-every-option>`__
+.. note:: If you want to disable the game in your server, you can edit your "enable_ttt" `config option <server.html#list-of-every-option>`__
 
 
 ----

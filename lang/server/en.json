@@ -25,11 +25,6 @@
             "any": "any channel",
             "dm": "private message"
         },
-        "ttt_display": {
-            "disabled": "disabled",
-            "short": "short",
-            "normal": "normal"
-        },
         "xp_type": {
             "global": "global",
             "mee6-like": "mee6-like",
@@ -112,6 +107,7 @@
         "delete_welcome_on_quick_leave": "Should I delete the welcome message when a member leaves right after joining? %{value}",
         "description": "Server description:\n %{value}",
         "enable_fun": "Are the commands listed in the `fun` command enabled? %{value}",
+        "enable_ttt": "Can members play tic-tac-toe in this server? %{value}",
         "enable_xp": "Should the xp system be enabled? %{value}",
         "help_in_dm": "Send help message in private message? %{value}",
         "hunter": "List of all chat rooms in which the game *Hunter* is active: %{value}",
@@ -140,7 +136,6 @@
         "streaming_channel": "Channel where to send live notifications: %{value}",
         "stream_mention": "Role to mention when a member starts a live: %{value}",
         "streaming_role": "Role given to whitelisted members who are streaming: %{value}",
-        "ttt_display": "Usage of the tic-tac-toe: %{value}",
         "ttt_emojis": "Emojis used to play tic-tac-toe: %{value}",
         "update_mentions": "Roles mentioned in the bot changelog: %{value}",
         "verification_role": "Roles removed when a user use the `verify` command: %{value}",
