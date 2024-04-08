@@ -62,8 +62,8 @@
         "profile card-preview": "card-preview",
         "profile config": "config",
         "profile list-card-styles": "list-card-styles",
-        "quote": "quote",
         "Quote": "Quote",
+        "quote": "quote",
         "random-tip": "random-tip",
         "rank": "rank",
         "reminders clear": "clear",
@@ -103,6 +103,7 @@
         "slowmode": "slowmode",
         "softban": "softban",
         "stats": "stats",
+        "tic-tac-toe": "tic-tac-toe",
         "tickets portal set-category": "set-category",
         "tickets portal set-format": "set-format",
         "tickets portal set-hint": "set-hint",
@@ -149,7 +150,8 @@
         "partners set-invite": "Edit the invite URL of a partner",
         "quote": "Quote a message with a nice generated image",
         "random-tip": "Get a random tip or trivia about the bot",
-        "set-xp": "Set the XP of a user in your server"
+        "set-xp": "Set the XP of a user in your server",
+        "tic-tac-toe": "Play a game of Tic Tac Toe against the bot"
     },
     "group_description": {
         "antiscam": "Everything related to the antiscam feature",
