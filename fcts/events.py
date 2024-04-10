@@ -280,9 +280,9 @@ class Events(commands.Cog):
             self.bot.dispatch("error", err, "Sending server count to top.gg")
         if self.bot.entity_id == 2:
             try: # https://discordbotlist.com/api/v1/bots/1048011651145797673/stats
-                payload = json.dumps({
+                payload = {
                     "guilds": guild_count
-                })
+                }
                 headers = {
                     "Authorization": self.bot.others["discordbotlist_axobot"],
                 }
