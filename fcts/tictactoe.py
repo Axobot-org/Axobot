@@ -8,7 +8,6 @@ from discord.ext import commands
 
 from libs.bot_classes import Axobot
 from libs.checks.checks import is_ttt_enabled
-from libs.serverconfig.options_list import options
 
 GridType = list[Union[int, Literal['X', 'O']]]
 
@@ -20,7 +19,6 @@ class TicTacToe(commands.Cog):
         self.bot = bot
         self.file = 'tictactoe'
         self.in_game = {}
-        self.types: tuple[str] = options['ttt_display']['values']
 
     @app_commands.command(name="tic-tac-toe")
     @app_commands.check(is_ttt_enabled)
