@@ -25,6 +25,7 @@ from libs.paginator import PaginatedSelectView, Paginator
 from libs.rss import (FeedEmbedData, FeedObject, FeedType, RssMessage,
                       YoutubeRSS, feed_parse)
 from libs.rss.rss_deviantart import DeviantartRSS
+from libs.rss.rss_general import InvalidFormatError
 from libs.rss.rss_twitch import TwitchRSS
 from libs.rss.rss_web import WebRSS
 from libs.tips import GuildTip
@@ -466,7 +467,11 @@ class Rss(commands.Cog):
         msg.fill_embed_data()
         await msg.fill_mention(ctx.guild)
         allowed_mentions = discord.AllowedMentions.none()
-        content = await msg.create_msg()
+        try:
+            content = await msg.create_msg()
+        except InvalidFormatError:
+            await ctx.send(await self.bot._(ctx.guild.id, "rss.test.invalid-format"))
+            return
         if isinstance(content, discord.Embed):
             await ctx.send(embed=content, allowed_mentions=allowed_mentions, silent=feed_object.silent_mention)
         elif content == "":
@@ -1480,8 +1485,13 @@ class Rss(commands.Cog):
                         obj.feed = feed
                         obj.fill_embed_data()
                         await obj.fill_mention(guild)
-                        if await self.send_rss_msg(obj, chan):
-                            sent_messages += 1
+                        try:
+                            if await self.send_rss_msg(obj, chan):
+                                sent_messages += 1
+                        except InvalidFormatError:
+                            self.bot.dispatch("server_warning", ServerWarningType.RSS_INVALID_FORMAT, guild,
+                                              channel=chan, feed_id=feed.feed_id)
+                            break
                     latest_post_date = obj.date
                     latest_entry_id = obj.entry_id
                 if sent_messages > 0 and isinstance(latest_post_date, datetime.datetime):
