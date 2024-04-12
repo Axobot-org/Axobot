@@ -98,7 +98,10 @@ class Welcomer(commands.Cog):
                     member_count=member.guild.member_count,
                     type=botormember
                 ))
-                silent: bool = await self.bot.get_config(member.guild.id, "welcome_silent_mention")
+                silent: bool = (
+                    False if event_type == "leave"
+                    else await self.bot.get_config(member.guild.id, "welcome_silent_mention")
+                )
                 msg = await channel.send(text, silent=silent)
                 if event_type == "welcome":
                     self.join_cache[member.guild.id, member.id] = msg.id
