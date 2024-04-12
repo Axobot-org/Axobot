@@ -32,7 +32,6 @@ def load_sql_connection(bot: "Axobot"):
             bot.log.info("Database connected locally")
             bot.database_keys['host'] = '127.0.0.1'
         cnx.close()
-    except Exception as err:
-        bot.log.error("---- UNABLE TO REACH THE DATABASE ----")
-        bot.log.error(err)
+    except Exception:
+        bot.log.error("---- UNABLE TO REACH THE DATABASE ----", exc_info=True)
         bot.database_online = False
