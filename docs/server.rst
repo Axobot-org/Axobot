@@ -102,6 +102,7 @@ List of every option
 * welcome: Message sent when a member joins your server.
 * welcome_channel: List of channels where messages when a member joins/leaves the server will be sent. By default, none.
 * welcome_roles: List of roles automatically given to members when they join the server. It is necessary that the bot is above the roles in question, and that it has the permission "Manage roles".
+* welcome_silent_mention: Boolean indicating whether the mentions in the welcome or leave messages should be silent or not. Default is :code:`False`.
 * xp_rate: Exp modifier, which multiplies the gain of xp by this number. It must be between 0.1 and 3, rounded to the nearest 1/100.
 * xp_type: Type of XP system to use: :code:`global` if you want to use the accross-server system, common with every other servers which use it, or :code:`local` if you want a more private system. There is also a :code:`mee6-like` system, which uses the same rules as the MEE6 bot, and is also local. Default to :code:`global`.
 

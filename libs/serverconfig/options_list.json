@@ -368,6 +368,11 @@
         "default": null,
         "is_listed": true
     },
+    "welcome_silent_mention": {
+        "type": "boolean",
+        "default": false,
+        "is_listed": true
+    },
     "xp_rate": {
         "type": "float",
         "min": 0.1,

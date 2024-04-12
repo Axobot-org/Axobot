@@ -143,6 +143,7 @@
         "welcome": "Message envoyé lorsqu'un membre arrive : %{value}",
         "welcome_channel": "Liste des salons dans lesquels envoyer les messages de bienvenue/départs : %{value}",
         "welcome_roles": "Liste des rôles donnés automatiquement aux nouveaux membres : %{value}",
+        "welcome_silent_mention": "Les messages de bienvenue doivent-ils être silencieux (i.e. sans notification) ? %{value}",
         "xp_rate": "Modficateur de gains d'xp : %{value}",
         "xp_type": "Type de système d'xp : %{value}"
     },
