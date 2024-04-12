@@ -79,7 +79,7 @@ class Welcomer(commands.Cog):
         if self.bot.get_cog('Utilities').sync_check_any_link(member.display_name) is not None:
             return
         if text:
-            channel: Optional[discord.TextChannel] = await self.bot.get_config(member.guild.id, 'welcome_channel')
+            channel: Optional[discord.TextChannel] = await self.bot.get_config(member.guild.id, "welcome_channel")
             if channel is None:
                 return
             if event_type == "leave" and (msg_id := self.join_cache.get((member.guild.id, member.id))):
@@ -98,7 +98,8 @@ class Welcomer(commands.Cog):
                     member_count=member.guild.member_count,
                     type=botormember
                 ))
-                msg = await channel.send(text)
+                silent: bool = await self.bot.get_config(member.guild.id, "welcome_silent_mention")
+                msg = await channel.send(text, silent=silent)
                 if event_type == "welcome":
                     self.join_cache[member.guild.id, member.id] = msg.id
             except discord.Forbidden:
