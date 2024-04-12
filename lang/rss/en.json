@@ -108,7 +108,8 @@
     },
     "success-add": "The rss feed of type \"%{type}\" with link <%{url}> has been properly added in the channel %{channel}!",
     "test": {
-        "empty-result": "The generated message seems to be empty, please check your message template and feed configuration."
+        "empty-result": "The generated message seems to be empty, please check your message template and feed configuration.",
+        "invalid-format": "Your template seems to have some formatting errors. Please ensure that you are using variables correctly."
     },
     "text-success": {
         "single": "The text of the feed #%{id} has been modified!\n New text: \n```\n%{text}\n```",
