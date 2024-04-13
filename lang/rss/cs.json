@@ -108,7 +108,8 @@
     },
     "success-add": "Rss kanál typu \"%{type}\" s odkazem <%{url}> byl správně přidán do kanálu %{channel}!",
     "test": {
-        "empty-result": "Vygenerovaná zpráva se zdá být prázdná, zkontrolujte prosím šablonu zprávy a konfiguraci feedu."
+        "empty-result": "Vygenerovaná zpráva se zdá být prázdná, zkontrolujte prosím šablonu zprávy a konfiguraci feedu.",
+        "invalid-format": "Zdá se, že vaše šablona má nějaké chyby ve formátování. Ujistěte se, že používáte proměnné správně."
     },
     "text-success": {
         "single": "Text kanálu #%{id} byl změněn!\n Nový text: \n```\n%{text}\n```",
