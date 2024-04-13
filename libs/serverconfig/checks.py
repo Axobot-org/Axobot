@@ -23,10 +23,10 @@ async def check_config(bot: Axobot, guild: discord.Guild, option: str, value: An
         levelup_is_channel = option != "levelup_channel" or not isinstance(value, str)
         if levelup_is_channel and (embed := await can_write_in_channel_check(bot, guild, option, value)):
             return embed
-    if option in {"levelup_channel", "levelup_msg", "noxp_channels", "noxp_roles", "xp_rate", "xp_type"}:
+    if option in {"levelup_channel", "levelup_msg", "noxp_channels", "noxp_roles", "xp_decay", "xp_rate", "xp_type"}:
         if embed := await xp_is_enabled_check(bot, guild, option, value):
             return embed
-    if option == "xp_rate":
+    if option in {"xp_decay", "xp_rate"}:
         if embed := await xp_is_local_check(bot, guild, option, value):
             return embed
 

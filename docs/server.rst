@@ -12,9 +12,6 @@ Recently, Axobot has features that can be modified per server, to make each serv
 
 The list of options continues to grow as development progresses, that's why a website is planned to make server configuration easier.
 
-.. note:: For the curious, know that all the configuration of each server is entirely saved in a MySQL database file, which makes its use easier than a simple txt or csv file.
-
-.. warning:: Recently, it has become possible to do without the names of the subcommands. Thus :code:`config 2` is equivalent to :code:`config see 2`, and :code:`config xp_rate 1.4` to :code:`config set xp_rate 1.4`.
 
 Watch
 -----
@@ -103,6 +100,7 @@ List of every option
 * welcome_channel: List of channels where messages when a member joins/leaves the server will be sent. By default, none.
 * welcome_roles: List of roles automatically given to members when they join the server. It is necessary that the bot is above the roles in question, and that it has the permission "Manage roles".
 * welcome_silent_mention: Boolean indicating whether the mentions in the welcome messages should be silent or not. Default is :code:`False`.
+* xp_decay: Amount of XP removed from each member of your server, per day. This allows inactive members to drop down your leaderboard. Default is :code:`0`.
 * xp_rate: Exp modifier, which multiplies the gain of xp by this number. It must be between 0.1 and 3, rounded to the nearest 1/100.
 * xp_type: Type of XP system to use: :code:`global` if you want to use the accross-server system, common with every other servers which use it, or :code:`local` if you want a more private system. There is also a :code:`mee6-like` system, which uses the same rules as the MEE6 bot, and is also local. Default to :code:`global`.
 
@@ -126,6 +124,8 @@ There are several ways to customize your xp system. In particular, you have a fe
 - **Select the type of xp:** there are natively three different xp systems at Axobot, modifiable with the option :code:`xp_type`: a :code:`global`, in common with all servers using this system (default), a :code:`local` respecting the same calculations but without synchronization between the servers, and a :code:`mee6-like` which uses the same rules as the famous MEE6 bot.
 
 - **Change the gain rate of xp:** if you find that your members are not earning xp fast enough (or too fast), or if you want to make a special event xp for a limited time, you can add a gain modifier between x0.1 and x3, which will multiply by its value each point of xp earned. Not usable for the global xp system, of course. Option name: :code:`xp_rate`.
+
+- **Move inactive members down** the leaderboard: sometimes, certain members amass a lot of XP over a period of time, then become inactive in your server, while maintaining a high ranking in the server leaderboard. One option to avoid this problem is to remove a certain amount of XP from everyone every day: inactive members will then continually lose XP. The configuration option :code:`xp_decay` lets you define the number of XP to be removed from each member every day.
 
 - **Prevent xp in some channels:** although Axobot prevents people from earning xp with its commands, it cannot detect commands from other bots. So you can prevent your members from earning xp in certain channels via the :code:`noxp_channels` option, which contains a list of all channels where your users can't earn any experience points.
 

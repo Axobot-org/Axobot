@@ -276,6 +276,10 @@ class Axobot(commands.bot.AutoShardedBot):
     def db_query(self):
         return create_database_query(self, self.cnx_axobot)
 
+    @property
+    def db_xp_query(self):
+        return create_database_query(self, self.cnx_xp)
+
     class SafeDict(dict):
         def __missing__(self, key):
             return '{' + key + '}'

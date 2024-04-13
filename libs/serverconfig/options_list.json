@@ -373,6 +373,13 @@
         "default": false,
         "is_listed": true
     },
+    "xp_decay": {
+        "type": "int",
+        "min": 0,
+        "max": 200,
+        "default": 0,
+        "is_listed": true
+    },
     "xp_rate": {
         "type": "float",
         "min": 0.1,
