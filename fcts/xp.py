@@ -6,6 +6,7 @@ import random
 import re
 import string
 import time
+import datetime
 from collections import defaultdict
 from io import BytesIO
 from typing import Literal, Optional, Union
@@ -14,7 +15,7 @@ import aiohttp
 import discord
 import mysql
 from discord import app_commands
-from discord.ext import commands
+from discord.ext import commands, tasks
 from PIL import Image, ImageFont
 
 from libs.arguments import args
@@ -68,11 +69,17 @@ class Xp(commands.Cog):
 
     @commands.Cog.listener()
     async def on_ready(self):
-        "Load cache on bot boot"
-        self.table = 'xp_beta' if self.bot.beta else 'xp'
-        await self.db_load_cache(None)
+        "Load cache + start decay loop"
         if not self.bot.database_online:
             await self.bot.unload_extension("fcts.xp")
+            return
+        self.table = 'xp_beta' if self.bot.beta else 'xp'
+        await self.db_load_cache(None)
+        self.xp_decay_loop.start()
+
+    async def cog_unload(self):
+        if self.xp_decay_loop.is_running():
+            self.xp_decay_loop.stop()
 
     async def get_lvlup_chan(self, msg: discord.Message) -> Union[
             None, discord.DMChannel, discord.TextChannel, discord.VoiceChannel, discord.StageChannel, discord.Thread
@@ -594,6 +601,51 @@ class Xp(commands.Cog):
             return result
         except Exception as err:
             self.bot.dispatch("error", err)
+
+    async def db_get_guilds_decays(self):
+        "Get a list of guilds where xp decay is enabled"
+        query = "SELECT `guild_id`, CAST(`value` AS INT) AS 'value' FROM `serverconfig` WHERE `option_name` = 'xp_decay' AND `value` > 0 AND `beta` = %s"
+        async with self.bot.db_query(query, (self.bot.beta,)) as query_result:
+            return query_result
+
+    @tasks.loop(time=datetime.time(hour=0, tzinfo=datetime.timezone.utc))
+    async def xp_decay_loop(self):
+        "Remove some xp to every member every day at midnight"
+        guilds = await self.db_get_guilds_decays()
+        decay_query = "UPDATE `{table}` SET `xp` = `xp` - %s"
+        cleanup_query = "DELETE FROM `{table}` WHERE `xp` <= 0"
+        guilds_count = users_count = 0
+        for guild_data in guilds:
+            guild_id, value = guild_data["guild_id"], guild_data["value"]
+            # check if axobot is still there
+            if self.bot.get_guild(guild_id) is None:
+                continue
+            # check if xp_type is not 'global'
+            if await self.bot.get_config(guild_id, "xp_type") == "global":
+                continue
+            # apply decay
+            async with self.bot.db_xp_query(decay_query.format(table=guild_id), (value,), returnrowcount=True) as row_count:
+                users_count += row_count
+                # if xp has been edited, invalidate cache
+                if row_count > 0 and guild_id in self.cache:
+                    del self.cache[guild_id]
+            # remove members with 0xp or less
+            async with self.bot.db_xp_query(cleanup_query.format(table=guild_id), returnrowcount=True) as row_count:
+                self.log.info("xp decay: removed %s members from guild %s", row_count, guild_id)
+            guilds_count += 1
+        log_text = f"XP decay: removed xp of {users_count} users from {guilds_count} guilds"
+        emb = discord.Embed(description=log_text, color=0x66ffcc, timestamp=self.bot.utcnow())
+        emb.set_author(name=self.bot.user, icon_url=self.bot.user.display_avatar)
+        self.bot.log.info(log_text)
+        await self.bot.send_embed(emb, url="loop")
+
+    @xp_decay_loop.before_loop
+    async def before_xp_decay_loop(self):
+        await self.bot.wait_until_ready()
+
+    @xp_decay_loop.error
+    async def on_xp_decay_loop_error(self, error: Exception):
+        self.bot.dispatch("error", error)
 
 
     async def get_image_from_url(self, url: str):
