@@ -148,6 +148,7 @@
         "welcome": "Message sent when a member arrives: %{value}",
         "welcome_channel": "List of channels where to send welcome/leave messages: %{value}",
         "welcome_roles": "List of roles automatically given to new members: %{value}",
+        "welcome_silent_mention": "Should the welcome message be sileny (i.e. without notifications)? %{value}",
         "xp_rate": "XP earnings modifier: %{value}",
         "xp_type": "XP system used: %{value}"
     },
