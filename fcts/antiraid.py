@@ -194,13 +194,13 @@ class AntiRaid(commands.Cog):
             # add users mentions count to the user score
             self.mentions_score[message.author.id] += mentions_count
         # if mentions score is higher than 0, apply sanctions
-        if self.mentions_score[message.author.id] > 0:
+        if mentions_count != 0 and self.mentions_score[message.author.id] > 0:
             await self.check_mentions_score(message.author)
         # 2. Check invites
         if invites_count := len(DISCORD_INVITE_REGEX.findall(message.content)):
             self.invites_score[message.author.id] += invites_count
         # if invites score is higher than 0, apply sanctions
-        if self.invites_score[message.author.id] > 0:
+        if invites_count != 0 and self.invites_score[message.author.id] > 0:
             await self.check_invites_score(message.author)
 
     async def check_mentions_score(self, member: discord.Member):
