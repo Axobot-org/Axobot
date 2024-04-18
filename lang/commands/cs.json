@@ -62,8 +62,8 @@
         "profile card-preview": "karta-náhledů",
         "profile config": "nastavení",
         "profile list-card-styles": "seznam-stylů-karet",
-        "quote": "citát",
         "Quote": "Citát",
+        "quote": "citát",
         "random-tip": "náhodný-tip",
         "rank": "hodnost",
         "reminders clear": "vyčistit",
@@ -103,6 +103,7 @@
         "slowmode": "pomalý-režim",
         "softban": "před-banem",
         "stats": "statistiky",
+        "tic-tac-toe": "piškvorky",
         "tickets portal set-category": "nastavit-kategorii",
         "tickets portal set-format": "nastavit-formát",
         "tickets portal set-hint": "nastavit-nápovědu",
@@ -149,7 +150,8 @@
         "partners set-invite": "Editovat zvaci URL partnera",
         "quote": "Citujte zprávu s pěkně vygenerovaným obrázkem",
         "random-tip": "Získejte náhodný tip nebo zajímavost o botovi",
-        "set-xp": "Nastavte XP uživateli na vašem serveru"
+        "set-xp": "Nastavte XP uživateli na vašem serveru",
+        "tic-tac-toe": "Hrajte hru Piškvorky proti botovi"
     },
     "group_description": {
         "antiscam": "Vše, co souvisí s funkcí antiscam",
