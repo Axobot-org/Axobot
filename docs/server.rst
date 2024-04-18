@@ -58,6 +58,8 @@ List of every option
 
 * anti_caps_lock: Boolean indicating whether the bot should send a warning message when a message with too much capitalization is sent. Default is True.
 * anti_raid: Anti-raid protection with some useful features. More information `here <moderator.html#anti-raid>`__. Default level: 0
+* anti_raid_ignored_roles: List of roles allowing your members to be ignored by the anti-raid feature. Any member having one of these roles will be immune to the anti-raid. Default to roles with the 'Moderate members' permission.
+* anti_scam: Boolean indicating whether the bot should scam your member messages and delete potential scams using our own `scam detector <articles/scam-detector.html>`__. Default is False.
 * ban_allowed_roles: List of roles allowed to use the `ban <moderator.html#ban>`__ command. By default, none.
 * bot_news: List of channels to which new bot products will be sent. These are the new bugs found as well as the new features added. None by default.
 * clear_allowed_roles: List of roles allowed to use the `clear <moderator.html#clear>`__ command. By default, none.
