@@ -21,7 +21,6 @@ async def load_cogs(bot: "Axobot"):
         'fcts.bot_info',
         'fcts.bot_stats',
         'fcts.cases',
-        'fcts.embeds',
         'fcts.errors',
         'fcts.events',
         'fcts.fun',

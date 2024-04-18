@@ -1,8 +1,9 @@
-from typing import Optional, Union
+from typing import Optional, Union, TYPE_CHECKING
 import aiohttp
 import discord
 
-from libs.bot_classes import Axobot
+if TYPE_CHECKING:
+    from libs.bot_classes import Axobot
 
 BASE_URL = 'https://discord.com/api/webhooks/'
 
@@ -13,7 +14,7 @@ __logs = {
     "beta": "625369903389736960/9xvl-UiQg5_QEekMReMVjf8BtvULzWT1BsU7gG0EulhtPQGc8EoAcc2QoHyVAYKmwlsv",
 }
 
-async def send_log_embed(bot: Axobot, embeds: list[Union[discord.Embed, dict]], url: Optional[str]=None):
+async def send_log_embed(bot: "Axobot", embeds: list[Union[discord.Embed, dict]], url: Optional[str]=None):
     """Sensend_log_embedlist of embeds to a discord channel"""
     if url is None:
         url = BASE_URL + __logs['beta'] if bot.beta else BASE_URL + __logs['classic']
