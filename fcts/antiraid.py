@@ -35,7 +35,7 @@ class AntiRaid(commands.Cog):
     async def on_member_join(self, member: discord.Member):
         "Check if a new member is a potential raider, and takes actions"
         if self.bot.database_online and self.check_cache.get((member.guild.id, member.id), True):
-            is_raider = await self.raid_check(member)
+            is_raider = await self.on_join_raid_check(member)
             self.check_cache[(member.guild.id, member.id)] = is_raider
 
     async def is_raider(self, member: discord.Member):
@@ -48,7 +48,7 @@ class AntiRaid(commands.Cog):
         level_name: str = await self.bot.get_config(guild.id, "anti_raid")
         return options["anti_raid"]["values"].index(level_name)
 
-    async def raid_check(self, member: discord.Member):
+    async def on_join_raid_check(self, member: discord.Member):
         """Check if a member should trigger the raid protection, and if so, kick or ban them
 
         Returns True if the member was kicked or banned, False otherwise"""
@@ -59,7 +59,7 @@ class AntiRaid(commands.Cog):
         # if antiraid is disabled or bot can't kick
         if level == 0 or not member.guild.me.guild_permissions.kick_members:
             return False
-        can_ban = member.guild.get_member(self.bot.user.id).guild_permissions.ban_members
+        can_ban = member.guild.me.guild_permissions.ban_members
         account_created_since = (self.bot.utcnow() - member.created_at).total_seconds()
         # Level 4
         if level >= 4:
