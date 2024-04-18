@@ -25,11 +25,6 @@
             "any": "anywhere",
             "dm": "spy-mode-communication"
         },
-        "ttt_display": {
-            "disabled": "disabld",
-            "short": "kwick",
-            "normal": "nörmal"
-        },
         "xp_type": {
             "global": "gëneral",
             "mee6-like": "mee6-copy",
@@ -112,6 +107,7 @@
         "delete_welcome_on_quick_leave": "Shuld I delete teh welcome msg whenever someone quick-join-and-leave-faster-than-a-cheetah? %{value}",
         "description": "Server description:\n %{value}",
         "enable_fun": "Arr' teh commands listed in te `fun` comand allowed? %{value}",
+        "enable_ttt": "Can ppl play tictactoe here? %{value}",
         "enable_xp": "Shald teh xperiense systèm be enabld? %{value}",
         "help_in_dm": "Sent help mess:a:ge on private msg? %{value}",
         "hunter": "Lyst for al cat roums in wich teh gamz *Hunter* are actved: %{value}",
@@ -140,7 +136,6 @@
         "streaming_channel": "Chanel where 2 sent stream news: %{value}",
         "stream_mention": "Role to mentun when a membur startz a lief: %{value}",
         "streaming_role": "Role 2 give 2 memberz when theyre in stream: %{value}",
-        "ttt_display": "How'll use titcattoe: %{value}",
         "ttt_emojis": "Images usd 2 play tic-tac-toe: %{value}",
         "update_mentions": "Roles pinged on teh bot changlog: %{value}",
         "verification_role": "Roles removd when smone use !verify itself: %{value}",
@@ -153,6 +148,8 @@
         "welcome": "Missge snt whem a mber arived :: %{value}",
         "welcome_channel": "Lst of canels whe're to sen wilcume/leivz mesage': %{value}",
         "welcome_roles": "Lizt from rles otomaticall giveD 2 knew mmbr: %{value}",
+        "welcome_silent_mention": "Shuld the welcome msg thing avoid notifications? %{value}",
+        "xp_decay": "How much xp shud I remove from ppl everyday? %{value}",
         "xp_rate": "XP earnings modifier: %{value}",
         "xp_type": "XP system used: %{value}"
     },
