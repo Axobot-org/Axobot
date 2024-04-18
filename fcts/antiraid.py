@@ -176,14 +176,26 @@ class AntiRaid(commands.Cog):
         return True
 
 
+    async def _should_ignore_member(self, member: discord.Member):
+        "Check whether this member should be verified (False) or is immune (True)"
+        if member.bot:
+            return True
+        immune_roles: Optional[list[discord.Role]] = await self.bot.get_config(member.guild.id, "anti_raid_ignored_roles")
+        if not immune_roles:
+            return member.guild_permissions.moderate_members
+        return any(
+            role in member.roles
+            for role in immune_roles
+        )
+
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
         "Check mentions/invites count when a message is sent"
         # if the message is not in a guild or the bot can't see the guild
         if not isinstance(message.author, discord.Member) or message.guild.me is None:
             return
-        # if the author is a bot or has permission to moderate memebrs
-        if message.author.bot or message.author.guild_permissions.moderate_members:
+        # if the author is a bot or should be immune
+        if await self._should_ignore_member(message.author):
             return
         # if the antiraid is disabled
         if await self._get_raid_level(message.guild) == 0:

@@ -10,6 +10,15 @@
         "default": "none",
         "is_listed": true
     },
+    "anti_raid_ignored_roles": {
+        "type": "roles_list",
+        "min_count": 1,
+        "max_count": 100,
+        "allow_integrated_roles": true,
+        "allow_everyone": false,
+        "default": null,
+        "is_listed": true
+    },
     "anti_scam": {
         "type": "boolean",
         "default": false,

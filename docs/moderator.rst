@@ -184,6 +184,8 @@ Anti-raid
 
 This option allows you to automatically moderate the newcomers and chat activity in your server, with several levels of security. You can enable it with the :code:`/config set anti_raid` command followed by the level you want.
 
+By default, any member with the 'Moderate members' permission on your server will be immune to the anti-raid system. You can customize which roles should immune your members with the :code:`anti_raid_ignored_roles` configuration option.
+
 For your server safety, Axobot will look at three things: the account creation date of newcomers, the spam of users mentions, and the spam of Discord server invitations.
 
 Here is the list of levels:
