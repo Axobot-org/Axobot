@@ -5,7 +5,6 @@ import time
 from typing import (TYPE_CHECKING, Awaitable, Callable, Literal, Optional,
                     Union, overload)
 
-import aiohttp
 import discord
 from discord.ext import commands
 from mysql.connector import connect as sql_connect
@@ -13,6 +12,7 @@ from mysql.connector.connection import MySQLConnection
 from mysql.connector.errors import ProgrammingError
 
 from fcts.tokens import get_database_connection, get_secrets_dict
+from .bot_embeds_manager import send_log_embed
 from libs.database import create_database_query
 from libs.emojis_manager import EmojisManager
 from libs.prefix_manager import PrefixManager
@@ -326,14 +326,7 @@ class Axobot(commands.bot.AutoShardedBot):
         """Send a list of embeds to a discord channel"""
         if isinstance(embeds, discord.Embed):
             embeds = [embeds]
-        if cog := self.get_cog('Embeds'):
-            await cog.send(embeds, url)
-        elif url is not None and url.startswith('https://'):
-            embeds = (embed.to_dict() for embed in embeds)
-            async with aiohttp.ClientSession() as session:
-                async with session.post(url, json={"embeds": embeds}) as resp:
-                    if resp.status >= 400:
-                        self.log.error("Unable to send embed to %s: %s", url, await resp.text())
+        await send_log_embed(self, embeds, url)
 
     async def potential_command(self, message: discord.Message):
         "Check if a message is potentially a bot command"
