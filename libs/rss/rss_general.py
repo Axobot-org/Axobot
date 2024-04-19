@@ -254,6 +254,7 @@ class RssMessage:
         return emb
 
 def format_text(source: str, data: "Axobot.SafeDict"):
+    "Try to safely format a string with a dictionary of data, raise a custom error if it fails"
     try:
         return source.format_map(data)
     except (ValueError, TypeError) as err:
