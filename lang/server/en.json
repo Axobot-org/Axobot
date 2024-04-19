@@ -98,6 +98,7 @@
     "server_desc": {
         "anti_caps_lock": "Should I send a message when a member sends too many capital letters? %{value}",
         "anti_raid": "Level of anti-raid protection: %{value} \n*([Documentation](https://axobot.rtfd.io/en/latest/moderator.html#anti-raid))*",
+        "anti_raid_ignored_roles": "List of roles allowing members to bypass the anti-raid protection: %{value}",
         "anti_scam": "Should I check for malicious messages and delete them? %{value}",
         "autoremove_xp": "Experience points removed daily from inactive members: %{value}",
         "ban_allowed_roles": "List of roles that can use the command \"ban\": %{value}",
