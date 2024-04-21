@@ -10,7 +10,7 @@ def setup_logger():
     bot_logger = logging.getLogger("bot")
 
     # DEBUG logs to a file
-    file_handler = RotatingFileHandler("logs/debug.log", maxBytes=1e6, backupCount=2, delay=True)
+    file_handler = RotatingFileHandler("logs/debug.log", maxBytes=5e6, backupCount=2, delay=True)
     file_handler.setLevel(logging.DEBUG)
     _set_logging_formatter(file_handler)
     file_handler.set_name("file")
@@ -55,7 +55,7 @@ def _setup_database_logger():
     db_logger = logging.getLogger("bot.db")
 
     # DEBUG logs to a file
-    file_handler = RotatingFileHandler("logs/sql-debug.log", maxBytes=2e6, backupCount=2, delay=True)
+    file_handler = RotatingFileHandler("logs/sql-debug.log", maxBytes=5e6, backupCount=2, delay=True)
     file_handler.setLevel(logging.DEBUG)
     _set_logging_formatter(file_handler)
     file_handler.set_name("file")

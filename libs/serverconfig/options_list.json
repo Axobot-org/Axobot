@@ -10,6 +10,15 @@
         "default": "none",
         "is_listed": true
     },
+    "anti_raid_ignored_roles": {
+        "type": "roles_list",
+        "min_count": 1,
+        "max_count": 100,
+        "allow_integrated_roles": true,
+        "allow_everyone": false,
+        "default": null,
+        "is_listed": true
+    },
     "anti_scam": {
         "type": "boolean",
         "default": false,
@@ -59,6 +68,11 @@
         "is_listed": true
     },
     "enable_fun": {
+        "type": "boolean",
+        "default": true,
+        "is_listed": true
+    },
+    "enable_ttt": {
         "type": "boolean",
         "default": true,
         "is_listed": true
@@ -134,11 +148,6 @@
         "allow_everyone": false,
         "default": null,
         "is_listed": true
-    },
-    "nicknames_history": {
-        "type": "boolean",
-        "default": false,
-        "is_listed": false
     },
     "noxp_channels": {
         "type": "text_channels_list",
@@ -279,12 +288,6 @@
         "default": null,
         "is_listed": true
     },
-    "ttt_display": {
-        "type": "enum",
-        "values": ["disabled", "short", "normal"],
-        "default": "normal",
-        "is_listed": true
-    },
     "ttt_emojis": {
         "type": "emojis_list",
         "min_count": 2,
@@ -367,6 +370,18 @@
         "allow_integrated_roles": false,
         "allow_everyone": false,
         "default": null,
+        "is_listed": true
+    },
+    "welcome_silent_mention": {
+        "type": "boolean",
+        "default": false,
+        "is_listed": true
+    },
+    "xp_decay": {
+        "type": "int",
+        "min": 0,
+        "max": 200,
+        "default": 0,
         "is_listed": true
     },
     "xp_rate": {

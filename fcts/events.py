@@ -256,7 +256,7 @@ class Events(commands.Cog):
 
     async def dbl_send_data(self):
         """Send guilds count to Discord Bots Lists"""
-        if self.bot.beta:
+        if self.bot.entity_id != 2:
             return
         start_time = time.time()
         answers: list[str] = []
@@ -278,21 +278,34 @@ class Events(commands.Cog):
         except Exception as err:
             answers.append("top.gg: 0")
             self.bot.dispatch("error", err, "Sending server count to top.gg")
-        if self.bot.entity_id == 2:
-            try: # https://discordbotlist.com/api/v1/bots/1048011651145797673/stats
-                payload = json.dumps({
-                    "guilds": guild_count
-                })
-                headers = {
-                    "Authorization": self.bot.others["discordbotlist_axobot"],
-                }
-                async with session.post(f"https://discordbotlist.com/api/v1/bots/{self.bot.user.id}/stats",
-                                        json=payload, headers=headers) as resp:
-                    self.bot.log.debug(f"discordbotlist returned {resp.status} for {payload}")
-                    answers.append(f"discordbotlist: {resp.status}")
-            except Exception as err:
-                answers.append("discordbotlist: 0")
-                self.bot.dispatch("error", err, "Sending server count to discordbotlist")
+        try: # https://discordbotlist.com/api/v1/bots/1048011651145797673/stats
+            payload = {
+                "guilds": guild_count
+            }
+            headers = {
+                "Authorization": self.bot.others["discordbotlist_axobot"],
+            }
+            async with session.post(f"https://discordbotlist.com/api/v1/bots/{self.bot.user.id}/stats",
+                                    json=payload, headers=headers) as resp:
+                self.bot.log.debug(f"discordbotlist returned {resp.status} for {payload}")
+                answers.append(f"discordbotlist: {resp.status}")
+        except Exception as err:
+            answers.append("discordbotlist: 0")
+            self.bot.dispatch("error", err, "Sending server count to discordbotlist")
+        try: # https://discordextremelist.xyz/en-US/bots/1048011651145797673
+            payload = {
+                "guildCount": guild_count
+            }
+            headers = {
+                "Authorization": self.bot.others["discordextremelist"],
+            }
+            async with session.post(f"https://api.discordextremelist.xyz/v2/bot/{self.bot.user.id}/stats",
+                                    json=payload, headers=headers) as resp:
+                self.bot.log.debug(f"discordextremelist returned {resp.status} for {payload}")
+                answers.append(f"discordextremelist: {resp.status}")
+        except Exception as err:
+            answers.append("discordextremelist: 0")
+            self.bot.dispatch("error", err, "Sending server count to discordextremelist")
         await session.close()
         answers = ' - '.join(answers)
         delta_time = round(time.time()-start_time, 3)

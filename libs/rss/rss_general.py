@@ -224,22 +224,22 @@ class RssMessage:
             self.author = f"{self.author} (retweeted from @{self.rt_from})"
 
         safedict = await self._generate_safedict()
-        text = msg_format.format_map(safedict)
+        text = format_text(msg_format, safedict)
         if not self.feed.use_embed:
             return text[:2000]
 
         emb = discord.Embed(description=text[:4096], color=self.embed_data['color'])
         if self.embed_data['author_text']:
-            emb.set_author(name=self.embed_data['author_text'].format_map(safedict)[:256])
+            emb.set_author(name=format_text(self.embed_data['author_text'], safedict)[:256])
         if self.embed_data['footer_text']:
-            emb.set_footer(text=self.embed_data['footer_text'].format_map(safedict)[:2048])
+            emb.set_footer(text=format_text(self.embed_data['footer_text'], safedict)[:2048])
         if self.embed_data['title'] is None:
             if self.feed.type != 'tw':
                 emb.title = self.title[:256]
             else:
                 emb.title = self.author[:256]
         else:
-            emb.title = self.embed_data['title'].format_map(safedict)[:256]
+            emb.title = format_text(self.embed_data['title'], safedict)[:256]
         if "{url}" not in msg_format and "{link}" not in msg_format:
             emb.add_field(name='URL', value=self.url[:1024])
         if self.image is not None:
@@ -252,6 +252,16 @@ class RssMessage:
         if self.embed_data["enable_link_in_title"]:
             emb.url = self.url
         return emb
+
+def format_text(source: str, data: "Axobot.SafeDict"):
+    "Try to safely format a string with a dictionary of data, raise a custom error if it fails"
+    try:
+        return source.format_map(data)
+    except (ValueError, TypeError) as err:
+        raise InvalidFormatError from err
+
+class InvalidFormatError(Exception):
+    pass
 
 class FeedEmbedData(TypedDict):
     "Embed configuration for an RSS feed"

@@ -83,10 +83,15 @@ Read Text Channels & See Voice Channels
 
 Allows the bot to see chats and voice channels. This permission does not allow you to write in these chats or connect to the voice channels. Required for the bot.
 
-Manage Events
--------------
+Create/Manage Events
+--------------------
 
-Allows to create, edit and cancel server events. Not used at this moment.
+Allows to create, edit and cancel server events. Not used by the bot.
+
+Send polls
+----------
+
+Allows users to send polls in your channels. Not available to bots at the moment.
 
 
 ----------------
@@ -98,12 +103,10 @@ Read Messages/See channel
 
 Allows the bot to read messages from a chat, but not the history. In other words, the bot will react to your messages but will not be able to read them again. Remove this permission in a channel to prevent the bot from being there.
 
-
 Send Messages / Send Messages in Threads
 ----------------------------------------
 
 Allows the bot you to write messages in text channels and threads. Required for almost all functionalities, but not necessarily for all channels.
-
 
 Create Public/Private Threads
 -----------------------------

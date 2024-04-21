@@ -24,7 +24,7 @@ def is_immune(member: discord.Member) -> bool:
             or member.guild_permissions.manage_messages
             or member.guild_permissions.manage_guild)
 
-HARMLESS_DELETION_THRESHOLD = 0.007
+HARMLESS_DELETION_THRESHOLD = 0.02
 HARMLESS_WARNING_THRESHOLD = 0.3
 
 class AntiScam(commands.Cog):

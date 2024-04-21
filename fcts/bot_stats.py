@@ -314,7 +314,8 @@ class BotStats(commands.Cog):
         async with self.bot.db_query(query, (now, "eventpoints_collect.median", *args), multi=True) as _:
             pass
         # Number of rows
-        query = "INSERT INTO `statsbot`.`zbot` SELECT %s, %s, COUNT(*) AS value, 0, %s, %s, %s FROM `axobot`.`event_points` WHERE `beta` = %s"
+        query = "INSERT INTO `statsbot`.`zbot` SELECT %s, %s, COUNT(*) AS value, 0, %s, %s, %s FROM `axobot`.`event_points` "\
+            "WHERE `collect_points` != 0 AND `beta` = %s"
         async with self.bot.db_query(query, (now, "eventpoints_collect.rows", *args)) as _:
             pass
 
@@ -329,15 +330,18 @@ class BotStats(commands.Cog):
         # unit, is_sum, entity_id, beta
         args = ("points", False, self.bot.entity_id, self.bot.beta)
         # Total
-        query = "INSERT INTO `statsbot`.`zbot` SELECT %s, %s, SUM(`points`) AS value, 0, %s, %s, %s FROM `axobot`.`event_points` WHERE `beta` = %s"
+        query = "INSERT INTO `statsbot`.`zbot` SELECT %s, %s, SUM(`points`) AS value, 0, %s, %s, %s FROM `axobot`.`event_points`"\
+            " WHERE `beta` = %s"
         async with self.bot.db_query(query, (now, "eventpoints.total", *args)) as _:
             pass
         # Min
-        query = "INSERT INTO `statsbot`.`zbot` SELECT %s, %s, MIN(`points`) AS value, 0, %s, %s, %s FROM `axobot`.`event_points` WHERE `beta` = %s"
+        query = "INSERT INTO `statsbot`.`zbot` SELECT %s, %s, MIN(`points`) AS value, 0, %s, %s, %s FROM `axobot`.`event_points`"\
+            " WHERE `beta` = %s"
         async with self.bot.db_query(query, (now, "eventpoints.min", *args)) as _:
             pass
         # Max
-        query = "INSERT INTO `statsbot`.`zbot` SELECT %s, %s, MAX(`points`) AS value, 0, %s, %s, %s FROM `axobot`.`event_points` WHERE `beta` = %s"
+        query = "INSERT INTO `statsbot`.`zbot` SELECT %s, %s, MAX(`points`) AS value, 0, %s, %s, %s FROM `axobot`.`event_points`"\
+            " WHERE `beta` = %s"
         async with self.bot.db_query(query, (now, "eventpoints.max", *args)) as _:
             pass
         # Median
@@ -355,7 +359,8 @@ class BotStats(commands.Cog):
         async with self.bot.db_query(query, (now, "eventpoints.median", *args), multi=True) as _:
             pass
         # Number of rows
-        query = "INSERT INTO `statsbot`.`zbot` SELECT %s, %s, COUNT(*) AS value, 0, %s, %s, %s FROM `axobot`.`event_points` WHERE `points` != 0 AND `beta` = %s"
+        query = "INSERT INTO `statsbot`.`zbot` SELECT %s, %s, COUNT(*) AS value, 0, %s, %s, %s FROM `axobot`.`event_points` "\
+            "WHERE `points` != 0 AND `beta` = %s"
         async with self.bot.db_query(query, (now, "eventpoints.rows", *args)) as _:
             pass
 

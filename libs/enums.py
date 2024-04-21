@@ -82,3 +82,5 @@ class ServerWarningType(Enum):
     RSS_TWITTER_DISABLED = 10
     # role, user
     TEMP_ROLE_REMOVE_FORBIDDEN = 11
+    # channel, feed_id
+    RSS_INVALID_FORMAT = 12

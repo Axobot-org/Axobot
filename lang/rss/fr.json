@@ -108,7 +108,8 @@
     },
     "success-add": "Le flux rss de type '%{type}' avec le lien <%{url}> a bien été ajouté dans le salon %{channel} !",
     "test": {
-        "empty-result": "Le message généré semble être vide, veuillez vérifier votre template de message et la configuration du flux."
+        "empty-result": "Le message généré semble être vide, veuillez vérifier votre template de message et la configuration du flux.",
+        "invalid-format": "Votre template semble présenter des erreurs de formatage. Veuillez vous assurer que vous utilisez les variables correctement."
     },
     "text-success": {
         "single": "Le texte du flux n°%{id} a bien été modifié ! Nouveau texte : \n```\n%{text}\n```",

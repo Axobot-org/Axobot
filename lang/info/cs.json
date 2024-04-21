@@ -162,10 +162,6 @@
     "membercount-2": "Počet lidí",
     "membercount-3": "Počet online členů",
     "membercount-4": "Počet neověřených uživatelů",
-    "nicknames-disabled": {
-        "disabled": "Administrátor zakázal změny přezdívek na tomto serveru. Zde neuvidíte žádnou novou přezdívku :confused:",
-        "guild-too-big": "Změny přezdívek na tomto serveru nejsou povoleny, pravděpodobně proto, že váš server je příliš velký. Požádejte správce, aby povolil volbu \"nicknames_history\", pokud chcete."
-    },
     "not-found": "Nelze najít %{N}",
     "ping": {
         "normal": ":ping_pong:  Pong!\nBot ping: %{bot}ms\nDiscord ping: %{api}ms",
