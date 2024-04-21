@@ -121,7 +121,6 @@
         "membercounter": "Channel displaying your member count in its name: %{value}",
         "mute_allowed_roles": "List of roles that can use the \"mute\" command: %{value}",
         "muted_role": "Used role to mute members: %{value}",
-        "nicknames_history": "Should I remember nickname changes in this server? %{value}",
         "noxp_channels": "Channels where you can't get xp: %{value}",
         "noxp_roles": "Roles that prevent getting xp: %{value}",
         "partner_channel": "Channel where partners are sent: %{value}",

@@ -116,7 +116,6 @@
         "membercounter": "Salon affichant dans son nom le nombre de membres : %{value}",
         "mute_allowed_roles": "Liste des rôles qui peuvent utiliser la commande 'mute' : %{value}",
         "muted_role": "Rôle utilisé pour rendre les gens muets : %{value}",
-        "nicknames_history": "Dois-je me souvenir des changements de pseudos dans ce serveur ? %{value}",
         "noxp_channels": "Salons où il est impossible d'obtenir de l'xp : %{value}",
         "noxp_roles": "Rôles qui empêchent d'obtenir de l'xp : %{value}",
         "partner_channel": "Salon dans lequel envoyer les partenaires : %{value}",

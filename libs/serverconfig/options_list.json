@@ -149,11 +149,6 @@
         "default": null,
         "is_listed": true
     },
-    "nicknames_history": {
-        "type": "boolean",
-        "default": false,
-        "is_listed": false
-    },
     "noxp_channels": {
         "type": "text_channels_list",
         "min_count": 1,

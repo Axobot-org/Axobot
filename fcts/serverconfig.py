@@ -60,8 +60,6 @@ class ServerConfig(commands.Cog):
         else:
             raw_value = await self.get_raw_option(guild_id, option_name)
             value = await from_raw(option_name, raw_value, guild)
-        if option_name == "nicknames_history" and value is None:
-            value = len(guild.members) < self.max_members_for_nicknames
         if self.enable_caching:
             self.cache[(guild_id, option_name)] = value
         return value
