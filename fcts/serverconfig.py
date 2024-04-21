@@ -23,8 +23,8 @@ class ServerConfig(commands.Cog):
     def __init__(self, bot: Axobot):
         self.bot = bot
         self.file = "serverconfig"
-        self.cache = TTLCache[tuple[int, str], Any](maxsize=10_000, ttl=3_600 * 2)
-        self.enable_caching = False
+        self.cache = TTLCache[tuple[int, str], Any](maxsize=10_000, ttl=60) # 1min cache
+        self.enable_caching = True
         self.membercounter_pending: dict[int, int] = {}
         self.embed_color = 0x3fb9ef
         self.log_color = 0x1b5fb1
