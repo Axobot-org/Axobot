@@ -384,7 +384,7 @@ class Admin(commands.Cog):
             for cog in filtered
         ][:25]
 
-    @admin_group.command(name="shutdown"
+    @admin_group.command(name="shutdown")
     @commands.check(checks.is_bot_admin)
     async def shutdown(self, ctx: MyContext):
         """Eteint le bot"""
