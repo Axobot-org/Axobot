@@ -406,7 +406,7 @@ class ServerConfig(commands.Cog):
         else:
             await ctx.send(await self.bot._(ctx.guild.id, "server.reset-all.error"))
 
-    @config_main.command(name='list')
+    @config_main.command(name="list")
     @commands.cooldown(1, 20, commands.BucketType.guild)
     async def config_list(self, ctx: MyContext):
         """Get the list of every usable option"""
@@ -423,6 +423,7 @@ class ServerConfig(commands.Cog):
         """Displays the value of an option, or all options if none is specified"""
         if not ctx.bot.database_online:
             return await ctx.send(await self.bot._(ctx.guild.id, "cases.no_database"))
+        await ctx.defer()
         if option is None:
             await self.send_all_config(ctx.guild, ctx)
         else:
