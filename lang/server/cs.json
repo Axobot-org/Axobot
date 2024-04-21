@@ -25,11 +25,6 @@
             "any": "jakýkoliv kanál",
             "dm": "soukromá zpráva"
         },
-        "ttt_display": {
-            "disabled": "zakázáno",
-            "short": "krátký",
-            "normal": "normální"
-        },
         "xp_type": {
             "global": "globální",
             "mee6-like": "mee6-like",
@@ -112,6 +107,7 @@
         "delete_welcome_on_quick_leave": "Mám odstranit uvítací zprávu, když člen opustí ihned po připojení? %{value}",
         "description": "Popis serveru:\n %{value}",
         "enable_fun": "Jsou příkazy uvedené v příkazu `fun` povoleny? %{value}",
+        "enable_ttt": "Mohou členové hrát hru piškvorky na tomto serveru? %{value}",
         "enable_xp": "Měl by být povolen xp systém? %{value}",
         "help_in_dm": "Odeslat zprávu nápovědy v soukromé zprávě? %{value}",
         "hunter": "Seznam všech chatovacích místností, ve kterých je hra *lovec* aktivní: %{value}",
@@ -140,7 +136,6 @@
         "streaming_channel": "Kanál kde odesílat živá oznámení: %{value}",
         "stream_mention": "Role, kterou je třeba zmínit, když člen začne být live: %{value}",
         "streaming_role": "Role přidělená autorizovaným členům, kteří streamují: %{value}",
-        "ttt_display": "Použití tic-taku: %{value}",
         "ttt_emojis": "Emoji používanou k přehrávání tic-takto: %{value}",
         "update_mentions": "Role uvedené v seznamu změn bota: %{value}",
         "verification_role": "Role odstraněny, když uživatel použije příkaz `verify`: %{value}",
@@ -153,6 +148,7 @@
         "welcome": "Zpráva odeslána, když člen dorazí: %{value}",
         "welcome_channel": "Seznam kanálů pro odesílání uvítání/zanechání zpráv: %{value}",
         "welcome_roles": "Seznam rolí automaticky zadaných novým členům: %{value}",
+        "welcome_silent_mention": "Má se zprává o dosažení vyšší úrovně neodesílat (tj. bez notifikace)? %{value}",
         "xp_rate": "Změna výdělků XP: %{value}",
         "xp_type": "Použitý XP systém: %{value}"
     },

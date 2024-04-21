@@ -1,13 +1,8 @@
 {
     "already-playing": "You already have a game in progress!",
     "bot-begin": "Let's go, I'll start!",
-    "game-removed": "You have correctly left the game",
-    "not-playing": "You don't have any game in progress",
     "nul": "Draw, no one won...",
-    "pion-1": "There's already a pawn on that cell!",
-    "pion-2": "Invalid input case",
-    "tip": "\n*To play, simply type a number between 1 and 9, corresponding to the chosen case. I play the %{symb1}, you play the %{symb2}*",
-    "too-late": "You took too long to decide. Game over!",
+    "tip": "\n*To play, simply click on an empty cell. I play the %{symb1}, you play the %{symb2}*",
     "user-begin": "{}, you begin!",
     "win-bot": "I won! End of the game!",
     "win-user": "Well done, %{user} won!"

@@ -23,7 +23,8 @@ class ServerConfig(commands.Cog):
     def __init__(self, bot: Axobot):
         self.bot = bot
         self.file = "serverconfig"
-        self.cache = TTLCache[tuple[int, str], Any](maxsize=10_000, ttl=3_600 * 2)
+        self.cache = TTLCache[tuple[int, str], Any](maxsize=10_000, ttl=60) # 1min cache
+        self.enable_caching = True
         self.membercounter_pending: dict[int, int] = {}
         self.embed_color = 0x3fb9ef
         self.log_color = 0x1b5fb1
@@ -52,16 +53,15 @@ class ServerConfig(commands.Cog):
 
     async def get_option(self, guild_id: int, option_name: str):
         "Return the formated value of a server config option"
-        if (cached := self.cache.get((guild_id, option_name))) is not None:
-            return cached
+        if self.enable_caching and (guild_id, option_name) in self.cache:
+            return self.cache[(guild_id, option_name)]
         if (guild := self.bot.get_guild(guild_id)) is None:
             value = options_list[option_name]["default"]
         else:
             raw_value = await self.get_raw_option(guild_id, option_name)
             value = await from_raw(option_name, raw_value, guild)
-        if option_name == "nicknames_history" and value is None:
-            value = len(guild.members) < self.max_members_for_nicknames
-        self.cache[(guild_id, option_name)] = value
+        if self.enable_caching:
+            self.cache[(guild_id, option_name)] = value
         return value
 
     async def set_option(self, guild_id: int, option_name: str, value: Any):
@@ -71,7 +71,8 @@ class ServerConfig(commands.Cog):
         if not self.bot.database_online:
             return False
         if await self.db_set_value(guild_id, option_name, to_raw(option_name, value)):
-            self.cache[(guild_id, option_name)] = value
+            if self.enable_caching:
+                self.cache[(guild_id, option_name)] = value
             if option_name == "prefix":
                 await self.bot.prefix_manager.update_prefix(guild_id, value)
             return True
@@ -84,7 +85,7 @@ class ServerConfig(commands.Cog):
         if not self.bot.database_online:
             return False
         if await self.db_delete_option(guild_id, option_name):
-            if (guild_id, option_name) in self.cache:
+            if self.enable_caching and (guild_id, option_name) in self.cache:
                 self.cache.pop((guild_id, option_name))
             if option_name == "prefix":
                 await self.bot.prefix_manager.reset_prefix(guild_id)
@@ -97,9 +98,9 @@ class ServerConfig(commands.Cog):
             return False
         if await self.db_delete_guild(guild_id):
             for option_name in options_list:
-                if (guild_id, option_name) in self.cache:
+                if self.enable_caching and (guild_id, option_name) in self.cache:
                     self.cache.pop((guild_id, option_name))
-                    await self.bot.prefix_manager.reset_prefix(guild_id)
+            await self.bot.prefix_manager.reset_prefix(guild_id)
             return True
         return False
 
@@ -405,7 +406,7 @@ class ServerConfig(commands.Cog):
         else:
             await ctx.send(await self.bot._(ctx.guild.id, "server.reset-all.error"))
 
-    @config_main.command(name='list')
+    @config_main.command(name="list")
     @commands.cooldown(1, 20, commands.BucketType.guild)
     async def config_list(self, ctx: MyContext):
         """Get the list of every usable option"""
@@ -422,6 +423,7 @@ class ServerConfig(commands.Cog):
         """Displays the value of an option, or all options if none is specified"""
         if not ctx.bot.database_online:
             return await ctx.send(await self.bot._(ctx.guild.id, "cases.no_database"))
+        await ctx.defer()
         if option is None:
             await self.send_all_config(ctx.guild, ctx)
         else:

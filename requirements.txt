@@ -14,12 +14,11 @@ isbnlib
 LRFutils==0.1.2
 mysql-connector-python>=8.0
 nltk>=3.7
-Pillow~=10.2.0
+Pillow~=10.3.0
 psutil>=5.8
 python-dateutil
 pytz
 rembg~=2.0.0
-speedtest-cli>=2.1.3
 timezonefinder
 
 # Antiscam training

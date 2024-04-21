@@ -25,6 +25,7 @@ from libs.paginator import PaginatedSelectView, Paginator
 from libs.rss import (FeedEmbedData, FeedObject, FeedType, RssMessage,
                       YoutubeRSS, feed_parse)
 from libs.rss.rss_deviantart import DeviantartRSS
+from libs.rss.rss_general import InvalidFormatError
 from libs.rss.rss_twitch import TwitchRSS
 from libs.rss.rss_web import WebRSS
 from libs.tips import GuildTip
@@ -466,7 +467,11 @@ class Rss(commands.Cog):
         msg.fill_embed_data()
         await msg.fill_mention(ctx.guild)
         allowed_mentions = discord.AllowedMentions.none()
-        content = await msg.create_msg()
+        try:
+            content = await msg.create_msg()
+        except InvalidFormatError:
+            await ctx.send(await self.bot._(ctx.guild.id, "rss.test.invalid-format"))
+            return
         if isinstance(content, discord.Embed):
             await ctx.send(embed=content, allowed_mentions=allowed_mentions, silent=feed_object.silent_mention)
         elif content == "":
@@ -1377,7 +1382,7 @@ class Rss(commands.Cog):
         "Send a RSS message into its Discord channel, with the corresponding mentions"
         content = await obj.create_msg()
         if self.bot.zombie_mode:
-            return False
+            return True
         allowed_mentions = discord.AllowedMentions(everyone=False, roles=[
             discord.Object(id=int(role_id)) for role_id in obj.feed.role_ids
         ])
@@ -1390,9 +1395,6 @@ class Rss(commands.Cog):
                 await channel.send(content, allowed_mentions=allowed_mentions, silent=obj.feed.silent_mention)
             return True
         except discord.HTTPException as err:
-            self.log.info("Cannot send message on channel %s: %s", channel.id, err)
-            self.bot.dispatch("error", err, f"While sending feed {obj.feed.feed_id} on channel {channel.id}")
-        except Exception as err:
             self.log.info("Cannot send message on channel %s: %s", channel.id, err)
             self.bot.dispatch("error", err, f"While sending feed {obj.feed.feed_id} on channel {channel.id}")
         return False
@@ -1459,6 +1461,8 @@ class Rss(commands.Cog):
             if isinstance(objs, (str, type(None), int)) or len(objs) == 0:
                 return True
             elif isinstance(objs, list):
+                if len(objs) == 0:
+                    return True
                 # update cache
                 self.cache[feed.link] = objs
                 latest_post_date = None
@@ -1481,15 +1485,20 @@ class Rss(commands.Cog):
                         obj.feed = feed
                         obj.fill_embed_data()
                         await obj.fill_mention(guild)
-                        if await self.send_rss_msg(obj, chan):
-                            sent_messages += 1
+                        try:
+                            if await self.send_rss_msg(obj, chan):
+                                sent_messages += 1
+                        except InvalidFormatError:
+                            self.bot.dispatch("server_warning", ServerWarningType.RSS_INVALID_FORMAT, guild,
+                                              channel=chan, feed_id=feed.feed_id)
+                            break
                     latest_post_date = obj.date
                     latest_entry_id = obj.entry_id
-                if isinstance(latest_post_date, datetime.datetime):
+                if sent_messages > 0 and isinstance(latest_post_date, datetime.datetime):
                     await self._update_feed_last_entry(feed.feed_id, latest_post_date, latest_entry_id)
                 if should_send_stats and sent_messages and (statscog := self.bot.get_cog("BotStats")):
                     statscog.rss_stats['messages'] += sent_messages
-                return True
+                return sent_messages > 0
             else:
                 return True
         except Exception as err:
@@ -1607,34 +1616,6 @@ class Rss(commands.Cog):
     async def loop_error(self, error: Exception):
         "When the loop fails"
         self.bot.dispatch("error", error, "RSS main loop has stopped <@279568324260528128>")
-
-
-    @commands.command(name="rss_loop",hidden=True)
-    @commands.check(checks.is_bot_admin)
-    async def rss_loop_admin(self, ctx: MyContext, new_state: Literal["start", "stop", "once"]):
-        """Manage the rss loop
-        new_state can be start, stop or once"""
-        if not ctx.bot.database_online:
-            emoji = random.choice(["crétin ?","? Tu ferais mieux de fixer tes bugs","?","? :rofl:","?"])
-            return await ctx.send("Lol, t'as oublié que la base de donnée était hors ligne " + emoji)
-        if new_state == "start":
-            try:
-                self.rss_loop.start() # pylint: disable=no-member
-            except RuntimeError:
-                await ctx.send("La boucle est déjà en cours !")
-            else:
-                await ctx.send("Boucle rss relancée !")
-        elif new_state == "stop":
-            self.rss_loop.cancel() # pylint: disable=no-member
-            self.log.info(" RSS loop force-stopped by an admin")
-            await ctx.send("Boucle rss arrêtée de force !")
-        elif new_state == "once":
-            if self.loop_processing:
-                await ctx.send("Une boucle rss est déjà en cours !")
-            else:
-                await ctx.send("Et hop ! Une itération de la boucle en cours !")
-                self.log.info(" RSS loop forced by an admin")
-                await self.refresh_feeds()
 
     async def send_log(self, text: str, guild: discord.Guild):
         """Send a log to the logging channel"""

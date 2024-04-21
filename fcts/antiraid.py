@@ -35,7 +35,7 @@ class AntiRaid(commands.Cog):
     async def on_member_join(self, member: discord.Member):
         "Check if a new member is a potential raider, and takes actions"
         if self.bot.database_online and self.check_cache.get((member.guild.id, member.id), True):
-            is_raider = await self.raid_check(member)
+            is_raider = await self.on_join_raid_check(member)
             self.check_cache[(member.guild.id, member.id)] = is_raider
 
     async def is_raider(self, member: discord.Member):
@@ -48,7 +48,7 @@ class AntiRaid(commands.Cog):
         level_name: str = await self.bot.get_config(guild.id, "anti_raid")
         return options["anti_raid"]["values"].index(level_name)
 
-    async def raid_check(self, member: discord.Member):
+    async def on_join_raid_check(self, member: discord.Member):
         """Check if a member should trigger the raid protection, and if so, kick or ban them
 
         Returns True if the member was kicked or banned, False otherwise"""
@@ -59,7 +59,7 @@ class AntiRaid(commands.Cog):
         # if antiraid is disabled or bot can't kick
         if level == 0 or not member.guild.me.guild_permissions.kick_members:
             return False
-        can_ban = member.guild.get_member(self.bot.user.id).guild_permissions.ban_members
+        can_ban = member.guild.me.guild_permissions.ban_members
         account_created_since = (self.bot.utcnow() - member.created_at).total_seconds()
         # Level 4
         if level >= 4:
@@ -176,14 +176,26 @@ class AntiRaid(commands.Cog):
         return True
 
 
+    async def _should_ignore_member(self, member: discord.Member):
+        "Check whether this member should be verified (False) or is immune (True)"
+        if member.bot:
+            return True
+        immune_roles: Optional[list[discord.Role]] = await self.bot.get_config(member.guild.id, "anti_raid_ignored_roles")
+        if not immune_roles:
+            return member.guild_permissions.moderate_members
+        return any(
+            role in member.roles
+            for role in immune_roles
+        )
+
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
         "Check mentions/invites count when a message is sent"
         # if the message is not in a guild or the bot can't see the guild
         if not isinstance(message.author, discord.Member) or message.guild.me is None:
             return
-        # if the author is a bot or has permission to moderate memebrs
-        if message.author.bot or message.author.guild_permissions.moderate_members:
+        # if the author is a bot or should be immune
+        if await self._should_ignore_member(message.author):
             return
         # if the antiraid is disabled
         if await self._get_raid_level(message.guild) == 0:
@@ -194,13 +206,13 @@ class AntiRaid(commands.Cog):
             # add users mentions count to the user score
             self.mentions_score[message.author.id] += mentions_count
         # if mentions score is higher than 0, apply sanctions
-        if self.mentions_score[message.author.id] > 0:
+        if mentions_count != 0 and self.mentions_score[message.author.id] > 0:
             await self.check_mentions_score(message.author)
         # 2. Check invites
         if invites_count := len(DISCORD_INVITE_REGEX.findall(message.content)):
             self.invites_score[message.author.id] += invites_count
         # if invites score is higher than 0, apply sanctions
-        if self.invites_score[message.author.id] > 0:
+        if invites_count != 0 and self.invites_score[message.author.id] > 0:
             await self.check_invites_score(message.author)
 
     async def check_mentions_score(self, member: discord.Member):

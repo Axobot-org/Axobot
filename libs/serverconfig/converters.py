@@ -144,7 +144,7 @@ AllRepresentation = Union[
 class OptionConverter:
     "Base class for option converters"
     @staticmethod
-    async def from_raw(raw: str, representation: TypedDict, guild: discord.Guild):
+    async def from_raw(raw: str, representation: AllRepresentation, guild: discord.Guild):
         raise NotImplementedError
 
     @staticmethod
@@ -156,7 +156,7 @@ class OptionConverter:
         raise NotImplementedError
 
     @staticmethod
-    async def from_input(raw: str, representation: TypedDict, guild: discord.Guild, ctx: MyContext):
+    async def from_input(raw: str, representation: AllRepresentation, guild: discord.Guild, ctx: MyContext):
         raise NotImplementedError
 
 def get_converter(option_name: str):

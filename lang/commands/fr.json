@@ -100,6 +100,7 @@
         "set-xp": "modifier-xp",
         "slowmode": "mode-lent",
         "stats": "stats",
+        "tic-tac-toe": "morpion",
         "tickets portal set-category": "modifier-catégorie",
         "tickets portal set-format": "modifier-format",
         "tickets portal set-hint": "modifier-indice",
@@ -148,7 +149,8 @@
         "quote": "Cite un message avec une jolie image générée",
         "random-tip": "Affiche une astuce aléatoire à propos du bot",
         "set-xp": "Modifie l'XP d'un utilisateur dans le serveur",
-        "slowmode": "Ralenti le spam du salon en activant le mode lent"
+        "slowmode": "Ralenti le spam du salon en activant le mode lent",
+        "tic-tac-toe": "Joue une partie de morpion (TicTacToe) contre le bot"
     },
     "group_description": {
         "antiscam": "Tout ce qui concerne la fonction d'anti-arnaque",

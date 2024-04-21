@@ -162,10 +162,6 @@
     "membercount-2": "Number of humans",
     "membercount-3": "Number of online members",
     "membercount-4": "Number of unverified users",
-    "nicknames-disabled": {
-        "disabled": "The nicknames changes records in this server have been disabled by an administrator. You won't see any new nickname here :confused:",
-        "guild-too-big": "The nicknames changes in this server are not recorded, probably because your server is too large. Ask an administrator to enable the \"nicknames_history\" option if you want them."
-    },
     "not-found": "Unable to find %{N}",
     "ping": {
         "normal": ":ping_pong:  Pong!\nBot ping: %{bot}ms\nDiscord ping: %{api}ms",

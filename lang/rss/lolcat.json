@@ -108,7 +108,8 @@
     },
     "success-add": "Teh rss feed for type '%{type}' with lik <%{url}> have bein prperly addded in the cannel %{channel} !",
     "test": {
-        "empty-result": "Uh oh, looks like teh generated msg is empty :/ plz check ur feed config or contact our help crew."
+        "empty-result": "Uh oh, looks like teh generated msg is empty :/ plz check ur feed config or contact our help crew.",
+        "invalid-format": "Uh, ur template haz some weird errors. Plz fix it by checking how u'r using ur feed variables."
     },
     "text-success": {
         "single": "Teh text of the feed #%{id} haz been modified!\n New cute text : \n```\n%{text}\n```",

@@ -18,6 +18,14 @@ import sys
 
 sys.path.insert(0, os.path.abspath('.'))
 
+try:
+    from changelog_generation import generate_changelog_file
+except ImportError:
+    pass
+else:
+    print("Generating the changelog file...")
+    generate_changelog_file("changelog.rst")
+
 # -- Project information -----------------------------------------------------
 
 project = 'Axobot'
@@ -27,7 +35,7 @@ author = 'ZRunner'
 # The short X.Y version
 version = '4.5'
 # The full version, including alpha/beta/rc tags
-release = '4.5.5'
+release = '4.5.6'
 
 _documentation_name = "Axobot Documentation"
 
@@ -167,6 +175,6 @@ texinfo_documents = [
 html_theme_options = {
     "toc_title": "On this page",
     "show_toc_level": 2,
-    "repository_url": "https://github.com/ZRunner/Zbot",
+    "repository_url": "https://github.com/ZRunner/Axobot",
     "use_repository_button": True,
 }
