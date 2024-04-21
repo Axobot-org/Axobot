@@ -24,6 +24,7 @@ class ServerConfig(commands.Cog):
         self.bot = bot
         self.file = "serverconfig"
         self.cache = TTLCache[tuple[int, str], Any](maxsize=10_000, ttl=3_600 * 2)
+        self.enable_caching = False
         self.membercounter_pending: dict[int, int] = {}
         self.embed_color = 0x3fb9ef
         self.log_color = 0x1b5fb1
@@ -52,7 +53,7 @@ class ServerConfig(commands.Cog):
 
     async def get_option(self, guild_id: int, option_name: str):
         "Return the formated value of a server config option"
-        if (cached := self.cache.get((guild_id, option_name))) is not None:
+        if self.enable_caching and (cached := self.cache.get((guild_id, option_name))) is not None:
             return cached
         if (guild := self.bot.get_guild(guild_id)) is None:
             value = options_list[option_name]["default"]
@@ -61,7 +62,8 @@ class ServerConfig(commands.Cog):
             value = await from_raw(option_name, raw_value, guild)
         if option_name == "nicknames_history" and value is None:
             value = len(guild.members) < self.max_members_for_nicknames
-        self.cache[(guild_id, option_name)] = value
+        if self.enable_caching:
+            self.cache[(guild_id, option_name)] = value
         return value
 
     async def set_option(self, guild_id: int, option_name: str, value: Any):
@@ -71,7 +73,8 @@ class ServerConfig(commands.Cog):
         if not self.bot.database_online:
             return False
         if await self.db_set_value(guild_id, option_name, to_raw(option_name, value)):
-            self.cache[(guild_id, option_name)] = value
+            if self.enable_caching:
+                self.cache[(guild_id, option_name)] = value
             if option_name == "prefix":
                 await self.bot.prefix_manager.update_prefix(guild_id, value)
             return True
@@ -84,7 +87,7 @@ class ServerConfig(commands.Cog):
         if not self.bot.database_online:
             return False
         if await self.db_delete_option(guild_id, option_name):
-            if (guild_id, option_name) in self.cache:
+            if self.enable_caching and (guild_id, option_name) in self.cache:
                 self.cache.pop((guild_id, option_name))
             if option_name == "prefix":
                 await self.bot.prefix_manager.reset_prefix(guild_id)
@@ -97,9 +100,9 @@ class ServerConfig(commands.Cog):
             return False
         if await self.db_delete_guild(guild_id):
             for option_name in options_list:
-                if (guild_id, option_name) in self.cache:
+                if self.enable_caching and (guild_id, option_name) in self.cache:
                     self.cache.pop((guild_id, option_name))
-                    await self.bot.prefix_manager.reset_prefix(guild_id)
+            await self.bot.prefix_manager.reset_prefix(guild_id)
             return True
         return False
 
