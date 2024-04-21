@@ -162,10 +162,6 @@
     "membercount-2": "Nombre d'humains",
     "membercount-3": "Nombre de membres connectés",
     "membercount-4": "Nombre de membres non vérifiés",
-    "nicknames-disabled": {
-        "disabled": "Les enregistrements de changements de pseudo ont été désactivés par un administrateur de ce serveur. Vous ne verrez pas vos nouveaux changements de pseudo ici :confused:",
-        "guild-too-big": "Les changements de pseudo dans ce serveur ne sont pas sauvegardés, probablement parce que votre serveur est trop grand. Demandez à un administrateur d'activer l'option \"nicknames_history\" si vous le souhaitez."
-    },
     "not-found": "Impossible de trouver %{N}",
     "ping": {
         "normal": ":ping_pong:  Pong !\nLatence du bot : %{bot}ms\nLatence de l'API Discord : %{api}ms",
