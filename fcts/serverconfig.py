@@ -53,8 +53,8 @@ class ServerConfig(commands.Cog):
 
     async def get_option(self, guild_id: int, option_name: str):
         "Return the formated value of a server config option"
-        if self.enable_caching and (cached := self.cache.get((guild_id, option_name))) is not None:
-            return cached
+        if self.enable_caching and (guild_id, option_name) in self.cache:
+            return self.cache[(guild_id, option_name)]
         if (guild := self.bot.get_guild(guild_id)) is None:
             value = options_list[option_name]["default"]
         else:
