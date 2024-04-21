@@ -162,10 +162,6 @@
     "membercount-2": "Numbrz for good people",
     "membercount-3": "Nmbr ov god online peepl",
     "membercount-4": "Numer of sus people",
-    "nicknames-disabled": {
-        "disabled": "Oh no, nick changes are been disabled here by an administrator. U won't see new nicknames!",
-        "guild-too-big": "Oh no, nick changes are disabled here cuz ur server is 2 big to save 'em all. Ask an admin to enabled them with the 'nicknames_history' option!"
-    },
     "not-found": "Unable 2 found %{N}",
     "ping": {
         "normal": ":ping_pong:  Gotcha!\nMy running speed: %{bot}ms\nHow slow iz discord: %{api}ms",
