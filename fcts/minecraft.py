@@ -266,6 +266,7 @@ class Minecraft(commands.Cog):
         ..Example minecraft follow-server mc.hypixel.net
 
         ..Doc minecraft.html#mc"""
+        await ctx.guild.get_channel_or_thread()
         if not ctx.bot.database_online:
             await ctx.send(await self.bot._(ctx.guild.id, "cases.no_database"))
             return
@@ -280,7 +281,7 @@ class Minecraft(commands.Cog):
             return
         if channel is None:
             channel = ctx.channel
-        if not channel.permissions_for(ctx.guild.me).send_messages or channel.permissions_for(ctx.guild.me).embed_links:
+        if not channel.permissions_for(ctx.guild.me).send_messages or not channel.permissions_for(ctx.guild.me).embed_links:
             await ctx.send(await self.bot._(ctx.guild.id, "minecraft.serv-follow.missing-perms"))
             return
         try:
