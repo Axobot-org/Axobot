@@ -24,7 +24,7 @@ class AntiRaid(commands.Cog):
         self.invites_score: defaultdict[int, int] = defaultdict(int)
 
     async def cog_load(self):
-         # pylint: disable=no-member
+        # pylint: disable=no-member
         self.decrease_users_scores.start()
 
     async def cog_unload(self):

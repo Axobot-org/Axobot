@@ -32,8 +32,6 @@ importlib.reload(args)
 importlib.reload(checks)
 
 
-
-
 class Xp(commands.Cog):
     "XP system"
 
@@ -75,9 +73,13 @@ class Xp(commands.Cog):
             return
         self.table = 'xp_beta' if self.bot.beta else 'xp'
         await self.db_load_cache(None)
+
+    async def cog_load(self):
+        # pylint: disable=no-member
         self.xp_decay_loop.start()
 
     async def cog_unload(self):
+        # pylint: disable=no-member
         if self.xp_decay_loop.is_running():
             self.xp_decay_loop.stop()
 
