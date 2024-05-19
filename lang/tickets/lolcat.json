@@ -28,6 +28,7 @@
         "channel": "Ouch, I couldnt creete a new ticket channel. Pliz make sure I haz teh requiwed permissions in \"%{category}\" nd try again.",
         "thread": "Woops, I couldnt creete a new ticket threed. Pleez make sure I haz teh requird permissionz in %{channel} and try harder."
     },
+    "missing-perms-send": "Woopsie, looks like am missing teh **'Send messages'** permissun in %{channel}. Plz give perm and try again.",
     "missing-perms-setup": {
         "to-member": "Oopsie, I couldnt setup ur ticket channel. Pls ask a server moderator 2 fix my perms, or any1 havin access to teh tickets thing may be able 2 read ur ticket and that might be uncool u know?",
         "to-staff": "Woops, i couldnt setup teh channel perms for ur ticket. Plz check I have the 'Manage roles' perm in the category %{category}, or I wont prevent other bad guys from seeing teh tickets."
