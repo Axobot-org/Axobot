@@ -4,8 +4,8 @@
 # check python version
 import sys
 py_version = sys.version_info
-if py_version.major != 3 or py_version.minor < 9:
-    print("You must use at least Python 3.9!", file=sys.stderr)
+if py_version.major != 3 or py_version.minor < 11:
+    print("You must use at least Python 3.11!", file=sys.stderr)
     sys.exit(1)
 
 import pkg_resources
@@ -92,7 +92,7 @@ async def main():
         return
     else:
         token: str = args.token
-        client.entity_id: int = args.entity_id
+        client.entity_id = args.entity_id
     # Events loop
     if not args.event_loop:
         client.internal_loop_enabled = False
