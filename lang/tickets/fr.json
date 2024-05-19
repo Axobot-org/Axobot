@@ -28,6 +28,7 @@
         "channel": "Oups, je n'ai pas pu créer de salon pour votre ticket. Assurez-vous que j'ai les permissions nécessaires dans la catégorie \"%{category}\" et réessayez.",
         "thread": "Oups, je n'ai pas pu créer de fil pour votre. Assurez-vous que j'ai les permissions nécessaires dans %{channel} et réessayez."
     },
+    "missing-perms-send": "Oups, je n'ai pas les permissions requises pour envoyer des messages dans le salon %{channel}. Veuillez m'accorder la **permission 'Envoyer des messages'** puis réessayez.",
     "missing-perms-setup": {
         "to-member": "Oups, je n'ai pas pu configurer correctement le salon de votre ticket. Veuillez demander à un modérateur de serveur de corriger mes permissions, sinon toute personne ayant accès à la catégorie des tickets pourrait être en mesure de lire votre ticket.",
         "to-staff": "Oups, je n'ai pas pu configurer les permissions du salon pour votre ticket. Veuillez vous assurer que j'ai la permission \"Gérer les rôles\" dans la catégorie %{category}, sinon toute personne ayant accès à cette catégorie pourrait voir les nouveaux tickets."
