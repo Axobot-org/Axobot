@@ -96,7 +96,7 @@ class AbstractSubcog(ABC):
             ]
             parsed_date = None
             if related_objective and (min_date := related_objective[0].get("min_date")):
-                parsed_date = datetime.datetime.strptime(min_date, "%Y-%m-%d").replace(tzinfo=datetime.timezone.utc)
+                parsed_date = datetime.datetime.strptime(min_date, "%Y-%m-%d").replace(tzinfo=datetime.UTC)
                 format_date = await FormatUtils.date(parsed_date, hour=False, seconds=False)
                 desc += f" (**{await self.bot._(ctx.channel, 'bot_events.available-starting', date=format_date)}**)"
             # assign correct emoji
@@ -260,7 +260,7 @@ class AbstractSubcog(ABC):
             if query_result[0] is None:
                 return None
             # apply utc offset
-            last_collect = query_result[0].replace(tzinfo=datetime.timezone.utc)
+            last_collect = query_result[0].replace(tzinfo=datetime.UTC)
         return last_collect
 
     async def db_add_user_items(self, user_id: int, items_ids: list[int]):

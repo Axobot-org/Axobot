@@ -610,7 +610,7 @@ class Xp(commands.Cog):
         async with self.bot.db_query(query, (self.bot.beta,)) as query_result:
             return query_result
 
-    @tasks.loop(time=datetime.time(hour=0, tzinfo=datetime.timezone.utc))
+    @tasks.loop(time=datetime.time(hour=0, tzinfo=datetime.UTC))
     async def xp_decay_loop(self):
         "Remove some xp to every member every day at midnight"
         guilds = await self.db_get_guilds_decays()

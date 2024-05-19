@@ -1375,7 +1375,7 @@ class Rss(commands.Cog):
             return
         ids_list = ', '.join(map(str, feed_ids))
         query = f"UPDATE `{self.table}` SET `last_refresh` = %s WHERE `ID` IN ({ids_list})"
-        async with self.bot.db_query(query, (datetime.datetime.utcnow(),), returnrowcount=True) as query_results:
+        async with self.bot.db_query(query, (self.bot.utcnow(),), returnrowcount=True) as query_results:
             self.log.info("Set last refresh date for %s feeds", query_results)
 
     async def send_rss_msg(self, obj: "RssMessage", channel: Union[discord.TextChannel, discord.Thread]):

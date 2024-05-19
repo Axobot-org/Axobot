@@ -145,8 +145,7 @@ class YoutubeRSS:
                 break
             entry_date = entry.get("published_parsed")
             # check if the entry is not too close to (or passed) the last post
-            if entry_date is None or (
-                    dt.datetime(*entry_date[:6]) - date).total_seconds() <= self.min_time_between_posts:
+            if (dt.datetime(*entry_date[:6], tzinfo=dt.UTC) - date).total_seconds() <= self.min_time_between_posts:
                 # we know we can break because entries are sorted by most recent first
                 break
             img_url = None

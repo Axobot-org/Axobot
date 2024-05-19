@@ -80,7 +80,7 @@ class TwitchRSS:
         for entry in feed.entries:
             if len(posts_list) > 10:
                 break
-            if dt.datetime(*entry['published_parsed'][:6]) <= date:
+            if dt.datetime(*entry['published_parsed'][:6], tzinfo=dt.UTC) <= date:
                 break
             img_url = None
             if img_match := re.search(r'<img src="([^"]+)" />', entry['summary']):

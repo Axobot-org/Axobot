@@ -446,7 +446,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
 
         ..Doc fun.html#nasa"""
         def get_date(raw_str: str):
-            return datetime.datetime.strptime(raw_str, "%Y-%m-%d").replace(tzinfo=datetime.timezone.utc)
+            return datetime.datetime.strptime(raw_str, "%Y-%m-%d").replace(tzinfo=datetime.UTC)
 
         await interaction.response.defer()
         if self.nasa_pict is None \

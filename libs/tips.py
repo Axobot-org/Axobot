@@ -116,7 +116,7 @@ class TipsManager:
         query = "SELECT MAX(shown_at) FROM tips WHERE user_id = %s AND tip_id = %s"
         async with self.bot.db_query(query, (user_id, tip.value), astuple=True) as query_result:
             if query_result[0][0]:
-                return query_result[0][0].replace(tzinfo=datetime.timezone.utc)
+                return query_result[0][0].replace(tzinfo=datetime.UTC)
             return None
 
     async def db_get_last_guild_tip_shown(self, guild_id: int, tip: GuildTip) -> Optional[datetime.datetime]:
@@ -124,7 +124,7 @@ class TipsManager:
         query = "SELECT MAX(shown_at) FROM tips WHERE guild_id = %s AND tip_id = %s"
         async with self.bot.db_query(query, (guild_id, tip.value), astuple=True) as query_result:
             if query_result[0][0]:
-                return query_result[0][0].replace(tzinfo=datetime.timezone.utc)
+                return query_result[0][0].replace(tzinfo=datetime.UTC)
             return None
 
     async def should_show_user_tip(self, user_id: int, tip: UserTip) -> bool:
