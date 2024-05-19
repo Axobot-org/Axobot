@@ -1,23 +1,11 @@
 #!/usr/bin/env python
 #coding=utf-8
 
-# check python version
-import sys
-py_version = sys.version_info
-if py_version.major != 3 or py_version.minor < 11:
-    print("You must use at least Python 3.11!", file=sys.stderr)
-    sys.exit(1)
+# pylint: disable=wrong-import-order, wrong-import-position, ungrouped-imports
 
-import pkg_resources
-
-def check_libs():
-    """Check if the required libraries are installed and can be imported"""
-    with open("requirements.txt", 'r', encoding="utf-8") as file:
-        packages = pkg_resources.parse_requirements(file.readlines())
-    pkg_resources.working_set.resolve(packages)
-
-
-check_libs()
+# Check Python version and 3rd party libraries
+from libs.boot_utils.check_requirements import check_requirements
+check_requirements()
 
 # required to avoid segmentation error - don't ask me why
 from nltk import SnowballStemmer # pylint: disable=unused-import
@@ -27,7 +15,7 @@ import asyncio
 import time
 import json
 from random import choice
-from fcts import tokens  # pylint: disable=no-name-in-module
+from fcts import tokens
 from libs.bot_classes import Axobot
 from libs.boot_utils import set_beta_logs, setup_start_parser, setup_logger, load_cogs, load_sql_connection
 
