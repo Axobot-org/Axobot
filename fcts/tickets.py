@@ -403,18 +403,26 @@ class Tickets(commands.Cog):
     @commands.cooldown(2, 30, commands.BucketType.guild)
     @commands.guild_only()
     @commands.check(checks.has_manage_channels)
-    async def summon(self, ctx: MyContext):
+    async def summon(self, ctx: MyContext, channel: Optional[discord.TextChannel] = None):
         """Ask the bot to send a message allowing people to open tickets
 
         ..Doc tickets.html#as-staff-send-the-prompt-message"""
+        destination_channel = channel or ctx.channel
+        if not destination_channel.permissions_for(ctx.guild.me).send_messages:
+            await ctx.send(
+                await self.bot._(ctx.guild.id, "tickets.missing-perms-send", channel=destination_channel.mention),
+                ephemeral=True
+            )
+            return
         topics = await self.db_get_topics(ctx.guild.id)
-        other = {"id": -1,
-                 "topic": (await self.bot._(ctx.guild.id, "tickets.other")).capitalize(),
-                 "topic_emoji": None
-                 }
+        other = {
+            "id": -1,
+            "topic": (await self.bot._(ctx.guild.id, "tickets.other")).capitalize(),
+            "topic_emoji": None
+        }
         defaults = await self.db_get_defaults(ctx.guild.id)
         prompt = defaults["prompt"] if defaults else await self.bot._(ctx.guild.id, "tickets.default-topic-prompt")
-        await ctx.channel.send(prompt, view=SelectView(ctx.guild.id, topics + [other]))
+        await destination_channel.send(prompt, view=SelectView(ctx.guild.id, topics + [other]))
         if ctx.interaction:
             await ctx.reply(await self.bot._(ctx.guild.id, "misc.done!"), ephemeral=True)
 
