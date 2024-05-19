@@ -1,6 +1,7 @@
 import datetime
 import random
-from enum import Enum
+from enum import StrEnum
+from enum import auto as enum_auto
 from typing import TYPE_CHECKING, Optional, TypedDict, Union
 
 import discord
@@ -10,18 +11,18 @@ if TYPE_CHECKING:
     from bot_classes import Axobot, MyContext
 
 
-class UserTip(str, Enum):
+class UserTip(StrEnum):
     "Tips that can be shown to users"
-    RANK_CARD_PERSONALISATION = "rank_card_personalisation"
+    RANK_CARD_PERSONALISATION = enum_auto()
 
 
-class GuildTip(str, Enum):
+class GuildTip(StrEnum):
     "Tips that can be shown to guilds"
-    SERVERLOG_ENABLE_ANTISCAM = "serverlog_enable_antiscam"
-    SERVERLOG_ENABLE_ANTIRAID = "serverlog_enable_antiraid"
-    SERVERLOG_ENABLE_BOTWARNING = "serverlog_enable_botwarning"
-    RSS_DIFFERENCE_DISABLE_DELETE = "rss_difference_disable_delete"
-    RSS_DELETE_DISABLED_FEEDS = "rss_delete_disabled_feeds"
+    SERVERLOG_ENABLE_ANTISCAM = enum_auto()
+    SERVERLOG_ENABLE_ANTIRAID = enum_auto()
+    SERVERLOG_ENABLE_BOTWARNING = enum_auto()
+    RSS_DIFFERENCE_DISABLE_DELETE = enum_auto()
+    RSS_DELETE_DISABLED_FEEDS = enum_auto()
 
 
 minTimeBetweenTips: dict[Union[UserTip, GuildTip], datetime.timedelta] = {
