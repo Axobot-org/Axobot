@@ -298,6 +298,8 @@ class Minecraft(commands.Cog):
 
     async def validate_server_ip(self, ip: str, port: Optional[int] = None):
         "Validate a server IP and port"
+        if ip.count(":") > 1 or (port is not None and ip.count(":") == 1):
+            return None
         if ":" in ip and port is None:
             ip, port_str = ip.split(":")
             if not port_str.isnumeric():
