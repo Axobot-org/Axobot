@@ -19,7 +19,6 @@ from libs.views import ConfirmView
 importlib.reload(args)
 importlib.reload(checks)
 
-utc = datetime.timezone.utc
 DescriptionType = app_commands.Range[str, 1, 1500]
 
 
@@ -46,9 +45,9 @@ class Partners(commands.Cog):
         return {'Authorization': self.bot.dbl_token}
 
     @tasks.loop(time=[
-        datetime.time(hour=7, tzinfo=utc),
-        datetime.time(hour=14, tzinfo=utc),
-        datetime.time(hour=21, tzinfo=utc)
+        datetime.time(hour=7, tzinfo=datetime.UTC),
+        datetime.time(hour=14, tzinfo=datetime.UTC),
+        datetime.time(hour=21, tzinfo=datetime.UTC)
     ], reconnect=True)
     async def refresh_loop(self):
         """Refresh partners channels every 7 hours"""

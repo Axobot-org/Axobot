@@ -1,3 +1,4 @@
+import datetime
 import logging
 import sys
 import time
@@ -6,7 +7,8 @@ from typing import TYPE_CHECKING, Union
 
 from mysql.connector import errors
 from mysql.connector.connection import MySQLConnection, MySQLCursor
-from mysql.connector.cursor import RE_PY_PARAM, _bytestr_format_dict, _ParamSubstitutor
+from mysql.connector.cursor import (RE_PY_PARAM, _bytestr_format_dict,
+                                    _ParamSubstitutor)
 
 if TYPE_CHECKING:
     from mysql.connector.connection_cext import CMySQLConnection, CMySQLCursor
@@ -120,6 +122,11 @@ def create_database_query(bot: "Axobot", cnx_axobot: Union[MySQLConnection, 'CMy
                     result = return_type() if one_row is None else return_type(one_row)
                 else:
                     result = list(map(return_type, self.cursor.fetchall()))
+                    # convert datetime objects to UTC
+                    for row in result:
+                        for key, value in (row.items() if isinstance(row, dict) else enumerate(row)):
+                            if isinstance(value, datetime.datetime) and value.tzinfo is None:
+                                row[key] = value.replace(tzinfo=datetime.UTC)
             else:
                 if self.multi:
                     # make sure to execute every query

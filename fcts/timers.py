@@ -75,7 +75,7 @@ class Timers(commands.Cog):
     @cached(TTLCache(1_000, ttl=60))
     async def format_duration_left(self, end_date: datetime.datetime, lang: str) -> str:
         "Format the duration left for a reminder"
-        now = self.bot.utcnow() if end_date.tzinfo else datetime.datetime.utcnow()
+        now = self.bot.utcnow()
         if now > end_date:
             return "-" + await FormatUtils.time_delta(
                 end_date, now,
@@ -278,16 +278,16 @@ class Timers(commands.Cog):
                     rmd_data["tr_channel"] = reminder["channel"]
                 # duration
                 end: datetime.datetime = reminder["begin"] + datetime.timedelta(seconds=reminder['duration'])
-                now = ctx.bot.utcnow() if end.tzinfo else datetime.datetime.utcnow()
+                now = ctx.bot.utcnow()
                 if now > end:
                     duration = "-" + await FormatUtils.time_delta(
                         end, now,
-                        lang=lang, year=True, form="short"
+                        lang=lang, year=True, form="short", seconds=False
                     )
                 else:
                     duration = await FormatUtils.time_delta(
                         now, end,
-                        lang=lang, year=True, form="short"
+                        lang=lang, year=True, form="short", seconds=False
                     )
                 rmd_data["tr_duration"] = duration
                 # append to the list

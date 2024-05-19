@@ -67,9 +67,9 @@ class BotEvents(commands.Cog):
         self.reset()
         for ev_id, ev_data in events.items():
             ev_data["begin"] = datetime.datetime.strptime(
-                ev_data["begin"], "%Y-%m-%d").replace(tzinfo=datetime.timezone.utc)
+                ev_data["begin"], "%Y-%m-%d").replace(tzinfo=datetime.UTC)
             ev_data["end"] = datetime.datetime.strptime(
-                ev_data["end"], "%Y-%m-%d").replace(tzinfo=datetime.timezone.utc)
+                ev_data["end"], "%Y-%m-%d").replace(tzinfo=datetime.UTC)
 
             if ev_data["begin"] <= now < ev_data["end"]:
                 self.current_event = ev_data["type"]
@@ -94,8 +94,8 @@ class BotEvents(commands.Cog):
         ]
 
     @tasks.loop(time=[
-        datetime.time(hour=0,  tzinfo=datetime.timezone.utc),
-        datetime.time(hour=12, tzinfo=datetime.timezone.utc),
+        datetime.time(hour=0,  tzinfo=datetime.UTC),
+        datetime.time(hour=12, tzinfo=datetime.UTC),
     ])
     async def _update_event_loop(self):
         "Refresh the current bot event every 12h"
@@ -206,7 +206,7 @@ class BotEvents(commands.Cog):
                 if str(objective["points"]) == required_points
             ]
             if related_objective and (min_date := related_objective[0].get("min_date")):
-                parsed_date = datetime.datetime.strptime(min_date, "%Y-%m-%d").replace(tzinfo=datetime.timezone.utc)
+                parsed_date = datetime.datetime.strptime(min_date, "%Y-%m-%d").replace(tzinfo=datetime.UTC)
                 format_date = await FormatUtils.date(parsed_date, hour=False, seconds=False)
                 description += f" ({await self.bot._(channel, 'bot_events.available-starting', date=format_date)})"
             prices.append(f"- **{required_points} {points}:** {description}")
@@ -241,7 +241,7 @@ class BotEvents(commands.Cog):
         for reward in rewards:
             if reward["rank_card"] not in cards and points >= reward["points"]:
                 if min_date := reward.get("min_date"):
-                    parsed_date = datetime.datetime.strptime(min_date, "%Y-%m-%d").replace(tzinfo=datetime.timezone.utc)
+                    parsed_date = datetime.datetime.strptime(min_date, "%Y-%m-%d").replace(tzinfo=datetime.UTC)
                     if self.bot.utcnow() < parsed_date:
                         continue
                 yield reward["rank_card"]
@@ -302,7 +302,7 @@ class BotEvents(commands.Cog):
         for reward in rewards:
             if points >= reward["points"]:
                 if min_date := reward.get("min_date"):
-                    parsed_date = datetime.datetime.strptime(min_date, "%Y-%m-%d").replace(tzinfo=datetime.timezone.utc)
+                    parsed_date = datetime.datetime.strptime(min_date, "%Y-%m-%d").replace(tzinfo=datetime.UTC)
                     if self.bot.utcnow() < parsed_date:
                         continue
                 await member.add_roles(discord.Object(reward["role_id"]))

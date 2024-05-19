@@ -31,13 +31,13 @@ class Duration(float):
             found = True
         r = re.search(r'^(\d+) ?mo(?:nths?)?$', argument)
         if r is not None:
-            now = then = datetime.datetime.now(datetime.timezone.utc)
+            now = then = datetime.datetime.now(datetime.UTC)
             then += relativedelta(months=int(r.group(1)))
             duration += (then - now).total_seconds()
             found = True
         r = re.search(r'^(\d+) ?y(?:ears?)?$', argument)
         if r is not None:
-            now = then = datetime.datetime.now(datetime.timezone.utc)
+            now = then = datetime.datetime.now(datetime.UTC)
             then += relativedelta(years=int(r.group(1)))
             duration += (then - now).total_seconds()
             found = True

@@ -110,9 +110,9 @@ class RssMessage:
         self.post_text = post_text
         self.post_description = post_description
         if isinstance(date, datetime.datetime):
-            self.date = date
+            self.date = date.replace(tzinfo=datetime.UTC)
         elif isinstance(date, time.struct_time):
-            self.date = datetime.datetime(*date[:6]).replace(tzinfo=datetime.timezone.utc)
+            self.date = datetime.datetime(*date[:6]).replace(tzinfo=datetime.UTC)
         elif isinstance(date, str):
             try:
                 self.date = datetime.datetime.fromisoformat(date)
@@ -283,7 +283,7 @@ class FeedObject:
     def __init__(self, from_dict: dict):
         self.feed_id: int = from_dict['ID']
         self.added_at: Optional[datetime.datetime] = (
-            from_dict['added_at'].replace(tzinfo=datetime.timezone.utc)
+            from_dict['added_at']
             if from_dict['added_at']
             else None
         )
@@ -300,12 +300,12 @@ class FeedObject:
         self.silent_mention: bool = bool(from_dict['silent_mention'])
         self.filter_config: FeedFilterConfig = json.loads(from_dict['filter_config']) or {"filter_type": "none", "words": []}
         self.last_update: Optional[datetime.datetime] = (
-            from_dict['last_update'].replace(tzinfo=datetime.timezone.utc)
+            from_dict['last_update']
             if from_dict['last_update']
             else None
         )
         self.last_refresh: Optional[datetime.datetime] = (
-            from_dict['last_refresh'].replace(tzinfo=datetime.timezone.utc)
+            from_dict['last_refresh']
             if from_dict['last_refresh']
             else None
         )
@@ -316,10 +316,7 @@ class FeedObject:
         "Return True if the feed has been refreshed in the last 7 days"
         if self.last_refresh is None:
             return False
-        if self.last_refresh.tzinfo:
-            now = datetime.datetime.now(datetime.timezone.utc)
-        else:
-            now = datetime.datetime.utcnow()
+        now = datetime.datetime.now(datetime.UTC)
         return self.last_refresh > now - datetime.timedelta(days=7)
 
     @classmethod
