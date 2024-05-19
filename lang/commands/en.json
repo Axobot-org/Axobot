@@ -62,8 +62,8 @@
         "profile card-preview": "card-preview",
         "profile config": "config",
         "profile list-card-styles": "list-card-styles",
-        "Quote": "Quote",
         "quote": "quote",
+        "Quote": "Quote",
         "random-tip": "random-tip",
         "rank": "rank",
         "reminders clear": "clear",
@@ -503,6 +503,9 @@
         },
         "tickets portal set-text": {
             "message": "message"
+        },
+        "tickets portal summon": {
+            "channel": "channel"
         },
         "tickets review-config": {
             "topic_id": "topic-id"
