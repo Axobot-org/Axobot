@@ -175,7 +175,7 @@ class ChristmasSubcog(AbstractSubcog):
 
     @cached(TTLCache(maxsize=1, ttl=60*2)) # cache for 2min
     async def today(self):
-        return dt.datetime.now(dt.timezone.utc).date()
+        return dt.datetime.now(dt.UTC).date()
 
     async def check_trigger_words(self, message: str):
         "Check if a word in the message triggers the event"

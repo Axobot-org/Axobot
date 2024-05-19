@@ -76,7 +76,7 @@ class DeviantartRSS:
         posts_list: list[RssMessage] = []
         url = "https://www.deviantart.com/" + username
         for entry in feed.entries:
-            if dt.datetime(*entry['published_parsed'][:6]) <= date:
+            if dt.datetime(*entry['published_parsed'][:6], tzinfo=dt.UTC) <= date:
                 break
             img_url = entry['media_content'][0]['url'] if "media_content" in entry else None
             title = re.search(r"DeviantArt: ([^ ]+)'s gallery", feed.feed['title']).group(1)
