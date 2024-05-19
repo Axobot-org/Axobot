@@ -1,4 +1,4 @@
-from enum import Enum
+from enum import IntEnum, unique
 
 
 class RankCardsFlag:
@@ -57,9 +57,9 @@ class UserFlag:
         "Convert an integer value to its list of flags"
         return [v for k, v in self.FLAGS.items() if i & k == k]
 
-class ServerWarningType(Enum):
+@unique
+class ServerWarningType(IntEnum):
     "Type of emitted server warning, mainly used for logs"
-
     # channel, is_join
     WELCOME_MISSING_TXT_PERMISSIONS = 1
     # channel, feed_id
