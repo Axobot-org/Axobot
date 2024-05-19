@@ -20,7 +20,7 @@ How to use
 As staff: Send the prompt message
 ---------------------------------
 
-**Syntax:** :code:`tickets portal summon`
+**Syntax:** :code:`tickets portal summon [channel]`
 
 Once you have configured the necessary (see the following chapters), you should display the prompt so that your members can select a topic and open their ticket. Using this command will ask Axobot to send a message containing the presentation message and the topic selector.
 
