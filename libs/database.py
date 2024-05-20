@@ -3,26 +3,26 @@ import logging
 import sys
 import time
 from types import GeneratorType
-from typing import TYPE_CHECKING, Union
+from typing import TYPE_CHECKING
 
 from mysql.connector import errors
 from mysql.connector.connection import MySQLConnection, MySQLCursor
 from mysql.connector.cursor import (RE_PY_PARAM, _bytestr_format_dict,
                                     _ParamSubstitutor)
+from mysql.connector.connection_cext import CMySQLConnection, CMySQLCursor
 
 if TYPE_CHECKING:
-    from mysql.connector.connection_cext import CMySQLConnection, CMySQLCursor
 
     from libs.bot_classes.axobot import Axobot
 
 
-def create_database_query(bot: "Axobot", cnx_axobot: Union[MySQLConnection, 'CMySQLConnection']):
+def create_database_query(bot: "Axobot", cnx_axobot: MySQLConnection | CMySQLConnection):
     """Create a database query object using a specific database connector"""
 
     class DatabaseQuery:
         """Represents a context manager to execute a query to a database"""
 
-        def __init__(self, query: str, args: Union[tuple, dict] = None, *,
+        def __init__(self, query: str, args: tuple | dict = None, *,
         fetchone: bool = False, multi: bool = False, returnrowcount: bool = False, astuple: bool = False):
             self.query = query
             self.multi = multi
@@ -32,7 +32,7 @@ def create_database_query(bot: "Axobot", cnx_axobot: Union[MySQLConnection, 'CMy
             self.fetchone = fetchone
             self.returnrowcount = returnrowcount
             self.astuple = astuple
-            self.cursor: Union[MySQLCursor, 'CMySQLCursor'] = None
+            self.cursor: MySQLCursor | CMySQLCursor = None
             self.log = logging.getLogger("bot.db")
 
         async def _format_query(self):
@@ -46,7 +46,7 @@ def create_database_query(bot: "Axobot", cnx_axobot: Union[MySQLConnection, 'CMy
             operation = self.query
             params = self.args
             try:
-                if not isinstance(operation, (bytes, bytearray)):
+                if not isinstance(operation, bytes | bytearray):
                     stmt = operation.encode(cursor._connection.python_charset)
                 else:
                     stmt = operation
@@ -56,7 +56,7 @@ def create_database_query(bot: "Axobot", cnx_axobot: Union[MySQLConnection, 'CMy
             if params:
                 if isinstance(params, dict):
                     stmt = _bytestr_format_dict(stmt, cursor._process_params_dict(params))
-                elif isinstance(params, (list, tuple)):
+                elif isinstance(params, list | tuple):
                     psub = _ParamSubstitutor(cursor._process_params(params))
                     stmt = RE_PY_PARAM.sub(psub, stmt)
                     if psub.remaining != 0:
@@ -85,7 +85,7 @@ def create_database_query(bot: "Axobot", cnx_axobot: Union[MySQLConnection, 'CMy
                 if isinstance(prepared, dict):
                     for key, value in prepared.items():
                         stmt = stmt.replace(f"%({key})s".encode(), value)
-                elif isinstance(prepared, (list, tuple)):
+                elif isinstance(prepared, list | tuple):
                     psub = _ParamSubstitutor(prepared)
                     stmt = RE_PY_PARAM.sub(psub, stmt)
                     if psub.remaining != 0:
@@ -98,7 +98,7 @@ def create_database_query(bot: "Axobot", cnx_axobot: Union[MySQLConnection, 'CMy
             return stmt.decode("unicode_escape")
 
 
-        async def __aenter__(self) -> Union[int, list[dict], dict]:
+        async def __aenter__(self) -> int | list[dict] | dict:
             self.cursor: MySQLCursor = cnx_axobot.cursor(
                 dictionary=(not self.astuple)
             )

@@ -5,7 +5,7 @@ import datetime
 import json
 import logging
 import time
-from typing import TYPE_CHECKING, Any, Literal, Optional, TypedDict, Union
+from typing import TYPE_CHECKING, Any, Literal, TypedDict
 
 import discord
 import feedparser
@@ -22,8 +22,8 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger("bot.rss")
 
-async def feed_parse(url: str, timeout: int, session: Optional[ClientSession] = None
-                     ) -> Optional[feedparser.FeedParserDict]:
+async def feed_parse(url: str, timeout: int, session: ClientSession | None = None
+                     ) -> feedparser.FeedParserDict | None:
     """Asynchronous parsing using cool methods"""
     # if session is provided, we have to not close it
     if session is None:
@@ -92,15 +92,14 @@ class RssMessage:
                  feed: "FeedObject",
                  url: str,
                  title: str,
-                 date: Union[datetime.datetime, time.struct_time,
-                             str] = datetime.datetime.now(),
-                 entry_id: Optional[str] = None,
-                 author: Optional[str] = None,
-                 channel: Optional[str] = None,
-                 retweeted_from: Optional[str] = None,
-                 image: Optional[str] = None,
-                 post_text: Optional[str] = None,
-                 post_description: Optional[str] = None,
+                 date: datetime.datetime | time.struct_time | str = datetime.datetime.now(),
+                 entry_id: str | None = None,
+                 author: str | None = None,
+                 channel: str | None = None,
+                 retweeted_from: str | None = None,
+                 image: str | None = None,
+                 post_text: str | None = None,
+                 post_description: str | None = None,
                  ):
         self.bot = bot
         self.feed = feed
@@ -265,13 +264,13 @@ class InvalidFormatError(Exception):
 
 class FeedEmbedData(TypedDict):
     "Embed configuration for an RSS feed"
-    author_text: Optional[str]
-    title: Optional[str]
-    footer_text: Optional[str]
-    color: Optional[int]
-    show_date_in_footer: Optional[bool]
-    enable_link_in_title: Optional[bool]
-    image_location: Optional[Literal["thumbnail", "banner", "none"]]
+    author_text: str | None
+    title: str | None
+    footer_text: str | None
+    color: int | None
+    show_date_in_footer: bool | None
+    enable_link_in_title: bool | None
+    image_location: Literal["thumbnail", "banner", "none"] | None
 
 class FeedFilterConfig(TypedDict):
     "Filter configuration for an RSS feed"
@@ -282,7 +281,7 @@ class FeedObject:
     "A feed record from the database"
     def __init__(self, from_dict: dict):
         self.feed_id: int = from_dict['ID']
-        self.added_at: Optional[datetime.datetime] = (
+        self.added_at: datetime.datetime | None = (
             from_dict['added_at']
             if from_dict['added_at']
             else None
@@ -292,19 +291,19 @@ class FeedObject:
         self.channel_id: int = from_dict['channel']
         self.type: FeedType = from_dict['type']
         self.link: str = from_dict['link']
-        self.date: Optional[datetime.datetime]= from_dict['date']
-        self.last_entry_id: Optional[str] = from_dict['last_entry_id']
+        self.date: datetime.datetime | None= from_dict['date']
+        self.last_entry_id: str | None = from_dict['last_entry_id']
         self.role_ids: list[str] = [role for role in from_dict['roles'].split(';') if role.isnumeric()]
         self.use_embed: bool = from_dict['use_embed']
         self.embed_data: FeedEmbedData = json.loads(from_dict['embed'])
         self.silent_mention: bool = bool(from_dict['silent_mention'])
         self.filter_config: FeedFilterConfig = json.loads(from_dict['filter_config']) or {"filter_type": "none", "words": []}
-        self.last_update: Optional[datetime.datetime] = (
+        self.last_update: datetime.datetime | None = (
             from_dict['last_update']
             if from_dict['last_update']
             else None
         )
-        self.last_refresh: Optional[datetime.datetime] = (
+        self.last_refresh: datetime.datetime | None = (
             from_dict['last_refresh']
             if from_dict['last_refresh']
             else None
@@ -320,7 +319,7 @@ class FeedObject:
         return self.last_refresh > now - datetime.timedelta(days=7)
 
     @classmethod
-    def unrecorded(cls, from_type: str, guild_id: Optional[int]=None, channel_id: Optional[int]=None, link: Optional[str]=None):
+    def unrecorded(cls, from_type: str, guild_id: int | None=None, channel_id: int | None=None, link: str | None=None):
         return cls({
             "ID": None,
             "added_at": None,
@@ -343,7 +342,7 @@ class FeedObject:
             "enabled": True
         })
 
-    def get_emoji(self, cog: "EmojisManager") -> Union[discord.Emoji, str]:
+    def get_emoji(self, cog: "EmojisManager") -> discord.Emoji | str:
         "Get the representative emoji of a feed type"
         if self.type == 'yt':
             return cog.get_emoji('youtube')

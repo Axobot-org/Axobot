@@ -1,7 +1,7 @@
 import datetime
 import re
 from collections import defaultdict
-from typing import Optional, Tuple, TypedDict, Union
+from typing import TypedDict
 
 import discord
 from discord import app_commands
@@ -21,7 +21,7 @@ class RoleReactionRow(TypedDict):
     emoji: str
     description: str
     added_at: datetime.datetime
-    emoji_display: Optional[str]
+    emoji_display: str | None
 
 RoleDescription = app_commands.Range[str, 1, 150]
 
@@ -42,7 +42,7 @@ class RolesReact(commands.Cog):
     async def on_ready(self):
         self.table = 'roles_react_beta' if self.bot.beta else 'roles_react'
 
-    async def prepare_react(self, payload: discord.RawReactionActionEvent) -> Optional[Tuple[discord.Message, discord.Role]]:
+    async def prepare_react(self, payload: discord.RawReactionActionEvent) -> tuple[discord.Message, discord.Role] | None:
         "Handle new added/removed reactions and check if they are roles reactions"
         if payload.guild_id is None or payload.user_id == self.bot.user.id:
             return None
@@ -131,7 +131,7 @@ class RolesReact(commands.Cog):
                 rr_list.append(row)
         return rr_list
 
-    async def db_get_role_from_emoji(self, guild_id: int, emoji: Union[discord.Emoji, int, str]) -> Optional[RoleReactionRow]:
+    async def db_get_role_from_emoji(self, guild_id: int, emoji: discord.Emoji | int | str) -> RoleReactionRow | None:
         """Get a role reaction from the database corresponding to an emoji"""
         if isinstance(emoji, discord.Emoji):
             emoji = emoji.id
@@ -154,7 +154,7 @@ class RolesReact(commands.Cog):
         return True
 
     async def give_remove_role(self, user: discord.Member, role: discord.Role, guild: discord.Guild,
-                               channel: Union[discord.TextChannel, discord.Thread], give: bool = True,
+                               channel: discord.TextChannel | discord.Thread, give: bool = True,
                                ignore_failure: bool = False):
         """Add or remove a role to a user if possible"""
         if self.bot.zombie_mode:
@@ -274,7 +274,7 @@ class RolesReact(commands.Cog):
 
     async def create_list_embed(self, rr_list: list[RoleReactionRow], guild: discord.Guild):
         """Create a text with the roles list"""
-        emojis: list[Union[str, discord.Emoji]] = []
+        emojis: list[str | discord.Emoji] = []
         for k in rr_list:
             emojis.append(await self.get_emoji_display_form(guild, k['emoji']))
         result = [

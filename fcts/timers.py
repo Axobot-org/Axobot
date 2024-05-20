@@ -1,7 +1,6 @@
 import copy
 import datetime
 import time
-from typing import Optional
 
 import discord
 from asyncache import cached
@@ -24,7 +23,7 @@ class Timers(commands.Cog):
         self.bot = bot
         self.file = "timers"
 
-    async def db_get_reminder(self, reminder_id: int, user: Optional[int] = None) -> Optional[dict]:
+    async def db_get_reminder(self, reminder_id: int, user: int | None = None) -> dict | None:
         "Get a specific reminder for a user"
         if user is not None:
             query = "SELECT * FROM `timed` WHERE user=%s AND action='timer' AND ID=%s AND `beta`=%s"
@@ -94,7 +93,7 @@ class Timers(commands.Cog):
     @cached(TTLCache(1_000, ttl=60))
     async def _format_reminder_choice(self, current: str, lang: str, reminder_id: int, begin_date: datetime.datetime,
                                       duration: str, reminder_message: str
-                                      ) -> Optional[tuple[bool, float, app_commands.Choice[str]]]:
+                                      ) -> tuple[bool, float, app_commands.Choice[str]] | None:
         "Format a reminder for a discord Choice"
         end_date: datetime.datetime = begin_date + datetime.timedelta(seconds=duration)
         f_duration = await self.format_duration_left(end_date, lang)
@@ -250,7 +249,7 @@ class Timers(commands.Cog):
             res.append(discord.SelectOption(value=str(reminder['id']), label=label, description=desc))
         return res
 
-    async def ask_reminder_ids(self, input_id: Optional[int], ctx: MyContext, title: str) -> Optional[list[int]]:
+    async def ask_reminder_ids(self, input_id: int | None, ctx: MyContext, title: str) -> list[int] | None:
         "Ask the user to select reminder IDs"
         selection = []
         if input_id is not None:
@@ -323,7 +322,7 @@ class Timers(commands.Cog):
     @remind_main.command(name="delete", aliases=["remove", "del"])
     @commands.cooldown(5, 30, commands.BucketType.user)
     @commands.check(checks.database_connected)
-    async def remind_del(self, ctx: MyContext, reminder_id: Optional[int] = None):
+    async def remind_del(self, ctx: MyContext, reminder_id: int | None = None):
         """Delete a reminder
         ID can be found with the `reminder list` command.
 

@@ -5,7 +5,7 @@ import subprocess
 import time
 from collections import defaultdict
 from datetime import datetime
-from typing import Any, Optional, TypedDict, Union
+from typing import Any, TypedDict
 
 import aiohttp
 import discord
@@ -62,8 +62,8 @@ class BotStats(commands.Cog):
         self.antiscam = {"warning": 0, "deletion": 0}
         self.ticket_events = {"creation": 0}
         self.emitted_serverlogs: dict[str, int] = {}
-        self.serverlogs_audit_search: Optional[tuple[int, int]] = None
-        self.last_backup_size: Optional[int] = None
+        self.serverlogs_audit_search: tuple[int, int] | None = None
+        self.last_backup_size: int | None = None
         self.open_files: dict[str, int] = defaultdict(int)
         self.role_reactions = {"added": 0, "removed": 0}
         self.snooze_events: dict[tuple[int, int], int] = defaultdict(int)
@@ -204,7 +204,7 @@ class BotStats(commands.Cog):
 
     @commands.Cog.listener()
     async def on_app_command_completion(self, _interaction: discord.Interaction,
-                                        command: Union[discord.app_commands.Command, discord.app_commands.ContextMenu]):
+                                        command: discord.app_commands.Command | discord.app_commands.ContextMenu):
         "Called when an app command is correctly used by someone"
         name = command.qualified_name.lower()
         self.commands_uses[name] = self.commands_uses.get(name, 0) + 1
@@ -410,7 +410,7 @@ class BotStats(commands.Cog):
         except Exception as err:
             self.bot.dispatch("error", err)
 
-    async def db_get_emojis_info(self, emoji_id: Union[int, list[int]]) -> list[dict[str, Any]]:
+    async def db_get_emojis_info(self, emoji_id: int | list[int]) -> list[dict[str, Any]]:
         """Get info about an emoji usage"""
         if not self.bot.database_online:
             return []
@@ -594,7 +594,7 @@ class BotStats(commands.Cog):
     async def on_sql_loop_error(self, error: Exception):
         self.bot.dispatch("error", error, "SQL stats loop has stopped <@279568324260528128>")
 
-    async def get_sum_stats(self, variable: str, minutes: int) -> Union[int, float, str, None]:
+    async def get_sum_stats(self, variable: str, minutes: int) -> int | float | str | None:
         """Get the sum of a certain variable in the last X minutes"""
         cnx = self.bot.cnx_axobot
         cursor = cnx.cursor(dictionary=True)

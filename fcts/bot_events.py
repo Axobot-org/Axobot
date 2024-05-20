@@ -1,7 +1,7 @@
 import datetime
 import json
 import logging
-from typing import AsyncGenerator, Literal, Optional, Union
+from typing import AsyncGenerator, Literal
 
 import discord
 from discord.ext import commands, tasks
@@ -21,13 +21,13 @@ class BotEvents(commands.Cog):
         self.file = "bot_events"
         self.log = logging.getLogger("bot.event")
 
-        self.current_event: Optional[EventType] = None
+        self.current_event: EventType | None = None
         self.current_event_data: EventData = {}
-        self.current_event_id: Optional[str] = None
+        self.current_event_id: str | None = None
 
-        self.coming_event: Optional[EventType] = None
+        self.coming_event: EventType | None = None
         self.coming_event_data: EventData = {}
-        self.coming_event_id: Optional[str] = None
+        self.coming_event_id: str | None = None
         self.update_current_event()
 
         self._subcog: AbstractSubcog = SingleReactionSubcog(
@@ -228,7 +228,7 @@ class BotEvents(commands.Cog):
         "Get some event points every hour"
         await self.subcog.collect_cmd(ctx)
 
-    async def get_user_unlockable_rankcards(self, user: discord.User, points: Optional[int]=None) -> AsyncGenerator[str, None]:
+    async def get_user_unlockable_rankcards(self, user: discord.User, points: int | None=None) -> AsyncGenerator[str, None]:
         "Get a list of event rank cards that the user can unlock"
         if (users_cog := self.bot.get_cog("Users")) is None:
             return
@@ -246,7 +246,7 @@ class BotEvents(commands.Cog):
                         continue
                 yield reward["rank_card"]
 
-    async def check_and_send_card_unlocked_notif(self, channel, user: Union[discord.User, int]):
+    async def check_and_send_card_unlocked_notif(self, channel, user: discord.User | int):
         "Check if the user meets the requirements to unlock the event rank card, and send a notification if so"
         if isinstance(user, int):
             user = self.bot.get_user(user)
@@ -265,7 +265,7 @@ class BotEvents(commands.Cog):
             emb.set_author(name=user.global_name, icon_url=user.display_avatar)
             await channel.send(embed=emb)
 
-    async def reload_event_rankcard(self, user: Union[discord.User, int], points: Optional[int] = None):
+    async def reload_event_rankcard(self, user: discord.User | int, points: int | None = None):
         """Grant the current event rank card to the provided user, if they have enough points
         'points' argument can be provided to avoid re-fetching the database"""
         if (users_cog := self.bot.get_cog("Users")) is None:
@@ -285,7 +285,7 @@ class BotEvents(commands.Cog):
             )
             await self.bot.send_embed(embed)
 
-    async def reload_event_special_role(self, user: Union[discord.User, int], points: int = None):
+    async def reload_event_special_role(self, user: discord.User | int, points: int = None):
         """Grant the current event special role to the provided user, if they have enough points
         'points' argument can be provided to avoid re-fetching the database"""
         if self.current_event is None or len(rewards := await self.get_specific_objectives("role")) == 0:

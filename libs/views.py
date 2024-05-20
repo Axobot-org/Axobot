@@ -1,4 +1,4 @@
-from typing import Callable, Optional, Union
+from typing import Callable
 
 import discord
 
@@ -12,8 +12,8 @@ class ConfirmView(discord.ui.View):
             self, bot: Axobot, ctx, validation: Callable[[discord.Interaction], bool], ephemeral: bool=True,
             timeout: int=60, send_confirmation: bool=True):
         super().__init__(timeout=timeout)
-        self.value: Optional[bool] = None
-        self.response_interaction: Optional[discord.Interaction] = None
+        self.value: bool | None = None
+        self.response_interaction: discord.Interaction | None = None
 
         self.bot = bot
         self.ctx = ctx
@@ -52,7 +52,7 @@ class ConfirmView(discord.ui.View):
         self.response_interaction = interaction
         self.stop()
 
-    async def disable(self, interaction: Union[discord.Message, discord.Interaction]):
+    async def disable(self, interaction: discord.Message | discord.Interaction):
         "Called when the timeout has expired"
         for child in self.children:
             child.disabled = True
@@ -91,8 +91,8 @@ class TextInputModal(discord.ui.Modal):
 
     text_input = discord.ui.TextInput(label="", placeholder=None, style=discord.TextStyle.paragraph)
 
-    def __init__(self, title: str, label: str, success_message: str, placeholder: Optional[str]=None, \
-                 default: Optional[str]=None,  min_length: int=1, max_length: int=100, timeout: int=600):
+    def __init__(self, title: str, label: str, success_message: str, placeholder: str | None=None, \
+                 default: str | None=None,  min_length: int=1, max_length: int=100, timeout: int=600):
         super().__init__(title=title, timeout=timeout)
         self.text_input.label = label
         self.text_input.placeholder = placeholder
@@ -100,7 +100,7 @@ class TextInputModal(discord.ui.Modal):
         self.text_input.max_length = max_length
         self.text_input.default = default
         self.success_message = success_message
-        self.response_interaction: Optional[discord.Interaction] = None
+        self.response_interaction: discord.Interaction | None = None
 
     @property
     def value(self):

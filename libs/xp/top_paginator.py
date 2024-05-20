@@ -1,6 +1,6 @@
 
 from math import ceil
-from typing import Literal, Optional, TypedDict
+from typing import Literal, TypedDict
 
 import discord
 from asyncache import cached
@@ -33,7 +33,7 @@ class TopPaginator(Paginator):
         self.display_url = guild.id % 3 == 2
         self.scope = scope
         self.page = start_page
-        self.raw_data: list[Optional[RawData]] = []
+        self.raw_data: list[RawData | None] = []
         self.positions: list[Position] = []
         self.cog = client.get_cog("Xp")
         self.used_system: str = None

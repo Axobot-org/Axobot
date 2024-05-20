@@ -1,5 +1,5 @@
 import json
-from typing import Any, Callable, Coroutine, Optional, TypedDict, Union
+from typing import Any, Callable, Coroutine, TypedDict
 
 import discord
 from discord.app_commands import Command, Group
@@ -42,7 +42,7 @@ class Help(commands.Cog):
     @commands.hybrid_command(name="help")
     @commands.cooldown(2, 8, commands.BucketType.user)
     @commands.cooldown(10, 30, commands.BucketType.guild)
-    async def help_cmd(self, ctx: MyContext, *, args: Optional[str]=None):
+    async def help_cmd(self, ctx: MyContext, *, args: str | None = None):
         """Shows this message
 Enable "Embed Links" permission for better rendering
 
@@ -82,7 +82,7 @@ If the bot can't send the new command format, it will try to send the old one.""
         send = await get_send_callback(ctx)
         await self._send_error_unknown_command(ctx, send, command_arg)
 
-    async def _detect_category_from_args(self, ctx: MyContext, args: list[str]) -> Optional[str]:
+    async def _detect_category_from_args(self, ctx: MyContext, args: list[str]) -> str | None:
         """Detect the category from the arguments passed to the help command"""
         arg_input = " ".join(args).lower()
         if arg_input in self.commands_data:
@@ -110,8 +110,7 @@ If the bot can't send the new command format, it will try to send the old one.""
             return
         await self._send_error_unknown_command(ctx, send, parent)
 
-    async def _find_command_from_name(self, args: list[str], parent_command: Union[Command, None]
-                                      ) -> Union[Command, Group, None]:
+    async def _find_command_from_name(self, args: list[str], parent_command: Command | None) -> Command | Group | None:
         if parent_command and not args:
             return parent_command
         if not args:

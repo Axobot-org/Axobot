@@ -1,6 +1,6 @@
 import asyncio
 import logging
-from typing import Literal, Optional
+from typing import Literal
 
 import discord
 from cachetools import TTLCache
@@ -73,13 +73,13 @@ class Welcomer(commands.Cog):
         """Envoie un message de bienvenue/départ dans le serveur"""
         if self.bot.zombie_mode:
             return
-        text: Optional[str] = await self.bot.get_config(member.guild.id, event_type)
+        text: str | None = await self.bot.get_config(member.guild.id, event_type)
         if member.id in self.no_message or (event_type == "welcome" and await self._is_raider(member)):
             return
         if self.bot.get_cog('Utilities').sync_check_any_link(member.display_name) is not None:
             return
         if text:
-            channel: Optional[discord.TextChannel] = await self.bot.get_config(member.guild.id, "welcome_channel")
+            channel: discord.TextChannel | None = await self.bot.get_config(member.guild.id, "welcome_channel")
             if channel is None:
                 return
             if event_type == "leave" and (msg_id := self.join_cache.get((member.guild.id, member.id))):
@@ -190,7 +190,7 @@ class Welcomer(commands.Cog):
     async def give_roles(self, member: discord.Member):
         """Give new roles to new users"""
         try:
-            roles: Optional[list[discord.Role]] = await self.bot.get_config(member.guild.id, "welcome_roles")
+            roles: list[discord.Role] | None = await self.bot.get_config(member.guild.id, "welcome_roles")
             if roles is None:
                 return
             for role in roles:

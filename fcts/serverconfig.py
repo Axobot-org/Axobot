@@ -1,6 +1,6 @@
 import json
 import time
-from typing import Any, Optional
+from typing import Any
 
 import discord
 from cachetools import TTLCache
@@ -231,7 +231,7 @@ class ServerConfig(commands.Cog):
 
     # ---- DATABASE ACCESS ----
 
-    async def db_get_value(self, guild_id: int, option_name: str) -> Optional[str]:
+    async def db_get_value(self, guild_id: int, option_name: str) -> str | None:
         "Get a value from the database"
         if option_name not in options_list:
             raise ValueError(f"Option {option_name} does not exist")
@@ -243,7 +243,7 @@ class ServerConfig(commands.Cog):
                 return None
             return query_results['value']
 
-    async def db_get_guild(self, guild_id: int) -> Optional[dict[str, str]]:
+    async def db_get_guild(self, guild_id: int) -> dict[str, str] | None:
         "Get a guild from the database"
         if not self.bot.database_online:
             raise RuntimeError("Database is offline")
@@ -422,7 +422,7 @@ class ServerConfig(commands.Cog):
     @config_main.command(name="see")
     @commands.cooldown(1, 10, commands.BucketType.guild)
     @commands.guild_only()
-    async def config_see(self, ctx: MyContext, option: Optional[str]=None):
+    async def config_see(self, ctx: MyContext, option: str | None=None):
         """Displays the value of an option, or all options if none is specified"""
         if not ctx.bot.database_online:
             return await ctx.send(await self.bot._(ctx.guild.id, "cases.no_database"))

@@ -2,7 +2,7 @@ import asyncio
 import datetime
 import importlib
 import time
-from typing import Literal, Optional, Union
+from typing import Literal
 
 import aiohttp
 import discord
@@ -77,7 +77,7 @@ class Partners(commands.Cog):
     async def generate_id(self):
         return round(time.time()/2)
 
-    async def db_get_partner(self, partner_id: int, guild_id: int) -> Optional[dict]:
+    async def db_get_partner(self, partner_id: int, guild_id: int) -> dict | None:
         """Return a partner based on its ID"""
         query = f"SELECT * FROM `{self.table}` WHERE `ID` = %s AND `guild` = %s"
         async with self.bot.db_query(query, (partner_id, guild_id), fetchone=True) as query_result:
@@ -140,7 +140,7 @@ class Partners(commands.Cog):
             pass
         return True
 
-    async def db_get_bot_guilds(self, bot_id: int) -> Optional[int]:
+    async def db_get_bot_guilds(self, bot_id: int) -> int | None:
         "Try to fetch the bot guilds count from the internal database"
         if bot_id == 159985870458322944:
             bot_id = 159985415099514880
@@ -152,7 +152,7 @@ class Partners(commands.Cog):
                 return query_results['server_count']
         return None
 
-    async def get_bot_guilds(self, bot_id:int, session:aiohttp.ClientSession) -> Optional[int]:
+    async def get_bot_guilds(self, bot_id:int, session:aiohttp.ClientSession) -> int | None:
         """Get the guilds count of a bot
         None if unknown bot/count not provided"""
         db_count = await self.db_get_bot_guilds(bot_id)
@@ -168,7 +168,7 @@ class Partners(commands.Cog):
             return api_count
         return None
 
-    async def get_bot_owners(self, bot_id:int, session:aiohttp.ClientSession) -> list[Union[discord.User, int]]:
+    async def get_bot_owners(self, bot_id:int, session:aiohttp.ClientSession) -> list[discord.User | int]:
         """Get the owners list of a bot
         Empty list if unknown bot/owners not provided"""
         try:
@@ -193,7 +193,7 @@ class Partners(commands.Cog):
                 channels.append(channel)
         return channels
 
-    async def update_partners(self, channel: discord.TextChannel, color: Optional[int] = None) -> int:
+    async def update_partners(self, channel: discord.TextChannel, color: int | None = None) -> int:
         """Update every partners of a channel"""
         if not channel.permissions_for(channel.guild.me).embed_links:
             return 0
@@ -311,7 +311,7 @@ class Partners(commands.Cog):
             'value': f"[{tr_click.capitalize()}](https://discord.gg/{partner['target']})"
         }
         if len(target_desc) == 0:
-            target_desc: Optional[str] = await self.bot.get_config(inv.guild.id, 'description')
+            target_desc: str | None = await self.bot.get_config(inv.guild.id, 'description')
         return title, (field1, field2), image, target_desc
 
     async def give_roles(self,invite:discord.Invite,guild:discord.Guild):
@@ -590,7 +590,7 @@ class Partners(commands.Cog):
 
         ..Doc server.html#refresh-your-list"""
         msg = await ctx.send(await self.bot._(ctx.guild, "rss.guild-loading", emoji=self.bot.emojis_manager.customs['loading']))
-        channel: Optional[discord.abc.GuildChannel] = await self.bot.get_config(ctx.guild.id, "partner_channel")
+        channel: discord.abc.GuildChannel | None = await self.bot.get_config(ctx.guild.id, "partner_channel")
         if channel is None:
             return await msg.edit(content=await self.bot._(ctx.guild, "partners.no-channel"))
         count = await self.update_partners(channel)

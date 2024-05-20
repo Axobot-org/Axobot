@@ -2,7 +2,6 @@ import csv
 import json
 import os
 import pickle
-from typing import Optional, Union
 
 import aiohttp
 
@@ -24,9 +23,9 @@ class AntiScamAgent:
         }
         self.model = self.get_model()
         # map of <domain_name, is_safe>
-        self.websites_list: Optional[dict[str, bool]] = None
+        self.websites_list: dict[str, bool] | None = None
 
-    def fetch_websites_locally(self, filename: Optional[str] = None):
+    def fetch_websites_locally(self, filename: str | None = None):
         "Fetch the websites list from a local CSV file, if possible"
         filepath = filename if filename else os.path.dirname(__file__) + "/data/base_websites.csv"
         self.websites_list = {}
@@ -35,7 +34,7 @@ class AntiScamAgent:
             for row in spamreader:
                 self.websites_list[row[0]] = row[1] == '1'
 
-    def save_websites_locally(self, data: dict[str, bool], filename: Optional[str] = None):
+    def save_websites_locally(self, data: dict[str, bool], filename: str | None = None):
         "Save the websites list to a local CSV file"
         filepath = filename if filename else os.path.dirname(__file__) + "/data/base_websites.csv"
         with open(filepath, 'w', encoding='utf-8') as csv_file:
@@ -76,7 +75,7 @@ class AntiScamAgent:
         self.save_model_to_file(new_model)
         self.model = new_model
 
-    def predict_bot(self, message: Union[Message, str]):
+    def predict_bot(self, message: Message | str):
         "Try to predict the dangerousity of a message"
         if isinstance(message, str):
             dataset = Message.from_raw(message, 0, self.websites_list)

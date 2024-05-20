@@ -1,7 +1,7 @@
 import json
 import logging
 import re
-from typing import Optional, TypedDict
+from typing import TypedDict
 
 import discord
 from aiohttp import ClientResponseError
@@ -57,13 +57,13 @@ class Twitch(commands.Cog):
         except IntegrityError:
             return False
 
-    async def db_get_guild_subscriptions_count(self, guild_id: int) -> Optional[int]:
+    async def db_get_guild_subscriptions_count(self, guild_id: int) -> int | None:
         "Get the number of subscriptions for a guild"
         query = "SELECT COUNT(*) FROM `streamers` WHERE `guild_id` = %s AND `beta` = %s"
         async with self.bot.db_query(query, (guild_id, self.bot.beta), astuple=True) as query_result:
             return query_result[0][0] if query_result else None
 
-    async def db_get_guild_streamers(self, guild_id: int, platform: Optional[PlatformId]=None) -> list[StreamersDBObject]:
+    async def db_get_guild_streamers(self, guild_id: int, platform: PlatformId | None=None) -> list[StreamersDBObject]:
         "Get the streamers for a guild"
         query = "SELECT * FROM `streamers` WHERE `guild_id` = %s AND `beta` = %s"
         args = [guild_id, self.bot.beta]
@@ -73,7 +73,7 @@ class Twitch(commands.Cog):
         async with self.bot.db_query(query, args) as query_result:
             return query_result
 
-    async def db_get_guilds_per_streamers(self, platform: Optional[PlatformId]=None) -> list[GroupedStreamerDBObject]:
+    async def db_get_guilds_per_streamers(self, platform: PlatformId | None=None) -> list[GroupedStreamerDBObject]:
         "Get all streamers objects"
         where = "" if platform is None else f"AND `platform` = \"{platform}\""
         query = f"SELECT `platform`, `user_id`, `user_name`, `is_streaming`, JSON_ARRAYAGG(`guild_id`) as \"guild_ids\" FROM `streamers` WHERE `beta` = %s {where} GROUP BY `platform`, `user_id`; "
@@ -95,13 +95,13 @@ class Twitch(commands.Cog):
         async with self.bot.db_query(query, (is_streaming, platform, user_id, self.bot.beta), returnrowcount=True) as query_result:
             return query_result > 0
 
-    async def db_get_streamer_status(self, platform: PlatformId, user_id: str) -> Optional[bool]:
+    async def db_get_streamer_status(self, platform: PlatformId, user_id: str) -> bool | None:
         "Get the streaming status of a streamer"
         query = "SELECT `is_streaming` FROM `streamers` WHERE `platform` = %s AND `user_id` = %s AND `beta` = %s LIMIT 1"
         async with self.bot.db_query(query, (platform, user_id, self.bot.beta), astuple=True) as query_result:
             return query_result[0][0] if query_result else None
 
-    async def db_get_streamer_name(self, platform: PlatformId, user_id: str) -> Optional[str]:
+    async def db_get_streamer_name(self, platform: PlatformId, user_id: str) -> str | None:
         "Get the last known name of a streamer from its ID and platform"
         query = "SELECT `user_name` FROM `streamers` WHERE `platform` = %s AND `user_id` = %s AND `beta` = %s LIMIT 1"
         async with self.bot.db_query(query, (platform, user_id, self.bot.beta), astuple=True) as query_result:
@@ -246,7 +246,7 @@ class Twitch(commands.Cog):
         else:
             await ctx.send(await self.bot._(ctx, "twitch.check-stream.offline", streamer=streamer))
 
-    async def create_stream_embed(self, stream: StreamObject, guild_id: int, streamer_avatar: Optional[str]=None):
+    async def create_stream_embed(self, stream: StreamObject, guild_id: int, streamer_avatar: str | None=None):
         "Create a Discord embed for a starting Twitch stream"
         started_at = isoparse(stream["started_at"])
         embed = discord.Embed(

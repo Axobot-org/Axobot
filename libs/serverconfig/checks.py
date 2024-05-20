@@ -1,4 +1,4 @@
-from typing import Any, Optional, Union
+from typing import Any
 
 import discord
 
@@ -73,7 +73,7 @@ async def antiscam_check(bot: Axobot, guild: discord.Guild, _option: str, value:
         await bot._(guild, "server.tips.antiscam", modlogs_enable=await bot.get_command_mention("modlogs enable"))
     )
 
-async def moderation_commands_check(bot: Axobot, guild: discord.Guild, option: str, value: Optional[list[discord.Role]]):
+async def moderation_commands_check(bot: Axobot, guild: discord.Guild, option: str, value: list[discord.Role] | None):
     "Check if bot has the required permissions to execute moderation commands, else warn to grant them"
     if not value:
         return
@@ -115,7 +115,7 @@ async def moderation_commands_check(bot: Axobot, guild: discord.Guild, option: s
 
 
 async def can_write_in_channel_check(bot: Axobot, guild: discord.Guild, _option: str,
-                                     value: Union[discord.TextChannel, list[discord.TextChannel]]):
+                                     value: discord.TextChannel | list[discord.TextChannel]):
     "Check if bot can write in the channel, else warn to grant permissions"
     if not isinstance(value, list):
         value = [value]

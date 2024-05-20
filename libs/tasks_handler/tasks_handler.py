@@ -4,7 +4,7 @@ import json
 import logging
 import re
 from datetime import datetime, timedelta, timezone
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 import discord
 
@@ -176,7 +176,7 @@ class TaskHandler:
             text = await self.bot._(channel, "timers.rmd.embed-asked", user=user.mention, duration=f_duration)
             view = RecreateReminderView(self.bot, task)
             await view.init()
-            if isinstance(channel, (discord.User, discord.DMChannel)) or channel.permissions_for(guild.me).embed_links:
+            if isinstance(channel, discord.User | discord.DMChannel) or channel.permissions_for(guild.me).embed_links:
                 if task['data'] is not None and 'msg_url' in task['data']:
                     click_here = await self.bot._(channel, "timers.rmd.embed-link")
                     task["message"] += f"\n\n[{click_here}]({task['data']['msg_url']})"
@@ -197,8 +197,8 @@ class TaskHandler:
             raise err
         return True
 
-    async def add_task(self, action: str, duration: int, userid: int, guildid: Optional[int] = None,
-                       channelid: Optional[int] = None, message: Optional[str] = None, data: Optional[dict] = None):
+    async def add_task(self, action: str, duration: int, userid: int, guildid: int | None = None,
+                       channelid: int | None = None, message: str | None = None, data: dict | None = None):
         """Add a task to the list"""
         tasks_list = await self.get_events_from_db(get_all=True)
         for task in tasks_list:

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import datetime as dt
 import re
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 import aiohttp
 import discord
@@ -27,15 +27,15 @@ class DeviantartRSS:
         matches = re.match(self.url_pattern, string)
         return bool(matches)
 
-    async def get_username_by_url(self, url: str) -> Optional[str]:
+    async def get_username_by_url(self, url: str) -> str | None:
         "Extract the DevianArt username from a URL"
         matches = re.match(self.url_pattern, url)
         if not matches:
             return None
         return matches.group(1)
 
-    async def _get_feed(self, username: str, filter_config: Optional[FeedFilterConfig]=None,
-                        session: Optional[aiohttp.ClientSession]=None) -> FeedParserDict:
+    async def _get_feed(self, username: str, filter_config: FeedFilterConfig | None=None,
+                        session: aiohttp.ClientSession | None=None) -> FeedParserDict:
         "Get a list of feeds from a deviantart username"
         url = 'https://backend.deviantart.com/rss.xml?q=gallery%3A' + username
         feed = await feed_parse(url, 9, session)
@@ -46,8 +46,8 @@ class DeviantartRSS:
         return feed
 
     async def get_last_post(self, channel: discord.TextChannel, username: str,
-                            filter_config: Optional[FeedFilterConfig],
-                            session: Optional[aiohttp.ClientSession]=  None):
+                            filter_config: FeedFilterConfig | None,
+                            session: aiohttp.ClientSession | None=  None):
         "Get the last post from a DeviantArt user"
         feed = await self._get_feed(username, filter_config, session)
         if feed is None:
@@ -67,8 +67,8 @@ class DeviantartRSS:
         )
 
     async def get_new_posts(self, channel: discord.TextChannel, username: str, date: dt.datetime,
-                            filter_config: Optional[FeedFilterConfig],
-                            session: Optional[aiohttp.ClientSession]=None) -> list[RssMessage]:
+                            filter_config: FeedFilterConfig | None,
+                            session: aiohttp.ClientSession | None=None) -> list[RssMessage]:
         "Get all new posts from a DeviantArt user"
         feed = await self._get_feed(username, filter_config, session)
         if feed is None:

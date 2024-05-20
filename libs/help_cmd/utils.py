@@ -1,5 +1,5 @@
 import inspect
-from typing import Callable, Optional, TypedDict, Union, get_type_hints
+from typing import Callable, TypedDict, Union, get_type_hints
 
 import discord
 from discord import app_commands
@@ -31,7 +31,7 @@ async def get_embed_footer(ctx: MyContext):
     "Get the footer text to use for help embeds"
     return (await ctx.bot._(ctx.channel, "help.footer")).format('/')
 
-async def get_discord_locale(ctx: Union[MyContext, discord.Interaction]):
+async def get_discord_locale(ctx: MyContext | discord.Interaction):
     "Get the Discord locale to use for a given context"
     bot_locale = await ctx.bot._(ctx.channel, "_used_locale")
     for locale, lang in LOCALES_MAP.items():
@@ -39,7 +39,7 @@ async def get_discord_locale(ctx: Union[MyContext, discord.Interaction]):
             return locale
     return discord.Locale.british_english
 
-async def extract_info(raw_description: str) -> tuple[Optional[str], list[str], Optional[str]]:
+async def extract_info(raw_description: str) -> tuple[str | None, list[str], str | None]:
     "Split description, examples and documentation link from the given documentation"
     description, examples = [], []
     doc = ""
@@ -58,10 +58,10 @@ async def extract_info(raw_description: str) -> tuple[Optional[str], list[str], 
 
 async def generate_warnings_field(
         ctx: MyContext,
-        command: Union[app_commands.Command, app_commands.Group, commands.Command, commands.Group]
-    ) -> Optional[FieldData]:
+        command: app_commands.Command | app_commands.Group | commands.Command | commands.Group
+    ) -> FieldData | None:
     "Generate an embed field to list warnings and checks about a command usage"
-    if isinstance(command, (app_commands.Group, commands.Group)):
+    if isinstance(command, app_commands.Group | commands.Group):
         return None
     warnings: list[str] = []
     if isinstance(command, commands.Command) and not command.enabled:
@@ -134,10 +134,10 @@ async def _run_check_function(ctx: MyContext, check: Callable) -> bool:
 
 async def get_send_callback(ctx: MyContext):
     "Get a function to call to send the command result"
-    async def _send_interaction(content: Optional[str]=None, *, embed: Optional[discord.Embed] = None):
+    async def _send_interaction(content: str | None=None, *, embed: discord.Embed | None = None):
         await ctx.interaction.followup.send(content, embed=embed)
 
-    async def _send_default(content: Optional[str]=None, *, embed: Optional[discord.Embed] = None):
+    async def _send_default(content: str | None=None, *, embed: discord.Embed | None = None):
         await destination.send(content, embed=embed)
 
     destination = None

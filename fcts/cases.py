@@ -1,7 +1,7 @@
 import importlib
 from datetime import datetime
 from math import ceil
-from typing import Any, Optional
+from typing import Any
 
 import discord
 from discord import app_commands
@@ -30,7 +30,7 @@ class Case:
     "Represents a moderation case"
 
     def __init__(self, bot: Axobot, guild_id: int, user_id: int, case_type: str, mod_id: int, reason: str, date: datetime,
-                 duration: Optional[int]=None, case_id: Optional[int]=None):
+                 duration: int | None=None, case_id: int | None=None):
         self.bot = bot
         self.guild_id = guild_id
         self.user_id = user_id
@@ -205,7 +205,7 @@ VALUES (%(g)s, %(u)s, %(t)s, %(m)s, %(r)s, %(d)s)"
     @case_main.command(name="glist", with_app_command=False)
     @commands.guild_only()
     @commands.check(is_support_staff)
-    async def see_case_2(self, ctx: MyContext, guild: Optional[args.GuildArgument], *, user: discord.User):
+    async def see_case_2(self, ctx: MyContext, guild: args.GuildArgument | None, *, user: discord.User):
         """Get every case of a user on a specific guild or on every guilds
         This user can have left the server
 
@@ -216,7 +216,7 @@ VALUES (%(g)s, %(u)s, %(t)s, %(m)s, %(r)s, %(d)s)"
             return await ctx.send(await self.bot._(ctx.guild.id,'cases.no_database'))
         await self.see_case_main(ctx, guild.id if guild else None, user)
 
-    async def see_case_main(self, ctx: MyContext, guild_id: Optional[int], user: discord.User):
+    async def see_case_main(self, ctx: MyContext, guild_id: int | None, user: discord.User):
         "Main method to show cases from a given user"
         if ctx.interaction:
             await ctx.interaction.response.defer()

@@ -1,6 +1,6 @@
 import random
 import time
-from typing import Literal, Optional, Union
+from typing import Literal
 
 import discord
 from discord import app_commands
@@ -9,7 +9,7 @@ from discord.ext import commands
 from libs.bot_classes import Axobot
 from libs.checks.checks import is_ttt_enabled
 
-GridType = list[Union[int, Literal['X', 'O']]]
+GridType = list[int | Literal['X', 'O']]
 
 
 class TicTacToe(commands.Cog):
@@ -81,7 +81,7 @@ class TicTacToe(commands.Cog):
             else:
                 await self.update_grid()
 
-        async def update_grid(self, content: Optional[str] = discord.utils.MISSING):
+        async def update_grid(self, content: str | None = discord.utils.MISSING):
             """Update the view buttons with the current grid state"""
             self.clear_items()
             for i in range(9):

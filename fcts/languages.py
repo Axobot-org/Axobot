@@ -1,5 +1,3 @@
-from typing import Union
-
 import discord
 import i18n
 
@@ -7,9 +5,19 @@ from libs.bot_classes import Axobot, MyContext
 from libs.serverconfig.options_list import options
 from libs.translator import AxobotTranslator
 
-SourceType = Union[None, int, discord.Guild, discord.TextChannel, discord.Thread,
-                   discord.Member, discord.User, discord.DMChannel, discord.Interaction,
-                   discord.PartialMessageable, MyContext]
+SourceType = (
+    None
+    | int
+    | discord.Guild
+    | discord.TextChannel
+    | discord.Thread
+    | discord.Member
+    | discord.User
+    | discord.DMChannel
+    | discord.Interaction
+    | discord.PartialMessageable
+    | MyContext
+)
 
 
 class Languages(discord.ext.commands.Cog):
@@ -48,7 +56,7 @@ class Languages(discord.ext.commands.Cog):
         if isinstance(source, discord.Guild):
             # get ID from guild
             source = source.id
-        elif isinstance(source, (discord.abc.GuildChannel, discord.Thread)):
+        elif isinstance(source, discord.abc.GuildChannel | discord.Thread):
             # get ID from text channel
             source = source.guild.id
         elif isinstance(source, discord.Interaction):
@@ -66,7 +74,7 @@ class Languages(discord.ext.commands.Cog):
             else:
                 source = source.author
 
-        if isinstance(source, (discord.Member, discord.User)):
+        if isinstance(source, discord.Member | discord.User):
             # get lang from user
             used_langs = await self.bot.get_cog('Utilities').get_languages(source, limit=1)
             lang_opt = used_langs[0][0] if len(used_langs) > 0 else self.default_language
@@ -104,7 +112,7 @@ class Languages(discord.ext.commands.Cog):
             fallback = "fr" if locale == "fr2" else "en"
             return await self._recursive_get_translation(fallback, string_id, **kwargs)
 
-    async def get_translation(self, locale: str, string_id: str, **kwargs) -> Union[str, list]:
+    async def get_translation(self, locale: str, string_id: str, **kwargs) -> str | list:
         "Get a translation from the i18n files directly"
         if string_id == '_used_locale':
             return locale

@@ -1,3 +1,4 @@
+import datetime
 import importlib
 import logging
 import operator
@@ -6,10 +7,9 @@ import random
 import re
 import string
 import time
-import datetime
 from collections import defaultdict
 from io import BytesIO
-from typing import Literal, Optional, Union
+from typing import Literal
 
 import aiohttp
 import discord
@@ -40,7 +40,7 @@ class Xp(commands.Cog):
         self.file = 'xp'
         self.log = logging.getLogger("bot.xp")
 
-        self.cache: dict[Union[int, Literal["global"]], dict[int, tuple[int, int]]] = {'global': {}}
+        self.cache: dict[int | Literal["global"], dict[int, tuple[int, int]]] = {'global': {}}
         self.levels = [0]
         self.embed_color = discord.Colour(0xffcf50)
         self.table = 'xp_beta' if bot.beta else 'xp'
@@ -83,9 +83,8 @@ class Xp(commands.Cog):
         if self.xp_decay_loop.is_running():
             self.xp_decay_loop.stop()
 
-    async def get_lvlup_chan(self, msg: discord.Message) -> Union[
-            None, discord.DMChannel, discord.TextChannel, discord.VoiceChannel, discord.StageChannel, discord.Thread
-        ]:
+    async def get_lvlup_chan(self, msg: discord.Message) -> (
+            None | discord.DMChannel | discord.TextChannel | discord.VoiceChannel | discord.StageChannel | discord.Thread):
         "Find the channel where to send the levelup message"
         value = await self.bot.get_config(msg.guild.id, "levelup_channel")
         if value == "none":
@@ -205,10 +204,10 @@ class Xp(commands.Cog):
         "Returns True if the user cannot get xp in these conditions"
         if msg.guild is None:
             return False
-        chans: Optional[list[discord.abc.Messageable]] = await self.bot.get_config(msg.guild.id, "noxp_channels")
+        chans: list[discord.abc.Messageable] | None = await self.bot.get_config(msg.guild.id, "noxp_channels")
         if chans is not None and msg.channel in chans:
             return True
-        roles: Optional[list[discord.Role]] = await self.bot.get_config(msg.guild.id, "noxp_roles")
+        roles: list[discord.Role] | None = await self.bot.get_config(msg.guild.id, "noxp_roles")
         if roles is not None:
             for role in roles:
                 if role in msg.author.roles:
@@ -228,7 +227,7 @@ class Xp(commands.Cog):
             not isinstance(destination, discord.DMChannel) and not destination.permissions_for(msg.guild.me).send_messages
         ):
             return
-        text: Optional[str] = await self.bot.get_config(msg.guild.id, "levelup_msg")
+        text: str | None = await self.bot.get_config(msg.guild.id, "levelup_msg")
         if text is None or len(text) == 0:
             text = random.choice(await self.bot._(msg.channel, "xp.default_levelup"))
             while '{random}' not in text and random.random() < 0.7:
@@ -381,7 +380,7 @@ class Xp(commands.Cog):
             return None
 
 
-    async def db_set_xp(self, user_id: int, points: int, action: Literal['add', 'set']='add', guild_id: Optional[int]=None):
+    async def db_set_xp(self, user_id: int, points: int, action: Literal['add', 'set']='add', guild_id: int | None=None):
         """Ajoute/reset de l'xp à un utilisateur dans la database"""
         try:
             if not self.bot.database_online:
@@ -407,7 +406,7 @@ class Xp(commands.Cog):
             self.bot.dispatch("error", err)
             return False
 
-    async def db_remove_user(self, user_id :int, guild_id: Optional[int]=None):
+    async def db_remove_user(self, user_id :int, guild_id: int | None=None):
         "Removes a user from the xp table"
         if not self.bot.database_online:
             await self.bot.unload_extension("fcts.xp")
@@ -423,7 +422,7 @@ class Xp(commands.Cog):
         cnx.commit()
         cursor.close()
 
-    async def db_get_xp(self, user_id: int, guild_id: Optional[int]) -> Optional[int]:
+    async def db_get_xp(self, user_id: int, guild_id: int | None) -> int | None:
         "Get the xp of a user in a guild"
         try:
             if not self.bot.database_online:
@@ -452,7 +451,7 @@ class Xp(commands.Cog):
         except Exception as err:
             self.bot.dispatch("error", err)
 
-    async def db_get_users_count(self, guild_id: Optional[int]=None):
+    async def db_get_users_count(self, guild_id: int | None=None):
         """Get the number of ranked users in a guild (or in the global database)"""
         try:
             if not self.bot.database_online:
@@ -476,7 +475,7 @@ class Xp(commands.Cog):
         except Exception as err:
             self.bot.dispatch("error", err)
 
-    async def db_load_cache(self, guild_id: Optional[int]):
+    async def db_load_cache(self, guild_id: int | None):
         "Load the XP cache for a given guild (or the global cache)"
         try:
             if not self.bot.database_online:
@@ -670,7 +669,7 @@ class Xp(commands.Cog):
     @app_commands.describe(user="The user to get the rank of. If not specified, it will be you.")
     @commands.bot_has_permissions(send_messages=True)
     @commands.cooldown(1, 20, commands.BucketType.user)
-    async def rank(self, ctx: MyContext, *, user: Optional[discord.User]=None):
+    async def rank(self, ctx: MyContext, *, user: discord.User | None=None):
         """Check how many xp you got
         If you don't specify any user, I'll send you your own XP
 
@@ -868,7 +867,7 @@ class Xp(commands.Cog):
     @app_commands.describe(page="The page number", scope="The scope of the leaderboard (global or server)")
     @commands.bot_has_permissions(send_messages=True)
     @commands.cooldown(5,60,commands.BucketType.user)
-    async def top(self, ctx: MyContext, page: Optional[commands.Range[int, 1]]=1, scope: LeaderboardScope='global'):
+    async def top(self, ctx: MyContext, page: commands.Range[int, 1]=1, scope: LeaderboardScope='global'):
         """Get the list of the highest XP users
 
         ..Example top
