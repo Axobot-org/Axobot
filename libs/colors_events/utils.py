@@ -514,7 +514,7 @@ async def check_image_general(image: bytes, colors_refs: list[ColorType], colors
             passed = ratios[-1] <= 10
 
     colors = []
-    for name, ratio in zip(colors_names, ratios):
+    for name, ratio in zip(colors_names, ratios, strict=True):
         colors.append({
             'name': name,
             'ratio': ratio

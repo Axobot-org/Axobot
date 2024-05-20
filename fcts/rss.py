@@ -1557,7 +1557,7 @@ class Rss(commands.Cog):
             for i in range(0, len(feeds_list), FEEDS_PER_SUBLOOP):
                 task_feeds = feeds_list[i:i+FEEDS_PER_SUBLOOP]
                 results = await asyncio.gather(*[self._loop_refresh_one_feed(feed, session, guild_id) for feed in task_feeds])
-                for task_result, feed in zip(results, task_feeds):
+                for task_result, feed in zip(results, task_feeds, strict=True):
                     if task_result is True:
                         checked_count += 1
                         success_ids.append(feed.feed_id)

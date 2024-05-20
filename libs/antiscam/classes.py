@@ -105,7 +105,7 @@ class PredictionResult:
         self.probabilities: dict[ClassType, float] = {}
         self.result: ClassType = None
         max_prob = -1
-        for prob, cls in zip(probabilities, classes):
+        for prob, cls in zip(probabilities, classes, strict=True):
             self.probabilities[cls] = prob
             if prob > max_prob:
                 self.result = cls
