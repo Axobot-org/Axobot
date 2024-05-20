@@ -460,6 +460,17 @@ class ServerLogs(commands.Cog):
                 emb.add_field(name="Message Author", value=f"{author} ({author.id})")
             await self.validate_logs(guild, channel_ids, emb, "message_update")
 
+    async def _format_attachments_list(self, attachments: list[discord.Attachment]) -> str:
+        "Format a list of attachments into a string"
+        count = 5
+        def _format(attachments: list[discord.Attachment]):
+            if len(attachments) > count:
+                return " ".join(f"[{a.filename}]({a.url})" for a in attachments[:count]) + f" and {len(attachments)-count} more"
+            return " ".join(f"[{a.filename}]({a.url})" for a in attachments[:count])
+        while len(msg := _format(attachments)) > 1024:
+            count -= 1
+        return msg
+
     @commands.Cog.listener()
     async def on_raw_message_delete(self, payload: discord.RawMessageDeleteEvent):
         """Triggered when a message is deleted
@@ -481,7 +492,8 @@ class ServerLogs(commands.Cog):
                 emb.add_field(name="Message Author", value=f"{msg.author} ({msg.author.id})")
                 if msg.attachments:
                     field_title = "Attachment" if len(msg.attachments) == 1 else f"Attachments ({len(msg.attachments)})"
-                    emb.add_field(name=field_title, value=" ".join([f"[{a.filename}]({a.url})" for a in msg.attachments[:5]]))
+                    field_value = await self._format_attachments_list(msg.attachments)
+                    emb.add_field(name=field_title, value=field_value)
             created_at = discord.utils.snowflake_time(payload.message_id)
             emb.add_field(name="Created at", value=f"<t:{created_at.timestamp():.0f}>")
             await self.validate_logs(guild, channel_ids, emb, "message_delete")
