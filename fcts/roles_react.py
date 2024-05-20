@@ -283,7 +283,7 @@ class RolesReact(commands.Cog):
                 if len(rr['description']) > 0
                 else f"{emoji}   <@&{rr['role']}>"
             )
-            for rr, emoji in zip(rr_list, emojis)
+            for rr, emoji in zip(rr_list, emojis, strict=True)
         ]
         return '\n'.join(result), emojis
 
