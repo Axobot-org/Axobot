@@ -11,7 +11,7 @@ async def get_roundvalues_combinations(values_range: range) -> list[RoundValueTy
     "Get all possible combinations of round values"
     keys = ('max_frequency', 'caps_percentage', 'avg_word_len')
     values = [list(values_range) for _ in range(len(keys))]
-    return [dict(zip(keys, v)) for v in itertools.product(*values)]
+    return [dict(zip(keys, v, strict=True)) for v in itertools.product(*values)]
 
 async def train_model(data: list[Message], quick_train: bool=False):
     "Train a new model with the given data"
