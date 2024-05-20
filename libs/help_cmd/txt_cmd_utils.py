@@ -1,4 +1,4 @@
-from typing import Any, Literal, Optional, Union
+from typing import Any, Literal, Union
 
 from discord import Attachment, Locale
 from discord.app_commands import Command as AppCommand
@@ -24,7 +24,7 @@ async def get_command_description(ctx: MyContext, command: commands.Command):
     raw_desc = command.description.strip()
     if raw_desc == '' and command.help is not None:
         raw_desc = command.help.strip()
-    desc = Optional[str]
+    desc = str | None
     desc, examples, doc = await extract_info(raw_desc)
     # check for translated description
     if short_desc := await get_command_desc_translation(ctx, command):
@@ -40,7 +40,7 @@ async def get_command_description(ctx: MyContext, command: commands.Command):
 async def get_command_signature(ctx: MyContext, command: commands.Command):
     "Get the signature of a command"
     # prefix
-    if isinstance(command, (AppCommand, commands.HybridCommand, commands.HybridGroup)):
+    if isinstance(command, AppCommand | commands.HybridCommand | commands.HybridGroup):
         prefix = "/"
     else:
         prefix = await ctx.bot.get_prefix(ctx.message)
@@ -61,7 +61,7 @@ async def get_command_full_name_translation(ctx: MyContext, command: commands.Co
         command = command.parent
     return full_name
 
-async def get_command_name_translation(ctx: MyContext, command: commands.Command, locale: Optional[Locale]=None):
+async def get_command_name_translation(ctx: MyContext, command: commands.Command, locale: Locale | None=None):
     "Get the translated command or group name (without parent name)"
     locale = locale or await get_discord_locale(ctx)
     if isinstance(command, commands.Group):
@@ -95,7 +95,7 @@ async def _get_command_param_translation(ctx: MyContext, param: commands.Paramet
     "Get the translated command parameter name"
     locale = await get_discord_locale(ctx)
     class FakeParameter:
-        def __init__(self, command: Union[AppCommand, commands.HybridCommand]):
+        def __init__(self, command: AppCommand | commands.HybridCommand):
             self.command = command
     context = TranslationContext(
         TranslationContextLocation.parameter_name,

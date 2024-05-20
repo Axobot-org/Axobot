@@ -100,7 +100,7 @@ A BIG thanks to the Project Blurple and their original code for the colorization
                             method: HalloweenVariationFlagType = "hallowify",
                             variations: commands.Greedy[ColorVariation] = None,
                             replace_background: bool = False,
-                            who: typing.Optional[TargetConverterType] = None):
+                            who: typing.TargetConverterType | None = None):
         "Method called under the hood of each modifier command"
         if not (ctx.guild is None or ctx.channel.permissions_for(ctx.guild.me).attach_files):
             await ctx.send(await self.bot._(ctx.channel, "color-event.missing-attachment-perm"))
@@ -131,7 +131,7 @@ A BIG thanks to the Project Blurple and their original code for the colorization
     async def lightfy(self, ctx: MyContext, method: HalloweenVariationFlagType = "hallowify",
                       variations: commands.Greedy[ColorVariation] = None,
                       replace_background: bool = False,
-                      who: typing.Optional[TargetConverterType] = None):
+                      who: typing.TargetConverterType | None = None):
         "Lightfy an image"
         await self.color_command("light", ctx, method, variations, replace_background, who)
 
@@ -142,7 +142,7 @@ A BIG thanks to the Project Blurple and their original code for the colorization
     async def darkfy(self, ctx: MyContext, method: HalloweenVariationFlagType = "hallowify",
                       variations: commands.Greedy[ColorVariation] = None,
                       replace_background: bool = False,
-                      who: typing.Optional[TargetConverterType] = None):
+                      who: typing.TargetConverterType | None = None):
         "Darkfy an image"
         await self.color_command("dark", ctx, method, variations, replace_background, who)
 
@@ -150,7 +150,7 @@ A BIG thanks to the Project Blurple and their original code for the colorization
     @commands.cooldown(2, 60, commands.BucketType.member)
     @commands.cooldown(30, 40, commands.BucketType.guild)
     @commands.check(is_halloween)
-    async def check(self, ctx: MyContext,who: typing.Optional[TargetConverterType] = None):
+    async def check(self, ctx: MyContext,who: typing.TargetConverterType | None = None):
         """Check an image to know if you're cool enough.
 
         ..Example halloween check

@@ -1,4 +1,4 @@
-from typing import Literal, Union
+from typing import Literal
 
 import discord
 from discord import app_commands
@@ -119,7 +119,7 @@ class RolesManagement(commands.Cog):
     @commands.guild_only()
     @commands.check(checks.has_manage_roles)
     async def roles_grant(self, ctx: MyContext, role: discord.Role,
-                         users: commands.Greedy[Union[discord.Role, discord.Member, Literal['everyone']]]):
+                         users: commands.Greedy[discord.Role | discord.Member | Literal['everyone']]):
         """Give a role to a list of roles/members
         Users list may be either members or roles, or even only one member
 
@@ -171,7 +171,7 @@ class RolesManagement(commands.Cog):
     @commands.guild_only()
     @commands.check(checks.has_manage_roles)
     async def roles_revoke(self, ctx: MyContext, role: discord.Role,
-                           users: commands.Greedy[Union[discord.Role, discord.Member, Literal['everyone']]]):
+                           users: commands.Greedy[discord.Role | discord.Member | Literal['everyone']]):
         """Remove a role to a list of roles/members
         Users list may be either members or roles, or even only one member
 

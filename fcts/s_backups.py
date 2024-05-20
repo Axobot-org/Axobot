@@ -1,14 +1,13 @@
-from libs.bot_classes import Axobot, MyContext
-import discord
-import importlib
-import aiohttp
 import json
-import typing
-from discord.ext import commands
 from io import BytesIO
+from typing import Any
 
+import aiohttp
+import discord
+from discord.ext import commands
+
+from libs.bot_classes import Axobot, MyContext
 from libs.checks import checks
-importlib.reload(checks)
 
 
 class Backups(commands.Cog):
@@ -223,7 +222,7 @@ Arguments are:
         def __init__(self):
             pass
 
-        async def urlToByte(self, url:str) -> typing.Optional[bytes]:
+        async def urlToByte(self, url:str) -> bytes | None:
             async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=10)) as session:
                 async with session.get(url) as response:
                     if response.status>=200 and response.status<300:
@@ -306,7 +305,7 @@ Arguments are:
                         logs.append(f"  {symb[0]} Role {role_data.name} deleted")
             del role, role_data
             for role_data in data["roles"]:
-                role_data: dict[str, typing.Any]
+                role_data: dict[str, Any]
                 if role_data["position"] > 0 and (role := roles_list.get(roles_list[role_data["id"]])):
                     new_pos = min(max(ctx.guild.me.top_role.position-1,1), role_data["position"])
                     if role.position == new_pos:
@@ -657,7 +656,7 @@ Arguments are:
                             logs.append("  "+symb[2]+" Webhook {} deleted".format(web.name))
 
 
-        async def load_backup(self,ctx:MyContext, data:dict, args:list) -> typing.Tuple[list,list]:
+        async def load_backup(self,ctx:MyContext, data: dict, args: list) -> tuple[list,list]:
             "Load a backup in a server, for backups version 1"
             if data.pop('_backup_version',None) != 1:
                 return ([0,1], ["Unknown backup version"])

@@ -1,6 +1,6 @@
 import datetime
 import re
-from typing import TYPE_CHECKING, Annotated, Optional, Union
+from typing import TYPE_CHECKING, Annotated, Optional
 
 import discord
 from dateutil.relativedelta import relativedelta
@@ -87,7 +87,7 @@ class CardStyle(str):
 class BotOrGuildInviteConverter:
     """Converts a string to a bot invite or a guild invite"""
     @classmethod
-    async def convert(cls, _ctx: "MyContext", argument: str) -> Union[str, int]:
+    async def convert(cls, _ctx: "MyContext", argument: str) -> str | int:
         "Do the conversion"
         answer = None
         r_invite = re.search(
@@ -107,7 +107,7 @@ class BotOrGuildInviteConverter:
             raise arguments_errors.InvalidBotOrGuildInviteError(argument)
         return answer
 
-BotOrGuildInvite = Annotated[Union[str, int], BotOrGuildInviteConverter]
+BotOrGuildInvite = Annotated[str | int, BotOrGuildInviteConverter]
 
 class URL:
     "Convert argument to a valid URL"
@@ -152,7 +152,7 @@ class PartialOrUnicodeEmojiConverter:
         except commands.errors.BadArgument:
             return await UnicodeEmojiConverter().convert(ctx, argument)
 
-PartialorUnicodeEmoji = Annotated[Union[discord.PartialEmoji, str], PartialOrUnicodeEmojiConverter]
+PartialorUnicodeEmoji = Annotated[discord.PartialEmoji | str, PartialOrUnicodeEmojiConverter]
 
 class DiscordOrUnicodeEmojiConverter:
     "Represents any unicode or Discord emoji"
@@ -165,7 +165,7 @@ class DiscordOrUnicodeEmojiConverter:
         except commands.errors.BadArgument:
             return await UnicodeEmojiConverter().convert(ctx, argument)
 
-DiscordOrUnicodeEmoji = Annotated[Union[discord.Emoji, str], DiscordOrUnicodeEmojiConverter]
+DiscordOrUnicodeEmoji = Annotated[discord.Emoji | str, DiscordOrUnicodeEmojiConverter]
 
 
 class arguments(commands.Converter):

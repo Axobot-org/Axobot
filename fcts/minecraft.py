@@ -3,7 +3,7 @@ import json
 import re
 import time
 from difflib import SequenceMatcher
-from typing import Any, Optional, Union
+from typing import Any
 
 import aiohttp
 import discord
@@ -27,6 +27,66 @@ def _similar(input_1: str, input_2: str):
     "Compare two strings and output the similarity ratio"
     return SequenceMatcher(None, input_1, input_2).ratio()
 
+
+class MCServer:
+    "Class containing all the data about a Minecraft server info, and methods to create a Discord embed from it"
+    def __init__(self, ip: str, max_players: int, online_players: int, players: list[str], ping: float,
+                    img: str | None, version: str, api: str, desc: str):
+        self.ip = ip
+        self.max_players = max_players
+        self.online_players = online_players
+        self.players = players
+        if str(ping).isnumeric():
+            self.ping = round(float(ping), 3)
+        else:
+            self.ping = ping
+        self.image = img
+        self.version = version
+        self.api = api
+        self.desc = desc
+
+    async def clear_desc(self):
+        "Clear the server description from any tabulation or color syntax"
+        self.desc = re.sub(r'§.', '', self.desc)
+        self.desc = re.sub(r'[ \t\r]{2,}', ' ', self.desc).strip()
+        return self
+
+    async def create_msg(self, guild: discord.Guild, translate):
+        "Create a Discord embed from the saved data"
+        if self.players == []:
+            if self.online_players == 0:
+                p = [str(await translate(guild, "misc.none")).capitalize()]
+            else:
+                p: list[str] = [await translate(guild, "minecraft.no-player-list")]
+        else:
+            p = self.players
+        embed = discord.Embed(
+            title=await translate(guild, "minecraft.serv-title", ip=self.ip),
+            color=discord.Colour(0x417505),
+            timestamp=datetime.datetime.utcfromtimestamp(time.time())
+        )
+        embed.set_footer(text=await translate(guild, "minecraft.server.from-provider", provider=self.api))
+        if self.image is not None:
+            embed.set_thumbnail(url=self.image)
+        embed.add_field(name=await translate(guild, "minecraft.server.version"), value=self.version)
+        embed.add_field(
+            name=await translate(guild, "minecraft.server.players-count"),
+            value=f"{self.online_players}/{self.max_players}"
+        )
+        if len(p) > 20:
+            embed.add_field(name=await translate(guild, "minecraft.server.players-list-20"), value=", ".join(p[:20]))
+        else:
+            embed.add_field(name=await translate(guild, "minecraft.server.players-list-all"), value=", ".join(p))
+        if self.ping is not None:
+            embed.add_field(name=await translate(guild, "minecraft.server.latency"), value=f"{self.ping:.0f} ms")
+        if self.desc:
+            embed.add_field(
+                name=await translate(guild, "minecraft.server.description"),
+                value="```\n" + self.desc + "\n```",
+                inline=False
+            )
+        return embed
+
 class Minecraft(commands.Cog):
     """Cog gathering all commands related to the Minecraft® game"""
 
@@ -36,7 +96,7 @@ class Minecraft(commands.Cog):
         self.file = "minecraft"
         self.embed_color = 0x16BD06
         self.uuid_cache: dict[str, str] = {}
-        self._session: Optional[aiohttp.ClientSession] = None
+        self._session: aiohttp.ClientSession | None = None
 
     @property
     def session(self):
@@ -239,7 +299,7 @@ class Minecraft(commands.Cog):
 
     @mc_main.command(name="server")
     @app_commands.checks.cooldown(5, 20)
-    async def mc_server(self, ctx: MyContext, ip: str, port: Optional[int] = None):
+    async def mc_server(self, ctx: MyContext, ip: str, port: int | None = None):
         """Get infos about any Minecraft Java server
 
         ..Example minecraft server play.gunivers.net
@@ -259,8 +319,8 @@ class Minecraft(commands.Cog):
     @commands.guild_only()
     @commands.check(can_use_rss)
     @app_commands.checks.cooldown(5, 20)
-    async def mc_follow_server(self, ctx: MyContext, ip: str, port: Optional[int] = None,
-                               channel: Optional[discord.TextChannel] = None):
+    async def mc_follow_server(self, ctx: MyContext, ip: str, port: int | None = None,
+                               channel: discord.TextChannel | None = None):
         """Follow a server's info in real time in your channel
 
         ..Example minecraft follow-server mc.hypixel.net
@@ -295,7 +355,7 @@ class Minecraft(commands.Cog):
             await ctx.send(await self.bot._(ctx.guild, "errors.unknown2", about=cmd))
             self.bot.dispatch("error", err, ctx)
 
-    async def validate_server_ip(self, ip: str, port: Optional[int] = None):
+    async def validate_server_ip(self, ip: str, port: int | None = None):
         "Validate a server IP and port"
         if ip.count(":") > 1 or (port is not None and ip.count(":") == 1):
             return None
@@ -311,7 +371,7 @@ class Minecraft(commands.Cog):
             return None
         return ip, port
 
-    async def create_server_1(self, guild: discord.Guild, ip: str, port: Optional[str]=None) -> Union[str, 'MCServer']:
+    async def create_server_1(self, guild: discord.Guild, ip: str, port: str | None=None) -> str | MCServer:
         "Collect and serialize server data from a given IP, using minetools.eu"
         if port is None:
             url = "https://api.minetools.eu/ping/"+str(ip)
@@ -345,12 +405,12 @@ class Minecraft(commands.Cog):
         online_players = data['players']['online']
         max_players = data['players']['max']
         latency = data['latency']
-        return await self.MCServer(
+        return await MCServer(
             formated_ip, version=version, online_players=online_players, max_players=max_players, players=players, img=img_url,
             ping=latency, desc=data['description'], api='api.minetools.eu'
         ).clear_desc()
 
-    async def create_server_2(self, guild: discord.Guild, ip: str, port: Optional[str]):
+    async def create_server_2(self, guild: discord.Guild, ip: str, port: str | None):
         "Collect and serialize server data from a given IP, using mcsrvstat.us"
         if port is None:
             url = "https://api.mcsrvstat.us/1/"+str(ip)
@@ -382,7 +442,7 @@ class Minecraft(commands.Cog):
         online_players = data['players']['online']
         max_players = data['players']['max']
         l = None
-        return await self.MCServer(
+        return await MCServer(
             formated_ip, version=version, online_players=online_players, max_players=max_players, players=players, img=None,
             ping=l, desc=desc, api="api.mcsrvstat.us"
         ).clear_desc()
@@ -401,66 +461,7 @@ class Minecraft(commands.Cog):
                 self.uuid_cache[username] = None
         return self.uuid_cache[username]
 
-    class MCServer:
-        "Class containing all the data about a Minecraft server info, and methods to create a Discord embed from it"
-        def __init__(self, ip: str, max_players: int, online_players: int, players: list[str], ping: float,
-                     img: Optional[str], version: str, api: str, desc: str):
-            self.ip = ip
-            self.max_players = max_players
-            self.online_players = online_players
-            self.players = players
-            if str(ping).isnumeric():
-                self.ping = round(float(ping), 3)
-            else:
-                self.ping = ping
-            self.image = img
-            self.version = version
-            self.api = api
-            self.desc = desc
-
-        async def clear_desc(self):
-            "Clear the server description from any tabulation or color syntax"
-            self.desc = re.sub(r'§.', '', self.desc)
-            self.desc = re.sub(r'[ \t\r]{2,}', ' ', self.desc).strip()
-            return self
-
-        async def create_msg(self, guild: discord.Guild, translate):
-            "Create a Discord embed from the saved data"
-            if self.players == []:
-                if self.online_players == 0:
-                    p = [str(await translate(guild, "misc.none")).capitalize()]
-                else:
-                    p: list[str] = [await translate(guild, "minecraft.no-player-list")]
-            else:
-                p = self.players
-            embed = discord.Embed(
-                title=await translate(guild, "minecraft.serv-title", ip=self.ip),
-                color=discord.Colour(0x417505),
-                timestamp=datetime.datetime.utcfromtimestamp(time.time())
-            )
-            embed.set_footer(text=await translate(guild, "minecraft.server.from-provider", provider=self.api))
-            if self.image is not None:
-                embed.set_thumbnail(url=self.image)
-            embed.add_field(name=await translate(guild, "minecraft.server.version"), value=self.version)
-            embed.add_field(
-                name=await translate(guild, "minecraft.server.players-count"),
-                value=f"{self.online_players}/{self.max_players}"
-            )
-            if len(p) > 20:
-                embed.add_field(name=await translate(guild, "minecraft.server.players-list-20"), value=", ".join(p[:20]))
-            else:
-                embed.add_field(name=await translate(guild, "minecraft.server.players-list-all"), value=", ".join(p))
-            if self.ping is not None:
-                embed.add_field(name=await translate(guild, "minecraft.server.latency"), value=f"{self.ping:.0f} ms")
-            if self.desc:
-                embed.add_field(
-                    name=await translate(guild, "minecraft.server.description"),
-                    value="```\n" + self.desc + "\n```",
-                    inline=False
-                )
-            return embed
-
-    async def send_msg_server(self, obj: Union[str, "MCServer"], channel: discord.abc.Messageable, ip: tuple[str, Optional[str]]):
+    async def send_msg_server(self, obj: str | MCServer, channel: discord.abc.Messageable, ip: tuple[str, str | None]):
         "Send the message into a Discord channel"
         guild = None if isinstance(channel, discord.DMChannel) else channel.guild
         embed = await self.form_msg_server(obj, guild, ip)
@@ -476,7 +477,7 @@ class Minecraft(commands.Cog):
             msg = None
         return msg
 
-    async def form_msg_server(self, obj: Union[str, "MCServer"], guild: discord.Guild, ip: tuple[str, Optional[str]]):
+    async def form_msg_server(self, obj: str | MCServer, guild: discord.Guild, ip: tuple[str, str | None]):
         "Create the embed from the saved data"
         if isinstance(obj, str):
             if ip[1] is None:

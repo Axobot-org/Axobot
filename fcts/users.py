@@ -1,5 +1,5 @@
 import importlib
-from typing import Any, Optional
+from typing import Any
 
 import discord
 from asyncache import cached
@@ -27,7 +27,7 @@ class Users(commands.Cog):
         self.bot = bot
         self.file = 'users'
 
-    async def db_get_userinfo(self, user_id: int) -> Optional[dict[str, Any]]:
+    async def db_get_userinfo(self, user_id: int) -> dict[str, Any] | None:
         """Get the user info from the database"""
         if not self.bot.database_online:
             return None
@@ -175,7 +175,7 @@ class Users(commands.Cog):
     @commands.check(checks.database_connected)
     @commands.cooldown(3, 45, commands.BucketType.user)
     @commands.cooldown(5, 60, commands.BucketType.guild)
-    async def profile_cardpreview(self, ctx: MyContext, style: Optional[args.CardStyle]=None):
+    async def profile_cardpreview(self, ctx: MyContext, style: args.CardStyle | None=None):
         """Get a preview of a card style
 
         ..Example profile card-preview
@@ -252,7 +252,7 @@ class Users(commands.Cog):
         discord.app_commands.Choice(name=option, value=option)
         for option in user_options_list
     ])
-    async def user_config(self, ctx: MyContext, option: str, enable: Optional[bool]=None):
+    async def user_config(self, ctx: MyContext, option: str, enable: bool | None=None):
         """Modify any config option
         Here you can enable or disable one of the users option that Axobot has, which are:
         - animated_card: Display an animated rank card if your pfp is a gif (way slower rendering)

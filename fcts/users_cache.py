@@ -1,6 +1,5 @@
 import time
 from collections import defaultdict
-from typing import Union
 
 import discord
 from discord.ext import commands, tasks
@@ -25,7 +24,7 @@ class UsersCache(commands.Cog):
         if self.delete_old_cache_loop.is_running():
             self.delete_old_cache_loop.stop()
 
-    async def register_user(self, user: Union[discord.User, discord.Member]):
+    async def register_user(self, user: discord.User | discord.Member):
         "Register a user into our database"
         if (user.global_name is None and not user.bot) or time.time() - self.last_save[user.id] < 60*30:
             return

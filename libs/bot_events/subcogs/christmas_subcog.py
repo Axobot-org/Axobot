@@ -1,7 +1,6 @@
 import datetime as dt
 from collections import defaultdict
 from random import choices, random
-from typing import Optional
 
 import discord
 import emoji
@@ -46,7 +45,7 @@ class ChristmasSubcog(AbstractSubcog):
     "Utility class for the BotEvents cog when the event is Christmas"
 
     def __init__(self, bot: Axobot,
-                 current_event: Optional[EventType], current_event_data: EventData, current_event_id: Optional[str]):
+                 current_event: EventType | None, current_event_data: EventData, current_event_id: str | None):
         super().__init__(bot, current_event, current_event_data, current_event_id)
         self.pending_reactions: dict[int, EventItem] = {} # map of MessageID => EventItem
 

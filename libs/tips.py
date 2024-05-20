@@ -2,7 +2,7 @@ import datetime
 import random
 from enum import StrEnum
 from enum import auto as enum_auto
-from typing import TYPE_CHECKING, Optional, TypedDict, Union
+from typing import TYPE_CHECKING, TypedDict
 
 import discord
 from cachetools import TTLCache
@@ -25,7 +25,7 @@ class GuildTip(StrEnum):
     RSS_DELETE_DISABLED_FEEDS = enum_auto()
 
 
-minTimeBetweenTips: dict[Union[UserTip, GuildTip], datetime.timedelta] = {
+minTimeBetweenTips: dict[UserTip | GuildTip, datetime.timedelta] = {
     UserTip.RANK_CARD_PERSONALISATION: datetime.timedelta(days=60),
     GuildTip.SERVERLOG_ENABLE_ANTISCAM: datetime.timedelta(days=14),
     GuildTip.SERVERLOG_ENABLE_ANTIRAID: datetime.timedelta(days=14),
@@ -42,7 +42,7 @@ class TipsManager:
         self.bot = bot
         self.user_cache = TTLCache[int, list[self.UserTipsFetchResult]](maxsize=10_000, ttl=60 * 60 * 2)
         self.guild_cache = TTLCache[int, list[self.GuildTipsFetchResult]](maxsize=10_000, ttl=60 * 60 * 2)
-        self._random_tips_params: Optional[dict[str, str]] = None
+        self._random_tips_params: dict[str, str] | None = None
 
     async def get_random_tips_params(self) -> dict[str, str]:
         "Get the translation parameters for the random tips"
@@ -107,7 +107,7 @@ class TipsManager:
         async with self.bot.db_query(query, (guild_id, tip.value)):
             pass
 
-    async def db_get_last_user_tip_shown(self, user_id: int, tip: UserTip) -> Optional[datetime.datetime]:
+    async def db_get_last_user_tip_shown(self, user_id: int, tip: UserTip) -> datetime.datetime | None:
         "Get the last time a tip has been shown to a user"
         if user_tips := self.user_cache.get(user_id):
             sorted_tips = sorted(user_tips, key=lambda x: x["shown_at"], reverse=True)
@@ -120,7 +120,7 @@ class TipsManager:
                 return query_result[0][0].replace(tzinfo=datetime.UTC)
             return None
 
-    async def db_get_last_guild_tip_shown(self, guild_id: int, tip: GuildTip) -> Optional[datetime.datetime]:
+    async def db_get_last_guild_tip_shown(self, guild_id: int, tip: GuildTip) -> datetime.datetime | None:
         "Get the last time a tip has been shown to a guild"
         query = "SELECT MAX(shown_at) FROM tips WHERE guild_id = %s AND tip_id = %s"
         async with self.bot.db_query(query, (guild_id, tip.value), astuple=True) as query_result:
@@ -142,7 +142,7 @@ class TipsManager:
             return True
         return self.bot.utcnow() - last_tip > minTimeBetweenTips[tip]
 
-    async def send_user_tip(self, ctx: "MyContext", tip: UserTip, ephemeral: Optional[bool]=None, **variables: dict[str, str]):
+    async def send_user_tip(self, ctx: "MyContext", tip: UserTip, ephemeral: bool | None=None, **variables: dict[str, str]):
         "Send a tip to a user"
         possible_titles = await self.bot._(ctx, "tips.embed.title")
         text = await self.bot._(ctx, f"tips.{tip.value}", **variables)

@@ -3,7 +3,7 @@ from __future__ import annotations
 import datetime as dt
 import html
 import re
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 import discord
 import twitter
@@ -30,7 +30,7 @@ class TwitterRSS:
         matches = re.match(self.url_pattern, string)
         return bool(matches)
 
-    async def get_userid_from_url(self, url: str) -> Optional[int]:
+    async def get_userid_from_url(self, url: str) -> int | None:
         "Get a Twitter user ID from a twitter url"
         match = re.search(self.url_pattern, url)
         if match is None:
@@ -82,7 +82,7 @@ class TwitterRSS:
             raise err
         return posts
 
-    async def get_last_post(self, channel: discord.TextChannel, name: str) -> Optional[RssMessage]:
+    async def get_last_post(self, channel: discord.TextChannel, name: str) -> RssMessage | None:
         "Get the last post from a given Twitter user"
         # fetch tweets
         posts = await self._get_feed_list(name)

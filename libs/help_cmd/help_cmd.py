@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 import discord
 from discord.ext import commands
@@ -74,7 +74,7 @@ async def _generate_command_fields(cog: "HelpCog", ctx: MyContext, command: comm
     fields.append(await _generate_command_category_field(cog, ctx, command))
     return syntax, fields
 
-async def _generate_aliases_field(ctx: MyContext, command: commands.Command) -> Optional[FieldData]:
+async def _generate_aliases_field(ctx: MyContext, command: commands.Command) -> FieldData | None:
     "Generate an embed field to list aliases of a command"
     if not command.aliases:
         return None
@@ -89,7 +89,7 @@ async def _generate_aliases_field(ctx: MyContext, command: commands.Command) -> 
         "inline": False
     }
 
-async def _generate_subcommands_field(ctx: MyContext, cmd: commands.Group) -> Optional[FieldData]:
+async def _generate_subcommands_field(ctx: MyContext, cmd: commands.Group) -> FieldData | None:
     "Generate an embed field to describe the subcommands of a commands group"
     subcmds = ""
     subs_cant_show = 0

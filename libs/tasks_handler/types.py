@@ -1,16 +1,16 @@
 from datetime import datetime
-from typing import Literal, Optional, TypedDict
+from typing import Literal, TypedDict
 
 
 class DbTask(TypedDict):
     "A task stored in the database"
     ID: int
-    guild: Optional[int]
-    channel: Optional[int]
+    guild: int | None
+    channel: int | None
     user: int
     action: Literal["mute", "ban", "timer"]
     begin: datetime
     duration: int
-    message: Optional[str]
-    data: Optional[str]
+    message: str | None
+    data: str | None
     beta: bool

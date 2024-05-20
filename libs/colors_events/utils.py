@@ -1,14 +1,15 @@
 import asyncio
 import io
 import math
-from typing import Annotated, Any, Callable, Optional, TypedDict, Union
+from typing import Annotated, Any, Callable, TypedDict
 
 import discord
 from discord.ext import commands
 from PIL import Image, ImageSequence
 
 from libs.bot_classes import MyContext
-from libs.colors_events.background_change import apply_gradient, get_background_mask
+from libs.colors_events.background_change import (apply_gradient,
+                                                  get_background_mask)
 
 ColorType = tuple[int, int, int]
 ColorAlphaType = tuple[int, int, int, int]
@@ -52,7 +53,7 @@ class TargetConverter:
 
         return await LinkConverter().convert(ctx, argument)
 
-TargetConverterType = Annotated[Union[discord.Member, discord.PartialEmoji, LinkConverter], TargetConverter]
+TargetConverterType = Annotated[discord.Member | discord.PartialEmoji | LinkConverter, TargetConverter]
 
 class ColorVariation(str):
     "Represents a usable color variation for color conversion algorithm"
@@ -64,7 +65,7 @@ class ColorVariation(str):
             raise commands.errors.BadArgument('Not a valid flag!')
         return argument
 
-async def get_url_from_ctx(ctx: MyContext, who: Optional[TargetConverterType]):
+async def get_url_from_ctx(ctx: MyContext, who: TargetConverterType | None):
     "Get the resource URL from either the who argument or the context"
     if ctx.message.attachments:
         url = ctx.message.attachments[0].proxy_url

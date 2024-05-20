@@ -1,5 +1,3 @@
-import typing
-
 import discord
 from discord.ext import commands
 
@@ -8,7 +6,7 @@ from libs.checks.errors import NotAVoiceMessageError
 
 admins_id = {279568324260528128,281404141841022976,552273019020771358}
 
-async def is_bot_admin(ctx: typing.Union[MyContext, discord.Interaction, discord.User]):
+async def is_bot_admin(ctx: MyContext | discord.Interaction | discord.User):
     "Check if the user is one of the bot administrators"
     if isinstance(ctx, commands.Context):
         user = ctx.author
@@ -18,11 +16,11 @@ async def is_bot_admin(ctx: typing.Union[MyContext, discord.Interaction, discord
         user = ctx
     if isinstance(user, str) and user.isnumeric():
         user = int(user)
-    elif isinstance(user, (discord.User, discord.Member)):
+    elif isinstance(user, discord.User | discord.Member):
         user = user.id
     return user in admins_id
 
-async def is_support_staff(ctx: typing.Union[MyContext, discord.Interaction]) -> bool:
+async def is_support_staff(ctx: MyContext | discord.Interaction) -> bool:
     "Check if the user is one of the bot staff, either by flag or by role"
     user = ctx.author if isinstance(ctx, commands.Context) else ctx.user
     if user.id in admins_id:
@@ -133,7 +131,7 @@ class CannotSendEmbed(commands.CommandError):
     def __init__(self):
         super().__init__("The bot must have the 'embed links' permission")
 
-async def bot_can_embed(ctx: typing.Union[MyContext, discord.Interaction]) -> bool:
+async def bot_can_embed(ctx: MyContext | discord.Interaction) -> bool:
     "Check if the bot can send embeds"
     if isinstance(ctx, commands.Context) and ctx.can_send_embed:
         return True

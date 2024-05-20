@@ -1,6 +1,6 @@
 import time
 from datetime import datetime, timedelta
-from typing import Literal, Union
+from typing import Literal
 
 from babel import dates, numbers
 from dateutil.relativedelta import relativedelta
@@ -34,7 +34,7 @@ class FormatUtils:
 
 
     @staticmethod
-    async def time_delta(date1: Union[datetime, int], date2: datetime = None,
+    async def time_delta(date1: datetime | int, date2: datetime = None,
                          lang: str = 'en', year: bool = False, hour: bool = True, seconds: bool = True,
                          form: Literal["short", "developed"]='developed'):
         """Translates a two time interval datetime into a readable character string
@@ -89,7 +89,7 @@ class FormatUtils:
         return result.strip()
 
     @staticmethod
-    async def date(date: Union[datetime, time.struct_time], lang: str = 'en',
+    async def date(date: datetime | time.struct_time, lang: str = 'en',
                    year: bool = False, weekday: bool = False, hour: bool = True, seconds: bool = True, digital: bool = False
                    ) -> str:
         """Translates a datetime object into a readable string"""
@@ -129,7 +129,7 @@ class FormatUtils:
         return result
 
     @staticmethod
-    async def format_nbr(number: Union[int, float], lang: str) -> str:
+    async def format_nbr(number: int | float, lang: str) -> str:
         "Format any number in the given language"
         locale = get_locale(lang)
         return numbers.format_decimal(number, locale=locale)

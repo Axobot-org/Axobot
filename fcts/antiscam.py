@@ -323,8 +323,8 @@ class AntiScam(commands.Cog):
         )
 
     async def _report_message(self, message_author: discord.User, content: str, mentions_count: int,
-                              guild_id: typing.Optional[int],
-                              report_author: typing.Optional[discord.Member], source_msg: typing.Optional[discord.Message]):
+                              guild_id: int | None,
+                              report_author: discord.Member | None, source_msg: discord.Message | None):
         msg = Message.from_raw(content, mentions_count, self.agent.websites_list)
         if guild_id:
             msg.contains_everyone = f'<@&{guild_id}>' in content or '@everyone' in content

@@ -4,7 +4,7 @@ import pickle
 import random
 import re
 import string
-from typing import Literal, Optional, TypedDict
+from typing import Literal, TypedDict
 
 from .classes import Message
 
@@ -138,7 +138,7 @@ class RandomForest:
         self.tests: list[list[Message]] = []
         self.classes_: dict[int, int] = {} # map class ID to index
 
-    def fit(self, data: list[Message], _y_values: Optional[list[CLASS]]=None):
+    def fit(self, data: list[Message], _y_values: list[CLASS] | None = None):
         "Train the model for a given list of messages"
         # calculate quantity of rows used to train each tree
         learning_amount = round((1-self.test_percent) * len(data))

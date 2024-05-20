@@ -1,5 +1,4 @@
 from datetime import datetime, timedelta, timezone
-from typing import Optional
 
 import aiohttp
 from asyncache import cached
@@ -13,10 +12,10 @@ class TwitchApiAgent:
     "Handle the HTTP API usage for you"
 
     def __init__(self):
-        self.client_id: Optional[str] = None
-        self.token_expires_at: Optional[datetime] = None
-        self._token: Optional[str] = None
-        self._session: Optional[aiohttp.ClientSession] = None
+        self.client_id: str | None = None
+        self.token_expires_at: datetime | None = None
+        self._token: str | None = None
+        self._session: aiohttp.ClientSession | None = None
 
     @property
     def is_token_valid(self):
@@ -69,7 +68,7 @@ class TwitchApiAgent:
         }
 
     @cached(TTLCache(maxsize=10_000, ttl=3600))
-    async def get_user_by_name(self, username: str) -> Optional[StreamerObject]:
+    async def get_user_by_name(self, username: str) -> StreamerObject | None:
         "Get the ID of a user from their username"
         if not self.is_token_valid:
             raise HttpTokenNotSet()
@@ -87,7 +86,7 @@ class TwitchApiAgent:
                 return None
 
     @cached(TTLCache(maxsize=10_000, ttl=3600))
-    async def get_user_by_id(self, user_id: str) -> Optional[StreamerObject]:
+    async def get_user_by_id(self, user_id: str) -> StreamerObject | None:
         "Get the user object from their ID"
         if not self.is_token_valid:
             raise HttpTokenNotSet()

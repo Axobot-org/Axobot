@@ -1,5 +1,3 @@
-from typing import Optional, Union
-
 import discord
 from discord import app_commands
 from discord.ext import commands
@@ -18,7 +16,7 @@ class PollCog(commands.Cog):
     async def add_vote(self, msg: discord.Message):
         "Add votes emojis as reactions under a message"
         if self.bot.database_online and msg.guild is not None:
-            emojis_list: list[Union[str, discord.Emoji]] = await self.bot.get_config(msg.guild.id, "vote_emojis")
+            emojis_list: list[str | discord.Emoji] = await self.bot.get_config(msg.guild.id, "vote_emojis")
         else:
             await msg.add_reaction('👍')
             await msg.add_reaction('👎')
@@ -32,7 +30,7 @@ class PollCog(commands.Cog):
         if message.guild is None or not self.bot.is_ready() or not self.bot.database_online or message.content.startswith('.'):
             return
         try:
-            channels: Optional[list[discord.TextChannel]] = await self.bot.get_config(message.guild.id, "poll_channels")
+            channels: list[discord.TextChannel] | None = await self.bot.get_config(message.guild.id, "poll_channels")
             if channels is None:
                 return
             if message.channel in channels and not message.author.bot:
@@ -49,8 +47,8 @@ class PollCog(commands.Cog):
     @app_commands.checks.cooldown(4, 30)
     async def poll(self, interaction: discord.Interaction,
                    options_count: app_commands.Range[int, 1, 20],
-                   channel: Union[None, discord.TextChannel, discord.VoiceChannel, discord.StageChannel] = None,
-                   text: Optional[str] = None
+                   channel: None | discord.TextChannel | discord.VoiceChannel | discord.StageChannel = None,
+                   text: str | None = None
                    ):
         """Create a poll in the current channel"""
         destination_channel = channel or interaction.channel

@@ -1,7 +1,7 @@
 import glob
 import os
 import sys
-from typing import Literal, Optional, Union
+from typing import Literal
 
 import discord
 import psutil
@@ -23,7 +23,7 @@ class BotInfo(commands.Cog):
         self.bot_version = conf.release + ('a' if bot.beta else '')
         self.process = psutil.Process()
         self.process.cpu_percent()
-        self.codelines: Optional[int] = None
+        self.codelines: int | None = None
 
     @commands.Cog.listener()
     async def on_ready(self):
@@ -113,7 +113,7 @@ class BotInfo(commands.Cog):
         rss_msg_24h = await self.bot.get_cog("BotStats").get_sum_stats("rss.messages", 60*24)
         # number formatter
         lang = await self.bot._(ctx.channel, "_used_locale")
-        async def n_format(nbr: Union[int, float, None]):
+        async def n_format(nbr: int | float | None):
             return await FormatUtils.format_nbr(nbr, lang) if nbr is not None else "0"
         # Generating message
         desc = ""
@@ -131,7 +131,7 @@ class BotInfo(commands.Cog):
             ('cmds_24h', await n_format(cmds_24h)),
             ('rss_msg_24h', await n_format(rss_msg_24h)),
             ('total_xp', await n_format(total_xp)+" ")]:
-            str_args = {f'v{i}': var[i] for i in range(len(var))} if isinstance(var, (tuple, list)) else {'v': var}
+            str_args = {f'v{i}': var[i] for i in range(len(var))} if isinstance(var, tuple | list) else {'v': var}
             desc += await self.bot._(ctx.channel, "info.stats."+key, **str_args) + "\n"
         if ctx.can_send_embed: # if we can use embed
             title = await self.bot._(ctx.channel,"info.stats.title")
@@ -158,7 +158,7 @@ class BotInfo(commands.Cog):
         commands_limit = 15
         lang = await self.bot._(ctx.channel, '_used_locale')
         # SQL query
-        async def do_query(minutes: Optional[int] = None):
+        async def do_query(minutes: int | None = None):
             if minutes:
                 date_where_clause = "date BETWEEN (DATE_SUB(UTC_TIMESTAMP(), INTERVAL %(minutes)s MINUTE)) AND UTC_TIMESTAMP() AND"
             else:

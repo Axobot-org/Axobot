@@ -1,6 +1,5 @@
 from collections import defaultdict
 from datetime import timedelta
-from typing import Optional
 
 import discord
 from cachetools import TTLCache
@@ -140,7 +139,7 @@ class AntiRaid(commands.Cog):
             return False
         return True
 
-    async def ban(self, member: discord.Member, reason: str, duration: Optional[timedelta] = None):
+    async def ban(self, member: discord.Member, reason: str, duration: timedelta | None = None):
         "Try to ban a member from a guild, by checking every needed permission and requirements"
         # if user is too high
         if member.roles[-1].position >= member.guild.me.roles[-1].position:
@@ -180,7 +179,7 @@ class AntiRaid(commands.Cog):
         "Check whether this member should be verified (False) or is immune (True)"
         if member.bot:
             return True
-        immune_roles: Optional[list[discord.Role]] = await self.bot.get_config(member.guild.id, "anti_raid_ignored_roles")
+        immune_roles: list[discord.Role] | None = await self.bot.get_config(member.guild.id, "anti_raid_ignored_roles")
         if not immune_roles:
             return member.guild_permissions.moderate_members
         return any(

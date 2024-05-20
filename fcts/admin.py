@@ -10,7 +10,7 @@ import time
 import traceback
 from collections import defaultdict
 from contextlib import redirect_stdout
-from typing import TYPE_CHECKING, Literal, Optional, Union
+from typing import TYPE_CHECKING, Literal
 
 import discord
 from asyncache import cached
@@ -51,7 +51,7 @@ class Admin(commands.Cog):
         self.bot = bot
         self.file = "admin"
         self.emergency_time = 15.0
-        self.update: dict[Literal["fr", "en"], Optional[str]]
+        self.update: dict[Literal["fr", "en"], str | None]
         if self.bot.beta:
             self.update = {"fr": "Foo", "en": "Bar"}
         else:
@@ -81,7 +81,7 @@ class Admin(commands.Cog):
     async def check_if_admin(self, ctx: MyContext):
         return await checks.is_bot_admin(ctx)
 
-    async def check_if_god(self, ctx: Union[discord.User, discord.Guild, MyContext]):
+    async def check_if_god(self, ctx: discord.User | discord.Guild | MyContext):
         "Check if a user is in God mode for a given context"
         if isinstance(ctx, discord.User):
             return await checks.is_bot_admin(ctx)
@@ -250,11 +250,11 @@ class Admin(commands.Cog):
             return
         count = 0
         for guild in ctx.bot.guilds:
-            channel: Optional[discord.TextChannel] = await ctx.bot.get_config(guild.id, "bot_news")
+            channel: discord.TextChannel | None = await ctx.bot.get_config(guild.id, "bot_news")
             if channel is None:
                 # no channel configured
                 continue
-            lang: Optional[str] = await ctx.bot.get_config(guild.id, "language")
+            lang: str | None = await ctx.bot.get_config(guild.id, "language")
             if lang not in self.update:
                 lang = "fr" if lang == "fr2" else "en"
             mentions_roles: list[discord.Role] = await self.bot.get_config(guild.id, "update_mentions") or []
@@ -419,7 +419,7 @@ class Admin(commands.Cog):
 
     @admin_group.command(name="pull")
     @commands.check(checks.is_bot_admin)
-    async def git_pull(self, ctx: MyContext, branch: Optional[AvailableGitBranches]=None, install_requirements: bool=False):
+    async def git_pull(self, ctx: MyContext, branch: AvailableGitBranches | None=None, install_requirements: bool=False):
         """Pull du code depuis le dépôt git"""
         msg = await ctx.send("Pull en cours...")
         repo = Repo(os.getcwd())
@@ -454,7 +454,7 @@ class Admin(commands.Cog):
 
     @admin_group.command(name="config")
     @commands.check(checks.is_bot_admin)
-    async def admin_sconfig_see(self, ctx: MyContext, guild: discord.Guild, option: Optional[str]=None):
+    async def admin_sconfig_see(self, ctx: MyContext, guild: discord.Guild, option: str | None=None):
         """Affiche les options d'un serveur"""
         if not ctx.bot.database_online:
             await ctx.send("Impossible d'afficher cette commande, la base de donnée est hors ligne :confused:")
@@ -490,7 +490,7 @@ class Admin(commands.Cog):
 
     @admin_db.command(name="biggest-tables")
     @commands.check(checks.is_bot_admin)
-    async def db_biggest(self, ctx: MyContext, database: Optional[str] = None):
+    async def db_biggest(self, ctx: MyContext, database: str | None = None):
         "Affiche les tables les plus lourdes de la base de données"
         query = "SELECT table_name AS \"Table\", ROUND(((data_length + index_length) / 1024 / 1024), 2) AS \"Size (MB)\" FROM information_schema.TABLES"
         if database:
@@ -1107,7 +1107,7 @@ Cette option affecte tous les serveurs"""
 
     @admin_group.command(name="execute")
     @commands.check(checks.is_bot_admin)
-    async def sudo(self, ctx: MyContext, who: Union[discord.Member, discord.User], *, command: str):
+    async def sudo(self, ctx: MyContext, who: discord.Member | discord.User, *, command: str):
         """Exécute une commande en tant qu'un autre utilisateur
         Credits: Rapptz (https://github.com/Rapptz/RoboDanny/blob/rewrite/cogs/admin.py)"""
         await ctx.defer()
