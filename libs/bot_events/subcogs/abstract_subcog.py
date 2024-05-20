@@ -1,6 +1,6 @@
 import datetime
 from abc import ABC, abstractmethod
-from typing import Any, Literal, Optional, TypedDict
+from typing import Any, Literal, TypedDict
 
 import discord
 
@@ -22,7 +22,7 @@ class AbstractSubcog(ABC):
     "Abstract class for the subcogs used by BotEvents"
 
     def __init__(self, bot: Axobot,
-                 current_event: Optional[EventType], current_event_data: EventData, current_event_id: Optional[str]):
+                 current_event: EventType | None, current_event_data: EventData, current_event_id: str | None):
         self.bot = bot
         self.current_event = current_event
         self.current_event_data = current_event_data
@@ -179,7 +179,7 @@ class AbstractSubcog(ABC):
             return 1e9
         return (self.bot.utcnow() - last_collect).total_seconds()
 
-    async def add_collect(self, user_id: int, points: int, send_notif_to_channel: Optional[discord.TextChannel] = None):
+    async def add_collect(self, user_id: int, points: int, send_notif_to_channel: discord.TextChannel | None = None):
         "Add collect points to a user"
         if not self.bot.database_online or self.bot.current_event is None:
             return
@@ -193,7 +193,7 @@ class AbstractSubcog(ABC):
             except Exception as err:
                 self.bot.dispatch("error", err)
 
-    async def add_collect_and_strike(self, user_id: int, points: int, send_notif_to_channel: Optional[discord.TextChannel]=None):
+    async def add_collect_and_strike(self, user_id: int, points: int, send_notif_to_channel: discord.TextChannel | None=None):
         """Add collect points to a user and increase the strike level by 1"""
         if not self.bot.database_online or self.bot.current_event is None:
             return True
@@ -225,7 +225,7 @@ class AbstractSubcog(ABC):
         async with self.bot.db_query(query, (self.bot.beta,), fetchone=True) as query_results:
             return query_results['count']
 
-    async def db_get_event_rank(self, user_id: int) -> Optional[DBUserRank]:
+    async def db_get_event_rank(self, user_id: int) -> DBUserRank | None:
         "Get the ranking of a user"
         if not self.bot.database_online:
             return None

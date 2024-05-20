@@ -1,14 +1,14 @@
 import random
-from typing import Any, Callable, Optional, Union
+from typing import Any, Callable
 
 import discord
 
 
 class TicketCreationEvent:
     "Represents a ticket being created"
-    def __init__(self, topic: dict, name: str, interaction: discord.Interaction, channel: Union[discord.TextChannel, discord.Thread]):
+    def __init__(self, topic: dict, name: str, interaction: discord.Interaction, channel: discord.TextChannel | discord.Thread):
         self.topic = topic
-        self.topic_emoji: Optional[str] = topic["topic_emoji"]
+        self.topic_emoji: str | None = topic["topic_emoji"]
         self.topic_name: str = topic["topic"]
         self.name = name
         self.guild = interaction.guild
@@ -36,8 +36,8 @@ class SendHintText(discord.ui.View):
     def __init__(self, user_id: int, label_confirm: str, label_cancel: str, text_cancel: str):
         super().__init__(timeout=180)
         self.user_id = user_id
-        self.confirmed: Optional[bool] = None
-        self.interaction: Optional[discord.Interaction] = None
+        self.confirmed: bool | None = None
+        self.interaction: discord.Interaction | None = None
         confirm_btn = discord.ui.Button(label=label_confirm, style=discord.ButtonStyle.green)
         confirm_btn.callback = self.confirm
         self.add_item(confirm_btn)
@@ -64,7 +64,7 @@ class SendHintText(discord.ui.View):
         await self.disable(interaction)
         await interaction.followup.send(self.text_cancel, ephemeral=True)
 
-    async def disable(self, src: Union[discord.Interaction, discord.Message]):
+    async def disable(self, src: discord.Interaction | discord.Message):
         "When the view timeouts or is disabled"
         for child in self.children:
             child.disabled = True
@@ -78,7 +78,8 @@ class AskTitleModal(discord.ui.Modal):
     "Ask a user the name of their ticket"
     name = discord.ui.TextInput(label="", placeholder=None, style=discord.TextStyle.short, max_length=100)
 
-    def __init__(self, guild_id: int, topic: dict, title: str, input_label: str, input_placeholder: str, callback: Callable[[discord.Interaction, dict, str], Any]):
+    def __init__(self, guild_id: int, topic: dict, title: str, input_label: str, input_placeholder: str,
+                 callback: Callable[[discord.Interaction, dict, str], Any]):
         super().__init__(title=title, timeout=600)
         self.guild_id = guild_id
         self.topic = topic
@@ -101,10 +102,12 @@ class AskTopicSelect(discord.ui.View):
         super().__init__(timeout=90)
         self.user_id = user_id
         options = self.build_options(topics)
-        self.select = discord.ui.Select(placeholder=placeholder, min_values=1, max_values=min(max_values, len(options)), options=options)
+        self.select = discord.ui.Select(
+            placeholder=placeholder, min_values=1, max_values=min(max_values, len(options)), options=options
+        )
         self.select.callback = self.callback
         self.add_item(self.select)
-        self.topics: Optional[list[str]] = None
+        self.topics: list[str] | None = None
 
     # pylint: disable=arguments-differ
     async def interaction_check(self, interaction: discord.Interaction):
@@ -125,7 +128,7 @@ class AskTopicSelect(discord.ui.View):
         await interaction.edit_original_response(view=self)
         self.stop()
 
-    async def disable(self, src: Union[discord.Interaction, discord.Message]):
+    async def disable(self, src: discord.Interaction | discord.Message):
         "When the view timeouts or is disabled"
         for child in self.children:
             child.disabled = True

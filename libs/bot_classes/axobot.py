@@ -3,7 +3,7 @@ import logging
 import sys
 import time
 from typing import (TYPE_CHECKING, Awaitable, Callable, Literal, Optional,
-                    Union, overload)
+                    overload)
 
 import discord
 from discord.ext import commands
@@ -12,7 +12,6 @@ from mysql.connector.connection import MySQLConnection
 from mysql.connector.errors import ProgrammingError
 
 from fcts.tokens import get_database_connection, get_secrets_dict
-from .bot_embeds_manager import send_log_embed
 from libs.database import create_database_query
 from libs.emojis_manager import EmojisManager
 from libs.prefix_manager import PrefixManager
@@ -20,6 +19,7 @@ from libs.serverconfig.options_list import options as options_list
 from libs.tasks_handler import TaskHandler
 from libs.tips import TipsManager
 
+from .bot_embeds_manager import send_log_embed
 from .consts import PRIVATE_GUILD_ID
 from .my_context import MyContext
 
@@ -91,7 +91,7 @@ class Axobot(commands.bot.AutoShardedBot):
     def dbl_token(self):
         return self.others["dbl_axobot"]
 
-    async def on_error(self, event_method: Union[Exception, str], *_args, **_kwargs):
+    async def on_error(self, event_method: Exception | str, *_args, **_kwargs):
         "Called when an event raises an uncaught exception"
         if isinstance(event_method, str) and event_method.startswith("on_") and event_method != "on_error":
             _, error, _ = sys.exc_info()
@@ -296,7 +296,7 @@ class Axobot(commands.bot.AutoShardedBot):
             return options_list.get(option, {"default": None})["default"]
         return None
 
-    async def get_recipient(self, channel: discord.DMChannel) -> Optional[discord.User]:
+    async def get_recipient(self, channel: discord.DMChannel) -> discord.User | None:
         """Get the recipient of the given DM channel
 
         This method is required because most of the time Discord doesn't properly give that info"""
@@ -322,7 +322,7 @@ class Axobot(commands.bot.AutoShardedBot):
             return fake_tr
         return cog.tr
 
-    async def send_embed(self, embeds: Union[list[discord.Embed], discord.Embed], url: str=None):
+    async def send_embed(self, embeds: list[discord.Embed] | discord.Embed, url: str | None=None):
         """Send a list of embeds to a discord channel"""
         if isinstance(embeds, discord.Embed):
             embeds = [embeds]
@@ -341,7 +341,7 @@ class Axobot(commands.bot.AutoShardedBot):
         target = PRIVATE_GUILD_ID if self.beta else None
         self.app_commands_list = await self.tree.fetch_commands(guild=target)
 
-    async def fetch_app_command_by_name(self, name: str) -> Optional[discord.app_commands.AppCommand]:
+    async def fetch_app_command_by_name(self, name: str) -> discord.app_commands.AppCommand | None:
         "Get a specific app command from the Discord API"
         if self.app_commands_list is None:
             await self.fetch_app_commands()

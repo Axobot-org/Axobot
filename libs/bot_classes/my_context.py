@@ -1,6 +1,6 @@
 from io import BytesIO
 from json import dumps
-from typing import TYPE_CHECKING, Any, Optional, Union
+from typing import TYPE_CHECKING, Any
 
 import discord
 from discord.ext import commands
@@ -35,7 +35,7 @@ class MyContext(commands.Context):
         """If the bot has the right permissions to send an embed in the current context"""
         return self.interaction is not None or self.bot_permissions.embed_links
 
-    async def send(self, *args, json: Union[dict, list, None]=None, **kwargs) -> Optional[discord.Message]:
+    async def send(self, *args, json: dict | list | None = None, **kwargs) -> discord.Message | None:
         if self.bot.zombie_mode and self.command.name not in self.bot.allowed_commands:
             return
         if self.message.type == discord.MessageType.reply and self.message.reference:
@@ -55,7 +55,6 @@ class MyContext(commands.Context):
 
     async def send_help(self, *args: Any):
         """Send the help message of the given command"""
-        # command: Union[str, commands.Command]
         if len(args) == 1 and isinstance(args[0], commands.Command):
             cmd_arg = args[0].qualified_name
         elif len(args) == 1 and isinstance(args[0], str):
@@ -66,7 +65,7 @@ class MyContext(commands.Context):
             raise ValueError(args)
         await self.bot.get_command("help")(self, args=cmd_arg)
 
-    async def send_super_help(self, entity: Union[str, commands.Command, commands.Cog, None]=None):
+    async def send_super_help(self, entity: str | commands.Command | commands.Cog | None = None):
         "Use the default help command"
         if entity:
             return await super().send_help(entity)

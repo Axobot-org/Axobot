@@ -1,6 +1,6 @@
 import json
 import logging
-from typing import Literal, Optional, TypedDict, Union
+from typing import Literal, TypedDict
 
 import discord
 from discord.app_commands import locale_str as _T
@@ -20,28 +20,28 @@ class IntOptionRepresentation(TypedDict):
     type: Literal["int"]
     min: int
     max: int
-    default: Optional[int]
+    default: int | None
     is_listed: bool
 
 class FloatOptionRepresentation(TypedDict):
     "Configuration for a float option"
     type: Literal["float"]
     min: float
-    max: Optional[float]
-    default: Optional[float]
+    max: float | None
+    default: float | None
     is_listed: bool
 
 class BooleanOptionRepresentation(TypedDict):
     "Configuration for a boolean option"
     type: Literal["boolean"]
-    default: Optional[bool]
-    is_listed: Optional[bool]
+    default: bool | None
+    is_listed: bool | None
 
 class EnumOptionRepresentation(TypedDict):
     "Configuration for an enum option"
     type: Literal["enum"]
     values: tuple[str]
-    default: Optional[str]
+    default: str | None
     is_listed: bool
 
 class TextOptionRepresentation(TypedDict):
@@ -49,7 +49,7 @@ class TextOptionRepresentation(TypedDict):
     type: Literal["text"]
     min_length: int
     max_length: int
-    default: Optional[str]
+    default: str | None
     is_listed: bool
 
 class RoleOptionRepresentation(TypedDict):
@@ -109,37 +109,37 @@ class EmojisListOptionRepresentation(TypedDict):
     type: Literal["emojis_list"]
     min_count: int
     max_count: int
-    default: Optional[list[str]]
+    default: list[str] | None
     is_listed: bool
 
 class ColorOptionRepresentation(TypedDict):
     "Configuration for a color option (stored as an int)"
     type: Literal["color"]
-    default: Optional[int]
+    default: int | None
     is_listed: bool
 
 class LevelupChannelOptionRepresentation(TypedDict):
     "Configuration for a levelup channel option"
     type: Literal["levelup_channel"]
-    default: Optional[str]
+    default: str | None
     is_listed: bool
 
-AllRepresentation = Union[
-    IntOptionRepresentation,
-    FloatOptionRepresentation,
-    BooleanOptionRepresentation,
-    EnumOptionRepresentation,
-    TextOptionRepresentation,
-    RoleOptionRepresentation,
-    RolesListOptionRepresentation,
-    TextChannelOptionRepresentation,
-    TextChannelsListOptionRepresentation,
-    VoiceChannelOptionRepresentation,
-    CategoryOptionRepresentation,
-    EmojisListOptionRepresentation,
-    ColorOptionRepresentation,
-    LevelupChannelOptionRepresentation,
-]
+AllRepresentation = (
+    IntOptionRepresentation
+    | FloatOptionRepresentation
+    | BooleanOptionRepresentation
+    | EnumOptionRepresentation
+    | TextOptionRepresentation
+    | RoleOptionRepresentation
+    | RolesListOptionRepresentation
+    | TextChannelOptionRepresentation
+    | TextChannelsListOptionRepresentation
+    | VoiceChannelOptionRepresentation
+    | CategoryOptionRepresentation
+    | EmojisListOptionRepresentation
+    | ColorOptionRepresentation
+    | LevelupChannelOptionRepresentation
+)
 
 class OptionConverter:
     "Base class for option converters"
@@ -208,7 +208,7 @@ def to_raw(option_name: str, value):
     converter = get_converter(option_name)
     return converter.to_raw(value)
 
-async def to_display(option_name: str, value, guild: discord.Guild, bot: "Axobot") -> Optional[str]:
+async def to_display(option_name: str, value, guild: discord.Guild, bot: "Axobot") -> str | None:
     "Convert a config object to a string value, for display in embeds"
     if value is None:
         if option_name == "levelup_msg":
@@ -466,11 +466,11 @@ class TextChannelOption(OptionConverter):
         return channel
 
     @staticmethod
-    def to_raw(value: Union[discord.TextChannel, discord.Thread]):
+    def to_raw(value: discord.TextChannel | discord.Thread):
         return str(value.id)
 
     @staticmethod
-    def to_display(_option_name, value: Union[discord.TextChannel, discord.Thread]):
+    def to_display(_option_name, value: discord.TextChannel | discord.Thread):
         return value.mention
 
     @staticmethod
@@ -479,7 +479,7 @@ class TextChannelOption(OptionConverter):
             channel = await commands.GuildChannelConverter().convert(ctx, raw)
         except commands.BadArgument:
             raise ValueError("Invalid channel", "CHANNEL_INVALID", representation, raw) from None
-        if not isinstance(channel, (discord.TextChannel, discord.Thread)):
+        if not isinstance(channel, discord.TextChannel | discord.Thread):
             raise ValueError("Channel is not a text channel", "CHANNEL_NOT_TEXT", representation)
         if (not representation["allow_threads"]) and isinstance(channel, discord.Thread):
             raise ValueError("Threads are not allowed", "CHANNEL_THREAD", representation)
@@ -493,12 +493,12 @@ class TextChannelsListOption(OptionConverter):
     "Option converter for a list of discord text channel values"
     @staticmethod
     async def from_raw(raw: str, representation: TextChannelsListOptionRepresentation, guild: discord.Guild
-                       ) -> list[Union[discord.TextChannel, discord.Thread]]:
+                       ) -> list[discord.TextChannel | discord.Thread]:
         channel_ids = json.loads(raw)
         if any(not isinstance(id, int) for id in channel_ids):
             log.warning("[TextChannelsListConverter] Invalid channel ids: %s", channel_ids)
             channel_ids = [id for id in channel_ids if isinstance(id, int)]
-        channels: list[Union[discord.TextChannel, discord.Thread]] = []
+        channels: list[discord.TextChannel | discord.Thread] = []
         for channel_id in channel_ids:
             if channel := await getch_channel_or_thread(guild, channel_id):
                 channels.append(channel)
@@ -510,22 +510,22 @@ class TextChannelsListOption(OptionConverter):
         return channels
 
     @staticmethod
-    def to_raw(value: list[Union[discord.TextChannel, discord.Thread]]):
+    def to_raw(value: list[discord.TextChannel | discord.Thread]):
         return json.dumps([channel.id for channel in value])
 
     @staticmethod
-    def to_display(_option_name, value: list[Union[discord.TextChannel, discord.Thread]]):
+    def to_display(_option_name, value: list[discord.TextChannel | discord.Thread]):
         return ", ".join(channel.mention for channel in value)
 
     @staticmethod
     async def from_input(raw: str, representation: TextChannelsListOptionRepresentation, guild: discord.Guild, ctx: MyContext):
-        channels: list[Union[discord.TextChannel, discord.Thread]] = []
+        channels: list[discord.TextChannel | discord.Thread] = []
         for word in raw.split(" "):
             try:
                 channel = await commands.GuildChannelConverter().convert(ctx, word)
             except commands.BadArgument:
                 raise ValueError("Invalid channel", "CHANNEL_INVALID", representation, word) from None
-            if not isinstance(channel, (discord.TextChannel, discord.Thread)):
+            if not isinstance(channel, discord.TextChannel | discord.Thread):
                 raise ValueError("Channel is not a text channel", "CHANNEL_NOT_TEXT", representation)
             if (not representation["allow_threads"]) and isinstance(channel, discord.Thread):
                 raise ValueError("Threads are not allowed", "CHANNEL_THREAD", representation)
@@ -614,11 +614,11 @@ class EmojisListOption(OptionConverter):
     "Option converter for a list of emojis (both Unicode and discord emojis)"
     @staticmethod
     async def from_raw(raw: str, representation: EmojisListOptionRepresentation, guild: discord.Guild):
-        emoji_ids: list[Union[str, int]] = json.loads(raw)
-        if any(not isinstance(id, (int, str)) for id in emoji_ids):
+        emoji_ids: list[str | int] = json.loads(raw)
+        if any(not isinstance(id, int | str) for id in emoji_ids):
             log.warning("[EmojisListConverter] Invalid emoji ids: %s", emoji_ids)
-            emoji_ids = [id for id in emoji_ids if isinstance(id, (int, str))]
-        emojis: list[Union[UnicodeEmojiConverter, discord.Emoji]] = []
+            emoji_ids = [id for id in emoji_ids if isinstance(id, int | str)]
+        emojis: list[UnicodeEmojiConverter | discord.Emoji] = []
         for emoji_id in emoji_ids:
             if isinstance(emoji_id, int):
                 guild_emojis = [emoji for emoji in guild.emojis if emoji.id == emoji_id]
@@ -634,16 +634,16 @@ class EmojisListOption(OptionConverter):
         return emojis
 
     @staticmethod
-    def to_raw(value: list[Union[UnicodeEmojiConverter, discord.Emoji]]):
+    def to_raw(value: list[UnicodeEmojiConverter | discord.Emoji]):
         return json.dumps([emoji.id if isinstance(emoji, discord.Emoji) else emoji for emoji in value])
 
     @staticmethod
-    def to_display(_option_name, value: list[Union[UnicodeEmojiConverter, discord.Emoji]]):
+    def to_display(_option_name, value: list[UnicodeEmojiConverter | discord.Emoji]):
         return " ".join(str(emoji) for emoji in value)
 
     @staticmethod
     async def from_input(raw: str, representation: EmojisListOptionRepresentation, guild: discord.Guild, ctx: MyContext):
-        emojis: list[Union[UnicodeEmojiConverter, discord.Emoji]] = []
+        emojis: list[UnicodeEmojiConverter | discord.Emoji] = []
         for emoji in raw.split():
             if emoji in UnicodeEmojis:
                 if emoji in emojis:
@@ -707,13 +707,13 @@ class LevelupChannelOption(OptionConverter):
         return await TextChannelOption.from_raw(raw, channel_repr, guild)
 
     @staticmethod
-    def to_raw(value: Union[str, discord.TextChannel]):
+    def to_raw(value: str | discord.TextChannel):
         if isinstance(value, str):
             return value
         return TextChannelOption.to_raw(value)
 
     @staticmethod
-    def to_display(option_name, value: Union[str, discord.TextChannel]):
+    def to_display(option_name, value: str | discord.TextChannel):
         if isinstance(value, str):
             return _T(f"server.enum.{option_name}.{value}")
         return TextChannelOption.to_display(option_name, value)

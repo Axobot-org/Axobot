@@ -4,7 +4,6 @@ import random
 import re
 import sys
 import traceback
-import typing
 
 import discord
 from discord.ext import commands, tasks
@@ -15,7 +14,7 @@ from libs.checks import checks
 from libs.checks.errors import (NotAVoiceMessageError, NotDuringEventError,
                                 VerboseCommandError)
 
-AllowedCtx = typing.Union[MyContext, discord.Message, discord.Interaction, str]
+AllowedCtx = MyContext | discord.Message | discord.Interaction | str
 
 class Errors(commands.Cog):
     """General cog for error management."""
@@ -98,7 +97,7 @@ class Errors(commands.Cog):
             cmd = await self.bot.get_command_mention("event info")
             await ctx.send(await self.bot._(ctx.channel, 'errors.notduringevent', cmd=cmd), ephemeral=True)
             return
-        elif isinstance(error,commands.errors.CommandOnCooldown):
+        elif isinstance(error, commands.errors.CommandOnCooldown):
             if await checks.is_bot_admin(ctx) and not ctx.interaction:
                 await ctx.reinvoke()
                 return
@@ -109,7 +108,7 @@ class Errors(commands.Cog):
         elif isinstance(error, commands.BadLiteralArgument):
             await ctx.send(await self.bot._(ctx.channel, 'errors.badlitteral'), ephemeral=True)
             return
-        elif isinstance(error,(commands.BadArgument, commands.BadUnionArgument)):
+        elif isinstance(error, commands.BadArgument | commands.BadUnionArgument):
             allowed_mentions = discord.AllowedMentions(everyone=False, users=False, roles=False)
             async def send_err(tr_key: str, **kwargs):
                 await ctx.send(await self.bot._(ctx.channel, tr_key, **kwargs),
@@ -251,7 +250,7 @@ class Errors(commands.Cog):
             await self.on_error(error, None)
 
     @commands.Cog.listener()
-    async def on_error(self, error: Exception, ctx: typing.Optional[AllowedCtx] = None):
+    async def on_error(self, error: Exception, ctx: AllowedCtx | None):
         """Called when an error is raised
 
         Its only purpose is to log the error, ctx param is only useful for traceability"""
@@ -283,7 +282,7 @@ class Errors(commands.Cog):
             else:
                 context = f"{ctx.guild.name} | {ctx.channel.name}"
             # if channel is the private beta channel, send it there
-            if isinstance(ctx, (MyContext, discord.Interaction)) and ctx.channel.id == 625319425465384960:
+            if isinstance(ctx, MyContext | discord.Interaction) and ctx.channel.id == 625319425465384960:
                 await ctx.channel.send(f"{context}\n```py\n{trace[:1950]}\n```")
             else:
                 await self.send_error_msg_autoformat(context, trace)

@@ -1,11 +1,10 @@
 import logging
-from typing import Optional
 
 from bs4 import BeautifulSoup
 
 log = logging.getLogger("bot.rss")
 
-async def get_text_from_entry(entry: dict) -> Optional[str]:
+async def get_text_from_entry(entry: dict) -> str | None:
     "Get the text from an RSS feed entry"
     if "content" in entry:
         return await convert_post_to_text(entry["content"][0]["value"], entry["content"][0]["type"])
@@ -16,7 +15,7 @@ async def get_text_from_entry(entry: dict) -> Optional[str]:
     log.error("No content or summary in entry for article %s", entry['link'])
     return None
 
-async def get_summary_from_entry(entry: dict) -> Optional[str]:
+async def get_summary_from_entry(entry: dict) -> str | None:
     "Get the summary from an RSS feed entry"
     if "content" in entry and "summary" in entry: # if summary is the actual content, it's not the summary duh
         if "summary_detail" not in entry:
@@ -25,7 +24,7 @@ async def get_summary_from_entry(entry: dict) -> Optional[str]:
     log.warning("No summary in entry (or summary is same than content) for article %s", entry['link'])
     return None
 
-async def convert_post_to_text(post: str, post_type: str) -> Optional[str]:
+async def convert_post_to_text(post: str, post_type: str) -> str | None:
     "Convert an RSS feed post text into a plain text string"
     if post_type == "text/html":
         return await convert_html_to_text(post)

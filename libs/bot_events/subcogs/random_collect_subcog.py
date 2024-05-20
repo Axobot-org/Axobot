@@ -1,6 +1,5 @@
 from collections import defaultdict
 from random import choice, choices, lognormvariate, randint, random
-from typing import Optional
 
 import discord
 
@@ -14,7 +13,7 @@ class RandomCollectSubcog(AbstractSubcog):
     "Utility class for the BotEvents cog when the event is about collecting random items"
 
     def __init__(self, bot: Axobot,
-                 current_event: Optional[EventType], current_event_data: EventData, current_event_id: Optional[str]):
+                 current_event: EventType | None, current_event_data: EventData, current_event_id: str | None):
         super().__init__(bot, current_event, current_event_data, current_event_id)
 
         self.collect_reward = [-8, 25]
@@ -166,7 +165,7 @@ class RandomCollectSubcog(AbstractSubcog):
             k=items_count
         )
 
-    async def check_user_collect_availability(self, user_id: int, seconds_since_last_collect: Optional[int] = None):
+    async def check_user_collect_availability(self, user_id: int, seconds_since_last_collect: int | None = None):
         "Check if a user can collect points, and if they are in a strike period"
         if not self.bot.database_online or self.bot.current_event is None:
             return False, False

@@ -1,5 +1,3 @@
-from typing import Optional, Union
-
 from discord import Locale
 from discord.app_commands import Argument as AppArgument
 from discord.app_commands import Command, Group
@@ -11,7 +9,7 @@ from libs.bot_classes import MyContext
 
 from .utils import extract_info, get_discord_locale
 
-AppCommandOrGroup = Union[Command, Group]
+AppCommandOrGroup = Command | Group
 
 
 async def get_command_inline_desc(ctx: MyContext, cmd: AppCommandOrGroup):
@@ -27,7 +25,7 @@ async def get_command_description(ctx: MyContext, command: AppCommandOrGroup):
         raw_desc = command.description.strip()
     else:
         raw_desc = command.callback.__doc__ or ""
-    desc = Optional[str]
+    desc = str | None
     desc, examples, doc = await extract_info(raw_desc)
     # check for translated description
     if short_desc := await get_command_desc_translation(ctx, command):
@@ -56,7 +54,7 @@ async def get_command_full_name_translation(ctx: MyContext, command: AppCommandO
         command = command.parent
     return full_name
 
-async def get_command_name_translation(ctx: MyContext, command: AppCommandOrGroup, locale: Optional[Locale]=None):
+async def get_command_name_translation(ctx: MyContext, command: AppCommandOrGroup, locale: Locale | None=None):
     "Get the translated command or group name (without parent name)"
     locale = locale or await get_discord_locale(ctx)
     if isinstance(command, Group):

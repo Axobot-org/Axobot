@@ -1,5 +1,5 @@
 from math import ceil
-from typing import Any, Optional, Union
+from typing import Any
 
 from discord import (ButtonStyle, Interaction, Message, NotFound, SelectOption,
                      User, ui)
@@ -32,7 +32,7 @@ class Paginator(ui.View):
         self.page = 1
         self.children[2].label = stop_label
 
-    async def send_init(self, ctx: Union[MyContext, Interaction]):
+    async def send_init(self, ctx: MyContext | Interaction):
         "Build the first page, before anyone actually click"
         contents = await self.get_page_content(None, self.page)
         await self._update_buttons()
@@ -61,10 +61,10 @@ class Paginator(ui.View):
             await interaction.response.send_message(err, ephemeral=True)
         return result
 
-    async def on_error(self, interaction, error, item):
+    async def on_error(self, interaction, error, item, /):
         await self.client.dispatch("error", error, interaction)
 
-    async def disable(self, interaction: Union[Message, Interaction]):
+    async def disable(self, interaction: Message | Interaction):
         "Called when the timeout has expired"
         try:
             await self._update_contents(interaction, stopped=True)
@@ -77,7 +77,7 @@ class Paginator(ui.View):
         count = await self.get_page_count()
         self.page = min(max(page, 1), count)
 
-    async def _update_contents(self, interaction: Union[Message, Interaction], stopped: bool=None):
+    async def _update_contents(self, interaction: Message | Interaction, stopped: bool=None):
         "Update the page content"
         if isinstance(interaction, Interaction):
             await interaction.response.defer()
@@ -141,7 +141,7 @@ class Paginator(ui.View):
 class PaginatedSelectView(ui.View):
     "View used to represent a discord Select with potentially more than 25 options"
 
-    def __init__(self, client: Axobot, message: Optional[str], options: list[SelectOption], user: User, placeholder: str,
+    def __init__(self, client: Axobot, message: str | None, options: list[SelectOption], user: User, placeholder: str,
                  stop_label: str = "Quit", min_values: int = 1, max_values: int = 25, timeout: int = 180):
         super().__init__(timeout=timeout)
         if any(not isinstance(opt.value, str) for opt in options):
@@ -170,7 +170,7 @@ class PaginatedSelectView(ui.View):
         self._values: set[str] = set()
 
     @property
-    def values(self) -> Union[str, list[str], None]:
+    def values(self) -> str | list[str] | None:
         "Return the selected values"
         if len(self._values) == 0:
             return None
@@ -183,7 +183,7 @@ class PaginatedSelectView(ui.View):
         await self._update_buttons()
         return await ctx.send(view=self)
 
-    async def interaction_check(self, interaction) -> bool:
+    async def interaction_check(self, interaction, /) -> bool:
         result = True
         if user := interaction.user:
             result = user == self.user
@@ -192,13 +192,13 @@ class PaginatedSelectView(ui.View):
             await interaction.response.send_message(err, ephemeral=True)
         return result
 
-    async def on_error(self, interaction, error, item):
+    async def on_error(self, interaction, error, item, /):
         await self.client.dispatch("error", error, interaction)
 
     async def on_timeout(self):
         self._values.clear()
 
-    async def disable(self, interaction: Union[Message, Interaction]):
+    async def disable(self, interaction: Message | Interaction):
         "Called when the timeout has expired"
         await self._update_contents(interaction, stopped=True)
         self.stop()
@@ -219,7 +219,7 @@ class PaginatedSelectView(ui.View):
         pages_count = ceil(len(self.options) / 25)
         self.page = min(max(page, 1), pages_count)
 
-    async def _update_contents(self, interaction: Union[Message, Interaction], stopped: bool=None):
+    async def _update_contents(self, interaction: Message | Interaction, stopped: bool=None):
         "Update the page content"
         if isinstance(interaction, Interaction):
             await interaction.response.defer()

@@ -3,7 +3,7 @@
 
 
 import json
-from typing import Any, Optional
+from typing import Any
 from urllib.parse import urlparse
 
 import requests
@@ -56,7 +56,7 @@ class Bitly(BaseShortener):
         BaseShortener.__init__(self, api_key)
 
     # pylint: disable=no-self-use
-    def _get_error_from_response(self, response: dict[str, Any]) -> Optional[str]:
+    def _get_error_from_response(self, response: dict[str, Any]) -> str | None:
         """The exact nature of the error is obtained from the 'message' json attribute"""
         return response.get('message')
 

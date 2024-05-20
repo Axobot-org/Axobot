@@ -9,27 +9,30 @@ from libs.arguments.errors import InvalidPermissionTargetError
 from libs.bot_classes import Axobot, MyContext
 from libs.paginator import cut_text
 
-VoiceChannelTypes = typing.Union[
-    discord.VoiceChannel,
-    discord.StageChannel
-]
+VoiceChannelTypes = (
+    discord.VoiceChannel
+    | discord.StageChannel
+)
 
-TextChannelTypes = typing.Union[
-    discord.TextChannel,
-    discord.CategoryChannel,
-    discord.ForumChannel,
-    discord.Thread
-]
+TextChannelTypes = (
+    discord.TextChannel
+    | discord.CategoryChannel
+    | discord.ForumChannel
+    | discord.Thread
+)
 
-AcceptableChannelTypes = typing.Optional[typing.Union[
-    VoiceChannelTypes,
-    TextChannelTypes,
-]]
-AcceptableTargetTypes = typing.Optional[typing.Union[
-    discord.Member,
-    discord.Role,
-    RawPermissionValue
-]]
+AcceptableChannelTypes = (
+    None
+    | VoiceChannelTypes
+    | TextChannelTypes
+)
+
+AcceptableTargetTypes = (
+    None
+    | discord.Member
+    | discord.Role
+    | RawPermissionValue
+)
 
 
 class TargetConverter(commands.Converter):
@@ -106,7 +109,7 @@ class Perms(commands.Cog):
         target="The member or role to check the permissions of, or an integer/binary value"
     )
     @commands.guild_only()
-    async def check_permissions(self, ctx: MyContext, channel:AcceptableChannelTypes=None, *,
+    async def check_permissions(self, ctx: MyContext, channel: AcceptableChannelTypes=None, *,
                                 target: typing.Annotated[AcceptableTargetTypes, TargetConverter]=None):
         """Check the permissions assigned to a member/role
         By default, it will calculate the author's permissions at the server level.

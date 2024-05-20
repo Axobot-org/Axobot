@@ -1,6 +1,5 @@
 import logging
 import time
-from typing import Optional
 
 import discord
 from aiohttp import ClientSession
@@ -26,7 +25,7 @@ class VoiceMessages(commands.Cog):
         self.bot.tree.add_command(self.stt_ctx_menu)
         self.max_duration = 2*60
         self.cache: dict[int, str] = {}
-        self._session: Optional[ClientSession] = None
+        self._session: ClientSession | None = None
 
     @property
     def session(self):

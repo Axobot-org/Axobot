@@ -1,6 +1,5 @@
 import logging
 import time
-from typing import Optional, Union
 
 import discord
 from discord import app_commands
@@ -101,7 +100,7 @@ class Tickets(commands.Cog):
         async with self.bot.db_query(query, (guild_id, self.bot.beta)) as db_query:
             return db_query
 
-    async def db_get_defaults(self, guild_id: int) -> Optional[DBTopicRow]:
+    async def db_get_defaults(self, guild_id: int) -> DBTopicRow | None:
         "Get the default values for a guild"
         query = "SELECT * FROM `tickets` WHERE `guild_id` = %s AND `topic` IS NULL AND `beta` = %s"
         async with self.bot.db_query(query, (guild_id, self.bot.beta), fetchone=True) as db_query:
@@ -118,7 +117,7 @@ class Tickets(commands.Cog):
         async with self.bot.db_query(query, args, fetchone=True) as db_query:
             return db_query or None
 
-    async def db_get_guild_default_id(self, guild_id: int) -> Optional[int]:
+    async def db_get_guild_default_id(self, guild_id: int) -> int | None:
         "Return the row ID corresponding to the default guild setup, or None"
         query = "SELECT id FROM `tickets` WHERE guild_id = %s AND topic IS NULL AND beta = %s"
         async with self.bot.db_query(query, (guild_id, self.bot.beta), fetchone=True) as db_query:
@@ -133,7 +132,7 @@ class Tickets(commands.Cog):
         async with self.bot.db_query(query, {'g': guild_id, 'b': self.bot.beta}) as db_query:
             return db_query
 
-    async def db_add_topic(self, guild_id: int, name: str, emoji: Union[None, str]) -> bool:
+    async def db_add_topic(self, guild_id: int, name: str, emoji: str | None) -> bool:
         "Add a topic to a guild"
         query = "INSERT INTO `tickets` (`guild_id`, `topic`, `topic_emoji`, `beta`) VALUES (%s, %s, %s, %s)"
         try:
@@ -161,31 +160,31 @@ class Tickets(commands.Cog):
         async with self.bot.db_query(query, (name, guild_id, topic_id, self.bot.beta), returnrowcount=True) as db_query:
             return db_query > 0
 
-    async def db_edit_topic_emoji(self, guild_id: int, topic_id: int, emoji: Optional[str]) -> bool:
+    async def db_edit_topic_emoji(self, guild_id: int, topic_id: int, emoji: str | None) -> bool:
         "Edit a topic emoji"
         query = "UPDATE `tickets` SET `topic_emoji` = %s WHERE `guild_id` = %s AND `id` = %s AND `beta` = %s"
         async with self.bot.db_query(query, (emoji, guild_id, topic_id, self.bot.beta), returnrowcount=True) as db_query:
             return db_query > 0
 
-    async def db_edit_topic_hint(self, guild_id: int, topic_id: int, hint: Optional[str]) -> bool:
+    async def db_edit_topic_hint(self, guild_id: int, topic_id: int, hint: str | None) -> bool:
         "Edit a topic emoji"
         query = "UPDATE `tickets` SET `hint` = %s WHERE `guild_id` = %s AND `id` = %s AND `beta` = %s"
         async with self.bot.db_query(query, (hint, guild_id, topic_id, self.bot.beta), returnrowcount=True) as db_query:
             return db_query > 0
 
-    async def db_edit_topic_role(self, guild_id: int, topic_id: int, role_id: Optional[int]) -> bool:
+    async def db_edit_topic_role(self, guild_id: int, topic_id: int, role_id: int | None) -> bool:
         "Edit a topic emoji"
         query = "UPDATE tickets SET role = %s WHERE guild_id = %s AND id = %s AND beta = %s"
         async with self.bot.db_query(query, (role_id, guild_id, topic_id, self.bot.beta), returnrowcount=True) as db_query:
             return db_query > 0
 
-    async def db_edit_topic_category(self, guild_id: int, topic_id: int, category: Optional[int]) -> bool:
+    async def db_edit_topic_category(self, guild_id: int, topic_id: int, category: int | None) -> bool:
         "Edit a topic category or channel in which tickets will be created"
         query = "UPDATE `tickets` SET `category` = %s WHERE `guild_id` = %s AND `id` = %s AND `beta` = %s"
         async with self.bot.db_query(query, (category, guild_id, topic_id, self.bot.beta), returnrowcount=True) as db_query:
             return db_query > 0
 
-    async def db_edit_topic_format(self, guild_id: int, topic_id: int, name_format: Optional[str]) -> bool:
+    async def db_edit_topic_format(self, guild_id: int, topic_id: int, name_format: str | None) -> bool:
         "Edit a topic channel/thread name format"
         query = "UPDATE `tickets` SET `name_format` = %s WHERE `guild_id` = %s AND `id` = %s AND `beta` = %s"
         async with self.bot.db_query(query, (name_format, guild_id, topic_id, self.bot.beta), returnrowcount=True) as db_query:
@@ -197,7 +196,7 @@ class Tickets(commands.Cog):
         async with self.bot.db_query(query, (message, guild_id, self.bot.beta)) as _:
             pass
 
-    async def ask_user_topic(self, ctx: MyContext, multiple = False, message: Optional[str] = None):
+    async def ask_user_topic(self, ctx: MyContext, multiple = False, message: str | None = None):
         "Ask a user which topic they want to edit"
         placeholder = await self.bot._(ctx.guild.id, "tickets.selection-placeholder")
         topics = await self.db_get_topics(ctx.guild.id)
@@ -267,7 +266,7 @@ class Tickets(commands.Cog):
             msg = await self.bot._(interaction.guild_id, "tickets.missing-perms-setup.to-member")
         await interaction.edit_original_response(content=msg)
 
-    async def get_channel_name(self, name_format: Optional[str], interaction: discord.Interaction,
+    async def get_channel_name(self, name_format: str | None, interaction: discord.Interaction,
                                topic: dict, ticket_name: str) -> str:
         "Build the correct channel name for a new ticket"
         channel_name = name_format or self.default_name_format
@@ -403,7 +402,7 @@ class Tickets(commands.Cog):
     @commands.cooldown(2, 30, commands.BucketType.guild)
     @commands.guild_only()
     @commands.check(checks.has_manage_channels)
-    async def summon(self, ctx: MyContext, channel: Optional[discord.TextChannel] = None):
+    async def summon(self, ctx: MyContext, channel: discord.TextChannel | None = None):
         """Ask the bot to send a message allowing people to open tickets
 
         ..Doc tickets.html#as-staff-send-the-prompt-message"""
@@ -454,7 +453,7 @@ class Tickets(commands.Cog):
     @commands.cooldown(3, 30, commands.BucketType.guild)
     @commands.guild_only()
     @commands.check(checks.has_manage_channels)
-    async def portal_set_role(self, ctx: MyContext, role: Optional[discord.Role]):
+    async def portal_set_role(self, ctx: MyContext, role: discord.Role | None):
         """Edit a default staff role
         Anyone with this role will be able to read newly created tickets
         Type "None" to set admins only
@@ -489,7 +488,7 @@ class Tickets(commands.Cog):
     @commands.cooldown(3, 30, commands.BucketType.guild)
     @commands.guild_only()
     @commands.check(checks.has_manage_channels)
-    async def portal_set_category(self, ctx: MyContext, category_or_channel: Union[discord.CategoryChannel, discord.TextChannel]):
+    async def portal_set_category(self, ctx: MyContext, category_or_channel: discord.CategoryChannel | discord.TextChannel):
         """Set the category or the channel in which tickets will be created
 
         If you select a channel, tickets will use the Discord threads system but allowed roles may not be applied
@@ -561,7 +560,7 @@ class Tickets(commands.Cog):
     @commands.cooldown(3, 45, commands.BucketType.guild)
     @commands.guild_only()
     @commands.check(checks.has_manage_channels)
-    async def topic_add(self, ctx: MyContext, emote: Optional[PartialorUnicodeEmoji]=None, *, name: str):
+    async def topic_add(self, ctx: MyContext, emote: PartialorUnicodeEmoji | None=None, *, name: str):
         """Create a new ticket topic
         A topic name is limited to 100 characters
         Only Discord emojis are accepted for now
@@ -591,7 +590,7 @@ class Tickets(commands.Cog):
     @commands.cooldown(3, 45, commands.BucketType.guild)
     @commands.guild_only()
     @commands.check(checks.has_manage_channels)
-    async def topic_remove(self, ctx: MyContext, topic_id: Optional[int] = None):
+    async def topic_remove(self, ctx: MyContext, topic_id: int | None = None):
         """Permanently delete a topic by its name
 
         ..Doc tickets.html#delete-a-topic"""
@@ -600,7 +599,7 @@ class Tickets(commands.Cog):
             if topic_id is None:
                 # timeout
                 return
-        topic_ids: Optional[list[int]] = [topic_id]
+        topic_ids: list[int] | None = [topic_id]
         if topic_ids is None:
             # timeout
             return
@@ -623,7 +622,7 @@ class Tickets(commands.Cog):
     @commands.cooldown(3, 30, commands.BucketType.guild)
     @commands.guild_only()
     @commands.check(checks.has_manage_channels)
-    async def topic_edit_name(self, ctx: MyContext, topic_id: Optional[int], *, name: commands.Range[str, 1, 100]):
+    async def topic_edit_name(self, ctx: MyContext, topic_id: int | None, *, name: commands.Range[str, 1, 100]):
         """Edit a topic name
         A topic name is limited to 100 characters
 
@@ -647,8 +646,8 @@ class Tickets(commands.Cog):
     @commands.cooldown(3, 30, commands.BucketType.guild)
     @commands.guild_only()
     @commands.check(checks.has_manage_channels)
-    async def topic_set_emote(self, ctx: MyContext, topic_id: Optional[int],
-                              emote: Optional[PartialorUnicodeEmoji]=None):
+    async def topic_set_emote(self, ctx: MyContext, topic_id: int | None,
+                              emote: PartialorUnicodeEmoji | None=None):
         """Edit a topic emoji
         Type "None" to set no emoji for this topic
 
@@ -677,7 +676,7 @@ class Tickets(commands.Cog):
     @commands.cooldown(3, 30, commands.BucketType.guild)
     @commands.guild_only()
     @commands.check(checks.has_manage_channels)
-    async def topic_set_hint(self, ctx: MyContext, topic_id: Optional[int]=None, *, message: str):
+    async def topic_set_hint(self, ctx: MyContext, topic_id: int | None=None, *, message: str):
         """Edit a topic hint message
         The message will be displayed when a user tries to open a ticket, before user confirmation
         Type "None" to set the text to the default one (`tickets portal set-hint`)
@@ -706,7 +705,7 @@ If that still doesn't work, please create your ticket
     @commands.cooldown(3, 30, commands.BucketType.guild)
     @commands.guild_only()
     @commands.check(checks.has_manage_channels)
-    async def topic_set_role(self, ctx: MyContext, topic_id: Optional[int]=None, role: Optional[discord.Role]=None):
+    async def topic_set_role(self, ctx: MyContext, topic_id: int | None=None, role: discord.Role | None=None):
         """Edit a topic staff role
         Anyone with this role will be able to read newly created tickets with this topic
         Type "None" to set the role to the default one (`tickets portal set-role`)
@@ -737,7 +736,7 @@ If that still doesn't work, please create your ticket
     @commands.cooldown(3, 30, commands.BucketType.guild)
     @commands.guild_only()
     @commands.check(checks.has_manage_channels)
-    async def topic_set_format(self, ctx: MyContext, topic_id: Optional[int], name_format: str):
+    async def topic_set_format(self, ctx: MyContext, topic_id: int | None, name_format: str):
         """Set the format used to generate the channel/thread name
         You can use the following placeholders: username, userid, topic, topic_emoji, ticket_name
         Use "none" to reset the format to the default one
@@ -801,7 +800,7 @@ If that still doesn't work, please create your ticket
     @commands.cooldown(3, 40, commands.BucketType.guild)
     @commands.guild_only()
     @commands.check(checks.has_manage_channels)
-    async def portal_review_config(self, ctx: MyContext, *, topic_id: Optional[int]=None):
+    async def portal_review_config(self, ctx: MyContext, *, topic_id: int | None=None):
         """Review the configuration of a topic or all topics
 
         ..Example tickets review-config

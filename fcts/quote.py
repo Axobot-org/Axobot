@@ -1,5 +1,4 @@
 from io import BytesIO
-from typing import Optional
 
 import aiohttp
 import discord
@@ -64,7 +63,7 @@ class Quote(commands.Cog):
         await self.quote_command(interaction, message, style)
 
 
-    async def quote_message(self, message: discord.Message, style: QuoteStyle) -> Optional[discord.Message]:
+    async def quote_message(self, message: discord.Message, style: QuoteStyle) -> discord.Message | None:
         "Generate a Quote card from a message and post it to the channel"
         text = remove_markdown(message.clean_content)
         while '\n\n' in text:

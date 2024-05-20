@@ -3,7 +3,7 @@ import importlib
 import random
 import urllib.parse
 from math import ceil
-from typing import Any, Literal, Optional, Union
+from typing import Any, Literal
 
 import aiohttp
 import discord
@@ -47,7 +47,7 @@ class Fun(commands.Cog):
         self.bot = bot
         self.file = "fun"
         self.tf = TimezoneFinder()
-        self.nasa_pict: Optional[dict[str, Any]] = None
+        self.nasa_pict: dict[str, Any] | None = None
 
     @property
     def utilities(self):
@@ -108,8 +108,8 @@ class Fun(commands.Cog):
 
     @fun_main.command(name="count-messages")
     @app_commands.checks.cooldown(3, 30)
-    async def count(self, interaction: discord.Interaction, limit: Optional[app_commands.Range[int, 10, 1_000]]=100,
-                    user: Optional[discord.User]=None, channel: Optional[discord.TextChannel]=None):
+    async def count(self, interaction: discord.Interaction, limit: app_commands.Range[int, 10, 1_000]=100,
+                    user: discord.User | None=None, channel: discord.TextChannel | None=None):
         """Count the number of messages sent by the user in one channel
 You can specify a verification limit by adding a number in argument (up to 1.000.000)
 
@@ -200,7 +200,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         ]
 
     @fun_main.command(name="kill")
-    async def kill(self, interaction: discord.Interaction, *, name: Optional[str]=None):
+    async def kill(self, interaction: discord.Interaction, *, name: str | None=None):
         """Just try to kill someone with a fun message
 
         ..Example kill herobrine
@@ -303,7 +303,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         channel="The channel where the bot must send the message"
     )
     async def say(self, interaction: discord.Interaction, text: str,
-                  channel: Union[discord.TextChannel, discord.Thread, None] = None):
+                  channel: discord.TextChannel | discord.Thread | None = None):
         """Let the bot say something for you
         You can specify a channel where the bot must send this message. If channel is None, the current channel will be used
 
@@ -392,7 +392,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         if not g.ok:
             await interaction.followup.send(content=await self.bot._(interaction, "fun.invalid-city"))
             return
-        tz_name: Optional[str] = self.tf.timezone_at_land(lat=g.json['lat'], lng=g.json['lng'])
+        tz_name: str | None = self.tf.timezone_at_land(lat=g.json['lat'], lng=g.json['lng'])
         if tz_name is None:
             await interaction.followup.send(content=await self.bot._(interaction, "fun.uninhabited-city"))
             return
@@ -475,7 +475,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
     @fun_main.command(name="discord-jobs")
     @app_commands.checks.cooldown(2, 20)
     @app_commands.rename(query="filter")
-    async def discord_jobs(self, interaction: discord.Interaction, query: Optional[str] = None):
+    async def discord_jobs(self, interaction: discord.Interaction, query: str | None = None):
         """Get the list of available jobs in Discord
 
         ..Example discordjobs
@@ -588,7 +588,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
 
     @fun_main.command(name="avatar")
     @app_commands.checks.cooldown(2, 10)
-    async def avatar(self, interaction: discord.Interaction, user: Optional[discord.User]):
+    async def avatar(self, interaction: discord.Interaction, user: discord.User | None):
         """Get the avatar URL of any user"""
         if user is None:
             user = interaction.user
@@ -609,14 +609,14 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         color="The color of the embed bar"
     )
     async def send_embed(self, interaction: discord.Interaction,
-                         channel: Optional[discord.TextChannel]=None,
-                         title: Optional[app_commands.Range[str, 1, 256]]=None,
-                         content: Optional[app_commands.Range[str, 1, 2048]]=None,
-                         url: Optional[app_commands.Range[str, 5, 256]]=None,
-                         footer: Optional[app_commands.Range[str, 1, 90]]=None,
-                         image_url: Optional[app_commands.Range[str, 5, 256]]=None,
-                         thumbnail_url: Optional[app_commands.Range[str, 5, 256]]=None,
-                         color: Optional[args.ColorTransformer]=None
+                         channel: discord.TextChannel | None=None,
+                         title: app_commands.Range[str, 1, 256] | None=None,
+                         content: app_commands.Range[str, 1, 2048] | None=None,
+                         url: app_commands.Range[str, 5, 256] | None=None,
+                         footer: app_commands.Range[str, 1, 90] | None=None,
+                         image_url: app_commands.Range[str, 5, 256] | None=None,
+                         thumbnail_url: app_commands.Range[str, 5, 256] | None=None,
+                         color: args.ColorTransformer | None=None
         ):
         """Use the bot to send a custom embed
 

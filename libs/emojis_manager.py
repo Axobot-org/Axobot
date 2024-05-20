@@ -1,5 +1,5 @@
 import string
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 import discord
 import requests
@@ -979,7 +979,7 @@ class EmojisManager:
             text = text.replace(unicode, name)
         return text
 
-    def get_emoji(self, name: str) -> Optional[discord.Emoji]:
+    def get_emoji(self, name: str) -> discord.Emoji | None:
         "Get a custom emoji object"
         ids = {
             "youtube": 447459436982960143,

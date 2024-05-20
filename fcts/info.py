@@ -1,6 +1,6 @@
 import importlib
 import locale
-from typing import Literal, Optional, Union, get_args
+from typing import Literal, get_args
 
 import aiohttp
 import discord
@@ -51,7 +51,7 @@ class Info(commands.Cog):
         query_type="The type of the item to look for"
     )
     async def info_main(self, interaction: discord.Interaction, *, query: app_commands.Range[str, 1, 100], \
-                        query_type: Optional[QueryTypesTyping] = None):
+                        query_type: QueryTypesTyping | None = None):
         """Find informations about someone/something
 
         ..Example info role The VIP
@@ -400,7 +400,7 @@ class Info(commands.Cog):
                 )
         await interaction.followup.send(embed=embed)
 
-    async def emoji_info(self, interaction: discord.Interaction, emoji: Union[discord.Emoji, discord.PartialEmoji]):
+    async def emoji_info(self, interaction: discord.Interaction, emoji: discord.Emoji | discord.PartialEmoji):
         "Get info about any Discord emoji"
         lang = await self.bot._(interaction, "_used_locale")
         since = await self.bot._(interaction, "misc.since")
@@ -597,8 +597,8 @@ class Info(commands.Cog):
             value=await self.bot._(interaction, "info.info.guild-7", c=guild.member_count, b=bots, o=online)
         )
         # Channel count
-        text_count = sum(1 for channel in guild.channels if isinstance(channel, (discord.TextChannel, discord.ForumChannel)))
-        voice_count = sum(1 for channel in guild.channels if isinstance(channel, (discord.VoiceChannel, discord.StageChannel)))
+        text_count = sum(1 for channel in guild.channels if isinstance(channel, discord.TextChannel | discord.ForumChannel))
+        voice_count = sum(1 for channel in guild.channels if isinstance(channel, discord.VoiceChannel | discord.StageChannel))
         embed.add_field(
             name=await self.bot._(interaction, "info.info.guild-6"),
             value=await self.bot._(interaction, "info.info.guild-3", txt=text_count, voc=voice_count, cat=len(guild.categories))
@@ -716,7 +716,7 @@ class Info(commands.Cog):
         if invite.max_age is not None:
             max_age = str(invite.max_age) if invite.max_age != 0 else "∞"
             embed.add_field(name=await self.bot._(interaction, "info.info.inv-3"), value=max_age)
-        if isinstance(invite.channel,(discord.PartialInviteChannel,discord.abc.GuildChannel)):
+        if isinstance(invite.channel, discord.PartialInviteChannel | discord.abc.GuildChannel):
             # Guild name
             embed.add_field(name=await self.bot._(interaction, "info.info.guild-0"), value=invite.guild.name)
             # Channel name

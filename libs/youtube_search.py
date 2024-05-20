@@ -26,7 +26,7 @@ import os
 import sys
 from argparse import ArgumentParser, HelpFormatter, Namespace
 from functools import wraps
-from typing import Callable, Iterable, Optional
+from typing import Callable, Iterable
 
 from google.auth.exceptions import GoogleAuthError
 from googleapiclient.discovery import Resource
@@ -124,7 +124,7 @@ class Service:
 
         return res
 
-    def find_channel_by_custom_url(self, url: str) -> Optional[str]:
+    def find_channel_by_custom_url(self, url: str) -> str | None:
         "Search for a channel ID from a given custom identifier"
         resp = self.youtube.search().list(  # pylint: disable=no-member
             q=url,
@@ -163,7 +163,7 @@ class Service:
 
         return None
 
-    def find_channel_by_user_name(self, user: str) -> Optional[str]:
+    def find_channel_by_user_name(self, user: str) -> str | None:
         "Search for a channel ID from a given username"
         resp = self.youtube.channels().list(  # pylint: disable=no-member
             forUsername=user,
@@ -182,7 +182,7 @@ class Service:
 
         return None
 
-    def query_custom_url(self, channel_id: str) -> Optional[str]:
+    def query_custom_url(self, channel_id: str) -> str | None:
         "Search for a custom URL from a given channel identifier"
         resp = self.youtube.channels().list(  # pylint: disable=no-member
             id=channel_id,
@@ -200,7 +200,7 @@ class Service:
                 return item['snippet']['customUrl']
         return None
 
-    def query_channel_title(self, channel_id: str) -> Optional[str]:
+    def query_channel_title(self, channel_id: str) -> str | None:
         "Search for a custom URL from a given channel identifier"
         resp = self.youtube.channels().list(  # pylint: disable=no-member
             id=channel_id,
@@ -262,7 +262,7 @@ class Act:
 
         lowered_name = name.lower().replace(' ', '_')
         arg: str = getattr(opts, lowered_name)
-        result: Optional[str] = getattr(service, 'find_channel_by_' + lowered_name)(arg)
+        result: str | None = getattr(service, 'find_channel_by_' + lowered_name)(arg)
 
         if result is None:
             error('%s "%s": no associated channel found',
@@ -284,7 +284,7 @@ class Act:
             opts.max_results,
             opts.app_key)
 
-        custom_name: Optional[str] = service.query_custom_url(opts.channel_url)
+        custom_name: str | None = service.query_custom_url(opts.channel_url)
 
         if custom_name is not None:
             print(custom_name)
@@ -297,7 +297,7 @@ class Act:
             opts.max_results,
             opts.app_key)
 
-        title: Optional[str] = service.query_channel_title(opts.channel_url)
+        title: str | None = service.query_channel_title(opts.channel_url)
 
         if title is not None:
             print(title)

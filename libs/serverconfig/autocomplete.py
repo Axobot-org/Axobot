@@ -1,5 +1,3 @@
-from typing import Union
-
 import discord
 from discord import Interaction
 from discord.app_commands import Choice
@@ -152,7 +150,7 @@ async def _autocomplete_role(_bot: Axobot, interaction: Interaction, option: Rol
 
 async def _autocomplete_text_channel(_: Axobot, interaction: Interaction, option: TextChannelOptionRepresentation, current: str):
     "Autocompletion for text channel options"
-    all_channels: list[Union[discord.TextChannel, discord.Thread]] = interaction.guild.text_channels
+    all_channels: list[discord.TextChannel | discord.Thread] = interaction.guild.text_channels
     if option["allow_threads"]:
         all_channels += list(interaction.guild.threads)
     filtered_channels = (
@@ -181,7 +179,7 @@ async def _autocomplete_text_channel(_: Axobot, interaction: Interaction, option
 
 async def _autocomplete_voice_channel(_: Axobot, interaction: Interaction, option: VoiceChannelOptionRepresentation, current:str):
     "Autocompletion for voice channel options"
-    all_channels: list[Union[discord.VoiceChannel, discord.StageChannel]] = interaction.guild.voice_channels
+    all_channels: list[discord.VoiceChannel | discord.StageChannel] = interaction.guild.voice_channels
     if option["allow_stage_channels"]:
         all_channels = all_channels + interaction.guild.stage_channels
     filtered_channels = (

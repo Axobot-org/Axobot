@@ -2,7 +2,7 @@ import datetime
 import importlib
 import random
 from math import ceil
-from typing import Dict, List, Literal, Optional, Union
+from typing import Literal
 
 import discord
 from discord import app_commands
@@ -71,7 +71,7 @@ Slowmode works up to one message every 6h (21600s)
     @commands.cooldown(4, 30, commands.BucketType.guild)
     @commands.guild_only()
     @commands.check(checks.can_clear)
-    async def clear(self, ctx: MyContext, number: commands.Range[int, 1, CLEAR_MAX_MESSAGES], users: commands.Greedy[discord.User]=None, *, contains_file: Optional[bool]=None, contains_url: Optional[bool]=None, contains_invite: Optional[bool]=None, is_pinned: Optional[bool]=None):
+    async def clear(self, ctx: MyContext, number: commands.Range[int, 1, CLEAR_MAX_MESSAGES], users: commands.Greedy[discord.User]=None, *, contains_file: bool | None=None, contains_url: bool | None=None, contains_invite: bool | None=None, is_pinned: bool | None=None):
         """Keep your chat clean
         <number>: number of messages to check
         [users]: list of user IDs or mentions to delete messages from
@@ -161,7 +161,7 @@ Slowmode works up to one message every 6h (21600s)
     @commands.cooldown(5, 20, commands.BucketType.guild)
     @commands.guild_only()
     @commands.check(checks.can_kick)
-    async def kick(self, ctx: MyContext, user:discord.Member, *, reason: Optional[str]=None):
+    async def kick(self, ctx: MyContext, user:discord.Member, *, reason: str | None=None):
         """Kick a member from this server
 
 ..Example kick @someone Not nice enough to stay here
@@ -268,11 +268,11 @@ Slowmode works up to one message every 6h (21600s)
             await ctx.send(await self.bot._(ctx.guild.id, "moderation.error"))
             self.bot.dispatch("command_error", ctx, err)
 
-    async def get_muted_role(self, guild: discord.Guild) -> Optional[discord.Role]:
+    async def get_muted_role(self, guild: discord.Guild) -> discord.Role | None:
         "Find the muted role from the guild config option"
         return await self.bot.get_config(guild.id, "muted_role")
 
-    async def mute_member(self, member: discord.Member, reason: Optional[str], duration: Optional[datetime.timedelta]=None):
+    async def mute_member(self, member: discord.Member, reason: str | None, duration: datetime.timedelta | None=None):
         """Call when someone should be muted in a guild"""
         # add the muted role
         role = await self.get_muted_role(member.guild)
@@ -318,7 +318,7 @@ Slowmode works up to one message every 6h (21600s)
     @commands.guild_only()
     @commands.check(checks.can_mute)
     async def mute(self, ctx: MyContext, user: discord.Member, time: commands.Greedy[args.Duration], *,
-                   reason: Optional[str]=None):
+                   reason: str | None=None):
         """Timeout someone.
 You can also mute this member for a defined duration, then use the following format:
 `XXm` : XX minutes
@@ -421,7 +421,7 @@ You can also mute this member for a defined duration, then use the following for
         async with self.bot.db_query(query, (user.id, guild.id)):
             pass
 
-    async def is_muted(self, guild: discord.Guild, member: discord.Member, role: Optional[discord.Role]) -> bool:
+    async def is_muted(self, guild: discord.Guild, member: discord.Member, role: discord.Role | None) -> bool:
         """Check if a user is currently muted"""
         if member.is_timed_out():
             return True
@@ -434,7 +434,7 @@ You can also mute this member for a defined duration, then use the following for
             result: int = query_results[0]['count']
         return result > 0
 
-    async def db_get_muted_list(self, guild_id: int, reasons: bool = False) -> Union[Dict[int, str], List[int]]:
+    async def db_get_muted_list(self, guild_id: int, reasons: bool = False) -> dict[int, str] | list[int]:
         """List muted users for a specific guild
         Set 'reasons' to True if you want the attached reason"""
         if reasons:
@@ -550,7 +550,7 @@ This will remove the role 'muted' for the targeted member
     @commands.guild_only()
     @commands.check(checks.can_ban)
     async def ban(self, ctx:MyContext, user: discord.User, time: commands.Greedy[args.Duration]=None,
-                  days_to_delete: commands.Range[int, 0, 7]=0, *, reason: Optional[str]=None):
+                  days_to_delete: commands.Range[int, 0, 7]=0, *, reason: str | None=None):
         """Ban someone
 The 'days_to_delete' option represents the number of days worth of messages to delete from the user in the guild, bewteen 0 and 7
 
@@ -631,7 +631,7 @@ The 'days_to_delete' option represents the number of days worth of messages to d
     @commands.cooldown(5,20, commands.BucketType.guild)
     @commands.guild_only()
     @commands.check(checks.can_ban)
-    async def unban(self, ctx: MyContext, user: str, *, reason: Optional[str]=None):
+    async def unban(self, ctx: MyContext, user: str, *, reason: str | None=None):
         """Unban someone
 
 ..Example unban 1048011651145797673 Nice enough
@@ -686,7 +686,7 @@ The 'days_to_delete' option represents the number of days worth of messages to d
     @app_commands.describe(reason="The reason of the kick")
     @commands.guild_only()
     @commands.check(checks.can_kick)
-    async def softban(self, ctx: MyContext, user: discord.Member, *, reason: Optional[str]=None):
+    async def softban(self, ctx: MyContext, user: discord.Member, *, reason: str | None=None):
         """Kick a member and lets Discord delete all his messages up to 7 days old.
 Permissions for using this command are the same as for the kick
 
@@ -880,7 +880,7 @@ The 'show_reasons' parameter is used to display the mute reasons.
 
         class MutesPaginator(Paginator):
             "Paginator used to display muted users"
-            users_map: dict[int, Optional[discord.User]] = {}
+            users_map: dict[int, discord.User | None] = {}
 
             async def get_page_count(self) -> int:
                 length = len(muted_list)
@@ -968,7 +968,7 @@ The 'show_reasons' parameter is used to display the mute reasons.
     @commands.guild_only()
     @commands.check(checks.has_manage_expressions)
     async def emoji_restrict(self, ctx: MyContext, emoji: discord.Emoji,
-                             roles: commands.Greedy[Union[discord.Role, Literal['everyone']]]):
+                             roles: commands.Greedy[discord.Role | Literal['everyone']]):
         """Restrict the use of an emoji to certain roles
 
         ..Example emoji restrict :vip: @VIP @Admins
@@ -1157,11 +1157,11 @@ The 'show_reasons' parameter is used to display the mute reasons.
             if start_message.channel is None:
                 self.bot.dispatch("command_error", ctx, ValueError("Channel not found"))
                 return
-        p = start_message.channel.permissions_for(ctx.guild.me)
-        if not start_message.channel.permissions_for(ctx.guild.me).manage_messages:
+        bot_perms = start_message.channel.permissions_for(ctx.guild.me)
+        if not bot_perms.manage_messages:
             await ctx.send(await self.bot._(ctx.guild.id, "moderation.need-manage-messages"))
             return
-        if not start_message.channel.permissions_for(ctx.guild.me).read_message_history:
+        if not bot_perms.read_message_history:
             await ctx.send(await self.bot._(ctx.guild.id, "moderation.need-read-history"))
             return
         if start_message.created_at < ctx.bot.utcnow() - datetime.timedelta(days=21):

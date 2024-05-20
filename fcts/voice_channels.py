@@ -1,7 +1,6 @@
 import json
 import logging
 import random
-from typing import Optional
 
 import aiohttp
 import discord
@@ -69,7 +68,7 @@ class VoiceChannels(commands.Cog):
         if not member.guild.me.guild_permissions.manage_roles:
             self.log.info("Missing \"manage_roles\" permission on guild %s", member.guild.id)
             return
-        roles: Optional[list[discord.Role]] = await self.bot.get_config(member.guild.id, 'voice_roles')
+        roles: list[discord.Role] | None = await self.bot.get_config(member.guild.id, 'voice_roles')
         if not roles:
             return
         pos = member.guild.me.top_role.position
@@ -94,7 +93,7 @@ class VoiceChannels(commands.Cog):
                 return
             if not self.bot.database_online:
                 return
-            voice_channel: Optional[discord.VoiceChannel] = await self.bot.get_config(member.guild.id, "voice_channel")
+            voice_channel: discord.VoiceChannel | None = await self.bot.get_config(member.guild.id, "voice_channel")
             if voice_channel is None:  # if nothing was setup
                 return
             if after.channel == voice_channel:
@@ -120,7 +119,7 @@ class VoiceChannels(commands.Cog):
     async def create_channel(self, member: discord.Member):
         """Create a new voice channel
         The member will get "Manage channel" permissions automatically"""
-        category: Optional[discord.CategoryChannel] = await self.bot.get_config(member.guild.id, 'voice_category')
+        category: discord.CategoryChannel | None = await self.bot.get_config(member.guild.id, 'voice_category')
         if category is None:  # if nothing was setup
             return
         perms = category.permissions_for(member.guild.me)
@@ -173,7 +172,8 @@ class VoiceChannels(commands.Cog):
             header = {'X-Api-Key': self.bot.others['random_api_token']}
             try:
                 async with session.get(RANDOM_NAMES_URL, headers=header) as resp:
-                    self.names['random']: list[str] = await resp.json()
+                    json: list[str] = await resp.json()
+                    self.names['random'] = json
             except aiohttp.ContentTypeError as err:
                 self.bot.dispatch("error", err)
                 return "hello"
@@ -187,9 +187,10 @@ class VoiceChannels(commands.Cog):
             try:
                 async with session.get(MINECRAFT_ENTITIES_URL) as resp:
                     data: dict[str, list[str]] = json.loads(await resp.text())
-                    self.names['minecraft']: list[str] = [
+                    json: list[str] = [
                         name.replace('minecraft:', '').replace('_', ' ') for name in data["values"]
                     ]
+                    self.names['minecraft'] = json
                     random.shuffle(self.names['minecraft'])
             except aiohttp.ContentTypeError as err:
                 self.bot.dispatch("error", err)

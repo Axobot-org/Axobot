@@ -7,7 +7,7 @@ import re
 import time
 from json import dumps
 from math import ceil
-from typing import Any, Callable, Literal, Optional, Union
+from typing import Any, Callable, Literal
 
 import discord
 from aiohttp import ClientSession, client_exceptions
@@ -99,7 +99,7 @@ class Rss(commands.Cog):
     @app_commands.rename(feed_type="type")
     @commands.cooldown(3, 20, commands.BucketType.user)
     async def rss_last_post(self, ctx: MyContext, url: str,
-                            feed_type: Optional[Literal["youtube", "twitter", "twitch", "deviantart", "web"]]):
+                            feed_type: Literal["youtube", "twitter", "twitch", "deviantart", "web"] | None):
         """Search the last post of a feed
 
         ..Example rss last-post https://www.youtube.com/channel/UCZ5XnGb-3t7jCkXdawN2tkA
@@ -303,7 +303,7 @@ class Rss(commands.Cog):
     @commands.guild_only()
     @commands.check(checks.database_connected)
     @commands.check(can_use_rss)
-    async def systeme_rm(self, ctx: MyContext, feed: Optional[str]=None):
+    async def systeme_rm(self, ctx: MyContext, feed: str | None=None):
         """Unsubscribe from a RSS feed
 
         ..Example rss remove
@@ -338,7 +338,7 @@ class Rss(commands.Cog):
     @commands.guild_only()
     @commands.check(checks.database_connected)
     @commands.check(can_use_rss)
-    async def feed_enable(self, ctx: MyContext, feed: Optional[str]=None):
+    async def feed_enable(self, ctx: MyContext, feed: str | None=None):
         """Re-enable a disabled feed
 
         ..Example rss enable
@@ -378,7 +378,7 @@ class Rss(commands.Cog):
     @commands.guild_only()
     @commands.check(checks.database_connected)
     @commands.check(can_use_rss)
-    async def feed_disable(self, ctx: MyContext, feed: Optional[str]=None):
+    async def feed_disable(self, ctx: MyContext, feed: str | None=None):
         """Disable a RSS feed
 
         ..Example rss disable
@@ -428,7 +428,7 @@ class Rss(commands.Cog):
     @commands.guild_only()
     @commands.check(checks.database_connected)
     @commands.check(can_use_rss)
-    async def feed_test(self, ctx: MyContext, feed: Optional[str]=None):
+    async def feed_test(self, ctx: MyContext, feed: str | None=None):
         """Test a RSS feed format
         This will send the last post of the feed following the format you set up
 
@@ -675,8 +675,8 @@ class Rss(commands.Cog):
             choices.append((current not in name, name, choice))
         return [choice for _, _, choice in sorted(choices, key=lambda x: x[0:2])]
 
-    async def ask_rss_id(self, input_id: Optional[int], ctx: MyContext, title: str,
-                         feed_filter: Callable[[FeedObject], bool]=None, max_count: Optional[int]=1) -> Optional[list[int]]:
+    async def ask_rss_id(self, input_id: int | None, ctx: MyContext, title: str,
+                         feed_filter: Callable[[FeedObject], bool]=None, max_count: int | None=1) -> list[int] | None:
         "Ask the user to select a feed ID"
         selection = []
         if feed_filter is None:
@@ -737,8 +737,8 @@ class Rss(commands.Cog):
     @commands.guild_only()
     @commands.check(can_use_rss)
     @commands.check(checks.database_connected)
-    async def change_mentions(self, ctx: MyContext, feed: Optional[str]=None, silent: Optional[bool]=None, *,
-                              mentions: Optional[str]):
+    async def change_mentions(self, ctx: MyContext, feed: str | None=None, silent: bool | None=None, *,
+                              mentions: str | None):
         """Configures a role to be notified when a news is posted
         The "silent" parameter (Yes/No) allows you to send new feeds as silent messages, which won't send push notifications to your users.
         If you want to use the @everyone role, please put the server ID instead of the role name.
@@ -803,7 +803,7 @@ class Rss(commands.Cog):
                     msg: discord.Message = await self.bot.wait_for('message',
                         check=lambda msg: msg.author==ctx.author, timeout=30.0)
                     if msg.content.lower() in no_role: # if no role should be mentionned
-                        roles_ids: Optional[list[str]] = None
+                        roles_ids: list[str] | None = None
                     else:
                         roles_ids = []
                         names = []
@@ -899,7 +899,7 @@ class Rss(commands.Cog):
     @commands.guild_only()
     @commands.check(can_use_rss)
     @commands.check(checks.database_connected)
-    async def move_guild_feed(self, ctx: MyContext, feed: Optional[str]=None, channel: Optional[discord.TextChannel]=None):
+    async def move_guild_feed(self, ctx: MyContext, feed: str | None=None, channel: discord.TextChannel | None=None):
         """Move a rss feed in another channel
 
         ..Example rss move
@@ -956,7 +956,7 @@ class Rss(commands.Cog):
     @commands.guild_only()
     @commands.check(can_use_rss)
     @commands.check(checks.database_connected)
-    async def change_text(self, ctx: MyContext, feed: Optional[str]=None):
+    async def change_text(self, ctx: MyContext, feed: str | None=None):
         """Change the text of an rss feed
 
         Available variables:
@@ -1066,14 +1066,14 @@ class Rss(commands.Cog):
         image_location="Where to put the image in the embed (thumbnail, image, or None)",
     )
     @app_commands.rename(feed_id="feed")
-    async def change_embed(self, ctx: MyContext, feed_id: Optional[str] = None, should_use_embed: Optional[bool] = None,
+    async def change_embed(self, ctx: MyContext, feed_id: str | None = None, should_use_embed: bool | None = None,
                                color: discord.Color = None,
-                               author_text: Optional[commands.Range[str, 2, 256]] = None,
-                               title: Optional[commands.Range[str, 2, 256]] = None,
-                               footer_text: Optional[commands.Range[str, 2, 2048]] = None,
-                               show_date_in_footer: Optional[bool] = None,
-                               enable_link_in_title: Optional[bool] = None,
-                               image_location: Optional[Literal["thumbnail", "banner", "none"]] = None):
+                               author_text: commands.Range[str, 2, 256] | None = None,
+                               title: commands.Range[str, 2, 256] | None = None,
+                               footer_text: commands.Range[str, 2, 2048] | None = None,
+                               show_date_in_footer: bool | None = None,
+                               enable_link_in_title: bool | None = None,
+                               image_location: Literal["thumbnail", "banner", "none"] | None = None):
         """Use an embed or not for a feed
         You can also provide arguments to change the color/texts of the embed. Followed variables are usable in text arguments:
         - `{author}`: the author of the post
@@ -1166,7 +1166,7 @@ class Rss(commands.Cog):
     @commands.check(checks.database_connected)
     @app_commands.rename(feed_id="feed")
     async def change_feed_filter(self, ctx: MyContext, feed_id: str, filter_type: Literal["blacklist", "whitelist", "none"], *,
-                                 words: Optional[str] = None):
+                                 words: str | None = None):
         """Add a filter on the feed to only allow posts containing (or not containing) some words
 
         Words must be separated by a comma (`,`).
@@ -1272,7 +1272,7 @@ class Rss(commands.Cog):
             numb = int('66'+numb)
         return numb
 
-    async def db_get_feed(self, feed_id: int) -> Optional[FeedObject]:
+    async def db_get_feed(self, feed_id: int) -> FeedObject | None:
         "Get a rss feed from its ID"
         query = f"SELECT * FROM `{self.table}` WHERE `ID`='{feed_id}'"
         async with self.bot.db_query(query) as query_results:
@@ -1335,7 +1335,7 @@ class Rss(commands.Cog):
             t = query_results['count']
         return t
 
-    async def db_update_feed(self, feed_id: int, values: Optional[list[tuple[str, Any]]]=None):
+    async def db_update_feed(self, feed_id: int, values: list[tuple[str, Any]] | None=None):
         "Update a field values"
         values = values if values is not None else [(None, None)]
         if self.bot.zombie_mode:
@@ -1345,7 +1345,7 @@ class Rss(commands.Cog):
         async with self.bot.db_query(query, [val[1] for val in values] + [feed_id]):
             pass
 
-    async def _update_feed_last_entry(self, feed_id: int, last_post_date: datetime.datetime, last_entry_id: Optional[str]):
+    async def _update_feed_last_entry(self, feed_id: int, last_post_date: datetime.datetime, last_entry_id: str | None):
         "Update the last entry of a feed"
         if self.bot.zombie_mode:
             return
@@ -1378,7 +1378,7 @@ class Rss(commands.Cog):
         async with self.bot.db_query(query, (self.bot.utcnow(),), returnrowcount=True) as query_results:
             self.log.info("Set last refresh date for %s feeds", query_results)
 
-    async def send_rss_msg(self, obj: "RssMessage", channel: Union[discord.TextChannel, discord.Thread]):
+    async def send_rss_msg(self, obj: "RssMessage", channel: discord.TextChannel | discord.Thread):
         "Send a RSS message into its Discord channel, with the corresponding mentions"
         content = await obj.create_msg()
         if self.bot.zombie_mode:
@@ -1400,7 +1400,7 @@ class Rss(commands.Cog):
         return False
 
     async def _get_channel_or_thread(self, guild: discord.Guild, channel_id: int
-                                     ) -> Union[discord.TextChannel, discord.Thread, None]:
+                                     ) -> discord.TextChannel | discord.Thread | None:
         """Get a channel or thread from its ID
         If not in cache, fetch it from Discord"""
         if channel := guild.get_channel_or_thread(channel_id):
@@ -1458,7 +1458,7 @@ class Rss(commands.Cog):
                 # transform single object into list
                 if isinstance(objs, RssMessage):
                     objs = [objs]
-            if isinstance(objs, (str, type(None), int)) or len(objs) == 0:
+            if isinstance(objs, str | int | None) or len(objs) == 0:
                 return True
             elif isinstance(objs, list):
                 if len(objs) == 0:
@@ -1519,7 +1519,7 @@ class Rss(commands.Cog):
                                       feed_id=feed.feed_id
                                       )
 
-    async def _loop_refresh_one_feed(self, feed: FeedObject, session: ClientSession, guild_id: Optional[int]) -> Optional[bool]:
+    async def _loop_refresh_one_feed(self, feed: FeedObject, session: ClientSession, guild_id: int | None) -> bool | None:
         "Refresh one feed (called by the refresh_feeds method loop)"
         if not feed.enabled:
             return None
@@ -1533,7 +1533,7 @@ class Rss(commands.Cog):
             return False
         return result
 
-    async def refresh_feeds(self, guild_id: Optional[int]=None):
+    async def refresh_feeds(self, guild_id: int | None=None):
         "Loop through feeds and do magic things"
         if not self.bot.rss_enabled:
             return

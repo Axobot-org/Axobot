@@ -2,7 +2,7 @@ import asyncio
 import datetime
 import time
 from random import random
-from typing import TYPE_CHECKING, Any, Callable, Optional
+from typing import TYPE_CHECKING, Any, Callable
 
 import discord
 from cachetools import TTLCache
@@ -179,7 +179,7 @@ class ServerLogs(commands.Cog):
     @commands.guild_only()
     @commands.check(checks.has_manage_guild)
     @commands.cooldown(1, 10, commands.BucketType.channel)
-    async def modlogs_list(self, ctx: MyContext, channel: Optional[discord.TextChannel]=None):
+    async def modlogs_list(self, ctx: MyContext, channel: discord.TextChannel | None=None):
         """Show the full list of server logs type, or the list of enabled logs for a channel
 
         ..Example modlogs list
@@ -222,7 +222,7 @@ class ServerLogs(commands.Cog):
     @app_commands.describe(channel="The channel to add logs to. Leave empty to select the current channel")
     @commands.guild_only()
     @commands.check(checks.has_manage_guild)
-    async def modlogs_enable(self, ctx: MyContext, logs: commands.Greedy[ServerLog], channel: Optional[discord.TextChannel]=None):
+    async def modlogs_enable(self, ctx: MyContext, logs: commands.Greedy[ServerLog], channel: discord.TextChannel | None=None):
         """Enable one or more logs in the current channel
 
         ..Example modlogs enable ban bot_warnings
@@ -296,7 +296,7 @@ class ServerLogs(commands.Cog):
     @app_commands.describe(channel="The channel to remove logs from. Leave empty to select the current channel")
     @commands.guild_only()
     @commands.check(checks.has_manage_guild)
-    async def modlogs_disable(self, ctx:MyContext, logs: commands.Greedy[ServerLog], channel: Optional[discord.TextChannel]=None):
+    async def modlogs_disable(self, ctx:MyContext, logs: commands.Greedy[ServerLog], channel: discord.TextChannel | None=None):
         """Disable one or more logs in the current channel
 
         ..Example modlogs disable ban message_delete
@@ -340,7 +340,7 @@ class ServerLogs(commands.Cog):
             all_label=await self.bot._(interaction, "serverlogs.autocompletion-all")
         )
 
-    async def log_name_autocomplete(self, current: str, available_logs: Optional[list[str]]=None, all_label: str="all"):
+    async def log_name_autocomplete(self, current: str, available_logs: list[str] | None=None, all_label: str="all"):
         "Autocompletion for log names"
         all_logs = list(self.available_logs()) if available_logs is None else  available_logs
         filtered = sorted(
@@ -1296,7 +1296,7 @@ Minimum age required by anti-raid: {min_age}"
 
     @commands.Cog.listener()
     async def on_moderation_ban(self, guild: discord.Guild, author: discord.Member, user: discord.User,
-                                case_id: Optional[int], reason: Optional[str], duration: Optional[int]):
+                                case_id: int | None, reason: str | None, duration: int | None):
         """Triggered when someone uses the ban command
         Corresponding log: member_ban"""
         if channel_ids := await self.is_log_enabled(guild.id, "member_ban"):
@@ -1319,7 +1319,7 @@ Minimum age required by anti-raid: {min_age}"
 
     @commands.Cog.listener()
     async def on_moderation_unban(self, guild: discord.Guild, author: discord.Member, user: discord.user,
-                                  case_id: Optional[int], reason: Optional[str]):
+                                  case_id: int | None, reason: str | None):
         """Triggered when someone uses the unban command
         Corresponding log: member_unban"""
         if channel_ids := await self.is_log_enabled(guild.id, "member_unban"):
@@ -1351,7 +1351,7 @@ Minimum age required by anti-raid: {min_age}"
 
     @commands.Cog.listener()
     async def on_moderation_softban(self, guild: discord.Guild, author: discord.Member, user: discord.User,
-                                    case_id: Optional[int], reason: Optional[str]):
+                                    case_id: int | None, reason: str | None):
         """Triggered when someone uses the softban command
         Corresponding log: member_kick"""
         if channel_ids := await self.is_log_enabled(guild.id, "member_kick"):
@@ -1369,7 +1369,7 @@ Minimum age required by anti-raid: {min_age}"
 
     @commands.Cog.listener()
     async def on_moderation_kick(self, guild: discord.Guild, author: discord.Member, user: discord.User,
-                                 case_id: Optional[int], reason: Optional[str]):
+                                 case_id: int | None, reason: str | None):
         """Triggered when someone uses the kick command
         Corresponding log: member_kick"""
         if channel_ids := await self.is_log_enabled(guild.id, "member_kick"):
@@ -1387,7 +1387,7 @@ Minimum age required by anti-raid: {min_age}"
 
     @commands.Cog.listener()
     async def on_moderation_mute(self, guild: discord.Guild, author: discord.Member, user: discord.Member,
-                                 case_id: Optional[int], reason: Optional[str], duration: Optional[int]):
+                                 case_id: int | None, reason: str | None, duration: int | None):
         """Triggered when someone uses the mute command
         Corresponding log: member_timeout"""
         if channel_ids := await self.is_log_enabled(guild.id, "member_timeout"):
@@ -1437,7 +1437,7 @@ Minimum age required by anti-raid: {min_age}"
 
     @commands.Cog.listener()
     async def on_moderation_warn(self, guild: discord.Guild, author: discord.Member, user: discord.Member,
-                                 case_id: Optional[int], message: str):
+                                 case_id: int | None, message: str):
         """Triggered when someone uses the warn command
         Corresponding log: member_warn"""
         if channel_ids := await self.is_log_enabled(guild.id, "member_warn"):

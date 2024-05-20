@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Optional, Union
+from typing import TYPE_CHECKING
 
 from discord import Locale, app_commands
 from discord.app_commands import locale_str
@@ -20,7 +20,7 @@ LOCALES_MAP = {
 
 IGNORED_COMMANDS = {"admin", "find"}
 
-async def is_ignored_command(cmd: Union[app_commands.Command, app_commands.Group, app_commands.ContextMenu]):
+async def is_ignored_command(cmd: app_commands.Command | app_commands.Group | app_commands.ContextMenu):
     "Check if the given command should be ignored by the translator"
     if isinstance(cmd, app_commands.ContextMenu):
         root = cmd
@@ -72,14 +72,14 @@ class AxobotTranslator(app_commands.Translator):
         else:
             return await self._translate_custom(lang, string, locale)
 
-    async def _translate_cmd(self, lang: str, string: str, locale: Locale) -> Optional[str]:
+    async def _translate_cmd(self, lang: str, string: str, locale: Locale) -> str | None:
         try:
             return await self.bot.get_cog("Languages").get_translation(lang, string)
         except KeyError:
             if locale in {Locale.american_english, Locale.french}:
                 self.bot.log.warning(f"[translator] Missing translation for '{string}' in {locale} ({lang})")
 
-    async def _translate_custom(self, lang: str, string: locale_str, locale: Locale) -> Optional[str]:
+    async def _translate_custom(self, lang: str, string: locale_str, locale: Locale) -> str | None:
         try:
             return await self.bot.get_cog("Languages").get_translation(lang, string.message)
         except KeyError:

@@ -3,7 +3,7 @@ from __future__ import annotations
 import datetime as dt
 import re
 import time
-from typing import TYPE_CHECKING, Literal, Optional
+from typing import TYPE_CHECKING, Literal
 
 import aiohttp
 import discord
@@ -30,8 +30,8 @@ class WebRSS:
         matches = re.match(self.url_pattern, string)
         return bool(matches)
 
-    async def _get_feed(self, url: str, filter_config: Optional[FeedFilterConfig]=None,
-                        session: Optional[aiohttp.ClientSession]=None) -> FeedParserDict:
+    async def _get_feed(self, url: str, filter_config: FeedFilterConfig | None=None,
+                        session: aiohttp.ClientSession | None=None) -> FeedParserDict:
         "Get a list of feeds from a web URL"
         feed = await feed_parse(url, 9, session)
         if feed is None or not feed.entries:
@@ -56,23 +56,22 @@ class WebRSS:
                 return None
         return feed
 
-    async def _get_feed_date_key(self, entry: FeedParserDict) -> Optional[
-        Literal['published_parsed', 'published', 'updated_parsed']
-    ]:
+    async def _get_feed_date_key(self, entry: FeedParserDict
+                                 ) -> Literal['published_parsed', 'published', 'updated_parsed'] | None:
         "Compute which key to use to get the date from a feed"
         for i in ['published_parsed', 'published', 'updated_parsed']:
             if entry.get(i) is not None:
                 return i
 
-    async def _get_entry_title(self, entry: FeedParserDict) -> Optional[str]:
+    async def _get_entry_title(self, entry: FeedParserDict) -> str | None:
         "Try to find the article ID or title"
         for i in ['id', 'title', 'updated_parsed']:
             if value := entry.get(i):
                 return value
 
     async def get_last_post(self, channel: discord.TextChannel, url: str,
-                            filter_config: Optional[FeedFilterConfig],
-                            session: Optional[aiohttp.ClientSession]=None):
+                            filter_config: FeedFilterConfig | None,
+                            session: aiohttp.ClientSession | None=None):
         "Get the last post from a web feed"
         feed = await self._get_feed(url, filter_config, session)
         if not feed:
@@ -124,9 +123,9 @@ class WebRSS:
         )
 
     async def get_new_posts(self, channel: discord.TextChannel, url: str, date: dt.datetime,
-                            filter_config: Optional[FeedFilterConfig],
-                            last_entry_id: Optional[str]=None,
-                            session: Optional[aiohttp.ClientSession]=None) -> list[RssMessage]:
+                            filter_config: FeedFilterConfig | None,
+                            last_entry_id: str | None=None,
+                            session: aiohttp.ClientSession | None=None) -> list[RssMessage]:
         "Get new posts from a web feed"
         feed = await self._get_feed(url, filter_config, session)
         if not feed or not feed.entries:
