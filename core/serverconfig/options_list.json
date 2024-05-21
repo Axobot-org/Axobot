@@ -1,0 +1,400 @@
+{
+    "anti_caps_lock": {
+        "type": "boolean",
+        "default": false,
+        "is_listed": true
+    },
+    "anti_raid": {
+        "type": "enum",
+        "values": ["none", "smooth", "careful", "high", "extreme"],
+        "default": "none",
+        "is_listed": true
+    },
+    "anti_raid_ignored_roles": {
+        "type": "roles_list",
+        "min_count": 1,
+        "max_count": 100,
+        "allow_integrated_roles": true,
+        "allow_everyone": false,
+        "default": null,
+        "is_listed": true
+    },
+    "anti_scam": {
+        "type": "boolean",
+        "default": false,
+        "is_listed": true
+    },
+    "ban_allowed_roles": {
+        "type": "roles_list",
+        "min_count": 1,
+        "max_count": 100,
+        "allow_integrated_roles": true,
+        "allow_everyone": true,
+        "default": null,
+        "is_listed": true
+    },
+    "bot_news": {
+        "type": "text_channel",
+        "allow_threads": true,
+        "allow_announcement_channels": true,
+        "allow_non_nsfw_channels": true,
+        "default": null,
+        "is_listed": true
+    },
+    "clear_allowed_roles": {
+        "type": "roles_list",
+        "min_count": 1,
+        "max_count": 100,
+        "allow_integrated_roles": true,
+        "allow_everyone": true,
+        "default": null,
+        "is_listed": true
+    },
+    "compress_help": {
+        "type": "boolean",
+        "default": false,
+        "is_listed": true
+    },
+    "delete_welcome_on_quick_leave": {
+        "type": "boolean",
+        "default": false,
+        "is_listed": true
+    },
+    "description": {
+        "type": "text",
+        "min_length": 0,
+        "max_length": 1000,
+        "default": null,
+        "is_listed": true
+    },
+    "enable_fun": {
+        "type": "boolean",
+        "default": true,
+        "is_listed": true
+    },
+    "enable_ttt": {
+        "type": "boolean",
+        "default": true,
+        "is_listed": true
+    },
+    "enable_xp": {
+        "type": "boolean",
+        "default": false,
+        "is_listed": true
+    },
+    "help_in_dm": {
+        "type": "boolean",
+        "default": false,
+        "is_listed": true
+    },
+    "kick_allowed_roles": {
+        "type": "roles_list",
+        "min_count": 1,
+        "max_count": 100,
+        "allow_integrated_roles": true,
+        "allow_everyone": true,
+        "default": null,
+        "is_listed": true
+    },
+    "language": {
+        "type": "enum",
+        "values": ["fr", "en", "lolcat", "fi", "de", "fr2", "cs"],
+        "default": "en",
+        "is_listed": true
+    },
+    "leave": {
+        "type": "text",
+        "min_length": 0,
+        "max_length": 1800,
+        "default": null,
+        "is_listed": true
+    },
+    "levelup_channel": {
+        "type": "levelup_channel",
+        "default": "any",
+        "is_listed": true
+    },
+    "levelup_msg": {
+        "type": "text",
+        "min_length": 0,
+        "max_length": 1800,
+        "default": null,
+        "is_listed": true
+    },
+    "levelup_silent_mention": {
+        "type": "boolean",
+        "default": false,
+        "is_listed": true
+    },
+    "membercounter": {
+        "type": "voice_channel",
+        "allow_stage_channels": false,
+        "allow_non_nsfw_channels": true,
+        "default": null,
+        "is_listed": true
+    },
+    "mute_allowed_roles": {
+        "type": "roles_list",
+        "min_count": 1,
+        "max_count": 100,
+        "allow_integrated_roles": true,
+        "allow_everyone": true,
+        "default": null,
+        "is_listed": true
+    },
+    "muted_role": {
+        "type": "role",
+        "allow_integrated_roles": false,
+        "allow_everyone": false,
+        "default": null,
+        "is_listed": true
+    },
+    "noxp_channels": {
+        "type": "text_channels_list",
+        "min_count": 1,
+        "max_count": 2000,
+        "allow_threads": true,
+        "allow_announcement_channels": true,
+        "allow_non_nsfw_channels": true,
+        "default": null,
+        "is_listed": true
+    },
+    "noxp_roles": {
+        "type": "roles_list",
+        "min_count": 1,
+        "max_count": 100,
+        "allow_integrated_roles": true,
+        "allow_everyone": false,
+        "default": null,
+        "is_listed": true
+    },
+    "partner_channel": {
+        "type": "text_channel",
+        "allow_threads": true,
+        "allow_announcement_channels": true,
+        "allow_non_nsfw_channels": true,
+        "default": null,
+        "is_listed": true
+    },
+    "partner_color": {
+        "type": "color",
+        "default": 10949630,
+        "is_listed": true
+    },
+    "partner_role": {
+        "type": "role",
+        "allow_integrated_roles": false,
+        "allow_everyone": false,
+        "default": null,
+        "is_listed": true
+    },
+    "poll_channels": {
+        "type": "text_channels_list",
+        "min_count": 1,
+        "max_count": 50,
+        "allow_threads": true,
+        "allow_announcement_channels": true,
+        "allow_non_nsfw_channels": true,
+        "default": null,
+        "is_listed": true
+    },
+    "prefix": {
+        "type": "text",
+        "min_length": 1,
+        "max_length": 10,
+        "default": "!",
+        "is_listed": true
+    },
+    "private_leaderboard": {
+        "type": "boolean",
+        "default": true,
+        "is_listed": true
+    },
+    "rank_in_dm": {
+        "type": "boolean",
+        "default": false,
+        "is_listed": true
+    },
+    "roles_react_max_number": {
+        "type": "int",
+        "min": 0,
+        "max": null,
+        "default": 20,
+        "is_listed": false
+    },
+    "rr_max_number": {
+        "type": "int",
+        "min": 0,
+        "max": null,
+        "default": 10,
+        "is_listed": false
+    },
+    "rss_max_number": {
+        "type": "int",
+        "min": 0,
+        "max": null,
+        "default": 10,
+        "is_listed": false
+    },
+    "save_roles": {
+        "type": "boolean",
+        "default": false,
+        "is_listed": false
+    },
+    "say_allowed_roles": {
+        "type": "roles_list",
+        "min_count": 1,
+        "max_count": 100,
+        "allow_integrated_roles": true,
+        "allow_everyone": true,
+        "default": null,
+        "is_listed": true
+    },
+    "slowmode_allowed_roles": {
+        "type": "roles_list",
+        "min_count": 1,
+        "max_count": 100,
+        "allow_integrated_roles": true,
+        "allow_everyone": true,
+        "default": null,
+        "is_listed": true
+    },
+    "stream_mention": {
+        "type": "role",
+        "allow_integrated_roles": true,
+        "allow_everyone": true,
+        "default": null,
+        "is_listed": true
+    },
+     "streamers_max_number": {
+        "type": "int",
+        "min": 0,
+        "max": null,
+        "default": 20,
+        "is_listed": false
+    },
+    "streaming_channel": {
+        "type": "text_channel",
+        "allow_threads": true,
+        "allow_announcement_channels": true,
+        "allow_non_nsfw_channels": true,
+        "default": null,
+        "is_listed": true
+    },
+    "streaming_role": {
+        "type": "role",
+        "allow_integrated_roles": false,
+        "allow_everyone": false,
+        "default": null,
+        "is_listed": true
+    },
+    "ttt_emojis": {
+        "type": "emojis_list",
+        "min_count": 2,
+        "max_count": 2,
+        "default": ["🔴", "🔵"],
+        "is_listed": true
+    },
+    "update_mentions": {
+        "type": "roles_list",
+        "min_count": 1,
+        "max_count": 10,
+        "allow_integrated_roles": true,
+        "allow_everyone": true,
+        "default": null,
+        "is_listed": false
+    },
+    "voice_category": {
+        "type": "category",
+        "default": null,
+        "is_listed": true
+    },
+     "voice_channel": {
+        "type": "voice_channel",
+        "allow_stage_channels": false,
+        "allow_non_nsfw_channels": true,
+        "default": null,
+        "is_listed": true
+    },
+    "voice_channel_format": {
+        "type": "text",
+        "min_length": 1,
+        "max_length": 50,
+        "default": "{random}",
+        "is_listed": true
+    },
+    "voice_roles": {
+        "type": "roles_list",
+        "min_count": 1,
+        "max_count": 10,
+        "allow_integrated_roles": false,
+        "allow_everyone": false,
+        "default": null,
+        "is_listed": true
+    },
+    "vote_emojis": {
+        "type": "emojis_list",
+        "min_count": 2,
+        "max_count": 2,
+        "default": ["👍", "👎"],
+        "is_listed": true
+    },
+    "warn_allowed_roles": {
+        "type": "roles_list",
+        "min_count": 1,
+        "max_count": 100,
+        "allow_integrated_roles": true,
+        "allow_everyone": true,
+        "default": null,
+        "is_listed": true
+    },
+    "welcome": {
+        "type": "text",
+        "min_length": 0,
+        "max_length": 1800,
+        "default": null,
+        "is_listed": true
+    },
+    "welcome_channel": {
+        "type": "text_channel",
+        "allow_threads": false,
+        "allow_announcement_channels": true,
+        "allow_non_nsfw_channels": true,
+        "default": null,
+        "is_listed": true
+    },
+    "welcome_roles": {
+        "type": "roles_list",
+        "min_count": 1,
+        "max_count": 100,
+        "allow_integrated_roles": false,
+        "allow_everyone": false,
+        "default": null,
+        "is_listed": true
+    },
+    "welcome_silent_mention": {
+        "type": "boolean",
+        "default": false,
+        "is_listed": true
+    },
+    "xp_decay": {
+        "type": "int",
+        "min": 0,
+        "max": 200,
+        "default": 0,
+        "is_listed": true
+    },
+    "xp_rate": {
+        "type": "float",
+        "min": 0.1,
+        "max": 3.0,
+        "default": 1.0,
+        "is_listed": true
+    },
+    "xp_type": {
+        "type": "enum",
+        "values": ["global","mee6-like","local"],
+        "default": "global",
+        "is_listed": true
+    }
+}
