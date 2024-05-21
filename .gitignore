@@ -1,14 +1,10 @@
 # Python executables
 *.pyc
 __pycache__
-fcts/tokens.py
-fcts/cryptage.py
-fcts/test.py
-fcts/libs_testing.py
+core/tokens.py
+core/cryptage.py
 fcts/requirements
-fcts/secret.py
 backup/*
-start2.py
 env/
 
 # Mac folders
@@ -21,7 +17,6 @@ env/
 *.log
 *.log.*
 ._*
-translation/*
 docs/_*
 docs/changelog.rst
 rankcards_update.json
