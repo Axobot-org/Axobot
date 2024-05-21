@@ -1,0 +1,105 @@
+{
+    "data": {
+        "emoji": "ℹ️",
+        "commands": [
+            "about",
+            "admins",
+            "changelog",
+            "discordlinks",
+            "documentation",
+            "help",
+            "info",
+            "last-post",
+            "markdown",
+            "membercount",
+            "ping",
+            "prefix",
+            "rss",
+            "stats",
+            "random-tip"
+        ]
+    },
+    "moderation": {
+        "emoji": "🔨",
+        "commands": [
+            "antiscam",
+            "backup",
+            "ban",
+            "banlist",
+            "cases",
+            "clear",
+            "destop",
+            "kick",
+            "mute",
+            "modlogs",
+            "mutelist",
+            "set-xp",
+            "slowmode",
+            "softban",
+            "unban",
+            "unhoist",
+            "unmute",
+            "voice-clean",
+            "warn"
+        ]
+    },
+    "server-settings": {
+        "emoji": "⚙️",
+        "commands": [
+            "config",
+            "emoji",
+            "mute-config",
+            "partners",
+            "pin",
+            "role",
+            "roles-react",
+            "roles-rewards",
+            "tickets",
+            "twitch",
+            "welcome"
+        ]
+    },
+    "users-info": {
+        "emoji": "👥",
+        "commands": [
+            "permissions",
+            "profile",
+            "rank",
+            "top"
+        ]
+    },
+    "other": {
+        "emoji": "👀",
+        "commands": [
+            "bitly",
+            "embed",
+            "reminders",
+            "cookie",
+            "event",
+            "minecraft",
+            "fun",
+            "poll",
+            "quote",
+            "react",
+            "remindme",
+            "say",
+            "tic-tac-toe"
+        ]
+    },
+    "staff": {
+        "emoji": "👷",
+        "commands": [
+            "add_cog",
+            "admin",
+            "del_cog",
+            "eval",
+            "find",
+            "rss_loop",
+            "test"
+        ]
+    },
+    "unclassed": {
+        "emoji": "🤷",
+        "commands": []
+    }
+}

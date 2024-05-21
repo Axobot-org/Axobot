@@ -4,7 +4,7 @@
 # pylint: disable=wrong-import-order, wrong-import-position, ungrouped-imports
 
 # Check Python version and 3rd party libraries
-from libs.boot_utils.check_requirements import check_requirements
+from core.boot_utils.check_requirements import check_requirements
 check_requirements()
 
 # required to avoid segmentation error - don't ask me why
@@ -15,9 +15,9 @@ import asyncio
 import time
 import json
 from random import choice
-from fcts import tokens
-from libs.bot_classes import Axobot
-from libs.boot_utils import set_beta_logs, setup_start_parser, setup_logger, load_cogs, load_sql_connection
+from core import tokens
+from core.bot_classes import Axobot
+from core.boot_utils import set_beta_logs, setup_start_parser, setup_logger, load_cogs, load_sql_connection
 
 async def main():
     "Load everything and start the bot"

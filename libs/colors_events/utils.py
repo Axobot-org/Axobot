@@ -7,7 +7,7 @@ import discord
 from discord.ext import commands
 from PIL import Image, ImageSequence
 
-from libs.bot_classes import MyContext
+from core.bot_classes import MyContext
 from libs.colors_events.background_change import (apply_gradient,
                                                   get_background_mask)
 
