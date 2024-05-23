@@ -196,7 +196,7 @@ class RolesReact(commands.Cog):
     @commands.hybrid_group(name="roles-react")
     @commands.guild_only()
     @commands.cooldown(1, 5, commands.BucketType.guild)
-    @app_commands.default_permissions()
+    @app_commands.default_permissions(manage_guild=True)
     async def rr_main(self, ctx: MyContext):
         """Manage your roles reactions
 
