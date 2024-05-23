@@ -98,6 +98,7 @@
     "server_desc": {
         "anti_caps_lock": "Mám poslat zprávu, když člen pošle příliš mnoho velkých písmen? %{value}",
         "anti_raid": "Úroveň anti-raid ochrany: %{value} \n*([Documentation](https://axobot.rtfd.io/en/latest/moderator.html#anti-raid))*",
+        "anti_raid_ignored_roles": "Seznam rolí, které umožňují uživatelům obejít ochranu antiraid: %{value}",
         "anti_scam": "Mám zkontrolovat škodlivé zprávy a smazat je? %{value}",
         "autoremove_xp": "Zkušenosti jsou denně odebírány od neaktivních členů: %{value}",
         "ban_allowed_roles": "Seznam rolí, které mohou použít příkaz \"ban\": %{value}",
@@ -120,7 +121,6 @@
         "membercounter": "Kanál zobrazující počet vašich členů v názvu: %{value}",
         "mute_allowed_roles": "Seznam rolí, které mohou použít příkaz \"umlčení\": %{value}",
         "muted_role": "Používá se role k umlčení členů: %{value}",
-        "nicknames_history": "Mám si pamatovat změny přezdívky na tomto serveru? %{value}",
         "noxp_channels": "Kanály, kde nemůžete získat xp: %{value}",
         "noxp_roles": "Role zabraňující získání xp: %{value}",
         "partner_channel": "Kanál, kde jsou odesláni partneři: %{value}",
@@ -149,6 +149,7 @@
         "welcome_channel": "Seznam kanálů pro odesílání uvítání/zanechání zpráv: %{value}",
         "welcome_roles": "Seznam rolí automaticky zadaných novým členům: %{value}",
         "welcome_silent_mention": "Má se zprává o dosažení vyšší úrovně neodesílat (tj. bez notifikace)? %{value}",
+        "xp_decay": "Kolik XP se má odebrat všem každý den? %{value}",
         "xp_rate": "Změna výdělků XP: %{value}",
         "xp_type": "Použitý XP systém: %{value}"
     },
