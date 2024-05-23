@@ -266,7 +266,6 @@ class Minecraft(commands.Cog):
         ..Example minecraft follow-server mc.hypixel.net
 
         ..Doc minecraft.html#mc"""
-        await ctx.guild.get_channel_or_thread()
         if not ctx.bot.database_online:
             await ctx.send(await self.bot._(ctx.guild.id, "cases.no_database"))
             return
