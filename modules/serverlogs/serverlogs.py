@@ -9,18 +9,18 @@ from cachetools import TTLCache
 from discord import app_commands
 from discord.ext import commands, tasks
 
-from fcts.tickets import TicketCreationEvent
-from libs.antiscam.classes import PredictionResult
-from core.arguments.args import ServerLog
-from core.arguments.errors import InvalidServerLogError
 from core.bot_classes import DISCORD_INVITE_REGEX, Axobot, MyContext
 from core.checks import checks
 from core.enums import ServerWarningType
 from core.formatutils import FormatUtils
 from core.tips import GuildTip
+from modules.antiscam.model.classes import PredictionResult
+from modules.tickets.src.types import TicketCreationEvent
+
+from .arguments.serverlog_argument import InvalidServerLogError, ServerLog
 
 if TYPE_CHECKING:
-    from fcts.cases import Case
+    from modules.cases.cases import Case
 
 
 class ServerLogs(commands.Cog):

@@ -1,4 +1,5 @@
 import json
+import os
 from typing import Any, Callable, Coroutine, TypedDict
 
 import discord
@@ -24,7 +25,8 @@ class Help(commands.Cog):
         self.old_cmd = bot.remove_command("help")
         self.help_color = 0x7ED321
         self.help_color_dm = 0xD6FFA9
-        with open('fcts/help.json', 'r', encoding="utf-8") as file:
+        json_path = os.path.dirname(__file__) + "/help.json"
+        with open(json_path, 'r', encoding="utf-8") as file:
             self.commands_data: dict[str, CommandsCategoryData] = json.load(file)
 
     @property

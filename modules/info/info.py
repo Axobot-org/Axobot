@@ -11,7 +11,7 @@ from core.arguments import args
 from core.bot_classes import PRIVATE_GUILD_ID, Axobot, MyContext
 from core.checks import checks
 from core.formatutils import FormatUtils
-from libs.rss.rss_general import FeedObject
+from modules.rss.src.rss_general import FeedObject
 
 default_color = discord.Color(0x50e3c2)
 

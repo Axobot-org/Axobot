@@ -13,7 +13,7 @@ from .utils import (FieldData, generate_warnings_field, get_embed_color,
                     get_embed_footer, get_send_callback)
 
 if TYPE_CHECKING:
-    from fcts.help_cmd import Help as HelpCog
+    from ..help_cmd import Help as HelpCog
 
 AppCommandOrGroup = Command | Group
 

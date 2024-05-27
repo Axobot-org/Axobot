@@ -64,7 +64,7 @@ class Xp(commands.Cog):
     async def on_ready(self):
         "Load cache + start decay loop"
         if not self.bot.database_online:
-            await self.bot.unload_extension("fcts.xp")
+            await self.bot.unload_module("xp")
             return
         self.table = 'xp_beta' if self.bot.beta else 'xp'
         await self.db_load_cache(None)
@@ -379,7 +379,7 @@ class Xp(commands.Cog):
         """Ajoute/reset de l'xp à un utilisateur dans la database"""
         try:
             if not self.bot.database_online:
-                await self.bot.unload_extension("fcts.xp")
+                await self.bot.unload_module("xp")
                 return None
             if points <= 0:
                 return True
@@ -404,7 +404,7 @@ class Xp(commands.Cog):
     async def db_remove_user(self, user_id :int, guild_id: int | None=None):
         "Removes a user from the xp table"
         if not self.bot.database_online:
-            await self.bot.unload_extension("fcts.xp")
+            await self.bot.unload_module("xp")
             return None
         if guild_id is None:
             cnx = self.bot.cnx_axobot
@@ -421,7 +421,7 @@ class Xp(commands.Cog):
         "Get the xp of a user in a guild"
         try:
             if not self.bot.database_online:
-                await self.bot.unload_extension("fcts.xp")
+                await self.bot.unload_module("xp")
                 return None
             if guild_id is None:
                 cnx = self.bot.cnx_axobot
@@ -450,7 +450,7 @@ class Xp(commands.Cog):
         """Get the number of ranked users in a guild (or in the global database)"""
         try:
             if not self.bot.database_online:
-                await self.bot.unload_extension("fcts.xp")
+                await self.bot.unload_module("xp")
                 return None
             if guild_id is None:
                 cnx = self.bot.cnx_axobot
@@ -474,7 +474,7 @@ class Xp(commands.Cog):
         "Load the XP cache for a given guild (or the global cache)"
         try:
             if not self.bot.database_online:
-                await self.bot.unload_extension("fcts.xp")
+                await self.bot.unload_module("xp")
                 return
             if guild_id is None:
                 self.log.info("Loading XP cache (global)")
@@ -509,7 +509,7 @@ class Xp(commands.Cog):
         "Get the top of the guild (or the global top)"
         try:
             if not self.bot.database_online:
-                await self.bot.unload_extension("fcts.xp")
+                await self.bot.unload_module("xp")
                 return None
             if guild is not None and await self.bot.get_config(guild.id, "xp_type") != "global":
                 cnx = self.bot.cnx_xp
@@ -549,7 +549,7 @@ class Xp(commands.Cog):
         """Get the rank of a user"""
         try:
             if not self.bot.database_online:
-                await self.bot.unload_extension("fcts.xp")
+                await self.bot.unload_module("xp")
                 return None
             if guild is not None and await self.bot.get_config(guild.id, "xp_type") != "global":
                 cnx = self.bot.cnx_xp
@@ -589,7 +589,7 @@ class Xp(commands.Cog):
         """Get the total number of earned xp"""
         try:
             if not self.bot.database_online:
-                await self.bot.unload_extension("fcts.xp")
+                await self.bot.unload_module("xp")
                 return None
             query = f"SELECT SUM(xp) as total FROM `{self.table}`"
             async with self.bot.db_query(query, fetchone=True) as query_results:

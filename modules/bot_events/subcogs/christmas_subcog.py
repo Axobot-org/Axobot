@@ -8,8 +8,9 @@ from asyncache import cached
 from cachetools import TTLCache
 
 from core.bot_classes import Axobot
-from core.bot_events.dict_types import EventData, EventItem, EventType
-from core.bot_events.subcogs.abstract_subcog import AbstractSubcog
+
+from ..data.dict_types import EventData, EventItem, EventType
+from .abstract_subcog import AbstractSubcog
 
 # list of the advent calendar items IDs per day between 1 and 24
 #  on december 25th the card will be unlocked
