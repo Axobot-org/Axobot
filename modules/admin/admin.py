@@ -18,16 +18,16 @@ from cachetools import TTLCache
 from discord.ext import commands
 from git import GitCommandError, Repo
 
-from docs import conf
-from libs.antiscam import update_unicode_map
-from libs.antiscam.training_bayes import train_model
 from core.bot_classes import (PRIVATE_GUILD_ID, SUPPORT_GUILD_ID, Axobot,
                               MyContext)
 from core.checks import checks
 from core.enums import RankCardsFlag, UserFlag
 from core.formatutils import FormatUtils
-from libs.rss.rss_general import feed_parse
 from core.views import ConfirmView
+from docs import conf
+from modules.antiscam.model import update_unicode_map
+from modules.antiscam.model.training_bayes import train_model
+from modules.rss.src.rss_general import feed_parse
 
 if TYPE_CHECKING:
     from modules.antiscam.model import AntiScam
@@ -292,8 +292,8 @@ class Admin(commands.Cog):
     async def add_cog(self, ctx: MyContext, name: str):
         """Ajouter un cog au bot"""
         try:
-            await self.bot.load_extension('fcts.'+name)
-            await ctx.send(f"Module '{name}' ajouté !")
+            await self.bot.load_module(name)
+            await ctx.send(f"Module '{name}' activé !")
             self.bot.log.info("Extension %s loaded", name)
         except Exception as err:
             await ctx.send(str(err))
@@ -303,7 +303,7 @@ class Admin(commands.Cog):
     async def rm_cog(self, ctx: MyContext, name: str):
         """Enlever un cog au bot"""
         try:
-            await self.bot.unload_extension('fcts.'+name)
+            await self.bot.unload_module(name)
             await ctx.send(f"Module '{name}' désactivé !")
             self.bot.log.info("Extension %s unloaded", name)
         except Exception as err:
@@ -318,12 +318,8 @@ class Admin(commands.Cog):
             cogs = sorted([x.file for x in self.bot.cogs.values()])
         reloaded_cogs = []
         for cog in cogs:
-            if not cog.startswith("fcts."):
-                fcog = "fcts."+cog
-            else:
-                fcog = cog
             try:
-                await self.bot.reload_extension(fcog)
+                await self.bot.reload_module(cog)
             except ModuleNotFoundError:
                 await ctx.send(f"Cog {cog} can't be found")
             except commands.errors.ExtensionNotLoaded :

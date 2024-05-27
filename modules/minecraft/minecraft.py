@@ -13,11 +13,11 @@ from dateutil.parser import isoparse
 from discord import app_commands
 from discord.ext import commands
 
-from fcts.rss import can_use_rss
 from core.bot_classes import Axobot, MyContext
 from core.checks import checks
 from core.formatutils import FormatUtils
-from libs.rss.rss_general import FeedObject
+from modules.rss.rss import can_use_rss
+from modules.rss.src import FeedObject
 
 SERVER_ADDRESS_REGEX = re.compile(r"^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$|"
                                   r"^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)+([A-Za-z]|"

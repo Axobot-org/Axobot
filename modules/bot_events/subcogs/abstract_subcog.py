@@ -5,10 +5,11 @@ from typing import Any, Literal, TypedDict
 import discord
 
 from core.bot_classes import Axobot, MyContext
-from core.bot_events.dict_types import (EventData, EventItem,
-                                        EventItemWithCount, EventType)
-from core.bot_events.get_translations import get_events_translations
 from core.formatutils import FormatUtils
+
+from ..data.dict_types import (EventData, EventItem, EventItemWithCount,
+                               EventType)
+from ..data.get_translations import get_events_translations
 
 
 class DBUserRank(TypedDict):

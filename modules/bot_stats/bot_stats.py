@@ -13,9 +13,9 @@ import mysql
 import psutil
 from discord.ext import commands, tasks
 
-from fcts.tickets import TicketCreationEvent
 from core.bot_classes import Axobot, MyContext
 from core.enums import ServerWarningType
+from modules.tickets.src.types import TicketCreationEvent
 
 try:
     import orjson  # type: ignore

@@ -242,7 +242,7 @@ class Rss(commands.Cog):
     @commands.guild_only()
     @commands.check(can_use_rss)
     @commands.check(checks.database_connected)
-    async def system_add(self, ctx: MyContext, link: str):
+    async def system_add(self, ctx: MyContext, link: str, channel: discord.TextChannel | discord.Thread | None=None):
         """Subscribe to a rss feed, and automatically send updates in this channel
 
         ..Example rss add https://www.deviantart.com/adri526
@@ -284,10 +284,11 @@ class Rss(commands.Cog):
             return
         if feed_type is None or not await self.check_rss_url(link):
             return await ctx.send(await self.bot._(ctx.guild.id, "rss.invalid-flow"))
+        destination_channel = channel or ctx.channel
         try:
-            feed_id = await self.db_add_feed(ctx.guild.id,ctx.channel.id,feed_type,identifiant)
+            feed_id = await self.db_add_feed(ctx.guild.id, destination_channel.id, feed_type, identifiant)
             await ctx.send(await self.bot._(
-                ctx.guild,"rss.success-add", type=display_type, url=link, channel=ctx.channel.mention
+                ctx.guild,"rss.success-add", type=display_type, url=link, channel=destination_channel.mention
             ))
             self.log.info("RSS feed added into server %s (%s - %s)", ctx.guild.id, link, feed_id)
             await self.send_log(f"Feed added into server {ctx.guild.id} ({feed_id})", ctx.guild)
@@ -900,7 +901,8 @@ class Rss(commands.Cog):
     @commands.guild_only()
     @commands.check(can_use_rss)
     @commands.check(checks.database_connected)
-    async def move_guild_feed(self, ctx: MyContext, feed: str | None=None, channel: discord.TextChannel | None=None):
+    async def move_guild_feed(self, ctx: MyContext, feed: str | None=None,
+                              channel: discord.TextChannel | discord.Thread | None=None):
         """Move a rss feed in another channel
 
         ..Example rss move

@@ -11,9 +11,8 @@ from core.bot_classes import Axobot, MyContext
 from core.checks import checks
 from core.enums import ServerWarningType
 
-from .src.types import DBTopicRow
-from .src.views import (AskTitleModal, AskTopicSelect, SelectView,
-                        SendHintText, TicketCreationEvent)
+from .src.types import DBTopicRow, TicketCreationEvent
+from .src.views import AskTitleModal, AskTopicSelect, SelectView, SendHintText
 
 
 def is_named_other(name: str, other_translated: str):

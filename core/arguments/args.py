@@ -194,19 +194,6 @@ class Snowflake:
             raise commands.ObjectNotFound(argument)
         return cls(int(argument))
 
-
-class ServerLog(str):
-    "Convert arguments to a server log type"
-    @classmethod
-    async def convert(cls, _ctx: "MyContext", argument: str) -> str:
-        "Do the conversion"
-        from fcts.serverlogs import \
-            ServerLogs  # pylint: disable=import-outside-toplevel
-
-        if argument in ServerLogs.available_logs() or argument == 'all':
-            return argument
-        raise arguments_errors.InvalidServerLogError(argument)
-
 class RawPermissionValue(int):
     "Represents a raw permission value, as an integer"
     @classmethod

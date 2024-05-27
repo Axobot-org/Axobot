@@ -195,6 +195,18 @@ class Axobot(commands.bot.AutoShardedBot):
         # pylint: disable=useless-super-delegation
         return super().get_cog(name)
 
+    async def load_module(self, module_name: str):
+        "Load a module"
+        await self.load_extension(f"modules.{module_name}.{module_name}")
+
+    async def unload_module(self, module_name: str):
+        "Unload a module"
+        await self.unload_extension(f"modules.{module_name}.{module_name}")
+
+    async def reload_module(self, module_name: str):
+        "Reload a module"
+        await self.reload_extension(f"modules.{module_name}.{module_name}")
+
     @property
     def cnx_axobot(self) -> MySQLConnection:
         """Connection to the default database

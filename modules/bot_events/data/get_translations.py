@@ -2,7 +2,8 @@ import json
 import os
 from typing import Literal
 
-from core.bot_events.dict_types import EventsTranslation
+from .dict_types import EventsTranslation
+
 
 def get_events_translations() -> dict[Literal["fr", "en"], EventsTranslation]:
     """Get the translations for the events"""
