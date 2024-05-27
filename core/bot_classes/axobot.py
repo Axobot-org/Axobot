@@ -63,7 +63,7 @@ class Axobot(commands.bot.AutoShardedBot):
         intents.webhooks = False
         intents.integrations = False
         # we now initialize the bot class
-        super().__init__(command_prefix=get_prefix, case_insensitive=case_insensitive,
+        super().__init__(command_prefix=get_prefix, case_insensitive=case_insensitive, max_messages=50_000,
                          status=status, allowed_mentions=allowed_mentions, intents=intents, enable_debug_events=True)
         self.database_online = database_online  # if the mysql database works
         self.beta = beta # if the bot is in beta mode
