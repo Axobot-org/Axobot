@@ -2,7 +2,7 @@
 # See https://pre-commit.com/hooks.html for more hooks
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.4.0
+    rev: v4.6.0
     hooks:
       - id: check-json
       - id: check-merge-conflict
@@ -10,6 +10,6 @@ repos:
       - id: trailing-whitespace
         args: [--markdown-linebreak-ext=rst]
   - repo: https://github.com/zricethezav/gitleaks
-    rev: v8.16.0
+    rev: v8.18.2
     hooks:
       - id: gitleaks
