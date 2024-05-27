@@ -21,8 +21,8 @@ docs/changelog.rst
 rankcards_update.json
 *-cache.json
 *.tar
-modules/*/data/*.pkl
-modules/*/data/base_websites.csv
+modules/**/data/*.pkl
+modules/**/data/base_websites.csv
 
 # private assets
 assets/card-models/*.png
