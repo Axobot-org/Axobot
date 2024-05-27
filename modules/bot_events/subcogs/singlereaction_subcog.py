@@ -6,9 +6,10 @@ from asyncache import cached
 from cachetools import TTLCache
 
 from core.bot_classes import Axobot
-from core.bot_events.dict_types import EventData, EventItem, EventType
-from core.bot_events.subcogs.abstract_subcog import AbstractSubcog
 from core.formatutils import FormatUtils
+
+from ..data.dict_types import EventData, EventItem, EventType
+from .abstract_subcog import AbstractSubcog
 
 
 class SingleReactionSubcog(AbstractSubcog):

@@ -9,7 +9,7 @@ from .help_all import all_commands
 from .utils import get_embed_color, get_embed_footer, get_send_callback
 
 if TYPE_CHECKING:
-    from fcts.help_cmd import Help as HelpCog
+    from ..help_cmd import Help as HelpCog
 
 def sort_by_name(cmd: commands.Command):
     return cmd.name

@@ -9,7 +9,7 @@ from .utils import (FieldData, get_embed_color, get_embed_footer,
                     get_send_callback)
 
 if TYPE_CHECKING:
-    from fcts.help_cmd import Help as HelpCog
+    from ..help_cmd import Help as HelpCog
 
 
 def sort_by_name(cmd: discord.app_commands.Command):

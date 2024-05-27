@@ -8,13 +8,13 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
-from fcts.cases import Case
 from core.arguments import args
 from core.bot_classes import Axobot, MyContext
 from core.checks import checks
 from core.formatutils import FormatUtils
 from core.paginator import Paginator
 from core.views import ConfirmView
+from modules.cases.cases import Case
 
 importlib.reload(checks)
 importlib.reload(args)

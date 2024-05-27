@@ -30,7 +30,7 @@ class VoiceChannels(commands.Cog):
     async def on_ready(self):
         "if the database is still offline when the bot is ready, remove that cog"
         if not self.bot.database_online:
-            await self.bot.unload_extension("fcts.voice_channels")
+            await self.bot.unload_module("voice_channels")
 
     async def db_get_channels(self):
         "Refresh the channels cache"
