@@ -109,9 +109,8 @@ class BotOrGuildInviteConverter:
 
 BotOrGuildInvite = Annotated[str | int, BotOrGuildInviteConverter]
 
-class URL:
-    "Convert argument to a valid URL"
-
+class URL(str):
+    "Represents a decomposed URL"
     def __init__(self, regex_exp: re.Match):
         self.domain: str = regex_exp.group('domain')
         self.path: str = regex_exp.group('path')
@@ -121,14 +120,18 @@ class URL:
     def __str__(self):
         return f"Url(url='{self.url}', domain='{self.domain}', path='{self.path}', is_https={self.is_https})"
 
-    @classmethod
-    async def convert(cls, _ctx: "MyContext", argument: str) -> "URL":
+class URLTransformer(discord.app_commands.Transformer): # pylint: disable=abstract-method
+    "Convert argument to a valid URL"
+
+    async def transform(self, _interaction, value, /) -> URL:
         "Convert a string to a proper URL instance, else raise BadArgument"
         r = re.search(
-            r'(?P<https>https?)://(?:www\.)?(?P<domain>[^/\s]+)(?:/(?P<path>[\S]+))?', argument)
+            r'(?P<https>https?)://(?:www\.)?(?P<domain>[^/\s]+)(?:/(?P<path>[\S]+))?', value)
         if r is None:
-            raise arguments_errors.InvalidUrlError(argument)
-        return cls(r)
+            raise arguments_errors.InvalidUrlError(value)
+        return URL(r)
+
+URLArgument = discord.app_commands.Transform[URL, URLTransformer]
 
 class UnicodeEmojiConverter(str):
     "Represents any Unicode emoji"
