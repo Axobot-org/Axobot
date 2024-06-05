@@ -8,7 +8,7 @@ from discord.ext.commands import Cog
 
 from core.bot_classes import Axobot, MyContext
 from core.checks.errors import NotDuringEventError
-from libs.colors_events import (ColorVariation, HalloweenVariationFlagType,
+from core.colors_events import (ColorVariation, HalloweenVariationFlagType,
                                 TargetConverterType, check_halloween,
                                 convert_halloween, get_url_from_ctx)
 
@@ -100,7 +100,7 @@ A BIG thanks to the Project Blurple and their original code for the colorization
                             method: HalloweenVariationFlagType = "hallowify",
                             variations: commands.Greedy[ColorVariation] = None,
                             replace_background: bool = False,
-                            who: typing.TargetConverterType | None = None):
+                            who: TargetConverterType | None = None):
         "Method called under the hood of each modifier command"
         if not (ctx.guild is None or ctx.channel.permissions_for(ctx.guild.me).attach_files):
             await ctx.send(await self.bot._(ctx.channel, "color-event.missing-attachment-perm"))
@@ -131,7 +131,7 @@ A BIG thanks to the Project Blurple and their original code for the colorization
     async def lightfy(self, ctx: MyContext, method: HalloweenVariationFlagType = "hallowify",
                       variations: commands.Greedy[ColorVariation] = None,
                       replace_background: bool = False,
-                      who: typing.TargetConverterType | None = None):
+                      who: TargetConverterType | None = None):
         "Lightfy an image"
         await self.color_command("light", ctx, method, variations, replace_background, who)
 
@@ -142,7 +142,7 @@ A BIG thanks to the Project Blurple and their original code for the colorization
     async def darkfy(self, ctx: MyContext, method: HalloweenVariationFlagType = "hallowify",
                       variations: commands.Greedy[ColorVariation] = None,
                       replace_background: bool = False,
-                      who: typing.TargetConverterType | None = None):
+                      who: TargetConverterType | None = None):
         "Darkfy an image"
         await self.color_command("dark", ctx, method, variations, replace_background, who)
 
@@ -150,7 +150,7 @@ A BIG thanks to the Project Blurple and their original code for the colorization
     @commands.cooldown(2, 60, commands.BucketType.member)
     @commands.cooldown(30, 40, commands.BucketType.guild)
     @commands.check(is_halloween)
-    async def check(self, ctx: MyContext,who: typing.TargetConverterType | None = None):
+    async def check(self, ctx: MyContext,who: TargetConverterType | None = None):
         """Check an image to know if you're cool enough.
 
         ..Example halloween check
