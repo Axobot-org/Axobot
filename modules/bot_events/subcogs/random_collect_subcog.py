@@ -38,108 +38,101 @@ class RandomCollectSubcog(AbstractSubcog):
     async def on_raw_reaction_add(self, payload):
         pass
 
-    async def profile_cmd(self, ctx, user):
+    async def profile_cmd(self, interaction, user):
         "Displays the profile of the user"
-        lang = await self.get_event_language(ctx.channel)
+        lang = await self.get_event_language(interaction)
         events_desc = self.translations_data[lang]["events_desc"]
 
         # if no event
         if not self.current_event_id in events_desc:
-            await ctx.send(await self.bot._(ctx.channel, "bot_events.nothing-desc"))
+            await interaction.followup.send(await self.bot._(interaction, "bot_events.nothing-desc"))
             if self.current_event_id:
-                self.bot.dispatch("error", ValueError(f"'{self.current_event_id}' has no event description"), ctx)
+                self.bot.dispatch("error", ValueError(f"'{self.current_event_id}' has no event description"), interaction)
             return
         # if current event has no objectives
         if not self.current_event_data["objectives"]:
             cmd_mention = await self.bot.get_command_mention("event info")
-            await ctx.send(await self.bot._(ctx.channel, "bot_events.no-objectives", cmd=cmd_mention))
+            await interaction.followup.send(await self.bot._(interaction, "bot_events.no-objectives", cmd=cmd_mention))
             return
 
-        await ctx.defer()
-
-        title = await self.bot._(ctx.channel, "bot_events.rank-title")
-        desc = await self.bot._(ctx.channel, "bot_events.xp-howto")
+        title = await self.bot._(interaction, "bot_events.rank-title")
+        desc = await self.bot._(interaction, "bot_events.xp-howto")
 
         emb = discord.Embed(title=title, description=desc, color=self.current_event_data["color"])
         emb.set_author(name=user, icon_url=user.display_avatar.replace(static_format="png", size=32))
-        for field in await self.generate_user_profile_rank_fields(ctx, lang, user):
+        for field in await self.generate_user_profile_rank_fields(interaction, lang, user):
             emb.add_field(**field)
-        emb.add_field(**await self.generate_user_profile_collection_field(ctx, user))
-        await ctx.send(embed=emb)
+        emb.add_field(**await self.generate_user_profile_collection_field(interaction, user))
+        await interaction.followup.send(embed=emb)
 
-    async def collect_cmd(self, ctx):
+    async def collect_cmd(self, interaction):
         "Get some event points every hour"
-        current_event = self.current_event_id
-        lang = await self.get_event_language(ctx.channel)
+        lang = await self.get_event_language(interaction)
         events_desc = self.translations_data[lang]["events_desc"]
         # if no event
-        if not current_event in events_desc:
-            await ctx.send(await self.bot._(ctx.channel, "bot_events.nothing-desc"))
-            if current_event:
-                self.bot.dispatch("error", ValueError(f"'{current_event}' has no event description"), ctx)
+        if not self.current_event_id in events_desc:
+            await interaction.followup.send(await self.bot._(interaction, "bot_events.nothing-desc"))
+            if self.current_event_id:
+                self.bot.dispatch("error", ValueError(f"'{self.current_event_id}' has no event description"), interaction)
             return
         # if current event has no objectives
         if not self.current_event_data["objectives"]:
             cmd_mention = await self.bot.get_command_mention("event info")
-            await ctx.send(await self.bot._(ctx.channel, "bot_events.no-objectives", cmd=cmd_mention))
+            await interaction.followup.send(await self.bot._(interaction, "bot_events.no-objectives", cmd=cmd_mention))
             return
-        await ctx.defer()
 
         # check last collect from this user
-        seconds_since_last_collect = await self.get_seconds_since_last_collect(ctx.author.id)
-        can_collect, is_strike = await self.check_user_collect_availability(ctx.author.id, seconds_since_last_collect)
+        seconds_since_last_collect = await self.get_seconds_since_last_collect(interaction.user.id)
+        can_collect, is_strike = await self.check_user_collect_availability(interaction.user.id, seconds_since_last_collect)
         if not can_collect:
             # cooldown error
             time_remaining = self.collect_cooldown - seconds_since_last_collect
             remaining = await FormatUtils.time_delta(time_remaining, lang=lang)
-            txt = await self.bot._(ctx.channel, "bot_events.collect.too-quick", time=remaining)
+            txt = await self.bot._(interaction, "bot_events.collect.too-quick", time=remaining)
         else:
             # grant points
             items = await self.get_random_items()
-            strike_level = (await self.db_get_user_strike_level(ctx.author.id) + 1) if is_strike else 0
+            strike_level = (await self.db_get_user_strike_level(interaction.user.id) + 1) if is_strike else 0
             if len(items) == 0:
                 points = randint(*self.collect_reward)
                 bonus = 0
             else:
                 points = sum(item["points"] for item in items)
                 bonus = max(0, await self.adjust_points_to_strike(points, strike_level) - points)
-                await self.db_add_user_items(ctx.author.id, [item["item_id"] for item in items])
-            txt = await self.generate_collect_message(ctx.channel, items, points + bonus)
+                await self.db_add_user_items(interaction.user.id, [item["item_id"] for item in items])
+            txt = await self.generate_collect_message(interaction, items, points + bonus)
             if strike_level and bonus != 0:
                 txt += "\n\n" + \
-                    await self.bot._(ctx.channel, 'bot_events.collect.strike-bonus', bonus=bonus, level=strike_level+1)
+                    await self.bot._(interaction, 'bot_events.collect.strike-bonus', bonus=bonus, level=strike_level+1)
             if is_strike:
-                await self.add_collect_and_strike(ctx.author.id, points + bonus, send_notif_to_channel=ctx.channel)
+                await self.add_collect_and_strike(interaction.user.id, points + bonus, send_notif_to_channel=interaction.channel)
             else:
-                await self.add_collect(ctx.author.id, points + bonus, send_notif_to_channel=ctx.channel)
+                await self.add_collect(interaction.user.id, points + bonus, send_notif_to_channel=interaction.channel)
         # send result
-        if ctx.can_send_embed:
-            title = self.translations_data[lang]["events_title"][current_event]
-            emb = discord.Embed(title=title, description=txt, color=self.current_event_data["color"])
-            emb.add_field(**await self.get_random_tip_field(ctx.channel))
-            await ctx.send(embed=emb)
-        else:
-            await ctx.send(txt)
+        title = self.translations_data[lang]["events_title"][self.current_event_id]
+        emb = discord.Embed(title=title, description=txt, color=self.current_event_data["color"])
+        emb.add_field(**await self.get_random_tip_field(interaction))
+        await interaction.followup.send(embed=emb)
 
-    async def generate_collect_message(self, channel, items: list[EventItem], points: int):
+    async def generate_collect_message(self, interaction: discord.Interaction, items: list[EventItem], points: int):
         "Generate the message to send after a /collect command"
         items_count = len(items)
         # no item collected
         if items_count == 0:
             if points < 0:
-                return await self.bot._(channel, "bot_events.collect.lost-points", points=-points)
+                return await self.bot._(interaction, "bot_events.collect.lost-points", points=-points)
             if points == 0:
-                return await self.bot._(channel, "bot_events.collect.nothing")
-            return await self.bot._(channel, "bot_events.collect.got-points", points=points)
-        language = await self.bot._(channel, "_used_locale")
+                return await self.bot._(interaction, "bot_events.collect.nothing")
+            return await self.bot._(interaction, "bot_events.collect.got-points", points=points)
+        language = await self.bot._(interaction, "_used_locale")
         name_key = "french_name" if language in ("fr", "fr2") else "english_name"
         # 1 item collected
         if items_count == 1:
             item_name = items[0]["emoji"] + " " + items[0][name_key]
-            return await self.bot._(channel, "bot_events.collect.got-items", count=1, item=item_name, points=points)
+            return await self.bot._(interaction, "bot_events.collect.got-items", count=1, item=item_name, points=points)
         # more than 1 item
         f_points = str(points) if points <= 0 else "+" + str(points)
-        text = await self.bot._(channel, "bot_events.collect.got-items", count=items_count, points=f_points)
+        text = await self.bot._(interaction, "bot_events.collect.got-items", count=items_count, points=f_points)
         items_group: dict[int, int] = defaultdict(int)
         for item in items:
             items_group[item["item_id"]] += 1

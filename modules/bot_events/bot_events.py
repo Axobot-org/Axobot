@@ -4,9 +4,10 @@ import logging
 from typing import AsyncGenerator, Literal
 
 import discord
+from discord import app_commands
 from discord.ext import commands, tasks
 
-from core.bot_classes import SUPPORT_GUILD_ID, Axobot, MyContext
+from core.bot_classes import SUPPORT_GUILD_ID, Axobot
 from core.checks.checks import database_connected
 from core.formatutils import FormatUtils
 
@@ -129,19 +130,18 @@ class BotEvents(commands.Cog):
         if self.current_event:
             await self.subcog.on_raw_reaction_add(payload)
 
-    @commands.hybrid_group("event", aliases=["botevents", "botevent", "events"])
-    @commands.check(database_connected)
-    async def events_main(self, ctx: MyContext):
-        """Participate in bot special events!"""
-        if ctx.subcommand_passed is None and not ctx.command_failed:
-            await ctx.send_help(ctx.command)
+    events_main = app_commands.Group(
+        name="event",
+        description="Participate in bot special events!",
+    )
 
     @events_main.command(name="info")
-    @commands.check(database_connected)
-    async def event_info(self, ctx: MyContext):
+    @app_commands.check(database_connected)
+    async def event_info(self, interaction: discord.Interaction):
         """Get info about the current event"""
+        await interaction.response.defer()
         current_event = self.current_event_id
-        lang = await self.subcog.get_event_language(ctx.channel)
+        lang = await self.subcog.get_event_language(interaction)
         events_desc = self.subcog.translations_data[lang]["events_desc"]
 
         if current_event in events_desc:
@@ -154,49 +154,41 @@ class BotEvents(commands.Cog):
             # Begin/End dates
             begin = f"<t:{self.current_event_data['begin'].timestamp():.0f}>"
             end = f"<t:{self.current_event_data['end'].timestamp():.0f}>"
-            if ctx.can_send_embed:
-                emb = discord.Embed(title=title, description=event_desc, color=self.current_event_data["color"])
-                if self.current_event_data["icon"]:
-                    emb.set_image(url=self.current_event_data["icon"])
+            emb = discord.Embed(title=title, description=event_desc, color=self.current_event_data["color"])
+            if self.current_event_data["icon"]:
+                emb.set_image(url=self.current_event_data["icon"])
+            emb.add_field(
+                name=(await self.bot._(interaction, "misc.beginning")).capitalize(),
+                value=begin
+            )
+            emb.add_field(
+                name=(await self.bot._(interaction, "misc.end")).capitalize(),
+                value=end
+            )
+            # Prices to win
+            prices_translations = self.subcog.translations_data[lang]["events_prices"]
+            if current_event in prices_translations:
                 emb.add_field(
-                    name=(await self.bot._(ctx.channel, "misc.beginning")).capitalize(),
-                    value=begin
+                    name=await self.bot._(interaction, "bot_events.events-price-title"),
+                    value=await self.get_info_prices_field(interaction),
+                    inline=False
                 )
-                emb.add_field(
-                    name=(await self.bot._(ctx.channel, "misc.end")).capitalize(),
-                    value=end
-                )
-                # Prices to win
-                prices_translations = self.subcog.translations_data[lang]["events_prices"]
-                if current_event in prices_translations:
-                    emb.add_field(
-                        name=await self.bot._(ctx.channel, "bot_events.events-price-title"),
-                        value=await self.get_info_prices_field(ctx.channel),
-                        inline=False
-                    )
-                await ctx.send(embed=emb)
-            else:
-                txt = f"""**{title}**\n\n{event_desc}
-
-                __{(await self.bot._(ctx.channel, "misc.beginning")).capitalize()}:__ {begin}
-                __{(await self.bot._(ctx.channel, "misc.end")).capitalize()}:__ {end}
-                """
-                await ctx.send(txt)
+            await interaction.followup.send(embed=emb)
         elif self.coming_event_data:
             date = f"<t:{self.coming_event_data['begin'].timestamp():.0f}>"
-            await ctx.send(await self.bot._(ctx.channel, "bot_events.soon", date=date))
+            await interaction.followup.send(await self.bot._(interaction, "bot_events.soon", date=date))
         else:
-            await ctx.send(await self.bot._(ctx.channel, "bot_events.nothing-desc"))
+            await interaction.followup.send(await self.bot._(interaction, "bot_events.nothing-desc"))
             if current_event:
-                self.bot.dispatch("error", ValueError(f"'{current_event}' has no event description"), ctx)
+                self.bot.dispatch("error", ValueError(f"'{current_event}' has no event description"), interaction)
 
-    async def get_info_prices_field(self, channel):
+    async def get_info_prices_field(self, interaction: discord.Interaction):
         "Get the prices field text for the current event"
-        lang = await self.subcog.get_event_language(channel)
+        lang = await self.subcog.get_event_language(interaction)
         prices_translations = self.subcog.translations_data[lang]["events_prices"]
         if self.current_event_id not in prices_translations:
-            return await self.bot._(channel, "bot_events.nothing-desc")
-        points = await self.bot._(channel, "bot_events.points")
+            return await self.bot._(interaction, "bot_events.nothing-desc")
+        points = await self.bot._(interaction, "bot_events.points")
         if lang == "fr":
             points += " "
         prices: list[str] = []
@@ -209,25 +201,28 @@ class BotEvents(commands.Cog):
             if related_objective and (min_date := related_objective[0].get("min_date")):
                 parsed_date = datetime.datetime.strptime(min_date, "%Y-%m-%d").replace(tzinfo=datetime.UTC)
                 format_date = await FormatUtils.date(parsed_date, hour=False, seconds=False)
-                description += f" ({await self.bot._(channel, 'bot_events.available-starting', date=format_date)})"
+                description += f" ({await self.bot._(interaction, 'bot_events.available-starting', date=format_date)})"
             prices.append(f"- **{required_points} {points}:** {description}")
         return "\n".join(prices)
 
     @events_main.command(name="profile")
-    @commands.check(database_connected)
-    async def event_profile(self, ctx: MyContext, user: discord.User = None):
+    @app_commands.checks.cooldown(4, 10)
+    @app_commands.check(database_connected)
+    async def event_profile(self, interaction: discord.Interaction, user: discord.User = None):
         """Take a look at your progress in the event and your global ranking
         Event points are reset after each event"""
         if user is None:
-            user = ctx.author
-        await self.subcog.profile_cmd(ctx, user)
+            user = interaction.user
+        await interaction.response.defer()
+        await self.subcog.profile_cmd(interaction, user)
 
     @events_main.command(name="collect")
-    @commands.check(database_connected)
-    @commands.cooldown(1, 60, commands.BucketType.user)
-    async def event_collect(self, ctx: MyContext):
+    @app_commands.checks.cooldown(1, 60)
+    @app_commands.check(database_connected)
+    async def event_collect(self, interaction: discord.Interaction):
         "Get some event points every hour"
-        await self.subcog.collect_cmd(ctx)
+        await interaction.response.defer()
+        await self.subcog.collect_cmd(interaction)
 
     async def get_user_unlockable_rankcards(self, user: discord.User, points: int | None=None) -> AsyncGenerator[str, None]:
         "Get a list of event rank cards that the user can unlock"
