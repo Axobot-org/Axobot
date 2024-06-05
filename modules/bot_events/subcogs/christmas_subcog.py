@@ -105,73 +105,68 @@ class ChristmasSubcog(AbstractSubcog):
         # add points (and potentially grant reward rank card)
         await self.add_collect(payload.user_id, item["points"], send_notif_to_channel=notif_channel)
 
-    async def profile_cmd(self, ctx, user):
+    async def profile_cmd(self, interaction, user):
         "Displays the profile of the user"
-        lang = await self.get_event_language(ctx.channel)
+        lang = await self.get_event_language(interaction)
         events_desc = self.translations_data[lang]["events_desc"]
 
         # if no event
         if not self.current_event_id in events_desc:
-            await ctx.send(await self.bot._(ctx.channel, "bot_events.nothing-desc"))
+            await interaction.followup.send(await self.bot._(interaction, "bot_events.nothing-desc"))
             if self.current_event_id:
-                self.bot.dispatch("error", ValueError(f"'{self.current_event_id}' has no event description"), ctx)
+                self.bot.dispatch("error", ValueError(f"'{self.current_event_id}' has no event description"), interaction)
             return
         # if current event has no objectives
         if not self.current_event_data["objectives"]:
             cmd_mention = await self.bot.get_command_mention("event info")
-            await ctx.send(await self.bot._(ctx.channel, "bot_events.no-objectives", cmd=cmd_mention))
+            await interaction.followup.send(await self.bot._(interaction, "bot_events.no-objectives", cmd=cmd_mention))
             return
 
-        await ctx.defer()
-
-        title = await self.bot._(ctx.channel, "bot_events.rank-title")
-        desc = await self.bot._(ctx.channel, "bot_events.xp-howto")
+        title = await self.bot._(interaction, "bot_events.rank-title")
+        desc = await self.bot._(interaction, "bot_events.xp-howto")
 
         emb = discord.Embed(title=title, description=desc, color=self.current_event_data["color"])
         emb.set_author(name=user.global_name, icon_url=user.display_avatar.replace(static_format="png", size=32))
-        for field in await self.generate_user_profile_rank_fields(ctx, lang, user):
+        for field in await self.generate_user_profile_rank_fields(interaction, lang, user):
             emb.add_field(**field)
-        if user == ctx.author:
+        if user == interaction.user:
             if field := await self._generate_user_profile_top_rank_field(user):
                 emb.add_field(**field)
-        emb.add_field(**await self.generate_user_profile_collection_field(ctx, user))
-        await ctx.send(embed=emb)
+        emb.add_field(**await self.generate_user_profile_collection_field(interaction, user))
+        await interaction.followup.send(embed=emb)
 
-    async def collect_cmd(self, ctx):
+    async def collect_cmd(self, interaction):
         "Collect your daily reward"
         current_event = self.current_event_id
-        lang = await self.get_event_language(ctx.channel)
+        lang = await self.get_event_language(interaction)
         events_desc = self.translations_data[lang]["events_desc"]
         # if no event
         if not current_event in events_desc:
-            await ctx.send(await self.bot._(ctx.channel, "bot_events.nothing-desc"))
+            await interaction.followup.send(await self.bot._(interaction, "bot_events.nothing-desc"))
             if current_event:
-                self.bot.dispatch("error", ValueError(f"'{current_event}' has no event description"), ctx)
+                self.bot.dispatch("error", ValueError(f"'{current_event}' has no event description"), interaction)
             return
         # if current event has no objectives
         if not self.current_event_data["objectives"]:
             cmd_mention = await self.bot.get_command_mention("event info")
-            await ctx.send(await self.bot._(ctx.channel, "bot_events.no-objectives", cmd=cmd_mention))
+            await interaction.followup.send(await self.bot._(interaction, "bot_events.no-objectives", cmd=cmd_mention))
             return
-        await ctx.defer()
 
         # check last collect from this user
-        last_collect_day = await self.get_last_user_collect(ctx.author.id)
+        last_collect_day = await self.get_last_user_collect(interaction.user.id)
         gifts = await self.get_calendar_gifts_from_date(last_collect_day)
         if gifts:
-            await self.db_add_user_items(ctx.author.id, [item["item_id"] for item in gifts])
-        txt = await self.generate_collect_message(ctx.channel, gifts, last_collect_day)
+            await self.db_add_user_items(interaction.user.id, [item["item_id"] for item in gifts])
+        txt = await self.generate_collect_message(interaction, gifts, last_collect_day)
         # send result
-        if ctx.can_send_embed:
-            title = self.translations_data[lang]["events_title"][current_event]
-            emb = discord.Embed(title="✨ "+title, description=txt, color=self.current_event_data["color"])
-            emb.add_field(**await self.get_random_tip_field(ctx.channel))
-            emb.set_thumbnail(url="https://cdn-icons-png.flaticon.com/512/4213/4213958.png")
-            await ctx.send(embed=emb)
-        else:
-            await ctx.send(txt)
+        title = self.translations_data[lang]["events_title"][current_event]
+        emb = discord.Embed(title="✨ "+title, description=txt, color=self.current_event_data["color"])
+        emb.add_field(**await self.get_random_tip_field(interaction))
+        emb.set_thumbnail(url="https://cdn-icons-png.flaticon.com/512/4213/4213958.png")
+        await interaction.followup.send(embed=emb)
         # add points (and potentially grant reward rank card)
-        await self.add_collect(ctx.author.id, sum(item["points"] for item in gifts), send_notif_to_channel=ctx.channel)
+        await self.add_collect(
+            interaction.user.id, sum(item["points"] for item in gifts), send_notif_to_channel=interaction.channel)
 
     @cached(TTLCache(maxsize=1, ttl=60*2)) # cache for 2min
     async def today(self):
@@ -225,24 +220,24 @@ the end of the event? Don't forget to join our [support server](https://discord.
         today = await self.today()
         return today.month == 12 and today.day >= 25
 
-    async def generate_collect_message(self, channel, items: list[EventItem], last_collect_day: dt.date):
+    async def generate_collect_message(self, interaction: discord.Interaction, items: list[EventItem], last_collect_day: dt.date):
         "Generate the message to send after a /collect command"
         past_christmas = await self.is_past_christmas()
         if not items:
             if past_christmas:
-                return await self.bot._(channel, "bot_events.calendar.collected-all")
-            return await self.bot._(channel, "bot_events.calendar.collected-day")
+                return await self.bot._(interaction, "bot_events.calendar.collected-all")
+            return await self.bot._(interaction, "bot_events.calendar.collected-day")
         # 1 item collected
-        language = await self.bot._(channel, "_used_locale")
+        language = await self.bot._(interaction, "_used_locale")
         name_key = "french_name" if language in ("fr", "fr2") else "english_name"
         today = await self.today()
         total_points = sum(item["points"] for item in items)
         text = "### "
         if (today - last_collect_day).days <= 1 or last_collect_day.month != 12:
-            text += await self.bot._(channel, "bot_events.calendar.today-gifts", points=total_points)
+            text += await self.bot._(interaction, "bot_events.calendar.today-gifts", points=total_points)
         else:
             missed_days = min(today.day - last_collect_day.day - 1, 3)
-            text = await self.bot._(channel, "bot_events.calendar.today-gifts-late", days=missed_days, points=total_points)
+            text = await self.bot._(interaction, "bot_events.calendar.today-gifts-late", days=missed_days, points=total_points)
         items_group: dict[int, int] = defaultdict(int)
         for item in items:
             items_group[item["item_id"]] += 1
