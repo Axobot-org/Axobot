@@ -105,9 +105,9 @@ class RandomCollectSubcog(AbstractSubcog):
                 txt += "\n\n" + \
                     await self.bot._(interaction, 'bot_events.collect.strike-bonus', bonus=bonus, level=strike_level+1)
             if is_strike:
-                await self.add_collect_and_strike(interaction.user.id, points + bonus, send_notif_to_channel=interaction.channel)
+                await self.add_collect_and_strike(interaction.user.id, points + bonus, send_notif_to_interaction=interaction)
             else:
-                await self.add_collect(interaction.user.id, points + bonus, send_notif_to_channel=interaction.channel)
+                await self.add_collect(interaction.user.id, points + bonus, send_notif_to_interaction=interaction)
         # send result
         title = self.translations_data[lang]["events_title"][self.current_event_id]
         emb = discord.Embed(title=title, description=txt, color=self.current_event_data["color"])

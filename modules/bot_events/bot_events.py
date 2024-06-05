@@ -242,7 +242,8 @@ class BotEvents(commands.Cog):
                         continue
                 yield reward["rank_card"]
 
-    async def check_and_send_card_unlocked_notif(self, channel, user: discord.User | int):
+    async def check_and_send_card_unlocked_notif(self,
+                                                 interaction: discord.Interaction | discord.TextChannel, user: discord.User | int):
         "Check if the user meets the requirements to unlock the event rank card, and send a notification if so"
         if isinstance(user, int):
             user = self.bot.get_user(user)
@@ -250,16 +251,22 @@ class BotEvents(commands.Cog):
                 return
         cards = [card async for card in self.get_user_unlockable_rankcards(user)]
         if cards:
-            title = await self.bot._(channel, "bot_events.rankcard-unlocked.title")
+            title = await self.bot._(interaction, "bot_events.rankcard-unlocked.title")
             profile_card_cmd = await self.bot.get_command_mention("profile card")
-            desc = await self.bot._(channel, "bot_events.rankcard-unlocked.desc",
+            desc = await self.bot._(interaction, "bot_events.rankcard-unlocked.desc",
                                     cards=", ".join(cards),
                                     profile_card_cmd=profile_card_cmd,
                                     count=len(cards)
                                     )
             emb = discord.Embed(title=title, description=desc, color=discord.Color.brand_green())
             emb.set_author(name=user.global_name, icon_url=user.display_avatar)
-            await channel.send(embed=emb)
+            if isinstance(interaction, discord.Interaction):
+                await interaction.followup.send(embed=emb)
+            else:
+                try:
+                    await interaction.send(embed=emb)
+                except discord.Forbidden:
+                    pass
 
     async def reload_event_rankcard(self, user: discord.User | int, points: int | None = None):
         """Grant the current event rank card to the provided user, if they have enough points

@@ -84,7 +84,7 @@ class SingleReactionSubcog(AbstractSubcog):
         # send the notification in the guild/DM channel
         await channel.send(embed=embed, delete_after=delete_after)
         # add points (and potentially grant reward rank card)
-        await self.add_collect(payload.user_id, item["points"], send_notif_to_channel=channel)
+        await self.add_collect(payload.user_id, item["points"], send_notif_to_interaction=channel)
 
     async def profile_cmd(self, interaction, user):
         "Displays the profile of the user"
