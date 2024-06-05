@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 
 from core.bot_classes import SUPPORT_GUILD_ID, MyContext
+from core.bot_classes.axobot import Axobot
 from core.checks.errors import NotAVoiceMessageError
 
 admins_id = {279568324260528128,281404141841022976,552273019020771358}
@@ -142,16 +143,10 @@ async def bot_can_embed(ctx: MyContext | discord.Interaction) -> bool:
             return True
     raise CannotSendEmbed()
 
-async def is_translator(ctx: MyContext) -> bool:
-    "Check if the user is an agreeded translator"
-    if cog := ctx.bot.get_cog('Users'):
-        return await cog.has_userflag(ctx.author, 'translator')
-    return False
-
-
-async def database_connected(ctx: MyContext) -> bool:
+async def database_connected(ctx: MyContext | discord.Interaction[Axobot]) -> bool:
     "Check if the database is online and accessible"
-    if ctx.bot.database_online:
+    bot = ctx.client if isinstance(ctx, discord.Interaction) else ctx.bot
+    if bot.database_online:
         return True
     raise commands.CommandError("Database offline")
 
