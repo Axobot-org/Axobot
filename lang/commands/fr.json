@@ -1,8 +1,6 @@
 {
     "command_name": {
         "about": "à-propos",
-        "antiscam disable": "désactiver",
-        "antiscam enable": "activer",
         "antiscam report": "signaler",
         "antiscam test": "tester",
         "ban": "bannir",

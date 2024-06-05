@@ -1,8 +1,6 @@
 {
     "command_name": {
         "about": "about",
-        "antiscam disable": "disable",
-        "antiscam enable": "enable",
         "antiscam report": "report",
         "antiscam test": "test",
         "ban": "ban",

@@ -5,8 +5,8 @@ import discord
 from discord import app_commands
 from discord.ext import commands, tasks
 
-from core.bot_classes import Axobot, MyContext
-from core.checks import checks
+from core.arguments.args import MessageTransformer
+from core.bot_classes import Axobot
 
 from .model import AntiScamAgent, Message
 from .model.classes import (EMBED_COLORS, MsgReportView, PredictionResult,
@@ -223,58 +223,33 @@ class AntiScam(commands.Cog):
                     )
         return data
 
-    @commands.hybrid_group(name="antiscam")
-    @app_commands.default_permissions(manage_guild=True)
-    async def antiscam(self, ctx: MyContext):
-        """Everything related to the antiscam feature
+    antiscam_main = app_commands.Group(
+        name="antiscam",
+        description="Everything related to the antiscam feature",
+    )
 
-        ..Doc moderator.html#anti-scam"""
-        if ctx.subcommand_passed is None:
-            await ctx.send_help(ctx.command)
-
-    @antiscam.command(name="test")
+    @antiscam_main.command(name="test")
     @app_commands.describe(text="The message to check")
-    @commands.cooldown(5, 30, commands.BucketType.user)
-    async def antiscam_test(self, ctx: MyContext, *, text: str):
+    @app_commands.checks.cooldown(5, 30)
+    async def antiscam_test(self, interaction: discord.Interaction, *, text: str):
         """Test the antiscam feature with a given message
 
         ..Example antiscam test free nitro for everyone at bit.ly/tomato"""
+        await interaction.response.defer()
         data = Message.from_raw(text, 0, self.agent.websites_list)
         pred = self.agent.predict_bot(data)
-        url_score = await self.bot._(ctx.channel, "antiscam.url-score", score=data.url_score)
-        probabilities_ = await self.bot._(ctx.channel, "antiscam.probabilities")
+        url_score = await self.bot._(interaction, "antiscam.url-score", score=data.url_score)
+        probabilities_ = await self.bot._(interaction, "antiscam.probabilities")
         answer = probabilities_
         for category, proba in pred.probabilities.items():
             answer += f"\n- {self.agent.categories[category]}: {round(proba*100, 1)}%"
         answer += f"\n\n{url_score}"
         embed = discord.Embed(
-            title = await self.bot._(ctx.channel, "antiscam.result") + " " + self.agent.categories[pred.result],
+            title = await self.bot._(interaction, "antiscam.result") + " " + self.agent.categories[pred.result],
             description = answer,
             color=discord.Color.red() if pred.result >= 2 else discord.Color.green()
         )
-        await ctx.send(embed=embed)
-
-    @antiscam.command(name="enable")
-    @commands.guild_only()
-    @commands.check(checks.has_manage_guild)
-    async def antiscam_enable(self, ctx: MyContext):
-        """Enable the antiscam feature in your server
-
-        ..Doc moderator.html#anti-scam"""
-        config_cmd = self.bot.get_command("config set")
-        if await config_cmd.can_run(ctx):
-            await config_cmd(ctx, "anti_scam", value="true")
-
-    @antiscam.command(name="disable")
-    @commands.guild_only()
-    @commands.check(checks.has_manage_guild)
-    async def antiscam_disable(self, ctx: MyContext):
-        """Disable the antiscam feature in your server
-
-        ..Doc moderator.html#anti-scam"""
-        config_cmd = self.bot.get_command("config set")
-        if await config_cmd.can_run(ctx):
-            await config_cmd(ctx, "anti_scam", value="false")
+        await interaction.followup.send(embed=embed)
 
     async def report_context_menu(self, interaction: discord.Interaction, message: discord.Message):
         "Report a suspicious message to the bot team"
@@ -292,34 +267,35 @@ class AntiScam(commands.Cog):
             ephemeral=True
         )
 
-    @antiscam.command(name="report")
-    @commands.cooldown(5, 30, commands.BucketType.guild)
-    @commands.cooldown(2, 10, commands.BucketType.user)
-    async def antiscam_report(self, ctx: MyContext, *, message: str):
+    @antiscam_main.command(name="report")
+    @app_commands.checks.cooldown(2, 10)
+    @app_commands.describe(message="The message to report: either a message ID or a raw text")
+    async def antiscam_report(self, interaction: discord.Interaction, *, message: str):
         """Report a suspicious message to the bot team
         This will help improving the bot detection AI
 
         ..Doc moderator.html#anti-scam"""
-        await ctx.defer()
+        await interaction.response.defer()
         try:
-            src_msg = await commands.converter.MessageConverter().convert(ctx, message)
+            src_msg = await MessageTransformer().transform(interaction, message)
         except commands.CommandError:
             src_msg = None
             content = message
             mentions_count = 0
-            author = ctx.author
+            author = interaction.user
             reporter = None
         else:
             if not src_msg.content:
-                await ctx.send(await self.bot._(ctx, "antiscam.report-empty"), ephemeral=True)
+                await interaction.followup.send(await self.bot._(interaction, "antiscam.report-empty"), ephemeral=True)
                 return
             content = src_msg.content
             mentions_count = len(src_msg.mentions)
             author = src_msg.author
-            reporter = ctx.author
-        await self._report_message(author, content, mentions_count, ctx.guild.id, report_author=reporter, source_msg=src_msg)
-        await ctx.reply(
-            await self.bot._(ctx.channel, "antiscam.report-successful"),
+            reporter = interaction.user
+        await self._report_message(
+            author, content, mentions_count, interaction.guild_id, report_author=reporter, source_msg=src_msg)
+        await interaction.followup.send(
+            await self.bot._(interaction, "antiscam.report-successful"),
             allowed_mentions=discord.AllowedMentions.none()
         )
 
