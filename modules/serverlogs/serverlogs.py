@@ -133,17 +133,23 @@ class ServerLogs(commands.Cog):
                 if not embeds or channel is None or channel.guild.me is None:
                     self.to_send.pop(channel_id)
                     continue
+                perms = channel.permissions_for(channel.guild.me)
+                if not (perms.send_messages and perms.embed_links):
+                    continue
+                # send logs
                 try:
-                    perms = channel.permissions_for(channel.guild.me)
-                    if perms.send_messages and perms.embed_links:
-                        embeds_to_send = await self._get_embeds_batch(embeds)
-                        await channel.send(embeds=embeds_to_send)
-                        if len(embeds) > len(embeds_to_send):
-                            self.to_send[channel_id] = self.to_send[channel_id][len(embeds_to_send):]
-                        else:
-                            self.to_send.pop(channel_id)
+                    embeds_to_send = await self._get_embeds_batch(embeds)
+                    await channel.send(embeds=embeds_to_send)
                 except discord.HTTPException as err:
                     self.bot.dispatch('error', err, f"Sending logs to guild {channel.guild.id} | Channel {channel.id}")
+                    if not isinstance(err, discord.InvalidData):
+                        # invalid data error is not recoverable, so we remove the logs
+                        continue
+                # remove sent embeds
+                if len(embeds) > len(embeds_to_send):
+                    self.to_send[channel_id] = self.to_send[channel_id][len(embeds_to_send):]
+                else:
+                    self.to_send.pop(channel_id)
         except Exception as err: # pylint: disable=broad-except
             self.bot.dispatch('error', err, None)
 
@@ -1543,7 +1549,8 @@ Minimum age required by anti-raid: {min_age}"
                 emb.description = f"**Could not send RSS message** in channel {kwargs.get('channel').mention}"
                 emb.add_field(name="Feed ID", value=kwargs.get('feed_id'))
                 rss_text_cmd = await self.bot.get_command_mention("rss set-text")
-                emb.add_field(name="Reason", value=f"Invalid template format. Use the {rss_text_cmd} command to fix your template.")
+                emb.add_field(name="Reason",
+                              value=f"Invalid template format. Use the {rss_text_cmd} command to fix your template.")
             elif warning_type == ServerWarningType.TICKET_CREATION_UNKNOWN_TARGET:
                 emb.description = f"**Could not create ticket** in channel or category {kwargs.get('channel_id')}"
                 emb.add_field(name="Selected topic", value=kwargs.get('topic_name'))
