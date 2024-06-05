@@ -8,7 +8,7 @@ from discord.ext import commands
 from PIL import Image, ImageSequence
 
 from core.bot_classes import MyContext
-from libs.colors_events.background_change import (apply_gradient,
+from core.colors_events.background_change import (apply_gradient,
                                                   get_background_mask)
 
 ColorType = tuple[int, int, int]

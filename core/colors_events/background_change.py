@@ -4,7 +4,7 @@ from PIL import Image, ImageDraw, ImageFilter
 from rembg import new_session, remove
 
 if TYPE_CHECKING:
-    from libs.colors_events.utils import ColorType
+    from core.colors_events.utils import ColorType
 
 
 async def get_background_mask(image: Image.Image) -> Image.Image:
