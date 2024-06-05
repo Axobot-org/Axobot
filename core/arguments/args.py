@@ -7,6 +7,7 @@ from dateutil.relativedelta import relativedelta
 from discord.ext import commands
 
 from core.arguments import errors as arguments_errors
+from core.bot_classes.axobot import Axobot
 
 if TYPE_CHECKING:
     from core.bot_classes import MyContext
@@ -74,14 +75,19 @@ class AnyUser(discord.User):
             raise commands.errors.UserNotFound(argument)
 
 
-class CardStyle(str):
+class CardStyleTransformer(discord.app_commands.Transformer):
     "Converts a string to a valid XP card style"
-    @classmethod
-    async def convert(cls, ctx: "MyContext", argument: str):
+
+    async def transform(self, interaction: discord.Interaction[Axobot], value, /):
         "Do the conversion"
-        if argument in await ctx.bot.get_cog('Utilities').allowed_card_styles(ctx.author):
-            return argument
-        raise arguments_errors.InvalidCardStyleError(argument)
+        if value in await interaction.client.get_cog('Utilities').allowed_card_styles(interaction.user):
+            return value
+        raise arguments_errors.InvalidCardStyleError(value)
+
+    async def autocomplete(self, interaction, value, /):
+        raise NotImplementedError()
+
+CardStyleArgument = discord.app_commands.Transform[str, CardStyleTransformer]
 
 
 class BotOrGuildInviteConverter:

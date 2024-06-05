@@ -8,7 +8,7 @@ from discord import app_commands
 from discord.ext import commands
 
 from core.arguments import args
-from core.bot_classes import Axobot, MyContext
+from core.bot_classes import Axobot
 from core.checks import checks
 from core.enums import RankCardsFlag, UserFlag
 
@@ -25,7 +25,7 @@ class Users(commands.Cog):
 
     def __init__(self, bot: Axobot):
         self.bot = bot
-        self.file = 'users'
+        self.file = "users"
 
     async def db_get_userinfo(self, user_id: int) -> dict[str, Any] | None:
         """Get the user info from the database"""
@@ -99,7 +99,7 @@ class Users(commands.Cog):
         if not self.bot.database_online:
             return []
         if userinfo := await self.db_get_userinfo(user.id):
-            return UserFlag().int_to_flags(userinfo['user_flags'])
+            return UserFlag().int_to_flags(userinfo["user_flags"])
         return []
 
     async def has_userflag(self, user: discord.User, flag: str) -> bool:
@@ -113,7 +113,7 @@ class Users(commands.Cog):
         if not self.bot.database_online:
             return []
         if userinfo := await self.db_get_userinfo(user.id):
-            return RankCardsFlag().int_to_flags(userinfo['rankcards_unlocked'])
+            return RankCardsFlag().int_to_flags(userinfo["rankcards_unlocked"])
         return []
 
     async def has_rankcard(self, user: discord.User, rankcard: str) -> bool:
@@ -149,12 +149,12 @@ class Users(commands.Cog):
             self.bot.dispatch("error", err)
             return {}
         if '' in result:
-            result['default'] = result.pop('')
+            result["default"] = result.pop('')
         return result
 
     async def card_style_autocomplete(self, user: discord.User, current: str):
         "Autocompletion for a card style name"
-        styles_list: list[str] = await self.bot.get_cog('Utilities').allowed_card_styles(user)
+        styles_list: list[str] = await self.bot.get_cog("Utilities").allowed_card_styles(user)
         filtered = sorted(
             (not name.startswith(current), name) for name in styles_list
             if current in name
@@ -164,18 +164,16 @@ class Users(commands.Cog):
             for value in filtered
         ][:25]
 
-    @commands.hybrid_group(name='profile')
-    async def profile_main(self, ctx: MyContext):
-        """Configure the bot for your own usage"""
-        if ctx.subcommand_passed is None:
-            await ctx.send_help(ctx.command)
+    profile_main = app_commands.Group(
+        name="profile",
+        description="Configure the bot for your own usage",
+    )
 
-    @profile_main.command(name='card-preview')
+    @profile_main.command(name="card-preview")
     @app_commands.describe(style="The name of the card style you want to preview. Leave empty for your current style")
-    @commands.check(checks.database_connected)
-    @commands.cooldown(3, 45, commands.BucketType.user)
-    @commands.cooldown(5, 60, commands.BucketType.guild)
-    async def profile_cardpreview(self, ctx: MyContext, style: args.CardStyle | None=None):
+    @app_commands.check(checks.database_connected)
+    @app_commands.checks.cooldown(3, 45)
+    async def profile_cardpreview(self, interaction: discord.Interaction, style: args.CardStyleArgument | None = None):
         """Get a preview of a card style
 
         ..Example profile card-preview
@@ -183,76 +181,58 @@ class Users(commands.Cog):
         ..Example profile card-preview red
 
         ..Doc user.html#change-your-xp-card"""
-        if ctx.current_argument != style:
-            available_cards = ', '.join(await ctx.bot.get_cog('Utilities').allowed_card_styles(ctx.author))
-            await ctx.send(await self.bot._(ctx.channel, 'users.invalid-card', cards=available_cards))
-            return
-        if not ctx.bot_permissions.attach_files:
-            await ctx.send(await self.bot._(ctx.channel, 'users.missing-attach-files'))
-            return
-        await ctx.defer()
+        await interaction.response.defer(ephemeral=True)
         if style is None:
-            style = await self.bot.get_cog('Utilities').get_xp_style(ctx.author)
+            style = await self.bot.get_cog("Utilities").get_xp_style(interaction.user)
         profile_card_cmd = await self.bot.get_command_mention("profile card")
-        desc = await self.bot._(ctx.channel, "users.card-desc", profile_cmd=profile_card_cmd)
-        xp_cog = self.bot.get_cog('Xp')
-        translations_map = await xp_cog.get_card_translations_map(ctx.channel)
-        card = await xp_cog.create_card(translations_map, ctx.author, style, xp=30, rank=0, ranks_nb=1,
+        desc = await self.bot._(interaction, "users.card-desc", profile_cmd=profile_card_cmd)
+        xp_cog = self.bot.get_cog("Xp")
+        translations_map = await xp_cog.get_card_translations_map(interaction)
+        card = await xp_cog.create_card(translations_map, interaction.user, style, xp=30, rank=0, ranks_nb=1,
                                                         levels_info=[1, 85, 0])
                                                         # current level, xp for next level, xp for current level
-        await ctx.send(desc, file=card)
+        await interaction.followup.send(desc, file=card)
 
     @profile_cardpreview.autocomplete("style")
     async def cardpreview_autocomplete_style(self, inter: discord.Interaction, current: str):
         return await self.card_style_autocomplete(inter.user, current)
 
-    @profile_main.command(name='card')
+    @profile_main.command(name="card")
     @app_commands.describe(style="The name of the card style you want to use")
-    @commands.cooldown(3, 45, commands.BucketType.user)
-    @commands.check(checks.database_connected)
-    async def profile_card(self, ctx: MyContext, style: args.CardStyle):
+    @app_commands.checks.cooldown(3, 45)
+    @app_commands.check(checks.database_connected)
+    async def profile_card(self, interaction: discord.Interaction, style: args.CardStyleArgument):
         """Change your xp card style.
 
         ..Example profile card christmas23
 
         ..Doc user.html#change-your-xp-card"""
-        if style is None and len(ctx.view.buffer.split(' ')) > 2:
-            # unknown style, send the whole list
-            available_cards = ', '.join(await ctx.bot.get_cog('Utilities').allowed_card_styles(ctx.author))
-            if ctx.view.buffer.split(' ')[2] == 'list':
-                try:
-                    # send the rank card notification if needed
-                    await self.bot.get_cog("BotEvents").check_and_send_card_unlocked_notif(ctx.channel, ctx.author)
-                    await self.bot.get_cog("BotEvents").reload_event_rankcard(ctx.author.id)
-                except Exception as err:
-                    self.bot.dispatch("error", err)
-                await ctx.send(await self.bot._(ctx.channel, 'users.list-cards', cards=available_cards))
-            else:
-                await ctx.send(await self.bot._(ctx.channel, 'users.invalid-card', cards=available_cards))
-            return
-        await ctx.defer()
-        await self.db_edit_user_xp_card(ctx.author.id, style)
-        await ctx.send(await self.bot._(ctx.channel, 'users.changed-card', style=style))
+        await interaction.response.defer(ephemeral=True)
+        await self.db_edit_user_xp_card(interaction.user.id, style)
+        await interaction.followup.send(await self.bot._(interaction, "users.changed-card", style=style))
 
     @profile_card.autocomplete("style")
     async def card_autocomplete_style(self, inter: discord.Interaction, current: str):
         return await self.card_style_autocomplete(inter.user, current)
 
-    @profile_main.command(name='list-card-styles')
-    @commands.cooldown(3, 45, commands.BucketType.user)
-    @commands.check(checks.database_connected)
-    async def profile_card_list(self, ctx: MyContext):
+    @profile_main.command(name="list-card-styles")
+    @app_commands.checks.cooldown(3, 45)
+    @app_commands.check(checks.database_connected)
+    async def profile_card_list(self, interaction: discord.Interaction):
         "List the available card styles for you"
-        available_cards = '\n- ' + '\n- '.join(await ctx.bot.get_cog('Utilities').allowed_card_styles(ctx.author))
-        await ctx.send(await self.bot._(ctx.channel, 'users.list-cards', cards=available_cards))
+        available_cards = "\n- " + "\n- ".join(await self.bot.get_cog("Utilities").allowed_card_styles(interaction.user))
+        await interaction.response.send_message(
+            await self.bot._(interaction, "users.list-cards", cards=available_cards),
+            ephemeral=True
+        )
 
     @profile_main.command(name="config")
-    @commands.check(checks.database_connected)
+    @app_commands.check(checks.database_connected)
     @app_commands.choices(option=[
         discord.app_commands.Choice(name=option, value=option)
         for option in user_options_list
     ])
-    async def user_config(self, ctx: MyContext, option: str, enable: bool | None=None):
+    async def user_config(self, interaction: discord.Interaction, option: str, enable: bool | None=None):
         """Modify any config option
         Here you can enable or disable one of the users option that Axobot has, which are:
         - animated_card: Display an animated rank card if your pfp is a gif (way slower rendering)
@@ -261,21 +241,21 @@ class Users(commands.Cog):
         Value can only be a boolean (true/false)
         Providing empty value will show you the current value and more details"""
         if option not in user_options_list:
-            await ctx.send(await self.bot._(ctx.channel, "users.config_list", options=" - ".join(user_options_list)))
+            await interaction.response.send_message(
+                await self.bot._(interaction, "users.config_list", options=" - ".join(user_options_list))
+            )
             return
+        await interaction.response.defer(ephemeral=True)
         if enable is None:
-            value = await self.db_get_user_config(ctx.author.id, option)
-            if ctx.guild is None or ctx.channel.permissions_for(ctx.guild.me).external_emojis:
-                emojis = self.bot.emojis_manager.customs['green_check'], self.bot.emojis_manager.customs['red_cross']
-            else:
-                emojis = ('✅','❎')
+            value = await self.db_get_user_config(interaction.user.id, option)
+            emojis = self.bot.emojis_manager.customs["green_check"], self.bot.emojis_manager.customs["red_cross"]
             if value:
-                await ctx.send(emojis[0]+" "+await self.bot._(ctx.channel, f'users.set_config.{option}.true'))
+                await interaction.followup.send(emojis[0]+" "+await self.bot._(interaction, f"users.set_config.{option}.true"))
             else:
-                await ctx.send(emojis[1]+" "+await self.bot._(ctx.channel, f'users.set_config.{option}.false'))
+                await interaction.followup.send(emojis[1]+" "+await self.bot._(interaction, f"users.set_config.{option}.false"))
         else:
-            await self.db_edit_user_config(ctx.author.id, option, enable)
-            await ctx.send(await self.bot._(ctx.channel, 'users.config_success', opt=option))
+            await self.db_edit_user_config(interaction.user.id, option, enable)
+            await interaction.followup.send(await self.bot._(interaction, "users.config_success", opt=option))
 
 
 async def setup(bot):
