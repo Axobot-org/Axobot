@@ -103,7 +103,7 @@ class ChristmasSubcog(AbstractSubcog):
             await user.dm_channel.send(embed=embed)
             notif_channel = user.dm_channel
         # add points (and potentially grant reward rank card)
-        await self.add_collect(payload.user_id, item["points"], send_notif_to_channel=notif_channel)
+        await self.add_collect(payload.user_id, item["points"], send_notif_to_interaction=notif_channel)
 
     async def profile_cmd(self, interaction, user):
         "Displays the profile of the user"
@@ -165,8 +165,7 @@ class ChristmasSubcog(AbstractSubcog):
         emb.set_thumbnail(url="https://cdn-icons-png.flaticon.com/512/4213/4213958.png")
         await interaction.followup.send(embed=emb)
         # add points (and potentially grant reward rank card)
-        await self.add_collect(
-            interaction.user.id, sum(item["points"] for item in gifts), send_notif_to_channel=interaction.channel)
+        await self.add_collect(interaction.user.id, sum(item["points"] for item in gifts), send_notif_to_interaction=interaction)
 
     @cached(TTLCache(maxsize=1, ttl=60*2)) # cache for 2min
     async def today(self):

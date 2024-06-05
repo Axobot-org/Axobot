@@ -181,30 +181,31 @@ class AbstractSubcog(ABC):
             return 1e9
         return (self.bot.utcnow() - last_collect).total_seconds()
 
-    # TODO: use interaction instead of channel for followup notifications
-    async def add_collect(self, user_id: int, points: int, send_notif_to_channel: discord.TextChannel | None = None):
+    async def add_collect(self, user_id: int, points: int,
+                          send_notif_to_interaction: discord.Interaction | discord.TextChannel | None = None):
         "Add collect points to a user"
         if not self.bot.database_online or self.bot.current_event is None:
             return
         await self.db_add_collect(user_id, points, with_strike=False)
         if cog := self.bot.get_cog("BotEvents"):
             try:
-                if send_notif_to_channel:
-                    await cog.check_and_send_card_unlocked_notif(send_notif_to_channel, user_id)
+                if send_notif_to_interaction:
+                    await cog.check_and_send_card_unlocked_notif(send_notif_to_interaction, user_id)
                 await cog.reload_event_rankcard(user_id)
                 await cog.reload_event_special_role(user_id)
             except Exception as err:
                 self.bot.dispatch("error", err)
 
-    async def add_collect_and_strike(self, user_id: int, points: int, send_notif_to_channel: discord.TextChannel | None=None):
+    async def add_collect_and_strike(self, user_id: int, points: int,
+                                     send_notif_to_interaction: discord.Interaction | discord.TextChannel | None = None):
         """Add collect points to a user and increase the strike level by 1"""
         if not self.bot.database_online or self.bot.current_event is None:
             return True
         await self.db_add_collect(user_id, points, with_strike=True)
         if cog := self.bot.get_cog("BotEvents"):
             try:
-                if send_notif_to_channel:
-                    await cog.check_and_send_card_unlocked_notif(send_notif_to_channel, user_id)
+                if send_notif_to_interaction:
+                    await cog.check_and_send_card_unlocked_notif(send_notif_to_interaction, user_id)
                 await cog.reload_event_rankcard(user_id)
                 await cog.reload_event_special_role(user_id)
             except Exception as err:
