@@ -67,22 +67,9 @@ As permissions are internally stored by Discord as integers or bit flags, you ca
 Ping
 ----
 
-**Syntax:** :code:`ping [ip adress]`
+**Syntax:** :code:`ping`
 
 The ping command allows you to get the bot latency. It's useful if you want to check why your command takes too long to be read. The number corresponds with the delay between the moment when your message reaches Discord and the moment when the bot's response is received by the API.
-
-If you give an ip address in the command, the bot will send a certain number of packets to this server to see if it is active, and know its latency. This may take a short time, depending on the server bandwidth and the number of packets to send.
-
-------
-Prefix
-------
-
-**Syntax:** :code:`prefix`
-
-A nice shortcut to know the prefixes to which the bot responds. This is usually the prefix defined in the `configuration <server.html>`_, plus the mention of the bot.
-
-..note:: You can change the bot prefix on your server with the :code:`config set prefix <new prefix>` command.
-
 
 ----------
 Statistics
