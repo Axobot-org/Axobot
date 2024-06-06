@@ -50,16 +50,15 @@ class TipsManager:
             return self._random_tips_params
         self._random_tips_params  = {
             "about_cmd": await self.bot.get_command_mention("about"),
-            "bigtext_cmd": await self.bot.get_command_mention("bigtext"),
             "clear_cmd": await self.bot.get_command_mention("clear"),
             "config_cmd": await self.bot.get_command_mention("config"),
-            "discordlinks_cmd": await self.bot.get_command_mention("discordlinks"),
+            "discordlinks_cmd": await self.bot.get_command_mention("fun discord-links"),
             "event_cmd": await self.bot.get_command_mention("event info"),
             "stats_cmd": await self.bot.get_command_mention("stats"),
             "say_cmd": await self.bot.get_command_mention("say"),
             "sponsor_url": "https://github.com/sponsors/ZRunner",
             "rss_disable_cmd": await self.bot.get_command_mention("rss disable"),
-            "rss_delete_cmd": await self.bot.get_command_mention("rss delete"),
+            "rss_delete_cmd": await self.bot.get_command_mention("rss remove"),
             "support_server_url": "https://discord.gg/N55zY88",
             "antiscam_enable_cmd": await self.bot.get_command_mention("antiscam enable"),
         }
