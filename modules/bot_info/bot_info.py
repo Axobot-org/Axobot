@@ -5,13 +5,14 @@ from typing import Literal
 
 import discord
 import psutil
+from discord import app_commands
 from discord.ext import commands
 
-from docs import conf
-from core.bot_classes import Axobot, MyContext
+from core.bot_classes import Axobot
 from core.bot_classes.consts import IGNORED_GUILDS
 from core.checks import checks
 from core.formatutils import FormatUtils
+from docs import conf
 
 
 class BotInfo(commands.Cog):
@@ -67,21 +68,21 @@ class BotInfo(commands.Cog):
                 return len(self.bot.guilds)
         return len([x for x in self.bot.guilds if x.id not in ignored_guilds])
 
-    @commands.hybrid_command(name="stats")
-    @commands.check(checks.database_connected)
-    @commands.cooldown(3, 60, commands.BucketType.guild)
-    async def stats_main(self, ctx: MyContext, category: Literal["general", "commands"]="general"):
+    @app_commands.command(name="stats")
+    @app_commands.check(checks.database_connected)
+    @app_commands.checks.cooldown(3, 60)
+    async def stats_main(self, interaction: discord.Interaction, category: Literal["general", "commands"]="general"):
         """Display some statistics about the bot
 
         ..Doc infos.html#statistics"""
         if category == "general":
-            await self.stats_general(ctx)
+            await self.stats_general(interaction)
         elif category == "commands":
-            await self.stats_commands(ctx)
+            await self.stats_commands(interaction)
 
-    async def stats_general(self, ctx: MyContext):
+    async def stats_general(self, interaction: discord.Interaction):
         "General statistics about the bot"
-        await ctx.defer()
+        await interaction.response.defer()
         python_version = sys.version_info
         f_python_version = str(python_version.major)+"."+str(python_version.minor)
         latency = round(self.bot.latency*1000, 2)
@@ -112,7 +113,7 @@ class BotInfo(commands.Cog):
         # RSS messages within 24h
         rss_msg_24h = await self.bot.get_cog("BotStats").get_sum_stats("rss.messages", 60*24)
         # number formatter
-        lang = await self.bot._(ctx.channel, "_used_locale")
+        lang = await self.bot._(interaction, "_used_locale")
         async def n_format(nbr: int | float | None):
             return await FormatUtils.format_nbr(nbr, lang) if nbr is not None else "0"
         # Generating message
@@ -132,15 +133,12 @@ class BotInfo(commands.Cog):
             ('rss_msg_24h', await n_format(rss_msg_24h)),
             ('total_xp', await n_format(total_xp)+" ")]:
             str_args = {f'v{i}': var[i] for i in range(len(var))} if isinstance(var, tuple | list) else {'v': var}
-            desc += await self.bot._(ctx.channel, "info.stats."+key, **str_args) + "\n"
-        if ctx.can_send_embed: # if we can use embed
-            title = await self.bot._(ctx.channel,"info.stats.title")
-            color = ctx.bot.get_cog('Help').help_color
-            embed = discord.Embed(title=title, color=color, description=desc)
-            embed.set_thumbnail(url=self.bot.user.display_avatar.with_static_format("png"))
-            await ctx.send(embed=embed)
-        else:
-            await ctx.send(desc)
+            desc += await self.bot._(interaction, "info.stats."+key, **str_args) + "\n"
+        title = await self.bot._(interaction,"info.stats.title")
+        color = self.bot.get_cog('Help').help_color
+        embed = discord.Embed(title=title, color=color, description=desc)
+        embed.set_thumbnail(url=self.bot.user.display_avatar.with_static_format("png"))
+        await interaction.followup.send(embed=embed)
 
     def get_users_nber(self, ignored_guilds: list[int]):
         "Return the amount of members and the amount of bots in every reachable guild, excepted in ignored guilds"
@@ -148,15 +146,16 @@ class BotInfo(commands.Cog):
         members = list(set(x for x in members for x in x)) # filter users
         return len(members), len([x for x in members if x.bot])
 
-    async def stats_commands(self, ctx: MyContext):
+    async def stats_commands(self, interaction: discord.Interaction):
         """List the most used commands
 
         ..Doc infos.html#statistics"""
+        await interaction.response.defer()
         forbidden = ['eval', 'admin', 'test', 'bug', 'idea', 'send_msg']
         forbidden_where = ', '.join(f"'cmd.{elem}'" for elem in forbidden)
         forbidden_where += ', ' + ', '.join(f"'app_cmd.{elem}'" for elem in forbidden)
         commands_limit = 15
-        lang = await self.bot._(ctx.channel, '_used_locale')
+        lang = await self.bot._(interaction, '_used_locale')
         # SQL query
         async def do_query(minutes: int | None = None):
             if minutes:
@@ -205,79 +204,62 @@ ORDER BY usages DESC LIMIT %(limit)s"""
             data['cmd'] + ': ' + await FormatUtils.format_nbr(data['usages'], lang)
             for data in data_24h
         ])
-        title_24h = await self.bot._(ctx.channel, 'info.stats-cmds.day')
+        title_24h = await self.bot._(interaction, 'info.stats-cmds.day')
         # since the beginning
         data_total = await do_query()
         text_total = '• ' + "\n• ".join([
             data['cmd'] + ': ' + await FormatUtils.format_nbr(data['usages'], lang)
             for data in data_total
         ])
-        title_total = await self.bot._(ctx.channel, 'info.stats-cmds.total')
+        title_total = await self.bot._(interaction, 'info.stats-cmds.total')
         # message title and desc
-        title = await self.bot._(ctx.channel, "info.stats-cmds.title")
-        desc = await self.bot._(ctx.channel, "info.stats-cmds.description", number=commands_limit)
+        title = await self.bot._(interaction, "info.stats-cmds.title")
+        desc = await self.bot._(interaction, "info.stats-cmds.description", number=commands_limit)
         # send everything
-        if ctx.can_send_embed:
-            emb = discord.Embed(
-                title=title,
-                description=desc,
-                color=ctx.bot.get_cog('Help').help_color,
-            )
-            emb.set_thumbnail(url=self.bot.user.display_avatar.with_static_format("png"))
-            emb.add_field(name=title_total, value=text_total)
-            emb.add_field(name=title_24h, value=text_24h)
-            await ctx.send(embed=emb)
-        else:
-            await ctx.send(f"**{title}**\n{desc}\n\n{title_total}:\n{text_total}\n\n{title_24h}:\n{text_24h}")
+        emb = discord.Embed(
+            title=title,
+            description=desc,
+            color=self.bot.get_cog('Help').help_color,
+        )
+        emb.set_thumbnail(url=self.bot.user.display_avatar.with_static_format("png"))
+        emb.add_field(name=title_total, value=text_total)
+        emb.add_field(name=title_24h, value=text_24h)
+        await interaction.followup.send(embed=emb)
 
-    @commands.hybrid_command(name="ping", aliases=['rep'])
-    @commands.cooldown(5, 45, commands.BucketType.guild)
-    async def rep(self, ctx: MyContext, ):
+    @app_commands.command(name="ping")
+    @app_commands.checks.cooldown(5, 45)
+    async def rep(self, interaction: discord.Interaction):
         """Get the bot latency
 
         ..Example ping
 
         ..Doc infos.html#ping"""
-        msg = await ctx.send("Ping...")
-        bot_delta = (msg.created_at - ctx.message.created_at).total_seconds()
+        await interaction.response.send_message("Ping...")
+        msg = await interaction.original_response()
+        bot_delta = (msg.created_at - interaction.created_at).total_seconds()
         try:
             api_latency = round(self.bot.latency*1000)
         except OverflowError:
             api_latency = "∞"
-        await msg.edit(content=await self.bot._(ctx.channel, "info.ping.normal",
-                                                bot=round(bot_delta*1000),
-                                                api=api_latency)
-                       )
+        await msg.edit(content=await self.bot._(
+            interaction, "info.ping.normal",
+            bot=round(bot_delta*1000),
+            api=api_latency)
+        )
 
 
-    @commands.hybrid_command(name="documentation", aliases=['doc', 'docs'])
-    async def display_doc(self, ctx: MyContext):
+    @app_commands.command(name="documentation")
+    async def display_doc(self, interaction: discord.Interaction):
         """Get the documentation url"""
-        text = self.bot.emojis_manager.customs['readthedocs'] + await self.bot._(ctx.channel,"info.docs") + \
+        text = self.bot.emojis_manager.customs['readthedocs'] + await self.bot._(interaction,"info.docs") + \
             " https://axobot.rtfd.io"
         if self.bot.entity_id == 1:
             text += '/en/develop'
-        await ctx.send(text)
+        await interaction.response.send_message(text)
 
-
-    @commands.command(name="prefix")
-    async def get_prefix(self, ctx: MyContext):
-        """Show the usable prefix(s) for this server
-
-        ..Doc infos.html#prefix"""
-        txt = await self.bot._(ctx.channel,"info.prefix")
-        prefix = "\n".join((await ctx.bot.get_prefix(ctx.message))[1:])
-        if ctx.can_send_embed:
-            emb = discord.Embed(title=txt, description=prefix, timestamp=ctx.message.created_at,
-                color=ctx.bot.get_cog('Help').help_color)
-            emb.set_footer(text=ctx.author, icon_url=ctx.author.display_avatar)
-            await ctx.send(embed=emb)
-        else:
-            await ctx.send(txt+"\n"+prefix)
-
-    @commands.hybrid_command(name="about", aliases=["botinfos", "botinfo"])
-    @commands.cooldown(7, 30, commands.BucketType.user)
-    async def about_cmd(self, ctx: MyContext):
+    @app_commands.command(name="about")
+    @app_commands.checks.cooldown(7, 30)
+    async def about_cmd(self, interaction: discord.Interaction):
         """Information about the bot
 
 ..Doc infos.html#about"""
@@ -291,20 +273,17 @@ ORDER BY usages DESC LIMIT %(limit)s"""
             "sponsor": "https://github.com/sponsors/ZRunner",
         }
         for key, url in links.items():
-            urls += "\n:arrow_forward: " + await self.bot._(ctx.channel, f"info.about.{key}") + " <" + url + ">"
-        msg = await self.bot._(ctx.channel, "info.about-main", mention=ctx.bot.user.mention, links=urls)
-        if ctx.can_send_embed:
-            await ctx.send(embed=discord.Embed(description=msg, color=16298524))
-        else:
-            await ctx.send(msg)
+            urls += "\n:arrow_forward: " + await self.bot._(interaction, f"info.about.{key}") + " <" + url + ">"
+        msg = await self.bot._(interaction, "info.about-main", mention=self.bot.user.mention, links=urls)
+        await interaction.response.send_message(embed=discord.Embed(description=msg, color=16298524))
 
-    @commands.hybrid_command(name="random-tip")
-    @commands.cooldown(10, 30)
-    async def tip(self, ctx: MyContext):
+    @app_commands.command(name="random-tip")
+    @app_commands.checks.cooldown(10, 30)
+    async def tip(self, interaction: discord.Interaction):
         """Send a random tip or trivia about the bot
 
         ..Doc fun.html#tip"""
-        await ctx.send(await self.bot.tips_manager.generate_random_tip(ctx.channel))
+        await interaction.response.send_message(await self.bot.tips_manager.generate_random_tip(interaction))
 
 
 async def setup(bot: Axobot):
