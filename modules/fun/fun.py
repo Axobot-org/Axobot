@@ -654,9 +654,11 @@ If you want to use lines break in the texts, use the special character `\\n`
             )
         await interaction.response.defer(ephemeral=True)
         default_color = self.bot.get_cog('ServerConfig').embed_color
+        if content:
+            content = content.replace("\\n", "\n")
         emb = discord.Embed(
             title=title,
-            description=content.replace("\\n", "\n"),
+            description=content,
             url=url,
             color=color or default_color,
         )
