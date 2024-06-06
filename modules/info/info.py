@@ -8,7 +8,7 @@ from discord import app_commands
 from discord.ext import commands
 
 from core.arguments import args
-from core.bot_classes import PRIVATE_GUILD_ID, Axobot, MyContext
+from core.bot_classes import PRIVATE_GUILD_ID, Axobot
 from core.checks import checks
 from core.formatutils import FormatUtils
 from modules.rss.src.rss_general import FeedObject
@@ -64,13 +64,13 @@ class Info(commands.Cog):
 
         ..Doc infos.html#info"""
         await interaction.response.defer()
-        ctx = await commands.Context.from_interaction(interaction)
         if query_type is None:
-            if (guess_result := await self._guess_query_type(query, ctx)) is None:
+            if (guess_result := await self._guess_query_type(query, interaction)) is None:
                 await interaction.followup.send(await self.bot._(interaction, "info.not-found", N=query))
                 return
             query_type, resolved_query = guess_result
         else:
+            ctx = await commands.Context.from_interaction(interaction)
             try:
                 resolved_query = await self._convert_query(query, query_type, ctx)
             except (commands.BadArgument, ValueError):
@@ -104,10 +104,11 @@ class Info(commands.Cog):
         else:
             await interaction.followup.send(await self.bot._(interaction, "info.not-found", N=query))
 
-    async def _guess_query_type(self, query: str, ctx: commands.Context):
+    async def _guess_query_type(self, query: str, interaction: discord.Interaction):
         "Guess the query type from the given query"
         if query == "server":
-            return "server", ctx.guild
+            return "server", interaction.guild
+        ctx = await commands.Context.from_interaction(interaction)
         for query_type in QUERY_TYPES:
             try:
                 result = await self._convert_query(query, query_type, ctx)
@@ -115,7 +116,7 @@ class Info(commands.Cog):
                 continue
             else:
                 return query_type, result
-        if await checks.is_bot_admin(ctx):
+        if await checks.is_bot_admin(interaction):
             try:
                 return "server", await commands.GuildConverter().convert(ctx, query)
             except commands.BadArgument:
@@ -1094,12 +1095,9 @@ class Info(commands.Cog):
     async def find_channel(self, interaction: discord.Interaction, channel: str):
         "Find any channel from any server where the bot is"
         await interaction.response.defer()
-        class FakeCtx:
-            def __init__(self, bot):
-                self.bot = bot
-                self.guild = None
+        ctx = await commands.Context.from_interaction(interaction)
         try:
-            c = await commands.GuildChannelConverter().convert(FakeCtx(self.bot), channel)
+            resolved_channel = await commands.GuildChannelConverter().convert(ctx, channel)
         except commands.ChannelNotFound:
             await interaction.followup.send("Unknonwn channel")
             return
@@ -1107,9 +1105,10 @@ class Info(commands.Cog):
             color = None
         else:
             color = None if interaction.guild.me.color.value == 0 else interaction.guild.me.color
-        emb = discord.Embed(title="#"+c.name, color=color)
-        emb.add_field(name="ID", value=c.id)
-        emb.add_field(name="Server", value=f"{c.guild.name} ({c.guild.id})", inline=False)
+        emb = discord.Embed(title="#"+resolved_channel.name, color=color)
+        emb.add_field(name="ID", value=resolved_channel.id)
+        emb.add_field(name="Server", value=f"{resolved_channel.guild.name} ({resolved_channel.guild.id})", inline=False)
+        emb.add_field(name="Type", value=resolved_channel.type.name.capitalize())
         await interaction.followup.send(embed=emb)
 
     @find_main.command(name='role')
@@ -1186,15 +1185,14 @@ class Info(commands.Cog):
         emb.add_field(name="Recent errors", value=str(feed.recent_errors))
         await interaction.followup.send(embed=emb)
 
-    @commands.hybrid_command(name="membercount")
-    @commands.guild_only()
-    @commands.bot_has_permissions(send_messages=True)
-    async def membercount(self, ctx: MyContext):
-        """Get some digits on the number of server members
+    @app_commands.command(name="membercount")
+    @app_commands.guild_only()
+    async def membercount(self, interaction: discord.Interaction):
+        """Get some stats on the number of server members
 
         ..Doc infos.html#membercount"""
-        await ctx.defer()
-        total, bots_count, online_count, unverified = await self.get_members_repartition(ctx.guild.members)
+        await interaction.response.defer()
+        total, bots_count, online_count, unverified = await self.get_members_repartition(interaction.guild.members)
         humans_count = total - bots_count
         def get_count(nbr: int):
             if 0 < nbr / total < 0.01:
@@ -1206,20 +1204,19 @@ class Info(commands.Cog):
         bots_percent = get_count(bots_count)
         online_percent = get_count(online_count)
         unverified_percent = get_count(unverified)
-        l = [
-            (await self.bot._(ctx.guild.id, "info.membercount-0"), total),
-            (await self.bot._(ctx.guild.id, "info.membercount-2"), f"{humans_count} ({humans_percent}%)"),
-            (await self.bot._(ctx.guild.id, "info.membercount-1"), f"{bots_count} ({bots_percent}%)"),
+        fields = [
+            (await self.bot._(interaction, "info.membercount-0"), total),
+            (await self.bot._(interaction, "info.membercount-2"), f"{humans_count} ({humans_percent}%)"),
+            (await self.bot._(interaction, "info.membercount-1"), f"{bots_count} ({bots_percent}%)"),
         ]
         if self.bot.intents.presences:
-            l.append((await self.bot._(ctx.guild.id, "info.membercount-3"), f"{online_count} ({online_percent}%)"))
-        if "MEMBER_VERIFICATION_GATE_ENABLED" in ctx.guild.features:
-            l.append((await self.bot._(ctx.guild.id, "info.membercount-4"), f"{unverified} ({unverified_percent}%)"))
-        if ctx.can_send_embed:
-            embed = discord.Embed(colour=ctx.guild.me.color)
-            for i in l:
-                embed.add_field(name=i[0], value=i[1], inline=True)
-            await ctx.send(embed=embed)
+            fields.append((await self.bot._(interaction, "info.membercount-3"), f"{online_count} ({online_percent}%)"))
+        if "MEMBER_VERIFICATION_GATE_ENABLED" in interaction.guild.features:
+            fields.append((await self.bot._(interaction, "info.membercount-4"), f"{unverified} ({unverified_percent}%)"))
+        embed = discord.Embed(colour=interaction.guild.me.color)
+        for field in fields:
+            embed.add_field(name=field[0], value=field[1], inline=True)
+        await interaction.followup.send(embed=embed)
 
 
 async def setup(bot):
