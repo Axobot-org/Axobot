@@ -1,3 +1,4 @@
+import re
 from collections import defaultdict
 from datetime import timedelta
 
@@ -29,6 +30,30 @@ class AntiRaid(commands.Cog):
     async def cog_unload(self):
          # pylint: disable=no-member
         self.decrease_users_scores.cancel()
+
+    @commands.Cog.listener(name="on_message")
+    async def on_message_anticaps(self, msg: discord.Message):
+        "Check for capslock messages"
+        if msg.guild is None or msg.author.bot or not self.bot.database_online or len(msg.content) < 8:
+            return
+        if msg.channel.permissions_for(msg.author).administrator:
+            return
+        if not await self.bot.get_config(msg.guild, "anti_caps_lock"):
+            return
+        clean_content = msg.content
+        for rgx_match in (r'\|', r'\*', r'_', r'<a?:\w+:\d+>', r'<(#|@&?!?)\d+>', r'https?://\w+\.\S+'):
+            clean_content = re.sub(rgx_match, '', clean_content)
+        clean_content = clean_content.replace(' ', '')
+        if len(clean_content) < 8:
+            return
+        if sum(1 for c in clean_content if c.isupper())/len(clean_content) > 0.8:
+            try:
+                await msg.channel.send(
+                    await self.bot._(msg.guild, "moderation.caps-lock", user=msg.author.mention),
+                    delete_after=4.0
+                )
+            except discord.HTTPException:
+                pass
 
     @commands.Cog.listener()
     async def on_member_join(self, member: discord.Member):
@@ -187,8 +212,8 @@ class AntiRaid(commands.Cog):
             for role in immune_roles
         )
 
-    @commands.Cog.listener()
-    async def on_message(self, message: discord.Message):
+    @commands.Cog.listener("on_message")
+    async def on_message_antiraid(self, message: discord.Message):
         "Check mentions/invites count when a message is sent"
         # if the message is not in a guild or the bot can't see the guild
         if not isinstance(message.author, discord.Member) or message.guild.me is None:
