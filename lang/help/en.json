@@ -38,10 +38,6 @@
             "One of your roles is authorized to use this command (`mute_allowed_roles`)",
             "Missing allowed role (`mute_allowed_roles`)"
         ],
-        "can_say": [
-            "One of your roles is authorized to use this command (`say_allowed_roles`)",
-            "Missing allowed role (`say_allowed_roles`)"
-        ],
         "can_slowmode": [
             "One of your roles is authorized to use this command (`slowmode_allowed_roles`)",
             "Missing allowed role (`slowmode_allowed_roles`)"
