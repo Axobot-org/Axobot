@@ -34,7 +34,10 @@ class Paginator(ui.View):
 
     async def send_init(self, ctx: MyContext | Interaction):
         "Build the first page, before anyone actually click"
-        contents = await self.get_page_content(None, self.page)
+        contents = await self.get_page_content(
+            ctx if isinstance(ctx, Interaction) else None,
+            self.page
+        )
         await self._update_buttons()
         if isinstance(ctx, MyContext):
             return await ctx.send(**contents, view=self)
