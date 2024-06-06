@@ -296,7 +296,7 @@ class Axobot(commands.bot.AutoShardedBot):
         def __missing__(self, key):
             return '{' + key + '}'
 
-    async def get_config(self, guild_id: int, option: str):
+    async def get_config(self, guild_id: discord.Guild | int, option: str):
         """Get a configuration option for a specific guild
         Fallbacks to the default values if the guild is not found"""
         cog = self.get_cog("ServerConfig")

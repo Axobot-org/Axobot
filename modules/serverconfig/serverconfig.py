@@ -52,16 +52,18 @@ class ServerConfig(commands.Cog):
             value = to_raw(option_name, options_list[option_name]["default"])
         return value
 
-    async def get_option(self, guild_id: int, option_name: str):
+    async def get_option(self, guild_id: discord.Guild | int, option_name: str):
         "Return the formated value of a server config option"
         if self.enable_caching:
             try:
                 return self.cache[(guild_id, option_name)]
             except KeyError:
                 pass
-        if (guild := self.bot.get_guild(guild_id)) is None:
+        guild = guild_id if isinstance(guild_id, discord.Guild) else self.bot.get_guild(guild_id)
+        if guild is None:
             value = options_list[option_name]["default"]
         else:
+            guild_id = guild.id
             raw_value = await self.get_raw_option(guild_id, option_name)
             value = await from_raw(option_name, raw_value, guild)
         if self.enable_caching:
@@ -70,6 +72,8 @@ class ServerConfig(commands.Cog):
 
     async def set_option(self, guild_id: int, option_name: str, value: Any):
         "Set the value of a server config option"
+        if not isinstance(guild_id, int):
+            raise ValueError(f"Guild ID must be an integer, not {type(guild_id)}")
         if option_name not in options_list:
             raise ValueError(f"Option {option_name} does not exist")
         if not self.bot.database_online:
@@ -84,6 +88,8 @@ class ServerConfig(commands.Cog):
 
     async def reset_option(self, guild_id: int, option_name: str):
         "Reset the value of a server config option"
+        if not isinstance(guild_id, int):
+            raise ValueError(f"Guild ID must be an integer, not {type(guild_id)}")
         if option_name not in options_list:
             raise ValueError(f"Option {option_name} does not exist")
         if not self.bot.database_online:
