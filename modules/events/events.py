@@ -2,7 +2,6 @@ import asyncio
 import datetime
 import json
 import random
-import re
 import time
 
 import aiohttp
@@ -112,29 +111,18 @@ class Events(commands.Cog):
             return
         if msg.guild is None and not msg.flags.ephemeral:
             await self.send_mp(msg)
-        if "send nudes" in msg.content.lower() and len(msg.content)<13 and random.random() > 0.0:
+        if msg.content.lower() == f"{self.bot.user.mention} send nudes":
             try:
                 nudes_reacts = [':eyes:',':innocent:',':rolling_eyes:',':confused:',':smirk:']
                 if msg.guild is None or msg.channel.permissions_for(msg.guild.me).external_emojis:
-                    nudes_reacts += ['<:whut:485924115199426600>','<:thinksmart:513105826530197514>','<:excusemewhat:418154673523130398>','<:blobthinking:499661417012527104>','<a:ano_U:568494122856611850>','<:catsmirk:523929843331498015>','<a:ablobno:537680872820965377>']
+                    nudes_reacts += [
+                        '<:whut:485924115199426600>','<:thinksmart:513105826530197514>','<:excusemewhat:418154673523130398>',
+                        '<:blobthinking:499661417012527104>','<a:ano_U:568494122856611850>','<:catsmirk:523929843331498015>',
+                        '<a:ablobno:537680872820965377>'
+                    ]
                 await msg.channel.send(random.choice(nudes_reacts))
             except discord.HTTPException:
                 pass
-        if not msg.author.bot:
-            cond = False
-            if self.bot.database_online:
-                cond: bool = await self.bot.get_config(msg.guild, "anti_caps_lock")
-            if cond:
-                clean_content = msg.content
-                for rgx_match in (r'\|', r'\*', r'_', r'<a?:\w+:\d+>', r'<(#|@&?!?)\d+>', r'https?://\w+\.\S+'):
-                    clean_content = re.sub(rgx_match, '', clean_content)
-                clean_content = clean_content.replace(' ', '')
-                if len(clean_content) > 0 and sum(1 for c in clean_content if c.isupper())/len(clean_content) > 0.8 and len(clean_content)>7 and not msg.channel.permissions_for(msg.author).administrator:
-                    try:
-                        await msg.channel.send(await self.bot._(msg.guild, "moderation.caps-lock", user=msg.author.mention), delete_after=4.0)
-                    except discord.HTTPException:
-                        pass
-
 
     async def send_mp(self, msg: discord.Message):
         "Send DM logs to the super secret internal channel"
