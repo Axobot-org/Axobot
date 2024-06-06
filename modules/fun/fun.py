@@ -28,12 +28,6 @@ importlib.reload(args)
 def flatten_list(first_list: list) -> list:
     return [item for sublist in first_list for item in sublist]
 
-async def can_say(ctx: MyContext):
-    "Check if a user can use the 'say' cmd"
-    if not ctx.bot.database_online:
-        return ctx.channel.permissions_for(ctx.author).administrator
-    return await ctx.bot.get_cog("ServerConfig").check_member_config_permission(ctx.author, "say_allowed_roles")
-
 async def can_use_cookie(ctx: MyContext) -> bool:
     "Check if a user can use the 'cookie' cmd"
     async with ctx.bot.db_query("SELECT userID FROM `axobot`.`users` WHERE user_flags & 32 = 32", astuple=True) as query_results:

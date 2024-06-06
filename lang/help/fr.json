@@ -38,10 +38,6 @@
             "L'un de vos rôles est autorisé à utiliser cette commande (`mute_allowed_roles`)",
             "Rôle autorisé manquant (`mute_allowed_roles`)"
         ],
-        "can_say": [
-            "L'un de vos rôles est autorisé à utiliser cette commande (`say_allowed_roles`)",
-            "Rôle autorisé manquant (`say_allowed_roles`)"
-        ],
         "can_slowmode": [
             "L'un de vos rôles est autorisé à utiliser cette commande (`slowmode_allowed_roles`)",
             "Rôle autorisé manquant (`slowmode_allowed_roles`)"
