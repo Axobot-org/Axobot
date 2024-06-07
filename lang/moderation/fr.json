@@ -44,6 +44,7 @@
     "kick": {
         "cant-staff": "Vous ne pouvez pas expulser un autre membre du staff !",
         "no-perm": "Permission 'Kick members' manquante :confused:",
+        "success": "Le membre a bien été expulsé",
         "too-high": "Il semble que ce membre soit trop haut pour que je puisse l'expulser :thinking:"
     },
     "kick-chat": "Le membre %{user} (%{userid}) a bien été expulsé du serveur",
@@ -72,10 +73,12 @@
         "list-title-1": "Liste des 45 premiers membres muets du serveur '%{guild}'",
         "list-title-2": "Liste des 60 premiers membres muets du serveur '%{guild}'",
         "mute-high": "Oups, il semble que le rôle `muted` soit trop haut pour que je puisse le donner... Veuillez fixer ce problème en plaçant mon rôle plus haut que le rôle `muted`.",
+        "mute-success": "Le membre a bien été rendu muet",
         "no-mute": "Oups, il semble que le rôle `muted` n'existe pas :confused: Veuillez le créer et lui attribuer les permissions manuellement.",
         "no-mutes": "Aucun membre ne semble être actuellement muet dans ce serveur",
         "staff-mute": "Vous ne pouvez pas empêcher de parler un autre membre du staff",
-        "too-high": "Il semble que ce membre soit trop haut pour que je puisse l'exclure :thinking:"
+        "too-high": "Il semble que ce membre soit trop haut pour que je puisse l'exclure :thinking:",
+        "unmute-success": "Le membre peut à nouveau parler"
     },
     "mute-chat": "Le membre %{user} (%{userid}) a bien été réduit au silence !",
     "mute-dm": "Vous avez été rendu muet dans le serveur %{guild}",
@@ -128,6 +131,7 @@
     "warn": {
         "cant-bot": "Je ne peux pas avertir un bot ^^",
         "cant-staff": "Vous ne pouvez pas avertir un autre membre du staff !",
+        "success": "Le membre a bien reçu son avertissement",
         "warn-but-db": "Notre base de donnée étant hors ligne, l'avertisement n'a pas pu être enregistré. Néanmoins le membre a bien reçu son avertissement en MP"
     },
     "warn-chat": "Le membre %{user} (%{userid}) a bien reçu son avertissement",
