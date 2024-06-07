@@ -17,9 +17,9 @@ class Events(commands.Cog):
     def __init__(self, bot: Axobot):
         self.bot = bot
         self.file = "events"
-        self.dbl_last_sending = datetime.datetime.utcfromtimestamp(0)
-        self.statslogs_last_push = datetime.datetime.utcfromtimestamp(0)
-        self.loop_errors = [0,datetime.datetime.utcfromtimestamp(0)]
+        self.dbl_last_sending = datetime.datetime.fromtimestamp(0, tz=datetime.UTC)
+        self.statslogs_last_push = datetime.datetime.fromtimestamp(0, tz=datetime.UTC)
+        self.loop_errors = [0, datetime.datetime.fromtimestamp(0, tz=datetime.UTC)]
         self.embed_colors = {"welcome":5301186,
             "mute":4868682,
             "unmute":8311585,
@@ -139,9 +139,9 @@ class Events(commands.Cog):
         arrow = ":inbox_tray:" if msg.author == recipient else ":outbox_tray:"
         date_ = f"<t:{msg.created_at.timestamp():.0f}>"
         msg_content = msg.content if len(msg.content) < 1900 else msg.content[:1900] + "…"
-        text = "{} **{}** ({} - {})\n{}".format(arrow, recipient, recipient.id, date_, msg_content)
+        text = f"{arrow} **{recipient}** ({recipient.id} - {date_})\n{msg_content}"
         if len(msg.attachments) > 0:
-            text += "".join(["\n{}".format(x.url) for x in msg.attachments])
+            text += "".join([f"\n{x.url}" for x in msg.attachments])
         await channel.send(text, embed=emb)
 
     async def check_mp_adv(self, msg: discord.Message):
@@ -193,7 +193,7 @@ class Events(commands.Cog):
         "Check if someone has been kicked or banned by the bot"
         try:
             async for entry in member.guild.audit_logs(user=member.guild.me, limit=15):
-                if entry.created_at < self.bot.utcnow()-datetime.timedelta(seconds=60):
+                if entry.created_at < self.bot.utcnow() - datetime.timedelta(seconds=60):
                     break
                 if entry.action == discord.AuditLogAction.kick and entry.target == member:
                     await self.add_points(self.table['kick'])
@@ -212,8 +212,8 @@ class Events(commands.Cog):
         """Main loop of the bot"""
         if not self.bot.internal_loop_enabled:
             return
+        now = self.bot.utcnow()
         try:
-            now = datetime.datetime.now()
             # Timed tasks - every 20s
             if now.second%20 == 0 and self.bot.database_online:
                 await self.bot.task_handler.check_tasks()
@@ -229,11 +229,13 @@ class Events(commands.Cog):
         except Exception as err:
             self.bot.dispatch("error", err)
             self.loop_errors[0] += 1
-            if (datetime.datetime.now() - self.loop_errors[1]).total_seconds() > 120:
+            if (now - self.loop_errors[1]).total_seconds() > 120:
                 self.loop_errors[0] = 0
-                self.loop_errors[1] = datetime.datetime.now()
+                self.loop_errors[1] = now
             if self.loop_errors[0] > 10:
-                await self.bot.get_cog('Errors').senf_err_msg(":warning: **Too many errors: STOPPING THE MAIN LOOP** <@279568324260528128> :warning:")
+                await self.bot.get_cog('Errors').senf_err_msg(
+                    ":warning: **Too many errors: STOPPING THE MAIN LOOP** <@279568324260528128> :warning:"
+                )
                 self.loop.cancel() # pylint: disable=no-member
 
     @loop.before_loop
@@ -297,10 +299,14 @@ class Events(commands.Cog):
         await session.close()
         answers = ' - '.join(answers)
         delta_time = round(time.time()-start_time, 3)
-        emb = discord.Embed(description=f"**Guilds count updated** in {delta_time}s\n{answers}", color=7229109, timestamp=self.bot.utcnow())
+        emb = discord.Embed(
+            description=f"**Guilds count updated** in {delta_time}s\n{answers}",
+            color=7229109,
+            timestamp=self.bot.utcnow()
+        )
         emb.set_author(name=self.bot.user, icon_url=self.bot.user.display_avatar)
         await self.bot.send_embed(emb, url="loop")
-        self.dbl_last_sending = datetime.datetime.now()
+        self.dbl_last_sending = self.bot.utcnow()
 
     async def send_sql_statslogs(self):
         "Send some stats about the current bot stats"
@@ -345,7 +351,7 @@ class Events(commands.Cog):
         emb = discord.Embed(description='**Stats logs** updated', color=5293283, timestamp=self.bot.utcnow())
         emb.set_author(name=self.bot.user, icon_url=self.bot.user.display_avatar)
         await self.bot.send_embed(emb, url="loop")
-        self.statslogs_last_push = datetime.datetime.now()
+        self.statslogs_last_push = self.bot.utcnow()
 
 
 async def setup(bot):
