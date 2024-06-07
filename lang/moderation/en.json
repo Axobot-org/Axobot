@@ -44,6 +44,7 @@
     "kick": {
         "cant-staff": "You can't kick another staff!",
         "no-perm": "Permission \"Kick members\" needed :confused:",
+        "success": "The member has been kicked",
         "too-high": "It seems that this member is too high for me to kick them out :thinking:"
     },
     "kick-chat": "Member %{user} (%{userid}) has been kicked from this server",
@@ -72,10 +73,12 @@
         "list-title-1": "List of 45 muted members of the server \"%{guild}\"",
         "list-title-2": "List of 60 muted members of the server \"%{guild}\"",
         "mute-high": "Oops, it seems that the `muted` role is too high for me to give it... Please fix this problem by placing my role higher than the `muted` role.",
+        "mute-success": "The member has been muted",
         "no-mute": "Oops, it seems that the role `muted` does not exist :confused: Please create it and assign permissions manually.",
         "no-mutes": "No member seems to be muted from here",
         "staff-mute": "You can't prevent another staff member from speaking",
-        "too-high": "It seems that this member is too high for me to time out them out :thinking:"
+        "too-high": "It seems that this member is too high for me to time out them out :thinking:",
+        "unmute-success": "The member has been unmuted"
     },
     "mute-chat": "Member %{user} (%{userid}) has been muted",
     "mute-dm": "You have been muted in the server %{guild}",
@@ -128,6 +131,7 @@
     "warn": {
         "cant-bot": "I can't warn a bot ^^",
         "cant-staff": "You can't warn another staff member!",
+        "success": "The member has been warned",
         "warn-but-db": "Our database being offline, the warning could not be saved. Nevertheless, the member did receive their warning in DM"
     },
     "warn-chat": "The member %{user} (%{userid}) has been warned",
