@@ -1,7 +1,5 @@
-import datetime
 import json
 import re
-import time
 from difflib import SequenceMatcher
 from typing import Any
 
@@ -13,8 +11,7 @@ from dateutil.parser import isoparse
 from discord import app_commands
 from discord.ext import commands
 
-from core.bot_classes import Axobot, MyContext
-from core.checks import checks
+from core.bot_classes import Axobot
 from core.formatutils import FormatUtils
 from modules.rss.rss import can_use_rss
 from modules.rss.src import FeedObject
@@ -51,37 +48,36 @@ class MCServer:
         self.desc = re.sub(r'[ \t\r]{2,}', ' ', self.desc).strip()
         return self
 
-    async def create_msg(self, guild: discord.Guild, translate):
+    async def create_msg(self, source: discord.Interaction | discord.Guild, translate):
         "Create a Discord embed from the saved data"
         if self.players == []:
             if self.online_players == 0:
-                p = [str(await translate(guild, "misc.none")).capitalize()]
+                p = [str(await translate(source, "misc.none")).capitalize()]
             else:
-                p: list[str] = [await translate(guild, "minecraft.no-player-list")]
+                p: list[str] = [await translate(source, "minecraft.no-player-list")]
         else:
             p = self.players
         embed = discord.Embed(
-            title=await translate(guild, "minecraft.serv-title", ip=self.ip),
+            title=await translate(source, "minecraft.serv-title", ip=self.ip),
             color=discord.Colour(0x417505),
-            timestamp=datetime.datetime.utcfromtimestamp(time.time())
         )
-        embed.set_footer(text=await translate(guild, "minecraft.server.from-provider", provider=self.api))
+        embed.set_footer(text=await translate(source, "minecraft.server.from-provider", provider=self.api))
         if self.image is not None:
             embed.set_thumbnail(url=self.image)
-        embed.add_field(name=await translate(guild, "minecraft.server.version"), value=self.version)
+        embed.add_field(name=await translate(source, "minecraft.server.version"), value=self.version)
         embed.add_field(
-            name=await translate(guild, "minecraft.server.players-count"),
+            name=await translate(source, "minecraft.server.players-count"),
             value=f"{self.online_players}/{self.max_players}"
         )
         if len(p) > 20:
-            embed.add_field(name=await translate(guild, "minecraft.server.players-list-20"), value=", ".join(p[:20]))
+            embed.add_field(name=await translate(source, "minecraft.server.players-list-20"), value=", ".join(p[:20]))
         else:
-            embed.add_field(name=await translate(guild, "minecraft.server.players-list-all"), value=", ".join(p))
+            embed.add_field(name=await translate(source, "minecraft.server.players-list-all"), value=", ".join(p))
         if self.ping is not None:
-            embed.add_field(name=await translate(guild, "minecraft.server.latency"), value=f"{self.ping:.0f} ms")
+            embed.add_field(name=await translate(source, "minecraft.server.latency"), value=f"{self.ping:.0f} ms")
         if self.desc:
             embed.add_field(
-                name=await translate(guild, "minecraft.server.description"),
+                name=await translate(source, "minecraft.server.description"),
                 value="```\n" + self.desc + "\n```",
                 inline=False
             )
@@ -110,55 +106,43 @@ class Minecraft(commands.Cog):
             await self._session.close()
             self._session = None
 
-
-    @commands.hybrid_group(name="minecraft")
-    async def mc_main(self, ctx: MyContext):
-        """Search for info about servers/players/mods from Minecraft
-
-        ..Doc minecraft.html#mc"""
-        if ctx.subcommand_passed is None:
-            await ctx.send_help(ctx.command)
-
-    async def send_embed(self, ctx: MyContext, embed: discord.Embed):
-        "Try to send an embed into a channel, or report the error if it fails"
-        try:
-            await ctx.send(embed=embed)
-        except discord.DiscordException as err:
-            self.bot.dispatch("error", err, ctx)
-            await ctx.send(await self.bot._(ctx.channel, "minecraft.serv-error"))
+    mc_main = app_commands.Group(
+        name="minecraft",
+        description="Search for info about servers/players/mods from Minecraft",
+    )
 
     @mc_main.command(name="mod")
     @app_commands.checks.cooldown(5, 20)
-    async def mc_mod(self, ctx: MyContext, *, mod_name: str):
+    async def mc_mod(self, interaction: discord.Interaction, *, mod_name: str):
         """Get info about any mod registered on CurseForge or Modrinth
 
         ..Example minecraft mod Minecolonies
 
         ..Doc minecraft.html#mc"""
-        await ctx.defer()
-        if cf_result := await self.get_mod_from_curseforge(ctx, mod_name):
+        await interaction.response.defer()
+        if cf_result := await self.get_mod_from_curseforge(interaction, mod_name):
             cf_embed, cf_pertinence = cf_result
             if cf_pertinence > 0.9:
-                await self.send_embed(ctx, cf_embed)
+                await interaction.followup.send(embed=cf_embed)
                 return
         else:
             cf_embed, cf_pertinence = None, 0
-        if mr_result := await self.get_mod_from_modrinth(ctx, mod_name):
+        if mr_result := await self.get_mod_from_modrinth(interaction, mod_name):
             mr_embed, mr_pertinence = mr_result
             if mr_pertinence > 0.9:
-                await self.send_embed(ctx, mr_embed)
+                await interaction.followup.send(embed=mr_embed)
                 return
         else:
             mr_embed, mr_pertinence = None, 0
         if cf_pertinence > mr_pertinence and cf_embed is not None:
-            await self.send_embed(ctx, cf_embed)
+            await interaction.followup.send(embed=cf_embed)
             return
         elif mr_embed is not None:
-            await self.send_embed(ctx, mr_embed)
+            await interaction.followup.send(embed=mr_embed)
             return
-        await ctx.send(await self.bot._(ctx.channel, "minecraft.no-mod"))
+        await interaction.followup.send(await self.bot._(interaction, "minecraft.no-mod"))
 
-    async def get_mod_from_curseforge(self, ctx: MyContext, search_value: str):
+    async def get_mod_from_curseforge(self, interaction: discord.Interaction, search_value: str):
         "Get a mod data from the CurseForge API"
         url = "https://api.curseforge.com/v1/mods/search"
         header = {
@@ -203,20 +187,19 @@ class Minecraft(commands.Cog):
             "downloads": int(search['downloadCount']),
             "id-curseforge": str(search['id'])
         }
-        title = await self.bot._(ctx.channel, "minecraft.mod-title") + " - " + search['name']
+        title = await self.bot._(interaction, "minecraft.mod-title") + " - " + search['name']
         embed = discord.Embed(
             title=title,
             color=self.embed_color,
             url=search["links"]['websiteUrl'],
-            timestamp=ctx.message.created_at
         )
         if logo := search['logo']:
             embed.set_thumbnail(url=logo['thumbnailUrl'])
-        lang = await self.bot._(ctx.channel, "_used_locale")
+        lang = await self.bot._(interaction, "_used_locale")
         for name, data_value in data.items():
             if not data_value:
                 continue
-            translation = await self.bot._(ctx.channel, "minecraft.mod-fields."+name)
+            translation = await self.bot._(interaction, "minecraft.mod-fields."+name)
             if isinstance(data_value, int):
                 data_value = await FormatUtils.format_nbr(data_value, lang)
             inline = (
@@ -226,7 +209,7 @@ class Minecraft(commands.Cog):
             embed.add_field(name=translation, value=data_value, inline=inline)
         return embed, pertinence
 
-    async def get_mod_from_modrinth(self, ctx: MyContext, search_value: str):
+    async def get_mod_from_modrinth(self, interaction: discord.Interaction, search_value: str):
         "Get a mod data from the Modrinth API"
         url = "https://api.modrinth.com/v2/search"
         params = {
@@ -256,20 +239,19 @@ class Minecraft(commands.Cog):
             "downloads": int(search['downloads']),
             "id-modrinth": search["slug"]
         }
-        title = await self.bot._(ctx.channel, "minecraft.mod-title") + " - " + search["title"]
+        title = await self.bot._(interaction, "minecraft.mod-title") + " - " + search["title"]
         embed = discord.Embed(
             title=title,
             color=self.embed_color,
             url="https://modrinth.com/mod/" + search["slug"],
-            timestamp=ctx.message.created_at
         )
         if logo := search["icon_url"]:
             embed.set_thumbnail(url=logo)
-        lang = await self.bot._(ctx.channel, "_used_locale")
+        lang = await self.bot._(interaction, "_used_locale")
         for name, data_value in data.items():
             if not data_value:
                 continue
-            translation = await self.bot._(ctx.channel, "minecraft.mod-fields."+name)
+            translation = await self.bot._(interaction, "minecraft.mod-fields."+name)
             if isinstance(data_value, int):
                 data_value = await FormatUtils.format_nbr(data_value, lang)
             inline = name in {"author", "release", "downloads", "id-modrinth"} or name == "categories" and len(data_value) < 100
@@ -278,82 +260,85 @@ class Minecraft(commands.Cog):
 
     @mc_main.command(name="skin")
     @app_commands.checks.cooldown(5, 20)
-    @commands.check(checks.bot_can_embed)
-    async def mc_skin(self, ctx: MyContext, username: str):
+    async def mc_skin(self, interaction: discord.Interaction, username: str):
         """Get the skin of any Minecraft Java player
 
         ..Example minecraft skin Notch
 
         ..Doc minecraft.html#mc"""
-        await ctx.defer()
+        await interaction.response.defer()
         uuid = await self.username_to_uuid(username)
         if uuid is None:
-            await ctx.send(await self.bot._(ctx.channel, "minecraft.player-not-found"))
+            await interaction.followup.send(await self.bot._(interaction, "minecraft.player-not-found"))
             return
-        title = await self.bot._(ctx.channel, "minecraft.player-skin-title", player=username)
-        download = await self.bot._(ctx.channel, "minecraft.player-skin-download")
+        title = await self.bot._(interaction, "minecraft.player-skin-title", player=username)
+        download = await self.bot._(interaction, "minecraft.player-skin-download")
         emb = discord.Embed(
-            title=title, color=self.embed_color, description=f"[{download}](https://visage.surgeplay.com/skin/{uuid})")
+            title=title,
+            color=self.embed_color,
+            description=f"[{download}](https://visage.surgeplay.com/skin/{uuid})"
+        )
         emb.set_image(url="https://visage.surgeplay.com/full/384/" + uuid)
-        await self.send_embed(ctx, emb)
+        await interaction.followup.send(embed=emb)
 
     @mc_main.command(name="server")
     @app_commands.checks.cooldown(5, 20)
-    async def mc_server(self, ctx: MyContext, ip: str, port: int | None = None):
+    async def mc_server(self, interaction: discord.Interaction, ip: str, port: int | None = None):
         """Get infos about any Minecraft Java server
 
         ..Example minecraft server play.gunivers.net
 
         ..Doc minecraft.html#mc"""
         if (validation := await self.validate_server_ip(ip, port)) is None:
-            await ctx.send(await self.bot._(ctx.guild.id, "minecraft.invalid-ip"))
+            await interaction.response.send_message(
+                await self.bot._(interaction, "minecraft.invalid-ip"),
+                ephemeral=True
+            )
             return
         ip, port = validation
         port_str = str(port) if port else ''
-        await ctx.defer()
-        obj = await self.create_server_1(ctx.guild, ip, port_str)
-        embed = await self.form_msg_server(obj, ctx.guild, (ip, port_str))
-        await ctx.send(embed=embed)
+        await interaction.response.defer()
+        obj = await self.create_server_1(interaction, ip, port_str)
+        embed = await self.form_msg_server(obj, interaction, (ip, port_str))
+        await interaction.followup.send(embed=embed)
 
     @mc_main.command(name="follow-server")
-    @commands.guild_only()
-    @commands.check(can_use_rss)
+    @app_commands.guild_only()
+    @app_commands.check(can_use_rss)
     @app_commands.checks.cooldown(5, 20)
-    async def mc_follow_server(self, ctx: MyContext, ip: str, port: int | None = None,
+    async def mc_follow_server(self, interaction: discord.Interaction, ip: str, port: int | None = None,
                                channel: discord.TextChannel | None = None):
         """Follow a server's info in real time in your channel
 
         ..Example minecraft follow-server mc.hypixel.net
 
         ..Doc minecraft.html#mc"""
-        if not ctx.bot.database_online:
-            await ctx.send(await self.bot._(ctx.guild.id, "cases.no_database"))
+        if not self.bot.database_online:
+            await interaction.response.send_message(await self.bot._(interaction, "cases.no_database"), ephemeral=True)
             return
         if (validation := await self.validate_server_ip(ip, port)) is None:
-            await ctx.send(await self.bot._(ctx.guild.id, "minecraft.invalid-ip"))
+            await interaction.response.send_message(await self.bot._(interaction, "minecraft.invalid-ip"), ephemeral=True)
             return
         ip, port = validation
-        await ctx.defer()
-        is_over, flow_limit = await self.bot.get_cog('Rss').is_overflow(ctx.guild)
+        await interaction.response.defer()
+        is_over, flow_limit = await self.bot.get_cog('Rss').is_overflow(interaction.guild)
         if is_over:
-            await ctx.send(await self.bot._(ctx.guild.id, "rss.flow-limit", limit=flow_limit))
+            await interaction.followup.send(await self.bot._(interaction, "rss.flow-limit", limit=flow_limit))
             return
         if channel is None:
-            channel = ctx.channel
-        if not channel.permissions_for(ctx.guild.me).send_messages or not channel.permissions_for(ctx.guild.me).embed_links:
-            await ctx.send(await self.bot._(ctx.guild.id, "minecraft.serv-follow.missing-perms"))
+            channel = interaction.channel
+        bot_perms = channel.permissions_for(interaction.guild.me)
+        if not bot_perms.send_messages or not bot_perms.embed_links:
+            await interaction.followup.send(await self.bot._(interaction, "minecraft.serv-follow.missing-perms"))
             return
-        try:
-            if port is None:
-                display_ip = ip
-            else:
-                display_ip = f"{ip}:{port}"
-            await self.bot.get_cog('Rss').db_add_feed(ctx.guild.id, channel.id, 'mc', f"{ip}:{port or ''}")
-            await ctx.send(await self.bot._(ctx.guild, "minecraft.serv-follow.success", ip=display_ip, channel=channel.mention))
-        except Exception as err:
-            cmd = await self.bot.get_command_mention("about")
-            await ctx.send(await self.bot._(ctx.guild, "errors.unknown2", about=cmd))
-            self.bot.dispatch("error", err, ctx)
+        if port is None:
+            display_ip = ip
+        else:
+            display_ip = f"{ip}:{port}"
+        await self.bot.get_cog('Rss').db_add_feed(interaction.guild.id, channel.id, 'mc', f"{ip}:{port or ''}")
+        await interaction.followup.send(
+            await self.bot._(interaction, "minecraft.serv-follow.success", ip=display_ip, channel=channel.mention)
+        )
 
     async def validate_server_ip(self, ip: str, port: int | None = None):
         "Validate a server IP and port"
@@ -371,7 +356,8 @@ class Minecraft(commands.Cog):
             return None
         return ip, port
 
-    async def create_server_1(self, guild: discord.Guild, ip: str, port: str | None=None) -> str | MCServer:
+    async def create_server_1(self, source: discord.Interaction | discord.Guild,
+                              ip: str, port: str | None=None) -> str | MCServer:
         "Collect and serialize server data from a given IP, using minetools.eu"
         if port is None:
             url = "https://api.minetools.eu/ping/"+str(ip)
@@ -381,7 +367,7 @@ class Minecraft(commands.Cog):
             async with self.session.get(url, timeout=5) as resp:
                 data: dict = await resp.json()
         except Exception:
-            return await self.create_server_2(guild, ip, port)
+            return await self.create_server_2(source, ip, port)
         if "error" in data:
             if data['error'] != 'timed out':
                 self.bot.log.warning("(mc-server) Error on: " +
@@ -410,7 +396,7 @@ class Minecraft(commands.Cog):
             ping=latency, desc=data['description'], api='api.minetools.eu'
         ).clear_desc()
 
-    async def create_server_2(self, guild: discord.Guild, ip: str, port: str | None):
+    async def create_server_2(self, source: discord.Interaction | discord.Guild, ip: str, port: str | None):
         "Collect and serialize server data from a given IP, using mcsrvstat.us"
         if port is None:
             url = "https://api.mcsrvstat.us/1/"+str(ip)
@@ -420,15 +406,15 @@ class Minecraft(commands.Cog):
             async with self.session.get(url, timeout=5) as resp:
                 data: dict = await resp.json()
         except (aiohttp.ClientConnectorError, aiohttp.ContentTypeError):
-            return await self.bot._(guild, "minecraft.no-api")
+            return await self.bot._(source, "minecraft.no-api")
         except json.decoder.JSONDecodeError:
-            return await self.bot._(guild, "minecraft.serv-error")
+            return await self.bot._(source, "minecraft.serv-error")
         except Exception as err:
             self.bot.log.error(f"[mc-server-2] Erreur sur l'url {url} :")
             self.bot.dispatch("error", err, f"While checking minecraft server {ip}")
-            return await self.bot._(guild, "minecraft.serv-error")
+            return await self.bot._(source, "minecraft.serv-error")
         if data["debug"]["ping"] is False:
-            return await self.bot._(guild, "minecraft.no-ping")
+            return await self.bot._(source, "minecraft.no-ping")
         if 'list' in data['players']:
             players = data['players']['list'][:20]
         else:
@@ -477,7 +463,7 @@ class Minecraft(commands.Cog):
             msg = None
         return msg
 
-    async def form_msg_server(self, obj: str | MCServer, guild: discord.Guild, ip: tuple[str, str | None]):
+    async def form_msg_server(self, obj: str | MCServer, source: discord.Interaction | discord.Guild, ip: tuple[str, str | None]):
         "Create the embed from the saved data"
         if isinstance(obj, str):
             if ip[1] is None:
@@ -485,12 +471,11 @@ class Minecraft(commands.Cog):
             else:
                 ip = f"{ip[0]}:{ip[1]}"
             return discord.Embed(
-                title=await self.bot._(guild, "minecraft.serv-title", ip=ip),
+                title=await self.bot._(source, "minecraft.serv-title", ip=ip),
                 color=discord.Colour(0x417505),
                 description=obj,
-                timestamp=datetime.datetime.utcfromtimestamp(time.time())
             )
-        return await obj.create_msg(guild, self.bot._)
+        return await obj.create_msg(source, self.bot._)
 
     async def find_msg(self, channel: discord.TextChannel, _ip: list, feed_id: str):
         "Find the minecraft server message posted from that feed"
