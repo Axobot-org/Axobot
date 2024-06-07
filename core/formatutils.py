@@ -1,12 +1,10 @@
+import re
 import time
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from typing import Literal
 
 from babel import dates, numbers
 from dateutil.relativedelta import relativedelta
-from discord.ext import commands
-
-from core.arguments.args import Duration
 
 
 def get_locale(lang: str):
@@ -137,14 +135,45 @@ class FormatUtils:
     @staticmethod
     async def parse_duration(duration: str) -> int:
         """Parses a string duration into a number of seconds"""
-        duration = duration.lower()
+        duration = duration.lower().strip()
         try:
-            return await Duration.convert(None, duration)
-        except commands.BadArgument:
-            result = 0
-            try:
-                for word in duration.split():
-                    result += await Duration.convert(None, word)
-                return result
-            except commands.BadArgument:
-                raise ValueError("Invalid duration") from None
+            return await _Duration.convert(duration)
+        except ValueError:
+            return sum([
+                await _Duration.convert(word)
+                for word in duration.split()
+            ])
+
+
+class _Duration(float):
+    "Argument converter for durations input"
+
+    @classmethod
+    async def convert(cls, argument: str) -> int:
+        "Converts a string to a duration in seconds."
+        duration: int = 0
+        found = False
+        for symbol, coef in [('w', 604800), ('d', 86400), ('h', 3600), ('m', 60), ('min', 60)]:
+            r = re.search(r'^(\d+)'+symbol+'$', argument)
+            if r is not None:
+                duration += int(r.group(1))*coef
+                found = True
+        r = re.search(r'^(\d+)h(\d+)m?$', argument)
+        if r is not None:
+            duration += int(r.group(1))*3600 + int(r.group(2))*60
+            found = True
+        r = re.search(r'^(\d+) ?mo(?:nths?)?$', argument)
+        if r is not None:
+            now = then = datetime.now(UTC)
+            then += relativedelta(months=int(r.group(1)))
+            duration += (then - now).total_seconds()
+            found = True
+        r = re.search(r'^(\d+) ?y(?:ears?)?$', argument)
+        if r is not None:
+            now = then = datetime.now(UTC)
+            then += relativedelta(years=int(r.group(1)))
+            duration += (then - now).total_seconds()
+            found = True
+        if not found:
+            raise ValueError("Invalid duration")
+        return duration

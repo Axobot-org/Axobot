@@ -1,49 +1,14 @@
-import datetime
 import re
-from typing import TYPE_CHECKING, Annotated, Optional
+from typing import TYPE_CHECKING, Annotated
 
 import discord
-from dateutil.relativedelta import relativedelta
 from discord.ext import commands
 
 from core.arguments import errors as arguments_errors
+from core.formatutils import FormatUtils
 
 if TYPE_CHECKING:
     from core.bot_classes import Axobot, MyContext
-
-
-class Duration(float):
-    "Argument converter for durations input"
-
-    @classmethod
-    async def convert(cls, _ctx: Optional["MyContext"], argument: str) -> int:
-        "Converts a string to a duration in seconds."
-        duration: int = 0
-        found = False
-        for symbol, coef in [('w', 604800), ('d', 86400), ('h', 3600), ('m', 60), ('min', 60)]:
-            r = re.search(r'^(\d+)'+symbol+'$', argument)
-            if r is not None:
-                duration += int(r.group(1))*coef
-                found = True
-        r = re.search(r'^(\d+)h(\d+)m?$', argument)
-        if r is not None:
-            duration += int(r.group(1))*3600 + int(r.group(2))*60
-            found = True
-        r = re.search(r'^(\d+) ?mo(?:nths?)?$', argument)
-        if r is not None:
-            now = then = datetime.datetime.now(datetime.UTC)
-            then += relativedelta(months=int(r.group(1)))
-            duration += (then - now).total_seconds()
-            found = True
-        r = re.search(r'^(\d+) ?y(?:ears?)?$', argument)
-        if r is not None:
-            now = then = datetime.datetime.now(datetime.UTC)
-            then += relativedelta(years=int(r.group(1)))
-            duration += (then - now).total_seconds()
-            found = True
-        if not found:
-            raise arguments_errors.InvalidDurationError(argument)
-        return duration
 
 
 class AnyUser(discord.User):
@@ -137,6 +102,28 @@ class URLTransformer(discord.app_commands.Transformer): # pylint: disable=abstra
         return URL(r)
 
 URLArgument = discord.app_commands.Transform[URL, URLTransformer]
+
+class GreedyUsersTransformer(discord.app_commands.Transformer): # pylint: disable=abstract-method
+    "Convert argument to a list of users"
+
+    async def transform(self, interaction, value: str, /):
+        "Convert a string to a list of users, else raise BadArgument"
+        ctx = await commands.Context.from_interaction(interaction)
+        return [
+            await commands.UserConverter().convert(ctx, word)
+            for word in value.split(" ")
+        ]
+
+GreedyUsersArgument = discord.app_commands.Transform[list[discord.User], GreedyUsersTransformer]
+
+class GreedyDurationTransformer(discord.app_commands.Transformer): # pylint: disable=abstract-method
+    "Convert argument to a duration in seconds"
+
+    async def transform(self, _interaction, value: str, /):
+        "Convert a string to a duration in seconds, else raise BadArgument"
+        return await FormatUtils.parse_duration(value)
+
+GreedyDurationArgument = discord.app_commands.Transform[int, GreedyDurationTransformer]
 
 class UnicodeEmojiConverter(str):
     "Represents any Unicode emoji"

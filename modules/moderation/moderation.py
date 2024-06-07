@@ -29,12 +29,11 @@ class Moderation(commands.Cog):
         self.bot = bot
         self.file = "moderation"
 
-    @commands.hybrid_command(name="slowmode")
+    @app_commands.command(name="slowmode")
+    @app_commands.guild_only()
     @app_commands.default_permissions(manage_channels=True)
-    @commands.guild_only()
-    @commands.cooldown(1, 3, commands.BucketType.guild)
-    @commands.check(checks.can_slowmode)
-    async def slowmode(self, ctx: MyContext, seconds: int = 0):
+    @app_commands.checks.cooldown(1, 3)
+    async def slowmode(self, interaction: discord.Interaction, seconds: app_commands.Range[int, 0, 21600]):
         """Keep your chat cool
 Slowmode works up to one message every 6h (21600s)
 
@@ -43,35 +42,46 @@ Slowmode works up to one message every 6h (21600s)
 ..Example slowmode 0
 
 ..Doc moderator.html#slowmode"""
-        if not ctx.channel.permissions_for(ctx.guild.me).manage_channels:
-            await ctx.send(await self.bot._(ctx.guild.id, "moderation.no-perm"))
+        if not interaction.channel.permissions_for(interaction.guild.me).manage_channels:
+            await interaction.response.send_message(await self.bot._(interaction, "moderation.no-perm"), ephemeral=True)
             return
-        await ctx.defer()
+        await interaction.response.defer()
         if seconds == 0:
-            await ctx.channel.edit(slowmode_delay=0)
-            message = await self.bot._(ctx.guild.id, "moderation.slowmode.disabled")
+            await interaction.channel.edit(slowmode_delay=0)
+            message = await self.bot._(interaction, "moderation.slowmode.disabled")
         elif seconds > 21600:
-            message = await self.bot._(ctx.guild.id, "moderation.slowmode.too-long")
+            message = await self.bot._(interaction, "moderation.slowmode.too-long")
         else:
-            await ctx.channel.edit(slowmode_delay=seconds)
-            duration = await FormatUtils.time_delta(seconds, lang=await self.bot._(ctx, "_used_locale"))
-            message = await self.bot._(ctx.guild.id, "moderation.slowmode.enabled", channel=ctx.channel.mention, s=duration)
-        await ctx.send(message)
-        self.bot.dispatch("moderation_slowmode", ctx.channel, ctx.author, seconds)
+            await interaction.channel.edit(slowmode_delay=seconds)
+            duration = await FormatUtils.time_delta(seconds, lang=await self.bot._(interaction, "_used_locale"))
+            message = await self.bot._(
+                interaction, "moderation.slowmode.enabled",
+                channel=interaction.channel.mention,
+                s=duration
+            )
+        await interaction.followup.send(message)
+        self.bot.dispatch("moderation_slowmode", interaction.channel, interaction.user, seconds)
 
 
-    @commands.hybrid_command(name="clear")
+    @app_commands.command(name="clear")
+    @app_commands.guild_only()
     @app_commands.default_permissions(manage_messages=True)
-    @app_commands.describe(number="The max amount of messages to delete")
-    @app_commands.describe(users="list of user IDs or mentions to delete messages from, separated by spaces")
-    @app_commands.describe(contains_file="Clear only messages that contains (or does not) files")
-    @app_commands.describe(contains_url="Clear only messages that contains (or does not) links")
-    @app_commands.describe(contains_invite="Clear only messages that contains (or does not) Discord invites")
-    @app_commands.describe(is_pinned="Clear only messages that are (or are not) pinned")
-    @commands.cooldown(4, 30, commands.BucketType.guild)
-    @commands.guild_only()
-    @commands.check(checks.can_clear)
-    async def clear(self, ctx: MyContext, number: commands.Range[int, 1, CLEAR_MAX_MESSAGES], users: commands.Greedy[discord.User]=None, *, contains_file: bool | None=None, contains_url: bool | None=None, contains_invite: bool | None=None, is_pinned: bool | None=None):
+    @app_commands.describe(
+        number="The max amount of messages to delete",
+        users="list of user IDs or mentions to delete messages from, separated by spaces",
+        contains_file="Clear only messages that contains (or does not) files",
+        contains_url="Clear only messages that contains (or does not) links",
+        contains_invite="Clear only messages that contains (or does not) Discord invites",
+        is_pinned="Clear only messages that are (or are not) pinned"
+    )
+    @app_commands.checks.cooldown(4, 30)
+    async def clear(self, interaction: discord.Interaction,
+                    number: app_commands.Range[int, 1, CLEAR_MAX_MESSAGES],
+                    users: args.GreedyUsersArgument | None = None,
+                    contains_file: bool | None = None,
+                    contains_url: bool | None = None,
+                    contains_invite: bool | None = None,
+                    is_pinned: bool | None = None):
         """Keep your chat clean
         <number>: number of messages to check
         [users]: list of user IDs or mentions to delete messages from
@@ -88,27 +98,30 @@ Slowmode works up to one message every 6h (21600s)
 ..Example clear 50 False False True
 
 ..Doc moderator.html#clear"""
-        if not ctx.channel.permissions_for(ctx.guild.me).manage_messages:
-            await ctx.send(await self.bot._(ctx.guild.id, "moderation.need-manage-messages"))
+        if not interaction.channel.permissions_for(interaction.guild.me).manage_messages:
+            await interaction.response.send_message(await self.bot._(interaction, "moderation.need-manage-messages"))
             return
-        if not ctx.channel.permissions_for(ctx.guild.me).read_message_history:
-            await ctx.send(await self.bot._(ctx.guild.id, "moderation.need-read-history"))
+        if not interaction.channel.permissions_for(interaction.guild.me).read_message_history:
+            await interaction.response.send_message(await self.bot._(interaction, "moderation.need-read-history"))
             return
         if number < 1:
-            await ctx.send(await self.bot._(ctx.guild.id, "moderation.clear.too-few")+" "+self.bot.emojis_manager.customs["owo"])
+            await interaction.response.send_message(
+                await self.bot._(interaction, "moderation.clear.too-few") + " " + self.bot.emojis_manager.customs["owo"]
+            )
             return
-        await ctx.defer()
+        await interaction.response.defer(ephemeral=True)
         if users is None and contains_file is None and contains_url is None and contains_invite is None and is_pinned is None:
-            return await self.clear_simple(ctx, number)
+            await self._clear_simple(interaction, number)
+            return
         user_ids = None if users is None else {u.id for u in users}
 
         def check(msg: discord.Message):
             # do not delete invocation message
-            if ctx.interaction is not None and msg.interaction is not None and ctx.interaction.id == msg.interaction.id:
+            if msg.interaction is not None and interaction.id == msg.interaction.id:
                 return False
             if is_pinned is not None and msg.pinned != is_pinned:
                 return False
-            elif is_pinned is None and msg.pinned:
+            if is_pinned is None and msg.pinned:
                 return False
             if contains_file is not None and bool(msg.attachments) != contains_file:
                 return False
@@ -122,151 +135,113 @@ Slowmode works up to one message every 6h (21600s)
                 return msg.author.id in user_ids
             return True
 
-        if ctx.interaction:
-            # we'll have to check past the command answer
-            number += 1
-        else:
-            # start by deleting the invocation message
-            await ctx.message.delete()
-        deleted = await ctx.channel.purge(limit=number, check=check)
-        await ctx.send(await self.bot._(ctx.guild, "moderation.clear.done", count=len(deleted)), delete_after=2.0)
+        deleted = await interaction.channel.purge(limit=number, check=check)
+        await interaction.followup.send(await self.bot._(interaction, "moderation.clear.done", count=len(deleted)))
         if len(deleted) > 0:
-            self.bot.dispatch("moderation_clear", ctx.channel, ctx.author, len(deleted))
+            self.bot.dispatch("moderation_clear", interaction.channel, interaction.user, len(deleted))
 
-    async def clear_simple(self, ctx: MyContext, number: int):
+    async def _clear_simple(self, interaction: discord.Interaction, number: int):
         def check(msg: discord.Message):
-            if msg.pinned or msg.id == ctx.message.id:
+            if msg.pinned or (interaction.message and msg.id == interaction.message.id):
                 return False
-            if ctx.interaction is None or msg.interaction is None:
+            if interaction is None or msg.interaction is None:
                 return True
-            return ctx.interaction.id != msg.interaction.id
-        if ctx.interaction:
-            # we'll have to check past the command answer
-            number += 1
-        else:
-            # start by deleting the invocation message
-            await ctx.message.delete()
+            return interaction.id != msg.interaction.id
+
         try:
-            deleted = await ctx.channel.purge(limit=number, check=check)
-            await ctx.send(await self.bot._(ctx.guild, "moderation.clear.done", count=len(deleted)), delete_after=2.0)
-            self.bot.dispatch("moderation_clear", ctx.channel, ctx.author, len(deleted))
+            deleted = await interaction.channel.purge(limit=number, check=check)
+            await interaction.followup.send(
+                await self.bot._(interaction, "moderation.clear.done", count=len(deleted)),
+            )
+            self.bot.dispatch("moderation_clear", interaction.channel, interaction.user, len(deleted))
         except discord.errors.NotFound:
-            await ctx.send(await self.bot._(ctx.guild, "moderation.clear.not-found"))
-        except Exception as err:
-            self.bot.dispatch("command_error", ctx, err)
+            await interaction.followup.send(await self.bot._(interaction, "moderation.clear.not-found"))
 
 
-    @commands.hybrid_command(name="kick")
-    @app_commands.default_permissions(kick_members=True)
-    @commands.cooldown(5, 20, commands.BucketType.guild)
+    @app_commands.command(name="kick")
     @commands.guild_only()
-    @commands.check(checks.can_kick)
-    async def kick(self, ctx: MyContext, user:discord.Member, *, reason: str | None=None):
+    @app_commands.default_permissions(kick_members=True)
+    @app_commands.checks.cooldown(5, 20)
+    async def kick(self, interaction: discord.Interaction, user: discord.Member, reason: str | None = None):
         """Kick a member from this server
 
 ..Example kick @someone Not nice enough to stay here
 
 ..Doc moderator.html#kick"""
-        if not ctx.channel.permissions_for(ctx.guild.me).kick_members:
-            await ctx.send(await self.bot._(ctx.guild.id, "moderation.kick.no-perm"))
+        if not interaction.channel.permissions_for(interaction.guild.me).kick_members:
+            await interaction.response.send_message(await self.bot._(interaction.guild.id, "moderation.kick.no-perm"))
             return
-        await ctx.defer()
+        await interaction.response.defer(ephemeral=True)
 
-        async def user_can_kick(user):
-            try:
-                return await self.bot.get_cog("ServerConfig").check_member_config_permission(user, "kick_allowed_roles")
-            except commands.errors.CommandError:
-                pass
-            return False
+        async def user_can_kick(user: discord.Member):
+            return user.guild_permissions.kick_members
 
-        if user == ctx.guild.me or (self.bot.database_online and await user_can_kick(user)):
-            return await ctx.send(await self.bot._(ctx.guild.id, "moderation.kick.cant-staff"))
-        elif not self.bot.database_online and ctx.channel.permissions_for(user).kick_members:
-            return await ctx.send(await self.bot._(ctx.guild.id, "moderation.kick.cant-staff"))
-        if user.roles[-1].position >= ctx.guild.me.roles[-1].position:
-            await ctx.send(await self.bot._(ctx.guild.id, "moderation.kick.too-high"))
+        if user == interaction.guild.me or (self.bot.database_online and await user_can_kick(user)):
+            return await interaction.followup.send(await self.bot._(interaction, "moderation.kick.cant-staff"))
+        if not self.bot.database_online and interaction.channel.permissions_for(user).kick_members:
+            return await interaction.followup.send(await self.bot._(interaction, "moderation.kick.cant-staff"))
+        if user.roles[-1].position >= interaction.guild.me.roles[-1].position:
+            await interaction.followup.send(await self.bot._(interaction, "moderation.kick.too-high"))
             return
         # send DM
-        await self.dm_user(user, "kick", ctx, reason=reason)
+        await self.dm_user(user, "kick", interaction, reason=reason)
         f_reason = reason or "Unspecified"
         try:
-            await ctx.guild.kick(user, reason=f_reason[:512] + self.bot.zws)
+            await interaction.guild.kick(user, reason=f_reason[:512] + self.bot.zws)
         except discord.errors.Forbidden:
-            await ctx.send(await self.bot._(ctx.guild.id, "moderation.kick.too-high"))
+            await interaction.followup.send(await self.bot._(interaction, "moderation.kick.too-high"))
         case_id = None
-        if self.bot.database_online:
-            cases_cog = self.bot.get_cog('Cases')
-            case = Case(bot=self.bot, guild_id=ctx.guild.id, user_id=user.id, case_type="kick",
-                        mod_id=ctx.author.id, reason=f_reason, date=ctx.bot.utcnow())
-            try:
-                await cases_cog.db_add_case(case)
-                case_id = case.id
-            except Exception as err:
-                self.bot.dispatch("error", err, ctx)
-        try:
-            await ctx.message.delete()
-        except (discord.Forbidden, discord.NotFound):
-            pass
+        if self.bot.database_online and (cases_cog := self.bot.get_cog('Cases')):
+            case = Case(bot=self.bot, guild_id=interaction.guild.id, user_id=user.id, case_type="kick",
+                        mod_id=interaction.user.id, reason=f_reason, date=self.bot.utcnow())
+            await cases_cog.db_add_case(case)
+            case_id = case.id
+            await interaction.followup.send(await self.bot._(interaction,"moderation.kick.success"))
         # send in chat
-        await self.send_chat_answer("kick", user, ctx, case_id)
+        await self.send_chat_answer("kick", user, interaction, case_id)
         # send in modlogs
-        self.bot.dispatch("moderation_kick", ctx.guild, ctx.author, user, case_id, reason)
+        self.bot.dispatch("moderation_kick", interaction.guild, interaction.user, user, case_id, reason)
         await self.bot.get_cog('Events').add_event('kick')
 
 
-    @commands.hybrid_command(name="warn")
+    @app_commands.command(name="warn")
+    @app_commands.guild_only()
     @app_commands.default_permissions(moderate_members=True)
     @app_commands.describe(message="The reason of the warn")
-    @commands.cooldown(5, 20, commands.BucketType.guild)
-    @commands.guild_only()
-    @commands.check(checks.can_warn)
-    async def warn(self, ctx: MyContext, user: discord.Member, *, message: str):
+    @app_commands.checks.cooldown(5, 20)
+    async def warn(self, interaction: discord.Interaction, user: discord.Member, message: str):
         """Send a warning to a member
 
 ..Example warn @someone Please just stop, next one is a mute duh
 
 ..Doc moderator.html#warn"""
-        await ctx.defer()
-        try:
-            async def user_can_warn(user):
-                try:
-                    return await self.bot.get_cog("ServerConfig").check_member_config_permission(user, "warn_allowed_roles")
-                except commands.errors.CommandError:
-                    pass
-                return False
-            if user == ctx.guild.me or (self.bot.database_online and await user_can_warn(user)):
-                return await ctx.send(await self.bot._(ctx.guild.id, "moderation.warn.cant-staff"))
-            elif not self.bot.database_online and ctx.channel.permissions_for(user).manage_roles:
-                return await ctx.send(await self.bot._(ctx.guild.id, "moderation.warn.cant-staff"))
-            if user.bot and not user.id==423928230840500254:
-                await ctx.send(await self.bot._(ctx.guild.id, "moderation.warn.cant-bot"))
-                return
-        except Exception as err:
-            self.bot.dispatch("command_error", ctx, err)
+        async def user_can_warn(user: discord.Member):
+            return user.guild_permissions.moderate_members
+
+        await interaction.response.defer(ephemeral=True)
+        if user == interaction.guild.me or (self.bot.database_online and await user_can_warn(user)):
+            return await interaction.followup.send(await self.bot._(interaction, "moderation.warn.cant-staff"))
+        if not self.bot.database_online and interaction.channel.permissions_for(user).manage_roles:
+            return await interaction.followup.send(await self.bot._(interaction, "moderation.warn.cant-staff"))
+        if user.bot and not user.id==423928230840500254:
+            await interaction.followup.send(await self.bot._(interaction, "moderation.warn.cant-bot"))
             return
-        try:
-            # send DM
-            await self.dm_user(user, "warn", ctx, reason=message)
-            case_id = None
-            if self.bot.database_online:
-                if cases_cog := self.bot.get_cog('Cases'):
-                    case = Case(bot=self.bot, guild_id=ctx.guild.id, user_id=user.id, case_type="warn",
-                                mod_id=ctx.author.id, reason=message, date=ctx.bot.utcnow())
-                    await cases_cog.db_add_case(case)
-                    case_id = case.id
-            else:
-                await ctx.send(await self.bot._(ctx.guild.id,"moderation.warn.warn-but-db"))
-            # send in chat
-            await self.send_chat_answer("warn", user, ctx, case_id)
-            # send in modlogs
-            self.bot.dispatch("moderation_warn", ctx.guild, ctx.author, user, case_id, message)
-            try:
-                await ctx.message.delete()
-            except (discord.Forbidden, discord.NotFound):
-                pass
-        except Exception as err:
-            await ctx.send(await self.bot._(ctx.guild.id, "moderation.error"))
-            self.bot.dispatch("command_error", ctx, err)
+        # send DM
+        await self.dm_user(user, "warn", interaction, reason=message)
+        case_id = None
+        if self.bot.database_online and (cases_cog := self.bot.get_cog('Cases')):
+            case = Case(bot=self.bot, guild_id=interaction.guild.id, user_id=user.id, case_type="warn",
+                        mod_id=interaction.user.id, reason=message, date=self.bot.utcnow())
+            await cases_cog.db_add_case(case)
+            case_id = case.id
+            await interaction.followup.send(await self.bot._(interaction,"moderation.warn.success"))
+        else:
+            await interaction.followup.send(await self.bot._(interaction,"moderation.warn.warn-but-db"))
+        # send in chat
+        await self.send_chat_answer("warn", user, interaction, case_id)
+        # send in modlogs
+        self.bot.dispatch("moderation_warn", interaction.guild, interaction.user, user, case_id, message)
+
 
     async def get_muted_role(self, guild: discord.Guild) -> discord.Role | None:
         "Find the muted role from the guild config option"
@@ -289,35 +264,37 @@ Slowmode works up to one message every 6h (21600s)
         async with self.bot.db_query(query, (member.id, member.guild.id)):
             pass
 
-    async def check_mute_context(self, ctx: MyContext, role: discord.Role, member: discord.Member):
+    async def check_mute_context(self, interaction: discord.Interaction, role: discord.Role, member: discord.Member):
         "Return True if the user can be muted in the given context"
-        if await self.is_muted(ctx.guild, member, role):
-            await ctx.send(await self.bot._(ctx.guild.id, "moderation.mute.already-mute"))
+        if await self.is_muted(interaction.guild, member, role):
+            await interaction.followup.send(await self.bot._(interaction, "moderation.mute.already-mute"))
             return False
-        if not ctx.guild.me.guild_permissions.manage_roles:
-            await ctx.send(await self.bot._(ctx.guild.id, "moderation.mute.cant-mute"))
+        if not interaction.guild.me.guild_permissions.manage_roles:
+            await interaction.followup.send(await self.bot._(interaction, "moderation.mute.cant-mute"))
             return False
         if role is None:
-            if not ctx.guild.me.guild_permissions.moderate_members:
-                await ctx.send(await self.bot._(ctx.guild.id, "moderation.mute.cant-timeout"))
+            if not interaction.guild.me.guild_permissions.moderate_members:
+                await interaction.followup.send(await self.bot._(interaction, "moderation.mute.cant-timeout"))
                 return False
-            if member.top_role.position >= ctx.guild.me.roles[-1].position:
-                await ctx.send(await self.bot._(ctx.guild.id, "moderation.mute.too-high"))
+            if member.top_role.position >= interaction.guild.me.roles[-1].position:
+                await interaction.followup.send(await self.bot._(interaction, "moderation.mute.too-high"))
                 return False
             return True
-        if role.position > ctx.guild.me.roles[-1].position:
-            await ctx.send(await self.bot._(ctx.guild.id, "moderation.mute.mute-high"))
+        if role.position > interaction.guild.me.roles[-1].position:
+            await interaction.followup.send(await self.bot._(interaction, "moderation.mute.mute-high"))
             return False
         return True
 
-    @commands.hybrid_command(name="mute")
+    @app_commands.command(name="mute")
+    @app_commands.guild_only()
     @app_commands.default_permissions(moderate_members=True)
-    @app_commands.describe(time="The duration of the mute, example 3d 7h 12min")
-    @app_commands.describe(reason="The reason of the mute")
-    @commands.cooldown(5,20, commands.BucketType.guild)
-    @commands.guild_only()
-    @commands.check(checks.can_mute)
-    async def mute(self, ctx: MyContext, user: discord.Member, time: commands.Greedy[args.Duration], *,
+    @app_commands.rename(duration="time")
+    @app_commands.describe(
+        duration="The duration of the mute, example 3d 7h 12min",
+        reason="The reason of the mute"
+    )
+    @app_commands.checks.cooldown(5,20)
+    async def mute(self, interaction: discord.Interaction, user: discord.Member, duration: args.GreedyDurationArgument,
                    reason: str | None=None):
         """Timeout someone.
 You can also mute this member for a defined duration, then use the following format:
@@ -331,75 +308,55 @@ You can also mute this member for a defined duration, then use the following for
 ..Example mute @someone Plz respect me
 
 ..Doc articles/mute"""
-        duration = sum(time)
-        if duration > 0:
-            if duration > 60*60*24*365*3: # max 3 years
-                await ctx.send(await self.bot._(ctx.channel, "timers.rmd.too-long"))
-                return
-            f_duration = await FormatUtils.time_delta(duration, lang=await self.bot._(ctx.guild,'_used_locale'), form="short")
-        else:
-            f_duration = None
-        await ctx.defer()
-
-        async def user_can_mute(user):
-            try:
-                return await self.bot.get_cog("ServerConfig").check_member_config_permission(user, "mute_allowed_roles")
-            except commands.errors.CommandError:
-                pass
-            return False
-
-        try:
-            if user == ctx.guild.me or (self.bot.database_online and await user_can_mute(user)):
-                emoji = random.choice([
-                    ':confused:',
-                    ':no_mouth:',
-                    ':thinking:',
-                    ':upside_down:',
-                    self.bot.emojis_manager.customs['wat'],
-                    self.bot.emojis_manager.customs['owo'],
-                ])
-                await ctx.send((await self.bot._(ctx.guild.id, "moderation.mute.staff-mute")) + " " + emoji)
-                return
-            elif not self.bot.database_online and ctx.channel.permissions_for(user).manage_roles:
-                return await ctx.send(await self.bot._(ctx.guild.id, "moderation.warn.cant-staff"))
-        except Exception as err:
-            self.bot.dispatch("command_error", ctx, err)
+        if duration <= 0:
+            await interaction.response.send_message(await self.bot._(interaction, "timers.rmd.too-short"), ephemeral=True)
             return
-        role = await self.get_muted_role(ctx.guild)
-        if not await self.check_mute_context(ctx, role, user):
+        if duration > 60*60*24*365*3: # max 3 years
+            await interaction.response.send_message(await self.bot._(interaction, "timers.rmd.too-long"), ephemeral=True)
+            return
+        f_duration = await FormatUtils.time_delta(duration, lang=await self.bot._(interaction, '_used_locale'), form="short")
+        await interaction.response.defer(ephemeral=True)
+
+        async def user_can_mute(user: discord.Member):
+            return user.guild_permissions.moderate_members
+
+        if user == interaction.guild.me or (self.bot.database_online and await user_can_mute(user)):
+            emoji = random.choice([
+                ':confused:',
+                ':no_mouth:',
+                ':thinking:',
+                ':upside_down:',
+                self.bot.emojis_manager.customs['wat'],
+                self.bot.emojis_manager.customs['owo'],
+            ])
+            await interaction.followup.send((await self.bot._(interaction, "moderation.mute.staff-mute")) + " " + emoji)
+            return
+        if not self.bot.database_online and interaction.channel.permissions_for(user).manage_roles:
+            return await interaction.followup.send(await self.bot._(interaction, "moderation.warn.cant-staff"))
+        role = await self.get_muted_role(interaction.guild)
+        if not await self.check_mute_context(interaction, role, user):
             return
         case_id = None
-        try:
-            f_reason = reason or "Unspecified"
-            if self.bot.database_online:
-                cases_cog = self.bot.get_cog('Cases')
-                if f_duration is None:
-                    case = Case(bot=self.bot, guild_id=ctx.guild.id, user_id=user.id, case_type="mute",
-                                mod_id=ctx.author.id, reason=f_reason, date=ctx.bot.utcnow())
-                else:
-                    case = Case(bot=self.bot, guild_id=ctx.guild.id, user_id=user.id, case_type="tempmute",
-                                mod_id=ctx.author.id, reason=f_reason,date=ctx.bot.utcnow(), duration=duration)
-                    await self.bot.task_handler.add_task('mute', duration, user.id, ctx.guild.id)
-                try:
-                    await cases_cog.db_add_case(case)
-                    case_id = case.id
-                except Exception as err:
-                    self.bot.dispatch("command_error", ctx, err)
-            # actually mute
-            await self.mute_member(user, reason, datetime.timedelta(seconds=duration) if duration else None)
-            # send log
-            self.bot.dispatch("moderation_mute", ctx.guild, ctx.author, user, case_id, reason, duration)
-            # send DM
-            await self.dm_user(user, "mute", ctx, reason=reason, duration=f_duration)
-            # send in chat
-            await self.send_chat_answer("mute", user, ctx, case_id)
-            try:
-                await ctx.message.delete()
-            except (discord.Forbidden, discord.NotFound):
-                pass
-        except Exception as err:
-            await ctx.send(await self.bot._(ctx.guild.id, "moderation.error"))
-            self.bot.dispatch("command_error", ctx, err)
+        f_reason = reason or "Unspecified"
+        if self.bot.database_online and (cases_cog := self.bot.get_cog('Cases')):
+            if f_duration is None:
+                case = Case(bot=self.bot, guild_id=interaction.guild.id, user_id=user.id, case_type="mute",
+                            mod_id=interaction.user.id, reason=f_reason, date=self.bot.utcnow())
+            else:
+                case = Case(bot=self.bot, guild_id=interaction.guild.id, user_id=user.id, case_type="tempmute",
+                            mod_id=interaction.user.id, reason=f_reason,date=self.bot.utcnow(), duration=duration)
+                await self.bot.task_handler.add_task('mute', duration, user.id, interaction.guild.id)
+            await cases_cog.db_add_case(case)
+            case_id = case.id
+            await interaction.followup.send(await self.bot._(interaction,"moderation.mute.mute-success"))
+        # actually mute
+        await self.mute_member(user, reason, datetime.timedelta(seconds=duration) if duration else None)
+        # send log
+        self.bot.dispatch("moderation_mute", interaction.guild, interaction.user, user, case_id, reason, duration)
+        # send DM
+        await self.dm_user(user, "mute", interaction, reason=reason, duration=f_duration)
+        # send in chat
+        await self.send_chat_answer("mute", user, interaction, case_id)
 
 
     async def unmute_member(self, guild: discord.Guild, user: discord.Member, author: discord.Member):
@@ -452,104 +409,104 @@ You can also mute this member for a defined duration, then use the following for
                 result = [row['userid'] for row in query_results]
         return result
 
-    @commands.hybrid_command(name="unmute")
-    @app_commands.default_permissions(moderate_members=True)
-    @commands.cooldown(5,20, commands.BucketType.guild)
+    @app_commands.command(name="unmute")
     @commands.guild_only()
-    @commands.check(checks.can_mute)
-    async def unmute(self, ctx:MyContext, *, user: discord.Member):
+    @app_commands.default_permissions(moderate_members=True)
+    @app_commands.checks.cooldown(5, 20)
+    async def unmute(self, interaction: discord.Interaction, user: discord.Member):
         """Unmute someone
 This will remove the role 'muted' for the targeted member
 
 ..Example unmute @someone
 
 ..Doc articles/mute"""
-        role = await self.get_muted_role(ctx.guild)
+        role = await self.get_muted_role(interaction.guild)
         # if role not in user.roles:
-        if not await self.is_muted(ctx.guild, user, role):
-            await ctx.send(await self.bot._(ctx.guild.id, "moderation.mute.already-unmute"))
+        if not await self.is_muted(interaction.guild, user, role):
+            await interaction.response.send_message(
+                await self.bot._(interaction, "moderation.mute.already-unmute"), ephemeral=True)
             return
         if role is not None:
-            if not ctx.channel.permissions_for(ctx.guild.me).manage_roles:
-                await ctx.send(await self.bot._(ctx.guild.id, "moderation.mute.cant-mute"))
+            if not interaction.guild.me.guild_permissions.manage_roles:
+                await interaction.response.send_message(
+                    await self.bot._(interaction, "moderation.mute.cant-mute"), ephemeral=True)
                 return
-            if role.position >= ctx.guild.me.roles[-1].position:
-                await ctx.send(await self.bot._(ctx.guild.id, "moderation.mute.mute-high"))
+            if role.position >= interaction.guild.me.roles[-1].position:
+                await interaction.response.send_message(
+                    await self.bot._(interaction, "moderation.mute.mute-high"), ephemeral=True)
                 return
         elif user.is_timed_out():
-            if not ctx.guild.me.guild_permissions.moderate_members:
-                await ctx.send(await self.bot._(ctx.guild.id, "moderation.mute.cant-timeout"))
+            if not interaction.guild.me.guild_permissions.moderate_members:
+                await interaction.response.send_message(
+                    await self.bot._(interaction, "moderation.mute.cant-timeout"), ephemeral=True)
                 return
-            if user.top_role.position >= ctx.guild.me.roles[-1].position:
-                await ctx.send(await self.bot._(ctx.guild.id, "moderation.mute.too-high"))
+            if user.top_role.position >= interaction.guild.me.roles[-1].position:
+                await interaction.response.send_message(
+                    await self.bot._(interaction, "moderation.mute.too-high"), ephemeral=True)
                 return
-        await ctx.defer()
-        try:
-            # actually unmute
-            await self.unmute_member(ctx.guild, user, ctx.author)
-            # send log
-            self.bot.dispatch("moderation_unmute", ctx.guild, ctx.author, user)
-            # send in chat
-            await self.send_chat_answer("unmute", user, ctx)
-            try:
-                await ctx.message.delete()
-            except (discord.Forbidden, discord.NotFound):
-                pass
-            # remove planned automatic unmutes
-            await self.bot.task_handler.cancel_unmute(user.id, ctx.guild.id)
-        except Exception as err:
-            await ctx.send(await self.bot._(ctx.guild.id, "moderation.error"))
-            self.bot.dispatch("command_error", ctx, err)
+        await interaction.response.defer(ephemeral=True)
+        # actually unmute
+        await self.unmute_member(interaction.guild, user, interaction.user)
+        # send log
+        self.bot.dispatch("moderation_unmute", interaction.guild, interaction.user, user)
+        # send in chat
+        await self.send_chat_answer("unmute", user, interaction)
+        # remove planned automatic unmutes
+        await self.bot.task_handler.cancel_unmute(user.id, interaction.guild.id)
+        await interaction.followup.send(await self.bot._(interaction,"moderation.mute.unmute-success"))
 
-    @commands.hybrid_command(name="mute-config")
+    @app_commands.command(name="mute-config")
+    @app_commands.guild_only()
     @app_commands.default_permissions(manage_roles=True)
-    @commands.cooldown(1, 15, commands.BucketType.guild)
-    @commands.guild_only()
-    @commands.check(checks.has_manage_roles)
-    async def mute_config(self, ctx: MyContext):
+    @app_commands.checks.cooldown(1, 15)
+    async def mute_config(self, interaction: discord.Interaction):
         """Auto configure the muted role for you, if you do not want to use the official timeout
         Useful if you want to have a base for a properly working muted role
         Warning: the process may break some things in your server, depending on how you configured your channel permissions.
 
         ..Doc moderator.html#mute-unmute
         """
-        await ctx.defer()
+        await interaction.response.defer()
         confirm_view = ConfirmView(
-            self.bot, ctx.channel,
-            validation=lambda inter: inter.user == ctx.author,
-            ephemeral=False)
+            self.bot, interaction,
+            validation=lambda inter: inter.user == interaction.user,
+            ephemeral=False
+        )
         await confirm_view.init()
-        confirm_txt = await self.bot._(ctx.guild.id, "moderation.mute-config.confirm")
+        confirm_txt = await self.bot._(interaction, "moderation.mute-config.confirm")
         confirm_txt += "\n\n"
-        confirm_txt += await self.bot._(ctx.guild.id, "moderation.mute-config.tip",
+        confirm_txt += await self.bot._(interaction, "moderation.mute-config.tip",
                                         mute=await self.bot.get_command_mention("mute"))
-        confirm_msg = await ctx.send(confirm_txt, view=confirm_view)
+        confirm_msg = await interaction.followup.send(confirm_txt, view=confirm_view)
 
         await confirm_view.wait()
         await confirm_view.disable(confirm_msg)
         if not confirm_view.value:
             return
 
-        role = await self.get_muted_role(ctx.guild)
+        role = await self.get_muted_role(interaction.guild)
         create = role is None
-        role, count = await self.configure_muted_role(ctx.guild, role)
-        if role is None or count >= len(ctx.guild.voice_channels+ctx.guild.text_channels):
-            await ctx.send(await self.bot._(ctx.guild.id, "moderation.mute-config.err"))
+        role, errors_count = await self.configure_muted_role(interaction.guild, role)
+        if role is None or errors_count >= len(interaction.guild.channels):
+            await interaction.followup.send(await self.bot._(interaction, "moderation.mute-config.err"))
         elif create:
-            await ctx.send(await self.bot._(ctx.guild.id, "moderation.mute-config.success", count=count))
+            await interaction.followup.send(await self.bot._(interaction, "moderation.mute-config.success", count=errors_count))
         else:
-            await ctx.send(await self.bot._(ctx.guild.id, "moderation.mute-config.success2", count=count))
+            await interaction.followup.send(await self.bot._(interaction, "moderation.mute-config.success2", count=errors_count))
 
 
     @commands.hybrid_command(name="ban")
     @app_commands.default_permissions(ban_members=True)
-    @app_commands.describe(time="The duration of the ban, example 3d 7h 12min")
-    @app_commands.describe(days_to_delete="How many days of messages to delete, max 7")
-    @app_commands.describe(reason="The reason of the ban")
+    @app_commands.rename(duration="time")
+    @app_commands.describe(
+        duration="The duration of the ban, example 3d 7h 12min",
+        days_to_delete="How many days of messages to delete, max 7",
+        reason="The reason of the ban"
+    )
     @commands.cooldown(5,20, commands.BucketType.guild)
     @commands.guild_only()
     @commands.check(checks.can_ban)
-    async def ban(self, ctx:MyContext, user: discord.User, time: commands.Greedy[args.Duration]=None,
+    async def ban(self, ctx: MyContext, user: discord.User, duration: args.GreedyDurationArgument | None = None,
                   days_to_delete: commands.Range[int, 0, 7]=0, *, reason: str | None=None):
         """Ban someone
 The 'days_to_delete' option represents the number of days worth of messages to delete from the user in the guild, bewteen 0 and 7
@@ -562,8 +519,10 @@ The 'days_to_delete' option represents the number of days worth of messages to d
 
 ..Doc moderator.html#ban-unban
         """
-        duration = sum(time) if time else 0
-        if duration > 0:
+        if duration is not None:
+            if duration <= 0:
+                await interaction.response.send_message(await self.bot._(interaction, "timers.rmd.too-short"), ephemeral=True)
+                return
             if duration > 60*60*24*365*20: # max 20 years
                 await ctx.send(await self.bot._(ctx.channel, "timers.rmd.too-long"))
                 return
@@ -604,12 +563,12 @@ The 'days_to_delete' option represents the number of days worth of messages to d
         case_id = None
         if self.bot.database_online:
             cases_cog = self.bot.get_cog('Cases')
-            if f_duration is None:
+            if duration is None:
                 case = Case(bot=self.bot, guild_id=ctx.guild.id, user_id=user.id, case_type="ban",
-                            mod_id=ctx.author.id, reason=f_reason, date=ctx.bot.utcnow())
+                            mod_id=interaction.user.id, reason=f_reason, date=self.bot.utcnow())
             else:
                 case = Case(bot=self.bot, guild_id=ctx.guild.id, user_id=user.id, case_type="tempban",
-                            mod_id=ctx.author.id, reason=f_reason, date=ctx.bot.utcnow(), duration=duration)
+                            mod_id=interaction.user.id, reason=f_reason, date=self.bot.utcnow(), duration=duration)
                 await self.bot.task_handler.add_task('ban',duration,user.id,ctx.guild.id)
             try:
                 await cases_cog.db_add_case(case)
@@ -623,7 +582,7 @@ The 'days_to_delete' option represents the number of days worth of messages to d
         # send message in chat
         await self.send_chat_answer("ban", user, ctx, case_id)
         # send in modlogs
-        self.bot.dispatch("moderation_ban", ctx.guild, ctx.author, user, case_id, reason, duration)
+        self.bot.dispatch("moderation_ban", ctx.guild, interaction.user, user, case_id, reason, duration)
 
     @commands.hybrid_command(name="unban")
     @app_commands.default_permissions(ban_members=True)
@@ -666,7 +625,7 @@ The 'days_to_delete' option represents the number of days worth of messages to d
         if self.bot.database_online:
             cases_cog = self.bot.get_cog('Cases')
             case = Case(bot=self.bot, guild_id=ctx.guild.id, user_id=user.id, case_type="unban",
-                        mod_id=ctx.author.id, reason=f_reason, date=ctx.bot.utcnow())
+                        mod_id=interaction.user.id, reason=f_reason, date=self.bot.utcnow())
             try:
                 await cases_cog.db_add_case(case)
                 case_id = case.id
@@ -679,7 +638,7 @@ The 'days_to_delete' option represents the number of days worth of messages to d
         # send in chat
         await self.send_chat_answer("unban", user, ctx, case_id)
         # send in modlogs
-        self.bot.dispatch("moderation_unban", ctx.guild, ctx.author, user, case_id, reason)
+        self.bot.dispatch("moderation_unban", ctx.guild, interaction.user, user, case_id, reason)
 
     @commands.hybrid_command(name="softban")
     @app_commands.default_permissions(kick_members=True)
@@ -721,7 +680,7 @@ Permissions for using this command are the same as for the kick
             if self.bot.database_online:
                 cases_cog = self.bot.get_cog('Cases')
                 case = Case(bot=self.bot, guild_id=ctx.guild.id, user_id=user.id, case_type="softban",
-                            mod_id=ctx.author.id, reason=f_reason, date=ctx.bot.utcnow())
+                            mod_id=interaction.user.id, reason=f_reason, date=self.bot.utcnow())
                 try:
                     await cases_cog.db_add_case(case)
                     case_id = case.id
@@ -734,19 +693,20 @@ Permissions for using this command are the same as for the kick
             # send in chat
             await self.send_chat_answer("kick", user, ctx, case_id)
             # send in modlogs
-            self.bot.dispatch("moderation_softban", ctx.guild, ctx.author, user, case_id, reason)
+            self.bot.dispatch("moderation_softban", ctx.guild, interaction.user, user, case_id, reason)
         except discord.errors.Forbidden:
             await ctx.send(await self.bot._(ctx.guild.id, "moderation.kick.too-high"))
         except Exception as err:
             await ctx.send(await self.bot._(ctx.guild.id, "moderation.error"))
             self.bot.dispatch("error", err, ctx)
 
-    async def dm_user(self, user: discord.User, action: str, ctx: MyContext, reason: str = None, duration: str = None):
+    async def dm_user(self, user: discord.User, action: str, interaction: discord.Interaction,
+                      reason: str = None, duration: str = None):
         "DM a user about a moderation action taken against them"
         if user.id in self.bot.get_cog('Welcomer').no_message:
             return
         if action in ('warn', 'mute', 'kick', 'ban'):
-            message = await self.bot._(user, "moderation."+action+"-dm", guild=ctx.guild.name)
+            message = await self.bot._(user, "moderation."+action+"-dm", guild=interaction.guild.name)
         else:
             return
         color: int = None
@@ -772,28 +732,26 @@ Permissions for using this command are the same as for the kick
             if err.code == 50007:
                 # "Cannot send message to this user"
                 return
-            self.bot.dispatch("error", err, ctx)
+            self.bot.dispatch("error", err, interaction)
         except Exception as err:
-            self.bot.dispatch("error", err, ctx)
+            self.bot.dispatch("error", err, interaction)
 
-    async def send_chat_answer(self, action: str, user: discord.User, ctx: MyContext, case: int = None):
+    async def send_chat_answer(self, action: str, user: discord.User, interaction: discord.Interaction, case: int = None):
         "Send a message in the chat about a moderation action taken"
-        if action in ('warn', 'mute', 'unmute', 'kick', 'ban', 'unban'):
-            message = await self.bot._(ctx.guild.id, "moderation."+action+"-chat", user=user.mention, userid=user.id)
-        else:
+        if action not in ('warn', 'mute', 'unmute', 'kick', 'ban', 'unban'):
+            raise ValueError("Invalid action: "+action)
+        if not interaction.channel.permissions_for(interaction.guild.me).embed_links:
             return
-        _case = await self.bot._(ctx.guild.id, "misc.case")
-        if ctx.can_send_embed:
-            color = discord.Color.red()
-            if action in ("unmute", "unban"):
-                if help_cog := self.bot.get_cog("Help"):
-                    color = help_cog.help_color
-            emb = discord.Embed(description=message, colour=color)
-            if case:
-                emb.add_field(name=_case.capitalize(), value=f"#{case}")
-            await ctx.send(embed=emb)
-        else:
-            await ctx.send(f"{message}\n{_case.capitalize()} #{case}")
+        message = await self.bot._(interaction.guild.id, "moderation."+action+"-chat", user=user.mention, userid=user.id)
+        _case = await self.bot._(interaction.guild.id, "misc.case")
+        color = discord.Color.red()
+        if action in ("unmute", "unban"):
+            if help_cog := self.bot.get_cog("Help"):
+                color = help_cog.help_color
+        emb = discord.Embed(description=message, colour=color)
+        if case:
+            emb.add_field(name=_case.capitalize(), value=f"#{case}")
+        await interaction.channel.send(embed=emb)
 
     @commands.hybrid_command(name="banlist")
     @app_commands.default_permissions(ban_members=True)
@@ -850,14 +808,14 @@ You must be an administrator of this server to use this command.
                         else:
                             values = [str(entry.user) for entry in self.saved_bans[i:i+10]]
                         emb.add_field(name=f"{column_start}-{column_end}", value="\n".join(values))
-                footer = f"{ctx.author}  |  {page}/{await self.get_page_count()}"
-                emb.set_footer(text=footer, icon_url=ctx.author.display_avatar)
+                footer = f"{interaction.user}  |  {page}/{await self.get_page_count()}"
+                emb.set_footer(text=footer, icon_url=interaction.user.display_avatar)
                 return {
                     "embed": emb
                 }
 
         _quit = await self.bot._(ctx.guild, "misc.quit")
-        view = BansPaginator(self.bot, ctx.author, stop_label=_quit.capitalize())
+        view = BansPaginator(self.bot, interaction.user, stop_label=_quit.capitalize())
         await view.send_init(ctx)
 
 
@@ -919,14 +877,14 @@ The 'show_reasons' parameter is used to display the mute reasons.
                                 user = await self._resolve_user(user_id)
                                 values.append(str(user))
                         emb.add_field(name=f"{column_start}-{column_end}", value="\n".join(values))
-                footer = f"{ctx.author}  |  {page}/{await self.get_page_count()}"
-                emb.set_footer(text=footer, icon_url=ctx.author.display_avatar)
+                footer = f"{interaction.user}  |  {page}/{await self.get_page_count()}"
+                emb.set_footer(text=footer, icon_url=interaction.user.display_avatar)
                 return {
                     "embed": emb
                 }
 
         _quit = await self.bot._(ctx.guild, "misc.quit")
-        view = MutesPaginator(self.bot, ctx.author, stop_label=_quit.capitalize())
+        view = MutesPaginator(self.bot, interaction.user, stop_label=_quit.capitalize())
         await view.send_init(ctx)
 
 
@@ -1076,7 +1034,7 @@ The 'show_reasons' parameter is used to display the mute reasons.
                 "Create one page"
                 first_index = (page - 1) * 50
                 last_index = min(first_index + 50, len(emotes))
-                embed = discord.Embed(title=title, color=ctx.bot.get_cog('ServerConfig').embed_color)
+                embed = discord.Embed(title=title, color=self.bot.get_cog('ServerConfig').embed_color)
                 for i in range(first_index, last_index, 10):
                     emotes_list = list()
                     for emote in emotes[i:i+10]:
@@ -1088,7 +1046,7 @@ The 'show_reasons' parameter is used to display the mute reasons.
                 }
 
         _quit = await self.bot._(ctx.guild, "misc.quit")
-        view = EmojisPaginator(self.bot, ctx.author, stop_label=_quit.capitalize())
+        view = EmojisPaginator(self.bot, interaction.user, stop_label=_quit.capitalize())
         await view.send_init(ctx)
 
 
@@ -1164,7 +1122,7 @@ The 'show_reasons' parameter is used to display the mute reasons.
         if not bot_perms.read_message_history:
             await ctx.send(await self.bot._(ctx.guild.id, "moderation.need-read-history"))
             return
-        if start_message.created_at < ctx.bot.utcnow() - datetime.timedelta(days=21):
+        if start_message.created_at < self.bot.utcnow() - datetime.timedelta(days=21):
             await ctx.send(await self.bot._(ctx.guild.id, "moderation.destop.too-old", days=21))
             return
         await ctx.defer()
@@ -1173,7 +1131,7 @@ The 'show_reasons' parameter is used to display the mute reasons.
         messages.append(start_message)
         txt = await self.bot._(ctx.guild.id, "moderation.clear.done", count=len(messages))
         await ctx.send(txt, delete_after=2.0)
-        self.bot.dispatch("moderation_clear", ctx.channel, ctx.author, len(messages))
+        self.bot.dispatch("moderation_clear", ctx.channel, interaction.user, len(messages))
 
 
     async def configure_muted_role(self, guild: discord.Guild, role: discord.Role = None):
