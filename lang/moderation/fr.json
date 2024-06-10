@@ -1,13 +1,16 @@
 {
     "ban": {
+        "ban-success": "Le membre a bien été banni",
         "cant-ban": "Permission 'Ban members' manquante :confused:",
         "list-error": "Oups, il y a trop de membres à afficher :confused:",
         "list-title-0": "Liste des membres bannis du serveur '{}'",
         "list-title-1": "Liste des 45 premiers membres bannis du serveur '{}'",
         "list-title-2": "Liste des 60 premiers membres bannis du serveur '{}'",
         "no-bans": "Aucun membre ne semble être banni de ce serveur",
+        "softban-succes": "Le membre a bien été softban",
         "staff-ban": "Vous ne pouvez pas bannir un autre membre du staff !",
         "too-high": "Il semble que ce membre soit trop haut pour que je puisse le bannir :thinking:",
+        "unban-success": "Le membre a bien été débanni",
         "user-not-banned": "Cette personne ne fait pas partie des membres bannis :upside_down:"
     },
     "ban-chat": "Le membre %{user} (%{userid}) a bien été banni du serveur",
@@ -121,12 +124,12 @@
         "too-long": "Impossible de mettre une fréquence supérieure à six heures"
     },
     "unban-chat": "Le membre %{user} (%{userid}) n'est plus banni de ce serveur",
+    "unhoist-too-many-members": "Oups, votre serveur a trop de membres pour que je puisse faire cela. Veuillez contacter notre équipe de support pour plus d'informations.",
     "unhoisted": {
         "many": "%{count} surnoms édités !",
         "one": "1 surnom édité !",
         "zero": "Aucun surnom n'a été édité"
     },
-    "unhoist-too-many-members": "Oups, votre serveur a trop de membres pour que je puisse faire cela. Veuillez contacter notre équipe de support pour plus d'informations.",
     "unmute-chat": "Le membre %{user} (%{userid}) peut à nouveau parler !",
     "warn": {
         "cant-bot": "Je ne peux pas avertir un bot ^^",
