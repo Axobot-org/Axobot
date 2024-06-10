@@ -175,6 +175,7 @@ class WebRSS:
                 else:
                     title = '?'
                 post_text = await get_text_from_entry(entry)
+                post_description = await get_summary_from_entry(entry)
                 img = None
                 img_match = re.search(r'(http(s?):)([/|.\w\s-])*\.(?:jpe?g|gif|png|webp)', str(entry))
                 if img_match is not None:
@@ -189,7 +190,8 @@ class WebRSS:
                     author=author,
                     channel=feed.feed['title'] if 'title' in feed.feed else '?',
                     image=img,
-                    post_text=post_text
+                    post_text=post_text,
+                    post_description=post_description
                 )
                 posts_list.append(obj)
             except Exception as err:
