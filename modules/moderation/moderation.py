@@ -2,14 +2,13 @@ import datetime
 import importlib
 import random
 from math import ceil
-from typing import Literal
 
 import discord
 from discord import app_commands
 from discord.ext import commands
 
 from core.arguments import args
-from core.bot_classes import Axobot, MyContext
+from core.bot_classes import Axobot
 from core.checks import checks
 from core.formatutils import FormatUtils
 from core.paginator import Paginator
@@ -852,168 +851,6 @@ The 'show_reasons' parameter is used to display the mute reasons.
         _quit = await self.bot._(interaction, "misc.quit")
         view = MutesPaginator(self.bot, interaction.user, stop_label=_quit.capitalize())
         await view.send_init(interaction)
-
-
-    @commands.hybrid_group(name="emoji")
-    @app_commands.default_permissions(manage_expressions=True)
-    @commands.guild_only()
-    @commands.cooldown(5,20, commands.BucketType.guild)
-    async def emoji_group(self, ctx: MyContext):
-        """Manage your emojis
-        Administrator permission is required
-
-        ..Doc moderator.html#emoji-manager"""
-        if ctx.subcommand_passed is None:
-            await ctx.send_help(ctx.command)
-
-    @emoji_group.command(name="rename")
-    @app_commands.describe(emoji="The emoji to rename", name="The new name")
-    @commands.guild_only()
-    @commands.check(checks.has_manage_expressions)
-    async def emoji_rename(self, ctx: MyContext, emoji: discord.Emoji, name: str):
-        """Rename an emoji
-
-        ..Example emoji rename :cool: supercool
-
-        ..Doc moderator.html#emoji-manager"""
-        if emoji.guild != ctx.guild:
-            await ctx.send(await self.bot._(ctx.guild.id, "moderation.emoji.wrong-guild"))
-            return
-        if not ctx.channel.permissions_for(ctx.guild.me).manage_expressions:
-            await ctx.send(await self.bot._(ctx.guild.id, "moderation.emoji.cant-emoji"))
-            return
-        await emoji.edit(name=name)
-        await ctx.send(await self.bot._(ctx.guild.id, "moderation.emoji.renamed", emoji=emoji))
-
-    @emoji_group.command(name="restrict")
-    @app_commands.describe(
-        emoji="The emoji to restrict",
-        roles="The roles allowed to use this emoji (separated by spaces), or 'everyone'")
-    @commands.guild_only()
-    @commands.check(checks.has_manage_expressions)
-    async def emoji_restrict(self, ctx: MyContext, emoji: discord.Emoji,
-                             roles: commands.Greedy[discord.Role | Literal["everyone"]]):
-        """Restrict the use of an emoji to certain roles
-
-        ..Example emoji restrict :vip: @VIP @Admins
-
-        ..Example emoji restrict :vip: everyone
-
-        ..Doc moderator.html#emoji-manager"""
-        if emoji.guild != ctx.guild:
-            await ctx.send(await self.bot._(ctx.guild.id, "moderation.emoji.wrong-guild"))
-            return
-        if not ctx.guild.me.guild_permissions.manage_expressions:
-            await ctx.send(await self.bot._(ctx.guild.id, "moderation.emoji.cant-emoji"))
-            return
-        await ctx.defer()
-        # everyone role
-        if "everyone" in roles:
-            await emoji.edit(roles=[ctx.guild.default_role])
-            await ctx.send(await self.bot._(ctx.guild.id, "moderation.emoji.unrestricted", name=emoji))
-            return
-        # remove duplicates
-        roles = list(set(roles))
-        await emoji.edit(roles=roles)
-        # send success message
-        roles_mentions = " ".join([x.mention for x in roles])
-        await ctx.send(
-            await self.bot._(ctx.guild.id, "moderation.emoji.emoji-valid", name=emoji, roles=roles_mentions, count=len(roles))
-        )
-
-    @emoji_group.command(name="clear")
-    @commands.guild_only()
-    @commands.check(checks.has_manage_msg)
-    async def emoji_clear(self, ctx: MyContext, message: args.MessageArgument, emoji: discord.Emoji = None):
-        """Remove all reactions under a message
-        If you specify an emoji, only reactions with that emoji will be deleted
-
-        ..Example emoji clear
-
-        ..Example emoji clear :axoblob:
-
-        ..Doc moderator.html#emoji-manager"""
-        if not ctx.channel.permissions_for(ctx.guild.me).manage_messages:
-            return await ctx.send(await self.bot._(ctx.guild.id, "moderation.need-manage-messages"))
-        if emoji:
-            await message.clear_reaction(emoji)
-        else:
-            await message.clear_reactions()
-        try:
-            await ctx.message.delete()
-        except (discord.Forbidden, discord.NotFound):
-            pass
-
-    @emoji_rename.autocomplete("emoji")
-    @emoji_restrict.autocomplete("emoji")
-    @emoji_group.autocomplete("emoji")
-    async def emoji_autocompletion(self, interaction: discord.Interaction, current: str):
-        """Autocompletion for the role-reaction emoji in slash commands"""
-        if interaction.guild_id is None:
-            return []
-        current = current.lower()
-        options: list[tuple[bool, str, str]] = []
-        for emoji in interaction.guild.emojis:
-            emoji_display = ':' + emoji.name + ':'
-            lowercase_emoji_display = emoji_display.lower()
-            if current in lowercase_emoji_display or current in str(emoji.id):
-                options.append((lowercase_emoji_display.startswith(current), emoji_display, str(emoji.id)))
-        options.sort()
-        return [
-            app_commands.Choice(name=emoji, value=emoji_id)
-            for _, emoji, emoji_id in options
-        ][:25]
-
-    @emoji_group.command(name="list")
-    @commands.guild_only()
-    @commands.check(checks.bot_can_embed)
-    async def emoji_list(self, ctx: MyContext):
-        """List every emoji of your server
-
-        ..Example emojis list
-
-        ..Doc moderator.html#emoji-manager"""
-        structure = await self.bot._(ctx.guild.id, "moderation.emoji.list")
-        priv = "**"+await self.bot._(ctx.guild.id, "moderation.emoji.private")+"**"
-        title = await self.bot._(ctx.guild.id, "moderation.emoji.list-title", guild=ctx.guild.name)
-        # static emojis
-        emotes = [
-            structure.format(x, x.name, f"<t:{x.created_at.timestamp():.0f}>", priv if len(x.roles) > 0 else '')
-            for x in ctx.guild.emojis
-            if not x.animated
-        ]
-        # animated emojis
-        emotes += [
-            structure.format(x, x.name, f"<t:{x.created_at.timestamp():.0f}>", priv if len(x.roles) > 0 else '')
-            for x in ctx.guild.emojis
-            if x.animated
-        ]
-
-        class EmojisPaginator(Paginator):
-            async def get_page_count(self) -> int:
-                length = len(emotes)
-                if length == 0:
-                    return 1
-                return ceil(length / 50)
-
-            async def get_page_content(self, _: discord.Interaction, page: int):
-                "Create one page"
-                first_index = (page - 1) * 50
-                last_index = min(first_index + 50, len(emotes))
-                embed = discord.Embed(title=title, color=self.client.get_cog("ServerConfig").embed_color)
-                for i in range(first_index, last_index, 10):
-                    emotes_list = list()
-                    for emote in emotes[i:i+10]:
-                        emotes_list.append(emote)
-                    field_name = "{}-{}".format(i + 1, i + len(emotes_list))
-                    embed.add_field(name=field_name, value="\n".join(emotes_list), inline=False)
-                return {
-                    "embed": embed
-                }
-
-        _quit = await self.bot._(ctx.guild, "misc.quit")
-        view = EmojisPaginator(self.bot, interaction.user, stop_label=_quit.capitalize())
-        await view.send_init(ctx)
 
 
     @app_commands.command(name="unhoist")

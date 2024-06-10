@@ -116,6 +116,19 @@ class GreedyUsersTransformer(discord.app_commands.Transformer): # pylint: disabl
 
 GreedyUsersArgument = discord.app_commands.Transform[list[discord.User], GreedyUsersTransformer]
 
+class GreedyRolesTransformer(discord.app_commands.Transformer): # pylint: disable=abstract-method
+    "Convert argument to a list of roles"
+
+    async def transform(self, interaction, value: str, /):
+        "Convert a string to a list of roles, else raise BadArgument"
+        ctx = await commands.Context.from_interaction(interaction)
+        return [
+            await commands.RoleConverter().convert(ctx, word)
+            for word in value.split(" ")
+        ]
+
+GreedyRolesArgument = discord.app_commands.Transform[list[discord.Role], GreedyRolesTransformer]
+
 class GreedyDurationTransformer(discord.app_commands.Transformer): # pylint: disable=abstract-method
     "Convert argument to a duration in seconds"
 
@@ -124,6 +137,32 @@ class GreedyDurationTransformer(discord.app_commands.Transformer): # pylint: dis
         return await FormatUtils.parse_duration(value)
 
 GreedyDurationArgument = discord.app_commands.Transform[int, GreedyDurationTransformer]
+
+class EmojiTransformer(discord.app_commands.Transformer):
+    "Convert argument to a discord Emoji"
+
+    async def transform(self, interaction, value: str, /):
+        "Convert a string to a proper discord Emoji, else raise BadArgument"
+        ctx = await commands.Context.from_interaction(interaction)
+        return await commands.EmojiConverter().convert(ctx, value)
+
+    async def autocomplete(self, interaction, value, /):
+        if interaction.guild_id is None:
+            return []
+        value = value.lower()
+        options: list[tuple[bool, str, str]] = []
+        for emoji in interaction.guild.emojis:
+            emoji_display = ':' + emoji.name + ':'
+            lowercase_emoji_display = emoji_display.lower()
+            if value in lowercase_emoji_display or value in str(emoji.id):
+                options.append((lowercase_emoji_display.startswith(value), emoji_display, str(emoji.id)))
+        options.sort()
+        return [
+            discord.app_commands.Choice(name=emoji, value=emoji_id)
+            for _, emoji, emoji_id in options
+        ][:25]
+
+EmojiArgument = discord.app_commands.Transform[discord.Emoji, EmojiTransformer]
 
 class UnicodeEmojiConverter(str):
     "Represents any Unicode emoji"
