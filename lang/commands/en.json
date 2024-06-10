@@ -553,7 +553,7 @@
             "user": "user"
         },
         "unhoist": {
-            "chars": "characters"
+            "characters": "characters"
         },
         "unmute": {
             "user": "user"
