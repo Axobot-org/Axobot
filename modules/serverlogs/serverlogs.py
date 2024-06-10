@@ -1281,7 +1281,7 @@ Minimum age required by anti-raid: {min_age}"
                     colour=discord.Color.orange()
                 )
                 lang = await self.bot._(channel.guild.id, "_used_locale")
-                f_duration = FormatUtils.time_delta(duration, lang=lang)
+                f_duration = await FormatUtils.time_delta(duration, lang=lang)
                 emb.add_field(name="Duration", value=f_duration)
             emb.add_field(name="Moderator", value=author.mention)
             emb.set_author(name=author, icon_url=author.display_avatar)
