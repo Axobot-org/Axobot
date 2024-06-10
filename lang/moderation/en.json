@@ -32,6 +32,7 @@
     },
     "emoji": {
         "cant-emoji": "Oops, I'm missing the permission `Manage expressions` :confused:",
+        "cleared": "The reactions have been cleared!",
         "emoji-valid": {
             "one": "The %{name} emoji has been changed so that it can only be used by the %{roles} role",
             "many": "The %{name} emoji has been changed so that it can only be used by the %{roles} roles"

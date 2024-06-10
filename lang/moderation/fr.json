@@ -32,6 +32,7 @@
     },
     "emoji": {
         "cant-emoji": "Oups, il me manque la permission `Gérer les émojis` :confused:",
+        "cleared": "Les réactions ont bien été supprimées !",
         "emoji-valid": {
             "one": "L'émoji %{name} a été modifié pour n'être utilisable que par le rôle %{roles}",
             "many": "L'émoji %{name} a été modifié pour n'être utilisable que par les rôles %{roles}"

@@ -21,6 +21,7 @@ async def load_cogs(bot: "Axobot"):
         "bot_info",
         "bot_stats",
         "cases",
+        "emojis_management",
         "errors",
         "events",
         "fun",
