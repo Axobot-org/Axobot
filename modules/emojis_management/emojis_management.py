@@ -52,7 +52,7 @@ class EmojisManagement(commands.Cog):
     )
     @app_commands.checks.cooldown(2, 10)
     async def emoji_restrict(self, interaction: discord.Interaction, emoji: args.EmojiArgument,
-                             roles: args.GreedyRolesTransformer):
+                             roles: args.GreedyRolesArgument):
         """Restrict the use of an emoji to certain roles
 
         ..Example emoji restrict :vip: @VIP @Admins

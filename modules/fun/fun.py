@@ -332,7 +332,8 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         message="The URL of the message to react to",
         reactions="A space-separated list of custom or unicode emojis to react with"
     )
-    async def react(self, interaction: discord.Interaction, message: args.MessageArgument, reactions: str):
+    async def react(self, interaction: discord.Interaction, message: args.MessageArgument,
+                    reactions: args.GreedyDiscordOrUnicodeEmojiArgument):
         """Add reaction(s) to a message. Server emojis also work.
 
         ..Example react 375246790301057024-790177026232811531 :ok:
@@ -349,18 +350,13 @@ You can specify a verification limit by adding a number in argument (up to 1.000
             await interaction.response.send_message(await self.bot._(interaction, "fun.say-no-perm", channel=channel.mention))
             return
         await interaction.response.defer(ephemeral=True)
-        ctx = await MyContext.from_interaction(interaction)
         count = 0
-        for reaction in reactions.split():
+        for emoji in reactions:
             try:
-                emoji = await args.DiscordOrUnicodeEmojiConverter.convert(ctx, reaction)
                 await message.add_reaction(emoji)
-            except (discord.Forbidden, commands.BadArgument):
-                try:
-                    await message.add_reaction(reaction)
-                except discord.errors.HTTPException:
-                    await interaction.followup.send(content=await self.bot._(interaction, "fun.no-emoji"))
-                    return
+            except discord.errors.HTTPException:
+                await interaction.followup.send(content=await self.bot._(interaction, "fun.no-emoji"))
+                return
             count += 1
         await interaction.followup.send(content=await self.bot._(interaction, "fun.react-done", count=count))
 
@@ -610,7 +606,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
                          footer: app_commands.Range[str, 1, 90] | None=None,
                          image_url: app_commands.Range[str, 5, 256] | None=None,
                          thumbnail_url: app_commands.Range[str, 5, 256] | None=None,
-                         color: args.ColorTransformer | None=None
+                         color: args.ColorArgument | None=None
         ):
         """Use the bot to send a custom embed
 
