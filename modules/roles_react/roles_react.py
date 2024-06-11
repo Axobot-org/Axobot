@@ -7,8 +7,10 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
-from core.arguments import DiscordOrUnicodeEmoji
-from core.bot_classes import Axobot, MyContext
+from core.arguments import (DiscordOrUnicodeEmojiArgument,
+                            GreedyDiscordOrUnicodeEmojiArgument,
+                            MessageArgument)
+from core.bot_classes import Axobot
 from core.checks import checks
 from core.getch_methods import getch_member
 
@@ -193,21 +195,17 @@ class RolesReact(commands.Cog):
             return str(emoji)
         return raw_emoji
 
-    @commands.hybrid_group(name="roles-react")
-    @commands.guild_only()
-    @commands.cooldown(1, 5, commands.BucketType.guild)
-    @app_commands.default_permissions(manage_guild=True)
-    async def rr_main(self, ctx: MyContext):
-        """Manage your roles reactions
-
-        ..Doc roles-reactions.html"""
-        if ctx.subcommand_passed is None:
-            await ctx.send_help(ctx.command)
+    rr_main = app_commands.Group(
+        name="roles-react",
+        description="Manage your roles reactions",
+        default_permissions=discord.Permissions(manage_guild=True),
+        guild_only=True
+    )
 
     @rr_main.command(name="add")
-    @commands.check(checks.has_manage_guild)
-    @commands.check(checks.database_connected)
-    async def rr_add(self, ctx: MyContext, emoji: DiscordOrUnicodeEmoji, role: discord.Role, *,
+    @app_commands.check(checks.database_connected)
+    @app_commands.checks.cooldown(5, 20)
+    async def rr_add(self, interaction: discord.Interaction, emoji: DiscordOrUnicodeEmojiArgument, role: discord.Role,
                      description: RoleDescription = ''):
         """Add a role reaction
         This role will be given when a membre click on a specific reaction
@@ -218,57 +216,52 @@ class RolesReact(commands.Cog):
         ..Example roles_react add :uwu: lolcats
 
         ..Doc roles-reactions.html#add-and-remove-a-reaction"""
-        try:
-            if role.name == '@everyone':
-                raise commands.BadArgument(f'Role "{role.name}" not found')
-            await ctx.defer()
-            if await self.db_get_role_from_emoji(ctx.guild.id, emoji):
-                return await ctx.send(await self.bot._(ctx.guild.id, "roles_react.already-1-rr"))
-            max_rr: int = await self.bot.get_config(ctx.guild.id, 'roles_react_max_number')
-            existing_list = await self.db_get_roles(ctx.guild.id)
-            if len(existing_list) >= max_rr:
-                return await ctx.send(await self.bot._(ctx.guild.id, "roles_react.too-many-rr", l=max_rr))
-            await self.db_add_role(ctx.guild.id, role.id, emoji, description)
-        except Exception as err:
-            self.bot.dispatch("command_error", ctx, err)
+        if role == interaction.guild.default_role:
+            raise commands.BadArgument(f'Role "{role.name}" not found')
+        await interaction.response.defer()
+        if await self.db_get_role_from_emoji(interaction.guild_id, emoji):
+            await interaction.followup.send(await self.bot._(interaction, "roles_react.already-1-rr"))
+            return
+        max_rr: int = await self.bot.get_config(interaction.guild_id, 'roles_react_max_number')
+        existing_list = await self.db_get_roles(interaction.guild_id)
+        if len(existing_list) >= max_rr:
+            await interaction.followup.send(await self.bot._(interaction, "roles_react.too-many-rr", l=max_rr))
+            return
+        await self.db_add_role(interaction.guild_id, role.id, emoji, description)
+        await interaction.followup.send(await self.bot._(interaction, "roles_react.rr-added", r=role.name, e=emoji))
+        if rr := await self.db_get_role_from_emoji(interaction.guild_id, emoji):
+            await self._add_rr_to_cache(rr)
         else:
-            await ctx.send(await self.bot._(ctx.guild.id, "roles_react.rr-added", r=role.name, e=emoji))
-            if rr := await self.db_get_role_from_emoji(ctx.guild.id, emoji):
-                await self._add_rr_to_cache(rr)
-            else:
-                self.bot.log.warning(f"Could not add role reaction {emoji} in cache")
+            self.bot.log.warning(f"Could not add role reaction {emoji} in cache")
 
     @rr_main.command(name="remove")
-    @commands.check(checks.database_connected)
-    @commands.check(checks.has_manage_guild)
-    async def rr_remove(self, ctx: MyContext, emoji: str):
+    @app_commands.check(checks.database_connected)
+    @app_commands.checks.cooldown(5, 20)
+    async def rr_remove(self, interaction: discord.Interaction, emoji: str):
         """Remove a role react
 
         ..Example roles_react remove :uwu:
 
         ..Doc roles-reactions.html#add-and-remove-a-reaction"""
-        await ctx.defer()
-        try:
-            # if emoji is a custom one: extract the id
-            old_emoji = emoji
-            r = re.search(r'<a?:[^:]+:(\d+)>', emoji)
-            if r is not None:
-                emoji = r.group(1)
-            role_react = await self.db_get_role_from_emoji(ctx.guild.id, emoji)
-            if role_react is None:
-                return await ctx.send(await self.bot._(ctx.guild.id, "roles_react.no-rr"))
-            await self.db_remove_role(role_react['ID'])
-        except Exception as err:
-            self.bot.dispatch("command_error", ctx, err)
+        await interaction.response.defer()
+        # if emoji is a custom one: extract the id
+        old_emoji = emoji
+        r = re.search(r"<a?:[^:]+:(\d+)>", emoji)
+        if r is not None:
+            emoji = r.group(1)
+        role_react = await self.db_get_role_from_emoji(interaction.guild_id, emoji)
+        if role_react is None:
+            await interaction.followup.send(await self.bot._(interaction, "roles_react.no-rr"))
             return
-        role = ctx.guild.get_role(role_react['role'])
+        await self.db_remove_role(role_react['ID'])
+        role = interaction.guild.get_role(role_react['role'])
         if role is None:
-            await ctx.send(await self.bot._(ctx.guild.id, "roles_react.rr-removed-2", e=old_emoji))
+            await interaction.followup.send(await self.bot._(interaction, "roles_react.rr-removed-2", e=old_emoji))
         else:
-            await ctx.send(await self.bot._(ctx.guild.id, "roles_react.rr-removed", r=role, e=old_emoji))
+            await interaction.followup.send(await self.bot._(interaction, "roles_react.rr-removed", r=role, e=old_emoji))
         try:
-            if ctx.guild.id in self.cache:
-                del self.cache[ctx.guild.id][role_react["ID"]]
+            if interaction.guild_id in self.cache:
+                del self.cache[interaction.guild_id][role_react["ID"]]
         except KeyError:
             self.bot.log.debug(f"Emoji {emoji} not found in cache")
 
@@ -288,43 +281,47 @@ class RolesReact(commands.Cog):
         return '\n'.join(result), emojis
 
     @rr_main.command(name="list")
-    @commands.check(checks.database_connected)
-    @commands.check(checks.bot_can_embed)
-    async def rr_list(self, ctx: MyContext):
+    @app_commands.check(checks.database_connected)
+    @app_commands.checks.cooldown(3, 30)
+    async def rr_list(self, interaction: discord.Interaction):
         """List every roles reactions of your server
 
         ..Doc roles-reactions.html#list-every-roles-reactions"""
-        await ctx.defer()
-        if self.cache_initialized and ctx.guild.id in self.cache:
-            roles_list = list(self.cache[ctx.guild.id].values())
+        await interaction.response.defer(ephemeral=True)
+        if self.cache_initialized and interaction.guild_id in self.cache:
+            roles_list = list(self.cache[interaction.guild_id].values())
         else:
-            roles_list = await self.db_get_roles(ctx.guild.id)
-        des, _ = await self.create_list_embed(roles_list, ctx.guild)
-        max_rr: int = await self.bot.get_config(ctx.guild.id, 'roles_react_max_number')
-        title = await self.bot._(ctx.guild.id, "roles_react.rr-list", n=len(roles_list), m=max_rr)
-        emb = discord.Embed(title=title, description=des, color=self.embed_color, timestamp=ctx.message.created_at)
-        emb.set_footer(text=ctx.author, icon_url=ctx.author.display_avatar)
-        await ctx.send(embed=emb)
+            roles_list = await self.db_get_roles(interaction.guild_id)
+        des, _ = await self.create_list_embed(roles_list, interaction.guild)
+        max_rr: int = await self.bot.get_config(interaction.guild_id, 'roles_react_max_number')
+        title = await self.bot._(interaction, "roles_react.rr-list", n=len(roles_list), m=max_rr)
+        emb = discord.Embed(title=title, description=des, color=self.embed_color)
+        await interaction.followup.send(embed=emb)
 
     @rr_main.command(name="send")
-    @commands.check(checks.database_connected)
-    @commands.check(checks.bot_can_embed)
-    async def rr_get(self, ctx: MyContext):
+    @app_commands.check(checks.database_connected)
+    @app_commands.checks.cooldown(3, 30)
+    async def rr_send(self, interaction: discord.Interaction, channel: discord.TextChannel | discord.Thread | None = None):
         """Send the roles embed
 It will only display the whole message with reactions. Still very cool tho
 
 ..Doc roles-reactions.html#get-or-leave-a-role"""
-        await ctx.defer()
-        try:
-            roles_list = await self.db_get_roles(ctx.guild.id)
-        except Exception as err:
-            self.bot.dispatch("command_error", ctx, err)
+        if channel is None:
+            channel = interaction.channel
+        bot_perms = channel.permissions_for(interaction.guild.me)
+        if not (bot_perms.add_reactions and bot_perms.embed_links):
+            await interaction.response.send_message(
+                await self.bot._(interaction, "roles_react.cant-send-embed"), ephemeral=True
+            )
             return
-        des, emojis = await self.create_list_embed(roles_list, ctx.guild)
-        title = await self.bot._(ctx.guild.id, "roles_react.rr-embed")
-        emb = discord.Embed(title=title, description=des, color=self.embed_color, timestamp=ctx.message.created_at)
+
+        await interaction.response.defer(ephemeral=True)
+        roles_list = await self.db_get_roles(interaction.guild_id)
+        des, emojis = await self.create_list_embed(roles_list, interaction.guild)
+        title = await self.bot._(interaction, "roles_react.rr-embed")
+        emb = discord.Embed(title=title, description=des, color=self.embed_color)
         emb.set_footer(text=self.footer_texts[0])
-        msg = await ctx.send(embed=emb)
+        msg = await interaction.channel.send(embed=emb)
         for emoji in emojis:
             try:
                 await msg.add_reaction(emoji)
@@ -333,13 +330,17 @@ It will only display the whole message with reactions. Still very cool tho
             except discord.HTTPException as err:
                 if err.status == 400:
                     continue
-                self.bot.dispatch("command_error", ctx, err)
+                self.bot.dispatch("interaction_error", interaction, err)
                 break
+        await interaction.followup.send(
+            await self.bot._(interaction, "roles_react.success-sent", msg='<' + msg.jump_url + '>')
+        )
 
     @rr_main.command(name="set-description")
-    @commands.check(checks.database_connected)
-    @commands.check(checks.has_manage_guild)
-    async def rr_set_description(self, ctx: MyContext, emoji: DiscordOrUnicodeEmoji, *, description: RoleDescription):
+    @app_commands.check(checks.database_connected)
+    @app_commands.checks.cooldown(5, 20)
+    async def rr_set_description(self, interaction: discord.Interaction, emoji: DiscordOrUnicodeEmojiArgument,
+                                 description: RoleDescription):
         """Set the description of a role reaction
         Use the 'none' keyword to remove the description
 
@@ -348,34 +349,33 @@ It will only display the whole message with reactions. Still very cool tho
         ..Example roles_react set-description :bell: none
 
         ..Doc roles-reactions.html#edit-a-reaction-description"""
-        await ctx.defer()
+        await interaction.response.defer(ephemeral=True)
         if description.lower() == "none":
             description = ""
-        try:
-            role_react = await self.db_get_role_from_emoji(ctx.guild.id, emoji)
-            if role_react is None:
-                return await ctx.send(await self.bot._(ctx.guild.id, "roles_react.no-rr"))
-            await self.db_edit_description(role_react['ID'], description[:150])
-        except Exception as err:
-            self.bot.dispatch("command_error", ctx, err)
+        role_react = await self.db_get_role_from_emoji(interaction.guild_id, emoji)
+        if role_react is None:
+            await interaction.followup.send(await self.bot._(interaction, "roles_react.no-rr"))
+            return
+        await self.db_edit_description(role_react['ID'], description[:150])
+        if role := interaction.guild.get_role(role_react['role']):
+            role_mention = f"<@&{role.id}>"
         else:
-            if role := ctx.guild.get_role(role_react['role']):
-                role_mention = f"<@&{role.id}>"
-            else:
-                role_mention = str(role_react['role'])
-            await ctx.send(await self.bot._(
-                ctx.guild.id,
-                "roles_react.rr-description-set" if description else "roles_react.rr-description-reset",
-                role=role_mention))
+            role_mention = str(role_react['role'])
+        if description:
+            text_key = "roles_react.rr-description-set"
+        else:
+            text_key = "roles_react.rr-description-reset"
+        await interaction.followup.send(await self.bot._(interaction, text_key, role=role_mention))
 
-    @rr_main.command(name='update')
+    @rr_main.command(name="update")
     @app_commands.describe(
         embed="A link to the message you want to update",
         change_description="Update the embed content (default: True)",
         emojis="A list of emojis to include (default: all)")
-    @commands.check(checks.database_connected)
-    async def rr_update(self, ctx: MyContext, embed: discord.Message, change_description: bool = True,
-                        emojis: commands.Greedy[DiscordOrUnicodeEmoji] = None):
+    @app_commands.check(checks.database_connected)
+    @app_commands.checks.cooldown(5, 20)
+    async def rr_update(self, interaction: discord.Interaction, embed: MessageArgument, change_description: bool = True,
+                        emojis: GreedyDiscordOrUnicodeEmojiArgument | None = None):
         """Update an Axobot message to refresh roles/reactions
         If you don't want to update the embed content (for example if it's a custom embed) then you can use 'False' as a second argument, and I will only check the reactions
         Specifying a list of emojis will update the embed only for those emojis, and ignore other roles reactions
@@ -385,25 +385,31 @@ It will only display the whole message with reactions. Still very cool tho
         ..Example roles_react update 707726569430319164 True :cool: :vip:
 
         ..Doc roles-reactions.html#update-your-embed"""
-        if embed.author != ctx.guild.me:
-            return await ctx.send(await self.bot._(ctx.guild, "roles_react.not-zbot-msg"))
+        if embed.author != interaction.guild.me:
+            await interaction.response.send_message(
+                await self.bot._(interaction, "roles_react.not-zbot-msg"), ephemeral=True
+            )
+            return
         if len(embed.embeds) != 1 or embed.embeds[0].footer.text not in self.footer_texts:
-            return await ctx.send(await self.bot._(ctx.guild, "roles_react.not-zbot-embed"))
+            await interaction.response.send_message(
+                await self.bot._(interaction, "roles_react.not-zbot-embed"), ephemeral=True
+            )
+            return
         if not embed.channel.permissions_for(embed.guild.me).add_reactions:
-            return await ctx.send(await self.bot._(ctx.guild, "poll.cant-react"))
-        await ctx.defer()
+            await interaction.response.send_message(
+                await self.bot._(interaction, "poll.cant-react"), ephemeral=True
+            )
+            return
+        await interaction.response.defer(ephemeral=True)
         emb = embed.embeds[0]
-        try:
-            full_list = {x['emoji']: x for x in await self.db_get_roles(ctx.guild.id)}
-        except Exception as err:
-            return self.bot.dispatch("command_error", ctx, err)
+        full_list = {x['emoji']: x for x in await self.db_get_roles(interaction.guild_id)}
         if emojis is not None:
             emojis_ids = [str(x.id) if isinstance(x, discord.Emoji)
                       else str(x) for x in emojis]
             full_list = [full_list[x] for x in emojis_ids if x in full_list]
         else:
             full_list = list(full_list.values())
-        desc, proper_emojis = await self.create_list_embed(full_list, ctx.guild)
+        desc, proper_emojis = await self.create_list_embed(full_list, interaction.guild)
         reacts = [x.emoji for x in embed.reactions]
         for emoji in proper_emojis:
             if emoji not in reacts:
@@ -411,9 +417,9 @@ It will only display the whole message with reactions. Still very cool tho
         if emb.description != desc and change_description:
             emb.description = desc
             await embed.edit(embed=emb)
-            await ctx.send(await self.bot._(ctx.guild, "roles_react.embed-edited"))
+            await interaction.followup.send(await self.bot._(interaction, "roles_react.embed-edited"))
         else:
-            await ctx.send(await self.bot._(ctx.guild, "roles_react.reactions-edited"))
+            await interaction.followup.send(await self.bot._(interaction, "roles_react.reactions-edited"))
 
 
     @rr_remove.autocomplete("emoji")

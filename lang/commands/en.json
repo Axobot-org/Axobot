@@ -413,6 +413,9 @@
         "roles-react remove": {
             "emoji": "emoji"
         },
+        "roles-react send": {
+            "channel": "channel"
+        },
         "roles-react set-description": {
             "description": "description",
             "emoji": "emoji"
