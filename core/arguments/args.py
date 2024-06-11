@@ -129,6 +129,22 @@ class GreedyRolesTransformer(discord.app_commands.Transformer): # pylint: disabl
 
 GreedyRolesArgument = discord.app_commands.Transform[list[discord.Role], GreedyRolesTransformer]
 
+class GreedyUsersOrRolesTransformer(discord.app_commands.Transformer): # pylint: disable=abstract-method
+    "Convert argument to a list of users or roles"
+
+    async def transform(self, interaction, value: str, /):
+        "Convert a string to a list of users or roles, else raise BadArgument"
+        ctx = await commands.Context.from_interaction(interaction)
+        result = []
+        for word in value.split(" "):
+            try:
+                result.append(await commands.UserConverter().convert(ctx, word))
+            except commands.BadArgument:
+                result.append(await commands.RoleConverter().convert(ctx, word))
+        return result
+
+GreedyUsersOrRolesArgument = discord.app_commands.Transform[list[discord.User | discord.Role], GreedyUsersOrRolesTransformer]
+
 class GreedyDurationTransformer(discord.app_commands.Transformer): # pylint: disable=abstract-method
     "Convert argument to a duration in seconds"
 
