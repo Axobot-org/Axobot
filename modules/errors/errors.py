@@ -13,6 +13,7 @@ from core.bot_classes import Axobot, MyContext
 from core.checks import checks
 from core.checks.errors import (NotAVoiceMessageError, NotDuringEventError,
                                 VerboseCommandError)
+from modules.perms.arguments.perms_args import InvalidPermissionTargetError
 
 AllowedCtx = MyContext | discord.Message | discord.Interaction | str
 
@@ -177,7 +178,7 @@ class Errors(commands.Cog):
             if isinstance(error, arguments_errors.InvalidServerLogError):
                 return await send_err('errors.invalidserverlog')
             # Invalid member, role or permission
-            if isinstance(error, arguments_errors.InvalidPermissionTargetError):
+            if isinstance(error, InvalidPermissionTargetError):
                 return await send_err('errors.invalidpermissiontarget')
             self.log.warning('Unknown BadArgument error type: %s', error)
         elif isinstance(error,commands.errors.MissingRequiredArgument):
