@@ -1,5 +1,4 @@
 import asyncio
-import importlib
 import operator
 import re
 from typing import Any
@@ -10,11 +9,8 @@ from asyncache import cached
 from cachetools import TTLCache
 from discord.ext import commands
 
-from core.arguments import args
 from core.bot_classes import Axobot, MyContext
 from core.serverconfig.options_list import options
-
-importlib.reload(args)
 
 
 class Utilities(commands.Cog):
