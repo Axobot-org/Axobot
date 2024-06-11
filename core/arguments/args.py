@@ -54,18 +54,18 @@ class CardStyleTransformer(discord.app_commands.Transformer):
 CardStyleArgument = discord.app_commands.Transform[str, CardStyleTransformer]
 
 
-class BotOrGuildInviteConverter:
+class BotOrGuildInviteTransformer(discord.app_commands.Transformer): # pylint: disable=abstract-method
     """Converts a string to a bot invite or a guild invite"""
-    @classmethod
-    async def convert(cls, _ctx: "MyContext", argument: str) -> str | int:
+
+    async def transform(self, _interaction: discord.Interaction["Axobot"], value, /):
         "Do the conversion"
         answer = None
         r_invite = re.search(
             r'^https://discord(?:app)?\.com/(?:api/)?oauth2/authorize\?(?:client_id=(\d{17,19})|scope=([a-z\.\+]+?)|(?:permissions|guild_id|disable_guild_select|redirect_uri)=[^&\s]+)(?:&(?:client_id=(\d{17,19})|scope=([a-z\.\+]+?)|(?:permissions|guild_id|disable_guild_select|redirect_uri)=[^&\s]+))*$',
-            argument
+            value
         )
         if r_invite is None:
-            r_invite = re.search(r'(?:discord\.gg|discordapp\.com/invite)/([^\s/]+)', argument)
+            r_invite = re.search(r'(?:discord\.gg|discordapp\.com/invite)/([^\s/]+)', value)
             if r_invite is not None:
                 answer = r_invite.group(1)
         else:
@@ -74,10 +74,10 @@ class BotOrGuildInviteConverter:
                 if 'bot' in scopes:
                     answer = int(r_invite.group(1) or r_invite.group(3))
         if r_invite is None or answer is None:
-            raise arguments_errors.InvalidBotOrGuildInviteError(argument)
+            raise arguments_errors.InvalidBotOrGuildInviteError(value)
         return answer
 
-BotOrGuildInvite = Annotated[str | int, BotOrGuildInviteConverter]
+BotOrGuildInviteArgument = discord.app_commands.Transform[str | int, BotOrGuildInviteTransformer]
 
 class URL(str):
     "Represents a decomposed URL"
