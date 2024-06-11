@@ -4,7 +4,8 @@ from discord.ext import commands
 
 from core.arguments import args
 from core.bot_classes import Axobot
-from modules.bitly import bitly_api
+
+from .api import bitly_api
 
 
 class Bitly(commands.Cog):
