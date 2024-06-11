@@ -208,7 +208,7 @@ class RolesManagement(commands.Cog):
         for user in n_users:
             if count >= self.max_roles_modifications:
                 break
-            await user.remove_roles(role,reason="Asked by {ctx.author}")
+            await user.remove_roles(role, reason=f"Asked by {interaction.user}")
             count += 1
         answer = await self.bot._(interaction, "moderation.role.remove-success", count=count, m=len(n_users))
         if count == self.max_roles_modifications and len(n_users) > count:
