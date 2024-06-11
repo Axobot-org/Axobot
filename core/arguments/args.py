@@ -217,16 +217,6 @@ class DiscordOrUnicodeEmojiConverter:
 
 DiscordOrUnicodeEmoji = Annotated[discord.Emoji | str, DiscordOrUnicodeEmojiConverter]
 
-
-class arguments(commands.Converter):
-    "Convert arguments to a foo=bar dictionary"
-    async def convert(self, _ctx: "MyContext", argument: str) -> dict[str, str]:
-        answer = {}
-        for result in re.finditer(r'(\w+) ?= ?\"((?:[^\"\\]|\\\"|\\)+)\"', argument):
-            answer[result.group(1)] = result.group(2).replace('\\"', '"')
-        return answer
-
-
 class Snowflake:
     "Convert arguments to a discord Snowflake"
     def __init__(self, object_id: int):
@@ -243,23 +233,6 @@ class Snowflake:
         if len(argument) < 17 or len(argument) > 20 or not argument.isnumeric():
             raise commands.ObjectNotFound(argument)
         return cls(int(argument))
-
-class RawPermissionValue(int):
-    "Represents a raw permission value, as an integer"
-    @classmethod
-    async def convert(cls, _ctx: "MyContext", argument: str):
-        "Do the conversion"
-        if re.match(r'0b[0,1]+', argument):
-            return int(argument[2:], 2)
-        if not argument.isnumeric():
-            raise arguments_errors.InvalidRawPermissionError(argument)
-        try:
-            value = int(argument, 2 if len(argument) > 13 else 10)
-        except ValueError:
-            value = int(argument)
-        if value > discord.Permissions.all().value:
-            raise arguments_errors.InvalidRawPermissionError(argument)
-        return value
 
 class ISBN(int):
     "Convert argument to a valid ISBN"

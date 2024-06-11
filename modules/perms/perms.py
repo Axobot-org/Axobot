@@ -4,61 +4,11 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
-from core.arguments.args import RawPermissionValue
-from core.arguments.errors import InvalidPermissionTargetError
-from core.bot_classes import Axobot, MyContext
+from core.bot_classes import Axobot
 from core.paginator import cut_text
 
-VoiceChannelTypes = (
-    discord.VoiceChannel
-    | discord.StageChannel
-)
-
-TextChannelTypes = (
-    discord.TextChannel
-    | discord.CategoryChannel
-    | discord.ForumChannel
-    | discord.Thread
-)
-
-AcceptableChannelTypes = (
-    None
-    | VoiceChannelTypes
-    | TextChannelTypes
-)
-
-AcceptableTargetTypes = (
-    None
-    | discord.Member
-    | discord.Role
-    | RawPermissionValue
-)
-
-class TargetTransformer(app_commands.Transformer): # pylint: disable=abstract-method
-    "Convert a string argument into a Discord Member, Role or Permission object"
-    async def transform(self, interaction, value, /):
-        ctx = await MyContext.from_interaction(interaction)
-        try:
-            return await commands.MemberConverter().convert(ctx, value)
-        except commands.MemberNotFound:
-            pass
-
-        try:
-            return await commands.RoleConverter().convert(ctx, value)
-        except commands.RoleNotFound:
-            pass
-
-        try:
-            return await RawPermissionValue().convert(ctx, value)
-        except commands.BadArgument:
-            pass
-
-        if value == "everyone":
-            return ctx.guild.default_role
-
-        raise InvalidPermissionTargetError(value)
-
-TargetArgument = app_commands.Transform[AcceptableTargetTypes, TargetTransformer]
+from .arguments.perms_args import (AcceptableChannelTypes, TargetArgument,
+                                   TextChannelTypes, VoiceChannelTypes)
 
 
 class Perms(commands.Cog):

@@ -1,5 +1,6 @@
 from discord.ext import commands
 
+
 class VerboseBadArgumentError(commands.BadArgument):
     "Base class for when a BadArgument should be handled by the command_error event"
 
@@ -44,15 +45,3 @@ class InvalidServerLogError(VerboseBadArgumentError):
     def __init__(self, argument: str):
         self.argument = argument
         super().__init__(f"Invalid server log: {argument}")
-
-class InvalidRawPermissionError(VerboseBadArgumentError):
-    "Raised when the user argument is not a valid raw permission"
-    def __init__(self, argument: str):
-        self.argument = argument
-        super().__init__(f"Invalid raw permission: {argument}")
-
-class InvalidPermissionTargetError(VerboseBadArgumentError):
-    "Raised when the 'target' argument of the permissions command is not valid"
-    def __init__(self, argument: str):
-        self.argument = argument
-        super().__init__(f"Invalid member, role or permission: {argument}")
