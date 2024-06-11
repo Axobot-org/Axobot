@@ -1,5 +1,5 @@
 import re
-from typing import TYPE_CHECKING, Annotated
+from typing import TYPE_CHECKING
 
 import discord
 from discord.ext import commands
@@ -180,42 +180,55 @@ class EmojiTransformer(discord.app_commands.Transformer):
 
 EmojiArgument = discord.app_commands.Transform[discord.Emoji, EmojiTransformer]
 
-class UnicodeEmojiConverter(str):
+class UnicodeEmojiTransformer(discord.app_commands.Transformer): # pylint: disable=abstract-method
     "Represents any Unicode emoji"
 
-    @classmethod
-    async def convert(cls, ctx: "MyContext", argument: str):
+    async def transform(self, interaction: discord.Interaction["Axobot"], value, /):
         "Check if a string is a unicod emoji, else raise BadArgument"
-        unicodes = ctx.bot.emojis_manager.unicode_set
-        if all(char in unicodes for char in argument):
-            return argument
-        raise arguments_errors.InvalidUnicodeEmojiError(argument)
+        unicodes = interaction.client.emojis_manager.unicode_set
+        if all(char in unicodes for char in value):
+            return value
+        raise arguments_errors.InvalidUnicodeEmojiError(value)
 
-class PartialOrUnicodeEmojiConverter:
+class PartialOrUnicodeEmojiTransformer(discord.app_commands.Transformer): # pylint: disable=abstract-method
     "Represents any unicode or Discord emoji"
 
-    @classmethod
-    async def convert(cls, ctx: "MyContext", argument: str):
+    async def transform(self, interaction, value, /):
         "Convert an argument into a PartialEmoji or Unicode emoji"
+        ctx = await commands.Context.from_interaction(interaction)
         try:
-            return await commands.PartialEmojiConverter().convert(ctx, argument)
+            return await commands.PartialEmojiConverter().convert(ctx, value)
         except commands.errors.BadArgument:
-            return await UnicodeEmojiConverter().convert(ctx, argument)
+            return await UnicodeEmojiTransformer().transform(interaction, value)
 
-PartialorUnicodeEmoji = Annotated[discord.PartialEmoji | str, PartialOrUnicodeEmojiConverter]
+PartialorUnicodeEmojiArgument = discord.app_commands.Transform[discord.PartialEmoji | str, PartialOrUnicodeEmojiTransformer]
 
-class DiscordOrUnicodeEmojiConverter:
+class DiscordOrUnicodeEmojiTransformer(discord.app_commands.Transformer): # pylint: disable=abstract-method
     "Represents any unicode or Discord emoji"
 
-    @classmethod
-    async def convert(cls, ctx: "MyContext", argument: str):
+    async def transform(self, interaction, value, /):
         "Convert an argument into a PartialEmoji or Unicode emoji"
+        ctx = await commands.Context.from_interaction(interaction)
         try:
-            return await commands.EmojiConverter().convert(ctx, argument)
+            return await commands.EmojiConverter().convert(ctx, value)
         except commands.errors.BadArgument:
-            return await UnicodeEmojiConverter().convert(ctx, argument)
+            return await UnicodeEmojiTransformer().transform(interaction, value)
 
-DiscordOrUnicodeEmoji = Annotated[discord.Emoji | str, DiscordOrUnicodeEmojiConverter]
+DiscordOrUnicodeEmojiArgument = discord.app_commands.Transform[discord.Emoji | str, DiscordOrUnicodeEmojiTransformer]
+
+class GreedyDiscordOrUnicodeEmojiTransformer(discord.app_commands.Transformer): # pylint: disable=abstract-method
+    "Convert argument to a list of discord or unicode emojis"
+
+    async def transform(self, interaction, value: str, /):
+        "Convert a string to a list of discord or unicode emojis, else raise BadArgument"
+        return [
+            await DiscordOrUnicodeEmojiTransformer().transform(interaction, word)
+            for word in value.split(" ")
+        ]
+
+GreedyDiscordOrUnicodeEmojiArgument = discord.app_commands.Transform[
+    list[discord.Emoji | str], GreedyDiscordOrUnicodeEmojiTransformer
+]
 
 class Snowflake:
     "Convert arguments to a discord Snowflake"

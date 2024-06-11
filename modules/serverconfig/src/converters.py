@@ -6,13 +6,13 @@ import discord
 from discord.app_commands import locale_str as _T
 from discord.ext import commands
 
-from core.arguments import UnicodeEmojiConverter
 from core.bot_classes import Axobot, MyContext
 from core.emojis_manager import EmojisManager
 from core.getch_methods import getch_channel_or_thread
 from core.serverconfig.options_list import options as options_list
 
 log = logging.getLogger("bot")
+UnicodeEmoji = str
 UnicodeEmojis = EmojisManager(None).unicode_set
 
 class IntOptionRepresentation(TypedDict):
@@ -618,7 +618,7 @@ class EmojisListOption(OptionConverter):
         if any(not isinstance(id, int | str) for id in emoji_ids):
             log.warning("[EmojisListConverter] Invalid emoji ids: %s", emoji_ids)
             emoji_ids = [id for id in emoji_ids if isinstance(id, int | str)]
-        emojis: list[UnicodeEmojiConverter | discord.Emoji] = []
+        emojis: list[UnicodeEmoji | discord.Emoji] = []
         for emoji_id in emoji_ids:
             if isinstance(emoji_id, int):
                 guild_emojis = [emoji for emoji in guild.emojis if emoji.id == emoji_id]
@@ -634,21 +634,21 @@ class EmojisListOption(OptionConverter):
         return emojis
 
     @staticmethod
-    def to_raw(value: list[UnicodeEmojiConverter | discord.Emoji]):
+    def to_raw(value: list[UnicodeEmoji | discord.Emoji]):
         return json.dumps([emoji.id if isinstance(emoji, discord.Emoji) else emoji for emoji in value])
 
     @staticmethod
-    def to_display(_option_name, value: list[UnicodeEmojiConverter | discord.Emoji]):
+    def to_display(_option_name, value: list[UnicodeEmoji | discord.Emoji]):
         return " ".join(str(emoji) for emoji in value)
 
     @staticmethod
     async def from_input(raw: str, representation: EmojisListOptionRepresentation, guild: discord.Guild, ctx: MyContext):
-        emojis: list[UnicodeEmojiConverter | discord.Emoji] = []
+        emojis: list[UnicodeEmoji | discord.Emoji] = []
         for emoji in raw.split():
             if emoji in UnicodeEmojis:
                 if emoji in emojis:
                     continue
-                emojis.append(UnicodeEmojiConverter(emoji))
+                emojis.append(str(emoji))
             else:
                 try:
                     emoji = await commands.EmojiConverter().convert(ctx, emoji)

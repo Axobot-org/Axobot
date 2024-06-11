@@ -2,6 +2,7 @@
     "already-1-rr": "You already have a designated role for this emoji",
     "already-dont-have": "You don't have this role",
     "already-have": "You already have this role",
+    "cant-send-embed": "I can't send embeds and reactions in this channel",
     "embed-edited": "The embed and reactions have been successfully updated",
     "no-rr": "No role is related to this emoji",
     "not-zbot-embed": "This message does not contain any role-reaction embed",
@@ -17,5 +18,6 @@
     "rr-list": "List of reaction roles (%{n}/%{m})",
     "rr-removed": "The role %{r} can no longer be given via the emoji %{e}",
     "rr-removed-2": "The emoji %{e} is free again to give a role",
+    "success-sent": "The message has been sent to %{msg}!",
     "too-many-rr": "You have already reached the limit of %{l} roles"
 }
