@@ -239,14 +239,14 @@ When you load the backup, the bot may not be able to apply some changes. However
 Create a backup
 ---------------
 
-**Syntax:** :code:`backup create`
+**Syntax:** :code:`server-backup create`
 
 Creates a file containing as much information as possible on your server, within the limit of the permissions granted to the bot. You will have to keep this file carefully, it will be necessary for you when you will want to restore the backup.
 
 Load a backup
 -------------
 
-**Syntax:** :code:`backup load`
+**Syntax:** :code:`server-backup load`
 
 Uses the file attached to this message to load a backup, based on the data stored in the file. Be sure to send the file in the same message as the command, so that Axobot can easily find it. If the bot lacks permissions, it will try to skip this step and write it down in the logs. The set of logs is then sent at the end of the procedure.
 

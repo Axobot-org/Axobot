@@ -1,4 +1,5 @@
 {
+    "already_running": "A backup is already running, please wait for it to finish",
     "backup-done": "Backup done!",
     "err": "Oops, an internal error occured... wait a few moments or contact support (command `about`) if it happens again",
     "finished": "Backup applied! Here are the logs",

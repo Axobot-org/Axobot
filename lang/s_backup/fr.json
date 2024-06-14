@@ -1,4 +1,5 @@
 {
+    "already_running": "Une backup est déjà en cours d'exécution, veuillez patienter",
     "backup-done": "Sauvegarde terminée !",
     "err": "Oups, une erreur interne est survenue... attendez quelques instants ou contactez le support (commande `about`) si cela se reproduit",
     "finished": "Sauvegarde appliquée ! Voici les logs",
