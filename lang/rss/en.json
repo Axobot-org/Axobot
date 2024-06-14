@@ -98,13 +98,21 @@
     },
     "research-timeout": "The web page took too long to answer, I had to interrupt the process :eyes:",
     "roles": {
-        "cant-find": "I can't find this role",
+        "edit-silent-false": {
+            "one": "This feed has been modified to send regular notifications",
+            "many": "These feeds have been modified to send regular notifications"
+        },
+        "edit-silent-true": {
+            "one": "This feed has been modified to send silent notifications",
+            "many": "These feeds have been modified to send silent notifications"
+        },
         "edit-success": {
             "many": "This feed has been modified to mention the roles %{roles}",
             "one": "This feed has been modified to mention the role %{roles}",
             "zero": "This feed has been modified to not mention any role"
         },
-        "list": "Here is the list of roles already notified: %{roles}"
+        "list": "Here is the list of roles already notified: %{roles}",
+        "no-change": "No parameter has been changed"
     },
     "success-add": "The rss feed of type \"%{type}\" with link <%{url}> has been properly added in the channel %{channel}!",
     "test": {
