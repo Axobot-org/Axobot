@@ -387,7 +387,7 @@ class ServerLogs(commands.Cog):
             return True
         return False
 
-    async def send_botwarning_tip(self, ctx: MyContext):
+    async def send_botwarning_tip(self, ctx: MyContext | discord.Interaction):
         "Send a tip if bot_warnings log is not used in this guild"
         if ctx.guild is None or await self.is_log_enabled(ctx.guild.id, "bot_warnings"):
             return False

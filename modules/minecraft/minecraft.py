@@ -13,7 +13,6 @@ from discord.ext import commands
 
 from core.bot_classes import Axobot
 from core.formatutils import FormatUtils
-from modules.rss.rss import can_use_rss
 from modules.rss.src import FeedObject
 
 SERVER_ADDRESS_REGEX = re.compile(r"^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$|"
@@ -304,7 +303,6 @@ class Minecraft(commands.Cog):
 
     @mc_main.command(name="follow-server")
     @app_commands.guild_only()
-    @app_commands.check(can_use_rss)
     @app_commands.checks.cooldown(5, 20)
     async def mc_follow_server(self, interaction: discord.Interaction, ip: str, port: int | None = None,
                                channel: discord.TextChannel | None = None):

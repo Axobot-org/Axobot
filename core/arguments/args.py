@@ -1,5 +1,6 @@
+import inspect
 import re
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Type
 
 import discord
 from discord.ext import commands
@@ -9,6 +10,34 @@ from core.formatutils import FormatUtils
 
 if TYPE_CHECKING:
     from core.bot_classes import Axobot, MyContext
+
+def UnionTransformer(*types) -> Type[discord.app_commands.Transformer]: # pylint: disable=invalid-name
+    "Convert arguments to one of the provided types"
+
+    for type_ in types:
+        if not (
+            isinstance(type_, str)
+            or type_ is None
+            or inspect.isclass(type_) and issubclass(type_, discord.app_commands.Transformer)
+        ):
+            raise TypeError(f'unsupported type annotation: {type_!r}')
+
+    class UnionTransformerClass(discord.app_commands.Transformer): # pylint: disable=abstract-method
+        "Convert arguments to one of the provided types"
+
+        async def transform(self, interaction, value, /):
+            for type_ in types:
+                if isinstance(type_, str) and type_ == value:
+                    return value
+                if type_ is None and value is None:
+                    return None
+                if inspect.isclass(type_) and issubclass(type_, discord.app_commands.Transformer):
+                    try:
+                        return await type_().transform(interaction, value)
+                    except commands.errors.BadArgument:
+                        continue
+            raise commands.errors.BadArgument(value)
+    return UnionTransformerClass
 
 
 class AnyUser(discord.User):
@@ -37,7 +66,6 @@ class AnyUser(discord.User):
                 return await commands.UserConverter().convert(ctx, argument)
         if res is None:
             raise commands.errors.UserNotFound(argument)
-
 
 class CardStyleTransformer(discord.app_commands.Transformer):
     "Converts a string to a valid XP card style"
