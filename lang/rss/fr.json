@@ -98,13 +98,21 @@
     },
     "research-timeout": "La page web a mis trop de temps à répondre, j'ai dû interrompre le processus :eyes:",
     "roles": {
-        "cant-find": "Rôle introuvable",
+        "edit-silent-false": {
+            "one": "Ce flux a été modifié pour envoyer des mentions classiques",
+            "many": "Ces flux ont été modifiés pour envoyer des mentions classiques"
+        },
+        "edit-silent-true": {
+            "one": "Ce flux a été modifié pour envoyer des mentions silencieuses",
+            "many": "Ces flux ont été modifiés pour envoyer des mentions silencieuses"
+        },
         "edit-success": {
             "many": "Ce flux a bien été modifié pour mentionner les rôles %{roles}",
             "one": "Ce flux a bien été modifié pour mentionner le rôle %{roles}",
             "zero": "Ce flux a bien été modifié pour ne mentionner aucun rôle"
         },
-        "list": "Voici la liste des rôles déjà mentionnés : %{roles}"
+        "list": "Voici la liste des rôles déjà mentionnés : %{roles}",
+        "no-change": "Aucun paramètre n'a été modifié"
     },
     "success-add": "Le flux rss de type '%{type}' avec le lien <%{url}> a bien été ajouté dans le salon %{channel} !",
     "test": {

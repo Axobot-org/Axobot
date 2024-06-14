@@ -181,9 +181,13 @@ class PaginatedSelectView(ui.View):
             return list(self._values)[0]
         return sorted(self._values)
 
-    async def send_init(self, ctx: MyContext):
+    async def send_init(self, ctx: MyContext | Interaction):
         "Build the first page, before anyone actually click"
         await self._update_buttons()
+        if isinstance(ctx, Interaction):
+            if ctx.response.is_done():
+                return await ctx.followup.send(content=self.message, view=self)
+            return await ctx.response.send_message(content=self.message, view=self)
         return await ctx.send(view=self)
 
     async def interaction_check(self, interaction, /) -> bool:
