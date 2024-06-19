@@ -42,7 +42,7 @@
     "reset-all": {
         "confirmation": "Are you sure you really want to reset everything? There will be no going back.",
         "success": "All your configuration has been reset!",
-        "error": "Oops, something went wrong! Please contact our support if the problem persists"
+        "error": "Oops, something went wrong while resetting your configuration! Please contact our support if the problem persists"
     },
     "see-0": "Enter `!config help` for more details",
     "see-title": "%{guild} server configuration",
