@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING, Any
 
 import discord
 
-from core.bot_classes import Axobot, MyContext
+from core.bot_classes import Axobot
 from core.paginator import Paginator
 from core.serverconfig import options_list as opt_list
 
@@ -16,22 +16,25 @@ class ServerConfigPaginator(Paginator):
     "Allow user to see a server config and navigate into its pages"
 
     def __init__(self, client: Axobot, user: discord.User, stop_label: str, guild: discord.Guild, cog: "ServerConfig"):
-        super().__init__(client, user, stop_label, timeout=120)
+        super().__init__(client, user, stop_label, timeout=10)
         self.guild = guild
         self.cog = cog
         self.options_list = [option for option, value in opt_list.options.items() if value["is_listed"]]
         self.server_config: dict[str, Any] = {}
         self.items_per_page = 21
 
-    async def send_init(self, ctx: MyContext):
+    async def send_init(self, ctx: discord.Interaction):
         "Create and send 1st page"
-        full_config = await ctx.bot.get_cog("ServerConfig").get_guild_config(self.guild.id, with_defaults=True)
+        full_config = await self.client.get_cog("ServerConfig").get_guild_config(self.guild.id, with_defaults=True)
         for option, value in full_config.items():
             if option in opt_list.options and opt_list.options[option]["is_listed"]:
                 self.server_config[option] = value
         contents = await self.get_page_content(ctx, 1)
         await self._update_buttons()
-        return await ctx.send(**contents, view=self)
+        if ctx.response.is_done():
+            await ctx.followup.send(**contents, view=self)
+        else:
+            await ctx.response.send_message(**contents, view=self)
 
     async def get_page_count(self) -> int:
         length = len(self.server_config)

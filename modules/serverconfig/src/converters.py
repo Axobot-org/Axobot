@@ -6,7 +6,7 @@ import discord
 from discord.app_commands import locale_str as _T
 from discord.ext import commands
 
-from core.bot_classes import Axobot, MyContext
+from core.bot_classes import Axobot
 from core.emojis_manager import EmojisManager
 from core.getch_methods import getch_channel_or_thread
 from core.serverconfig.options_list import options as options_list
@@ -156,7 +156,7 @@ class OptionConverter:
         raise NotImplementedError
 
     @staticmethod
-    async def from_input(raw: str, representation: AllRepresentation, guild: discord.Guild, ctx: MyContext):
+    async def from_input(raw: str, representation: AllRepresentation, guild: discord.Guild, interaction: discord.Interaction):
         raise NotImplementedError
 
 def get_converter(option_name: str):
@@ -220,12 +220,12 @@ async def to_display(option_name: str, value, guild: discord.Guild, bot: "Axobot
         return await bot._(guild, result.message)
     return result
 
-async def from_input(option_name: str, raw: str, guild: discord.Guild, ctx: MyContext):
+async def from_input(option_name: str, raw: str, guild: discord.Guild, interaction: discord.Interaction):
     "Convert a user input to a config object"
     if raw is None:
         return None
     converter = get_converter(option_name)
-    return await converter.from_input(raw, options_list[option_name], guild, ctx)
+    return await converter.from_input(raw, options_list[option_name], guild, interaction)
 
 class IntOption(OptionConverter):
     "Option converter for integer values"
@@ -250,7 +250,8 @@ class IntOption(OptionConverter):
         return str(value)
 
     @staticmethod
-    async def from_input(raw: str, representation: IntOptionRepresentation, guild: discord.Guild, ctx: MyContext):
+    async def from_input(raw: str, representation: IntOptionRepresentation, guild: discord.Guild,
+                         interaction: discord.Interaction):
         try:
             value = int(raw)
         except ValueError:
@@ -284,7 +285,8 @@ class FloatOption(OptionConverter):
         return str(value)
 
     @staticmethod
-    async def from_input(raw: str, representation: FloatOptionRepresentation, guild: discord.Guild, ctx: MyContext):
+    async def from_input(raw: str, representation: FloatOptionRepresentation, guild: discord.Guild,
+                         interaction: discord.Interaction):
         try:
             value = round(float(raw), 3)
         except ValueError:
@@ -313,7 +315,8 @@ class BooleanOption(OptionConverter):
             return _T("server.bool.false")
 
     @staticmethod
-    async def from_input(raw: str, representation: BooleanOptionRepresentation, guild: discord.Guild, ctx: MyContext):
+    async def from_input(raw: str, representation: BooleanOptionRepresentation, guild: discord.Guild,
+                         interaction: discord.Interaction):
         true_ish = {"1", "true", "yes", "on", "oui"}
         false_ish = {"0", "false", "no", "off", "non"}
         if raw.lower() not in true_ish | false_ish:
@@ -339,7 +342,8 @@ class EnumOption(OptionConverter):
         return _T(f"server.enum.{option_name}.{value}")
 
     @staticmethod
-    async def from_input(raw: str, representation: EnumOptionRepresentation, guild: discord.Guild, ctx: MyContext):
+    async def from_input(raw: str, representation: EnumOptionRepresentation, guild: discord.Guild,
+                         interaction: discord.Interaction):
         if raw.lower() not in representation["values"]:
             raise ValueError("Invalid enum value", "ENUM_INVALID", representation)
         return raw.lower()
@@ -359,7 +363,8 @@ class TextOption(OptionConverter):
         return value
 
     @staticmethod
-    async def from_input(raw: str, representation: TextOptionRepresentation, guild: discord.Guild, ctx: MyContext):
+    async def from_input(raw: str, representation: TextOptionRepresentation, guild: discord.Guild,
+                         interaction: discord.Interaction):
         if len(raw) < representation["min_length"]:
             raise ValueError("Text is too short", "TEXT_TOO_SHORT", representation)
         elif len(raw) > representation["max_length"]:
@@ -390,7 +395,9 @@ class RoleOption(OptionConverter):
         return value.mention
 
     @staticmethod
-    async def from_input(raw: str, representation: RoleOptionRepresentation, guild: discord.Guild, ctx: MyContext):
+    async def from_input(raw: str, representation: RoleOptionRepresentation, guild: discord.Guild,
+                         interaction: discord.Interaction):
+        ctx = await commands.Context.from_interaction(interaction)
         try:
             role = await commands.RoleConverter().convert(ctx, raw)
         except commands.BadArgument:
@@ -427,8 +434,10 @@ class RolesListOption(OptionConverter):
         return ", ".join(role.mention for role in value)
 
     @staticmethod
-    async def from_input(raw: str, representation: RolesListOptionRepresentation, guild: discord.Guild, ctx: MyContext):
+    async def from_input(raw: str, representation: RolesListOptionRepresentation, guild: discord.Guild,
+                         interaction: discord.Interaction):
         roles: list[discord.Role] = []
+        ctx = await commands.Context.from_interaction(interaction)
         for word in raw.split(" "):
             try:
                 role = await commands.RoleConverter().convert(ctx, word)
@@ -446,7 +455,7 @@ class RolesListOption(OptionConverter):
             roles.append(role)
         if len(roles) < representation["min_count"]:
             raise ValueError("Too few roles", "ROLES_TOO_FEW", representation)
-        elif len(roles) > representation["max_count"]:
+        if len(roles) > representation["max_count"]:
             raise ValueError("Too many roles", "ROLES_TOO_MANY", representation)
         return roles
 
@@ -474,7 +483,9 @@ class TextChannelOption(OptionConverter):
         return value.mention
 
     @staticmethod
-    async def from_input(raw: str, representation: TextChannelOptionRepresentation, guild: discord.Guild, ctx: MyContext):
+    async def from_input(raw: str, representation: TextChannelOptionRepresentation, guild: discord.Guild,
+                         interaction: discord.Interaction):
+        ctx = await commands.Context.from_interaction(interaction)
         try:
             channel = await commands.GuildChannelConverter().convert(ctx, raw)
         except commands.BadArgument:
@@ -518,8 +529,10 @@ class TextChannelsListOption(OptionConverter):
         return ", ".join(channel.mention for channel in value)
 
     @staticmethod
-    async def from_input(raw: str, representation: TextChannelsListOptionRepresentation, guild: discord.Guild, ctx: MyContext):
+    async def from_input(raw: str, representation: TextChannelsListOptionRepresentation, guild: discord.Guild,
+                         interaction: discord.Interaction):
         channels: list[discord.TextChannel | discord.Thread] = []
+        ctx = await commands.Context.from_interaction(interaction)
         for word in raw.split(" "):
             try:
                 channel = await commands.GuildChannelConverter().convert(ctx, word)
@@ -538,7 +551,7 @@ class TextChannelsListOption(OptionConverter):
             channels.append(channel)
         if len(channels) < representation["min_count"]:
             raise ValueError("Too few channels", "CHANNELS_TOO_FEW", representation)
-        elif len(channels) > representation["max_count"]:
+        if len(channels) > representation["max_count"]:
             raise ValueError("Too many channels", "CHANNELS_TOO_MANY", representation)
         return channels
 
@@ -566,7 +579,9 @@ class VoiceChannelOption(OptionConverter):
         return value.mention
 
     @staticmethod
-    async def from_input(raw: str, representation: VoiceChannelOptionRepresentation, guild: discord.Guild, ctx: MyContext):
+    async def from_input(raw: str, representation: VoiceChannelOptionRepresentation, guild: discord.Guild,
+                         interaction: discord.Interaction):
+        ctx = await commands.Context.from_interaction(interaction)
         try:
             channel = await commands.GuildChannelConverter().convert(ctx, raw)
         except commands.BadArgument:
@@ -603,7 +618,9 @@ class CategoryOption(OptionConverter):
         return value.name
 
     @staticmethod
-    async def from_input(raw: str, representation: CategoryOptionRepresentation, guild: discord.Guild, ctx: MyContext):
+    async def from_input(raw: str, representation: CategoryOptionRepresentation, guild: discord.Guild,
+                         interaction: discord.Interaction):
+        ctx = await commands.Context.from_interaction(interaction)
         try:
             channel = await commands.CategoryChannelConverter().convert(ctx, raw)
         except commands.BadArgument:
@@ -642,8 +659,10 @@ class EmojisListOption(OptionConverter):
         return " ".join(str(emoji) for emoji in value)
 
     @staticmethod
-    async def from_input(raw: str, representation: EmojisListOptionRepresentation, guild: discord.Guild, ctx: MyContext):
+    async def from_input(raw: str, representation: EmojisListOptionRepresentation, guild: discord.Guild,
+                         interaction: discord.Interaction):
         emojis: list[UnicodeEmoji | discord.Emoji] = []
+        ctx = await commands.Context.from_interaction(interaction)
         for emoji in raw.split():
             if emoji in UnicodeEmojis:
                 if emoji in emojis:
@@ -661,7 +680,7 @@ class EmojisListOption(OptionConverter):
                 emojis.append(emoji)
         if len(emojis) < representation["min_count"]:
             raise ValueError("Too few emojis", "EMOJIS_TOO_FEW", representation)
-        elif len(emojis) > representation["max_count"]:
+        if len(emojis) > representation["max_count"]:
             raise ValueError("Too many emojis", "EMOJIS_TOO_MANY", representation)
         return emojis
 
@@ -686,7 +705,9 @@ class ColorOption(OptionConverter):
         return f"#{value:06X}"
 
     @staticmethod
-    async def from_input(raw: str, representation: ColorOptionRepresentation, guild: discord.Guild, ctx: MyContext):
+    async def from_input(raw: str, representation: ColorOptionRepresentation, guild: discord.Guild,
+                         interaction: discord.Interaction):
+        ctx = await commands.Context.from_interaction(interaction)
         try:
             color = await commands.ColorConverter().convert(ctx, raw)
         except commands.BadArgument:
@@ -719,7 +740,8 @@ class LevelupChannelOption(OptionConverter):
         return TextChannelOption.to_display(option_name, value)
 
     @staticmethod
-    async def from_input(raw: str, representation: LevelupChannelOptionRepresentation, guild: discord.Guild, ctx: MyContext):
+    async def from_input(raw: str, representation: LevelupChannelOptionRepresentation, guild: discord.Guild,
+                         interaction: discord.Interaction):
         if raw.lower() in {"any", "none", "dm"}:
             return raw.lower()
         channel_repr: TextChannelOptionRepresentation = representation | {
@@ -727,6 +749,7 @@ class LevelupChannelOption(OptionConverter):
             "allow_announcement_channels": True,
             "allow_non_nsfw_channels": True,
         }
+        ctx = await commands.Context.from_interaction(interaction)
         try:
             return await TextChannelOption.from_input(raw, channel_repr, guild, ctx)
         except ValueError:

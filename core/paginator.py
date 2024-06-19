@@ -70,25 +70,24 @@ class Paginator(ui.View):
     async def disable(self, interaction: Message | Interaction):
         "Called when the timeout has expired"
         try:
-            await self._update_contents(interaction, stopped=True)
+            await self._update_contents(interaction)
         except NotFound:
             pass
         self.stop()
 
-    async def _set_page(self, interaction: Interaction, page: int):
+    async def _set_page(self, _interaction: Interaction, page: int):
         "Set the page number starting from 1"
         count = await self.get_page_count()
         self.page = min(max(page, 1), count)
 
-    async def _update_contents(self, interaction: Message | Interaction, stopped: bool=None):
+    async def _update_contents(self, interaction: Message | Interaction):
         "Update the page content"
-        if isinstance(interaction, Interaction):
+        if isinstance(interaction, Interaction) and not interaction.response.is_done():
             await interaction.response.defer()
         await self._update_buttons()
         if isinstance(interaction, Interaction):
             contents = await self.get_page_content(interaction, self.page)
-            await interaction.followup.edit_message(
-                interaction.message.id,
+            await interaction.edit_original_response(
                 view=self,
                 **contents
             )
