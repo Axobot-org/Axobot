@@ -6,7 +6,6 @@ import aiohttp
 import discord
 from discord import app_commands
 from discord.ext import commands
-from discord.types.channel import GuildChannel
 
 from core.bot_classes import Axobot
 
@@ -130,7 +129,7 @@ Arguments are:
 
     async def create_backup(self, interaction: discord.Interaction) -> str:
         "Create a backup of the server and return it as a JSON string"
-        async def get_channel_json(chan: GuildChannel) -> dict:
+        async def get_channel_json(chan: discord.abc.GuildChannel) -> dict:
             chan_js = {'id': chan.id, 'name': chan.name,
                        'position': chan.position}
             if isinstance(chan, discord.TextChannel):
