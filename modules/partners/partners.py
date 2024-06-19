@@ -12,7 +12,7 @@ from discord import AppCommandOptionType, app_commands
 from discord.ext import commands, tasks
 
 from core.arguments import args
-from core.bot_classes import SUPPORT_GUILD_ID, Axobot, MyContext
+from core.bot_classes import SUPPORT_GUILD_ID, Axobot
 from core.checks import checks
 from core.views import ConfirmView
 
@@ -613,8 +613,7 @@ class Partners(commands.Cog):
 
     ..Doc server.html#change-the-embed-color"""
         await interaction.response.defer()
-        ctx = await MyContext.from_interaction(interaction)
-        await self.bot.get_cog('ServerConfig').config_set_cmd(ctx, "partner_color", color)
+        await self.bot.get_cog('ServerConfig').config_set_cmd(interaction, "partner_color", color)
 
     @partner_main.command(name="refresh")
     @app_commands.check(checks.database_connected)

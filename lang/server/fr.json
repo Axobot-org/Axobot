@@ -39,6 +39,11 @@
     "not-found": "Le serveur %{guild} n'a pas encore été enregistré dans la base de donnée",
     "opt_title": "Option '%{opt}' du serveur %{guild}",
     "option-notfound": "Cette option n'existe pas :confused:",
+    "reset-all": {
+        "confirmation": "Êtes-vous sûr de vouloir tout réinitialiser ? Il n'y aura pas de retour en arrière possible.",
+        "success": "Toute votre configuration a été réinitialisée !",
+        "error": "Oups, un problème est survenu lors de la réinitialisation de votre configuration ! Veuillez contacter notre support technique si le problème persiste"
+    },
     "see-0": "Entrez `!config help` pour plus de détails",
     "see-title": "Configuration du serveur %{guild}",
     "set_error": {

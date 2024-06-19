@@ -54,12 +54,12 @@ class ConfirmView(discord.ui.View):
 
     async def disable(self, interaction: discord.Message | discord.Interaction):
         "Called when the timeout has expired"
+        if isinstance(interaction, discord.Interaction) and not interaction.response.is_done():
+            await interaction.response.defer()
         for child in self.children:
             child.disabled = True
         if isinstance(interaction, discord.Interaction):
-            await interaction.followup.edit_message(
-                interaction.message.id,
-                content=interaction.message.content,
+            await interaction.edit_original_response(
                 view=self
             )
         else:

@@ -447,10 +447,13 @@ class Admin(commands.Cog):
         if not ctx.bot.database_online:
             await ctx.send("Impossible d'afficher cette commande, la base de donnée est hors ligne :confused:")
             return
+        if (interaction := ctx.interaction) is None:
+            await ctx.send("Cette commande n'est utilisable qu'en commande slash")
+            return
         if option is None:
-            await self.bot.get_cog("ServerConfig").send_all_config(guild, ctx)
+            await self.bot.get_cog("ServerConfig").send_all_config(guild, interaction)
         else:
-            await self.bot.get_cog("ServerConfig").send_specific_config(guild, ctx, option)
+            await self.bot.get_cog("ServerConfig").send_specific_config(guild, interaction, option)
 
     @admin_group.group(name="database", aliases=["db"])
     @commands.check(checks.is_bot_admin)
