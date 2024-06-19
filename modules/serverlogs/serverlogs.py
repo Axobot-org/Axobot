@@ -9,15 +9,15 @@ from cachetools import TTLCache
 from discord import app_commands
 from discord.ext import commands, tasks
 
-from core.bot_classes import DISCORD_INVITE_REGEX, Axobot, MyContext
-from core.checks import checks
+from core.bot_classes import DISCORD_INVITE_REGEX, Axobot
 from core.enums import ServerWarningType
 from core.formatutils import FormatUtils
 from core.tips import GuildTip
 from modules.antiscam.model.classes import PredictionResult
 from modules.tickets.src.types import TicketCreationEvent
 
-from .arguments.serverlog_argument import InvalidServerLogError, ServerLog
+from .arguments.serverlog_argument import (ALL_LOGS, LOGS_CATEGORIES,
+                                           ServerLogArgument)
 
 if TYPE_CHECKING:
     from modules.cases.cases import Case
@@ -25,25 +25,6 @@ if TYPE_CHECKING:
 
 class ServerLogs(commands.Cog):
     """Handle any kind of server log"""
-
-    logs_categories = {
-        "automod": {"antiraid", "antiscam"},
-        "members": {"member_roles", "member_nick", "member_avatar", "member_join", "member_leave",
-                    "member_verification", "user_update"},
-        "moderation": {"clear", "member_ban", "member_unban", "member_timeout", "member_kick", "member_warn",
-                       "moderation_case", "slowmode"},
-        "messages": {"message_update", "message_delete", "discord_invite", "ghost_ping"},
-        "other": {"bot_warnings", "server_update"},
-        "roles": {"role_creation", "role_update", "role_deletion"},
-        "tickets": {"ticket_creation"},
-        "voice": {"voice_join", "voice_move", "voice_leave"}
-    }
-
-    @classmethod
-    def available_logs(cls):
-        "Returns all existing logs types"
-        return {log for category in cls.logs_categories.values() for log in category}
-
 
     def __init__(self, bot: Axobot):
         self.bot = bot
@@ -71,56 +52,57 @@ class ServerLogs(commands.Cog):
                 res.append(channel)
         return res
 
-    async def validate_logs(self, guild: discord.Guild, channel_ids: list[int], embed: discord.Embed, log_type: str):
+    async def validate_logs(self, guild_id: discord.Guild, channel_ids: list[int], embed: discord.Embed, log_type: str):
         "Send a log embed to the corresponding modlogs channels"
         for channel_id in channel_ids:
             if channel_id in self.to_send:
                 self.to_send[channel_id].append(embed)
             else:
                 self.to_send[channel_id] = [embed]
-            self.bot.dispatch("serverlog", guild.id, channel_id, log_type)
+            self.bot.dispatch("serverlog", guild_id.id, channel_id, log_type)
 
-    async def db_get_from_channel(self, guild: int, channel: int, use_cache: bool=True) -> list[str]:
+    async def db_get_from_channel(self, guild_id: int, channel_id: int, use_cache: bool=True) -> list[str]:
         "Get enabled logs for a channel"
-        if use_cache and (cached := self.cache.get(guild)) and channel in cached:
-            return cached[channel]
+        if use_cache and (cached := self.cache.get(guild_id)) and channel_id in cached:
+            return cached[channel_id]
         query = "SELECT kind FROM serverlogs WHERE guild = %s AND channel = %s AND beta = %s"
-        async with self.bot.db_query(query, (guild, channel, self.bot.beta)) as query_results:
-            return [row['kind'] for row in query_results]
+        async with self.bot.db_query(query, (guild_id, channel_id, self.bot.beta)) as query_results:
+            return [row["kind"] for row in query_results]
 
-    async def db_get_from_guild(self, guild: int, use_cache: bool=True) -> dict[int, list[str]]:
+    async def db_get_from_guild(self, guild_id: int, use_cache: bool=True) -> dict[int, list[str]]:
         """Get enabled logs for a guild
         Returns a map of ChannelID -> list of enabled logs"""
-        if use_cache and (cached := self.cache.get(guild)):
+        if use_cache and (cached := self.cache.get(guild_id)):
             return cached
         query = "SELECT channel, kind FROM serverlogs WHERE guild = %s AND beta = %s"
-        async with self.bot.db_query(query, (guild, self.bot.beta)) as query_results:
+        async with self.bot.db_query(query, (guild_id, self.bot.beta)) as query_results:
             res = {}
             for row in query_results:
-                res[row['channel']] = res.get(row['channel'], []) + [row['kind']]
-            self.cache[guild] = res
+                res[row["channel"]] = res.get(row["channel"], []) + [row["kind"]]
+            self.cache[guild_id] = res
             return res
 
-    async def db_add(self, guild: int, channel: int, kind: str) -> bool:
+    async def db_add(self, guild_id: int, channel_id: int, kind: str) -> bool:
         "Add logs to a channel"
-        query = "INSERT INTO serverlogs (guild, channel, kind, beta) VALUES (%(g)s, %(c)s, %(k)s, %(b)s) ON DUPLICATE KEY UPDATE guild=%(g)s"
-        async with self.bot.db_query(query, {'g': guild, 'c': channel, 'k': kind, 'b': self.bot.beta}) as query_result:
-            if query_result > 0 and guild in self.cache:
-                if channel in self.cache[guild]:
-                    self.cache[guild][channel].append(kind)
+        query = "INSERT INTO serverlogs (guild, channel, kind, beta) VALUES (%(g)s, %(c)s, %(k)s, %(b)s) "\
+            "ON DUPLICATE KEY UPDATE guild=%(g)s"
+        async with self.bot.db_query(query, {'g': guild_id, 'c': channel_id, 'k': kind, 'b': self.bot.beta}) as query_result:
+            if query_result > 0 and guild_id in self.cache:
+                if channel_id in self.cache[guild_id]:
+                    self.cache[guild_id][channel_id].append(kind)
                 else:
-                    self.cache[guild][channel] = await self.db_get_from_channel(guild, channel, False)
+                    self.cache[guild_id][channel_id] = await self.db_get_from_channel(guild_id, channel_id, False)
             return query_result > 0
 
-    async def db_remove(self, guild: int, channel: int, kind: str) -> bool:
+    async def db_remove(self, guild_id: int, channel_id: int, kind: str) -> bool:
         "Remove logs from a channel"
         query = "DELETE FROM serverlogs WHERE guild = %s AND channel = %s AND kind = %s AND beta = %s"
-        async with self.bot.db_query(query, (guild, channel, kind, self.bot.beta), returnrowcount=True) as query_result:
-            if query_result > 0 and guild in self.cache:
-                if channel in self.cache[guild]:
-                    self.cache[guild][channel] = [x for x in self.cache[guild][channel] if x != kind]
+        async with self.bot.db_query(query, (guild_id, channel_id, kind, self.bot.beta), returnrowcount=True) as query_result:
+            if query_result > 0 and guild_id in self.cache:
+                if channel_id in self.cache[guild_id]:
+                    self.cache[guild_id][channel_id] = [x for x in self.cache[guild_id][channel_id] if x != kind]
                 else:
-                    self.cache[guild] = await self.db_get_from_guild(guild, use_cache=False)
+                    self.cache[guild_id] = await self.db_get_from_guild(guild_id, use_cache=False)
             return query_result > 0
 
 
@@ -141,7 +123,7 @@ class ServerLogs(commands.Cog):
                     embeds_to_send = await self._get_embeds_batch(embeds)
                     await channel.send(embeds=embeds_to_send)
                 except discord.HTTPException as err:
-                    self.bot.dispatch('error', err, f"Sending logs to guild {channel.guild.id} | Channel {channel.id}")
+                    self.bot.dispatch("error", err, f"Sending logs to guild {channel.guild.id} | Channel {channel.id}")
                     if not isinstance(err, discord.InvalidData):
                         # invalid data error is not recoverable, so we remove the logs
                         continue
@@ -151,7 +133,7 @@ class ServerLogs(commands.Cog):
                 else:
                     self.to_send.pop(channel_id)
         except Exception as err: # pylint: disable=broad-except
-            self.bot.dispatch('error', err, None)
+            self.bot.dispatch("error", err, None)
 
     @send_logs_task.before_loop
     async def before_logs_task(self):
@@ -168,67 +150,60 @@ class ServerLogs(commands.Cog):
             current += len(embed)
         return batch
 
-    @commands.hybrid_group(name="modlogs")
-    @app_commands.default_permissions(manage_guild=True)
-    @commands.guild_only()
-    @commands.check(checks.has_manage_guild)
-    @commands.cooldown(2, 6, commands.BucketType.guild)
-    async def modlogs_main(self, ctx: MyContext):
-        """Enable or disable server logs in specific channels
-
-        ..Doc moderator.html#server-logs"""
-        if ctx.subcommand_passed is None:
-            await ctx.send_help(ctx.command)
+    modlogs_main = app_commands.Group(
+        name="modlogs",
+        description="Enable or disable server logs in specific channels",
+        default_permissions=discord.Permissions(manage_guild=True),
+        guild_only=True,
+    )
 
     @modlogs_main.command(name="list")
     @app_commands.describe(channel="The channel to list logs for. Leave empty to list all logs for the server")
-    @commands.guild_only()
-    @commands.check(checks.has_manage_guild)
-    @commands.cooldown(1, 10, commands.BucketType.channel)
-    async def modlogs_list(self, ctx: MyContext, channel: discord.TextChannel | None=None):
+    @app_commands.checks.cooldown(1, 10)
+    async def modlogs_list(self, interaction: discord.Interaction, channel: discord.TextChannel | None = None):
         """Show the full list of server logs type, or the list of enabled logs for a channel
 
         ..Example modlogs list
 
         ..Doc moderator.html#how-to-setup-logs"""
+        await interaction.response.defer()
         if channel:  # display logs enabled for this channel only
-            title = await self.bot._(ctx.guild.id, "serverlogs.list.channel", channel='#'+channel.name)
-            if channel_logs := await self.db_get_from_channel(ctx.guild.id, channel.id):
+            title = await self.bot._(interaction, "serverlogs.list.channel", channel='#'+channel.name)
+            if channel_logs := await self.db_get_from_channel(interaction.guild_id, channel.id):
                 embed = discord.Embed(title=title)
-                for category, logs in sorted(self.logs_categories.items()):
-                    name = await self.bot._(ctx.guild.id, 'serverlogs.categories.'+category)
-                    actual_logs = ['- '+l for l in sorted(logs) if l in channel_logs]
+                for category, logs in sorted(LOGS_CATEGORIES.items()):
+                    name = await self.bot._(interaction, "serverlogs.categories."+category)
+                    actual_logs = ["- "+l for l in sorted(logs) if l in channel_logs]
                     if actual_logs:
                         embed.add_field(name=name, value='\n'.join(actual_logs))
             else: # error msg
-                cmd = await self.bot.prefix_manager.get_prefix(ctx.guild) + "modlogs enable"
-                embed = discord.Embed(title=title, description=await self.bot._(ctx.guild.id, "serverlogs.list.none", cmd=cmd))
+                cmd = await self.bot.get_command_mention("modlogs enable")
+                embed = discord.Embed(title=title, description=await self.bot._(interaction, "serverlogs.list.none", cmd=cmd))
         else:  # display available logs and logs enabled for the whole server
-            global_title = await self.bot._(ctx.guild.id, "serverlogs.list.all")
+            global_title = await self.bot._(interaction, "serverlogs.list.all")
             # fetch logs enabled in the guild
-            guild_logs = await self.db_get_from_guild(ctx.guild.id)
-            guild_logs = sorted(set(x for v in guild_logs.values() for x in v if x in self.available_logs()))
+            guild_logs = await self.db_get_from_guild(interaction.guild_id)
+            guild_logs = sorted(set(x for v in guild_logs.values() for x in v if x in ALL_LOGS))
             # build embed
-            if ctx.bot_permissions.external_emojis and (cog := self.bot.emojis_manager):
+            if interaction.guild.me.guild_permissions.external_emojis and (cog := self.bot.emojis_manager):
                 enabled_emoji, disabled_emoji = cog.customs["green_check"], cog.customs["gray_check"]
             else:
                 enabled_emoji, disabled_emoji = '🔹', '◾'
-            desc = await self.bot._(ctx.guild.id, "serverlogs.list.emojis", enabled=enabled_emoji, disabled=disabled_emoji)
+            desc = await self.bot._(interaction, "serverlogs.list.emojis", enabled=enabled_emoji, disabled=disabled_emoji)
             embed = discord.Embed(title=global_title, description=desc)
-            for category, logs in sorted(self.logs_categories.items()):
-                name = await self.bot._(ctx.guild.id, 'serverlogs.categories.'+category)
+            for category, logs in sorted(LOGS_CATEGORIES.items()):
+                name = await self.bot._(interaction, "serverlogs.categories."+category)
                 embed.add_field(name=name, value='\n'.join([
                     (enabled_emoji if l in guild_logs else disabled_emoji) + l for l in sorted(logs)
                     ]))
 
         embed.color = discord.Color.blue()
-        await ctx.send(embed=embed)
+        await interaction.followup.send(embed=embed)
 
-    @modlogs_main.command(name="enable", aliases=['add'])
+    @modlogs_main.command(name="enable")
     @app_commands.describe(channel="The channel to add logs to. Leave empty to select the current channel")
-    @commands.guild_only()
-    @commands.check(checks.has_manage_guild)
-    async def modlogs_enable(self, ctx: MyContext, logs: commands.Greedy[ServerLog], channel: discord.TextChannel | None=None):
+    async def modlogs_enable(self, interaction: discord.Interaction, logs: ServerLogArgument,
+                             channel: discord.TextChannel | None = None):
         """Enable one or more logs in the current channel
 
         ..Example modlogs enable ban bot_warnings
@@ -236,52 +211,46 @@ class ServerLogs(commands.Cog):
         ..Example modlogs enable role_creation bot_warnings #mod-logs
 
         ..Doc moderator.html#how-to-setup-logs"""
-        if len(logs) == 0:
-            raise InvalidServerLogError("")
-        if 'all' in logs:
-            logs = list(self.available_logs())
-        dest_channel = channel or ctx.channel
-        currently_actived_logs = await self.db_get_from_channel(ctx.guild.id, dest_channel.id)
+        dest_channel = channel or interaction.channel
+        currently_actived_logs = await self.db_get_from_channel(interaction.guild_id, dest_channel.id)
         actually_added: list[str] = []
         not_added: list[str] = []
-        if ctx.interaction and not ctx.interaction.response.is_done():
-            await ctx.defer()
+        await interaction.response.defer()
         for log in logs:
-            if log not in currently_actived_logs and await self.db_add(ctx.guild.id, dest_channel.id, log):
+            if log not in currently_actived_logs and await self.db_add(interaction.guild_id, dest_channel.id, log):
                 actually_added.append(log)
             else:
                 not_added.append(log)
         if actually_added:
-            added = ', '.join(sorted(actually_added))
-            if dest_channel == ctx.channel:
-                msg = await self.bot._(ctx.guild.id, "serverlogs.enabled.current", kind=added)
+            added = ", ".join(sorted(actually_added))
+            if dest_channel == interaction.channel:
+                msg = await self.bot._(interaction, "serverlogs.enabled.current", kind=added)
             else:
-                msg = await self.bot._(ctx.guild.id, "serverlogs.enabled.other", kind=added, channel=dest_channel.mention)
+                msg = await self.bot._(interaction, "serverlogs.enabled.other", kind=added, channel=dest_channel.mention)
             if not_added:
                 msg += "\n" + await self.bot._(
-                    ctx.guild.id, "serverlogs.enabled.already-enabled-list",
-                    kinds=', '.join(not_added),
+                    interaction, "serverlogs.enabled.already-enabled-list",
+                    kinds=", ".join(not_added),
                     count=len(not_added)
                 )
         else:
-            msg = await self.bot._(ctx.guild.id, "serverlogs.none-added")
+            msg = await self.bot._(interaction, "serverlogs.none-added")
 
-        if not dest_channel.permissions_for(ctx.guild.me).embed_links:
-            msg += "\n\n:warning: " + await self.bot._(ctx.guild.id, "serverlogs.embed-warning")
-        await ctx.send(msg)
+        if not dest_channel.permissions_for(interaction.guild.me).embed_links:
+            msg += "\n\n:warning: " + await self.bot._(interaction, "serverlogs.embed-warning")
+        await interaction.followup.send(msg)
         if "member_kick" in actually_added:
-            if await self.send_member_kick_warning(ctx):
+            if await self.send_member_kick_warning(interaction):
                 return
         if "antiscam" in actually_added:
-            if await self.send_antiscam_tip(ctx):
+            if await self.send_antiscam_tip(interaction):
                 return
         if "antiraid" in actually_added:
-            if await self.send_antiraid_tip(ctx):
+            if await self.send_antiraid_tip(interaction):
                 return
         if actually_added:
-            if random() < 0.7 and await self.send_botwarning_tip(ctx):
+            if random() < 0.7 and await self.send_botwarning_tip(interaction):
                 return
-
 
     @modlogs_enable.autocomplete("logs")
     async def _modlogs_enable_autocomplete(self, interaction: discord.Interaction, current: str):
@@ -290,7 +259,7 @@ class ServerLogs(commands.Cog):
         else:
             channel_id = interaction.channel_id
         actived_logs = await self.db_get_from_channel(interaction.guild_id, channel_id)
-        available_logs = self.available_logs() - set(actived_logs)
+        available_logs = ALL_LOGS - set(actived_logs)
         if len(available_logs) == 0:
             return []
         return await self.log_name_autocomplete(
@@ -298,11 +267,11 @@ class ServerLogs(commands.Cog):
             all_label=await self.bot._(interaction, "serverlogs.autocompletion-all")
         )
 
-    @modlogs_main.command(name="disable", aliases=['remove'])
+
+    @modlogs_main.command(name="disable")
     @app_commands.describe(channel="The channel to remove logs from. Leave empty to select the current channel")
-    @commands.guild_only()
-    @commands.check(checks.has_manage_guild)
-    async def modlogs_disable(self, ctx:MyContext, logs: commands.Greedy[ServerLog], channel: discord.TextChannel | None=None):
+    async def modlogs_disable(self, interaction: discord.Interaction, logs: ServerLogArgument,
+                              channel: discord.TextChannel | None = None):
         """Disable one or more logs in the current channel
 
         ..Example modlogs disable ban message_delete
@@ -310,27 +279,22 @@ class ServerLogs(commands.Cog):
         ..Example modlogs disable ghost_ping #mod-logs
 
         ..Doc moderator.html#how-to-setup-logs"""
-        if len(logs) == 0:
-            raise InvalidServerLogError("")
-        if 'all' in logs:
-            logs = list(self.available_logs())
-        dest_channel = channel or ctx.channel
-        currently_actived_logs = await self.db_get_from_channel(ctx.guild.id, dest_channel.id)
+        dest_channel = channel or interaction.channel
+        currently_actived_logs = await self.db_get_from_channel(interaction.guild_id, dest_channel.id)
         actually_removed: list[str] = []
-        if ctx.interaction and not ctx.interaction.response.is_done():
-            await ctx.defer()
+        await interaction.response.defer()
         for log in logs:
-            if log in currently_actived_logs and await self.db_remove(ctx.guild.id, dest_channel.id, log):
+            if log in currently_actived_logs and await self.db_remove(interaction.guild_id, dest_channel.id, log):
                 actually_removed.append(log)
         if actually_removed:
-            removed = ', '.join(sorted(actually_removed))
-            if dest_channel == ctx.channel:
-                msg = await self.bot._(ctx.guild.id, "serverlogs.disabled.current", kind=removed)
+            removed = ", ".join(sorted(actually_removed))
+            if dest_channel == interaction.channel:
+                msg = await self.bot._(interaction, "serverlogs.disabled.current", kind=removed)
             else:
-                msg = await self.bot._(ctx.guild.id, "serverlogs.disabled.other", kind=removed, channel=dest_channel.mention)
+                msg = await self.bot._(interaction, "serverlogs.disabled.other", kind=removed, channel=dest_channel.mention)
         else:
-            msg = await self.bot._(ctx.guild.id, "serverlogs.none-removed")
-        await ctx.send(msg)
+            msg = await self.bot._(interaction, "serverlogs.none-removed")
+        await interaction.followup.send(msg)
 
     @modlogs_disable.autocomplete("logs")
     async def _modlogs_disable_autocomplete(self, interaction: discord.Interaction, current: str):
@@ -348,7 +312,7 @@ class ServerLogs(commands.Cog):
 
     async def log_name_autocomplete(self, current: str, available_logs: list[str] | None=None, all_label: str="all"):
         "Autocompletion for log names"
-        all_logs = list(self.available_logs()) if available_logs is None else  available_logs
+        all_logs = list(ALL_LOGS) if available_logs is None else  available_logs
         filtered = sorted(
             (not option.startswith(current), option)
             for option in all_logs
@@ -358,50 +322,58 @@ class ServerLogs(commands.Cog):
             app_commands.Choice(name=value[1], value=value[1])
             for value in filtered
         ][:24]
-        choices.insert(0, app_commands.Choice(name=all_label, value='all'))
+        choices.insert(0, app_commands.Choice(name=all_label, value="all"))
         return choices
 
-    async def send_antiscam_tip(self, ctx: MyContext):
+    async def send_antiscam_tip(self, interaction: discord.Interaction):
         "Send a tip if antiscam log is enabled but not the antiscam system"
-        antiscam_enabled: bool = await self.bot.get_config(ctx.guild.id, "anti_scam")
+        antiscam_enabled: bool = await self.bot.get_config(interaction.guild_id, "anti_scam")
         if antiscam_enabled:
             return False
-        if await self.bot.tips_manager.should_show_guild_tip(ctx.guild.id, GuildTip.SERVERLOG_ENABLE_ANTISCAM):
+        if await self.bot.tips_manager.should_show_guild_tip(interaction.guild_id, GuildTip.SERVERLOG_ENABLE_ANTISCAM):
             antiscam_enable_cmd = await self.bot.get_command_mention("antiscam enable")
             await self.bot.tips_manager.send_guild_tip(
-                ctx,
+                interaction,
                 GuildTip.SERVERLOG_ENABLE_ANTISCAM,
                 antiscam_enable_cmd=antiscam_enable_cmd
             )
             return True
         return False
 
-    async def send_antiraid_tip(self, ctx: MyContext):
+    async def send_antiraid_tip(self, interaction: discord.Interaction):
         "Send a tip if antiraid log is enabled but not the antiscam system"
-        antiraid_level: str = await self.bot.get_config(ctx.guild.id, "anti_raid")
+        antiraid_level: str = await self.bot.get_config(interaction.guild_id, "anti_raid")
         if antiraid_level != "none":
             return False
-        if await self.bot.tips_manager.should_show_guild_tip(ctx.guild.id, GuildTip.SERVERLOG_ENABLE_ANTIRAID):
+        if await self.bot.tips_manager.should_show_guild_tip(interaction.guild_id, GuildTip.SERVERLOG_ENABLE_ANTIRAID):
             config_set_cmd = await self.bot.get_command_mention("config set")
-            await self.bot.tips_manager.send_guild_tip(ctx, GuildTip.SERVERLOG_ENABLE_ANTIRAID, config_set_cmd=config_set_cmd)
+            await self.bot.tips_manager.send_guild_tip(
+                interaction,
+                GuildTip.SERVERLOG_ENABLE_ANTIRAID,
+                config_set_cmd=config_set_cmd
+            )
             return True
         return False
 
-    async def send_botwarning_tip(self, ctx: MyContext | discord.Interaction):
+    async def send_botwarning_tip(self, interaction: discord.Interaction | discord.Interaction):
         "Send a tip if bot_warnings log is not used in this guild"
-        if ctx.guild is None or await self.is_log_enabled(ctx.guild.id, "bot_warnings"):
+        if interaction.guild is None or await self.is_log_enabled(interaction.guild_id, "bot_warnings"):
             return False
-        if await self.bot.tips_manager.should_show_guild_tip(ctx.guild.id, GuildTip.SERVERLOG_ENABLE_BOTWARNING):
+        if await self.bot.tips_manager.should_show_guild_tip(interaction.guild_id, GuildTip.SERVERLOG_ENABLE_BOTWARNING):
             log_add_cmd = await self.bot.get_command_mention("modlogs enable")
-            await self.bot.tips_manager.send_guild_tip(ctx, GuildTip.SERVERLOG_ENABLE_BOTWARNING, log_add_cmd=log_add_cmd)
+            await self.bot.tips_manager.send_guild_tip(
+                interaction,
+                GuildTip.SERVERLOG_ENABLE_BOTWARNING,
+                log_add_cmd=log_add_cmd
+            )
             return True
         return False
 
-    async def send_member_kick_warning(self, ctx: MyContext):
+    async def send_member_kick_warning(self, interaction: discord.Interaction):
         "Warn the user if member kick log is enabled but bot has not access to guild audit logs"
-        if ctx.guild.me.guild_permissions.view_audit_log:
+        if interaction.guild.me.guild_permissions.view_audit_log:
             return
-        await ctx.send(await self.bot._(ctx.guild, "serverlogs.kick-warning"))
+        await interaction.followup.send(await self.bot._(interaction.guild, "serverlogs.kick-warning"))
 
     async def search_audit_logs(self, guild: discord.Guild, action: discord.AuditLogAction,
                                 check: Callable[[discord.AuditLogEntry], bool]=None):
@@ -436,19 +408,19 @@ class ServerLogs(commands.Cog):
             if msg.cached_message:
                 if msg.cached_message.author.bot:
                     return
-                if "pinned" in msg.data and msg.cached_message.pinned != msg.data['pinned']:
+                if "pinned" in msg.data and msg.cached_message.pinned != msg.data["pinned"]:
                     return
                 old_content = msg.cached_message.content
                 author = msg.cached_message.author
                 guild = msg.cached_message.guild
                 link = msg.cached_message.jump_url
             else:
-                if 'author' in msg.data and (author_id := msg.data.get('author').get('id')):
+                if "author" in msg.data and (author_id := msg.data.get("author").get("id")):
                     author = self.bot.get_user(int(author_id))
                 guild = self.bot.get_guild(msg.guild_id)
                 link = f"https://discord.com/channels/{msg.guild_id}/{msg.channel_id}/{msg.message_id}"
-            new_content = msg.data.get('content')
-            if new_content is None: # and msg.data.get('flags', 0) & 32:
+            new_content = msg.data.get("content")
+            if new_content is None: # and msg.data.get("flags", 0) & 32:
                 return
             emb = discord.Embed(
                 description=f"**[Message]({link}) updated in <#{msg.channel_id}>**",
@@ -668,7 +640,7 @@ class ServerLogs(commands.Cog):
             description=f"**Member {before.mention} ({before.id}) set in timeout**",
             color=discord.Color.dark_gray()
         )
-        duration = await FormatUtils.time_delta(now, after.timed_out_until, lang='en')
+        duration = await FormatUtils.time_delta(now, after.timed_out_until, lang="en")
         emb.add_field(name="Duration", value=f"{duration} (until <t:{after.timed_out_until.timestamp():.0f}>)", inline=False)
         emb.set_author(name=str(after), icon_url=after.display_avatar)
         # try to get who timeouted that member
@@ -692,7 +664,7 @@ class ServerLogs(commands.Cog):
             description=f"**Member {before.mention} ({before.id}) no longer in timeout**",
             color=discord.Color.green()
         )
-        duration = await FormatUtils.time_delta(now, before.timed_out_until, lang='en')
+        duration = await FormatUtils.time_delta(now, before.timed_out_until, lang="en")
         emb.add_field(
             name="Planned timeout end",
             value=f"<t:{before.timed_out_until.timestamp():.0f}> (in {duration})",
@@ -1522,7 +1494,7 @@ Minimum age required by anti-raid: {min_age}"
                 )
             elif warning_type in {ServerWarningType.RSS_MISSING_TXT_PERMISSION, ServerWarningType.RSS_MISSING_EMBED_PERMISSION}:
                 emb.description = f"**Could not send RSS message** in channel {kwargs.get('channel').mention}"
-                emb.add_field(name="Feed ID", value=kwargs.get('feed_id'))
+                emb.add_field(name="Feed ID", value=kwargs.get("feed_id"))
                 if warning_type == ServerWarningType.RSS_MISSING_TXT_PERMISSION:
                     emb.add_field(
                         name="Missing permission",
@@ -1535,51 +1507,52 @@ Minimum age required by anti-raid: {min_age}"
                     )
             elif warning_type == ServerWarningType.RSS_UNKNOWN_CHANNEL:
                 emb.description = f"**Could not send RSS message** in channel {kwargs.get('channel_id')}"
-                emb.add_field(name="Feed ID", value=kwargs.get('feed_id'))
+                emb.add_field(name="Feed ID", value=kwargs.get("feed_id"))
                 emb.add_field(name="Reason", value="Unknown or deleted channel")
             elif warning_type == ServerWarningType.RSS_DISABLED_FEED:
                 emb.description = f"**Feed has been disabled** in channel <#{kwargs.get('channel_id')}>"
-                emb.add_field(name="Feed ID", value=kwargs.get('feed_id'))
+                emb.add_field(name="Feed ID", value=kwargs.get("feed_id"))
                 emb.add_field(name="Reason", value="Too many recent errors")
             elif warning_type == ServerWarningType.RSS_TWITTER_DISABLED:
-                emb.description = "Due to a recent Twitter API change, **Twitter feeds are not supported** anymore.\nYou should consider deleting this RSS feed."
-                emb.add_field(name="Feed ID", value=kwargs.get('feed_id'))
+                emb.description = "Due to a recent Twitter API change, **Twitter feeds are not supported** anymore.\n"\
+                    "You should consider deleting this RSS feed."
+                emb.add_field(name="Feed ID", value=kwargs.get("feed_id"))
                 emb.add_field(name="Reason", value="Withdrawal of the free Twitter API")
             elif warning_type == ServerWarningType.RSS_INVALID_FORMAT:
                 emb.description = f"**Could not send RSS message** in channel {kwargs.get('channel').mention}"
-                emb.add_field(name="Feed ID", value=kwargs.get('feed_id'))
+                emb.add_field(name="Feed ID", value=kwargs.get("feed_id"))
                 rss_text_cmd = await self.bot.get_command_mention("rss set-text")
                 emb.add_field(name="Reason",
                               value=f"Invalid template format. Use the {rss_text_cmd} command to fix your template.")
             elif warning_type == ServerWarningType.TICKET_CREATION_UNKNOWN_TARGET:
                 emb.description = f"**Could not create ticket** in channel or category {kwargs.get('channel_id')}"
-                emb.add_field(name="Selected topic", value=kwargs.get('topic_name'))
+                emb.add_field(name="Selected topic", value=kwargs.get("topic_name"))
                 emb.add_field(name="Reason", value="Unknown or deleted channel or category")
             elif warning_type == ServerWarningType.TICKET_CREATION_FAILED:
-                channel = kwargs.get('channel')
+                channel = kwargs.get("channel")
                 if isinstance(channel, discord.CategoryChannel):
                     emb.description = f"**Could not create ticket** in category {channel.name}"
                 else:
                     emb.description = f"**Could not create ticket** in channel {channel.mention}"
-                emb.add_field(name="Selected topic", value=kwargs.get('topic_name'))
+                emb.add_field(name="Selected topic", value=kwargs.get("topic_name"))
                 emb.add_field(
                     name="Missing permission",
                     value=await self.bot._(guild.id, "permissions.list.manage_channels")
                 )
             elif warning_type == ServerWarningType.TICKET_INIT_FAILED:
-                channel = kwargs.get('channel')
+                channel = kwargs.get("channel")
                 if isinstance(channel, discord.CategoryChannel):
                     emb.description = f"**Could not setup ticket permissions** in category {channel.name}"
                 else:
                     emb.description = f"**Could not setup ticket permissions** in channel {channel.mention}"
-                emb.add_field(name="Selected topic", value=kwargs.get('topic_name'))
+                emb.add_field(name="Selected topic", value=kwargs.get("topic_name"))
                 emb.add_field(
                     name="Missing permission",
                     value=await self.bot._(guild.id, "permissions.list.manage_permissions")
                 )
             elif warning_type == ServerWarningType.TEMP_ROLE_REMOVE_FORBIDDEN:
-                role = kwargs.get('role')
-                user = kwargs.get('user')
+                role = kwargs.get("role")
+                user = kwargs.get("user")
                 emb.description = f"**Could not remove temporary role** {role.mention} from user {user.mention}"
                 emb.add_field(name="Reason", value="Missing permission")
             else:

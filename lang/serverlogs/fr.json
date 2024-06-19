@@ -29,7 +29,7 @@
         "channel": "Liste des logs utilisés dans %{channel}",
         "emojis": "%{enabled} sont les logs activés dans ce serveur\n%{disabled} sont pour les autres logs disponibles",
         "guild": "Liste des logs utilisés dans ce serveur",
-        "none": "Aucun log n'est utilisé ici. Utilise `%{cmd}` pour commencer à obtenir des logs"
+        "none": "Aucun log n'est utilisé ici. Utilise %{cmd} pour commencer à obtenir des logs"
     },
     "none-added": "Ce salon est déjà abonné à tous ces logs !",
     "none-removed": "Ce salon n'était déjà abonné à aucun de ces logs !"

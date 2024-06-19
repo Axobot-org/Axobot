@@ -29,7 +29,7 @@
         "channel": "List of logs used in %{channel}",
         "emojis": "%{enabled} are for modlogs enabled in your server\n%{disabled} are for other available modlogs",
         "guild": "List of logs used in this server",
-        "none": "No log is used here. Use `%{cmd}` to start getting logs"
+        "none": "No log is used here. Use %{cmd} to start getting logs"
     },
     "none-added": "This channel is already subscribed to all these logs!",
     "none-removed": "This channel was already subscribed to none of these logs!"

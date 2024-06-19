@@ -1,19 +1,36 @@
-from typing import TYPE_CHECKING
+from discord import app_commands
 
 from core.arguments.errors import InvalidServerLogError
 
-if TYPE_CHECKING:
-    from core.bot_classes import MyContext
+LOGS_CATEGORIES = {
+    "automod": {"antiraid", "antiscam"},
+    "members": {"member_roles", "member_nick", "member_avatar", "member_join", "member_leave",
+                "member_verification", "user_update"},
+    "moderation": {"clear", "member_ban", "member_unban", "member_timeout", "member_kick", "member_warn",
+                    "moderation_case", "slowmode"},
+    "messages": {"message_update", "message_delete", "discord_invite", "ghost_ping"},
+    "other": {"bot_warnings", "server_update"},
+    "roles": {"role_creation", "role_update", "role_deletion"},
+    "tickets": {"ticket_creation"},
+    "voice": {"voice_join", "voice_move", "voice_leave"}
+}
 
+ALL_LOGS = {log for category in LOGS_CATEGORIES.values() for log in category}
 
-class ServerLog(str):
+class ServerLogTransformer(app_commands.Transformer): # pylint: disable=abstract-method
     "Convert arguments to a server log type"
-    @classmethod
-    async def convert(cls, _ctx: "MyContext", argument: str) -> str:
-        "Do the conversion"
-        from modules.serverlogs.serverlogs import \
-            ServerLogs  # pylint: disable=import-outside-toplevel
 
-        if argument in ServerLogs.available_logs() or argument == 'all':
-            return argument
-        raise InvalidServerLogError(argument)
+    async def transform(self, _interaction, value: str, /):
+        "Do the conversion"
+        if value == "all":
+            return list(ALL_LOGS)
+        result: list[str] = []
+        for word in value.split(" "):
+            if word not in ALL_LOGS:
+                raise InvalidServerLogError(value)
+            result.append(word)
+        if len(result) == 0:
+            raise InvalidServerLogError(value)
+        return result
+
+ServerLogArgument = app_commands.Transform[list[str], ServerLogTransformer]
