@@ -141,9 +141,12 @@ class WebRSS:
             if len(posts_list) > 10:
                 break
             entry_date = entry.get(date_field_key)
+            if isinstance(entry_date, time.struct_time) and entry_date.tm_zone is None:
+                entry_date = dt.datetime(*entry_date[:6], tzinfo=dt.UTC)
+            else:
+                entry_date = dt.datetime(*entry_date[:6])
             # check if the entry is not too close to (or passed) the last post
-            if entry_date is None or (
-                    dt.datetime(*entry_date[:6]) - date).total_seconds() < self.min_time_between_posts:
+            if entry_date is None or (entry_date - date).total_seconds() < self.min_time_between_posts:
                 # we know we can break because entries are sorted by most recent first
                 break
             entry_id = await self._get_entry_title(entry)
@@ -171,6 +174,7 @@ class WebRSS:
             else:
                 title = '?'
             post_text = await get_text_from_entry(entry)
+            post_description = await get_summary_from_entry(entry)
             img = None
             img_match = re.search(r'(http(s?):)([/|.\w\s-])*\.(?:jpe?g|gif|png|webp)', str(entry))
             if img_match is not None:
@@ -185,7 +189,8 @@ class WebRSS:
                 author=author,
                 channel=feed.feed['title'] if 'title' in feed.feed else '?',
                 image=img,
-                post_text=post_text
+                post_text=post_text,
+                post_description=post_description
             )
             posts_list.append(obj)
         posts_list.reverse()
