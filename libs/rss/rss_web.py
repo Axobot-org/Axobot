@@ -140,56 +140,53 @@ class WebRSS:
         for entry in feed.entries:
             if len(posts_list) > 10:
                 break
-            try:
-                entry_date = entry.get(date_field_key)
-                # check if the entry is not too close to (or passed) the last post
-                if entry_date is None or (
-                        dt.datetime(*entry_date[:6]) - date).total_seconds() < self.min_time_between_posts:
-                    # we know we can break because entries are sorted by most recent first
-                    break
-                entry_id = await self._get_entry_title(entry)
-                if last_entry_id is not None:
-                    if entry_id == last_entry_id:
-                        continue
-                if 'link' in entry:
-                    link = entry['link']
-                elif 'link' in feed:
-                    link = feed['link']
-                else:
-                    link = url
-                if 'author' in entry:
-                    author = entry['author']
-                elif 'author' in feed:
-                    author = feed['author']
-                elif 'title' in feed['feed']:
-                    author = feed['feed']['title']
-                else:
-                    author = '?'
-                if 'title' in entry:
-                    title = entry['title']
-                elif 'title' in feed:
-                    title = feed['title']
-                else:
-                    title = '?'
-                post_text = await get_text_from_entry(entry)
-                img = None
-                img_match = re.search(r'(http(s?):)([/|.\w\s-])*\.(?:jpe?g|gif|png|webp)', str(entry))
-                if img_match is not None:
-                    img = img_match.group(0)
-                obj = RssMessage(
-                    bot=self.bot,
-                    feed=FeedObject.unrecorded("web", channel.guild.id if channel.guild else None, channel.id, url),
-                    url=link,
-                    title=title,
-                    date=entry_date,
-                    entry_id=entry_id,
-                    author=author,
-                    channel=feed.feed['title'] if 'title' in feed.feed else '?',
-                    image=img,
-                    post_text=post_text
-                )
-                posts_list.append(obj)
-            except Exception as err:
-                self.bot.dispatch("error", err)
+            entry_date = entry.get(date_field_key)
+            # check if the entry is not too close to (or passed) the last post
+            if entry_date is None or (
+                    dt.datetime(*entry_date[:6]) - date).total_seconds() < self.min_time_between_posts:
+                # we know we can break because entries are sorted by most recent first
+                break
+            entry_id = await self._get_entry_title(entry)
+            if last_entry_id is not None:
+                if entry_id == last_entry_id:
+                    continue
+            if 'link' in entry:
+                link = entry['link']
+            elif 'link' in feed:
+                link = feed['link']
+            else:
+                link = url
+            if 'author' in entry:
+                author = entry['author']
+            elif 'author' in feed:
+                author = feed['author']
+            elif 'title' in feed['feed']:
+                author = feed['feed']['title']
+            else:
+                author = '?'
+            if 'title' in entry:
+                title = entry['title']
+            elif 'title' in feed:
+                title = feed['title']
+            else:
+                title = '?'
+            post_text = await get_text_from_entry(entry)
+            img = None
+            img_match = re.search(r'(http(s?):)([/|.\w\s-])*\.(?:jpe?g|gif|png|webp)', str(entry))
+            if img_match is not None:
+                img = img_match.group(0)
+            obj = RssMessage(
+                bot=self.bot,
+                feed=FeedObject.unrecorded("web", channel.guild.id if channel.guild else None, channel.id, url),
+                url=link,
+                title=title,
+                date=entry_date,
+                entry_id=entry_id,
+                author=author,
+                channel=feed.feed['title'] if 'title' in feed.feed else '?',
+                image=img,
+                post_text=post_text
+            )
+            posts_list.append(obj)
         posts_list.reverse()
         return posts_list
