@@ -64,7 +64,7 @@
         "rank": "rang",
         "reminders clear": "tout-annuler",
         "reminders create": "ajouter",
-        "reminders delete": "annuler",
+        "reminders cancel": "annuler",
         "reminders list": "liste",
         "remindme": "rappelle-moi",
         "Report a scam": "Signaler une arnaque",
@@ -377,7 +377,7 @@
             "duration": "durée",
             "message": "message"
         },
-        "reminders delete": {
+        "reminders cancel": {
             "reminder_id": "id-du-rappel"
         },
         "remindme": {

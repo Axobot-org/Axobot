@@ -52,12 +52,12 @@ Here you will get the full list of pending reminders, waiting for the end of the
 
 .. note:: Giving the "`Embed Links <perms.html#embed-links>`__" permission to the bot can be useful if you want to get a better rendering.
 
-Delete one or more reminders
+Cancel one or more reminders
 ----------------------------
 
-**Syntax:** :code:`reminders delete [ID]`
+**Syntax:** :code:`reminders cancel [ID]`
 
-Used when you want to stop a reminder, so Axobot will completely forget it. If you don't provide any ID, Axobot will ask you to directly select which reminders you want to delete.
+Used when you want to stop a reminder, so Axobot will completely forget it. If you don't provide any ID, Axobot will ask you to directly select which reminders you want to cancel.
 
 Clear every reminders
 ---------------------
