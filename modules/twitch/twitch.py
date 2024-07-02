@@ -10,8 +10,7 @@ from discord import app_commands
 from discord.ext import commands, tasks
 from mysql.connector.errors import IntegrityError
 
-from core.bot_classes import Axobot, MyContext
-from core.checks import checks
+from core.bot_classes import Axobot
 
 from .api.api_agent import TwitchApiAgent
 from .api.types import (GroupedStreamerDBObject, PlatformId, StreamersDBObject,
@@ -53,7 +52,9 @@ class Twitch(commands.Cog):
         "Add a streamer to the database"
         query = "INSERT INTO `streamers` (`guild_id`, `platform`, `user_id`, `user_name`, `beta`) VALUES (%s, %s, %s, %s, %s)"
         try:
-            async with self.bot.db_query(query, (guild_id, platform, user_id, user_name, self.bot.beta), returnrowcount=True) as query_result:
+            async with self.bot.db_query(
+                query, (guild_id, platform, user_id, user_name, self.bot.beta), returnrowcount=True
+            ) as query_result:
                 return query_result > 0
         except IntegrityError:
             return False
@@ -77,7 +78,8 @@ class Twitch(commands.Cog):
     async def db_get_guilds_per_streamers(self, platform: PlatformId | None=None) -> list[GroupedStreamerDBObject]:
         "Get all streamers objects"
         where = "" if platform is None else f"AND `platform` = \"{platform}\""
-        query = f"SELECT `platform`, `user_id`, `user_name`, `is_streaming`, JSON_ARRAYAGG(`guild_id`) as \"guild_ids\" FROM `streamers` WHERE `beta` = %s {where} GROUP BY `platform`, `user_id`; "
+        query = f"SELECT `platform`, `user_id`, `user_name`, `is_streaming`, JSON_ARRAYAGG(`guild_id`) as \"guild_ids\" "\
+            f"FROM `streamers` WHERE `beta` = %s {where} GROUP BY `platform`, `user_id`; "
         async with self.bot.db_query(query, (self.bot.beta,)) as query_result:
             return [
                 data | {"guild_ids": json.loads(data["guild_ids"])}
@@ -93,7 +95,9 @@ class Twitch(commands.Cog):
     async def db_set_streamer_status(self, platform: PlatformId, user_id: str, is_streaming: bool):
         "Set the streaming status of a streamer"
         query = "UPDATE `streamers` SET `is_streaming` = %s WHERE `platform` = %s AND `user_id` = %s AND `beta` = %s"
-        async with self.bot.db_query(query, (is_streaming, platform, user_id, self.bot.beta), returnrowcount=True) as query_result:
+        async with self.bot.db_query(
+            query, (is_streaming, platform, user_id, self.bot.beta), returnrowcount=True
+        ) as query_result:
             return query_result > 0
 
     async def db_get_streamer_status(self, platform: PlatformId, user_id: str) -> bool | None:
@@ -108,21 +112,15 @@ class Twitch(commands.Cog):
         async with self.bot.db_query(query, (platform, user_id, self.bot.beta), astuple=True) as query_result:
             return query_result[0][0] if query_result else None
 
-    @commands.hybrid_group(name="twitch")
-    @app_commands.default_permissions(manage_guild=True)
-    @commands.guild_only()
-    @commands.check(checks.has_manage_guild)
-    async def twitch(self, ctx: MyContext):
-        """Manage your Twitch subscriptions
+    twitch_main = app_commands.Group(
+        name="twitch",
+        description="Manage your Twitch subscriptions",
+        default_permissions=discord.Permissions(manage_guild=True),
+        guild_only=True,
+    )
 
-..Doc streamers.html"""
-        if ctx.invoked_subcommand is None:
-            await ctx.send_help(ctx.command)
-
-    @twitch.command(name="subscribe")
-    @commands.guild_only()
-    @commands.check(checks.has_manage_guild)
-    async def twitch_sub(self, ctx: MyContext, streamer: str):
+    @twitch_main.command(name="subscribe")
+    async def twitch_sub(self, interaction: discord.Interaction, streamer: str):
         """Subscribe to a Twitch streamer
 
 ..Example twitch subscribe https://twitch.tv/monstercat
@@ -130,36 +128,42 @@ class Twitch(commands.Cog):
 ..Example twitch subscribe Zerator
 
 ..Doc streamers.html#subscribe-or-unsubscribe-to-a-streamer"""
-        await ctx.defer()
-        if match := re.findall(r'^https://(?:www\.)?twitch\.tv/(\w+)', streamer):
+        await interaction.response.defer()
+        if match := re.findall(r"^https://(?:www\.)?twitch\.tv/(\w+)", streamer):
             streamer = match[0]
         try:
             user = await self.agent.get_user_by_name(streamer)
         except ValueError:
-            await ctx.send(await self.bot._(ctx.guild.id, "twitch.invalid-streamer-name"))
+            await interaction.followup.send(await self.bot._(interaction, "twitch.invalid-streamer-name"), ephemeral=True)
             return
         if user is None:
-            await ctx.send(await self.bot._(ctx.guild.id, "twitch.unknown-streamer"))
+            await interaction.followup.send(await self.bot._(interaction, "twitch.unknown-streamer"), ephemeral=True)
             return
-        streamers_count = await self.db_get_guild_subscriptions_count(ctx.guild.id)
-        max_count: int = await self.bot.get_config(ctx.guild.id, "streamers_max_number")
+        streamers_count = await self.db_get_guild_subscriptions_count(interaction.guild_id)
+        max_count: int = await self.bot.get_config(interaction.guild_id, "streamers_max_number")
         if streamers_count >= max_count:
-            await ctx.send(await self.bot._(ctx.guild.id, "twitch.subscribe.limit-reached", max_count))
+            await interaction.followup.send(
+                await self.bot._(interaction, "twitch.subscribe.limit-reached", max_count), ephemeral=True
+            )
             return
-        if await self.db_add_streamer(ctx.guild.id, "twitch", user["id"], user["display_name"]):
-            await ctx.send(await self.bot._(ctx.guild.id, "twitch.subscribe.success", streamer=user["display_name"]))
+        if await self.db_add_streamer(interaction.guild_id, "twitch", user["id"], user["display_name"]):
+            await interaction.followup.send(
+                await self.bot._(interaction, "twitch.subscribe.success", streamer=user["display_name"])
+            )
         else:
-            await ctx.send(await self.bot._(ctx.guild.id, "twitch.subscribe.already-subscribed", streamer=user["display_name"]))
+            await interaction.followup.send(
+                await self.bot._(interaction, "twitch.subscribe.already-subscribed", streamer=user["display_name"]),
+                ephemeral=True
+            )
 
-    @twitch.command(name="unsubscribe")
-    @commands.guild_only()
-    @commands.check(checks.has_manage_guild)
-    async def twitch_unsub(self, ctx: MyContext, streamer: str):
+    @twitch_main.command(name="unsubscribe")
+    async def twitch_unsub(self, interaction: discord.Interaction, streamer: str):
         """Unsubscribe from a Twitch streamer
 
 ..Example twitch unsubscribe monstercat
 
 ..Doc streamers.html#subscribe-or-unsubscribe-to-a-streamer"""
+        await interaction.response.defer()
         if streamer.isnumeric():
             user_id = streamer
             user_name = await self.db_get_streamer_name("twitch", user_id)
@@ -168,18 +172,20 @@ class Twitch(commands.Cog):
                 user_id = user["id"]
                 user_name = user["display_name"]
             else:
-                await ctx.send(await self.bot._(ctx.guild.id, "twitch.unknown-streamer"))
+                await interaction.followup.send(await self.bot._(interaction, "twitch.unknown-streamer"), ephemeral=True)
                 return
-        if await self.db_remove_streamer(ctx.guild.id, "twitch", user_id):
-            await ctx.send(await self.bot._(ctx.guild.id, "twitch.unsubscribe.success", streamer=user_name))
+        if await self.db_remove_streamer(interaction.guild_id, "twitch", user_id):
+            await interaction.followup.send(await self.bot._(interaction, "twitch.unsubscribe.success", streamer=user_name))
         else:
-            await ctx.send(await self.bot._(ctx.guild.id, "twitch.unsubscribe.not-subscribed", streamer=user_name))
+            await interaction.followup.send(
+                await self.bot._(interaction, "twitch.unsubscribe.not-subscribed", streamer=user_name), ephemeral=True
+            )
 
     @twitch_unsub.autocomplete("streamer")
-    async def twitch_unsub_autocomplete(self, ctx: MyContext, current: str):
+    async def twitch_unsub_autocomplete(self, interaction: discord.Interaction, current: str):
         "Autocomplete for twitch_unsub"
         current = current.lower()
-        streamers = await self.db_get_guild_streamers(ctx.guild.id, "twitch")
+        streamers = await self.db_get_guild_streamers(interaction.guild_id, "twitch")
         filtered = [
             (not streamer["user_name"].lower().startswith(current), streamer["user_name"], streamer["user_id"])
             for streamer in streamers
@@ -191,41 +197,40 @@ class Twitch(commands.Cog):
             for _, name, value in filtered
         ]
 
-    @twitch.command(name="list-subscriptions")
-    @commands.guild_only()
-    @commands.check(checks.has_manage_guild)
-    async def twitch_list(self, ctx: MyContext):
+    @twitch_main.command(name="list-subscriptions")
+    async def twitch_list(self, interaction: discord.Interaction):
         """List all subscribed Twitch streamers
 
 ..Example twitch list-subscriptions
 
 ..Doc streamers.html#list-your-subscriptions"""
-        await ctx.defer()
-        streamers = await self.db_get_guild_streamers(ctx.guild.id, "twitch")
-        max_count: int = await self.bot.get_config(ctx.guild.id, "streamers_max_number")
+        await interaction.response.defer()
+        streamers = await self.db_get_guild_streamers(interaction.guild_id, "twitch")
+        max_count: int = await self.bot.get_config(interaction.guild_id, "streamers_max_number")
         if streamers:
-            title = await self.bot._(ctx.guild.id, "twitch.subs-list.title", current=len(streamers), max=max_count)
-            on_live = await self.bot._(ctx.guild.id, "twitch.on-live-indication")
+            title = await self.bot._(interaction, "twitch.subs-list.title", current=len(streamers), max=max_count)
+            on_live = await self.bot._(interaction, "twitch.on-live-indication")
             streamers_name = [
                 streamer["user_name"] + (f"  *({on_live})*" if streamer["is_streaming"] else "")
                 for streamer in streamers
             ]
             streamers_name.sort(key=str.casefold)
-            await ctx.send(title+"\n• " + "\n• ".join(streamers_name))
+            await interaction.followup.send(title + "\n• " + "\n• ".join(streamers_name))
         else:
-            txt = await self.bot._(ctx.guild.id, "twitch.subs-list.empty", max=max_count)
+            txt = await self.bot._(interaction, "twitch.subs-list.empty", max=max_count)
             cmd = await self.bot.get_command_mention("twitch subscribe")
-            txt += "\n" + await self.bot._(ctx.guild.id, "twitch.subs-list.empty-tip", cmd=cmd, max=max_count)
-            await ctx.send(txt)
+            txt += "\n" + await self.bot._(interaction, "twitch.subs-list.empty-tip", cmd=cmd, max=max_count)
+            await interaction.followup.send(txt)
 
-    @twitch.command(name="check-stream")
-    @commands.cooldown(3, 60, commands.BucketType.user)
-    async def test_twitch(self, ctx: MyContext, streamer: str):
+    @twitch_main.command(name="check-stream")
+    @app_commands.checks.cooldown(3, 60)
+    async def test_twitch(self, interaction: discord.Interaction, streamer: str):
         """Check if a streamer is currently streaming
 
 ..Example twitch check-stream monstercat
 
 ..Doc streamers.html#check-a-streamer-status"""
+        await interaction.response.defer(ephemeral=interaction.guild is not None)
         if streamer.isnumeric():
             user_id = streamer
             avatar = None
@@ -235,19 +240,20 @@ class Twitch(commands.Cog):
                 avatar = streamer_obj["profile_image_url"].format(width=64, height=64)
                 user_id = streamer_obj["id"]
             except ValueError:
-                await ctx.send(await self.bot._(ctx, "twitch.invalid-streamer-name"))
+                await interaction.followup.send(await self.bot._(interaction, "twitch.invalid-streamer-name"), ephemeral=True)
                 return
         resp = await self.agent.get_user_stream_by_id(user_id)
         if len(resp) > 0:
             stream = resp[0]
-            if stream["is_mature"] and not (ctx.guild is None or ctx.channel.is_nsfw()):
-                await ctx.send(await self.bot._(ctx, "twitch.check-stream.no-nsfw"))
+            if stream["is_mature"] and not (interaction.guild is None or interaction.channel.is_nsfw()):
+                await interaction.followup.send(await self.bot._(interaction, "twitch.check-stream.no-nsfw"), ephemeral=True)
                 return
-            await ctx.send(embed=await self.create_stream_embed(stream, ctx, avatar))
+            await interaction.followup.send(embed=await self.create_stream_embed(stream, interaction, avatar))
         else:
-            await ctx.send(await self.bot._(ctx, "twitch.check-stream.offline", streamer=streamer))
+            await interaction.followup.send(await self.bot._(interaction, "twitch.check-stream.offline", streamer=streamer))
 
-    async def create_stream_embed(self, stream: StreamObject, guild_id: int, streamer_avatar: str | None=None):
+    async def create_stream_embed(self, stream: StreamObject, translation_source: discord.Interaction | int,
+                                  streamer_avatar: str | None=None):
         "Create a Discord embed for a starting Twitch stream"
         started_at = isoparse(stream["started_at"])
         embed = discord.Embed(
@@ -255,7 +261,7 @@ class Twitch(commands.Cog):
             url=f"https://twitch.tv/{stream['user_name']}",
             color=self.twitch_color,
             timestamp=started_at,
-            description=await self.bot._(guild_id, "twitch.check-stream.category", game=stream['game_name'])
+            description=await self.bot._(translation_source, "twitch.check-stream.category", game=stream["game_name"])
         )
         embed.set_image(url=stream["thumbnail_url"].format(width=1280, height=720))
         embed.set_author(name=stream["user_name"], url=f"https://twitch.tv/{stream['user_name']}", icon_url=streamer_avatar)
