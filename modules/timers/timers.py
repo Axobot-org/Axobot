@@ -1,4 +1,3 @@
-import copy
 import datetime
 import time
 
@@ -9,12 +8,13 @@ from discord import app_commands
 from discord.ext import commands
 
 from core.arguments import args
-from core.bot_classes import Axobot, MyContext
+from core.bot_classes import Axobot
 from core.checks import checks
 from core.formatutils import FormatUtils
 from core.paginator import PaginatedSelectView
 from core.views import ConfirmView
 
+ReminderTextArgument = app_commands.Range[str, 1, 1000]
 
 class Timers(commands.Cog):
     "Reminders system"
@@ -122,41 +122,44 @@ class Timers(commands.Cog):
         return [choice for _, _, choice in sorted(choices, key=lambda x: x[0:2])]
 
 
-    @commands.hybrid_command(name="remindme", aliases=['rmd'])
+    @app_commands.command(name="remindme")
     @app_commands.describe(duration="The duration to wait, eg. '2d 4h'", message="The message to remind you of")
-    @commands.cooldown(5, 30, commands.BucketType.channel)
-    @commands.cooldown(5, 60, commands.BucketType.user)
-    @commands.check(checks.database_connected)
-    async def remindme(self, ctx: MyContext, duration: commands.Greedy[args.Duration], *, message: str):
+    @app_commands.checks.cooldown(5, 60)
+    @app_commands.check(checks.database_connected)
+    async def remindme(self, interaction: discord.Interaction, duration: args.GreedyDurationArgument,
+                       message: ReminderTextArgument):
         """Create a new reminder
-        This is actually an alias of `reminder create`
+        This is actually an alias of `/reminder create`
 
-        ..Example rmd 3h 5min It's pizza time!
+        Please use the following duration format:
+        `XXm` : XX minutes
+        `XXh` : XX hours
+        `XXd` : XX days
+        `XXw` : XX weeks
+        `XXm` : XX months
+
+        ..Example remindme 3h 5min It's pizza time!
 
         ..Example remindme 3months Christmas is coming!
 
         ..Doc miscellaneous.html#create-a-new-reminder"""
-        await self.remind_create(ctx, duration, message=message)
+        await self._create_reminder(interaction, duration, message)
 
 
-    @commands.hybrid_group(name="reminders", aliases=["reminds", "reminder"])
-    async def remind_main(self, ctx: MyContext):
-        """Manage your pending reminders
+    remind_main = app_commands.Group(
+        name="reminders",
+        description="Manage your pending reminders",
+    )
 
-        ..Doc miscellaneous.html#reminders"""
-        if ctx.subcommand_passed is None:
-            await ctx.send_help(ctx.command)
-
-
-    @remind_main.command(name="create", aliases=["add"])
+    @remind_main.command(name="create")
     @app_commands.describe(duration="The duration to wait, eg. '2d 4h'", message="The message to remind you of")
-    @commands.cooldown(5, 30, commands.BucketType.channel)
-    @commands.cooldown(5, 60, commands.BucketType.user)
-    @commands.check(checks.database_connected)
-    async def remind_create(self, ctx: MyContext, duration: commands.Greedy[args.Duration], *, message: str):
+    @app_commands.checks.cooldown(5, 60)
+    @app_commands.check(checks.database_connected)
+    async def remind_create(self, interaction: discord.Interaction, duration: args.GreedyDurationArgument,
+                            message: ReminderTextArgument):
         """Create a new reminder
 
-        Please use the following format:
+        Please use the following duration format:
         `XXm` : XX minutes
         `XXh` : XX hours
         `XXd` : XX days
@@ -169,102 +172,106 @@ class Timers(commands.Cog):
 
         ..Doc miscellaneous.html#create-a-new-reminder
         """
-        duration = sum(duration)
-        if duration < 1:
-            await ctx.send(await self.bot._(ctx.channel, "timers.rmd.too-short"))
+        await self._create_reminder(interaction, duration, message)
+
+    async def _create_reminder(self, interaction: discord.Interaction, duration: int, message: str):
+        "Create a new reminder, from either '/remindme' or '/reminder create'"
+        if duration <= 0:
+            await interaction.response.send_message(
+                await self.bot._(interaction, "timers.rmd.too-short"), ephemeral=True
+            )
             return
         if duration > 60*60*24*365*5:
-            await ctx.send(await self.bot._(ctx.channel, "timers.rmd.too-long"))
-            return
-        await ctx.defer()
-        lang = await self.bot._(ctx.channel,'_used_locale')
-        f_duration = await FormatUtils.time_delta(duration, lang=lang, year=True, form='developed')
-        try:
-            data = {'msg_url': ctx.message.jump_url}
-            await ctx.bot.task_handler.add_task(
-                "timer",
-                duration,
-                ctx.author.id,
-                ctx.guild.id if ctx.guild else None,
-                ctx.channel.id,
-                message,
-                data
+            await interaction.response.send_message(
+                await self.bot._(interaction, "timers.rmd.too-long"), ephemeral=True
             )
-        except Exception as err:
-            self.bot.dispatch("command_error", ctx, err)
+            return
+        await interaction.response.defer()
+        lang = await self.bot._(interaction, "_used_locale")
+        f_duration = await FormatUtils.time_delta(duration, lang=lang, year=True, form="developed")
+        if msg := await interaction.original_response():
+            data = {"msg_url": msg.jump_url}
         else:
-            timestamp = f"<t:{time.time() + duration:.0f}>"
-            await ctx.send(await self.bot._(ctx.channel, "timers.rmd.saved", duration=f_duration, timestamp=timestamp))
+            data = {}
+        await self.bot.task_handler.add_task(
+            "timer",
+            duration,
+            interaction.user.id,
+            interaction.guild_id,
+            interaction.channel.id,
+            message,
+            data
+        )
+        timestamp = f"<t:{time.time() + duration:.0f}>"
+        await interaction.followup.send(
+            await self.bot._(interaction, "timers.rmd.saved", duration=f_duration, timestamp=timestamp)
+        )
 
 
     @remind_main.command(name="list")
-    @commands.cooldown(5, 60, commands.BucketType.user)
-    @commands.check(checks.database_connected)
-    async def remind_list(self, ctx: MyContext):
+    @app_commands.checks.cooldown(5, 60)
+    @app_commands.check(checks.database_connected)
+    async def remind_list(self, interaction: discord.Interaction):
         """List your pending reminders
 
         ..Doc miscellaneous.html#list-your-reminders
         """
-        reminders = await self.db_get_user_reminders(ctx.author.id)
+        await interaction.response.defer(ephemeral=interaction.guild is not None)
+        reminders = await self.db_get_user_reminders(interaction.user.id)
         if len(reminders) == 0:
-            await ctx.send(await self.bot._(ctx.channel, "timers.rmd.empty"))
+            await interaction.followup.send(await self.bot._(interaction, "timers.rmd.empty"))
             return
-        txt = await self.bot._(ctx.channel, "timers.rmd.item")
-        lang = await self.bot._(ctx.channel, '_used_locale')
+        txt = await self.bot._(interaction, "timers.rmd.item")
+        lang = await self.bot._(interaction, "_used_locale")
         reminders_formated_list: list[int, str] = []
+        ctx = await commands.Context.from_interaction(interaction)
         for item in reminders:
-            ctx2 = copy.copy(ctx)
-            ctx2.message.content = item["message"]
-            item["message"] = await commands.clean_content(fix_channel_mentions=True).convert(ctx2, item["message"])
-            msg = item['message'] if len(item['message'])<=50 else item['message'][:47]+"..."
+            item["message"] = await commands.clean_content(fix_channel_mentions=True).convert(ctx, item["message"])
+            msg = item["message"] if len(item["message"])<=50 else item["message"][:47]+"..."
             msg = discord.utils.escape_markdown(msg).replace("\n", " ")
-            chan = '<#'+str(item['channel'])+'>'
-            end: datetime.datetime = item["begin"] + datetime.timedelta(seconds=item['duration'])
+            chan = f"<#{item['channel']}>"
+            end: datetime.datetime = item["begin"] + datetime.timedelta(seconds=item["duration"])
             duration = await self.format_duration_left(end, lang)
-            item = txt.format(id=item['ID'], duration=duration, channel=chan, msg=msg)
+            item = txt.format(id=item["ID"], duration=duration, channel=chan, msg=msg)
             reminders_formated_list.append((-end.timestamp(), item))
         reminders_formated_list.sort()
         labels = [item[1] for item in reminders_formated_list]
-        if ctx.can_send_embed:
-            emb = discord.Embed(title=await self.bot._(ctx.channel, "timers.rmd.title"),color=16108042)
-            if len("\n".join(labels)) > 2000:
-                step = 5
-                for i in range(0, max(25, len(labels)), step):
-                    emb.add_field(name=self.bot.zws, value="\n".join(labels[i:i+step]), inline=False)
-            else:
-                emb.description = "\n".join(labels)
-            await ctx.send(embed=emb)
+        emb = discord.Embed(title=await self.bot._(interaction, "timers.rmd.title"),color=16108042)
+        if len("\n".join(labels)) > 2000:
+            step = 5
+            for i in range(0, max(25, len(labels)), step):
+                emb.add_field(name=self.bot.zws, value="\n".join(labels[i:i+step]), inline=False)
         else:
-            text = "**"+await self.bot._(ctx.channel, "timers.rmd.title")+"**\n\n".join(labels)
-            await ctx.send(text)
+            emb.description = "\n".join(labels)
+        await interaction.followup.send(embed=emb)
 
     async def transform_reminders_options(self, reminders: list[dict]):
         "Transform reminders data into discord SelectOption"
         res = []
         for reminder in reminders:
-            if len(reminder['message']) > 90:
-                reminder['message'] = reminder['message'][:89] + '…'
-            label = reminder['message']
+            if len(reminder["message"]) > 90:
+                reminder["message"] = reminder["message"][:89] + '…'
+            label = reminder["message"]
             desc = f"{reminder['tr_channel']} - {reminder['tr_duration']}"
-            res.append(discord.SelectOption(value=str(reminder['id']), label=label, description=desc))
+            res.append(discord.SelectOption(value=str(reminder["id"]), label=label, description=desc))
         return res
 
-    async def ask_reminder_ids(self, input_id: int | None, ctx: MyContext, title: str) -> list[int] | None:
+    async def ask_reminder_ids(self, input_id: int | None, interaction: discord.Interaction, title: str) -> list[int] | None:
         "Ask the user to select reminder IDs"
         selection = []
         if input_id is not None:
-            input_reminder = await self.db_get_reminder(input_id, ctx.author.id)
+            input_reminder = await self.db_get_reminder(input_id, interaction.user.id)
             if not input_reminder:
                 input_id = None
             else:
                 selection.append(input_reminder["ID"])
         if input_id is None:
-            reminders = await self.db_get_user_reminders(ctx.author.id)
+            reminders = await self.db_get_user_reminders(interaction.user.id)
             if len(reminders) == 0:
-                await ctx.send(await self.bot._(ctx.channel, "timers.rmd.empty"))
+                await interaction.followup.send(await self.bot._(interaction, "timers.rmd.empty"))
                 return
             reminders_data: list[dict] = []
-            lang = await self.bot._(ctx.channel, '_used_locale')
+            lang = await self.bot._(interaction, "_used_locale")
             for reminder in reminders:
                 rmd_data = {
                     "id": reminder["ID"],
@@ -276,8 +283,8 @@ class Timers(commands.Cog):
                 else:
                     rmd_data["tr_channel"] = reminder["channel"]
                 # duration
-                end: datetime.datetime = reminder["begin"] + datetime.timedelta(seconds=reminder['duration'])
-                now = ctx.bot.utcnow()
+                end: datetime.datetime = reminder["begin"] + datetime.timedelta(seconds=reminder["duration"])
+                now = self.bot.utcnow()
                 if now > end:
                     duration = "-" + await FormatUtils.time_delta(
                         end, now,
@@ -291,15 +298,15 @@ class Timers(commands.Cog):
                 rmd_data["tr_duration"] = duration
                 # append to the list
                 reminders_data.append(rmd_data)
-            form_placeholder = await self.bot._(ctx.channel, 'timers.rmd.select-placeholder')
+            form_placeholder = await self.bot._(interaction, "timers.rmd.select-placeholder")
             view = PaginatedSelectView(self.bot,
                 message=title,
                 options=await self.transform_reminders_options(reminders_data),
-                user=ctx.author,
+                user=interaction.user,
                 placeholder=form_placeholder,
                 max_values=len(reminders_data)
             )
-            msg = await view.send_init(ctx)
+            msg = await view.send_init(interaction)
             await view.wait()
             if view.values is None:
                 # timeout
@@ -312,39 +319,47 @@ class Timers(commands.Cog):
                     selection = list(map(int, view.values))
             except ValueError:
                 selection = []
-                self.bot.dispatch("error", ValueError(f"Invalid reminder IDs: {view.values}"), ctx)
+                self.bot.dispatch("error", ValueError(f"Invalid reminder IDs: {view.values}"), interaction)
         if len(selection) == 0:
             cmd = await self.bot.get_command_mention("about")
-            await ctx.send(await self.bot._(ctx.guild, "errors.unknown2", about=cmd))
+            await interaction.followup.send(await self.bot._(interaction, "errors.unknown2", about=cmd))
             return
         return selection
 
-    @remind_main.command(name="delete", aliases=["remove", "del"])
-    @commands.cooldown(5, 30, commands.BucketType.user)
-    @commands.check(checks.database_connected)
-    async def remind_del(self, ctx: MyContext, reminder_id: int | None = None):
+    @remind_main.command(name="cancel")
+    @app_commands.checks.cooldown(5, 30)
+    @app_commands.check(checks.database_connected)
+    async def remind_del(self, interaction: discord.Interaction, reminder_id: int | None = None):
         """Delete a reminder
         ID can be found with the `reminder list` command.
 
-        ..Example reminders delete
+        ..Example reminders cancel
 
-        ..Example reminders delete 253
+        ..Example reminders cancel 253
 
         ..Doc miscellaneous.html#delete-a-reminder
         """
-        ids = await self.ask_reminder_ids(reminder_id, ctx, await ctx.bot._(ctx.channel, "timers.rmd.delete.title"))
+        ephemeral = interaction.guild is not None
+        await interaction.response.defer(ephemeral=ephemeral)
+        ids = await self.ask_reminder_ids(reminder_id, interaction, await self.bot._(interaction, "timers.rmd.delete.title"))
         if ids is None:
             return
-        if await self.db_delete_reminders(ids, ctx.author.id):
+        if await self.db_delete_reminders(ids, interaction.user.id):
             for rmd_id in ids:
                 await self.bot.task_handler.remove_task(rmd_id)
-            await ctx.send(await self.bot._(ctx.channel, "timers.rmd.delete.success", count=len(ids)))
+            await interaction.followup.send(
+                await self.bot._(interaction, "timers.rmd.delete.success", count=len(ids)),
+                ephemeral=ephemeral
+            )
         else:
-            await ctx.send(await self.bot._(ctx.channel, "timers.rmd.delete.error"))
+            await interaction.followup.send(
+                await self.bot._(interaction, "timers.rmd.delete.error"),
+                ephemeral=ephemeral
+            )
             try:
                 raise ValueError(f"Failed to delete reminders: {ids}")
             except ValueError as err:
-                self.bot.dispatch("error", err, ctx)
+                self.bot.dispatch("error", err, interaction)
 
     @remind_del.autocomplete("reminder_id")
     async def remind_del_autocomplete(self, interaction: discord.Interaction, current: str):
@@ -355,31 +370,37 @@ class Timers(commands.Cog):
             self.bot.dispatch("interaction_error", interaction, err)
 
     @remind_main.command(name="clear")
-    @commands.cooldown(3, 60, commands.BucketType.user)
-    @commands.check(checks.database_connected)
-    async def remind_clear(self, ctx: MyContext):
+    @app_commands.checks.cooldown(3, 60)
+    @app_commands.check(checks.database_connected)
+    async def remind_clear(self, interaction: discord.Interaction):
         """Remove every pending reminder
 
         ..Doc miscellaneous.html#clear-every-reminders"""
-        count = await self.db_get_user_reminders_count(ctx.author.id)
+        ephemeral = interaction.guild is not None
+        await interaction.response.defer(ephemeral=ephemeral)
+        count = await self.db_get_user_reminders_count(interaction.user.id)
         if count == 0:
-            await ctx.send(await self.bot._(ctx.channel, "timers.rmd.empty"))
+            await interaction.followup.send(await self.bot._(interaction, "timers.rmd.empty"), ephemeral=ephemeral)
             return
 
-        confirm_view = ConfirmView(self.bot, ctx.channel,
-            validation=lambda inter: inter.user==ctx.author,
-            timeout=20)
+        confirm_view = ConfirmView(self.bot, interaction.channel,
+            validation=lambda inter: inter.user==interaction.user,
+            timeout=20
+        )
         await confirm_view.init()
-        confirm_msg = await ctx.send(await self.bot._(ctx.channel, "timers.rmd.confirm", count=count), view=confirm_view)
+        await interaction.followup.send(
+            await self.bot._(interaction, "timers.rmd.confirm", count=count), view=confirm_view,
+            ephemeral=ephemeral
+        )
 
         await confirm_view.wait()
-        await confirm_view.disable(confirm_msg)
+        await confirm_view.disable(interaction)
         if confirm_view.value is None:
-            await ctx.send(await self.bot._(ctx.channel, "timers.rmd.cancelled"))
+            await interaction.followup.send(await self.bot._(interaction, "timers.rmd.cancelled"), ephemeral=ephemeral)
             return
         if confirm_view.value:
-            await self.db_delete_all_user_reminders(ctx.author.id)
-            await ctx.send(await self.bot._(ctx.channel, "timers.rmd.cleared"))
+            await self.db_delete_all_user_reminders(interaction.user.id)
+            await interaction.followup.send(await self.bot._(interaction, "timers.rmd.cleared"), ephemeral=ephemeral)
 
 
     @commands.Cog.listener()

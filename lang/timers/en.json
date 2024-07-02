@@ -1,20 +1,20 @@
 {
     "rmd": {
         "cancelled": "Dropping the process",
-        "cleared": "Your reminders have been deleted!",
-        "confirm": "Are you sure you want to delete all your reminders? (%{count} pending)",
+        "cleared": "Your reminders have been cancelled!",
+        "confirm": "Are you sure you want to cancel all your reminders? (%{count} pending)",
         "custom-duration": {
             "button": "Other duration",
             "title": "Custom reminder duration",
             "input": "Enter a duration for your reminder"
         },
         "delete": {
-            "error": "Something went wrong while deleting your reminders. Please try again or contact support.",
+            "error": "Something went wrong while cancelling your reminders. Please try again or contact support.",
             "success": {
-                "one": "Your reminder has been deleted!",
-                "many": "%{count} reminders have successfully been deleted!"
+                "one": "Your reminder has been cancelled!",
+                "many": "%{count} reminders have successfully been cancelled!"
             },
-            "title": "Choose which reminder(s) you want to delete"
+            "title": "Choose which reminder(s) you want to cancel"
         },
         "embed-asked": "%{user}, you asked me %{duration} ago to remind you of this:",
         "embed-date": "Request date",
