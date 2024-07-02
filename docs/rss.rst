@@ -125,7 +125,7 @@ Filter a feed posts
 
 **Syntax** :code:`rss set-filter <feed ID> <blacklist|whitelist> [words]` or :code:`rss set-filter <feed ID> <none>`
 
-This command allows you to filter the posts of a feed, to only send the ones that contain specific words. You can either use a blacklist, to block posts that contain at least one of the sepcified words, or a whitelist, to only send posts that contain at least one of the specified words. Axobot will then check each new post title and tags, and will only send it if it matches the filter.
+This command allows you to filter the posts of a feed, to only send the ones that contain specific words. You can either use a blacklist, to block posts that contain at least one of the sepcified words, or a whitelist, to only send posts that contain at least one of the specified words. Axobot will then check each new post title and tags, and will only send it if it matches the filter. The filter is case-insensitive, meaning that the capitalization of the words doesn't matter (so "hello" will match both "Hello", "HELLo", etc.).
 
 The "feed ID" argument is the identifier of the feed (found with the command `rss list <#see-every-feed>`__ or via autocompletion). The words argument is the list of words you want to filter, separated by commas (:code:`,`).
 
