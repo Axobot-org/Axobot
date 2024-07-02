@@ -6,9 +6,8 @@ from discord import app_commands
 from discord.ext import commands
 from mysql.connector.errors import IntegrityError
 
-from core.arguments import PartialorUnicodeEmoji
-from core.bot_classes import Axobot, MyContext
-from core.checks import checks
+from core.arguments import PartialorUnicodeEmojiArgument
+from core.bot_classes import Axobot
 from core.enums import ServerWarningType
 
 from .src.types import DBTopicRow, TicketCreationEvent
@@ -19,6 +18,10 @@ def is_named_other(name: str, other_translated: str):
     "Check if a topic name corresponds to any 'other' variant"
     return name.lower() in {"other", "others", other_translated}
 
+TopicNameArgument = app_commands.Range[str, 1, 100]
+ChannelNameFormatArgument = app_commands.Range[str, 1, 70]
+HintTextArgument = app_commands.Range[str, 1, 2000]
+MAX_TOPICS_PER_GUILD = 25
 
 class Tickets(commands.Cog):
     "Handle the bot tickets system"
@@ -29,7 +32,6 @@ class Tickets(commands.Cog):
         self.log = logging.getLogger("bot.tickets")
         self.cooldowns: dict[discord.User, float] = {}
         self.default_name_format = "{username}-{topic}"
-        self.max_format_length = 70
 
     @commands.Cog.listener()
     async def on_interaction(self, interaction: discord.Interaction):
@@ -196,15 +198,15 @@ class Tickets(commands.Cog):
         async with self.bot.db_query(query, (message, guild_id, self.bot.beta)) as _:
             pass
 
-    async def ask_user_topic(self, ctx: MyContext, multiple = False, message: str | None = None):
+    async def ask_user_topic(self, interaction: discord.Interaction, multiple = False, message: str | None = None):
         "Ask a user which topic they want to edit"
-        placeholder = await self.bot._(ctx.guild.id, "tickets.selection-placeholder")
-        topics = await self.db_get_topics(ctx.guild.id)
+        placeholder = await self.bot._(interaction, "tickets.selection-placeholder")
+        topics = await self.db_get_topics(interaction.guild_id)
         if not topics:
-            await ctx.send(await self.bot._(ctx.guild.id, "tickets.topic.no-server-topic"))
+            await interaction.followup.send(await self.bot._(interaction, "tickets.topic.no-server-topic"), ephemeral=True)
             return None
-        view = AskTopicSelect(ctx.author.id, topics, placeholder, max_values=25 if multiple else 1)
-        msg = await ctx.send(message or await self.bot._(ctx.guild.id, "tickets.choose-topic-edition"), view=view)
+        view = AskTopicSelect(interaction.user.id, topics, placeholder, max_values=25 if multiple else 1)
+        msg = await interaction.followup.send(message or await self.bot._(interaction, "tickets.choose-topic-edition"), view=view)
         await view.wait()
         if view.topics is None:
             # timeout
@@ -213,8 +215,7 @@ class Tickets(commands.Cog):
         try:
             if multiple:
                 return [int(topic) for topic in view.topics]
-            else:
-                return int(view.topics[0])
+            return int(view.topics[0])
         except (ValueError, IndexError):
             return None
 
@@ -373,64 +374,54 @@ class Tickets(commands.Cog):
             for _, name, topic_id in filtered
         ]
 
-    async def send_error_message(self, ctx: MyContext):
+    async def send_error_message(self, interaction: discord.Interaction):
+        "Send a generic error message when something went wrong"
         about = await self.bot.get_command_mention("about")
-        await ctx.send(await self.bot._(ctx.guild.id, "errors.unknown", about=about))
+        send = interaction.followup.send if interaction.response.is_done() else interaction.response.send_message
+        await send(await self.bot._(interaction, "errors.unknown", about=about))
 
-    @commands.hybrid_group(name="tickets", aliases=["ticket"])
-    @discord.app_commands.default_permissions(manage_channels=True)
-    @commands.check(checks.has_manage_channels)
-    @commands.guild_only()
-    async def tickets_main(self, ctx: MyContext):
-        """Manage your tickets system
+    tickets_main = app_commands.Group(
+        name="tickets",
+        description="Manage your tickets system",
+        default_permissions=discord.Permissions(manage_channels=True),
+        guild_only=True,
+    )
 
-        ..Doc tickets.html"""
-        if ctx.subcommand_passed is None:
-            await ctx.send_help(ctx.command)
-
-    @tickets_main.group(name="portal")
-    @commands.guild_only()
-    @commands.check(checks.has_manage_channels)
-    async def tickets_portal(self, ctx: MyContext):
-        """Handle how your members are able to open tickets
-
-        ..Doc tickets.html"""
-        if ctx.subcommand_passed is None:
-            await ctx.send_help(ctx.command)
+    tickets_portal = app_commands.Group(
+        name="portal",
+        description="Handle how your members are able to open tickets",
+        parent=tickets_main,
+    )
 
     @tickets_portal.command()
-    @commands.cooldown(2, 30, commands.BucketType.guild)
-    @commands.guild_only()
-    @commands.check(checks.has_manage_channels)
-    async def summon(self, ctx: MyContext, channel: discord.TextChannel | None = None):
+    @app_commands.checks.cooldown(2, 30)
+    async def summon(self, interaction: discord.Interaction, channel: discord.TextChannel | None = None):
         """Ask the bot to send a message allowing people to open tickets
 
         ..Doc tickets.html#as-staff-send-the-prompt-message"""
-        destination_channel = channel or ctx.channel
-        if not destination_channel.permissions_for(ctx.guild.me).send_messages:
-            await ctx.send(
-                await self.bot._(ctx.guild.id, "tickets.missing-perms-send", channel=destination_channel.mention),
+        destination_channel = channel or interaction.channel
+        if not destination_channel.permissions_for(interaction.guild.me).send_messages:
+            await interaction.response.send_message(
+                await self.bot._(interaction, "tickets.missing-perms-send", channel=destination_channel.mention),
                 ephemeral=True
             )
             return
-        topics = await self.db_get_topics(ctx.guild.id)
+        await interaction.response.defer(ephemeral=True)
+        topics = await self.db_get_topics(interaction.guild_id)
         other = {
             "id": -1,
-            "topic": (await self.bot._(ctx.guild.id, "tickets.other")).capitalize(),
+            "topic": (await self.bot._(interaction, "tickets.other")).capitalize(),
             "topic_emoji": None
         }
-        defaults = await self.db_get_defaults(ctx.guild.id)
-        prompt = defaults["prompt"] if defaults else await self.bot._(ctx.guild.id, "tickets.default-topic-prompt")
-        await destination_channel.send(prompt, view=SelectView(ctx.guild.id, topics + [other]))
-        if ctx.interaction:
-            await ctx.reply(await self.bot._(ctx.guild.id, "misc.done!"), ephemeral=True)
+        defaults = await self.db_get_defaults(interaction.guild_id)
+        prompt = defaults["prompt"] if defaults else await self.bot._(interaction, "tickets.default-topic-prompt")
+        await destination_channel.send(prompt, view=SelectView(interaction.guild_id, topics + [other]))
+        await interaction.followup.send(await self.bot._(interaction, "misc.done!"))
 
     @tickets_portal.command(name="set-hint")
     @app_commands.describe(message="The hint to display for this topic - set 'none' for no hint")
-    @commands.cooldown(3, 30, commands.BucketType.guild)
-    @commands.guild_only()
-    @commands.check(checks.has_manage_channels)
-    async def portal_set_hint(self, ctx: MyContext, *, message: str):
+    @app_commands.checks.cooldown(3, 30)
+    async def portal_set_hint(self, interaction: discord.Interaction, *, message: HintTextArgument):
         """Set a default hint message
         The message will be displayed when a user tries to open a ticket, before user confirmation
         Type "none" for no hint message at all
@@ -440,20 +431,19 @@ class Tickets(commands.Cog):
         ..Doc tickets.html#default-hint"""
         if message.lower() == "none":
             message = None
-        row_id = await self.db_get_guild_default_id(ctx.guild.id)
+        await interaction.response.defer()
+        row_id = await self.db_get_guild_default_id(interaction.guild_id)
         if row_id is None:
-            row_id = await self.db_set_guild_default_id(ctx.guild.id)
-        if await self.db_edit_topic_hint(ctx.guild.id, row_id, message):
-            await ctx.send(await self.bot._(ctx.guild.id, "tickets.hint-edited.default"))
+            row_id = await self.db_set_guild_default_id(interaction.guild_id)
+        if await self.db_edit_topic_hint(interaction.guild_id, row_id, message):
+            await interaction.followup.send(await self.bot._(interaction, "tickets.hint-edited.default"))
         else:
-            await self.send_error_message(ctx)
+            await self.send_error_message(interaction)
 
     @tickets_portal.command(name="set-role")
     @app_commands.describe(role="The role allowed to see tickets from this topic - do not set to allow anyone")
-    @commands.cooldown(3, 30, commands.BucketType.guild)
-    @commands.guild_only()
-    @commands.check(checks.has_manage_channels)
-    async def portal_set_role(self, ctx: MyContext, role: discord.Role | None):
+    @app_commands.checks.cooldown(3, 30)
+    async def portal_set_role(self, interaction: discord.Interaction, role: discord.Role | None):
         """Edit a default staff role
         Anyone with this role will be able to read newly created tickets
         Type "None" to set admins only
@@ -461,34 +451,33 @@ class Tickets(commands.Cog):
         ..Example tickets set-role Moderators
 
         ..Doc tickets.html#default-staff-role"""
-        row_id = await self.db_get_guild_default_id(ctx.guild.id)
+        await interaction.response.defer()
+        row_id = await self.db_get_guild_default_id(interaction.guild_id)
         if row_id is None:
-            row_id = await self.db_set_guild_default_id(ctx.guild.id)
-        await self.db_edit_topic_role(ctx.guild.id, row_id, role.id if role else None)
+            row_id = await self.db_set_guild_default_id(interaction.guild_id)
+        await self.db_edit_topic_role(interaction.guild_id, row_id, role.id if role else None)
         key = "tickets.role-edited.default-reset" if role is None else "tickets.role-edited.default"
-        await ctx.send(await self.bot._(ctx.guild.id, key))
+        await interaction.followup.send(await self.bot._(interaction, key))
 
     @tickets_portal.command(name="set-text")
-    @commands.cooldown(3, 30, commands.BucketType.guild)
-    @commands.guild_only()
-    @commands.check(checks.has_manage_channels)
-    async def portal_set_text(self, ctx: MyContext, *, message: str):
+    @app_commands.checks.cooldown(3, 30)
+    async def portal_set_text(self, interaction: discord.Interaction, *, message: str):
         """Set a message to be displayed above the ticket topic selection
 
         ..Example tickets set-text Select a category below to start opening your ticket!
 
         ..Doc tickets.html#presentation-message"""
-        row_id = await self.db_get_guild_default_id(ctx.guild.id)
+        await interaction.response.defer()
+        row_id = await self.db_get_guild_default_id(interaction.guild_id)
         if row_id is None:
-            await self.db_set_guild_default_id(ctx.guild.id)
-        await self.db_edit_prompt(ctx.guild.id, message)
-        await ctx.send(await self.bot._(ctx.guild.id, "tickets.text-edited"))
+            await self.db_set_guild_default_id(interaction.guild_id)
+        await self.db_edit_prompt(interaction.guild_id, message)
+        await interaction.followup.send(await self.bot._(interaction, "tickets.text-edited"))
 
-    @tickets_portal.command(name="set-category", aliases=["set-channel"])
-    @commands.cooldown(3, 30, commands.BucketType.guild)
-    @commands.guild_only()
-    @commands.check(checks.has_manage_channels)
-    async def portal_set_category(self, ctx: MyContext, category_or_channel: discord.CategoryChannel | discord.TextChannel):
+    @tickets_portal.command(name="set-category")
+    @app_commands.checks.cooldown(3, 30)
+    async def portal_set_category(self, interaction: discord.Interaction,
+                                  category_or_channel: discord.CategoryChannel | discord.TextChannel):
         """Set the category or the channel in which tickets will be created
 
         If you select a channel, tickets will use the Discord threads system but allowed roles may not be applied
@@ -498,35 +487,37 @@ class Tickets(commands.Cog):
         ..Example tickets set-channels #tickets
 
         ..Doc tickets.html#tickets-category-channel"""
-        row_id = await self.db_get_guild_default_id(ctx.guild.id)
+        await interaction.response.defer()
+        row_id = await self.db_get_guild_default_id(interaction.guild_id)
         if row_id is None:
-            row_id = await self.db_set_guild_default_id(ctx.guild.id)
-        await self.db_edit_topic_category(ctx.guild.id, row_id, category_or_channel.id)
+            row_id = await self.db_set_guild_default_id(interaction.guild_id)
+        await self.db_edit_topic_category(interaction.guild_id, row_id, category_or_channel.id)
         embed = None
         if isinstance(category_or_channel, discord.CategoryChannel):
-            message = await self.bot._(ctx.guild.id,
+            message = await self.bot._(interaction,
                                        "tickets.category-edited.default-category",
                                        category=category_or_channel.name)
-            if not category_or_channel.permissions_for(ctx.guild.me).manage_channels:
-                embed = discord.Embed(description=await self.bot._(ctx.guild.id,
+            if not category_or_channel.permissions_for(interaction.guild.me).manage_channels:
+                embed = discord.Embed(description=await self.bot._(interaction,
                                                                    "tickets.category-edited.category-permission-warning"),
                                       colour=discord.Color.orange())
         else:
-            message = await self.bot._(ctx.guild.id,
+            message = await self.bot._(interaction,
                                        "tickets.category-edited.default-channel",
                                        channel=category_or_channel.mention)
-            if "PRIVATE_THREADS" not in ctx.guild.features or not category_or_channel.permissions_for(ctx.guild.me).create_private_threads:
-                embed = discord.Embed(description=await self.bot._(ctx.guild.id,
+            if (
+                "PRIVATE_THREADS" not in interaction.guild.features
+                or not category_or_channel.permissions_for(interaction.guild.me).create_private_threads
+            ):
+                embed = discord.Embed(description=await self.bot._(interaction,
                                                                    "tickets.category-edited.channel-privacy-warning"),
                                       colour=discord.Color.orange())
-        await ctx.send(message, embed=embed)
+        await interaction.followup.send(message, embed=embed)
 
     @tickets_portal.command(name="set-format")
     @app_commands.describe(name_format="The channel format for this topic - set 'none' to use the default one")
-    @commands.cooldown(3, 30, commands.BucketType.guild)
-    @commands.guild_only()
-    @commands.check(checks.has_manage_channels)
-    async def portal_set_format(self, ctx: MyContext, name_format: str):
+    @app_commands.checks.cooldown(3, 30)
+    async def portal_set_format(self, interaction: discord.Interaction, name_format: ChannelNameFormatArgument):
         """Set the format used to generate the channel/thread name
         You can use the following placeholders: username, userid, topic, topic_emoji, ticket_name
         Use "none" to reset the format to the default one
@@ -535,32 +526,25 @@ class Tickets(commands.Cog):
         ..Example tickets set-format {username}-tickets
 
         ..Example tickets set-format {username}-{topic}"""
-        if len(name_format) > self.max_format_length:
-            await ctx.send(await self.bot._(ctx.guild.id, "tickets.format.too-long", max=self.max_format_length))
-            return
-        row_id = await self.db_get_guild_default_id(ctx.guild.id)
+        await interaction.response.defer()
+        row_id = await self.db_get_guild_default_id(interaction.guild_id)
         if row_id is None:
-            row_id = await self.db_set_guild_default_id(ctx.guild.id)
+            row_id = await self.db_set_guild_default_id(interaction.guild_id)
         if name_format.lower() == "none":
             name_format = None
-        await self.db_edit_topic_format(ctx.guild.id, row_id, name_format)
-        await ctx.send(await self.bot._(ctx.guild.id, "tickets.format.edited.default"))
+        await self.db_edit_topic_format(interaction.guild_id, row_id, name_format)
+        await interaction.followup.send(await self.bot._(interaction, "tickets.format.edited.default"))
 
-    @tickets_main.group(name="topic", aliases=["topics"])
-    @commands.guild_only()
-    @commands.check(checks.has_manage_channels)
-    async def tickets_topics(self, ctx: MyContext):
-        """Handle the different ticket topics your members can select
+    tickets_topics = app_commands.Group(
+        name="topic",
+        description="Handle the different ticket topics your members can select",
+        parent=tickets_main,
+    )
 
-        ..Doc tickets.html"""
-        if ctx.subcommand_passed is None:
-            await ctx.send_help(ctx.command)
-
-    @tickets_topics.command(name="add", aliases=["create"])
-    @commands.cooldown(3, 45, commands.BucketType.guild)
-    @commands.guild_only()
-    @commands.check(checks.has_manage_channels)
-    async def topic_add(self, ctx: MyContext, emote: PartialorUnicodeEmoji | None=None, *, name: str):
+    @tickets_topics.command(name="add")
+    @app_commands.checks.cooldown(3, 45)
+    async def topic_add(self, interaction: discord.Interaction, name: TopicNameArgument,
+                        emote: PartialorUnicodeEmojiArgument | None = None):
         """Create a new ticket topic
         A topic name is limited to 100 characters
         Only Discord emojis are accepted for now
@@ -570,32 +554,36 @@ class Tickets(commands.Cog):
         ..Example tickets topic add Request a magician
 
         ..Doc tickets.html#create-a-new-topic"""
-        if len(name) > 100:
-            await ctx.send(await self.bot._(ctx.guild.id, "tickets.topic.too-long"))
+        await interaction.response.defer()
+        if is_named_other(name, await self.bot._(interaction, "tickets.other")):
+            await interaction.followup.send(
+                await self.bot._(interaction, "tickets.topic.other-already-exists"), ephemeral=True
+            )
             return
-        if is_named_other(name, await self.bot._(ctx.guild.id, "tickets.other")):
-            await ctx.send(await self.bot._(ctx.guild.id, "tickets.topic.other-already-exists"))
-            return
-        if len(await self.db_get_topics(ctx.guild.id)) >= 25:
-            await ctx.send(await self.bot._(ctx.guild.id, "tickets.topic.too-many", max=25))
+        if len(await self.db_get_topics(interaction.guild_id)) >= MAX_TOPICS_PER_GUILD:
+            await interaction.followup.send(
+                await self.bot._(interaction, "tickets.topic.too-many", max=MAX_TOPICS_PER_GUILD), ephemeral=True
+            )
             return
         if isinstance(emote, discord.PartialEmoji):
             emote = f"{emote.name}:{emote.id}"
-        if await self.db_add_topic(ctx.guild.id, name, emote):
-            await ctx.send(await self.bot._(ctx.guild.id, "tickets.topic.created", name=name))
+        if await self.db_add_topic(interaction.guild_id, name, emote):
+            await interaction.followup.send(await self.bot._(interaction, "tickets.topic.created", name=name))
         else:
-            await ctx.send(await self.bot._(ctx.guild.id, "tickets.topic.cant-create"))
+            await interaction.followup.send(await self.bot._(interaction, "tickets.topic.cant-create"), ephemeral=True)
 
     @tickets_topics.command(name="remove")
-    @commands.cooldown(3, 45, commands.BucketType.guild)
-    @commands.guild_only()
-    @commands.check(checks.has_manage_channels)
-    async def topic_remove(self, ctx: MyContext, topic_id: int | None = None):
+    @app_commands.checks.cooldown(3, 45)
+    async def topic_remove(self, interaction: discord.Interaction, topic_id: int | None = None):
         """Permanently delete a topic by its name
 
         ..Doc tickets.html#delete-a-topic"""
-        if not topic_id or not await self.db_topic_exists(ctx.guild.id, topic_id):
-            topic_id = await self.ask_user_topic(ctx, True, await ctx.bot._(ctx.guild.id, "tickets.choose-topics-deletion"))
+        await interaction.response.defer()
+        if not topic_id or not await self.db_topic_exists(interaction.guild_id, topic_id):
+            topic_id = await self.ask_user_topic(
+                interaction, True,
+                await self.bot._(interaction, "tickets.choose-topics-deletion")
+            )
             if topic_id is None:
                 # timeout
                 return
@@ -604,68 +592,65 @@ class Tickets(commands.Cog):
             # timeout
             return
         if len(topic_ids) == 1:
-            topic = await self.db_get_topic_with_defaults(ctx.guild.id, topic_ids[0])
+            topic = await self.db_get_topic_with_defaults(interaction.guild_id, topic_ids[0])
             topic_name = topic["topic"] if topic else ""
         else:
             topic_name = ""
-        counter = await self.db_delete_topics(ctx.guild.id, topic_ids)
+        counter = await self.db_delete_topics(interaction.guild_id, topic_ids)
         if counter > 0:
-            await ctx.send(await self.bot._(ctx.guild.id, "tickets.topic.deleted", count=counter, name=topic_name))
+            await interaction.followup.send(
+                await self.bot._(interaction, "tickets.topic.deleted", count=counter, name=topic_name)
+            )
         else:
-            await self.send_error_message(ctx)
+            await self.send_error_message(interaction)
 
     @topic_remove.autocomplete("topic_id")
     async def topic_remove_autocomplete(self, interaction: discord.Interaction, current: str):
         return await self.topic_id_autocompletion(interaction, current, allow_other=False)
 
     @tickets_topics.command(name="set-name")
-    @commands.cooldown(3, 30, commands.BucketType.guild)
-    @commands.guild_only()
-    @commands.check(checks.has_manage_channels)
-    async def topic_edit_name(self, ctx: MyContext, topic_id: int | None, *, name: commands.Range[str, 1, 100]):
+    @app_commands.checks.cooldown(3, 30)
+    async def topic_edit_name(self, interaction: discord.Interaction, topic_id: int | None, *, name: TopicNameArgument):
         """Edit a topic name
         A topic name is limited to 100 characters
 
         ..Example tickets topic set-name 5 "Minecraft issues"
 
         ..Doc tickets.html#edit-a-topic-name"""
-        if not topic_id or not await self.db_topic_exists(ctx.guild.id, topic_id):
-            topic_id = await self.ask_user_topic(ctx)
+        await interaction.response.defer()
+        if not topic_id or not await self.db_topic_exists(interaction.guild_id, topic_id):
+            topic_id = await self.ask_user_topic(interaction)
             if topic_id is None:
                 # timeout
                 return
-        if len(name) > 100:
-            await ctx.send(await self.bot._(ctx.guild.id, "tickets.topic.too-long"))
-            return
-        if await self.db_edit_topic_name(ctx.guild.id, topic_id, name):
-            await ctx.send(await self.bot._(ctx.guild.id, "tickets.name-edited", name=name))
+        if await self.db_edit_topic_name(interaction.guild_id, topic_id, name):
+            await interaction.followup.send(await self.bot._(interaction, "tickets.name-edited", name=name))
         else:
-            await ctx.send(await self.bot._(ctx.guild.id, "tickets.nothing-to-edit"))
+            await interaction.followup.send(await self.bot._(interaction, "tickets.nothing-to-edit"), ephemeral=True)
 
-    @tickets_topics.command(name="set-emote", aliases=["set-emoji"])
-    @commands.cooldown(3, 30, commands.BucketType.guild)
-    @commands.guild_only()
-    @commands.check(checks.has_manage_channels)
-    async def topic_set_emote(self, ctx: MyContext, topic_id: int | None,
-                              emote: PartialorUnicodeEmoji | None=None):
+    @tickets_topics.command(name="set-emote")
+    @app_commands.checks.cooldown(3, 30)
+    async def topic_set_emote(self, interaction: discord.Interaction, topic_id: int | None,
+                              emote: PartialorUnicodeEmojiArgument | None = None):
         """Edit a topic emoji
         Type "None" to set no emoji for this topic
 
         ..Example tickets topic set-emote :money_with_wings:
 
         ..Doc tickets.html#edit-a-topic-emoji"""
-        if not topic_id or not await self.db_topic_exists(ctx.guild.id, topic_id):
-            topic_id = await self.ask_user_topic(ctx)
+        await interaction.response.defer()
+        if not topic_id or not await self.db_topic_exists(interaction.guild_id, topic_id):
+            topic_id = await self.ask_user_topic(interaction)
             if topic_id is None:
                 # timeout
                 return
         elif isinstance(emote, discord.PartialEmoji):
             emote = f"{emote.name}:{emote.id}"
-        if await self.db_edit_topic_emoji(ctx.guild.id, topic_id, emote):
-            topic = await self.db_get_topic_with_defaults(ctx.guild.id, topic_id)
-            await ctx.send(await self.bot._(ctx.guild.id, "tickets.emote-edited", topic=topic["topic"]))
+        if await self.db_edit_topic_emoji(interaction.guild_id, topic_id, emote):
+            topic = await self.db_get_topic_with_defaults(interaction.guild_id, topic_id)
+            await interaction.followup.send(await self.bot._(interaction, "tickets.emote-edited", topic=topic["topic"]))
         else:
-            await ctx.send(await self.bot._(ctx.guild.id, "tickets.nothing-to-edit"))
+            await interaction.followup.send(await self.bot._(interaction, "tickets.nothing-to-edit"), ephemeral=True)
 
     @topic_set_emote.autocomplete("topic_id")
     async def topic_set_emote_autocomplete(self, interaction: discord.Interaction, current: str):
@@ -673,10 +658,8 @@ class Tickets(commands.Cog):
 
     @tickets_topics.command(name="set-hint")
     @app_commands.describe(message="The hint to display for this topic - set 'none' to use the default one")
-    @commands.cooldown(3, 30, commands.BucketType.guild)
-    @commands.guild_only()
-    @commands.check(checks.has_manage_channels)
-    async def topic_set_hint(self, ctx: MyContext, topic_id: int | None=None, *, message: str):
+    @app_commands.checks.cooldown(3, 30)
+    async def topic_set_hint(self, interaction: discord.Interaction, topic_id: int | None=None, *, message: HintTextArgument):
         """Edit a topic hint message
         The message will be displayed when a user tries to open a ticket, before user confirmation
         Type "None" to set the text to the default one (`tickets portal set-hint`)
@@ -685,16 +668,17 @@ class Tickets(commands.Cog):
 If that still doesn't work, please create your ticket
 
         ..Doc tickets.html#topic-specific-hint"""
-        if not topic_id or not await self.db_topic_exists(ctx.guild.id, topic_id):
-            topic_id = await self.ask_user_topic(ctx)
+        await interaction.response.defer()
+        if not topic_id or not await self.db_topic_exists(interaction.guild_id, topic_id):
+            topic_id = await self.ask_user_topic(interaction)
             if topic_id is None:
                 # timeout
                 return
         if message.lower() == "none":
             message = None
-        await self.db_edit_topic_hint(ctx.guild.id, topic_id, message)
-        topic = await self.db_get_topic_with_defaults(ctx.guild.id, topic_id)
-        await ctx.send(await self.bot._(ctx.guild.id, "tickets.hint-edited.topic", topic=topic["topic"]))
+        await self.db_edit_topic_hint(interaction.guild_id, topic_id, message)
+        topic = await self.db_get_topic_with_defaults(interaction.guild_id, topic_id)
+        await interaction.followup.send(await self.bot._(interaction, "tickets.hint-edited.topic", topic=topic["topic"]))
 
     @topic_set_hint.autocomplete("topic_id")
     async def topic_set_hint_autocomplete(self, interaction: discord.Interaction, current: str):
@@ -702,10 +686,8 @@ If that still doesn't work, please create your ticket
 
     @tickets_topics.command(name="set-role")
     @app_commands.describe(role="The role allowed to see tickets from this topic - do not set to use the default one")
-    @commands.cooldown(3, 30, commands.BucketType.guild)
-    @commands.guild_only()
-    @commands.check(checks.has_manage_channels)
-    async def topic_set_role(self, ctx: MyContext, topic_id: int | None=None, role: discord.Role | None=None):
+    @app_commands.checks.cooldown(3, 30)
+    async def topic_set_role(self, interaction: discord.Interaction, topic_id: int | None=None, role: discord.Role | None=None):
         """Edit a topic staff role
         Anyone with this role will be able to read newly created tickets with this topic
         Type "None" to set the role to the default one (`tickets portal set-role`)
@@ -715,17 +697,18 @@ If that still doesn't work, please create your ticket
         ..Example tickets topic set-role 347 \"Minecraft moderators\"
 
         ..Doc tickets.html#topic-specific-staff-role"""
-        if not topic_id or not await self.db_topic_exists(ctx.guild.id, topic_id):
-            topic_id = await self.ask_user_topic(ctx)
+        await interaction.response.defer()
+        if not topic_id or not await self.db_topic_exists(interaction.guild_id, topic_id):
+            topic_id = await self.ask_user_topic(interaction)
             if topic_id is None:
                 # timeout
                 return
-        if await self.db_edit_topic_role(ctx.guild.id, topic_id, role.id if role else None):
-            topic = await self.db_get_topic_with_defaults(ctx.guild.id, topic_id)
+        if await self.db_edit_topic_role(interaction.guild_id, topic_id, role.id if role else None):
+            topic = await self.db_get_topic_with_defaults(interaction.guild_id, topic_id)
             key = "tickets.role-edited.topic-reset" if role is None else "tickets.role-edited.topic"
-            await ctx.send(await self.bot._(ctx.guild.id, key, topic=topic["topic"]))
+            await interaction.followup.send(await self.bot._(interaction, key, topic=topic["topic"]))
         else:
-            await ctx.send(await self.bot._(ctx.guild.id, "tickets.nothing-to-edit"))
+            await interaction.followup.send(await self.bot._(interaction, "tickets.nothing-to-edit"), ephemeral=True)
 
     @topic_set_role.autocomplete("topic_id")
     async def topic_set_role_autocomplete(self, interaction: discord.Interaction, current: str):
@@ -733,10 +716,9 @@ If that still doesn't work, please create your ticket
 
     @tickets_topics.command(name="set-format")
     @app_commands.describe(name_format="The channel format for this topic - set 'none' to use the default one")
-    @commands.cooldown(3, 30, commands.BucketType.guild)
-    @commands.guild_only()
-    @commands.check(checks.has_manage_channels)
-    async def topic_set_format(self, ctx: MyContext, topic_id: int | None, name_format: str):
+    @app_commands.checks.cooldown(3, 30)
+    async def topic_set_format(self, interaction: discord.Interaction, topic_id: int | None,
+                               name_format: ChannelNameFormatArgument):
         """Set the format used to generate the channel/thread name
         You can use the following placeholders: username, userid, topic, topic_emoji, ticket_name
         Use "none" to reset the format to the default one
@@ -745,41 +727,37 @@ If that still doesn't work, please create your ticket
         ..Example tickets set-format {username}-special
 
         ..Example tickets set-format 347 {username}-{topic}"""
-        if not topic_id or not await self.db_topic_exists(ctx.guild.id, topic_id):
-            topic_id = await self.ask_user_topic(ctx)
+        if not topic_id or not await self.db_topic_exists(interaction.guild_id, topic_id):
+            topic_id = await self.ask_user_topic(interaction)
             if topic_id is None:
                 # timeout
                 return
-        if len(name_format) > self.max_format_length:
-            await ctx.send(await self.bot._(ctx.guild.id, "tickets.format.too-long", max=self.max_format_length))
-            return
         if name_format.lower() == "none":
             name_format = None
-        if await self.db_edit_topic_format(ctx.guild.id, topic_id, name_format):
-            topic = await self.db_get_topic_with_defaults(ctx.guild.id, topic_id)
-            await ctx.send(await self.bot._(ctx.guild.id, "tickets.format.edited.topic", topic=topic["topic"]))
+        if await self.db_edit_topic_format(interaction.guild_id, topic_id, name_format):
+            topic = await self.db_get_topic_with_defaults(interaction.guild_id, topic_id)
+            await interaction.followup.send(await self.bot._(interaction, "tickets.format.edited.topic", topic=topic["topic"]))
         else:
-            await ctx.send(await self.bot._(ctx.guild.id, "tickets.nothing-to-edit"))
+            await interaction.followup.send(await self.bot._(interaction, "tickets.nothing-to-edit"), ephemeral=True)
 
     @topic_set_format.autocomplete("topic_id")
     async def topic_set_format_autocomplete(self, interaction: discord.Interaction, current: str):
         return await self.topic_id_autocompletion(interaction, current)
 
     @tickets_topics.command(name="list")
-    @commands.cooldown(3, 20, commands.BucketType.guild)
-    @commands.guild_only()
-    @commands.check(checks.has_manage_channels)
-    async def topic_list(self, ctx: MyContext):
+    @app_commands.checks.cooldown(3, 20)
+    async def topic_list(self, interaction: discord.Interaction):
         "List every ticket topic used in your server"
+        await interaction.response.defer()
         topics_repr: list[str] = []
         none_emoji: str = self.bot.emojis_manager.customs['nothing']
-        topics = await self.db_get_topics(ctx.guild.id)
+        topics = await self.db_get_topics(interaction.guild_id)
         # make sure an "other" topic exists
-        if await self.db_get_guild_default_id(ctx.guild.id) is None:
-            await self.db_set_guild_default_id(ctx.guild.id)
-        topics.append(await self.db_get_defaults(ctx.guild.id))
+        if await self.db_get_guild_default_id(interaction.guild_id) is None:
+            await self.db_set_guild_default_id(interaction.guild_id)
+        topics.append(await self.db_get_defaults(interaction.guild_id))
         for topic in topics:
-            name = topic['topic'] or await self.bot._(ctx.guild.id, "tickets.other")
+            name = topic['topic'] or await self.bot._(interaction, "tickets.other")
             if topic['topic_emoji']:
                 emoji = discord.PartialEmoji.from_str(topic['topic_emoji'])
                 topics_repr.append(f"{emoji} {name}")
@@ -787,20 +765,15 @@ If that still doesn't work, please create your ticket
                 topics_repr.append(f"{none_emoji} {name}")
             if topic['role']:
                 topics_repr[-1] += f" - <@&{topic['role']}>"
-        title = await ctx.bot._(ctx.guild.id, "tickets.topic.list")
-        if ctx.can_send_embed:
-            embed = discord.Embed(title=title, description="\n".join(topics_repr), color=discord.Color.blue())
-            await ctx.send(embed=embed)
-        else:
-            await ctx.send(f"**{title}**\n\n" + "\n".join(topics_repr))
+        title = await self.bot._(interaction, "tickets.topic.list")
+        embed = discord.Embed(title=title, description="\n".join(topics_repr), color=discord.Color.blue())
+        await interaction.followup.send(embed=embed)
 
 
     @tickets_main.command(name="review-config")
     @app_commands.describe(topic_id="The topic to review - set none to review them all")
-    @commands.cooldown(3, 40, commands.BucketType.guild)
-    @commands.guild_only()
-    @commands.check(checks.has_manage_channels)
-    async def portal_review_config(self, ctx: MyContext, *, topic_id: int | None=None):
+    @app_commands.checks.cooldown(3, 40)
+    async def portal_review_config(self, interaction: discord.Interaction, *, topic_id: int | None=None):
         """Review the configuration of a topic or all topics
 
         ..Example tickets review-config
@@ -808,53 +781,61 @@ If that still doesn't work, please create your ticket
         ..Example tickets review-config Economy issues
 
         ..Doc tickets.html#review-the-configuration"""
+        await interaction.response.defer()
         if topic_id is None:
-            await self.review_all(ctx)
+            await self.review_all(interaction)
         else:
-            await self.review_topic(ctx, topic_id)
+            await self.review_topic(interaction, topic_id)
 
 
     @portal_review_config.autocomplete("topic_id")
     async def portal_review_autocomplete(self, interaction: discord.Interaction, current: str):
         return await self.topic_id_autocompletion(interaction, current, allow_other=False)
 
-    async def review_all(self, ctx: MyContext):
+    async def review_all(self, interaction: discord.Interaction):
         "Send a global recap of a guild settings"
-        topics = await self.db_get_topics(ctx.guild.id)
-        if defaults := await self.db_get_defaults(ctx.guild.id):
+        topics = await self.db_get_topics(interaction.guild_id)
+        if defaults := await self.db_get_defaults(interaction.guild_id):
             topics.append(defaults)
         emb = discord.Embed(
-            title=await self.bot._(ctx.guild.id, "tickets.review.embed.title-global"),
-            description=await self.bot._(ctx.guild.id, "tickets.review.embed.desc-global"),
+            title=await self.bot._(interaction, "tickets.review.embed.title-global"),
+            description=await self.bot._(interaction, "tickets.review.embed.desc-global"),
             color=discord.Color.blue(),
         )
         inline = len(topics) <= 6
 
-        language = await self.bot._(ctx.guild.id, "_used_locale")
+        language = await self.bot._(interaction, "_used_locale")
         async def field_value(key: str, value: str):
-            key_tr = await self.bot._(ctx.guild.id, f"tickets.review.{key}")
+            key_tr = await self.bot._(interaction, f"tickets.review.{key}")
             if "fr" in language:
                 return f"**{key_tr}** : {value}"
             return f"**{key_tr}**: {value}"
 
         for topic in topics:
             text: list[str] = []
-            name = topic["topic"] if topic["topic"] else await self.bot._(ctx.guild.id, "tickets.review.default")
+            name = topic["topic"] if topic["topic"] else await self.bot._(interaction, "tickets.review.default")
             if topic["topic_emoji"]:
                 name = str(discord.PartialEmoji.from_str(topic['topic_emoji'])) + " " + name
             if topic["role"]:
-                if role := ctx.guild.get_role(topic["role"]):
+                if role := interaction.guild.get_role(topic["role"]):
                     text.append(await field_value("role", role.mention))
                 else:
-                    text.append(await field_value("role", await self.bot._(ctx.guild.id, "tickets.review.deleted-role", id=topic["role"])))
+                    text.append(
+                        await field_value("role", await self.bot._(interaction, "tickets.review.deleted-role", id=topic["role"]))
+                    )
             if topic["category"]:
-                if channel := ctx.guild.get_channel(topic["category"]):
+                if channel := interaction.guild.get_channel(topic["category"]):
                     if isinstance(channel, discord.CategoryChannel):
                         text.append(await field_value("category", channel.name))
                     else:
                         text.append(await field_value("channel", channel.mention))
                 else:
-                    text.append(await field_value("category", await self.bot._(ctx.guild.id, "tickets.review.deleted-category", id=topic["category"])))
+                    text.append(
+                        await field_value(
+                            "category",
+                            await self.bot._(interaction, "tickets.review.deleted-category", id=topic["category"])
+                        )
+                    )
             if topic["name_format"]:
                 name_format = topic["name_format"] if len(topic["name_format"]) < 100 else topic["name_format"][:100] + "…"
                 text.append(await field_value("format", name_format))
@@ -865,77 +846,77 @@ If that still doesn't work, please create your ticket
                 prompt = topic["prompt"] if len(topic["prompt"]) < 200 else topic["prompt"][:200] + "…"
                 text.append(await field_value("prompt", prompt))
             if len(text) == 0:
-                text.append(await self.bot._(ctx.guild.id, "tickets.review.topic-no-config"))
+                text.append(await self.bot._(interaction, "tickets.review.topic-no-config"))
             emb.add_field(
                 name=name,
                 value="\n".join(text),
                 inline=inline
             )
         if len(emb.fields) == 0:
-            emb.description += "\n\n**" + await self.bot._(ctx.guild.id, "tickets.review.no-config") + "**"
-        await ctx.send(embed=emb)
+            emb.description += "\n\n**" + await self.bot._(interaction, "tickets.review.no-config") + "**"
+        await interaction.followup.send(embed=emb)
 
-    async def review_topic(self, ctx: MyContext, topic_id: int):
+    async def review_topic(self, interaction: discord.Interaction, topic_id: int):
         "Send a global recap of a guild settings"
-        topics = await self.db_get_topics(ctx.guild.id)
+        topics = await self.db_get_topics(interaction.guild_id)
         topics_filtered = [t for t in topics if t["id"] == topic_id]
         if len(topics_filtered) == 0:
-            await ctx.send(await self.bot._(ctx.guild.id, "tickets.review.topic-not-found"), ephemeral=True)
+            await interaction.followup.send(await self.bot._(interaction, "tickets.review.topic-not-found"), ephemeral=True)
             return
         topic = topics_filtered[0]
         emb = discord.Embed(
-            title=await self.bot._(ctx.guild.id, "tickets.review.embed.title-topic", topic=topic["topic"]),
-            description=await self.bot._(ctx.guild.id, "tickets.review.embed.desc-topic", topic=topic["topic"]),
+            title=await self.bot._(interaction, "tickets.review.embed.title-topic", topic=topic["topic"]),
+            description=await self.bot._(interaction, "tickets.review.embed.desc-topic", topic=topic["topic"]),
             color=discord.Color.blue(),
         )
         if topic["topic_emoji"]:
             emb.add_field(
-                name=await self.bot._(ctx.guild.id, "tickets.review.emoji"),
+                name=await self.bot._(interaction, "tickets.review.emoji"),
                 value=discord.PartialEmoji.from_str(topic['topic_emoji']),
             )
         if topic["role"]:
-            if role := ctx.guild.get_role(topic["role"]):
+            if role := interaction.guild.get_role(topic["role"]):
                 emb.add_field(
-                    name=await self.bot._(ctx.guild.id, "tickets.review.role"),
+                    name=await self.bot._(interaction, "tickets.review.role"),
                     value=role.mention,
                 )
             else:
                 emb.add_field(
-                    name=await self.bot._(ctx.guild.id, "tickets.review.role"),
-                    value=await self.bot._(ctx.guild.id, "tickets.review.deleted-role", id=topic["role"]),
+                    name=await self.bot._(interaction, "tickets.review.role"),
+                    value=await self.bot._(interaction, "tickets.review.deleted-role", id=topic["role"]),
                 )
         if topic["category"]:
-            if channel := ctx.guild.get_channel(topic["category"]):
+            if channel := interaction.guild.get_channel(topic["category"]):
                 if isinstance(channel, discord.CategoryChannel):
                     emb.add_field(
-                        name=await self.bot._(ctx.guild.id, "tickets.review.category"),
+                        name=await self.bot._(interaction, "tickets.review.category"),
                         value=channel.name,
                     )
                 else:
                     emb.add_field(
-                        name=await self.bot._(ctx.guild.id, "tickets.review.category"),
+                        name=await self.bot._(interaction, "tickets.review.category"),
                         value=channel.mention,
                     )
             else:
                 emb.add_field(
-                    name=await self.bot._(ctx.guild.id, "tickets.review.category"),
-                    value=await self.bot._(ctx.guild.id, "tickets.review.deleted-category", id=topic["category"]),
+                    name=await self.bot._(interaction, "tickets.review.category"),
+                    value=await self.bot._(interaction, "tickets.review.deleted-category", id=topic["category"]),
                 )
         if topic["name_format"]:
             emb.add_field(
-                name=await self.bot._(ctx.guild.id, "tickets.review.format"),
+                name=await self.bot._(interaction, "tickets.review.format"),
                 value=topic["name_format"],
                 inline=len(topic["name_format"]) < 60
             )
         if topic["hint"]:
             emb.add_field(
-                name=await self.bot._(ctx.guild.id, "tickets.review.hint"),
+                name=await self.bot._(interaction, "tickets.review.hint"),
                 value=topic["hint"] if len(topic["hint"]) < 1000 else topic["hint"][:1000] + "…",
                 inline=len(topic["hint"]) < 60
             )
         if len(emb.fields) == 0:
-            emb.description += "\n\n**" + await self.bot._(ctx.guild.id, "tickets.review.topic-no-config") + "**"
-        await ctx.send(embed=emb)
+            emb.description += "\n\n**" + await self.bot._(interaction, "tickets.review.topic-no-config") + "**"
+        await interaction.followup.send(embed=emb)
 
 async def setup(bot):
     await bot.add_cog(Tickets(bot))
