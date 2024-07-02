@@ -831,7 +831,7 @@ class Rss(commands.Cog):
             await self.bot._(interaction, "rss.move-success", count=len(feeds_ids), channel=channel.mention)
         )
 
-    @move_guild_feed.autocomplete("feed")
+    @move_guild_feed.autocomplete("feed_id")
     async def move_guild_feed_autocomplete(self, interaction: discord.Interaction, current: str):
         "Autocomplete for the feed ID in the /rss move command"
         try:
@@ -1047,7 +1047,7 @@ class Rss(commands.Cog):
                                  filter_type: Literal["blacklist", "whitelist", "none"], words: str | None = None):
         """Add a filter on the feed to only allow posts containing (or not containing) some words
 
-        Words must be separated by a comma (`,`).
+        Words must be separated by a comma (`,`), and are case-insensitive (meaning capitalization doesn't matter)
         The bot will check their presence in either the title or the category of each post.
 
         ..Example rss set-filter 6678466620137 blacklist "cars, mechanic"
