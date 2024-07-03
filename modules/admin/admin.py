@@ -1,5 +1,4 @@
 import asyncio
-import copy
 import datetime
 import importlib
 import io
@@ -15,9 +14,11 @@ from typing import TYPE_CHECKING, Literal
 import discord
 from asyncache import cached
 from cachetools import TTLCache
+from discord import app_commands
 from discord.ext import commands
 from git import GitCommandError, Repo
 
+from core.arguments.args import GuildArgument
 from core.bot_classes import (PRIVATE_GUILD_ID, SUPPORT_GUILD_ID, Axobot,
                               MyContext)
 from core.checks import checks
@@ -30,7 +31,7 @@ from modules.antiscam.model.training_bayes import train_model
 from modules.rss.src.rss_general import feed_parse
 
 if TYPE_CHECKING:
-    from modules.antiscam.model import AntiScam
+    from modules.antiscam.antiscam import AntiScam
 
 
 AvailableGitBranches = Literal["main", "develop"]
@@ -70,8 +71,8 @@ class Admin(commands.Cog):
             )
         return self._upvote_emojis
 
-    async def check_if_admin(self, ctx: MyContext):
-        return await checks.is_bot_admin(ctx)
+    async def check_if_admin(self, interaction: discord.Interaction):
+        return await checks.is_bot_admin(interaction)
 
     async def check_if_god(self, ctx: discord.User | discord.Guild | MyContext):
         "Check if a user is in God mode for a given context"
@@ -97,28 +98,27 @@ class Admin(commands.Cog):
         except discord.DiscordException:
             pass
 
-    @commands.hybrid_group(name="admin", hidden=True)
-    @discord.app_commands.guilds(PRIVATE_GUILD_ID)
-    @discord.app_commands.default_permissions(administrator=True)
-    @commands.check(checks.is_bot_admin)
-    async def admin_group(self, ctx: MyContext):
-        """Commandes réservées aux administrateurs du bot"""
-        if ctx.subcommand_passed is None:
-            await ctx.send_help("admin")
+    admin_main = app_commands.Group(
+        name="admin",
+        description="Commandes réservées aux administrateurs du bot",
+        default_permissions=discord.Permissions(administrator=True),
+        guild_ids=[PRIVATE_GUILD_ID.id, SUPPORT_GUILD_ID.id],
+        auto_locale_strings=False
+    )
+    admin_main.interaction_check = checks.is_bot_admin
 
-    @admin_group.command(name="send-msg")
-    @commands.check(checks.is_bot_admin)
-    async def send_msg(self, ctx: MyContext, user: discord.User, message: str):
+    @admin_main.command(name="send-msg")
+    async def send_msg(self, interaction: discord.Interaction, user: discord.User, message: str):
         "Send a DM to any user the bot can reach"
-        await ctx.defer()
+        await interaction.response.defer()
         await user.send(message)
-        await ctx.send(content="Done!")
+        await interaction.followup.send(content="Sent!")
 
-    @admin_group.command(name="sync")
-    @commands.check(checks.is_bot_admin)
-    async def sync_app_commands(self, ctx: MyContext, scope: Literal["global", "staff-server", "public-server"]):
+    @admin_main.command(name="sync")
+    async def sync_app_commands(self, interaction: discord.Interaction,
+                                scope: Literal["global", "staff-server", "public-server"]):
         "Sync app commands for either global or staff server scope"
-        await ctx.defer()
+        await interaction.response.defer()
         if scope == "global":
             if self.bot.beta:
                 self.bot.tree.copy_global_to(guild=PRIVATE_GUILD_ID)
@@ -133,41 +133,46 @@ class Admin(commands.Cog):
         elif scope == "public-server":
             cmds = await self.bot.tree.sync(guild=SUPPORT_GUILD_ID)
             txt = f"{len(cmds)} app commands synced in the support server"
-        else:
-            await ctx.send("Unknown scope")
-            return
         self.bot.app_commands_list = None
         self.bot.log.info(txt)
         emb = discord.Embed(description=txt, color=discord.Color.blue())
         await self.bot.send_embed(emb)
-        await ctx.send(txt + '!')
+        await interaction.followup.send(txt + '!')
 
-    @admin_group.command(name="god")
-    @commands.check(checks.is_bot_admin)
-    @commands.guild_only()
-    async def enable_god_mode(self, ctx: MyContext, enable:bool=True):
+    @admin_main.command(name="god")
+    async def enable_god_mode(self, interaction: discord.Interaction, enable: bool = True):
         """Get full powaaaaaa
 
         Donne les pleins-pouvoirs aux admins du bot sur ce serveur (accès à toutes les commandes de modération)"""
         if enable:
-            if ctx.guild.id not in self.god_mode:
-                self.god_mode.append(ctx.guild.id)
-                await ctx.send("<:nitro:548569774435598346> Mode superadmin activé sur ce serveur",delete_after=3)
+            if interaction.guild_id not in self.god_mode:
+                self.god_mode.append(interaction.guild_id)
+                await interaction.response.send_message(
+                    "<:nitro:548569774435598346> Mode superadmin activé sur ce serveur",
+                    ephemeral=True
+                )
             else:
-                await ctx.send("Mode superadmin déjà activé sur ce serveur",delete_after=3)
+                await interaction.response.send_message(
+                    "Mode superadmin déjà activé sur ce serveur",
+                    ephemeral=True
+                )
         else:
-            if ctx.guild.id in self.god_mode:
-                self.god_mode.remove(ctx.guild.id)
-                await ctx.send("Mode superadmin désactivé sur ce serveur",delete_after=3)
+            if interaction.guild_id in self.god_mode:
+                self.god_mode.remove(interaction.guild_id)
+                await interaction.response.send_message(
+                    "Mode superadmin désactivé sur ce serveur",
+                    ephemeral=True
+                )
             else:
-                await ctx.send("Ce mode n'est pas actif ici",delete_after=3)
-        await ctx.message.delete(delay=0)
+                await interaction.response.send_message(
+                    "Ce mode n'est pas actif ici",
+                    ephemeral=True
+                )
 
-    @admin_group.command(name="faq")
-    @commands.check(checks.is_bot_admin)
-    async def send_faq(self, ctx: MyContext):
+    @admin_main.command(name="faq")
+    async def send_faq(self, interaction: discord.Interaction):
         "Update the FAQ channels from the private preparation channels"
-        msg = await ctx.send("Suppression des salons...")
+        await interaction.response.send_message("Suppression des salons...")
         guild = self.bot.get_guild(SUPPORT_GUILD_ID.id)
         destination_fr = guild.get_channel(508028818154323980)
         destination_en = guild.get_channel(541599345972346881)
@@ -179,74 +184,77 @@ class Admin(commands.Cog):
         await destination_en.set_permissions(role_en, read_messages=False)
         await destination_fr.purge()
         await destination_en.purge()
-        await msg.edit(content="Envoi des messages...")
+        await interaction.edit_original_response(content="Envoi des messages...")
         async for message in chan_fr.history(limit=200, oldest_first=True):
             await destination_fr.send(message.content)
         async for message in chan_en.history(limit=200, oldest_first=True):
             await destination_en.send(message.content)
         await destination_fr.set_permissions(role_fr, read_messages=True)
         await destination_en.set_permissions(role_en, read_messages=True)
-        await msg.edit(content="Terminé !")
-        await self.add_success_reaction(ctx.message)
+        await interaction.edit_original_response(content="Terminé !")
 
 
-    @admin_group.command(name="update")
-    @commands.check(checks.is_bot_admin)
-    async def update_config(self, ctx: MyContext, send: bool=False):
+    @admin_main.command(name="update")
+    async def update_config(self, interaction: discord.Interaction, send: bool=False):
         """Préparer/lancer un message de mise à jour
         Ajouter "send" en argument déclenche la procédure pour l'envoyer à tous les serveurs"""
         if send:
-            await self.send_updates(ctx)
+            await self.send_updates(interaction)
             return
         def check(message: discord.Message):
-            return message.author == ctx.author and message.channel == ctx.channel
+            return message.author == interaction.user and message.channel == interaction.channel
         msg = None
         for language in self.update:
-            await ctx.send(f"Message en {language} ?")
+            await interaction.response.send_message(f"Message en {language} ?")
             try:
-                msg = await ctx.bot.wait_for("message", check=check, timeout=60)
+                msg = await self.bot.wait_for("message", check=check, timeout=60)
             except asyncio.TimeoutError:
-                return await ctx.send("Trop tard !")
+                await interaction.followup.send("Trop tard !")
+                return
             if msg.content.lower() in ["none", "annuler", "stop", "oups"]:
-                return await ctx.send("Annulé !")
+                await interaction.followup.send("Annulé !")
+                return
             self.update[language] = msg.content
         if msg:
             await self.add_success_reaction(msg)
 
-    async def send_updates(self, ctx:MyContext):
+    async def send_updates(self, interaction: discord.Interaction):
         """Lance un message de mise à jour"""
         if self.bot.zombie_mode:
             return
         if None in self.update.values():
-            return await ctx.send("Les textes ne sont pas complets !")
+            await interaction.response.send_message("Les textes ne sont pas complets !")
+            return
         text = "Vos messages contiennent"
         confirm_view = ConfirmView(
-            self.bot, ctx.channel,
-            validation=lambda inter: inter.user == ctx.author,
-            ephemeral=False)
+            self.bot, interaction.channel,
+            validation=lambda inter: inter.user == interaction.user,
+            ephemeral=False
+        )
         await confirm_view.init()
-        if max([len(x) for x in self.update.values()]) > 1900//len(self.update.keys()):
+        if max(len(x) for x in self.update.values()) > 1900//len(self.update.keys()):
+            await interaction.response.defer()
             for i, lang in enumerate(self.update.keys()):
                 text += f"\n{lang}:```\n{self.update.get(lang)}\n```"
-                await ctx.send(text, view=confirm_view if i == len(self.update)-1 else None)
+                await interaction.followup.send(text, view=confirm_view if i == len(self.update)-1 else None)
                 text = ''
         else:
             text += "\n"+"\n".join([f"{lang}:\n```\n{value}\n```" for lang, value in self.update.items()])
-            await ctx.send(text, view=confirm_view)
+            await interaction.response.send_message(text, view=confirm_view)
 
         await confirm_view.wait()
         if confirm_view.value is None:
-            await ctx.send("Trop long !")
+            await interaction.followup.send("Trop long !")
             return
         if not confirm_view.value:
             return
         count = 0
-        for guild in ctx.bot.guilds:
-            channel: discord.TextChannel | None = await ctx.bot.get_config(guild.id, "bot_news")
+        for guild in self.bot.guilds:
+            channel: discord.TextChannel | None = await self.bot.get_config(guild.id, "bot_news")
             if channel is None:
                 # no channel configured
                 continue
-            lang: str | None = await ctx.bot.get_config(guild.id, "language")
+            lang: str | None = await self.bot.get_config(guild.id, "language")
             if lang not in self.update:
                 lang = "fr" if lang == "fr2" else "en"
             mentions_roles: list[discord.Role] = await self.bot.get_config(guild.id, "update_mentions") or []
@@ -255,7 +263,7 @@ class Admin(commands.Cog):
             try:
                 await channel.send(self.update[lang]+"\n\n"+mentions, allowed_mentions=allowed_mentions)
             except Exception as err:
-                self.bot.dispatch("error", err, ctx)
+                self.bot.dispatch("error", err, interaction)
             else:
                 count += 1
             if guild.id == SUPPORT_GUILD_ID.id:
@@ -265,12 +273,16 @@ class Admin(commands.Cog):
                     await fr_chan.send(self.update["fr"] + "\n\n<@&1092557246921179257>", allowed_mentions=allowed_mentions)
                     count += 1
 
-        await ctx.send(f"Message envoyé dans {count} salons !")
+        await interaction.followup.send(f"Message envoyé dans {count} salons !")
         # add changelog in the database
-        query = "INSERT INTO `changelogs` (`version`, `release_date`, `fr`, `en`, `beta`) VALUES (%(v)s, %(r)s, %(fr)s, %(en)s, %(b)s) ON DUPLICATE KEY UPDATE `fr` = %(fr)s, `en` = %(en)s;"
+        query = "INSERT INTO `changelogs` (`version`, `release_date`, `fr`, `en`, `beta`) "\
+            "VALUES (%(v)s, %(r)s, %(fr)s, %(en)s, %(b)s) ON DUPLICATE KEY UPDATE `fr` = %(fr)s, `en` = %(en)s;"
         args = {
-            "v": conf.release, "r": ctx.message.created_at, "b": self.bot.beta,
-            "fr": self.update["fr"], "en": self.update["en"]
+            "v": conf.release,
+            "r": interaction.created_at,
+            "b": self.bot.beta,
+            "fr": self.update["fr"],
+            "en": self.update["en"]
         }
         async with self.bot.db_query(query, args):
             pass
@@ -278,71 +290,73 @@ class Admin(commands.Cog):
             self.update[language] = None
 
 
-    @admin_group.group(name="cog")
-    @commands.check(checks.is_bot_admin)
-    async def cogs_group(self, ctx: MyContext):
-        """Voir la liste de tout les cogs"""
-        text = ""
-        for cog_name, cog in self.bot.cogs.items():
-            text += f"- {cog.file} ({cog_name}) \n"
-        await ctx.send(text)
+    cog_group = app_commands.Group(
+        name="cog",
+        description="Gestion des cogs",
+        parent=admin_main
+    )
 
-    @cogs_group.command(name="load")
-    @commands.check(checks.is_bot_admin)
-    async def add_cog(self, ctx: MyContext, name: str):
+    @cog_group.command(name="load")
+    async def add_cog(self, interaction: discord.Interaction, name: str):
         """Ajouter un cog au bot"""
+        await interaction.response.defer()
         try:
             await self.bot.load_module(name)
-            await ctx.send(f"Module '{name}' activé !")
-            self.bot.log.info("Extension %s loaded", name)
         except Exception as err:
-            await ctx.send(str(err))
+            await interaction.followup.send(str(err))
+        else:
+            await interaction.followup.send(f"Module '{name}' activé !")
+            self.bot.log.info("Extension %s loaded", name)
 
-    @cogs_group.command("unload")
-    @commands.check(checks.is_bot_admin)
-    async def rm_cog(self, ctx: MyContext, name: str):
+    @cog_group.command(name="unload")
+    async def rm_cog(self, interaction: discord.Interaction, name: str):
         """Enlever un cog au bot"""
+        await interaction.response.defer()
         try:
             await self.bot.unload_module(name)
-            await ctx.send(f"Module '{name}' désactivé !")
-            self.bot.log.info("Extension %s unloaded", name)
         except Exception as err:
-            await ctx.send(str(err))
+            await interaction.followup.send(str(err))
+        else:
+            await interaction.followup.send(f"Module '{name}' désactivé !")
+            self.bot.log.info("Extension %s unloaded", name)
 
-    @cogs_group.command(name="reload")
-    @commands.check(checks.is_bot_admin)
-    async def reload_cog(self, ctx: MyContext, *, cog: str):
+    @cog_group.command(name="reload")
+    async def reload_cog(self, interaction: discord.Interaction, *, cog: str):
         """Recharge un module"""
-        cogs = cog.split(" ")
-        if len(cogs)==1 and cogs[0]=='all':
+        await interaction.response.defer()
+        if cog == "all":
             cogs = sorted([x.file for x in self.bot.cogs.values()])
+        else:
+            cogs = cog.split(" ")
+        answer: list[str] = []
         reloaded_cogs = []
-        for cog in cogs:
+        for cog_id in cogs:
             try:
-                await self.bot.reload_module(cog)
+                await self.bot.reload_module(cog_id)
             except ModuleNotFoundError:
-                await ctx.send(f"Cog {cog} can't be found")
+                answer.append(f"Cog {cog_id} can't be found")
             except commands.errors.ExtensionNotLoaded :
                 try:
-                    flib = importlib.import_module(cog)
+                    flib = importlib.import_module(cog_id)
                     importlib.reload(flib)
                 except ModuleNotFoundError:
-                    await ctx.send(f"Cog {cog} was never loaded")
+                    answer.append(f"Cog {cog_id} was never loaded")
                 else:
-                    self.bot.log.info("Lib %s reloaded", cog)
-                    await ctx.send(f"Lib {cog} reloaded")
+                    self.bot.log.info("Lib %s reloaded", cog_id)
+                    answer.append(f"Lib {cog_id} reloaded")
             except Exception as err:
-                self.bot.dispatch("error", err, ctx)
-                await ctx.send(f'**`ERROR:`** {type(err).__name__} - {err}')
+                self.bot.dispatch("error", err, interaction)
+                answer.append(f'**`ERROR:`** {type(err).__name__} - {err}')
             else:
-                self.bot.log.info("Extension %s reloaded", cog)
-                reloaded_cogs.append(cog)
-            if cog == 'utilities':
+                self.bot.log.info("Extension %s reloaded", cog_id)
+                reloaded_cogs.append(cog_id)
+            if cog_id == 'utilities':
                 await self.bot.get_cog('Utilities').on_ready()
         if len(reloaded_cogs) > 0:
-            await ctx.send(f"These cogs has successfully reloaded: {', '.join(reloaded_cogs)}")
+            answer.append(f"These cogs has successfully reloaded: {', '.join(reloaded_cogs)}")
             if info_cog := self.bot.get_cog("BotInfo"):
                 await info_cog.refresh_code_lines_count()
+        await interaction.followup.send("\n".join(answer))
 
     @reload_cog.autocomplete("cog")
     async def reload_cog_autocom(self, _: discord.Interaction, current: str):
@@ -372,13 +386,20 @@ class Admin(commands.Cog):
             for cog in filtered
         ][:25]
 
-    @admin_group.command(name="shutdown")
-    @commands.check(checks.is_bot_admin)
-    async def shutdown(self, ctx: MyContext):
+    @cog_group.command(name="list")
+    async def list_cogs(self, interaction: discord.Interaction):
+        """Liste les cogs actuellement chargés"""
+        text = ""
+        for cog_name, cog in self.bot.cogs.items():
+            text += f"- {cog.file} ({cog_name}) \n"
+        await interaction.response.send_message(text)
+
+    @admin_main.command(name="shutdown")
+    async def shutdown(self, interaction: discord.Interaction):
         """Eteint le bot"""
-        msg = await ctx.send("Nettoyage de l'espace de travail...")
+        await interaction.response.send_message("Nettoyage de l'espace de travail...")
         await self.cleanup_workspace()
-        await msg.edit(content="Bot en voie d'extinction")
+        await interaction.edit_original_response(content="Bot en voie d'extinction")
         await self.bot.change_presence(status=discord.Status("offline"))
         self.bot.log.info("Closing Discord connection")
         await self.bot.close()
@@ -396,104 +417,101 @@ class Admin(commands.Cog):
         if self.bot.database_online:
             self.bot.close_database_cnx()
 
-    @admin_group.command(name="reboot")
-    @commands.check(checks.is_bot_admin)
-    async def restart_bot(self, ctx: MyContext):
+    @admin_main.command(name="reboot")
+    async def restart_bot(self, interaction: discord.Interaction):
         """Relance le bot"""
-        await ctx.send(content="Redémarrage en cours...")
+        await interaction.response.send_message(content="Redémarrage en cours...")
         await self.cleanup_workspace()
         self.bot.log.info("Redémarrage du bot")
         os.execl(sys.executable, sys.executable, *sys.argv)
 
-    @admin_group.command(name="pull")
-    @commands.check(checks.is_bot_admin)
-    async def git_pull(self, ctx: MyContext, branch: AvailableGitBranches | None=None, install_requirements: bool=False):
+    @admin_main.command(name="pull")
+    async def git_pull(self, interaction: discord.Interaction, branch: AvailableGitBranches | None = None,
+                       install_requirements: bool = False):
         """Pull du code depuis le dépôt git"""
-        msg = await ctx.send("Pull en cours...")
+        await interaction.response.send_message("Pull en cours...")
         repo = Repo(os.getcwd())
         assert not repo.bare
         if branch:
             try:
                 repo.git.checkout(branch)
             except GitCommandError as err:
-                self.bot.dispatch("command_error", ctx, err)
-            else:
-                msg = await msg.edit(content=msg.content+f"\nBranche {branch} correctement sélectionnée")
+                self.bot.dispatch("error", err, interaction)
+                return
+            msg = await interaction.original_response()
+            msg = await msg.edit(content=msg.content + f"\nBranche {branch} correctement sélectionnée")
         origin = repo.remotes.origin
         origin.pull()
         msg = await msg.edit(content=msg.content + f"\nPull effectué avec succès sur la branche {repo.active_branch.name}")
         if install_requirements:
             await msg.edit(content=msg.content+"\nInstallation des dépendances...")
             os.system("pip install -qr requirements.txt")
-            msg = await msg.edit(content=msg.content+"\nDépendances installées")
+            await msg.edit(content=msg.content+"\nDépendances installées")
 
-    @admin_group.command(name="membercounter")
-    @commands.check(checks.is_bot_admin)
-    async def membercounter(self, ctx: MyContext):
+    @admin_main.command(name="membercounter")
+    async def membercounter(self, interaction: discord.Interaction):
         """Recharge tout ces salons qui contiennent le nombre de membres, pour tout les serveurs"""
-        if self.bot.database_online:
-            i = 0
-            for guild in self.bot.guilds:
-                if await self.bot.get_cog("ServerConfig").update_memberchannel(guild):
-                    i += 1
-            await ctx.send(f"{i} salons mis à jours !")
-        else:
-            await ctx.send("Impossible de faire ceci, la base de donnée est inaccessible")
-
-    @admin_group.command(name="config")
-    @commands.check(checks.is_bot_admin)
-    async def admin_sconfig_see(self, ctx: MyContext, guild: discord.Guild, option: str | None=None):
-        """Affiche les options d'un serveur"""
-        if not ctx.bot.database_online:
-            await ctx.send("Impossible d'afficher cette commande, la base de donnée est hors ligne :confused:")
+        if not self.bot.database_online:
+            await interaction.response.send_message("Impossible de faire ceci, la base de donnée est inaccessible")
             return
-        if (interaction := ctx.interaction) is None:
-            await ctx.send("Cette commande n'est utilisable qu'en commande slash")
+        await interaction.response.defer()
+        i = 0
+        for guild in self.bot.guilds:
+            if await self.bot.get_cog("ServerConfig").update_memberchannel(guild):
+                i += 1
+        await interaction.followup.send(f"{i} salons mis à jours !")
+
+    @admin_main.command(name="config")
+    async def admin_sconfig_see(self, interaction: discord.Interaction, guild: GuildArgument, option: str | None=None):
+        """Affiche les options d'un serveur"""
+        if not self.bot.database_online:
+            await interaction.response.send_message(
+                "Impossible d'afficher cette commande, la base de donnée est hors ligne :confused:"
+            )
             return
         if option is None:
             await self.bot.get_cog("ServerConfig").send_all_config(guild, interaction)
         else:
             await self.bot.get_cog("ServerConfig").send_specific_config(guild, interaction, option)
 
-    @admin_group.group(name="database", aliases=["db"])
-    @commands.check(checks.is_bot_admin)
-    async def admin_db(self, _ctx: MyContext):
-        "Commandes liées à la base de données"
 
-    @admin_db.command(name="reload")
-    @commands.check(checks.is_bot_admin)
-    async def db_reload(self, ctx: MyContext):
+    db_group = app_commands.Group(
+        name="database",
+        description="Commandes liées à la base de données",
+        parent=admin_main
+    )
+
+    @db_group.command(name="reload")
+    async def db_reload(self, interaction: discord.Interaction):
         "Reconnecte le bot à la base de donnée"
-        await ctx.defer()
+        await interaction.response.defer()
         self.bot.cnx_axobot.close()
         self.bot.connect_database_axobot()
         self.bot.cnx_xp.close()
         self.bot.connect_database_xp()
         if self.bot.cnx_axobot is not None and self.bot.cnx_xp is not None:
-            if ctx.interaction:
-                await ctx.reply("Done!")
-            else:
-                await self.add_success_reaction(ctx.message)
+            await interaction.followup.send("Done!")
             if xp := self.bot.get_cog("Xp"):
                 await xp.reload_sus()
             if serverconfig := self.bot.get_cog("ServerConfig"):
                 await serverconfig.clear_cache()
 
-    @admin_db.command(name="biggest-tables")
-    @commands.check(checks.is_bot_admin)
-    async def db_biggest(self, ctx: MyContext, database: str | None = None):
+    @db_group.command(name="biggest-tables")
+    async def db_biggest(self, interaction: discord.Interaction, database: str | None = None):
         "Affiche les tables les plus lourdes de la base de données"
-        query = "SELECT table_name AS \"Table\", ROUND(((data_length + index_length) / 1024 / 1024), 2) AS \"Size (MB)\" FROM information_schema.TABLES"
+        query = "SELECT table_name AS \"Table\", ROUND(((data_length + index_length) / 1024 / 1024), 2) AS \"Size (MB)\" "\
+            "FROM information_schema.TABLES"
         if database:
             query += f" WHERE table_schema = \"{database}\""
         query += " ORDER BY (data_length + index_length) DESC LIMIT 15"
+        await interaction.response.defer()
         async with self.bot.db_query(query, astuple=True) as query_results:
             if len(query_results) == 0:
-                await ctx.send("Invalid or empty database")
+                await interaction.followup.send("Invalid or empty database")
                 return
             length = max(len(result[0]) for result in query_results)
             txt = "\n".join(f"{result[0]:>{length}}: {result[1]} MB" for result in query_results if result[1] is not None)
-        await ctx.send("```yaml\n" + txt + "\n```")
+        await interaction.followup.send("```yaml\n" + txt + "\n```")
 
     @cached(TTLCache(1, 3600))
     async def get_databases_names(self) -> list[str]:
@@ -513,13 +531,13 @@ class Admin(commands.Cog):
         ][:25]
 
 
-    @admin_group.command(name="emergency", with_app_command=False)
-    @commands.check(checks.is_bot_admin)
-    async def emergency_cmd(self, ctx: MyContext):
+    @admin_main.command(name="emergency")
+    async def emergency_cmd(self, interaction: discord.Interaction):
         """Déclenche la procédure d'urgence
         A N'UTILISER QU'EN CAS DE BESOIN ABSOLU !
         Le bot quittera tout les serveurs après avoir envoyé un MP à chaque propriétaire"""
-        await ctx.send(await self.emergency())
+        if msg := await self.emergency():
+            await interaction.followup.send(msg)
 
     async def emergency(self, level=100):
         "Trigger the emergency procedure: leave every servers and send a DM to every owner"
@@ -572,225 +590,215 @@ class Admin(commands.Cog):
                 self.bot.dispatch("error", err, None)
         return "Qui a appuyé sur le bouton rouge ? :thinking:"
 
-    @admin_group.command(name="ignore")
-    @commands.check(checks.is_bot_admin)
-    async def add_ignoring(self, ctx: MyContext, target_id: str):
+    @admin_main.command(name="ignore")
+    @app_commands.describe(target_id="ID du serveur ou de l'utilisateur à ignorer")
+    async def add_ignoring(self, interaction: discord.Interaction, target_id: str):
         """Ajoute un serveur ou un utilisateur dans la liste des utilisateurs/serveurs ignorés"""
         int_target_id = int(target_id)
-        utils = ctx.bot.get_cog("Utilities")
+        utils = self.bot.get_cog("Utilities")
         if utils is None:
-            await ctx.send("Unable to find Utilities cog")
+            await interaction.response.send_message("Unable to find Utilities cog")
             return
-        config = await ctx.bot.get_cog("Utilities").get_bot_infos()
+        config = await utils.get_bot_infos()
         if config is None:
-            await ctx.send("The config dictionnary has not been initialized")
+            await interaction.response.send_message("The config dictionnary has not been initialized")
             return
+        await interaction.response.defer()
         if not (target := self.bot.get_guild(int_target_id)):
             target = self.bot.get_user(int_target_id)
         if target is None:
-            await ctx.send("Unable to find any guild or user with this ID")
+            await interaction.followup.send("Unable to find any guild or user with this ID")
             return
         if isinstance(target, discord.Guild):
             servs: list[str] = config["banned_guilds"].split(';')
             if str(target) in servs:
                 servs.remove(str(target))
                 await utils.edit_bot_infos(self.bot.user.id,[("banned_guilds",';'.join(servs))])
-                await ctx.send(f"Le serveur {target.name} n'est plus blacklisté")
+                await interaction.followup.send(f"Le serveur {target.name} n'est plus blacklisté")
             else:
                 servs.append(str(target.id))
                 await utils.edit_bot_infos(self.bot.user.id,[("banned_guilds",';'.join(servs))])
-                await ctx.send(f"Le serveur {target.name} a bien été blacklist")
+                await interaction.followup.send(f"Le serveur {target.name} a bien été blacklist")
         else:
             usrs: list[str] = config["banned_users"].split(';')
             if str(target.id) in usrs:
                 usrs.remove(str(target.id))
                 await utils.edit_bot_infos(self.bot.user.id,[("banned_users",';'.join(usrs))])
-                await ctx.send(f"L'utilisateur {target} n'est plus blacklisté")
+                await interaction.followup.send(f"L'utilisateur {target} n'est plus blacklisté")
             else:
                 usrs.append(str(target.id))
                 await utils.edit_bot_infos(self.bot.user.id,[("banned_users",';'.join(usrs))])
-                await ctx.send(f"L'utilisateur {target} a bien été blacklist")
-        ctx.bot.get_cog("Utilities").config = None
+                await interaction.followup.send(f"L'utilisateur {target} a bien été blacklist")
+        utils.config.clear()
 
 
-    @admin_group.command(name="module")
-    @commands.check(checks.is_bot_admin)
+    @admin_main.command(name="module")
     @discord.app_commands.describe(enable="Should we enable or disable this module")
-    async def enable_module(self, ctx: MyContext, module: Literal["xp", "rss", "stats", "files-count"], enable: bool):
+    async def enable_module(self, interaction: discord.Interaction, module: Literal["xp", "rss", "stats", "files-count"],
+                            enable: bool):
         """Active ou désactive un module (xp/rss/alerts)
 Cette option affecte tous les serveurs"""
+        send = interaction.response.send_message
         if module == "xp":
             self.bot.xp_enabled = enable
             if enable:
-                await ctx.send("L'xp est mainenant activée")
+                await send("L'xp est mainenant activée")
             else:
-                await ctx.send("L'xp est mainenant désactivée")
+                await send("L'xp est mainenant désactivée")
         elif module == "rss":
             self.bot.rss_enabled = enable
             if enable:
-                await ctx.send("Les flux RSS sont mainenant activée")
+                await send("Les flux RSS sont mainenant activée")
             else:
-                await ctx.send("Les flux RSS sont mainenant désactivée")
+                await send("Les flux RSS sont mainenant désactivée")
         elif module == "alerts":
             self.bot.stats_enabled = enable
             if enable:
-                await ctx.send("Le système de log de statistiques est mainenant activé")
+                await send("Le système de log de statistiques est mainenant activé")
             else:
-                await ctx.send("Le système de log de statistiques est mainenant désactivé")
+                await send("Le système de log de statistiques est mainenant désactivé")
         elif module == "files-count":
             self.bot.files_count_enabled = enable
             if enable:
-                await ctx.send("Le comptage de fichiers ouverts est mainenant activé")
+                await send("Le comptage de fichiers ouverts est mainenant activé")
             else:
-                await ctx.send("Le comptage de fichiers ouverts est mainenant désactivé")
+                await send("Le comptage de fichiers ouverts est mainenant désactivé")
         else:
-            await ctx.send("Module introuvable")
+            await send("Module introuvable")
 
-    @admin_group.group(name="flag", aliases=["flags"])
-    @commands.check(checks.is_bot_admin)
-    async def admin_flag(self, ctx: MyContext):
-        "Ajoute ou retire un attribut à un utilisateur"
-        if ctx.subcommand_passed is None:
-            await ctx.send_help(ctx.command)
 
-    @admin_flag.command(name="list")
-    @commands.check(checks.is_bot_admin)
-    async def admin_flag_list(self, ctx: MyContext, user: discord.User):
+    flag_group = app_commands.Group(
+        name="flag",
+        description="Ajoute ou retire un attribut à un utilisateur",
+        parent=admin_main
+    )
+
+    @flag_group.command(name="list")
+    async def admin_flag_list(self, interaction: discord.Interaction, user: discord.User):
         "Liste les flags d'un utilisateur"
-        await ctx.defer()
+        await interaction.response.defer()
         userflags: list[str] = sorted(await self.bot.get_cog("Users").get_userflags(user))
         if userflags:
-            await ctx.send(f"Liste des flags de {user} : {', '.join(userflags)}")
+            await interaction.followup.send(f"Liste des flags de {user} : {', '.join(userflags)}")
         else:
-            await ctx.send(f"{user} n'a aucun flag pour le moment")
+            await interaction.followup.send(f"{user} n'a aucun flag pour le moment")
 
-    @admin_flag.command(name="add")
-    @commands.check(checks.is_bot_admin)
+    @flag_group.command(name="add")
     @discord.app_commands.choices(flag=[
         discord.app_commands.Choice(name=flag, value=flag)
         for flag in UserFlag.FLAGS.values()
     ])
-    async def admin_flag_add(self, ctx: MyContext, user: discord.User, flag: str):
+    async def admin_flag_add(self, interaction: discord.Interaction, user: discord.User, flag: str):
         """Ajoute un flag à un utilisateur
 
         Flags valides : support, contributor, premium, partner, translator, cookie"""
-        await ctx.defer()
+        await interaction.response.defer()
         userflags: list[str] = await self.bot.get_cog("Users").get_userflags(user)
         if flag in userflags:
-            await ctx.send(f"L'utilisateur {user} a déjà ce flag !")
+            await interaction.followup.send(f"L'utilisateur {user} a déjà ce flag !")
             return
         userflags.append(flag)
         await self.bot.get_cog("Users").db_edit_user_flags(user.id, UserFlag().flags_to_int(userflags))
-        await ctx.send(f"L'utilisateur {user} a maintenant les flags {', '.join(userflags)}")
+        await interaction.followup.send(f"L'utilisateur {user} a maintenant les flags {', '.join(userflags)}")
 
-    @admin_flag.command(name="remove")
-    @commands.check(checks.is_bot_admin)
+    @flag_group.command(name="remove")
     @discord.app_commands.choices(flag=[
         discord.app_commands.Choice(name=flag, value=flag)
         for flag in UserFlag.FLAGS.values()
     ])
-    async def admin_flag_remove(self, ctx: MyContext, user: discord.User, flag: str):
+    async def admin_flag_remove(self, interaction: discord.Interaction, user: discord.User, flag: str):
         """Retire un flag à un utilisateur
 
         Flags valides : support, contributor, premium, partner, translator, cookie"""
-        await ctx.defer()
+        await interaction.response.defer()
         userflags: list[str] = await self.bot.get_cog("Users").get_userflags(user)
         if flag not in userflags:
-            await ctx.send(f"L'utilisateur {user} n'a déjà pas ce flag")
+            await interaction.followup.send(f"L'utilisateur {user} n'a déjà pas ce flag")
             return
         userflags.remove(flag)
         await self.bot.get_cog("Users").db_edit_user_flags(user.id, UserFlag().flags_to_int(userflags))
         if userflags:
-            await ctx.send(f"L'utilisateur {user} a maintenant les flags {', '.join(userflags)}")
+            await interaction.followup.send(f"L'utilisateur {user} a maintenant les flags {', '.join(userflags)}")
         else:
-            await ctx.send(f"L'utilisateur {user} n'a plus aucun flag")
+            await interaction.followup.send(f"L'utilisateur {user} n'a plus aucun flag")
 
-    @admin_group.group(name="rankcard")
-    @commands.check(checks.is_bot_admin)
-    async def admin_rankcard(self, ctx: MyContext):
-        "Ajoute ou retire une carte d'xp à un utilisateur"
-        if ctx.subcommand_passed is None:
-            await ctx.send_help(ctx.command)
 
-    @admin_rankcard.command(name="list")
-    @commands.check(checks.is_bot_admin)
-    async def admin_card_list(self, ctx: MyContext, user: discord.User):
+    rankcard_group = app_commands.Group(
+        name="rankcard",
+        description="Ajoute ou retire une carte d'xp à un utilisateur",
+        parent=admin_main
+    )
+
+    @rankcard_group.command(name="list")
+    async def admin_card_list(self, interaction: discord.Interaction, user: discord.User):
         "Liste les cartes d'xp d'un utilisateur"
-        await ctx.defer()
+        await interaction.response.defer()
         rankcards: list[str] = sorted(await self.bot.get_cog("Users").get_rankcards(user))
         if rankcards:
-            await ctx.send(f"Liste des cartes d'xp de {user} : {', '.join(rankcards)}")
+            await interaction.followup.send(f"Liste des cartes d'xp de {user} : {', '.join(rankcards)}")
         else:
-            await ctx.send(f"{user} n'a aucune carte d'xp spéciale pour le moment")
+            await interaction.followup.send(f"{user} n'a aucune carte d'xp spéciale pour le moment")
 
-    @admin_rankcard.command(name="add")
-    @commands.check(checks.is_bot_admin)
+    @rankcard_group.command(name="add")
     @discord.app_commands.choices(rankcard=[
         discord.app_commands.Choice(name=rankcard, value=rankcard)
         for rankcard in RankCardsFlag.FLAGS.values()
     ])
-    async def admin_card_add(self, ctx: MyContext, user: discord.User, rankcard: str):
+    async def admin_card_add(self, interaction: discord.Interaction, user: discord.User, rankcard: str):
         """Autorise une carte d'xp à un utilisateur"""
-        await ctx.defer()
+        await interaction.response.defer()
         rankcards: list[str] = await self.bot.get_cog("Users").get_rankcards(user)
         if rankcard in rankcards:
-            await ctx.send(f"L'utilisateur {user} a déjà cette carte d'xp !")
+            await interaction.followup.send(f"L'utilisateur {user} a déjà cette carte d'xp !")
             return
         rankcards.append(rankcard)
         await self.bot.get_cog("Users").set_rankcard(user, rankcard, add=True)
-        await ctx.send(f"L'utilisateur {user} a maintenant les cartes d'xp {', '.join(rankcards)}")
+        await interaction.followup.send(f"L'utilisateur {user} a maintenant les cartes d'xp {', '.join(rankcards)}")
 
-    @admin_rankcard.command(name="remove")
-    @commands.check(checks.is_bot_admin)
+    @rankcard_group.command(name="remove")
     @discord.app_commands.choices(rankcard=[
         discord.app_commands.Choice(name=rankcard, value=rankcard)
         for rankcard in RankCardsFlag.FLAGS.values()
     ])
-    async def admin_card_remove(self, ctx: MyContext, user: discord.User, rankcard: str):
+    async def admin_card_remove(self, interaction: discord.Interaction, user: discord.User, rankcard: str):
         """Retire une carte d'xp à un utilisateur"""
-        await ctx.defer()
+        await interaction.response.defer()
         rankcards: list[str] = await self.bot.get_cog("Users").get_rankcards(user)
         if rankcard not in rankcards:
-            await ctx.send(f"L'utilisateur {user} n'a déjà pas cette carte d'xp")
+            await interaction.followup.send(f"L'utilisateur {user} n'a déjà pas cette carte d'xp")
             return
         rankcards.remove(rankcard)
         await self.bot.get_cog("Users").set_rankcard(user, rankcard, add=False)
         if rankcards:
-            await ctx.send(f"L'utilisateur {user} a maintenant les cartes d'xp {', '.join(rankcards)}")
+            await interaction.followup.send(f"L'utilisateur {user} a maintenant les cartes d'xp {', '.join(rankcards)}")
         else:
-            await ctx.send(f"L'utilisateur {user} n'a plus aucune catre d'xp spéciale")
+            await interaction.followup.send(f"L'utilisateur {user} n'a plus aucune catre d'xp spéciale")
 
 
-    @admin_group.group(name="server")
-    @commands.check(checks.is_bot_admin)
-    async def main_botserv(self, ctx: MyContext):
-        """Quelques commandes liées au serveur officiel"""
-        if ctx.invoked_subcommand is None or ctx.invoked_subcommand==self.main_botserv: # pylint: disable=comparison-with-callable
-            text = "Liste des commandes disponibles :"
-            for cmd in ctx.command.commands:
-                cmd: commands.Command
-                text += f"\n- {cmd.name} *({cmd.help})*"
-            await ctx.send(text)
+    server_group = app_commands.Group(
+        name="server",
+        description="Quelques commandes liées au serveur officiel",
+        parent=admin_main
+    )
 
-    @main_botserv.command(name="owner_reload")
-    @commands.check(checks.is_bot_admin)
-    async def owner_reload(self, ctx: MyContext):
+    @server_group.command(name="owner_reload")
+    async def owner_reload(self, interaction: discord.Interaction):
         """Ajoute le rôle Owner à tout les membres possédant un serveur avec le bot
         Il est nécessaire d'avoir au moins 10 membres pour que le rôle soit ajouté"""
         server = self.bot.get_guild(SUPPORT_GUILD_ID.id)
         if server is None:
-            await ctx.send("Serveur de support introuvable")
+            await interaction.response.send_message("Serveur de support introuvable")
             return
         role = server.get_role(486905171738361876)
         if role is None:
-            await ctx.send("Rôle Owners introuvable")
+            await interaction.response.send_message("Rôle Owners introuvable")
             return
-        await ctx.defer()
+        await interaction.response.defer()
         owner_list: list[int] = []
         for guild in self.bot.guilds:
-            if len(guild.members)>9:
+            if len(guild.members) > 9:
                 if guild.owner_id is None:
-                    await ctx.send(f"Oops, askip le propriétaire de {guild.id} n'existe pas ._.")
+                    await interaction.followup.send(f"Oops, askip le propriétaire de {guild.id} n'existe pas ._. je continue...")
                     continue
                 owner_list.append(guild.owner_id)
         text: list[str] = []
@@ -802,9 +810,9 @@ Cette option affecte tous les serveurs"""
                 text.append("Rôle supprimé à " + (member.global_name or member.name))
                 await member.remove_roles(role,reason="This user doesn't support me anymore")
         if text:
-            await ctx.send("\n".join(text))
+            await interaction.followup.send("\n".join(text))
         else:
-            await ctx.send("Aucun changement n'a été effectué")
+            await interaction.followup.send("Aucun changement n'a été effectué")
 
     async def _get_ideas_list(self, channel: discord.TextChannel):
         "Get ideas from the ideas channel"
@@ -828,40 +836,39 @@ Cette option affecte tous les serveurs"""
         liste.sort(reverse=True)
         return liste
 
-    @main_botserv.command(name="best_ideas")
-    @commands.check(checks.is_bot_admin)
-    async def best_ideas(self, ctx: MyContext, number: int=10):
+    @server_group.command(name="best_ideas")
+    async def best_ideas(self, interaction: discord.Interaction, number: int=10):
         """Donne la liste des 10 meilleures idées"""
-        bot_msg = await ctx.send("Chargement des idées...")
+        await interaction.response.send_message("Chargement des idées...")
         server = self.bot.get_guild(SUPPORT_GUILD_ID.id if not self.bot.beta else PRIVATE_GUILD_ID.id)
         if server is None:
-            return await ctx.send("Serveur introuvable")
+            await interaction.response.send_message("Serveur introuvable")
+            return
         channel = server.get_channel(488769306524385301 if not self.bot.beta else 929864644678549534)
         if channel is None:
-            return await ctx.send("Salon introuvable")
+            await interaction.response.send_message("Salon introuvable")
+            return
+        await interaction.response.defer()
         ideas_list = await self._get_ideas_list(channel)
         count = len(ideas_list)
         ideas_list = ideas_list[:number]
         title = f"Liste des {len(ideas_list)} meilleures idées (sur {count}) :"
         text = ""
-        if ctx.guild is not None:
-            color = ctx.guild.me.color
+        if interaction.guild is not None:
+            color = interaction.guild.me.color
         else:
             color = discord.Colour(8311585)
         for (_, _, content, upvotes, downvotes) in ideas_list:
             text += f"\n**[{upvotes} - {downvotes}]**  {content}"
-        try:
-            if ctx.can_send_embed:
-                emb = discord.Embed(title=title, description=text, color=color, timestamp=self.bot.utcnow())
-                return await bot_msg.edit(content=None,embed=emb)
-            await bot_msg.edit(content=title+text)
-        except discord.HTTPException:
-            await ctx.send("Le message est trop long pour être envoyé !")
+        if len(text) > 2000:
+            await interaction.edit_original_response("Le message est trop long pour être envoyé !")
+        emb = discord.Embed(title=title, description=text, color=color, timestamp=self.bot.utcnow())
+        await interaction.edit_original_response(content=None, embed=emb)
 
-    @admin_group.command(name="activity")
-    @commands.check(checks.is_bot_admin)
+    @admin_main.command(name="activity")
     @discord.app_commands.rename(activity_type="type")
-    async def change_activity(self, ctx: MyContext, activity_type: Literal["play", "watch", "listen", "stream"], *, text: str):
+    async def change_activity(self, interaction: discord.Interaction, activity_type: Literal["play", "watch", "listen", "stream"],
+                              text: str):
         """Change l'activité du bot (play, watch, listen, stream)"""
         if activity_type == "play":
             new_activity = discord.Game(name=text)
@@ -872,26 +879,25 @@ Cette option affecte tous les serveurs"""
         elif activity_type == "stream":
             new_activity = discord.Activity(type=discord.ActivityType.streaming, name=text, timestamps={"start":time.time()})
         else:
-            await ctx.send("Sélectionnez *play*, *watch*, *listen* ou *stream* suivi du nom")
+            await interaction.response.send_message("Sélectionnez *play*, *watch*, *listen* ou *stream* suivi du nom")
             return
         await self.bot.change_presence(activity=new_activity)
-        if not ctx.interaction:
-            await ctx.message.delete()
+        await interaction.response.send_message("Activité changée !")
 
-    @admin_group.command(name="test-rss-url")
-    @commands.check(checks.is_bot_admin)
-    async def test_rss_url(self, ctx: MyContext, url: str, *, arguments=None):
+    @admin_main.command(name="test-rss-url")
+    async def test_rss_url(self, interaction: discord.Interaction, url: str, arguments: str | None = None):
         """Teste une url rss"""
-        await ctx.defer()
+        await interaction.response.defer()
         url = url.replace('<','').replace('>','')
         feed = await feed_parse(url, 8)
         if feed is None:
-            await ctx.send("Got a timeout")
+            await interaction.followup.send("Got a timeout")
             return
         txt = f"feeds.keys()\n```py\n{feed.keys()}\n```"
         if "bozo_exception" in feed:
             txt += f"\nException ({feed['bozo']}): {feed['bozo_exception']}"
-            return await ctx.send(txt)
+            await interaction.followup.send(txt)
+            return
         if len(str(feed.feed)) < 1400-len(txt):
             txt += f"feeds.feed\n```py\n{feed.feed}\n```"
         else:
@@ -904,10 +910,10 @@ Cette option affecte tous les serveurs"""
         if arguments is not None and "feeds" in arguments and "ctx" not in arguments:
             txt += f"\n{arguments}\n```py\n{eval(arguments)}\n```" # pylint: disable=eval-used
         try:
-            await ctx.send(txt)
+            await interaction.followup.send(txt)
         except discord.DiscordException as err:
             print("[rss_test] Error:",err)
-            await ctx.send("`Error`: "+str(err))
+            await interaction.followup.send("`Error`: "+str(err))
             print(txt)
         if arguments is None:
             ok_ = "<:greencheck:513105826555363348>"
@@ -960,52 +966,47 @@ Cette option affecte tous les serveurs"""
                     txt.append(nothing_+ok_+" summary")
                 else:
                     txt.append(nothing_+notok_+' summary (as description)')
-            await ctx.send("\n".join(txt))
+            await interaction.followup.send("\n".join(txt))
 
-    @admin_group.group(name="antiscam")
-    @commands.check(checks.is_bot_admin)
-    async def main_antiscam(self, ctx: MyContext):
-        "Gère le modèle d'anti-scam"
-        if ctx.subcommand_passed is None:
-            await ctx.send_help(ctx.command)
 
-    @main_antiscam.command(name="fetch-unicode")
-    @commands.check(checks.is_bot_admin)
-    async def antiscam_fetch_unicode(self, ctx: MyContext):
+    antiscam_group = app_commands.Group(
+        name="antiscam",
+        description="Gère le modèle d'anti-scam",
+        parent=admin_main
+    )
+
+    @antiscam_group.command(name="fetch-unicode")
+    async def antiscam_fetch_unicode(self, interaction: discord.Interaction):
         "Récupérer la table unicode des caractères confusables"
         if not self.bot.beta:
-            await ctx.send("Not usable in production!", ephemeral=True)
+            await interaction.response.send_message("Not usable in production!")
             return
-        await ctx.defer()
+        await interaction.response.defer()
         await update_unicode_map()
-        await ctx.send("Done!")
+        await interaction.followup.send("Done!")
 
-    @main_antiscam.command(name="update-table")
-    @commands.check(checks.is_bot_admin)
-    async def antiscam_update_table(self, ctx: MyContext):
+    @antiscam_group.command(name="update-table")
+    async def antiscam_update_table(self, interaction: discord.Interaction):
         "Met à jour la table des messages enregistrés"
         if (antiscam := self.bot.get_cog("AntiScam")) is None:
-            await ctx.send("AntiScam cog not found!")
+            await interaction.response.send_message("AntiScam cog not found!")
             return
         antiscam: "AntiScam"
-        await ctx.defer()
-        msg = await ctx.send("Hold on, I'm on it...")
+        await interaction.response.send_message("Hold on, I'm on it...")
         counter = await antiscam.db_update_messages(antiscam.table)
-        await msg.edit(content=f"{counter} messages updated!")
+        await interaction.edit_original_response(content=f"{counter} messages updated!")
 
-    @main_antiscam.command(name="train")
-    @commands.check(checks.is_bot_admin)
-    async def antiscam_train_model(self, ctx: MyContext):
+    @antiscam_group.command(name="train")
+    async def antiscam_train_model(self, interaction: discord.Interaction):
         "Ré-entraine le modèle d'anti-scam (ACTION DESTUCTRICE)"
         if not self.bot.beta:
-            await ctx.send("Not usable in production!", ephemeral=True)
+            await interaction.response.send_message("Not usable in production!")
             return
         if (antiscam := self.bot.get_cog("AntiScam")) is None:
-            await ctx.send("AntiScam cog not found!")
+            await interaction.response.send_message("AntiScam cog not found!")
             return
         antiscam: "AntiScam"
-        await ctx.defer()
-        msg = await ctx.send("Hold on, this may take a while...")
+        await interaction.response.send_message("Hold on, this may take a while...")
         start = time.time()
         data = await antiscam.get_messages_list()
         model = await train_model(data)
@@ -1018,21 +1019,20 @@ Cette option affecte tous les serveurs"""
             txt += f"\n✅ This model is better than the current one ({current_acc:.3f}), replacing it!"
         else:
             txt += f"\n❌ This model is not better than the current one ({current_acc:.3f})"
-        await msg.edit(content=txt)
+        await interaction.edit_original_response(content=txt)
         self.bot.log.info(txt)
 
-    @main_antiscam.command(name="list-words")
-    @commands.check(checks.is_bot_admin)
-    async def antiscam_list_words(self, ctx: MyContext,
-                                  words_category: Literal["spam-words", "safe-words", "all"]="all",
-                                  words_count: commands.Range[int, 1, 100]=15
+    @antiscam_group.command(name="list-words")
+    async def antiscam_list_words(self, interaction: discord.Interaction,
+                                  words_category: Literal["spam-words", "safe-words", "all"] = "all",
+                                  words_count: app_commands.Range[int, 1, 100] = 15
                                   ):
         "Liste les mots les plus importants dans la détection de scam"
         if (antiscam := self.bot.get_cog("AntiScam")) is None:
-            await ctx.send("AntiScam cog not found!")
+            await interaction.response.send_message("AntiScam cog not found!")
             return
         antiscam: "AntiScam"
-        await ctx.defer()
+        await interaction.response.defer()
         attr_counts: dict[str, int] = defaultdict(int)
         for tree in antiscam.agent.model.trees:
             for word, count in tree.attr_counts["spam"].items():
@@ -1047,11 +1047,131 @@ Cette option affecte tous les serveurs"""
             result.append("...")
         if words_category in {"safe-words", "all"}:
             result.extend(f"{word} ({score})" for word, score in sorted_words[-words_count:])
-        await ctx.send("\n".join(result))
+        await interaction.followup.send("\n".join(result))
+
+    @admin_main.command(name="rss-loop")
+    async def rss_loop(self, interaction: discord.Interaction, new_state: Literal["start", "stop", "run-once"]):
+        """Start or stop the RSS refresh loop"""
+        if not self.bot.database_online:
+            await interaction.response.send_message("Lol, t'as oublié que la base de donnée était hors ligne ?")
+            return
+        cog = self.bot.get_cog("Rss")
+        if cog is None:
+            await interaction.response.send_message("Le module RSS n'est pas chargé !")
+            return
+        await interaction.response.defer()
+        if new_state == "start":
+            try:
+                cog.rss_loop.start() # pylint: disable=no-member
+            except RuntimeError:
+                await interaction.followup.send("La boucle est déjà en cours !")
+            else:
+                await interaction.followup.send("Boucle rss relancée !")
+        elif new_state == "stop":
+            cog.rss_loop.cancel() # pylint: disable=no-member
+            cog.log.info(" RSS loop force-stopped by an admin")
+            await interaction.followup.send("Boucle rss arrêtée de force !")
+        elif new_state == "run-once":
+            if cog.loop_processing:
+                await interaction.followup.send("Une boucle rss est déjà en cours !")
+            else:
+                await interaction.followup.send("Et hop ! Une itération de la boucle en cours !")
+                cog.log.info(" RSS loop forced by an admin")
+                await cog.refresh_feeds()
+
+    bug_group = app_commands.Group(
+        name="bug",
+        description="Gère la liste des bugs publiquement annoncés",
+        parent=admin_main
+    )
+
+    @bug_group.command(name="add")
+    async def bug_add(self, interaction: discord.Interaction, french: str, english: str):
+        """Ajoute un bug à la liste"""
+        channel = self.bot.get_channel(929864644678549534) if self.bot.beta else self.bot.get_channel(488769283673948175)
+        if channel is None:
+            await interaction.response.send_message("Salon introuvable")
+            return
+        emb = discord.Embed(title="New bug", timestamp=self.bot.utcnow(), color=13632027)
+        emb.add_field(name="Français", value=french, inline=False)
+        emb.add_field(name="English", value=english, inline=False)
+        await channel.send(embed=emb)
+        await interaction.response.send_message("Bug ajouté !")
+
+    @bug_group.command(name="fix")
+    async def bug_fix(self, interaction: discord.Interaction, msg_id: str, mark_as_fixed: bool = True):
+        """Marque un bug comme étant fixé"""
+        chan = self.bot.get_channel(929864644678549534) if self.bot.beta else self.bot.get_channel(488769283673948175)
+        if chan is None:
+            await interaction.response.send_message("Salon introuvable")
+            return
+        await interaction.response.defer()
+        try: # try to fetch message from the bugs channel
+            msg = await chan.fetch_message(msg_id)
+        except discord.DiscordException as err:
+            await interaction.followup.send(f"`Error:` {err}")
+            return
+        if len(msg.embeds) != 1:
+            await interaction.followup.send("Nombre d'embeds invalide")
+            return
+        emb = msg.embeds[0]
+        if mark_as_fixed: # if the bug should be marked as fixed
+            emb.color = discord.Color(10146593)
+            emb.title = "New bug [fixed soon]"
+        else:
+            emb.color = discord.Color(13632027)
+            emb.title = "New bug"
+        await msg.edit(embed=emb)
+        await interaction.followup.send("Bug modifié !")
+
+
+    idea_group = app_commands.Group(
+        name="idea",
+        description="Gère la liste des suggestions à voter",
+        parent=admin_main
+    )
+    @idea_group.command(name="add")
+    async def idea_add(self, interaction: discord.Interaction, french: str, english: str):
+        """Ajoute une idée à la liste"""
+        channel = self.bot.get_channel(929864644678549534) if self.bot.beta else self.bot.get_channel(488769306524385301)
+        if channel is None:
+            await interaction.response.send_message("Salon introuvable")
+            return
+        emb = discord.Embed(color=16106019, timestamp=self.bot.utcnow())
+        emb.add_field(name="Français", value=french, inline=False)
+        emb.add_field(name="English", value=english, inline=False)
+        msg = await channel.send(embed=emb)
+        for emoji in self.upvote_emojis:
+            await msg.add_reaction(emoji)
+        await interaction.response.send_message("Idée ajoutée !")
+
+    @idea_group.command(name="valid")
+    async def idea_valid(self, interaction: discord.Interaction, msg_id: str, implemented: bool=True):
+        """Marque une idée comme étant ajoutée à la prochaine MàJ"""
+        chan = self.bot.get_channel(929864644678549534) if self.bot.beta else self.bot.get_channel(488769306524385301)
+        if chan is None:
+            await interaction.response.send_message("Salon introuvable")
+            return
+        await interaction.response.defer()
+        try: # try to fetch message from ideas channel
+            msg = await chan.fetch_message(msg_id)
+        except discord.DiscordException as err:
+            # something went wrong (invalid message ID, or any other Discord API error)
+            await interaction.followup.send(f"`Error:` {err}")
+            return
+        if len(msg.embeds) != 1:
+            await interaction.followup.send("Nombre d'embeds invalide")
+            return
+        emb = msg.embeds[0]
+        if implemented: # if the idea should be marked as soon-released
+            emb.color = discord.Color(10146593)
+        else:
+            emb.color = discord.Color(16106019)
+        await msg.edit(embed=emb)
+        await interaction.followup.send("Idée modifiée !")
 
 
     @commands.command(name="eval", hidden=True)
-    @commands.check(checks.is_bot_admin)
     async def _eval(self, ctx: MyContext, *, body: str):
         """Evaluates a code
         Credits: Rapptz (https://github.com/Rapptz/RoboDanny/blob/rewrite/cogs/admin.py)"""
@@ -1096,125 +1216,6 @@ Cette option affecte tous les serveurs"""
                 self._last_result = ret
                 await ctx.send(f"```py\n{value}{ret}\n```")
 
-    @admin_group.command(name="execute")
-    @commands.check(checks.is_bot_admin)
-    async def sudo(self, ctx: MyContext, who: discord.Member | discord.User, *, command: str):
-        """Exécute une commande en tant qu'un autre utilisateur
-        Credits: Rapptz (https://github.com/Rapptz/RoboDanny/blob/rewrite/cogs/admin.py)"""
-        await ctx.defer()
-        msg = copy.copy(ctx.message)
-        msg.author = who
-        msg.content = ctx.prefix + command
-        new_ctx = await self.bot.get_context(msg)
-        await self.bot.invoke(new_ctx)
-        await ctx.send(f"Command executed as {who} with success")
-
-    @admin_group.command(name="rss-loop")
-    @commands.check(checks.is_bot_admin)
-    async def rss_loop(self, ctx: MyContext, new_state: Literal["start", "stop", "run-once"]):
-        """Start or stop the RSS refresh loop"""
-        if not ctx.bot.database_online:
-            return await ctx.send("Lol, t'as oublié que la base de donnée était hors ligne ?")
-        cog = self.bot.get_cog("Rss")
-        if cog is None:
-            return await ctx.send("Le module RSS n'est pas chargé !")
-        if new_state == "start":
-            try:
-                cog.rss_loop.start() # pylint: disable=no-member
-            except RuntimeError:
-                await ctx.send("La boucle est déjà en cours !")
-            else:
-                await ctx.send("Boucle rss relancée !")
-        elif new_state == "stop":
-            cog.rss_loop.cancel() # pylint: disable=no-member
-            cog.log.info(" RSS loop force-stopped by an admin")
-            await ctx.send("Boucle rss arrêtée de force !")
-        elif new_state == "run-once":
-            if cog.loop_processing:
-                await ctx.send("Une boucle rss est déjà en cours !")
-            else:
-                await ctx.send("Et hop ! Une itération de la boucle en cours !")
-                cog.log.info(" RSS loop forced by an admin")
-                await cog.refresh_feeds()
-
-    @admin_group.group(name="bug")
-    @commands.check(checks.is_bot_admin)
-    async def main_bug(self, ctx: MyContext):
-        """Gère la liste des bugs"""
-
-    @main_bug.command(name="add")
-    async def bug_add(self, ctx: MyContext, french: str, english: str):
-        """Ajoute un bug à la liste"""
-        channel = ctx.bot.get_channel(929864644678549534) if self.bot.beta else ctx.bot.get_channel(488769283673948175)
-        if channel is None:
-            return await ctx.send("Salon 488769283673948175 introuvable")
-        emb = discord.Embed(title="New bug", timestamp=self.bot.utcnow(), color=13632027)
-        emb.add_field(name="Français", value=french, inline=False)
-        emb.add_field(name="English", value=english, inline=False)
-        await channel.send(embed=emb)
-        await self.add_success_reaction(ctx.message)
-
-    @main_bug.command(name="fix")
-    async def bug_fix(self, ctx: MyContext, msg_id: str, fixed: bool=True):
-        """Marque un bug comme étant fixé"""
-        chan = ctx.bot.get_channel(929864644678549534) if self.bot.beta else ctx.bot.get_channel(488769283673948175)
-        if chan is None:
-            return await ctx.send("Salon introuvable")
-        try: # try to fetch message from the bugs channel
-            msg = await chan.fetch_message(msg_id)
-        except discord.DiscordException as err:
-            return await ctx.send(f"`Error:` {err}")
-        if len(msg.embeds) != 1:
-            return await ctx.send("Nombre d'embeds invalide")
-        emb = msg.embeds[0]
-        if fixed: # if the bug should be marked as fixed
-            emb.color = discord.Color(10146593)
-            emb.title = "New bug [fixed soon]"
-        else:
-            emb.color = discord.Color(13632027)
-            emb.title = "New bug"
-        await msg.edit(embed=emb)
-        await self.add_success_reaction(ctx.message)
-
-    @admin_group.group(name="idea")
-    @commands.check(checks.is_bot_admin)
-    async def main_idea(self, ctx: MyContext):
-        """Ajouter une idée dans le salon des idées, en français et anglais"""
-
-    @main_idea.command(name="add")
-    async def idea_add(self, ctx: MyContext, french: str, english: str):
-        """Ajoute une idée à la liste"""
-        channel = ctx.bot.get_channel(929864644678549534) if self.bot.beta else ctx.bot.get_channel(488769306524385301)
-        if channel is None:
-            return await ctx.send("Salon introuvable")
-        emb = discord.Embed(color=16106019, timestamp=self.bot.utcnow())
-        emb.add_field(name="Français", value=french, inline=False)
-        emb.add_field(name="English", value=english, inline=False)
-        msg = await channel.send(embed=emb)
-        for emoji in self.upvote_emojis:
-            await msg.add_reaction(emoji)
-        await self.add_success_reaction(ctx.message)
-
-    @main_idea.command(name="valid")
-    async def idea_valid(self, ctx: MyContext, msg_id: str, implemented: bool=True):
-        """Marque une idée comme étant ajoutée à la prochaine MàJ"""
-        chan = ctx.bot.get_channel(929864644678549534) if self.bot.beta else ctx.bot.get_channel(488769306524385301)
-        if chan is None:
-            return await ctx.send("Salon introuvable")
-        try: # try to fetch message from ideas channel
-            msg = await chan.fetch_message(msg_id)
-        except discord.DiscordException as err:
-            # something went wrong (invalid message ID, or any other Discord API error)
-            return await ctx.send(f"`Error:` {err}")
-        if len(msg.embeds) != 1:
-            return await ctx.send("Nombre d'embeds invalide")
-        emb = msg.embeds[0]
-        if implemented: # if the idea should be marked as soon-released
-            emb.color = discord.Color(10146593)
-        else:
-            emb.color = discord.Color(16106019)
-        await msg.edit(embed=emb)
-        await self.add_success_reaction(ctx.message)
 
 async def setup(bot):
     await bot.add_cog(Admin(bot))

@@ -32,18 +32,20 @@ class Utilities(commands.Cog):
         await self.get_bot_infos()
 
     async def get_bot_infos(self):
+        """Get the bot's infos from the database"""
         if not self.bot.database_online:
-            return []
-        query = ("SELECT * FROM `bot_infos` WHERE `ID` = %s")
+            return {}
+        query = "SELECT * FROM `bot_infos` WHERE `ID` = %s"
         async with self.bot.db_query(query, (self.bot.user.id,)) as query_results:
-            config_list = list(query_results)
+            config_list: list[dict] = list(query_results)
         if len(config_list) > 0:
-            self.config: dict = config_list[0]
+            self.config = config_list[0]
             self.config.pop('token', None)
             return self.config
         return None
 
     async def edit_bot_infos(self, bot_id: int, values: list[tuple[str, Any]]):
+        """Edit the bot's infos in the database"""
         if not isinstance(values, list) or len(values) == 0:
             raise ValueError
         set_query = ', '.join('{}=%s'.format(val[0]) for val in values)
