@@ -7,12 +7,11 @@ from typing import TYPE_CHECKING
 
 from mysql.connector import errors
 from mysql.connector.connection import MySQLConnection, MySQLCursor
+from mysql.connector.connection_cext import CMySQLConnection, CMySQLCursor
 from mysql.connector.cursor import (RE_PY_PARAM, _bytestr_format_dict,
                                     _ParamSubstitutor)
-from mysql.connector.connection_cext import CMySQLConnection, CMySQLCursor
 
 if TYPE_CHECKING:
-
     from core.bot_classes.axobot import Axobot
 
 
@@ -33,7 +32,7 @@ def create_database_query(bot: "Axobot", cnx_axobot: MySQLConnection | CMySQLCon
             self.returnrowcount = returnrowcount
             self.astuple = astuple
             self.cursor: MySQLCursor | CMySQLCursor = None
-            self.log = logging.getLogger("bot.db")
+            self.log = logging.getLogger("bot.sql")
 
         async def _format_query(self):
             if isinstance(self.cursor, MySQLCursor):

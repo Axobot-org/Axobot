@@ -1,23 +1,21 @@
 import datetime
 import logging
 import sys
-import time
 from typing import (TYPE_CHECKING, Awaitable, Callable, Literal, Optional,
                     overload)
 
 import discord
 from discord.ext import commands
-from mysql.connector import connect as sql_connect
 from mysql.connector.connection import MySQLConnection
-from mysql.connector.errors import ProgrammingError
 
-from core.database import create_database_query
+from core.database import DatabaseConnectionManager
+from core.database.database import create_database_query
 from core.emojis_manager import EmojisManager
 from core.prefix_manager import PrefixManager
 from core.serverconfig.options_list import options as options_list
 from core.tasks_handler import TaskHandler
 from core.tips import TipsManager
-from core.tokens import get_database_connection, get_secrets_dict
+from core.tokens import get_secrets_dict
 
 from .bot_embeds_manager import send_log_embed
 from .consts import PRIVATE_GUILD_ID
@@ -68,9 +66,8 @@ class Axobot(commands.bot.AutoShardedBot):
         self.database_online = database_online  # if the mysql database works
         self.beta = beta # if the bot is in beta mode
         self.entity_id: int = 0 # ID of the bot for the statistics database
-        self.database_keys = get_database_connection() # credentials for the database
+        self.db = DatabaseConnectionManager()
         self.log = logging.getLogger("bot") # logs module
-        self._cnx = [[None, 0], [None, 0], [None, 0]] # database connections
         self.xp_enabled: bool = True # if xp is enabled
         self.rss_enabled: bool = True # if rss is enabled
         self.stats_enabled: bool = True # if the stats system is enabled (for grafana mainly)
@@ -208,81 +205,20 @@ class Axobot(commands.bot.AutoShardedBot):
         await self.reload_extension(f"modules.{module_name}.{module_name}")
 
     @property
-    def cnx_axobot(self) -> MySQLConnection:
+    def cnx_axobot(self):
         """Connection to the default database
         Used for almost everything"""
-        if self._cnx[0][1] + 1260 < round(time.time()):  # 21min
-            self.connect_database_axobot()
-            self._cnx[0][1] = round(time.time())
-            return self._cnx[0][0]
-        return self._cnx[0][0]
-
-    def connect_database_axobot(self):
-        "Create a connection to the default database"
-        if len(self.database_keys) > 0:
-            if self._cnx[0][0] is not None:
-                self._cnx[0][0].close()
-            self.log.debug(
-                "Connecting to MySQL (user %s, database %s)",
-                self.database_keys["user"],
-                self.database_keys["name_main"]
-            )
-            self._cnx[0][0] = sql_connect(
-                user=self.database_keys["user"],
-                password=self.database_keys["password"],
-                host=self.database_keys["host"],
-                database=self.database_keys["name_main"],
-                buffered=True,
-                charset="utf8mb4",
-                collation="utf8mb4_unicode_ci",
-                connection_timeout=5
-            )
-            self._cnx[0][1] = round(time.time())
-        else:
-            raise ValueError(dict)
-
-    def close_database_cnx(self):
-        "Close any opened database connection"
-        try:
-            self.cnx_axobot.close()
-        except ProgrammingError:
-            pass
-        try:
-            self.cnx_xp.close()
-        except ProgrammingError:
-            pass
+        return self.db.get_connection("axobot")
 
     @property
     def cnx_xp(self) -> MySQLConnection:
         """Connection to the xp database
         Used for guilds using local xp (1 table per guild)"""
-        if self._cnx[1][1] + 1260 < round(time.time()):  # 21min
-            self.connect_database_xp()
-            self._cnx[1][1] = round(time.time())
-            return self._cnx[1][0]
-        return self._cnx[1][0]
+        return self.db.get_connection("zbot-xp")
 
-    def connect_database_xp(self):
-        "Create a connection to the xp database"
-        if len(self.database_keys) > 0:
-            if self._cnx[1][0] is not None:
-                self._cnx[1][0].close()
-            self.log.debug(
-                "Connecting to MySQL (user %s, database %s)",
-                self.database_keys["user"],
-                self.database_keys["name_xp"]
-            )
-            self._cnx[1][0] = sql_connect(
-                user=self.database_keys["user"],
-                password=self.database_keys["password"],
-                host=self.database_keys["host"],
-                database=self.database_keys["name_xp"],
-                buffered=True,
-                connection_timeout=5
-            )
-            self._cnx[1][1] = round(time.time())
-        else:
-            raise ValueError(dict)
+    def close_database_cnx(self):
+        "Close any opened database connection"
+        self.db.disconnect_all()
 
     @property
     def db_query(self):
