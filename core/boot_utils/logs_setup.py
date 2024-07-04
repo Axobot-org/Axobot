@@ -52,7 +52,7 @@ def set_beta_logs():
 
 def _setup_database_logger():
     "Create the logger module for the database, as a sub-logger of the bot logger"
-    db_logger = logging.getLogger("bot.db")
+    db_logger = logging.getLogger("bot.sql")
 
     # DEBUG logs to a file
     file_handler = RotatingFileHandler("logs/sql-debug.log", maxBytes=5e6, backupCount=2, delay=True)
