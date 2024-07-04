@@ -194,9 +194,6 @@ class Errors(commands.Cog):
         elif isinstance(error, commands.errors.NoPrivateMessage):
             await ctx.send(await self.bot._(ctx.channel,"errors.DM"))
             return
-        elif isinstance(error, checks.CannotSendEmbed):
-            await ctx.send(await self.bot._(ctx.channel,"errors.cannotembed"))
-            return
         else:
             cmd = await self.bot.get_command_mention("about")
             try:

@@ -27,8 +27,8 @@ async def is_support_staff(ctx: MyContext | discord.Interaction) -> bool:
     if user.id in admins_id:
         return True
     bot = ctx.bot if isinstance(ctx, commands.Context) else ctx.client
-    if UsersCog := bot.get_cog("Users"):
-        return await UsersCog.has_userflag(user, "support")
+    if users_cog := bot.get_cog("Users"):
+        return await users_cog.has_userflag(user, "support")
     server = bot.get_guild(SUPPORT_GUILD_ID.id)
     if server is not None:
         member = server.get_member(user.id)
@@ -37,64 +37,6 @@ async def is_support_staff(ctx: MyContext | discord.Interaction) -> bool:
             return role in member.roles
     return False
 
-async def has_admin(ctx: MyContext) -> bool:
-    """Check if someone can see the banlist"""
-    return ctx.channel.permissions_for(ctx.author).administrator or await ctx.bot.get_cog("Admin").check_if_god(ctx)
-
-
-async def has_manage_msg(ctx: MyContext) -> bool:
-    """... if someone can pin a message"""
-    return ctx.channel.permissions_for(ctx.author).manage_messages or await ctx.bot.get_cog("Admin").check_if_god(ctx)
-
-
-async def has_manage_guild(ctx: MyContext) -> bool:
-    """... if someone can manage the server"""
-    return ctx.channel.permissions_for(ctx.author).manage_guild or await ctx.bot.get_cog("Admin").check_if_god(ctx)
-
-async def has_audit_logs(ctx: MyContext) -> bool:
-    """... if someone can see server audit logs"""
-    return ctx.channel.permissions_for(ctx.author).view_audit_log or await ctx.bot.get_cog("Admin").check_if_god(ctx)
-
-async def has_manage_roles(ctx: MyContext) -> bool:
-    """... if someone can manage the roles"""
-    return ctx.channel.permissions_for(ctx.author).manage_roles or await ctx.bot.get_cog("Admin").check_if_god(ctx)
-
-
-async def has_manage_nicknames(ctx: MyContext) -> bool:
-    """... if someone can change nicknames"""
-    return ctx.channel.permissions_for(ctx.author).manage_nicknames or await ctx.bot.get_cog("Admin").check_if_god(ctx)
-
-async def has_manage_channels(ctx: MyContext) -> bool:
-    """... if someone can manage the guild channels"""
-    return ctx.channel.permissions_for(ctx.author).manage_channels or await ctx.bot.get_cog("Admin").check_if_god(ctx)
-
-async def has_manage_expressions(ctx: MyContext) -> bool:
-    """... if someone can change nicknames"""
-    return ctx.channel.permissions_for(ctx.author).manage_expressions or await ctx.bot.get_cog("Admin").check_if_god(ctx)
-
-async def has_embed_links(ctx: MyContext) -> bool:
-    """... if someone can send embeds"""
-    if not isinstance(ctx.author, discord.Member):
-        return True
-    return ctx.channel.permissions_for(ctx.author).embed_links or await ctx.bot.get_cog("Admin").check_if_god(ctx)
-
-
-class CannotSendEmbed(commands.CommandError):
-    "Raised when the bot needs the embed links permission to work"
-    def __init__(self):
-        super().__init__("The bot must have the 'embed links' permission")
-
-async def bot_can_embed(ctx: MyContext | discord.Interaction) -> bool:
-    "Check if the bot can send embeds"
-    if isinstance(ctx, commands.Context) and ctx.can_send_embed:
-        return True
-    elif isinstance(ctx, discord.Interaction):
-        if ctx.guild is None:
-            return True
-        if ctx.channel.permissions_for(ctx.guild.me).embed_links:
-            return True
-    raise CannotSendEmbed()
-
 async def database_connected(ctx: MyContext | discord.Interaction[Axobot]) -> bool:
     "Check if the database is online and accessible"
     bot = ctx.client if isinstance(ctx, discord.Interaction) else ctx.bot
@@ -102,31 +44,11 @@ async def database_connected(ctx: MyContext | discord.Interaction[Axobot]) -> bo
         return True
     raise commands.CommandError("Database offline")
 
-
-async def is_fun_enabled(ctx: MyContext) -> bool:
-    "Check if fun is enabled in a given context"
-    if ctx.guild is None:
-        return True
-    if not ctx.bot.database_online and not ctx.author.guild_permissions.manage_guild:
-        return False
-    return await ctx.bot.get_config(ctx.guild.id, "enable_fun")
-
-
-
-async def is_a_cmd(msg: discord.Message, bot: commands.Bot) -> bool:
-    "Check if a message is a command"
-    pr = await bot.get_prefix(msg)
-    is_cmd = False
-    for p in pr:
-        is_cmd = is_cmd or msg.content.startswith(p)
-    return is_cmd
-
-async def is_ttt_enabled(interaction: discord.Interaction) -> bool:
+async def is_ttt_enabled(interaction: discord.Interaction[Axobot]) -> bool:
     "Check if the tic-tac-toe game is enabled in a given context"
     if interaction.guild is None:
         return True
     return await interaction.client.get_config(interaction.guild_id, "enable_ttt")
-
 
 async def is_voice_message(interaction: discord.Interaction):
     "Check if the message is a voice message"

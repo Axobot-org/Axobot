@@ -3,7 +3,6 @@
     "badarguments": "Oups, impossible de convertir le paramètre `%{p}` en type \"%{t}\" :confused:",
     "badboolean": "La valeur `%{v}` n'est pas un booléen valide",
     "badlitteral": "Oups, argument inconnu détecté !",
-    "cannotembed": "Oups, il me manqye la permission d'envoyer des contenus riches (embeds) pour exécuter cette commande !",
     "channotfound": "Le salon %{c} est introuvable",
     "checkfailure": "Oups, il semble que tu ne sois pas autorisé à utiliser cette commande. Utilise la commande %{help_cmd} pour savoir pourquoi !",
     "cooldown": "Vous êtes en cooldown pour cette commande. Veuillez attendre encore %{d} secondes...",

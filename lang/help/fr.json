@@ -10,10 +10,6 @@
         "users-info": "Infos sur les utilisateurs"
     },
     "check-desc": {
-        "bot_can_embed": [
-            "Le bot possède la permission d'envoyer des contenus riches (embeds)",
-            "Vous devez autoriser le bot à envoyer des contenus riches (embeds)"
-        ],
         "bot_has_permissions": [
             "Le bot possède les permissions suffisantes",
             "Le bot ne possède pas les permissions suffisantes"
@@ -34,42 +30,6 @@
             "Utilisable uniquement dans un serveur",
             "Utilisable uniquement dans un serveur"
         ],
-        "has_admin": [
-            "Vous avez la permission 'Administrateur'",
-            "Permission 'Administrateur' manquante"
-        ],
-        "has_audit_logs": [
-            "Vous avez la permission de 'Voir les logs du serveur'",
-            "Permission de 'Voir les logs du serveur' manquante"
-        ],
-        "has_embed_links": [
-            "Vous avez la permission \"Intégrer des liens\"",
-            "Vous devez avoir la permission \"Intégrer des liens\""
-        ],
-        "has_manage_channels": [
-            "Vous avez la permission de 'Gérer les salons'",
-            "Permission 'Gérer les salons' manquante"
-        ],
-        "has_manage_expressions": [
-            "Vous avez la permission de 'Gérer les émojis'",
-            "Permission 'Gérer les émojis' manquante"
-        ],
-        "has_manage_guild": [
-            "Vous avez la permission 'Gérer le serveur'",
-            "Permission 'Gérer le serveur' manquante"
-        ],
-        "has_manage_msg": [
-            "Vous avez la permission 'Gérer les messages'",
-            "Permission 'Gérer les messages' manquante"
-        ],
-        "has_manage_nicknames": [
-            "Vous avez la permission 'Gérer les pseudos'",
-            "Permission 'Gérer les pseudos' manquante"
-        ],
-        "has_manage_roles": [
-            "Vous avez la permission 'Gérer les rôles'",
-            "Permission 'Gérer les rôles' manquante"
-        ],
         "has_permissions": [
             "Vous avez les permissions Discord suffisantes",
             "Vous n'avez pas les permissions Discord suffisantes"
@@ -85,10 +45,6 @@
         "is_bot_admin": [
             "Il faut être administrateur du bot",
             "Vous n'êtes pas administrateur du bot"
-        ],
-        "is_fun_enabled": [
-            "Les commandes de fun sont activées",
-            "Les commandes de fun doivent être activées"
         ],
         "is_halloween": [
             "L'événement Halloween est en cours, profitez-en !",
