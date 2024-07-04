@@ -123,7 +123,6 @@
         "partner_color": "Color of partners embed: %{value}",
         "partner_role": "Role given to partners: %{value}",
         "poll_channels": "List of channels where :thumbsup: and :thumbsdown: reactions will be automatically added to each message: %{value}",
-        "prefix": "Current bot prefix: %{value}",
         "private_leaderboard": "Should non-members be able to access the server leaderboard? %{value}",
         "rank_in_dm": "Send rank cards in private messages? %{value}",
         "save_roles": "Should roles be saved when a member leaves, in case they returns? %{value}",

@@ -41,11 +41,9 @@ async def get_command_signature(ctx: MyContext, command: commands.Command):
     "Get the signature of a command"
     # prefix
     if isinstance(command, AppCommand | commands.HybridCommand | commands.HybridGroup):
-        prefix = "/"
+        prefix = '/'
     else:
-        prefix = await ctx.bot.get_prefix(ctx.message)
-        if isinstance(prefix, list):
-            prefix = prefix[-1]
+        prefix = '@' + ctx.bot.user.name + ' '
     # name
     translated_name = await get_command_full_name_translation(ctx, command)
     # parameters

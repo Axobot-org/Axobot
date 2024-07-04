@@ -1054,10 +1054,6 @@ class Info(commands.Cog):
             streamers_len: str = "{}/{}".format(await twitch_cog.db_get_guild_subscriptions_count(guild.id), streamers_len)
         else:
             streamers_len = "Not available"
-        # Prefix
-        pref = await self.bot.prefix_manager.get_prefix(guild)
-        if "`" not in pref:
-            pref = "`" + pref + "`"
         # Rss
         rss_len: int = await self.bot.get_config(guild.id, "rss_max_number")
         if rss_cog := self.bot.get_cog("Rss"):
@@ -1082,7 +1078,6 @@ class Info(commands.Cog):
         emb.add_field(name="Joined at", value=joined_at, inline=False)
         emb.add_field(name="Members", value=f"{guild.member_count} (including {bots} bots)")
         emb.add_field(name="Language", value=lang)
-        emb.add_field(name="Prefix", value=pref)
         emb.add_field(name="RSS feeds count", value=rss_numb)
         emb.add_field(name="Roles rewards count", value=rr_len)
         emb.add_field(name="Streamers count", value=streamers_len)

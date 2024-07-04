@@ -80,8 +80,6 @@ class ServerConfig(commands.Cog):
         if await self.db_set_value(guild_id, option_name, to_raw(option_name, value)):
             if self.enable_caching:
                 self.cache[(guild_id, option_name)] = value
-            if option_name == "prefix":
-                await self.bot.prefix_manager.update_prefix(guild_id, value)
             return True
         return False
 
@@ -96,8 +94,6 @@ class ServerConfig(commands.Cog):
         if await self.db_delete_option(guild_id, option_name):
             if self.enable_caching and (guild_id, option_name) in self.cache:
                 self.cache.pop((guild_id, option_name))
-            if option_name == "prefix":
-                await self.bot.prefix_manager.reset_prefix(guild_id)
             return True
         return False
 
@@ -109,7 +105,6 @@ class ServerConfig(commands.Cog):
         for option_name in options_list:
             if self.enable_caching and (guild_id, option_name) in self.cache:
                 self.cache.pop((guild_id, option_name))
-        await self.bot.prefix_manager.reset_prefix(guild_id)
         return True
 
     async def get_guild_config(self, guild_id: int, with_defaults: bool) -> dict[str, Any]:
