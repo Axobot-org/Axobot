@@ -29,7 +29,7 @@ By default, Axobot offers you to use the native Discord system to mute your memb
 A. The native Discord system
 ----------------------------
 
-To use Discord's native time-out method, you probably won't have to activate anything. Make sure that the "muted_role" configuration option is not set to any role (:code:`/config see muted_role`), and that roles are allowed to use the :code:`/mute` command (:code:`/config see mute_allowed_roles`), and voila, you can start using Axobot to sanction your members!
+To use Discord's native time-out method, you probably won't have to activate anything. Make sure that the "muted_role" configuration option is not set to any role (:code:`/config see muted_role`), and that roles are allowed to use the :code:`/mute` command , and voila, you can start using Axobot to sanction your members!
 
 B. The role-based system
 -------------------------
@@ -70,22 +70,6 @@ Knowing this, we understand that the "muted" role can only effectively prohibit 
 - no other role explicitly allows messages to be sent in that channel (they must be in neutral position, or grey slash).
 
 Once all these tips have been applied, and after having specified to Axobot to use this role (with the :code:`/config set muted_role` command followed by your role), you can finally use your "muted" role with peace of mind, via Axobot's :code:`/mute` command or even by manually giving it to your members!
-
-
-
-Allow a role to use the mute command
-====================================
-
-This is probably the easiest part of this setup guide. To allow a role to use the :code:`/mute` command, you just need to use the :code:`/config set mute_allowed_roles` command, followed by the roles you want to allow. Both role names, mentions and IDs should work.
-
-For example, to allow the "Moderator" and "Administrator" roles to use the command, you would use the following command:
-
-.. code-block:: ini
-
-    /config set mute_allowed_roles Moderator Administrator
-
-
-If you do not want any role to be able to execute this command (i.e. disable it), you can use the command :code:`/config reset mute_allowed_roles`.
 
 
 

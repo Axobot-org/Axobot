@@ -37,54 +37,6 @@ async def is_support_staff(ctx: MyContext | discord.Interaction) -> bool:
             return role in member.roles
     return False
 
-async def can_mute(ctx: MyContext) -> bool:
-    """Check if someone can mute"""
-    if ctx.bot.database_online:
-        return await ctx.bot.get_cog("ServerConfig").check_member_config_permission(ctx.author, "mute_allowed_roles")
-    else:
-        return ctx.channel.permissions_for(ctx.author).manage_roles
-
-
-async def can_warn(ctx: MyContext) -> bool:
-    """Check if someone can warn"""
-    if ctx.bot.database_online:
-        return await ctx.bot.get_cog("ServerConfig").check_member_config_permission(ctx.author, "warn_allowed_roles")
-    else:
-        return ctx.channel.permissions_for(ctx.author).manage_roles
-
-
-async def can_kick(ctx: MyContext) -> bool:
-    """Check if someone can kick"""
-    if ctx.bot.database_online:
-        return await ctx.bot.get_cog("ServerConfig").check_member_config_permission(ctx.author, "kick_allowed_roles")
-    else:
-        return ctx.channel.permissions_for(ctx.author).kick_members
-
-
-async def can_ban(ctx: MyContext) -> bool:
-    """Check if someone can ban"""
-    if ctx.bot.database_online:
-        return await ctx.bot.get_cog("ServerConfig").check_member_config_permission(ctx.author, "ban_allowed_roles")
-    else:
-        return ctx.channel.permissions_for(ctx.author).ban_members
-
-
-async def can_slowmode(ctx: MyContext) -> bool:
-    """Check if someone can use slowmode"""
-    if ctx.bot.database_online:
-        return await ctx.bot.get_cog("ServerConfig").check_member_config_permission(ctx.author, "slowmode_allowed_roles")
-    else:
-        return ctx.channel.permissions_for(ctx.author).manage_channels
-
-
-async def can_clear(ctx: MyContext) -> bool:
-    """Check if someone can use clear"""
-    if ctx.bot.database_online:
-        return await ctx.bot.get_cog("ServerConfig").check_member_config_permission(ctx.author, "clear_allowed_roles")
-    else:
-        return ctx.channel.permissions_for(ctx.author).manage_messages
-
-
 async def has_admin(ctx: MyContext) -> bool:
     """Check if someone can see the banlist"""
     return ctx.channel.permissions_for(ctx.author).administrator or await ctx.bot.get_cog("Admin").check_if_god(ctx)

@@ -614,13 +614,9 @@ Permissions for using this command are the same as for the kick
         if not interaction.guild.me.guild_permissions.ban_members:
             await interaction.response.send_message(await self.bot._(interaction, "moderation.ban.cant-ban"), ephemeral=True)
             return
-        async def user_can_kick(user):
-            try:
-                await self.bot.get_cog("ServerConfig").check_member_config_permission(user, "kick_allowed_roles")
-                return
-            except commands.errors.CommandError:
-                pass
-            return False
+        async def user_can_kick(user: discord.Member):
+            return user.guild_permissions.kick_members
+
         if user == interaction.guild.me or (self.bot.database_online and await user_can_kick(user)):
             await interaction.response.send_message(
                 await self.bot._(interaction, "moderation.kick.cant-staff"), ephemeral=True
