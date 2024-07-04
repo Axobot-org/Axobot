@@ -25,9 +25,9 @@ class YoutubeRSS:
     def __init__(self, bot: Axobot):
         self.bot = bot
         self.min_time_between_posts = 120 # seconds
-        self.search_service = Service(5, bot.others['google_api'])
+        self.search_service = Service(5, bot.others["google_api"])
         self.url_pattern = re.compile(
-            r'(?:https?://)?(?:www\.|m\.)?(?:youtube\.com|youtu\.be)/(?:channel/|user/|c/)?@?([^/\s?]+).*$'
+            r"(?:https?://)?(?:www\.|m\.)?(?:youtube\.com|youtu\.be)/(?:channel/|user/|c/)?@?([^/\s?]+).*$"
         )
         self.cookies = {
             "CONSENT": "YES+cb.20240421-07-p1.fr+FX+785"
@@ -98,7 +98,7 @@ class YoutubeRSS:
     async def _get_feed_list(self, channel_id: str, filter_config: FeedFilterConfig | None=None,
                              session: aiohttp.ClientSession | None=None) -> list[FeedParserDict]:
         "Get the feed list from a youtube channel"
-        url = 'https://www.youtube.com/feeds/videos.xml?channel_id='+channel_id
+        url = "https://www.youtube.com/feeds/videos.xml?channel_id="+channel_id
         feed = await feed_parse(url, 7, session)
         if feed is None or not feed.entries:
             return []
@@ -116,17 +116,17 @@ class YoutubeRSS:
             return await self.bot._(channel, "rss.nothing")
         entry = entries[0]
         img_url = None
-        if 'media_thumbnail' in entry and len(entry['media_thumbnail']) > 0:
-            img_url = entry['media_thumbnail'][0]['url']
+        if "media_thumbnail" in entry and len(entry["media_thumbnail"]) > 0:
+            img_url = entry["media_thumbnail"][0]["url"]
         post_text = await get_text_from_entry(entry)
         return RssMessage(
             bot=self.bot,
             feed=FeedObject.unrecorded("yt", channel.guild.id if channel.guild else None, channel.id),
-            url=entry['link'],
-            title=entry['title'],
-            date=entry['published_parsed'],
-            author=entry['author'],
-            channel=entry['author'],
+            url=entry["link"],
+            title=entry["title"],
+            date=entry["published_parsed"],
+            author=entry["author"],
+            channel=entry["author"],
             image=img_url,
             post_text=post_text
         )
@@ -148,17 +148,17 @@ class YoutubeRSS:
                 # we know we can break because entries are sorted by most recent first
                 break
             img_url = None
-            if 'media_thumbnail' in entry and len(entry['media_thumbnail']) > 0:
-                img_url = entry['media_thumbnail'][0]['url']
+            if "media_thumbnail" in entry and len(entry["media_thumbnail"]) > 0:
+                img_url = entry["media_thumbnail"][0]["url"]
             post_text = await get_text_from_entry(entry)
             obj = RssMessage(
                 bot=self.bot,
                 feed=FeedObject.unrecorded("yt", channel.guild.id if channel.guild else None, channel.id),
-                url=entry['link'],
-                title=entry['title'],
+                url=entry["link"],
+                title=entry["title"],
                 date=entry_date,
-                author=entry['author'],
-                channel=entry['author'],
+                author=entry["author"],
+                channel=entry["author"],
                 image=img_url,
                 post_text=post_text
             )

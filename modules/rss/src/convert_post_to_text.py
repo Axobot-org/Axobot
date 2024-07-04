@@ -12,7 +12,7 @@ async def get_text_from_entry(entry: dict) -> str | None:
         if "summary_detail" not in entry:
             return entry["summary"]
         return await convert_post_to_text(entry["summary"], entry["summary_detail"]["type"])
-    log.error("No content or summary in entry for article %s", entry['link'])
+    log.error("No content or summary in entry for article %s", entry["link"])
     return None
 
 async def get_summary_from_entry(entry: dict) -> str | None:
@@ -21,7 +21,7 @@ async def get_summary_from_entry(entry: dict) -> str | None:
         if "summary_detail" not in entry:
             return entry["summary"]
         return await convert_post_to_text(entry["summary"], entry["summary_detail"]["type"])
-    log.warning("No summary in entry (or summary is same than content) for article %s", entry['link'])
+    log.warning("No summary in entry (or summary is same than content) for article %s", entry["link"])
     return None
 
 async def convert_post_to_text(post: str, post_type: str) -> str | None:

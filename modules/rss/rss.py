@@ -154,7 +154,7 @@ class Rss(commands.Cog):
         else:
             form = await self.bot._(interaction, "rss.yt-form-last")
             obj = await text.create_msg(form)
-            if isinstance(obj,discord.Embed):
+            if isinstance(obj, discord.Embed):
                 await interaction.followup.send(embed=obj)
             else:
                 await interaction.followup.send(obj)
@@ -205,7 +205,7 @@ class Rss(commands.Cog):
         else:
             form = await self.bot._(interaction, "rss.web-form-last")
             obj = await text.create_msg(form)
-            if isinstance(obj,discord.Embed):
+            if isinstance(obj, discord.Embed):
                 await interaction.followup.send(embed=obj)
             else:
                 await interaction.followup.send(obj)
@@ -269,7 +269,8 @@ class Rss(commands.Cog):
             await interaction.followup.send(await self.bot._(interaction, "rss.invalid-link"))
             return
         if feed_type is None or not await self.check_rss_url(link):
-            return await interaction.followup.send(await self.bot._(interaction, "rss.invalid-flow"))
+            await interaction.followup.send(await self.bot._(interaction, "rss.invalid-flow"))
+            return
         destination_channel = channel or interaction.channel
         try:
             feed_id = await self.db_add_feed(interaction.guild_id, destination_channel.id, feed_type, identifiant)
@@ -826,7 +827,7 @@ class Rss(commands.Cog):
                 self.bot.dispatch("error", err, interaction)
             return
         for feed in feeds_ids:
-            await self.db_update_feed(feed, [("channel",channel.id)])
+            await self.db_update_feed(feed, [("channel", channel.id)])
         await interaction.followup.send(
             await self.bot._(interaction, "rss.move-success", count=len(feeds_ids), channel=channel.mention)
         )

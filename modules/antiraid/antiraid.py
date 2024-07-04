@@ -41,7 +41,7 @@ class AntiRaid(commands.Cog):
         if not await self.bot.get_config(msg.guild, "anti_caps_lock"):
             return
         clean_content = msg.content
-        for rgx_match in (r'\|', r'\*', r'_', r'<a?:\w+:\d+>', r'<(#|@&?!?)\d+>', r'https?://\w+\.\S+'):
+        for rgx_match in (r'\|', r'\*', r'_', r"<a?:\w+:\d+>", r"<(#|@&?!?)\d+>", r"https?://\w+\.\S+"):
             clean_content = re.sub(rgx_match, '', clean_content)
         clean_content = clean_content.replace(' ', '')
         if len(clean_content) < 8:
@@ -88,7 +88,7 @@ class AntiRaid(commands.Cog):
         # Level 4
         if level >= 4:
             if account_created_since <= 86400: # kick accounts created less than 1d before
-                if await self.kick(member,await self.bot._(member.guild.id,"logs.reason.young")):
+                if await self.kick(member, await self.bot._(member.guild.id,"logs.reason.young")):
                     self.bot.dispatch("antiraid_kick", member, {"account_creation_treshold": 86400})
                     return True
             if account_created_since <= 3600 and can_ban: # ban (2w) members created less than 1h before
@@ -110,7 +110,7 @@ class AntiRaid(commands.Cog):
         # Level 3 or more
         if level >= 3 and can_ban:
             # ban (1w) members with invitations in their nickname
-            if self.bot.get_cog('Utilities').sync_check_discord_invite(member.display_name) is not None:
+            if self.bot.get_cog("Utilities").sync_check_discord_invite(member.display_name) is not None:
                 duration = timedelta(days=7)
                 if await self.ban(member, await self.bot._(member.guild.id,"logs.reason.invite"), duration):
                     self.bot.dispatch("antiraid_ban", member, {
@@ -138,7 +138,7 @@ class AntiRaid(commands.Cog):
                     return True
         # Level 1 or more
         if level >= 1: # kick members with invitations in their nickname
-            if self.bot.get_cog('Utilities').sync_check_discord_invite(member.display_name) is not None:
+            if self.bot.get_cog("Utilities").sync_check_discord_invite(member.display_name) is not None:
                 if await self.kick(member, await self.bot._(member.guild.id,"logs.reason.invite")):
                     self.bot.dispatch("antiraid_kick", member, {"discord_invite": True})
                     return True
@@ -182,7 +182,7 @@ class AntiRaid(commands.Cog):
         except discord.HTTPException:
             return False
         if duration:
-            await self.bot.task_handler.add_task('ban', duration.total_seconds(), member.id, member.guild.id)
+            await self.bot.task_handler.add_task("ban", duration.total_seconds(), member.id, member.guild.id)
         return True
 
     async def timeout(self, member: discord.Member, reason: str, duration: timedelta):

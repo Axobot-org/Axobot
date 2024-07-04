@@ -27,8 +27,8 @@ async def is_support_staff(ctx: MyContext | discord.Interaction) -> bool:
     if user.id in admins_id:
         return True
     bot = ctx.bot if isinstance(ctx, commands.Context) else ctx.client
-    if UsersCog := bot.get_cog('Users'):
-        return await UsersCog.has_userflag(user, 'support')
+    if UsersCog := bot.get_cog("Users"):
+        return await UsersCog.has_userflag(user, "support")
     server = bot.get_guild(SUPPORT_GUILD_ID.id)
     if server is not None:
         member = server.get_member(user.id)
@@ -97,34 +97,34 @@ async def has_manage_msg(ctx: MyContext) -> bool:
 
 async def has_manage_guild(ctx: MyContext) -> bool:
     """... if someone can manage the server"""
-    return ctx.channel.permissions_for(ctx.author).manage_guild or await ctx.bot.get_cog('Admin').check_if_god(ctx)
+    return ctx.channel.permissions_for(ctx.author).manage_guild or await ctx.bot.get_cog("Admin").check_if_god(ctx)
 
 async def has_audit_logs(ctx: MyContext) -> bool:
     """... if someone can see server audit logs"""
-    return ctx.channel.permissions_for(ctx.author).view_audit_log or await ctx.bot.get_cog('Admin').check_if_god(ctx)
+    return ctx.channel.permissions_for(ctx.author).view_audit_log or await ctx.bot.get_cog("Admin").check_if_god(ctx)
 
 async def has_manage_roles(ctx: MyContext) -> bool:
     """... if someone can manage the roles"""
-    return ctx.channel.permissions_for(ctx.author).manage_roles or await ctx.bot.get_cog('Admin').check_if_god(ctx)
+    return ctx.channel.permissions_for(ctx.author).manage_roles or await ctx.bot.get_cog("Admin").check_if_god(ctx)
 
 
 async def has_manage_nicknames(ctx: MyContext) -> bool:
     """... if someone can change nicknames"""
-    return ctx.channel.permissions_for(ctx.author).manage_nicknames or await ctx.bot.get_cog('Admin').check_if_god(ctx)
+    return ctx.channel.permissions_for(ctx.author).manage_nicknames or await ctx.bot.get_cog("Admin").check_if_god(ctx)
 
 async def has_manage_channels(ctx: MyContext) -> bool:
     """... if someone can manage the guild channels"""
-    return ctx.channel.permissions_for(ctx.author).manage_channels or await ctx.bot.get_cog('Admin').check_if_god(ctx)
+    return ctx.channel.permissions_for(ctx.author).manage_channels or await ctx.bot.get_cog("Admin").check_if_god(ctx)
 
 async def has_manage_expressions(ctx: MyContext) -> bool:
     """... if someone can change nicknames"""
-    return ctx.channel.permissions_for(ctx.author).manage_expressions or await ctx.bot.get_cog('Admin').check_if_god(ctx)
+    return ctx.channel.permissions_for(ctx.author).manage_expressions or await ctx.bot.get_cog("Admin").check_if_god(ctx)
 
 async def has_embed_links(ctx: MyContext) -> bool:
     """... if someone can send embeds"""
     if not isinstance(ctx.author, discord.Member):
         return True
-    return ctx.channel.permissions_for(ctx.author).embed_links or await ctx.bot.get_cog('Admin').check_if_god(ctx)
+    return ctx.channel.permissions_for(ctx.author).embed_links or await ctx.bot.get_cog("Admin").check_if_god(ctx)
 
 
 class CannotSendEmbed(commands.CommandError):
@@ -185,7 +185,7 @@ async def is_voice_message(interaction: discord.Interaction):
         raise NotAVoiceMessageError()
     message = list(messages.values())[0]
     flags = discord.MessageFlags()
-    flags.value = message.get('flags', 0)
+    flags.value = message.get("flags", 0)
     if not flags.voice:
         raise NotAVoiceMessageError()
     return True

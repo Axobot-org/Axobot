@@ -14,7 +14,7 @@ class Bitly(commands.Cog):
     def __init__(self, bot: Axobot):
         self.bot = bot
         self.file = "bitly"
-        self.bitly_client = bitly_api.Bitly(api_key=self.bot.others['bitly'])
+        self.bitly_client = bitly_api.Bitly(api_key=self.bot.others["bitly"])
 
     bitly_main = app_commands.Group(
         name="bitly",
@@ -30,8 +30,9 @@ class Bitly(commands.Cog):
         ..Example bitly create https://fr-minecraft.net
 
         ..Doc miscellaneous.html#bitly-urls"""
-        if url.domain == 'bit.ly':
-            return await interaction.response.send_message(await self.bot._(interaction, "info.bitly_already_shortened"))
+        if url.domain == "bit.ly":
+            await interaction.response.send_message(await self.bot._(interaction, "info.bitly_already_shortened"))
+            return
         await interaction.response.defer()
         shortened_url = self.bitly_client.shorten_url(url.url)
         await interaction.followup.send(await self.bot._(interaction, "info.bitly_short", url=shortened_url))
@@ -45,8 +46,9 @@ class Bitly(commands.Cog):
         ..Example bitly find https://bit.ly/2JEHsUf
 
         ..Doc miscellaneous.html#bitly-urls"""
-        if url.domain != 'bit.ly':
-            return await interaction.response.send_message(await self.bot._(interaction, "info.bitly_nobit"))
+        if url.domain != "bit.ly":
+            await interaction.response.send_message(await self.bot._(interaction, "info.bitly_nobit"))
+            return
         await interaction.response.defer()
         expanded_url = self.bitly_client.expand_url(url.url)
         await interaction.followup.send(await self.bot._(interaction, "info.bitly_long", url=expanded_url))

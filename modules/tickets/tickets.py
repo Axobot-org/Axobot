@@ -48,7 +48,7 @@ class Tickets(commands.Cog):
             if len(custom_ids) != 3 or custom_ids[0] != str(interaction.guild_id) or custom_ids[1] != "tickets":
                 # unknown custom id
                 return
-            topic_id: int = int(interaction.data['values'][0])
+            topic_id: int = int(interaction.data["values"][0])
             topic = await self.db_get_topic_with_defaults(interaction.guild_id, topic_id)
             if topic is None:
                 if topic_id == -1 and await self.db_get_guild_default_id(interaction.guild_id) is None:
@@ -57,19 +57,19 @@ class Tickets(commands.Cog):
             if topic is None:
                 await interaction.response.send_message(await self.bot._(interaction.guild_id, "errors.unknown"), ephemeral=True)
                 raise RuntimeError(f"No topic found on guild {interaction.guild_id} with ID {topic_id}")
-            if topic['category'] is None:
+            if topic["category"] is None:
                 cmd = await self.bot.get_command_mention("tickets portal set-category")
                 await interaction.response.send_message(
                     await self.bot._(interaction.guild_id, "tickets.missing-category-config", set_category=cmd),
                     ephemeral=True
                 )
                 return
-            if topic['hint']:
+            if topic["hint"]:
                 hint_view = SendHintText(interaction.user.id,
                     await self.bot._(interaction.guild_id, "tickets.hint-useless"),
                     await self.bot._(interaction.guild_id, "tickets.hint-useful"),
                     await self.bot._(interaction.guild_id, "tickets.cancelled"))
-                embed = discord.Embed(color=discord.Color.green(), title=topic['topic'], description=topic['hint'])
+                embed = discord.Embed(color=discord.Color.green(), title=topic["topic"], description=topic["hint"])
                 await interaction.response.send_message(embed=embed, view=hint_view, ephemeral=True)
                 await hint_view.wait()
                 if hint_view.confirmed is None:
@@ -94,7 +94,7 @@ class Tickets(commands.Cog):
                 AskTitleModal(interaction.guild.id, topic, modal_title, modal_label, modal_placeholder, self.create_ticket)
             )
         except Exception as err: # pylint: disable=broad-except
-            self.bot.dispatch('error', err, f"when creating a ticket in guild {interaction.guild_id}")
+            self.bot.dispatch("error", err, f"when creating a ticket in guild {interaction.guild_id}")
 
     async def db_get_topics(self, guild_id: int) -> list[DBTopicRow]:
         "Fetch the topics associated to a guild"
@@ -125,7 +125,7 @@ class Tickets(commands.Cog):
         async with self.bot.db_query(query, (guild_id, self.bot.beta), fetchone=True) as db_query:
             if not db_query:
                 return None
-            return db_query['id']
+            return db_query["id"]
 
     async def db_set_guild_default_id(self, guild_id: int) -> int:
         "Create a new row for default guild setup"
@@ -145,7 +145,7 @@ class Tickets(commands.Cog):
 
     async def db_delete_topics(self, guild_id: int, topic_ids: list[int]) -> int:
         "Delete multiple topics from a guild"
-        topic_ids = ', '.join(map(str, topic_ids))
+        topic_ids = ", ".join(map(str, topic_ids))
         query = f"DELETE FROM `tickets` WHERE `guild_id` = %s AND id IN ({topic_ids}) AND `beta` = %s"
         async with self.bot.db_query(query, (guild_id, self.bot.beta), returnrowcount=True) as db_query:
             return db_query
@@ -224,7 +224,7 @@ class Tickets(commands.Cog):
         title = await self.bot._(interaction.guild_id, "tickets.ticket-introduction.title")
         desc = await self.bot._(interaction.guild_id, "tickets.ticket-introduction.description",
                                 user=interaction.user.mention,
-                                ticket_name=ticket_name, topic_name=topic['topic']
+                                ticket_name=ticket_name, topic_name=topic["topic"]
                                 )
         return discord.Embed(title=title, description=desc, color=discord.Color.green())
 
@@ -237,7 +237,7 @@ class Tickets(commands.Cog):
         permissions[user] = discord.PermissionOverwrite(send_messages=True, read_messages=True)
         permissions[channel.guild.me] = discord.PermissionOverwrite(send_messages=True, read_messages=True)
         # set for the staff
-        if (role_id := topic.get('role')) and (role := channel.guild.get_role(role_id)):
+        if (role_id := topic.get("role")) and (role := channel.guild.get_role(role_id)):
             permissions[role] = discord.PermissionOverwrite(
                 send_messages=True,
                 read_messages=True,
@@ -249,7 +249,7 @@ class Tickets(commands.Cog):
     async def setup_ticket_thread(self, thread: discord.Thread, topic: dict, user: discord.Member):
         "Add the required members to a Discord thread ticket"
         mentions = [thread.guild.me.mention, user.mention]
-        if (role_id := topic.get('role')) and (role := thread.guild.get_role(role_id)):
+        if (role_id := topic.get("role")) and (role := thread.guild.get_role(role_id)):
             mentions.append(role.mention)
         # sneaky tactic to add a lot of people:
         # send an empty message (to avoid notifying them)
@@ -271,10 +271,10 @@ class Tickets(commands.Cog):
                                topic: dict, ticket_name: str) -> str:
         "Build the correct channel name for a new ticket"
         channel_name = name_format or self.default_name_format
-        if isinstance(topic['topic_emoji'], str) and ':' in topic['topic_emoji']:
+        if isinstance(topic["topic_emoji"], str) and ':' in topic["topic_emoji"]:
             emoji: str = topic["topic_emoji"].split(':')[0]
         else:
-            emoji = topic['topic_emoji']
+            emoji = topic["topic_emoji"]
         if topic["topic"] is None:
             topic_name = await self.bot._(interaction.guild_id, "tickets.other")
         else:
@@ -291,12 +291,12 @@ class Tickets(commands.Cog):
         "Create the ticket once the user has provided every required info"
         # update cooldown
         self.cooldowns[interaction.user] = time.time()
-        category = interaction.guild.get_channel(topic['category'])
+        category = interaction.guild.get_channel(topic["category"])
         if category is None:
             self.bot.dispatch("server_warning", ServerWarningType.TICKET_CREATION_UNKNOWN_TARGET,
                 interaction.guild,
-                channel_id=topic['category'],
-                topic_name=topic['topic']
+                channel_id=topic["category"],
+                topic_name=topic["topic"]
             )
             raise RuntimeError(f"No category configured for guild {interaction.guild_id} and topic {topic['topic']}")
         sent_error = False
@@ -314,7 +314,7 @@ class Tickets(commands.Cog):
                 self.bot.dispatch("server_warning", ServerWarningType.TICKET_CREATION_FAILED,
                     interaction.guild,
                     channel=category,
-                    topic_name=topic['topic']
+                    topic_name=topic["topic"]
                 )
                 return
         elif isinstance(category, discord.TextChannel):
@@ -335,7 +335,7 @@ class Tickets(commands.Cog):
                 self.bot.dispatch("server_warning", ServerWarningType.TICKET_CREATION_FAILED,
                     interaction.guild,
                     channel=category,
-                    topic_name=topic['topic']
+                    topic_name=topic["topic"]
                 )
                 return
             await self.setup_ticket_thread(channel, topic, interaction.user)
@@ -343,8 +343,8 @@ class Tickets(commands.Cog):
             self.log.error("Unknown channel or category type: %s", type(category))
             return
         self.log.debug("Created channel/thread %s", channel.id)
-        topic['topic'] = topic['topic'] or await self.bot._(interaction.guild_id, "tickets.other")
-        txt: str = await self.bot._(interaction.guild_id, "tickets.ticket-created", channel=channel.mention, topic=topic['topic'])
+        topic["topic"] = topic["topic"] or await self.bot._(interaction.guild_id, "tickets.other")
+        txt: str = await self.bot._(interaction.guild_id, "tickets.ticket-created", channel=channel.mention, topic=topic["topic"])
         if sent_error:
             await interaction.followup.send(txt, ephemeral=True)
         else:
@@ -750,20 +750,20 @@ If that still doesn't work, please create your ticket
         "List every ticket topic used in your server"
         await interaction.response.defer()
         topics_repr: list[str] = []
-        none_emoji: str = self.bot.emojis_manager.customs['nothing']
+        none_emoji: str = self.bot.emojis_manager.customs["nothing"]
         topics = await self.db_get_topics(interaction.guild_id)
         # make sure an "other" topic exists
         if await self.db_get_guild_default_id(interaction.guild_id) is None:
             await self.db_set_guild_default_id(interaction.guild_id)
         topics.append(await self.db_get_defaults(interaction.guild_id))
         for topic in topics:
-            name = topic['topic'] or await self.bot._(interaction, "tickets.other")
-            if topic['topic_emoji']:
-                emoji = discord.PartialEmoji.from_str(topic['topic_emoji'])
+            name = topic["topic"] or await self.bot._(interaction, "tickets.other")
+            if topic["topic_emoji"]:
+                emoji = discord.PartialEmoji.from_str(topic["topic_emoji"])
                 topics_repr.append(f"{emoji} {name}")
             else:
                 topics_repr.append(f"{none_emoji} {name}")
-            if topic['role']:
+            if topic["role"]:
                 topics_repr[-1] += f" - <@&{topic['role']}>"
         title = await self.bot._(interaction, "tickets.topic.list")
         embed = discord.Embed(title=title, description="\n".join(topics_repr), color=discord.Color.blue())
@@ -815,7 +815,7 @@ If that still doesn't work, please create your ticket
             text: list[str] = []
             name = topic["topic"] if topic["topic"] else await self.bot._(interaction, "tickets.review.default")
             if topic["topic_emoji"]:
-                name = str(discord.PartialEmoji.from_str(topic['topic_emoji'])) + " " + name
+                name = str(discord.PartialEmoji.from_str(topic["topic_emoji"])) + " " + name
             if topic["role"]:
                 if role := interaction.guild.get_role(topic["role"]):
                     text.append(await field_value("role", role.mention))
@@ -872,7 +872,7 @@ If that still doesn't work, please create your ticket
         if topic["topic_emoji"]:
             emb.add_field(
                 name=await self.bot._(interaction, "tickets.review.emoji"),
-                value=discord.PartialEmoji.from_str(topic['topic_emoji']),
+                value=discord.PartialEmoji.from_str(topic["topic_emoji"]),
             )
         if topic["role"]:
             if role := interaction.guild.get_role(topic["role"]):

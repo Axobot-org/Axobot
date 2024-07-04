@@ -25,7 +25,7 @@ class RawPermissionValue(int):
     @classmethod
     async def convert(cls, _ctx: MyContext, argument: str):
         "Do the conversion"
-        if re.match(r'0b[0,1]+', argument):
+        if re.match(r"0b[0,1]+", argument):
             return int(argument[2:], 2)
         if not argument.isnumeric():
             raise InvalidRawPermissionError(argument)

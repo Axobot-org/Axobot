@@ -40,9 +40,9 @@ class AntiScam(commands.Cog):
         except FileNotFoundError:
             self.log.error("Failed to load the agent: file not found")
             self.agent = None
-        self.table = 'messages_beta'
+        self.table = "messages_beta"
         self.report_ctx_menu = app_commands.ContextMenu(
-            name='Report a scam',
+            name="Report a scam",
             callback=self.report_context_menu,
         )
         self.bot.tree.add_command(self.report_ctx_menu)
@@ -63,7 +63,7 @@ class AntiScam(commands.Cog):
                 query = "SELECT `domain`, `is_safe` FROM `spam-detection`.`websites`"
                 async with self.bot.db_query(query) as query_result:
                     for row in query_result:
-                        data[row['domain']] = row['is_safe']
+                        data[row["domain"]] = row["is_safe"]
                 self.agent.save_websites_locally(data)
                 self.log.info("Loaded %s domain names from database", len(data))
                 return
@@ -143,16 +143,16 @@ class AntiScam(commands.Cog):
         counter = 0
         cursor = self.bot.cnx_axobot.cursor()
         for msg in messages:
-            mentions_count = msg['mentions_count'] if msg['mentions_count'] > 0 else get_mentions_count(msg['message'])
-            normd_msg = normalize(msg['message'])
+            mentions_count = msg["mentions_count"] if msg["mentions_count"] > 0 else get_mentions_count(msg["message"])
+            normd_msg = normalize(msg["message"])
             edits = {
-                'normd_message': normd_msg,
-                'url_score': check_message(msg['message'], self.agent.websites_list),
-                'mentions_count': mentions_count,
-                'max_frequency': get_max_frequency(msg['message']),
-                'punctuation_count': get_punctuation_count(msg['message']),
-                'caps_percentage': round(get_caps_count(msg['message'])/len(msg['message']), 5),
-                'avg_word_len': round(get_avg_word_len(normd_msg), 3)
+                "normd_message": normd_msg,
+                "url_score": check_message(msg["message"], self.agent.websites_list),
+                "mentions_count": mentions_count,
+                "max_frequency": get_max_frequency(msg["message"]),
+                "punctuation_count": get_punctuation_count(msg["message"]),
+                "caps_percentage": round(get_caps_count(msg["message"])/len(msg["message"]), 5),
+                "avg_word_len": round(get_avg_word_len(normd_msg), 3)
             }
             if all(value == msg[k] for k, value in edits.items()):
                 # avoid updating rows with no new information
@@ -160,7 +160,7 @@ class AntiScam(commands.Cog):
             edits = {k: v for k, v in edits.items() if v != msg[k]}
             counter += 1
             query = f"UPDATE `spam-detection`.`{table}` SET {', '.join(f'{k}=%s' for k in edits)} WHERE id=%s"
-            params = list(edits.values()) + [msg['id']]
+            params = list(edits.values()) + [msg["id"]]
             # print(cur.mogrify(query, params))
             cursor.execute(query, params)
         self.bot.cnx_axobot.commit()
@@ -174,7 +174,7 @@ class AntiScam(commands.Cog):
                             color=int(EMBED_COLORS[status][1:], 16)
                             )
         emb.set_footer(
-            text=f'Sent by {author} • ID {row_id}',
+            text=f"Sent by {author} • ID {row_id}",
             icon_url=author.display_avatar
         )
         emb.add_field(name="Status", value=status.title())
@@ -182,7 +182,7 @@ class AntiScam(commands.Cog):
             pred_title = self.agent.categories[predicted.result].title()
             pred_value = round(predicted.probabilities[predicted.result]*100, 2)
             emb.add_field(name=f"According to {self.bot.user.display_name}",
-                          value=f'{pred_title} ({pred_value}%)')
+                          value=f"{pred_title} ({pred_value}%)")
         return emb
 
     async def send_report(self, message_author: discord.User, row_id: int, msg: Message):
@@ -197,7 +197,7 @@ class AntiScam(commands.Cog):
         emb.set_field_at(0, name=emb.fields[0].name, value=new_status.title())
         emb.color = int(EMBED_COLORS[new_status][1:], 16)
         await message.edit(embed=emb)
-        if new_status == 'deleted':
+        if new_status == "deleted":
             await message.delete(delay=3)
 
     async def get_messages_list(self):
@@ -208,18 +208,18 @@ class AntiScam(commands.Cog):
         data: list[Message] = []
         async with self.bot.db_query(query) as query_results:
             for row in query_results:
-                if len(row['message'].split(" ")) > 2:
+                if len(row["message"].split(" ")) > 2:
                     data.append(Message(
-                        row['message'],
-                        row['normd_message'],
-                        row['contains_everyone'],
-                        row['url_score'],
-                        row['mentions_count'],
-                        row['max_frequency'],
-                        row['punctuation_count'],
-                        row['caps_percentage'],
-                        row['avg_word_len'],
-                        row['category']-1)
+                        row["message"],
+                        row["normd_message"],
+                        row["contains_everyone"],
+                        row["url_score"],
+                        row["mentions_count"],
+                        row["max_frequency"],
+                        row["punctuation_count"],
+                        row["caps_percentage"],
+                        row["avg_word_len"],
+                        row["category"]-1)
                     )
         return data
 
@@ -304,9 +304,9 @@ class AntiScam(commands.Cog):
                               report_author: discord.Member | None, source_msg: discord.Message | None):
         msg = Message.from_raw(content, mentions_count, self.agent.websites_list)
         if guild_id:
-            msg.contains_everyone = f'<@&{guild_id}>' in content or '@everyone' in content
+            msg.contains_everyone = f"<@&{guild_id}>" in content or "@everyone" in content
         else:
-            msg.contains_everyone = '@everyone' in content
+            msg.contains_everyone = "@everyone" in content
         msg_id = await self.db_insert_msg(msg)
         await self.send_report(message_author, msg_id, msg)
         if report_author and source_msg:
@@ -375,10 +375,10 @@ class AntiScam(commands.Cog):
         msg_id = int(msg_id)
         if not interaction.response.is_done():
             await interaction.response.defer()
-        if action == 'delete':
+        if action == "delete":
             if await self.db_delete_msg(msg_id):
                 await interaction.followup.send("This record has successfully been deleted", ephemeral=True)
-                await self.edit_report_message(interaction.message, 'deleted')
+                await self.edit_report_message(interaction.message, "deleted")
                 return
         elif action in ("harmless", "scam", "insults", "raid", "spam"):
             if await self.db_update_msg(msg_id, action):

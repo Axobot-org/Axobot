@@ -33,7 +33,7 @@ from googleapiclient.discovery import Resource
 from googleapiclient.errors import HttpError
 
 program = os.path.basename(sys.argv[0])
-VER_DATE = '0.1 2020-07-25 11:23'  # $ date +'%F %R'
+VER_DATE = "0.1 2020-07-25 11:23"  # $ date +"%F %R"
 
 
 def error(msg: str, *args):
@@ -55,10 +55,10 @@ def print_list(lst: Iterable, name: str = None, newline=False):
     "Print a list of any object in the console"
     if len(lst) > 0:
         if newline:
-            print('\n')
+            print("\n")
         if name:
             print(name)
-        print('\n'.join(lst))
+        print("\n".join(lst))
 
 
 class Text:
@@ -87,8 +87,7 @@ class Service:
     from googleapiclient.discovery import build
 
     def __init__(self, max_results, app_key):
-        self.youtube: Resource = Service.build(
-            'youtube', 'v3', developerKey=app_key)
+        self.youtube: Resource = Service.build("youtube", "v3", developerKey=app_key)
         self.max_results = max_results
 
     def search_term(self, term, search_type=None) -> tuple[list[str], list[str], list[str]]:
@@ -96,31 +95,31 @@ class Service:
         resp = self.youtube.search().list(  # pylint: disable=no-member
             q=term,
             type=search_type,
-            part='id,snippet',
-            fields='items(id,snippet(title))',
+            part="id,snippet",
+            fields="items(id,snippet(title))",
             maxResults=self.max_results
         ).execute()
 
-        items = resp['items']
+        items = resp["items"]
         if len(items) > self.max_results:
-            warn('more than %d results found when querying search API (%s results)', self.max_results, len(items))
+            warn("more than %d results found when querying search API (%s results)", self.max_results, len(items))
             items = items[:self.max_results]
 
         res = [], [], []
 
         for item in items:
-            k = item['id']['kind']
-            if k == 'youtube#video':
-                i, k = 0, 'videoId'
-            elif k == 'youtube#channel':
-                i, k = 1, 'channelId'
-            elif k == 'youtube#playlist':
-                i, k = 2, 'playlistId'
+            k = item["id"]["kind"]
+            if k == "youtube#video":
+                i, k = 0, "videoId"
+            elif k == "youtube#channel":
+                i, k = 1, "channelId"
+            elif k == "youtube#playlist":
+                i, k = 2, "playlistId"
             else:
                 assert False
 
-            res[i].append('%s: %s' % (
-                item['id'][k], item['snippet']['title']))
+            res[i].append("%s: %s" % (
+                item["id"][k], item["snippet"]["title"]))
 
         return res
 
@@ -128,38 +127,38 @@ class Service:
         "Search for a channel ID from a given custom identifier"
         resp = self.youtube.search().list(  # pylint: disable=no-member
             q=url,
-            part='id',
-            type='channel',
-            fields='items(id(kind,channelId))',
+            part="id",
+            type="channel",
+            fields="items(id(kind,channelId))",
             maxResults=self.max_results
         ).execute()
 
-        items = resp['items']
+        items = resp["items"]
         assert len(items) <= self.max_results
 
         channels = []
         for item in items:
-            assert item['id']['kind'] == 'youtube#channel'
-            channels.append(item['id']['channelId'])
+            assert item["id"]["kind"] == "youtube#channel"
+            channels.append(item["id"]["channelId"])
 
         if len(channels) == 0:
             return None
 
         resp = self.youtube.channels().list(  # pylint: disable=no-member
             id=','.join(channels),
-            part='id,snippet',
-            fields='items(id,snippet(customUrl))',
+            part="id,snippet",
+            fields="items(id,snippet(customUrl))",
             maxResults=len(channels)
         ).execute()
 
-        items = resp['items']
+        items = resp["items"]
         assert len(items) <= len(channels)
 
         for item in items:
-            cust = item['snippet'].get('customUrl')
+            cust = item["snippet"].get("customUrl")
             if cust is not None and Text.casefold_equal(cust, url):
-                assert item['id'] is not None
-                return item['id']
+                assert item["id"] is not None
+                return item["id"]
 
         return None
 
@@ -167,18 +166,18 @@ class Service:
         "Search for a channel ID from a given username"
         resp = self.youtube.channels().list(  # pylint: disable=no-member
             forUsername=user,
-            part='id',
-            fields='items(id)',
+            part="id",
+            fields="items(id)",
             maxResults=1
         ).execute()
 
-        # stev: 'items' may be absent
-        items = resp.get('items', [])
+        # stev: "items" may be absent
+        items = resp.get("items", [])
         assert len(items) <= 1
 
         for item in items:
-            assert item['id'] is not None
-            return item['id']
+            assert item["id"] is not None
+            return item["id"]
 
         return None
 
@@ -186,36 +185,36 @@ class Service:
         "Search for a custom URL from a given channel identifier"
         resp = self.youtube.channels().list(  # pylint: disable=no-member
             id=channel_id,
-            part='snippet',
-            fields='items(snippet(customUrl))',
+            part="snippet",
+            fields="items(snippet(customUrl))",
             maxResults=1
         ).execute()
 
-        # stev: 'items' may be absent
-        items = resp.get('items', [])
+        # stev: "items" may be absent
+        items = resp.get("items", [])
         assert len(items) <= 1
 
         for item in items:
-            if 'customUrl' in item['snippet']:
-                return item['snippet']['customUrl']
+            if "customUrl" in item["snippet"]:
+                return item["snippet"]["customUrl"]
         return None
 
     def query_channel_title(self, channel_id: str) -> str | None:
         "Search for a custom URL from a given channel identifier"
         resp = self.youtube.channels().list(  # pylint: disable=no-member
             id=channel_id,
-            part='snippet',
-            fields='items(snippet(title))',
+            part="snippet",
+            fields="items(snippet(title))",
             maxResults=1
         ).execute()
 
-        # stev: 'items' may be absent
-        items = resp.get('items', [])
+        # stev: "items" may be absent
+        items = resp.get("items", [])
         assert len(items) <= 1
 
         for item in items:
-            if 'title' in item['snippet']:
-                return item['snippet']['title']
+            if "title" in item["snippet"]:
+                return item["snippet"]["title"]
         return None
 
 
@@ -226,9 +225,9 @@ def service_func(func):
         try:
             return func(*arg, **kwd)
         except HttpError as err:
-            error('HTTP error: %s', err)
+            error("HTTP error: %s", err)
         except GoogleAuthError as err:
-            error('Google auth error: %s', err)
+            error("Google auth error: %s", err)
         return None
 
     return wrapper
@@ -248,9 +247,9 @@ class Act:
 
         result_type = not opts.type or None
 
-        print_list(videos, result_type and 'Videos')
-        print_list(channels, result_type and 'Channels', bool(videos))
-        print_list(playlists, result_type and 'Playlists', bool(videos) or bool(channels))
+        print_list(videos, result_type and "Videos")
+        print_list(channels, result_type and "Channels", bool(videos))
+        print_list(playlists, result_type and "Playlists", bool(videos) or bool(channels))
 
     @staticmethod
     @service_func
@@ -262,19 +261,18 @@ class Act:
 
         lowered_name = name.lower().replace(' ', '_')
         arg: str = getattr(opts, lowered_name)
-        result: str | None = getattr(service, 'find_channel_by_' + lowered_name)(arg)
+        result: str | None = getattr(service, "find_channel_by_" + lowered_name)(arg)
 
         if result is None:
-            error('%s "%s": no associated channel found',
-                name, arg)
+            error("%s \"%s\": no associated channel found", name, arg)
         else:
             print(result)
 
     find_channel_by_custom_url: Callable[[Namespace], None] = \
-        lambda opts: Act.find_channel(opts, 'custom URL')
+        lambda opts: Act.find_channel(opts, "custom URL")
 
     find_channel_by_user_name: Callable[[Namespace], None] = \
-        lambda opts: Act.find_channel(opts, 'user name')
+        lambda opts: Act.find_channel(opts, "user name")
 
     @staticmethod
     @service_func
@@ -319,8 +317,8 @@ def options():
         add_help=False)
     parser.error = error
 
-    STR = 'STR'  # pylint: disable=invalid-name
-    NUM = 'NUM'  # pylint: disable=invalid-name
+    STR = "STR"  # pylint: disable=invalid-name
+    NUM = "NUM"  # pylint: disable=invalid-name
 
     def uint(arg):
         "Define a positive or null integer type"
@@ -331,42 +329,42 @@ def options():
 
     # stev: action options:
     group = parser.add_mutually_exclusive_group(required = True)
-    group.add_argument('-s', '--search-term',
-        help = 'do search for the given term',
+    group.add_argument("-s", "--search-term",
+        help = "do search for the given term",
         metavar = STR, default = None)
-    group.add_argument('-c', '--custom-url',
-        help = 'do find the channel ID associated to the given custom URL',
+    group.add_argument("-c", "--custom-url",
+        help = "do find the channel ID associated to the given custom URL",
         metavar = STR, default = None)
-    group.add_argument('-u', '--user-name',
-        help = 'do find the channel ID associated to the given user name',
+    group.add_argument("-u", "--user-name",
+        help = "do find the channel ID associated to the given user name",
         metavar = STR, default = None)
-    group.add_argument('-l', '--channel-url',
-        help = 'do query the custom URL associated to the given channel',
+    group.add_argument("-l", "--channel-url",
+        help = "do query the custom URL associated to the given channel",
         metavar = STR, default = None)
     # stev: dependent options:
-    parser.add_argument('-t', '--type', choices = ('channel', 'playlist', 'video'),
-        help = 'restrict the search query to only retrieve the specified type of resource',
+    parser.add_argument("-t", "--type", choices = ("channel", "playlist", "video"),
+        help = "restrict the search query to only retrieve the specified type of resource",
         default = None)
-    parser.add_argument('-m', '--max-results', type = uint,
-        help = 'set the API endpoint parameter `maxResults\' to the given number (default: 10)',
+    parser.add_argument("-m", "--max-results", type = uint,
+        help = "set the API endpoint parameter `maxResults\' to the given number (default: 10)",
         metavar = NUM, default = 10)
-    parser.add_argument('-k', '--app-key',
-        help = 'YouTube Data API application key (default: $YOUTUBE_DATA_APP_KEY)',
+    parser.add_argument("-k", "--app-key",
+        help = "YouTube Data API application key (default: $YOUTUBE_DATA_APP_KEY)",
         metavar = STR, default = None)
     # stev: info options:
-    parser.add_argument('-v', '--version',
-        action = 'version', version = '%(prog)s: version ' + VER_DATE,
-        help = 'print version numbers and exit')
-    parser.add_argument('-h', '--help',
-        help = 'display this help info and exit',
-        action = 'help')
+    parser.add_argument("-v", "--version",
+        action = "version", version = "%(prog)s: version " + VER_DATE,
+        help = "print version numbers and exit")
+    parser.add_argument("-h", "--help",
+        help = "display this help info and exit",
+        action = "help")
 
     args = parser.parse_args()
 
     if args.app_key is None:
-        args.app_key = os.getenv('YOUTUBE_DATA_APP_KEY')
+        args.app_key = os.getenv("YOUTUBE_DATA_APP_KEY")
         if args.app_key is None:
-            error('application key not given')
+            error("application key not given")
 
     has_search_terms = bool(args.search_term)
     has_custom_name = bool(args.custom_url)
@@ -393,5 +391,5 @@ def main():
     opt.action(opt)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

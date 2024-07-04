@@ -17,7 +17,7 @@ class TicTacToe(commands.Cog):
 
     def __init__(self, bot: Axobot):
         self.bot = bot
-        self.file = 'tictactoe'
+        self.file = "tictactoe"
         self.in_game = {}
 
     @app_commands.command(name="tic-tac-toe")
@@ -65,16 +65,16 @@ class TicTacToe(commands.Cog):
 
         async def init_game(self):
             "Init the emojis used to play"
-            if self.bot.current_event == 'halloween':
+            if self.bot.current_event == "halloween":
                 self.emojis = ("🎃", ":bat:")
             elif self.bot.current_event == "christmas":
                 self.emojis = ("☃️", "🎄")
-            elif self.bot.current_event == 'fish':
+            elif self.bot.current_event == "fish":
                 self.emojis = ("🐟", "🐠")
             elif self.interaction.guild:
                 self.emojis = await self.bot.get_config(self.interaction.guild_id, "ttt_emojis")
             if len(self.emojis) < 2:
-                self.emojis = (':red_circle:', ':blue_circle:')
+                self.emojis = (":red_circle:", ":blue_circle:")
             # if the bot should start, play its turn
             if not self.is_user_turn:
                 await self.bot_turn()
@@ -189,7 +189,7 @@ class TicTacToe(commands.Cog):
             emb = discord.Embed(
                 title=await self.bot._(interaction, "bot_events.tictactoe.reward-title"),
                 description=await self.bot._(interaction, "bot_events.tictactoe.reward-desc", points=points),
-                color=cog.current_event_data['color'],
+                color=cog.current_event_data["color"],
             )
             emb.set_author(name=user.global_name, icon_url=user.display_avatar)
             await interaction.followup.send(embed=emb)

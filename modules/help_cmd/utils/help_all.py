@@ -18,7 +18,7 @@ def sort_by_name(cmd: discord.app_commands.Command):
 async def help_all_command(cog: "HelpCog", ctx: MyContext):
     "Show all commands and groups"
     send = await get_send_callback(ctx)
-    compress: bool = await cog.bot.get_config(ctx.guild.id, 'compress_help') if ctx.guild else False
+    compress: bool = await cog.bot.get_config(ctx.guild.id, "compress_help") if ctx.guild else False
     commands = cog.bot.tree.get_commands(guild=None, type=discord.AppCommandType.chat_input)
     fields = await all_commands(cog, ctx, commands, compress=compress)
     if ctx.guild is None:

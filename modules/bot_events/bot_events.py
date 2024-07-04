@@ -64,7 +64,7 @@ class BotEvents(commands.Cog):
     def update_current_event(self):
         "Update class attributes with the new/incoming bot events if needed"
         now = self.bot.utcnow()
-        with open("events-list.json", 'r', encoding='utf-8') as file:
+        with open("events-list.json", 'r', encoding="utf-8") as file:
             events = json.load(file)
         self.reset()
         for ev_id, ev_data in events.items():
@@ -104,7 +104,7 @@ class BotEvents(commands.Cog):
         self.update_current_event()
         event = self.bot.get_cog("BotEvents").current_event
         emb = discord.Embed(
-            description=f'**Bot event** updated (current event is {event})',
+            description=f"**Bot event** updated (current event is {event})",
             color=1406147, timestamp=self.bot.utcnow()
         )
         emb.set_author(name=self.bot.user, icon_url=self.bot.user.display_avatar)
@@ -201,7 +201,7 @@ class BotEvents(commands.Cog):
             if related_objective and (min_date := related_objective[0].get("min_date")):
                 parsed_date = datetime.datetime.strptime(min_date, "%Y-%m-%d").replace(tzinfo=datetime.UTC)
                 format_date = await FormatUtils.date(parsed_date, hour=False, seconds=False)
-                description += f" ({await self.bot._(interaction, 'bot_events.available-starting', date=format_date)})"
+                description += " (" + await self.bot._(interaction, "bot_events.available-starting", date=format_date) + ")"
             prices.append(f"- **{required_points} {points}:** {description}")
         return "\n".join(prices)
 

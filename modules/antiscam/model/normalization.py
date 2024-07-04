@@ -8,31 +8,31 @@ from nltk.corpus import stopwords
 
 UNICODE_EMOJI: dict[str, str] = get_aliases_unicode_dict()
 
-RE_EMAIL = re.compile(r'[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+')
+RE_EMAIL = re.compile(r"[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+")
 RE_WEB = re.compile(
-    r'https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#= ]{1,256}\.[ a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&/=]*)')
-RE_MONEY = re.compile(r'£|\$|€')
+    r"https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#= ]{1,256}\.[ a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&/=]*)")
+RE_MONEY = re.compile(r"£|\$|€")
 RE_PHONE = re.compile(
-    r'\D((?:(?:\+|00)33|0)\s*[\d](?:[\s.-]*\d{2}){4}|(?:0|\+?44)\s?(?:\d\s?){9,10}\d)(?!\d)')
-RE_NUMBER_DOT = re.compile(r'((?:\d{1,3}(?:,\d{3})*|\d+)(?:[\.]\d+)?)(?=\D|$)')
-RE_PUNCTUATION = re.compile(r'(?:[^\w\d\s]|_)+')
-RE_PUNCTUATION_NO_DOTS = re.compile(r'(?:[^\w\d\s\.\!\?]|_)+')
-RE_DOTS = re.compile(r'[\.\!\?]+')
-RE_MULTIPLE_WHITESPACES = re.compile(r'\s{2,}')
-RE_INDENTATION = re.compile(r'(?:^\s+)|(?:\s+$)', re.MULTILINE)
-RE_DISCORD_USER = re.compile(r'<@!?\d{15,}>')
-RE_DISCORD_ROLE = re.compile(r'<@&\d{15,}>')
-RE_DISCORD_EMOJI = re.compile(r'<a?:\w+:\d+>')
-RE_DISCORD_CHANNEL = re.compile(r'<#&?\d{15,}>')
-RE_DISCORD_INVITE = re.compile(r'(https?://)?(www\.)?(discord\.(gg|io|me|li)|discordapp\.com/invite)/ ?[\w-]{3,}')
-RE_DISCORD_ID = re.compile(r'(?P<pre>\D|^)(\d{17,19})(?P<post>\D|$)')
+    r"\D((?:(?:\+|00)33|0)\s*[\d](?:[\s.-]*\d{2}){4}|(?:0|\+?44)\s?(?:\d\s?){9,10}\d)(?!\d)")
+RE_NUMBER_DOT = re.compile(r"((?:\d{1,3}(?:,\d{3})*|\d+)(?:[\.]\d+)?)(?=\D|$)")
+RE_PUNCTUATION = re.compile(r"(?:[^\w\d\s]|_)+")
+RE_PUNCTUATION_NO_DOTS = re.compile(r"(?:[^\w\d\s\.\!\?]|_)+")
+RE_DOTS = re.compile(r"[\.\!\?]+")
+RE_MULTIPLE_WHITESPACES = re.compile(r"\s{2,}")
+RE_INDENTATION = re.compile(r"(?:^\s+)|(?:\s+$)", re.MULTILINE)
+RE_DISCORD_USER = re.compile(r"<@!?\d{15,}>")
+RE_DISCORD_ROLE = re.compile(r"<@&\d{15,}>")
+RE_DISCORD_EMOJI = re.compile(r"<a?:\w+:\d+>")
+RE_DISCORD_CHANNEL = re.compile(r"<#&?\d{15,}>")
+RE_DISCORD_INVITE = re.compile(r"(https?://)?(www\.)?(discord\.(gg|io|me|li)|discordapp\.com/invite)/ ?[\w-]{3,}")
+RE_DISCORD_ID = re.compile(r"(?P<pre>\D|^)(\d{17,19})(?P<post>\D|$)")
 
-STOP_WORDS = set(stopwords.words('english'))
+STOP_WORDS = set(stopwords.words("english"))
 AFFIXES_STEM = SnowballStemmer("english")
-PROTECTED_WORDS = ('discordchannel', 'discorduser', 'discordemoji', 'discordrole', 'discordid',
-                   'emailaddress', 'webaddress', 'phonenumber', 'moneysymbol', 'number', 'discordinvite', 'emoji')
+PROTECTED_WORDS = ("discordchannel", "discorduser", "discordemoji", "discordrole", "discordid",
+                   "emailaddress", "webaddress", "phonenumber", "moneysymbol", "number", "discordinvite", "emoji")
 
-with open(os.path.dirname(__file__)+'/data/unicode_map.json', 'r', encoding='utf-8') as file:
+with open(os.path.dirname(__file__)+"/data/unicode_map.json", 'r', encoding="utf-8") as file:
     UNICODE_MAP: dict[str, str] = load(file)
 
 emojis_iter = map(lambda y: y, UNICODE_EMOJI.keys())
@@ -51,23 +51,23 @@ def normalize(message: str) -> str:
 
 
 def normalize_emojis(message: str) -> str:
-    return RE_EMOJI.sub(' emoji ', message)
+    return RE_EMOJI.sub(" emoji ", message)
 
 def normalize_words(message: str) -> str:
-    message = RE_DISCORD_INVITE.sub(' discordinvite ', message)
+    message = RE_DISCORD_INVITE.sub(" discordinvite ", message)
 
-    message = RE_EMAIL.sub(' emailaddress ', message)
-    message = RE_WEB.sub(' webaddress ', message)
-    message = RE_MONEY.sub(' moneysymbol ', message)
+    message = RE_EMAIL.sub(" emailaddress ", message)
+    message = RE_WEB.sub(" webaddress ", message)
+    message = RE_MONEY.sub(" moneysymbol ", message)
 
-    message = RE_DISCORD_USER.sub(' discorduser ', message)
-    message = RE_DISCORD_ROLE.sub(' discordrole ', message)
-    message = RE_DISCORD_EMOJI.sub(' discordemoji ', message)
-    message = RE_DISCORD_CHANNEL.sub(' discordchannel ', message)
-    message = RE_DISCORD_ID.sub('\\g<pre> discordid \\g<post>', message)
+    message = RE_DISCORD_USER.sub(" discorduser ", message)
+    message = RE_DISCORD_ROLE.sub(" discordrole ", message)
+    message = RE_DISCORD_EMOJI.sub(" discordemoji ", message)
+    message = RE_DISCORD_CHANNEL.sub(" discordchannel ", message)
+    message = RE_DISCORD_ID.sub("\\g<pre> discordid \\g<post>", message)
 
-    message = RE_PHONE.sub(' phonenumber ', message)
-    message = RE_NUMBER_DOT.sub(' number ', message)
+    message = RE_PHONE.sub(" phonenumber ", message)
+    message = RE_NUMBER_DOT.sub(" number ", message)
     return message
 
 def normalize_chars(message: str, remove_dots: bool = True) -> str:

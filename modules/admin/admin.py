@@ -40,10 +40,10 @@ AvailableGitBranches = Literal["main", "develop"]
 def cleanup_code(content: str):
     """Automatically removes code blocks from the code."""
     # remove ```py\n```
-    if content.startswith('```') and content.endswith('```'):
-        return '\n'.join(content.split('\n')[1:-1])
+    if content.startswith("```") and content.endswith("```"):
+        return "\n".join(content.split("\n")[1:-1])
     # remove `foo`
-    return content.strip('` \n')
+    return content.strip("` \n")
 
 class Admin(commands.Cog):
     "All commands related to the internal administration of the bot, only accessible by whitelisted users"
@@ -92,7 +92,7 @@ class Admin(commands.Cog):
             if emoji:
                 await msg.add_reaction(emoji)
             else:
-                await msg.add_reaction('\u2705')
+                await msg.add_reaction("\u2705")
         except discord.Forbidden:
             await msg.channel.send(":ok:")
         except discord.DiscordException:
@@ -346,12 +346,12 @@ class Admin(commands.Cog):
                     answer.append(f"Lib {cog_id} reloaded")
             except Exception as err:
                 self.bot.dispatch("error", err, interaction)
-                answer.append(f'**`ERROR:`** {type(err).__name__} - {err}')
+                answer.append(f"**`ERROR:`** {type(err).__name__} - {err}")
             else:
                 self.bot.log.info("Extension %s reloaded", cog_id)
                 reloaded_cogs.append(cog_id)
-            if cog_id == 'utilities':
-                await self.bot.get_cog('Utilities').on_ready()
+            if cog_id == "utilities":
+                await self.bot.get_cog("Utilities").on_ready()
         if len(reloaded_cogs) > 0:
             answer.append(f"These cogs has successfully reloaded: {', '.join(reloaded_cogs)}")
             if info_cog := self.bot.get_cog("BotInfo"):
@@ -805,10 +805,10 @@ Cette option affecte tous les serveurs"""
         for member in server.members:
             if member.id in owner_list and role not in member.roles:
                 text.append("Rôle ajouté à " + (member.global_name or member.name))
-                await member.add_roles(role,reason="This user support me")
+                await member.add_roles(role, reason="This user support me")
             elif (member.id not in owner_list) and role in member.roles:
                 text.append("Rôle supprimé à " + (member.global_name or member.name))
-                await member.remove_roles(role,reason="This user doesn't support me anymore")
+                await member.remove_roles(role, reason="This user doesn't support me anymore")
         if text:
             await interaction.followup.send("\n".join(text))
         else:
@@ -830,9 +830,9 @@ Cette option affecte tous les serveurs"""
                         downvotes = len(users)
                 duration = now-msg.created_at
                 if len(msg.embeds) > 0:
-                    liste.append((upvotes-downvotes,duration,msg.embeds[0].fields[0].value,upvotes,downvotes))
+                    liste.append((upvotes-downvotes, duration, msg.embeds[0].fields[0].value, upvotes, downvotes))
                 else:
-                    liste.append((upvotes-downvotes,duration,msg.content,upvotes,downvotes))
+                    liste.append((upvotes-downvotes, duration, msg.content, upvotes, downvotes))
         liste.sort(reverse=True)
         return liste
 
@@ -912,7 +912,7 @@ Cette option affecte tous les serveurs"""
         try:
             await interaction.followup.send(txt)
         except discord.DiscordException as err:
-            print("[rss_test] Error:",err)
+            print("[rss_test] Error:", err)
             await interaction.followup.send("`Error`: "+str(err))
             print(txt)
         if arguments is None:
@@ -943,7 +943,7 @@ Cette option affecte tous les serveurs"""
                     else:
                         txt[-1] += entry["title"]
                 else:
-                    txt.append(nothing_+notok_+' title')
+                    txt.append(nothing_+notok_+" title")
                 if "published_parsed" in entry:
                     txt.append(nothing_+ok_+" published_parsed")
                 elif "published" in entry:
@@ -951,21 +951,21 @@ Cette option affecte tous les serveurs"""
                 elif "updated_parsed" in entry:
                     txt.append(nothing_+ok_+" updated_parsed")
                 else:
-                    txt.append(nothing_+notok_+' date')
+                    txt.append(nothing_+notok_+" date")
                 if "author" in entry:
                     txt.append(nothing_+ok_+" author: "+entry["author"])
                 else:
-                    txt.append(nothing_+notok_+' author')
+                    txt.append(nothing_+notok_+" author")
                 if "content" in entry:
                     txt.append(nothing_+ok_+" content")
                 elif "summary" in entry:
                     txt.append(nothing_+ok_+" summary (as main content)")
                 else:
-                    txt.append(nothing_+notok_+' content')
+                    txt.append(nothing_+notok_+" content")
                 if "content" in entry and "summary" in entry:
                     txt.append(nothing_+ok_+" summary")
                 else:
-                    txt.append(nothing_+notok_+' summary (as description)')
+                    txt.append(nothing_+notok_+" summary (as description)")
             await interaction.followup.send("\n".join(txt))
 
 
@@ -1196,7 +1196,8 @@ Cette option affecte tous les serveurs"""
         try:
             exec(to_compile, env) # pylint: disable=exec-used
         except Exception as err:
-            return await ctx.send(f"```py\n{err.__class__.__name__}: {err}\n```")
+            await ctx.send(f"```py\n{err.__class__.__name__}: {err}\n```")
+            return
 
         func = env["func"]
         try:

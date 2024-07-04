@@ -103,7 +103,7 @@ class RandomCollectSubcog(AbstractSubcog):
             txt = await self.generate_collect_message(interaction, items, points + bonus)
             if strike_level and bonus != 0:
                 txt += "\n\n" + \
-                    await self.bot._(interaction, 'bot_events.collect.strike-bonus', bonus=bonus, level=strike_level+1)
+                    await self.bot._(interaction, "bot_events.collect.strike-bonus", bonus=bonus, level=strike_level+1)
             if is_strike:
                 await self.add_collect_and_strike(interaction.user.id, points + bonus, send_notif_to_interaction=interaction)
             else:

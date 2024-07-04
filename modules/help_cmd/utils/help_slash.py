@@ -84,12 +84,12 @@ async def _generate_subcommands_field(ctx: MyContext, cmd: Group) -> FieldData |
             else:
                 name = await get_command_name_translation(ctx, subcommand)
                 if (description := await get_command_desc_translation(ctx, subcommand)) is None:
-                    description = subcommand.description.split('\n')[0].strip()
+                    description = subcommand.description.split("\n")[0].strip()
                 desc = f"*({description})*" if len(description) > 0 else ""
                 subcmds += f"\n• {name} {desc}"
                 explored_subcommands.append(subcommand.name)
     if subs_cant_show > 0:
-        subcmds += "\n" + await ctx.bot._(ctx.channel, 'help.more-subcmds', count=subs_cant_show)
+        subcmds += "\n" + await ctx.bot._(ctx.channel, "help.more-subcmds", count=subs_cant_show)
     if len(subcmds) > 0:
         return {
             "name": await ctx.bot._(ctx.channel, "help.subcmds"),
@@ -101,12 +101,12 @@ async def _generate_command_category_field(cog: "HelpCog", ctx: MyContext, comma
     "Generate an embed field to describe the category of a command"
     category = "unclassed"
     for key, data in cog.commands_data.items():
-        categ_commands = data['commands']
+        categ_commands = data["commands"]
         root_name = command.root_parent.name if command.root_parent else command.name
         if root_name in categ_commands:
             category = key
             break
-    emoji = cog.commands_data[category]['emoji']
+    emoji = cog.commands_data[category]["emoji"]
     category = emoji + "  " + (await cog.bot._(ctx.channel, f"help.categories.{category}")).capitalize()
     return {
         "name": (await ctx.bot._(ctx.channel, "misc.category")).capitalize(),

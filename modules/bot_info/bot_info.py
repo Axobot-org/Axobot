@@ -36,11 +36,11 @@ class BotInfo(commands.Cog):
 
         Comments and empty lines are ignored."""
         count = 0
-        path = os.getcwd() + '/**/*.py'
+        path = os.getcwd() + "/**/*.py"
         for filename in glob.iglob(path, recursive=True):
-            if '/env/' in filename or not filename.endswith('.py'):
+            if "/env/" in filename or not filename.endswith(".py"):
                 continue
-            with open(filename, 'r', encoding='utf-8') as file:
+            with open(filename, 'r', encoding="utf-8") as file:
                 for line in file.read().split("\n"):
                     cleaned_line = line.strip()
                     if len(cleaned_line) > 2 and not cleaned_line.startswith('#') or cleaned_line.startswith('"'):
@@ -50,11 +50,11 @@ class BotInfo(commands.Cog):
     async def get_ignored_guilds(self) -> list[int]:
         "Get the list of ignored guild IDs"
         if self.bot.database_online:
-            if 'banned_guilds' not in self.bot.get_cog('Utilities').config.keys():
-                await self.bot.get_cog('Utilities').get_bot_infos()
+            if "banned_guilds" not in self.bot.get_cog("Utilities").config.keys():
+                await self.bot.get_cog("Utilities").get_bot_infos()
             return [
                 int(x)
-                for x in self.bot.get_cog('Utilities').config['banned_guilds'].split(";")
+                for x in self.bot.get_cog("Utilities").config["banned_guilds"].split(";")
                 if len(x) > 0
             ] + IGNORED_GUILDS
         return []
@@ -96,16 +96,16 @@ class BotInfo(commands.Cog):
         ignored_guilds = await self.get_ignored_guilds()
         len_servers = await self.get_guilds_count(ignored_guilds)
         # Languages
-        langs_list = list((await self.bot.get_cog('ServerConfig').get_languages(ignored_guilds)).items())
+        langs_list = list((await self.bot.get_cog("ServerConfig").get_languages(ignored_guilds)).items())
         langs_list.sort(reverse=True, key=lambda x: x[1])
         lang_total = sum(x[1] for x in langs_list)
-        langs_list = ' | '.join([f"{x[0]}: {x[1]/lang_total*100:.0f}%" for x in langs_list if x[1] > 0])
+        langs_list = " | ".join([f"{x[0]}: {x[1]/lang_total*100:.0f}%" for x in langs_list if x[1] > 0])
         del lang_total
         # Users/bots
-        users,bots = self.get_users_nber(ignored_guilds)
+        users, bots = self.get_users_nber(ignored_guilds)
         # Total XP
         if self.bot.database_online:
-            total_xp = await self.bot.get_cog('Xp').db_get_total_xp()
+            total_xp = await self.bot.get_cog("Xp").db_get_total_xp()
         else:
             total_xp = ""
         # Commands within 24h
@@ -119,23 +119,23 @@ class BotInfo(commands.Cog):
         # Generating message
         desc = ""
         for key, var in [
-            ('bot_version', self.bot_version),
-            ('servers_count', await n_format(len_servers)),
-            ('users_count', (await n_format(users), await n_format(bots))),
-            ('codes_lines', await n_format(self.codelines)),
-            ('languages', langs_list),
-            ('python_version', f_python_version),
-            ('lib_version', discord.__version__),
-            ('ram_usage', await n_format(ram_usage)),
-            ('cpu_usage', await n_format(cpu)),
-            ('api_ping', await n_format(latency)),
-            ('cmds_24h', await n_format(cmds_24h)),
-            ('rss_msg_24h', await n_format(rss_msg_24h)),
-            ('total_xp', await n_format(total_xp)+" ")]:
-            str_args = {f'v{i}': var[i] for i in range(len(var))} if isinstance(var, tuple | list) else {'v': var}
+            ("bot_version", self.bot_version),
+            ("servers_count", await n_format(len_servers)),
+            ("users_count", (await n_format(users), await n_format(bots))),
+            ("codes_lines", await n_format(self.codelines)),
+            ("languages", langs_list),
+            ("python_version", f_python_version),
+            ("lib_version", discord.__version__),
+            ("ram_usage", await n_format(ram_usage)),
+            ("cpu_usage", await n_format(cpu)),
+            ("api_ping", await n_format(latency)),
+            ("cmds_24h", await n_format(cmds_24h)),
+            ("rss_msg_24h", await n_format(rss_msg_24h)),
+            ("total_xp", await n_format(total_xp)+" ")]:
+            str_args = {f"v{i}": var[i] for i in range(len(var))} if isinstance(var, tuple | list) else {'v': var}
             desc += await self.bot._(interaction, "info.stats."+key, **str_args) + "\n"
         title = await self.bot._(interaction,"info.stats.title")
-        color = self.bot.get_cog('Help').help_color
+        color = self.bot.get_cog("Help").help_color
         embed = discord.Embed(title=title, color=color, description=desc)
         embed.set_thumbnail(url=self.bot.user.display_avatar.with_static_format("png"))
         await interaction.followup.send(embed=embed)
@@ -151,11 +151,11 @@ class BotInfo(commands.Cog):
 
         ..Doc infos.html#statistics"""
         await interaction.response.defer()
-        forbidden = ['eval', 'admin', 'test', 'bug', 'idea', 'send_msg']
-        forbidden_where = ', '.join(f"'cmd.{elem}'" for elem in forbidden)
-        forbidden_where += ', ' + ', '.join(f"'app_cmd.{elem}'" for elem in forbidden)
+        forbidden = ["eval", "admin", "test", "bug", "idea", "send_msg"]
+        forbidden_where = ", ".join(f"'cmd.{elem}'" for elem in forbidden)
+        forbidden_where += ", " + ", ".join(f"'app_cmd.{elem}'" for elem in forbidden)
         commands_limit = 15
-        lang = await self.bot._(interaction, '_used_locale')
+        lang = await self.bot._(interaction, "_used_locale")
         # SQL query
         async def do_query(minutes: int | None = None):
             if minutes:
@@ -200,18 +200,18 @@ ORDER BY usages DESC LIMIT %(limit)s"""
 
         # in the last 24h
         data_24h = await do_query(60*24)
-        text_24h = '• ' + "\n• ".join([
-            data['cmd'] + ': ' + await FormatUtils.format_nbr(data['usages'], lang)
+        text_24h = "• " + "\n• ".join([
+            data["cmd"] + ": " + await FormatUtils.format_nbr(data["usages"], lang)
             for data in data_24h
         ])
-        title_24h = await self.bot._(interaction, 'info.stats-cmds.day')
+        title_24h = await self.bot._(interaction, "info.stats-cmds.day")
         # since the beginning
         data_total = await do_query()
-        text_total = '• ' + "\n• ".join([
-            data['cmd'] + ': ' + await FormatUtils.format_nbr(data['usages'], lang)
+        text_total = "• " + "\n• ".join([
+            data["cmd"] + ": " + await FormatUtils.format_nbr(data["usages"], lang)
             for data in data_total
         ])
-        title_total = await self.bot._(interaction, 'info.stats-cmds.total')
+        title_total = await self.bot._(interaction, "info.stats-cmds.total")
         # message title and desc
         title = await self.bot._(interaction, "info.stats-cmds.title")
         desc = await self.bot._(interaction, "info.stats-cmds.description", number=commands_limit)
@@ -219,7 +219,7 @@ ORDER BY usages DESC LIMIT %(limit)s"""
         emb = discord.Embed(
             title=title,
             description=desc,
-            color=self.bot.get_cog('Help').help_color,
+            color=self.bot.get_cog("Help").help_color,
         )
         emb.set_thumbnail(url=self.bot.user.display_avatar.with_static_format("png"))
         emb.add_field(name=title_total, value=text_total)
@@ -251,10 +251,10 @@ ORDER BY usages DESC LIMIT %(limit)s"""
     @app_commands.command(name="documentation")
     async def display_doc(self, interaction: discord.Interaction):
         """Get the documentation url"""
-        text = self.bot.emojis_manager.customs['readthedocs'] + await self.bot._(interaction,"info.docs") + \
+        text = self.bot.emojis_manager.customs["readthedocs"] + await self.bot._(interaction,"info.docs") + \
             " https://axobot.rtfd.io"
         if self.bot.entity_id == 1:
-            text += '/en/develop'
+            text += "/en/develop"
         await interaction.response.send_message(text)
 
     @app_commands.command(name="about")

@@ -15,7 +15,7 @@ AppCommandOrGroup = Command | Group
 async def get_command_inline_desc(ctx: MyContext, cmd: AppCommandOrGroup):
     "Generate a 1-line description with the command name and short desc"
     name = await get_command_name_translation(ctx, cmd)
-    short = await get_command_desc_translation(ctx, cmd) or cmd.description.split('\n')[0].strip()
+    short = await get_command_desc_translation(ctx, cmd) or cmd.description.split("\n")[0].strip()
     return f"• **{name}**" + (f"  *{short}*" if short else "")
 
 
@@ -29,8 +29,8 @@ async def get_command_description(ctx: MyContext, command: AppCommandOrGroup):
     desc, examples, doc = await extract_info(raw_desc)
     # check for translated description
     if short_desc := await get_command_desc_translation(ctx, command):
-        if len(desc.split('\n')) > 1:
-            long_desc = '\n'.join(desc.split('\n')[1:]).strip()
+        if len(desc.split("\n")) > 1:
+            long_desc = "\n".join(desc.split("\n")[1:]).strip()
             desc = f"{short_desc}\n\n{long_desc}"
     if desc is None:
         desc = await ctx.bot._(ctx.channel, "help.no-desc-cmd")
@@ -104,8 +104,8 @@ async def _get_command_params_signature(ctx: MyContext, command: AppCommandOrGro
     for param in command.parameters:
         name = await _get_command_param_translation(ctx, param)
         if param.required:
-            result.append(f'<{name}>')
+            result.append(f"<{name}>")
         else:
-            result.append(f'[{name}]')
+            result.append(f"[{name}]")
 
     return ' '.join(result)

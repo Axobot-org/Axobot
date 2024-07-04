@@ -31,7 +31,7 @@ class Blurplefy(Cog):
                 self.cache: list[int] = json.load(jsonfile)
         except FileNotFoundError:
             with open("blurple-cache.json", "w", encoding="utf-8") as jsonfile:
-                jsonfile.write('[]')
+                jsonfile.write("[]")
             self.cache = []
 
     @commands.hybrid_group(name="blurple", aliases=["b"], brief="Happy Discord Birthday!")
@@ -111,16 +111,16 @@ Online editor: https://projectblurple.com/paint
         url = await get_url_from_ctx(ctx, who)
 
         old_msg = await ctx.send(
-            await self.bot._(ctx.channel, 'color-event.colorify.starting', name=fmodifier+'fy', user=ctx.author.mention)
+            await self.bot._(ctx.channel, "color-event.colorify.starting", name=fmodifier+"fy", user=ctx.author.mention)
         )
         try:
             async with aiohttp.ClientSession() as session:
                 async with session.get(str(url)) as image:
                     result = await convert_blurple(await image.read(), fmodifier, method, variations or [], replace_background)
         except RuntimeError as err:
-            await ctx.send(await self.bot._(ctx.channel, 'color-event.unknown-err', err=str(err)))
+            await ctx.send(await self.bot._(ctx.channel, "color-event.unknown-err", err=str(err)))
             return
-        await ctx.reply(await self.bot._(ctx.channel, 'color-event.colorify.success', user=ctx.author.mention), file=result)
+        await ctx.reply(await self.bot._(ctx.channel, "color-event.colorify.success", user=ctx.author.mention), file=result)
         if not isinstance(old_msg, discord.InteractionMessage):
             await old_msg.delete()
         if self.bot.database_online:
@@ -165,7 +165,7 @@ Online editor: https://projectblurple.com/paint
         async with aiohttp.ClientSession() as session:
             async with session.get(str(url)) as image:
                 result = await check_blurple(await image.read())
-        answer = "\n".join(f"> {color['name']}: {color['ratio']}%" for color in result['colors'])
+        answer = "\n".join(f"> {color['name']}: {color['ratio']}%" for color in result["colors"])
         await ctx.reply(await self.bot._(ctx.channel, "color-event.blurple.check.result", user=ctx.author.mention, results=answer))
         if result["passed"] and self.bot.database_online and ctx.author.id not in self.cache:
             reward_points = 40

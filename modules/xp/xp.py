@@ -21,7 +21,8 @@ from core.bot_classes import Axobot
 from core.serverconfig.options_list import options
 from core.tips import UserTip
 
-from .cards import CardGeneration, LeaderboardScope, TopPaginator
+from .cards import CardGeneration
+from .src.top_paginator import LeaderboardScope, TopPaginator
 from .src.xp_math import (get_level_from_xp_global, get_level_from_xp_mee6,
                           get_xp_from_level_global, get_xp_from_level_mee6)
 
@@ -31,13 +32,13 @@ class Xp(commands.Cog):
 
     def __init__(self, bot: Axobot):
         self.bot = bot
-        self.file = 'xp'
+        self.file = "xp"
         self.log = logging.getLogger("bot.xp")
 
-        self.cache: dict[int | Literal["global"], dict[int, tuple[int, int]]] = {'global': {}}
+        self.cache: dict[int | Literal["global"], dict[int, tuple[int, int]]] = {"global": {}}
         self.levels = [0]
         self.embed_color = discord.Colour(0xffcf50)
-        self.table = 'xp_beta' if bot.beta else 'xp'
+        self.table = "xp_beta" if bot.beta else "xp"
         self.classic_xp_cooldown = 5 # seconds between each xp gain for global/local
         self.mee6_xp_cooldown = 60 # seconds between each xp gain for mee6-like
         self.minimal_size = 5
@@ -46,17 +47,17 @@ class Xp(commands.Cog):
         self.max_xp_per_msg = 70
         self.sus = None
         self.default_xp_style = "dark"
-        self.types = ['global','mee6-like','local']
+        self.types = ["global","mee6-like","local"]
 
         verdana_font = "./assets/fonts/Verdana.ttf"
         roboto_font = "./assets/fonts/Roboto-Medium.ttf"
         self.fonts = {
-            'xp_fnt': ImageFont.truetype(verdana_font, 24),
-            'NIVEAU_fnt': ImageFont.truetype(verdana_font, 42),
-            'levels_fnt': ImageFont.truetype(verdana_font, 65),
-            'rank_fnt': ImageFont.truetype(verdana_font, 29),
-            'RANK_fnt': ImageFont.truetype(verdana_font, 23),
-            'name_fnt': ImageFont.truetype(roboto_font, 40),
+            "xp_fnt": ImageFont.truetype(verdana_font, 24),
+            "NIVEAU_fnt": ImageFont.truetype(verdana_font, 42),
+            "levels_fnt": ImageFont.truetype(verdana_font, 65),
+            "rank_fnt": ImageFont.truetype(verdana_font, 29),
+            "RANK_fnt": ImageFont.truetype(verdana_font, 23),
+            "name_fnt": ImageFont.truetype(roboto_font, 40),
         }
 
     @commands.Cog.listener()
@@ -65,7 +66,7 @@ class Xp(commands.Cog):
         if not self.bot.database_online:
             await self.bot.unload_module("xp")
             return
-        self.table = 'xp_beta' if self.bot.beta else 'xp'
+        self.table = "xp_beta" if self.bot.beta else "xp"
         await self.db_load_cache(None)
 
     async def cog_load(self):
@@ -99,7 +100,7 @@ class Xp(commands.Cog):
             return
         rate: float = await self.bot.get_config(msg.guild.id, "xp_rate")
         if self.sus is None:
-            if self.bot.get_cog('Utilities'):
+            if self.bot.get_cog("Utilities"):
                 await self.reload_sus()
             else:
                 self.sus = set()
@@ -114,8 +115,8 @@ class Xp(commands.Cog):
 
     async def add_xp_0(self, msg: discord.Message, _rate: float):
         """Global xp type"""
-        if msg.author.id in self.cache['global']:
-            if time.time() - self.cache['global'][msg.author.id][0] < self.classic_xp_cooldown:
+        if msg.author.id in self.cache["global"]:
+            if time.time() - self.cache["global"][msg.author.id][0] < self.classic_xp_cooldown:
                 return
         content = msg.clean_content
         if len(content) < self.minimal_size or await self.check_spam(content) or await self.bot.potential_command(msg):
@@ -125,16 +126,16 @@ class Xp(commands.Cog):
         giv_points = await self.calc_xp(msg)
         if giv_points == 0:
             return
-        if msg.author.id in self.cache['global']:
-            prev_points = self.cache['global'][msg.author.id][1]
+        if msg.author.id in self.cache["global"]:
+            prev_points = self.cache["global"][msg.author.id][1]
         else:
             prev_points = await self.db_get_xp(msg.author.id, None) or 0
-        await self.db_set_xp(msg.author.id, giv_points, 'add')
+        await self.db_set_xp(msg.author.id, giv_points, "add")
         # check for sus people
         if msg.author.id in self.sus:
             await self.send_sus_msg(msg, giv_points)
-        self.cache['global'][msg.author.id] = [round(time.time()), prev_points+giv_points]
-        new_lvl, _, _ = await self.calc_level(self.cache['global'][msg.author.id][1], "global")
+        self.cache["global"][msg.author.id] = [round(time.time()), prev_points+giv_points]
+        new_lvl, _, _ = await self.calc_level(self.cache["global"][msg.author.id][1], "global")
         ex_lvl, _, _ = await self.calc_level(prev_points, "global")
         if 0 < ex_lvl < new_lvl:
             await self.send_levelup(msg, new_lvl)
@@ -154,7 +155,7 @@ class Xp(commands.Cog):
             prev_points = self.cache[msg.guild.id][msg.author.id][1]
         else:
             prev_points = await self.db_get_xp(msg.author.id, msg.guild.id) or 0
-        await self.db_set_xp(msg.author.id, giv_points, 'add', msg.guild.id)
+        await self.db_set_xp(msg.author.id, giv_points, "add", msg.guild.id)
         # check for sus people
         if msg.author.id in self.sus:
             await self.send_sus_msg(msg, giv_points)
@@ -182,7 +183,7 @@ class Xp(commands.Cog):
             prev_points = self.cache[msg.guild.id][msg.author.id][1]
         else:
             prev_points = await self.db_get_xp(msg.author.id, msg.guild.id) or 0
-        await self.db_set_xp(msg.author.id, giv_points, 'add', msg.guild.id)
+        await self.db_set_xp(msg.author.id, giv_points, "add", msg.guild.id)
         # check for sus people
         if msg.author.id in self.sus:
             await self.send_sus_msg(msg, giv_points)
@@ -224,9 +225,9 @@ class Xp(commands.Cog):
         text: str | None = await self.bot.get_config(msg.guild.id, "levelup_msg")
         if text is None or len(text) == 0:
             text = random.choice(await self.bot._(msg.channel, "xp.default_levelup"))
-            while '{random}' not in text and random.random() < 0.7:
+            while "{random}" not in text and random.random() < 0.7:
                 text = random.choice(await self.bot._(msg.channel, "xp.default_levelup"))
-        if '{random}' in text:
+        if "{random}" in text:
             item = random.choice(await self.bot._(msg.channel, "xp.levelup-items"))
         else:
             item = ''
@@ -266,8 +267,8 @@ class Xp(commands.Cog):
         content = msg.clean_content
         matches = re.finditer(r"<a?(:\w+:)\d+>", content, re.MULTILINE)
         for _, match in enumerate(matches, start=1):
-            content = content.replace(match.group(0),match.group(1))
-        matches = re.finditer(r'((?:http|www)[^\s]+)', content, re.MULTILINE)
+            content = content.replace(match.group(0), match.group(1))
+        matches = re.finditer(r"((?:http|www)[^\s]+)", content, re.MULTILINE)
         for _, match in enumerate(matches, start=1):
             content = content.replace(match.group(0),"")
         return min(round(len(content)*self.xp_per_char), self.max_xp_per_msg)
@@ -301,8 +302,8 @@ class Xp(commands.Cog):
         bot_top_role_position = member.guild.me.top_role.position
         # list roles to add to this member
         roles_to_give: list[discord.Role] = []
-        for role in [rr for rr in rr_list if rr['level'] <= level and rr['role'] not in has_roles]:
-            role = member.guild.get_role(role['role'])
+        for role in [rr for rr in rr_list if rr["level"] <= level and rr["role"] not in has_roles]:
+            role = member.guild.get_role(role["role"])
             if role is None or role.position >= bot_top_role_position:
                 continue
             roles_to_give.append(role)
@@ -318,8 +319,8 @@ class Xp(commands.Cog):
             return count
         # list roles to remove from this member
         roles_to_remove: list[discord.Role] = []
-        for role in [rr for rr in rr_list if rr['level'] > level and rr['role'] in has_roles]:
-            role = member.guild.get_role(role['role'])
+        for role in [rr for rr in rr_list if rr["level"] > level and rr["role"] in has_roles]:
+            role = member.guild.get_role(role["role"])
             if role is None or role.position >= bot_top_role_position:
                 continue
             roles_to_remove.append(role)
@@ -341,7 +342,7 @@ class Xp(commands.Cog):
         async with self.bot.db_query(query) as query_result:
             if not query_result:
                 return
-            self.sus = {item['userID'] for item in query_result}
+            self.sus = {item["userID"] for item in query_result}
         self.log.info("Reloaded xp suspects (%s suspects)", len(self.sus))
 
     async def send_sus_msg(self, msg: discord.Message, xp: int):
@@ -374,7 +375,7 @@ class Xp(commands.Cog):
             return None
 
 
-    async def db_set_xp(self, user_id: int, points: int, action: Literal['add', 'set']='add', guild_id: int | None=None):
+    async def db_set_xp(self, user_id: int, points: int, action: Literal["add", "set"]="add", guild_id: int | None=None):
         """Ajoute/reset de l'xp à un utilisateur dans la database"""
         try:
             if not self.bot.database_online:
@@ -388,7 +389,7 @@ class Xp(commands.Cog):
                 cnx = self.bot.cnx_xp
             table = await self.get_table_name(guild_id)
             cursor = cnx.cursor(dictionary = True)
-            if action == 'add':
+            if action == "add":
                 query = f"INSERT INTO `{table}` (`userID`,`xp`) VALUES (%(u)s, %(p)s) ON DUPLICATE KEY UPDATE xp = xp + %(p)s;"
             else:
                 query = f"INSERT INTO `{table}` (`userID`,`xp`) VALUES (%(u)s, %(p)s) ON DUPLICATE KEY UPDATE xp = %(p)s;"
@@ -433,15 +434,15 @@ class Xp(commands.Cog):
             cursor = cnx.cursor(dictionary = True)
             cursor.execute(query, (user_id,))
             if result := cursor.fetchone():
-                g = 'global' if guild_id is None else guild_id
+                g = "global" if guild_id is None else guild_id
                 if isinstance(g, int) and g not in self.cache:
                     await self.db_load_cache(g)
                 if user_id in self.cache[g].keys():
-                    self.cache[g][user_id][1] = result['xp']
+                    self.cache[g][user_id][1] = result["xp"]
                 else:
-                    self.cache[g][user_id] = [round(time.time())-60,result ['xp']]
+                    self.cache[g][user_id] = [round(time.time())-60, result ["xp"]]
             cursor.close()
-            return result['xp'] if result else None
+            return result["xp"] if result else None
         except Exception as err:
             self.bot.dispatch("error", err)
 
@@ -491,14 +492,14 @@ class Xp(commands.Cog):
             cursor.execute(query)
             rows = list(cursor)
             if guild_id is None:
-                self.cache['global'].clear()
+                self.cache["global"].clear()
                 for row in rows:
-                    self.cache['global'][row['userID']] = [round(time.time())-60, int(row['xp'])]
+                    self.cache["global"][row["userID"]] = [round(time.time())-60, int(row["xp"])]
             else:
                 if guild_id not in self.cache:
                     self.cache[guild_id] = {}
                 for row in rows:
-                    self.cache[guild_id][row['userID']] = [round(time.time())-60, int(row['xp'])]
+                    self.cache[guild_id][row["userID"]] = [round(time.time())-60, int(row["xp"])]
             cursor.close()
             return
         except Exception as err:
@@ -536,7 +537,7 @@ class Xp(commands.Cog):
                 if limit is None:
                     limit = len(l2)
                 while len(liste)<limit and i<len(l2):
-                    if l2[i]['userID'] in ids:
+                    if l2[i]["userID"] in ids:
                         liste.append(l2[i])
                     i += 1
             cursor.close()
@@ -572,10 +573,10 @@ class Xp(commands.Cog):
             if guild is not None:
                 users = {x.id for x in guild.members}
             for x in cursor:
-                if (guild is not None and x['userID'] in users) or guild is None:
+                if (guild is not None and x["userID"] in users) or guild is None:
                     i += 1
-                if x['userID']== user_id:
-                    # x['rank'] = i
+                if x["userID"]== user_id:
+                    # x["rank"] = i
                     userdata = x
                     userdata["rank"] = round(userdata["rank"])
                     break
@@ -592,7 +593,7 @@ class Xp(commands.Cog):
                 return None
             query = f"SELECT SUM(xp) as total FROM `{self.table}`"
             async with self.bot.db_query(query, fetchone=True) as query_results:
-                result = round(query_results['total'])
+                result = round(query_results["total"])
             return result
         except Exception as err:
             self.bot.dispatch("error", err)
@@ -651,9 +652,9 @@ class Xp(commands.Cog):
 
     async def clear_cards(self, delete_all: bool=False):
         """Delete outdated rank cards"""
-        files =  os.listdir('./assets/cards/')
+        files =  os.listdir("./assets/cards/")
         done: set[str] = set()
-        for f in sorted([f.split('-')+['./assets/cards/'+f] for f in files], key=operator.itemgetter(1), reverse=True):
+        for f in sorted([f.split('-')+["./assets/cards/"+f] for f in files], key=operator.itemgetter(1), reverse=True):
             if delete_all or f[0] in done:
                 os.remove(f[3])
             else:
@@ -687,7 +688,7 @@ class Xp(commands.Cog):
                 return
             xp_used_type: str = await self.bot.get_config(interaction.guild_id, "xp_type")
         else:
-            xp_used_type = options['xp_type']["default"]
+            xp_used_type = options["xp_type"]["default"]
         xp = await self.db_get_xp(user.id, None if xp_used_type == "global" else interaction.guild_id)
         if xp is None:
             if interaction.user == user:
@@ -699,13 +700,13 @@ class Xp(commands.Cog):
         if xp_used_type == "global":
             ranks_nb = await self.db_get_users_count()
             try:
-                rank = (await self.db_get_rank(user.id))['rank']
+                rank = (await self.db_get_rank(user.id))["rank"]
             except KeyError:
                 rank = "?"
         else:
             ranks_nb = await self.db_get_users_count(interaction.guild_id)
             try:
-                rank = (await self.db_get_rank(user.id, interaction.guild))['rank']
+                rank = (await self.db_get_rank(user.id, interaction.guild))["rank"]
             except KeyError:
                 rank = "?"
         if isinstance(rank, float):
@@ -728,7 +729,7 @@ class Xp(commands.Cog):
             user.display_avatar.is_animated()
             and await self.bot.get_cog("Users").db_get_user_config(user.id, "animated_card")
         )
-        file_ext = 'png' if static else 'gif'
+        file_ext = "png" if static else "gif"
         filepath = f"./assets/cards/{user.id}-{xp}-{style}.{file_ext}"
         # check if the card has already been generated, and return it if it is the case
         if os.path.isfile(filepath):
@@ -749,7 +750,7 @@ class Xp(commands.Cog):
         )
         generated_card = card_generator.draw_card()
         if isinstance(generated_card, list):
-            duration = user_avatar.info['duration']
+            duration = user_avatar.info["duration"]
             if card_generator.skip_second_frames:
                 duration *= 2
             generated_card[0].save(
@@ -782,7 +783,7 @@ class Xp(commands.Cog):
                         levels_info: tuple[int, int, int]):
         """Generate and send a user rank card
         levels_info contains (current level, xp needed for the next level, xp needed for the current level)"""
-        style = await self.bot.get_cog('Utilities').get_xp_style(user)
+        style = await self.bot.get_cog("Utilities").get_xp_style(user)
         translations_map = await self.get_card_translations_map(interaction)
         card_image = await self.create_card(translations_map, user, style, xp, rank, ranks_nb, levels_info)
         # check if we should send the card in DM or in the channel
@@ -824,7 +825,7 @@ class Xp(commands.Cog):
         txts = [await self.bot._(interaction, "xp.card-level"), await self.bot._(interaction, "xp.card-rank")]
         emb = discord.Embed(color=self.embed_color)
         emb.set_author(name=user.display_name, icon_url=user.display_avatar)
-        emb.add_field(name='XP', value=f"{xp}/{levels_info[1]}")
+        emb.add_field(name="XP", value=f"{xp}/{levels_info[1]}")
         emb.add_field(name=txts[0].title(), value=levels_info[0])
         emb.add_field(name=txts[1].title(), value=f"{rank}/{ranks_nb}")
         send_in_private = await self.bot.get_config(interaction.guild_id, "rank_in_dm")
@@ -833,7 +834,7 @@ class Xp(commands.Cog):
     @app_commands.command(name="top")
     @app_commands.describe(page="The page number", scope="The scope of the leaderboard (global or server)")
     @app_commands.checks.cooldown(5, 60)
-    async def top(self, interaction: discord.Interaction, page: app_commands.Range[int, 1]=1, scope: LeaderboardScope='global'):
+    async def top(self, interaction: discord.Interaction, page: app_commands.Range[int, 1]=1, scope: LeaderboardScope="global"):
         """Get the list of the highest XP users
 
         ..Example top
@@ -843,7 +844,7 @@ class Xp(commands.Cog):
         ..Example top 7
 
         ..Doc user.html#get-the-general-ranking"""
-        if interaction.guild is not None and not await self.bot.get_config(interaction.guild_id,'enable_xp'):
+        if interaction.guild is not None and not await self.bot.get_config(interaction.guild_id, "enable_xp"):
             await interaction.response.send_message(
                 await self.bot._(interaction, "xp.xp-disabled"), ephemeral=True
             )
@@ -899,7 +900,7 @@ class Xp(commands.Cog):
         # send internal logs of the change
         desc = f"XP of user {user} `{user.id}` edited (from {prev_xp} to {xp}) in server `{interaction.guild_id}`"
         self.log.info(desc)
-        emb = discord.Embed(description=desc,color=8952255, timestamp=self.bot.utcnow())
+        emb = discord.Embed(description=desc, color=8952255, timestamp=self.bot.utcnow())
         emb.set_footer(text=interaction.guild.name)
         emb.set_author(name=self.bot.user, icon_url=self.bot.user.display_avatar)
         await self.bot.send_embed(emb)
@@ -949,19 +950,19 @@ class Xp(commands.Cog):
         ..Example rr add 10 Slowly farming
 
         ..Doc server.html#roles-rewards"""
-        if role.name == '@everyone':
-            raise commands.BadArgument(f'Role "{role.name}" not found')
+        if role.name == "@everyone":
+            raise commands.BadArgument(f"Role \"{role.name}\" not found")
         await interaction.response.defer()
         l = await self.rr_list_role(interaction.guild_id)
-        if len([x for x in l if x['level']==level]) > 0:
+        if len([x for x in l if x["level"]==level]) > 0:
             await interaction.followup.send(await self.bot._(interaction, "xp.already-1-rr"))
             return
         max_rr: int = await self.bot.get_config(interaction.guild_id, "rr_max_number")
         if len(l) >= max_rr:
             await interaction.followup.send(await self.bot._(interaction, "xp.too-many-rr", c=len(l)))
             return
-        await self.rr_add_role(interaction.guild_id,role.id,level)
-        await interaction.followup.send(await self.bot._(interaction, "xp.rr-added", role=role.name,level=level))
+        await self.rr_add_role(interaction.guild_id, role.id, level)
+        await interaction.followup.send(await self.bot._(interaction, "xp.rr-added", role=role.name, level=level))
 
     @rr_main.command(name="list")
     async def rr_list(self, interaction: discord.Interaction):
@@ -995,11 +996,11 @@ class Xp(commands.Cog):
 
         ..Doc server.html#roles-rewards"""
         await interaction.response.defer()
-        roles_list = await self.rr_list_role(interaction.guild_id,level)
+        roles_list = await self.rr_list_role(interaction.guild_id, level)
         if len(roles_list) == 0:
             await interaction.followup.send(await self.bot._(interaction, "xp.no-rr"))
             return
-        await self.rr_remove_role(roles_list[0]['ID'])
+        await self.rr_remove_role(roles_list[0]["ID"])
         await interaction.followup.send(await self.bot._(interaction, "xp.rr-removed", level=level))
 
     @rr_main.command(name="reload")
@@ -1010,7 +1011,7 @@ class Xp(commands.Cog):
         ..Doc server.html#roles-rewards"""
         if not interaction.guild.me.guild_permissions.manage_roles:
             await interaction.response.send_message(
-                await self.bot._(interaction,'moderation.mute.cant-mute'), ephemeral=True
+                await self.bot._(interaction, "moderation.mute.cant-mute"), ephemeral=True
             )
             return
         await interaction.response.defer()
@@ -1021,12 +1022,12 @@ class Xp(commands.Cog):
             return
         used_system: str = await self.bot.get_config(interaction.guild_id, "xp_type")
         xps = [
-            {'user': x['userID'], 'xp':x['xp']}
+            {"user": x["userID"], "xp": x["xp"]}
             for x in await self.db_get_top(limit=None, guild=None if used_system == "global" else interaction.guild)
         ]
         for member_data in xps:
-            if member := interaction.guild.get_member(member_data['user']):
-                level = (await self.calc_level(member_data['xp'], used_system))[0]
+            if member := interaction.guild.get_member(member_data["user"]):
+                level = (await self.calc_level(member_data["xp"], used_system))[0]
                 count += await self.give_rr(member, level, rr_list, remove=True)
         await interaction.followup.send(
             await self.bot._(interaction, "xp.rr-reload", role_count=count, member_count=interaction.guild.member_count)

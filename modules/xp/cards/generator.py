@@ -24,14 +24,14 @@ class CardGeneration:
                                   level, rank, participants, xp_to_current_level, xp_to_next_level, total_xp)
         self.fonts_cache: dict[tuple[str, int], ImageFont.FreeTypeFont] = {}
         if self.avatar.format == "GIF":
-            self.skip_second_frames = self.avatar.n_frames > 60 and self.avatar.info['duration'] < 30
+            self.skip_second_frames = self.avatar.n_frames > 60 and self.avatar.info["duration"] < 30
             self.result = [
-                Image.new('RGBA', CARD_SIZE, (255, 255, 255, 0))
+                Image.new("RGBA", CARD_SIZE, (255, 255, 255, 0))
                 for i in range(self.avatar.n_frames)
                 if not self.skip_second_frames or i%2==0
             ]
         else:
-            self.result = Image.new('RGBA', CARD_SIZE, (255, 255, 255, 0))
+            self.result = Image.new("RGBA", CARD_SIZE, (255, 255, 255, 0))
             self.skip_second_frames = False
 
 
@@ -76,22 +76,22 @@ class CardGeneration:
         """Add text to the destination image"""
         rendered_texts = []
         for data in self.data["texts"].values():
-            text = data['label']
-            alignment = data['alignment']
-            rect = tuple(tuple(x) for x in data['position'])
-            font_name = "./assets/fonts/" + data['font']
-            font_size = data['font_size']
-            color = data['color']
+            text = data["label"]
+            alignment = data["alignment"]
+            rect = tuple(tuple(x) for x in data["position"])
+            font_name = "./assets/fonts/" + data["font"]
+            font_size = data["font_size"]
+            color = data["color"]
             # Find idea font size
             font, font_size = self._find_max_text_size(text, rect, font_name, font_size)
             h_pos = round(rect[0][1] + (rect[1][1] - rect[0][1])/2)
-            if alignment == 'left':
+            if alignment == "left":
                 pos = rect[0][0], h_pos
                 anchor = "lm"
-            elif alignment == 'right':
+            elif alignment == "right":
                 pos = rect[1][0], h_pos
                 anchor = "rm"
-            elif alignment == 'center':
+            elif alignment == "center":
                 w_pow = round(rect[0][0] + (rect[1][0] - rect[0][0])/2)
                 pos = w_pow, h_pos
                 anchor = "mm"
@@ -130,19 +130,19 @@ class CardGeneration:
                 draw.rounded_rectangle(
                     ((bar_x, bar_y), (bar_x + width, bar_y + height)),
                     radius,
-                    fill=self.data['xp_bar_color']
+                    fill=self.data["xp_bar_color"]
                 )
         else:
             draw = ImageDraw.Draw(self.result)
             draw.rounded_rectangle(
                 ((bar_x, bar_y), (bar_x + width, bar_y + height)),
                 radius,
-                fill=self.data['xp_bar_color']
+                fill=self.data["xp_bar_color"]
             )
 
     def draw_card(self):
         "Do the magic"
-        background_img = Image.open("./assets/card-models/" + self.data['type'] + ".png").resize(CARD_SIZE)
+        background_img = Image.open("./assets/card-models/" + self.data["type"] + ".png").resize(CARD_SIZE)
 
         self._paste_avatar()
         if isinstance(self.result, list):
@@ -160,9 +160,9 @@ def main():
     "Try it and see"
     try:
         generator = CardGeneration(
-            card_name='christmas',
+            card_name="christmas",
             translation_map={},  # Not used in this example
-            username='Z_runner',
+            username="Z_runner",
             avatar=Image.open("avatar.png"),
             level=1,
             rank=4,

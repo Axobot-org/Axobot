@@ -17,13 +17,13 @@ class Perms(commands.Cog):
     def __init__(self, bot: Axobot):
         self.bot = bot
         self.file = "perms"
-        chan_perms = [key for key,value in discord.Permissions().all_channel() if value]
+        chan_perms = [key for key, value in discord.Permissions().all_channel() if value]
         self.perms_name = {
-            'general': [key for key,value in discord.Permissions().general() if value],
-            'text': [key for key,value in discord.Permissions().text() if value],
-            'voice': [key for key,value in discord.Permissions().voice() if value]
+            "general": [key for key, value in discord.Permissions().general() if value],
+            "text": [key for key, value in discord.Permissions().text() if value],
+            "voice": [key for key, value in discord.Permissions().voice() if value]
         }
-        self.perms_name['common_channel'] = [x for x in chan_perms if x in self.perms_name['general']]
+        self.perms_name["common_channel"] = [x for x in chan_perms if x in self.perms_name["general"]]
 
     async def collect_permissions(self, interaction: discord.Interaction, permissions: discord.Permissions, channel
                                   ) -> list[tuple[str, str]]:
@@ -35,11 +35,11 @@ class Perms(commands.Cog):
             perm_tr = await self.bot._(interaction, "permissions.list.administrator")
             if "permissions.list." in perm_tr: # unsuccessful translation
                 perm_tr = "Administrator"
-            return [(emojis_cog.customs['green_check'], perm_tr)]
+            return [(emojis_cog.customs["green_check"], perm_tr)]
         # else
-        common_perms = self.perms_name['common_channel']
-        text_perms = self.perms_name['text'] + common_perms
-        voice_perms = self.perms_name['voice'] + common_perms
+        common_perms = self.perms_name["common_channel"]
+        text_perms = self.perms_name["text"] + common_perms
+        voice_perms = self.perms_name["voice"] + common_perms
         for perm_id, value in permissions:
             if not (
                 channel is None
@@ -53,12 +53,12 @@ class Perms(commands.Cog):
             if "permissions.list." in perm_tr:  # unsuccessful translation
                 perm_tr = perm_id.replace('_', ' ').title()
             if value:
-                result.append((emojis_cog.customs['green_check'], perm_tr))
+                result.append((emojis_cog.customs["green_check"], perm_tr))
             else:
-                result.append((emojis_cog.customs['red_cross'], perm_tr))
+                result.append((emojis_cog.customs["red_cross"], perm_tr))
         return result
 
-    @app_commands.command(name='permissions')
+    @app_commands.command(name="permissions")
     @app_commands.guild_only()
     @app_commands.default_permissions(manage_roles=True)
     @app_commands.describe(
@@ -95,7 +95,7 @@ class Perms(commands.Cog):
             else:
                 perms = channel.permissions_for(target)
             col = target.color
-            avatar = interaction.guild.icon.replace(format='png', size=256) if interaction.guild.icon else None
+            avatar = interaction.guild.icon.replace(format="png", size=256) if interaction.guild.icon else None
             name = await self.bot._(interaction, "permissions.target.role", name=str(target))
         elif isinstance(target, int):
             perms = discord.Permissions(target)
@@ -124,7 +124,7 @@ class Perms(commands.Cog):
             embed.add_field(name=self.bot.zws, value=paragraph)
 
         _whatisthat = await self.bot._(interaction, "permissions.whatisthat")
-        embed.add_field(name=self.bot.zws, value=f'[{_whatisthat}](https://axobot.readthedocs.io/en/latest/perms.html)',
+        embed.add_field(name=self.bot.zws, value=f"[{_whatisthat}](https://axobot.readthedocs.io/en/latest/perms.html)",
                         inline=False)
         embed.set_author(name=name, icon_url=avatar)
         await interaction.followup.send(embed=embed)

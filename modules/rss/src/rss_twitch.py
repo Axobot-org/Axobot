@@ -20,7 +20,7 @@ class TwitchRSS:
     def __init__(self, bot: Axobot):
         self.bot = bot
         self.min_time_between_posts = 120 # seconds
-        self.url_pattern = r'^https://(?:www\.)?twitch\.tv/(\w+)'
+        self.url_pattern = r"^https://(?:www\.)?twitch\.tv/(\w+)"
 
     def is_twitch_url(self, string: str):
         "Check if an url is a valid twitch URL"
@@ -37,9 +37,9 @@ class TwitchRSS:
     async def _get_feed(self, username: str, filter_config: FeedFilterConfig | None=None,
                         session: aiohttp.ClientSession | None=None) -> FeedParserDict:
         "Get a list of feeds from a twitch username"
-        url = 'https://twitchrss.appspot.com/vod/' + username
+        url = "https://twitchrss.appspot.com/vod/" + username
         feed = await feed_parse(url, 5, session)
-        if feed is None or 'bozo_exception' in feed or not feed.entries:
+        if feed is None or "bozo_exception" in feed or not feed.entries:
             return None
         if filter_config is not None:
             feed.entries = [entry for entry in feed.entries[:50] if await check_filter(entry, filter_config)]
@@ -54,16 +54,16 @@ class TwitchRSS:
             return await self.bot._(channel.guild, "rss.nothing")
         entry = feed.entries[0]
         img_url = None
-        if img_match := re.search(r'<img src="([^"]+)" />', entry['summary']):
+        if img_match := re.search(r'<img src="([^"]+)" />', entry["summary"]):
             img_url = img_match.group(1)
         url = "https://www.twitch.tv/" + username
         return RssMessage(
             bot=self.bot,
             feed=FeedObject.unrecorded("twitch", channel.guild.id if channel.guild else None, channel.id, url),
-            url=entry['link'],
-            title=entry['title'],
-            date=entry['published_parsed'],
-            author=feed.feed['title'].replace("'s Twitch video RSS", ""),
+            url=entry["link"],
+            title=entry["title"],
+            date=entry["published_parsed"],
+            author=feed.feed["title"].replace("'s Twitch video RSS", ""),
             image=img_url,
             channel=username
         )
@@ -80,18 +80,18 @@ class TwitchRSS:
         for entry in feed.entries:
             if len(posts_list) > 10:
                 break
-            if dt.datetime(*entry['published_parsed'][:6], tzinfo=dt.UTC) <= date:
+            if dt.datetime(*entry["published_parsed"][:6], tzinfo=dt.UTC) <= date:
                 break
             img_url = None
-            if img_match := re.search(r'<img src="([^"]+)" />', entry['summary']):
+            if img_match := re.search(r'<img src="([^"]+)" />', entry["summary"]):
                 img_url = img_match.group(1)
             obj = RssMessage(
                 bot=self.bot,
                 feed=FeedObject.unrecorded("twitch", channel.guild.id if channel.guild else None, channel.id, url),
-                url=entry['link'],
-                title=entry['title'],
-                date=entry['published_parsed'],
-                author=feed.feed['title'].replace("'s Twitch video RSS", ""),
+                url=entry["link"],
+                title=entry["title"],
+                date=entry["published_parsed"],
+                author=feed.feed["title"].replace("'s Twitch video RSS", ""),
                 image=img_url,
                 channel=username
             )

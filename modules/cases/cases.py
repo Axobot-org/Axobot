@@ -61,7 +61,7 @@ class Case:
         # add duration if exists
         if self.duration is not None and self.duration > 0:
             lang = await self.bot._(self.guild_id, "_used_locale")
-            duration_ = await FormatUtils.time_delta(self.duration,lang=lang,form="short")
+            duration_ = await FormatUtils.time_delta(self.duration, lang=lang, form="short")
             text += await self.bot._(self.guild_id, "cases.display.duration", data=duration_)
         return text
 
