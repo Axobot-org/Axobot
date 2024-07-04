@@ -14,7 +14,6 @@
     "invalidcardstyle": "Invalid card style: `%{s}`",
     "invalidcolor": "Color `%{c}` invalid",
     "invalidinvite": "Invalid bot/server invite: `%{i}`",
-    "invalidisbn": "Invalid ISBN",
     "invalidpermissiontarget": "I could not find any member, role or permission with this name/value",
     "invalidserverlog": "Invalid server log type",
     "invalidsnowflake": "Invalid Discord ID",
