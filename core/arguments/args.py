@@ -40,33 +40,6 @@ def UnionTransformer(*types) -> Type[discord.app_commands.Transformer]: # pylint
     return UnionTransformerClass
 
 
-class AnyUser(discord.User):
-    "Argument converter for any user or member"
-
-    @classmethod
-    async def convert(cls, ctx: "MyContext", argument: str) -> discord.User:
-        "Converts a string to a user or member"
-        res = None
-        if argument.isnumeric():
-            if ctx.guild is not None:
-                res = ctx.guild.get_member(int(argument))
-            if res is None:
-                res = ctx.bot.get_user(int(argument))
-            if res is None:
-                try:
-                    res = await ctx.bot.fetch_user(int(argument))
-                except discord.NotFound:
-                    pass
-            if res is not None:
-                return res
-        else:
-            try:
-                return await commands.MemberConverter().convert(ctx, argument)
-            except commands.BadArgument:
-                return await commands.UserConverter().convert(ctx, argument)
-        if res is None:
-            raise commands.errors.UserNotFound(argument)
-
 class CardStyleTransformer(discord.app_commands.Transformer):
     "Converts a string to a valid XP card style"
 
@@ -274,17 +247,6 @@ class Snowflake:
         if len(argument) < 17 or len(argument) > 20 or not argument.isnumeric():
             raise commands.ObjectNotFound(argument)
         return cls(int(argument))
-
-class ISBN(int):
-    "Convert argument to a valid ISBN"
-    @classmethod
-    async def convert(cls, _ctx: "MyContext", argument: str) -> int:
-        "Convert a string to a proper ISBN, else raise BadArgument"
-        import isbnlib  # pylint: disable=import-outside-toplevel
-        if isbnlib.notisbn(argument):
-            raise arguments_errors.InvalidISBNError(argument)
-        return isbnlib.get_canonical_isbn(argument)
-
 
 class GuildTransformer(discord.app_commands.Transformer):
     "Convert a string argument in an interaction usage to a valid discord Guild"
