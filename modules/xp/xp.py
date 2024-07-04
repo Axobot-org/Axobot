@@ -17,14 +17,13 @@ from discord import app_commands
 from discord.ext import commands, tasks
 from PIL import Image, ImageFont
 
-from core.bot_classes import Axobot, MyContext
-from core.checks import checks
+from core.bot_classes import Axobot
 from core.serverconfig.options_list import options
 from core.tips import UserTip
 
 from .cards import CardGeneration, LeaderboardScope, TopPaginator
-from .xp_math import (get_level_from_xp_global, get_level_from_xp_mee6,
-                      get_xp_from_level_global, get_xp_from_level_mee6)
+from .src.xp_math import (get_level_from_xp_global, get_level_from_xp_mee6,
+                          get_xp_from_level_global, get_xp_from_level_mee6)
 
 
 class Xp(commands.Cog):
@@ -660,11 +659,10 @@ class Xp(commands.Cog):
             else:
                 done.add(f[0])
 
-    @commands.hybrid_command(name="rank")
+    @app_commands.command(name="rank")
     @app_commands.describe(user="The user to get the rank of. If not specified, it will be you.")
-    @commands.bot_has_permissions(send_messages=True)
-    @commands.cooldown(1, 20, commands.BucketType.user)
-    async def rank(self, ctx: MyContext, *, user: discord.User | None=None):
+    @app_commands.checks.cooldown(1, 15)
+    async def rank(self, interaction: discord.Interaction, user: discord.User | None = None):
         """Check how many xp you got
         If you don't specify any user, I'll send you your own XP
 
@@ -674,57 +672,54 @@ class Xp(commands.Cog):
 
         ..Doc user.html#check-the-xp-of-someone
         """
-        try:
-            if user is None:
-                user = ctx.author
-            if user.bot:
-                return await ctx.send(await self.bot._(ctx.channel, "xp.bot-rank"))
-            send_in_private = ctx.guild is None or await self.bot.get_config(ctx.guild.id, "rank_in_dm")
-            await ctx.defer(ephemeral=send_in_private)
-            if ctx.guild is not None:
-                if not await self.bot.get_config(ctx.guild.id, "enable_xp"):
-                    return await ctx.send(await self.bot._(ctx.guild.id, "xp.xp-disabled"))
-                xp_used_type: str = await self.bot.get_config(ctx.guild.id, "xp_type")
-            else:
-                xp_used_type = options['xp_type']["default"]
-            xp = await self.db_get_xp(user.id, None if xp_used_type == "global" else ctx.guild.id)
-            if xp is None:
-                if ctx.author == user:
-                    return await ctx.send(await self.bot._(ctx.channel, "xp.1-no-xp"))
-                return await ctx.send(await self.bot._(ctx.channel, "xp.2-no-xp"))
-            levels_info = await self.calc_level(xp, xp_used_type)
-            if xp_used_type == "global":
-                ranks_nb = await self.db_get_users_count()
-                try:
-                    rank = (await self.db_get_rank(user.id))['rank']
-                except KeyError:
-                    rank = "?"
-            else:
-                ranks_nb = await self.db_get_users_count(ctx.guild.id)
-                try:
-                    rank = (await self.db_get_rank(user.id,ctx.guild))['rank']
-                except KeyError:
-                    rank = "?"
-            if isinstance(rank, float):
-                rank = int(rank)
-            send_in_private = ctx.guild is None or await self.bot.get_config(ctx.guild.id, "rank_in_dm")
-            use_author_dm = send_in_private and ctx.interaction is None
-            # If we can send the rank card
-            if ctx.guild is None or use_author_dm or ctx.channel.permissions_for(ctx.guild.me).attach_files:
-                try:
-                    await self.send_card(ctx, user, xp, rank, ranks_nb, levels_info)
-                    return
-                except Exception as err:  # pylint: disable=broad-except
-                    # log the error and fall back to embed/text
-                    self.bot.dispatch("error", err, ctx)
-            # if we can send embeds
-            if ctx.can_send_embed:
-                await self.send_embed(ctx, user, xp, rank, ranks_nb, levels_info)
+        if user is None:
+            user = interaction.user
+        if user.bot:
+            await interaction.response.send_message(
+                await self.bot._(interaction, "xp.bot-rank"), ephemeral=True
+            )
+            return
+        send_in_private = interaction.guild is None or await self.bot.get_config(interaction.guild_id, "rank_in_dm")
+        await interaction.response.defer(ephemeral=send_in_private)
+        if interaction.guild is not None:
+            if not await self.bot.get_config(interaction.guild_id, "enable_xp"):
+                await interaction.followup.send(await self.bot._(interaction, "xp.xp-disabled"))
                 return
-            # fall back to raw text
-            await self.send_txt(ctx, user, xp, rank, ranks_nb, levels_info)
-        except Exception as err:
-            self.bot.dispatch("command_error", ctx, err)
+            xp_used_type: str = await self.bot.get_config(interaction.guild_id, "xp_type")
+        else:
+            xp_used_type = options['xp_type']["default"]
+        xp = await self.db_get_xp(user.id, None if xp_used_type == "global" else interaction.guild_id)
+        if xp is None:
+            if interaction.user == user:
+                await interaction.followup.send(await self.bot._(interaction, "xp.1-no-xp"))
+            else:
+                await interaction.followup.send(await self.bot._(interaction, "xp.2-no-xp"))
+            return
+        levels_info = await self.calc_level(xp, xp_used_type)
+        if xp_used_type == "global":
+            ranks_nb = await self.db_get_users_count()
+            try:
+                rank = (await self.db_get_rank(user.id))['rank']
+            except KeyError:
+                rank = "?"
+        else:
+            ranks_nb = await self.db_get_users_count(interaction.guild_id)
+            try:
+                rank = (await self.db_get_rank(user.id, interaction.guild))['rank']
+            except KeyError:
+                rank = "?"
+        if isinstance(rank, float):
+            rank = int(rank)
+        send_in_private = interaction.guild is None or await self.bot.get_config(interaction.guild_id, "rank_in_dm")
+        # If we can send the rank card
+        try:
+            await self.send_card(interaction, user, xp, rank, ranks_nb, levels_info)
+            return
+        except Exception as err:  # pylint: disable=broad-except
+            # log the error and fall back to embed/text
+            self.bot.dispatch("error", err, interaction)
+        # if we can send embeds
+        await self.send_embed(interaction, user, xp, rank, ranks_nb, levels_info)
 
     async def create_card(self, translation_map: dict[str, str], user: discord.User, style: str, xp: int, rank: int,
                           ranks_nb: int, levels_info: tuple[int, int, int]):
@@ -783,86 +778,62 @@ class Xp(commands.Cog):
             "total_xp": await self.bot._(source, "xp.card-xp-total"),
         }
 
-    async def send_card(
-            self, ctx: MyContext, user: discord.User, xp: int, rank: int, ranks_nb: int, levels_info: tuple[int, int, int]):
+    async def send_card(self, interaction: discord.Interaction, user: discord.User, xp: int, rank: int, ranks_nb: int,
+                        levels_info: tuple[int, int, int]):
         """Generate and send a user rank card
         levels_info contains (current level, xp needed for the next level, xp needed for the current level)"""
         style = await self.bot.get_cog('Utilities').get_xp_style(user)
-        translations_map = await self.get_card_translations_map(ctx.channel)
+        translations_map = await self.get_card_translations_map(interaction)
         card_image = await self.create_card(translations_map, user, style, xp, rank, ranks_nb, levels_info)
         # check if we should send the card in DM or in the channel
-        send_in_private = ctx.guild is None or await self.bot.get_config(ctx.guild.id, "rank_in_dm")
+        send_in_private = interaction.guild is None or await self.bot.get_config(interaction.guild_id, "rank_in_dm")
         try:
-            if ctx.interaction:
-                await ctx.send(file=card_image, ephemeral=send_in_private)
-            elif send_in_private:
-                await ctx.author.send(file=card_image)
-                try:
-                    await ctx.message.delete()
-                except discord.HTTPException:
-                    pass
-            else:
-                await ctx.send(file=card_image)
-        except discord.errors.Forbidden:
-            await ctx.send(await self.bot._(ctx.channel, "xp.card-forbidden"))
+            await interaction.followup.send(file=card_image, ephemeral=send_in_private)
         except discord.errors.HTTPException:
-            await ctx.send(await self.bot._(ctx.channel, "xp.card-too-large"))
+            await interaction.followup.send(await self.bot._(interaction, "xp.card-too-large"), ephemeral=True)
         else:
             if style == self.default_xp_style:
-                await self.send_rankcard_tip(ctx, ephemeral=ctx.interaction and send_in_private)
+                try:
+                    await self.send_rankcard_tip(interaction, ephemeral=send_in_private)
+                except Exception as err:  # pylint: disable=broad-except
+                    # if something goes wrong, don't notify the user
+                    self.bot.dispatch("error", err, interaction)
         if stats_cog := self.bot.get_cog("BotStats"):
             stats_cog.xp_cards["sent"] += 1
 
-    async def send_rankcard_tip(self, ctx: MyContext, ephemeral: bool):
+    async def send_rankcard_tip(self, interaction: discord.Interaction, ephemeral: bool):
         "Send a tip about the rank card personalisation"
         if random.random() > 0.2:
             return
-        if not await self.bot.get_cog("Users").db_get_user_config(ctx.author.id, "show_tips"):
+        if not await self.bot.get_cog("Users").db_get_user_config(interaction.user.id, "show_tips"):
             # tips are disabled
             return
-        if await self.bot.tips_manager.should_show_user_tip(ctx.author.id, UserTip.RANK_CARD_PERSONALISATION):
-            # user has not seen this tip yet
+        if await self.bot.tips_manager.should_show_user_tip(interaction.user.id, UserTip.RANK_CARD_PERSONALISATION):
+        # user has not seen this tip yet
             profile_cmd = await self.bot.get_command_mention("profile card")
-            await self.bot.tips_manager.send_user_tip(ctx, UserTip.RANK_CARD_PERSONALISATION, ephemeral=ephemeral,
-                                                      profile_cmd=profile_cmd)
+            await self.bot.tips_manager.send_user_tip(
+                interaction,
+                UserTip.RANK_CARD_PERSONALISATION,
+                ephemeral=ephemeral,
+                profile_cmd=profile_cmd
+            )
 
-    async def send_embed(self, ctx: MyContext, user: discord.User, xp, rank, ranks_nb,  levels_info: tuple[int, int, int]):
+    async def send_embed(self, interaction: discord.Interaction, user: discord.User, xp, rank, ranks_nb,
+                         levels_info: tuple[int, int, int]):
         "Send the user rank as an embed (fallback from card generation)"
-        txts = [await self.bot._(ctx.channel, "xp.card-level"), await self.bot._(ctx.channel, "xp.card-rank")]
+        txts = [await self.bot._(interaction, "xp.card-level"), await self.bot._(interaction, "xp.card-rank")]
         emb = discord.Embed(color=self.embed_color)
         emb.set_author(name=user.display_name, icon_url=user.display_avatar)
         emb.add_field(name='XP', value=f"{xp}/{levels_info[1]}")
         emb.add_field(name=txts[0].title(), value=levels_info[0])
         emb.add_field(name=txts[1].title(), value=f"{rank}/{ranks_nb}")
-        send_in_private = await self.bot.get_config(ctx.guild.id, "rank_in_dm")
-        if ctx.interaction:
-            await ctx.send(embed=emb, ephemeral=send_in_private)
-        elif send_in_private:
-            await ctx.author.send(embed=emb)
-        else:
-            await ctx.send(embed=emb)
+        send_in_private = await self.bot.get_config(interaction.guild_id, "rank_in_dm")
+        await interaction.followup.send(embed=emb, ephemeral=send_in_private)
 
-    async def send_txt(self, ctx: MyContext, user: discord.User, xp, rank, ranks_nb,  levels_info: tuple[int, int, int]):
-        "Send the user rank as a text message (fallback from embed)"
-        txts = [await self.bot._(ctx.channel, "xp.card-level"), await self.bot._(ctx.channel, "xp.card-rank")]
-        msg = f"""__**{user.display_name}**__
-**XP** {xp}/{levels_info[1]}
-**{txts[0].title()}** {levels_info[0]}
-**{txts[1].title()}** {rank}/{ranks_nb}"""
-        send_in_private = await self.bot.get_config(ctx.guild.id, "rank_in_dm")
-        if ctx.interaction:
-            await ctx.send(msg, ephemeral=send_in_private)
-        elif send_in_private:
-            await ctx.author.send(msg)
-        else:
-            await ctx.send(msg)
-
-
-    @commands.hybrid_command(name="top")
+    @app_commands.command(name="top")
     @app_commands.describe(page="The page number", scope="The scope of the leaderboard (global or server)")
-    @commands.bot_has_permissions(send_messages=True)
-    @commands.cooldown(5,60,commands.BucketType.user)
-    async def top(self, ctx: MyContext, page: commands.Range[int, 1]=1, scope: LeaderboardScope='global'):
+    @app_commands.checks.cooldown(5, 60)
+    async def top(self, interaction: discord.Interaction, page: app_commands.Range[int, 1]=1, scope: LeaderboardScope='global'):
         """Get the list of the highest XP users
 
         ..Example top
@@ -872,66 +843,66 @@ class Xp(commands.Cog):
         ..Example top 7
 
         ..Doc user.html#get-the-general-ranking"""
-        if ctx.guild is not None:
-            if not await self.bot.get_config(ctx.guild.id,'enable_xp'):
-                return await ctx.send(await self.bot._(ctx.guild.id, "xp.xp-disabled"))
-        if page < 1:
-            return await ctx.send(await self.bot._(ctx.channel, "xp.low-page"))
-        await ctx.defer()
-        _quit = await self.bot._(ctx.guild.id, "misc.quit")
-        view = TopPaginator(self.bot, ctx.author, ctx.guild, scope, page, _quit.capitalize())
+        if interaction.guild is not None and not await self.bot.get_config(interaction.guild_id,'enable_xp'):
+            await interaction.response.send_message(
+                await self.bot._(interaction, "xp.xp-disabled"), ephemeral=True
+            )
+            return
+        await interaction.response.defer()
+        _quit = await self.bot._(interaction, "misc.quit")
+        view = TopPaginator(self.bot, interaction.user, interaction.guild, scope, page, _quit.capitalize())
         await view.fetch_data()
-        msg = await view.send_init(ctx)
-        if msg:
-            if await view.wait():
-                # only manually disable if it was a timeout (ie. not a user stop)
-                await view.disable(msg)
+        msg = await view.send_init(interaction)
+        if msg and await view.wait():
+            # only manually disable if it was a timeout (ie. not a user stop)
+            await view.disable(msg)
 
 
-    @commands.hybrid_command(name='set-xp')
+    @app_commands.command(name="set-xp")
     @app_commands.default_permissions(administrator=True)
     @app_commands.describe(
         user="The user to set the XP of",
         xp="The new XP value. Set to 0 to remove the user from the leaderboard",
     )
-    @commands.guild_only()
-    @commands.cooldown(3, 15, commands.BucketType.user)
-    @commands.check(checks.has_admin)
-    async def set_xp(self, ctx: MyContext, user: discord.User, xp: commands.Range[int, 0, 10**15]):
+    @app_commands.guild_only()
+    @app_commands.checks.cooldown(3, 15)
+    async def set_xp(self, interaction: discord.Interaction, user: discord.User, xp: app_commands.Range[int, 0, 10**15]):
         """Set the XP of a user
 
         ..Example set_xp @someone 3000"""
         if user.bot:
-            await ctx.send(await self.bot._(ctx.guild.id, "xp.no-bot"))
+            await interaction.response.send_message(
+                await self.bot._(interaction, "xp.no-bot"), ephemeral=True
+            )
             return
-        await ctx.defer()
-        xp_used_type: str = await self.bot.get_config(ctx.guild.id, "xp_type")
+        # check if the xp system is enabled and local
+        xp_used_type: str = await self.bot.get_config(interaction.guild_id, "xp_type")
         if xp_used_type == "global":
-            await ctx.send(await self.bot._(ctx.guild.id, "xp.change-global-xp"))
+            await interaction.response.send_message(
+                await self.bot._(interaction, "xp.change-global-xp"), ephemeral=True
+            )
             return
-        if xp < 0:
-            await ctx.send(await self.bot._(ctx.guild.id, "xp.negative-xp"))
-            return
-        try:
-            prev_xp = await self.db_get_xp(user.id, ctx.guild.id)
-            if xp == 0:
-                await self.db_remove_user(user.id, ctx.guild.id)
-            else:
-                await self.db_set_xp(user.id, xp, action='set', guild_id=ctx.guild.id)
-            await ctx.send(await self.bot._(ctx.guild.id, "xp.change-xp-ok", user=str(user), xp=xp))
-        except Exception as err:
-            await ctx.send(await self.bot._(ctx.guild.id, "minecraft.serv-error"))
-            self.bot.dispatch("error", err, ctx)
+        await interaction.response.defer()
+        # get the current value (for internal logs)
+        prev_xp = await self.db_get_xp(user.id, interaction.guild_id)
+        # set the new xp value
+        if xp == 0:
+            await self.db_remove_user(user.id, interaction.guild_id)
         else:
-            if ctx.guild.id not in self.cache:
-                await self.db_load_cache(ctx.guild.id)
-            self.cache[ctx.guild.id][user.id] = [round(time.time()), xp]
-            desc = f"XP of user {user} `{user.id}` edited (from {prev_xp} to {xp}) in server `{ctx.guild.id}`"
-            self.log.info(desc)
-            emb = discord.Embed(description=desc,color=8952255, timestamp=self.bot.utcnow())
-            emb.set_footer(text=ctx.guild.name)
-            emb.set_author(name=self.bot.user, icon_url=self.bot.user.display_avatar)
-            await self.bot.send_embed(emb)
+            await self.db_set_xp(user.id, xp, action="set", guild_id=interaction.guild_id)
+        # confirm success
+        await interaction.followup.send(await self.bot._(interaction, "xp.change-xp-ok", user=str(user), xp=xp))
+        # update cache
+        if interaction.guild_id not in self.cache:
+            await self.db_load_cache(interaction.guild_id)
+        self.cache[interaction.guild_id][user.id] = [round(time.time()), xp]
+        # send internal logs of the change
+        desc = f"XP of user {user} `{user.id}` edited (from {prev_xp} to {xp}) in server `{interaction.guild_id}`"
+        self.log.info(desc)
+        emb = discord.Embed(description=desc,color=8952255, timestamp=self.bot.utcnow())
+        emb.set_footer(text=interaction.guild.name)
+        emb.set_author(name=self.bot.user, icon_url=self.bot.user.display_avatar)
+        await self.bot.send_embed(emb)
 
     async def gen_rr_id(self):
         return round(time.time()/2)
@@ -963,111 +934,103 @@ class Xp(commands.Cog):
             pass
         return True
 
-    @commands.hybrid_group(name="roles-rewards", aliases=['rr'])
-    @commands.guild_only()
-    @app_commands.default_permissions(manage_roles=True)
-    async def rr_main(self, ctx: MyContext):
-        """Manage your roles rewards like a boss
-
-        ..Doc server.html#roles-rewards"""
-        if ctx.subcommand_passed is None:
-            await ctx.send_help(ctx.command)
+    rr_main = app_commands.Group(
+        name="roles-rewards",
+        description="Manage your roles rewards like a boss",
+        default_permissions=discord.Permissions(manage_roles=True),
+        guild_only=True,
+    )
 
     @rr_main.command(name="add")
-    @commands.check(checks.has_manage_roles)
-    async def rr_add(self, ctx: MyContext, level: commands.Range[int, 1], *, role: discord.Role):
+    async def rr_add(self, interaction: discord.Interaction, level: app_commands.Range[int, 1], role: discord.Role):
         """Add a role reward
         This role will be given to every member who reaches the level
 
         ..Example rr add 10 Slowly farming
 
         ..Doc server.html#roles-rewards"""
-        try:
-            if role.name == '@everyone':
-                raise commands.BadArgument(f'Role "{role.name}" not found')
-            l = await self.rr_list_role(ctx.guild.id)
-            if len([x for x in l if x['level']==level]) > 0:
-                return await ctx.send(await self.bot._(ctx.guild.id, "xp.already-1-rr"))
-            max_rr: int = await self.bot.get_config(ctx.guild.id, "rr_max_number")
-            if len(l) >= max_rr:
-                return await ctx.send(await self.bot._(ctx.guild.id, "xp.too-many-rr", c=len(l)))
-            await self.rr_add_role(ctx.guild.id,role.id,level)
-        except Exception as err:
-            self.bot.dispatch("command_error", ctx, err)
-        else:
-            await ctx.send(await self.bot._(ctx.guild.id, "xp.rr-added", role=role.name,level=level))
+        if role.name == '@everyone':
+            raise commands.BadArgument(f'Role "{role.name}" not found')
+        await interaction.response.defer()
+        l = await self.rr_list_role(interaction.guild_id)
+        if len([x for x in l if x['level']==level]) > 0:
+            await interaction.followup.send(await self.bot._(interaction, "xp.already-1-rr"))
+            return
+        max_rr: int = await self.bot.get_config(interaction.guild_id, "rr_max_number")
+        if len(l) >= max_rr:
+            await interaction.followup.send(await self.bot._(interaction, "xp.too-many-rr", c=len(l)))
+            return
+        await self.rr_add_role(interaction.guild_id,role.id,level)
+        await interaction.followup.send(await self.bot._(interaction, "xp.rr-added", role=role.name,level=level))
 
     @rr_main.command(name="list")
-    @commands.check(checks.bot_can_embed)
-    async def rr_list(self, ctx: MyContext):
+    async def rr_list(self, interaction: discord.Interaction):
         """List every roles rewards of your server
 
         ..Doc server.html#roles-rewards"""
-        try:
-            roles_list = await self.rr_list_role(ctx.guild.id)
-        except Exception as err:
-            self.bot.dispatch("command_error", ctx, err)
+        await interaction.response.defer()
+        if roles_list := await self.rr_list_role(interaction.guild_id):
+            desc = '\n'.join([
+                f"• <@&{x['role']}> : lvl {x['level']}"
+                for x in roles_list
+            ])
         else:
-            if roles_list:
-                desc = '\n'.join([
-                    f"• <@&{x['role']}> : lvl {x['level']}"
-                    for x in roles_list
-                ])
-            else:
-                desc = await self.bot._(
-                    ctx.guild.id, "xp.no-rr-list", add=await self.bot.get_command_mention("roles-rewards add"))
-            max_rr: int = await self.bot.get_config(ctx.guild.id, "rr_max_number")
-            title = await self.bot._(ctx.guild.id,"xp.rr_list", c=len(roles_list), max=max_rr)
-            emb = discord.Embed(title=title, description=desc, timestamp=ctx.message.created_at)
-            emb.set_footer(text=ctx.author, icon_url=ctx.author.display_avatar)
-            await ctx.send(embed=emb)
+            roles_list = []
+            desc = await self.bot._(
+                interaction,
+                "xp.no-rr-list",
+                add=await self.bot.get_command_mention("roles-rewards add")
+            )
+        max_rr: int = await self.bot.get_config(interaction.guild_id, "rr_max_number")
+        title = await self.bot._(interaction,"xp.rr_list", c=len(roles_list), max=max_rr)
+        emb = discord.Embed(title=title, description=desc)
+        await interaction.followup.send(embed=emb)
 
     @rr_main.command(name="remove")
-    @commands.check(checks.has_manage_roles)
-    async def rr_remove(self, ctx: MyContext, level: commands.Range[int, 1]):
+    async def rr_remove(self, interaction: discord.Interaction, level: app_commands.Range[int, 1]):
         """Remove a role reward
         When a member reaches this level, no role will be given anymore
 
         ..Example roles-rewards remove 10
 
         ..Doc server.html#roles-rewards"""
-        try:
-            l = await self.rr_list_role(ctx.guild.id,level)
-            if len(l) == 0:
-                return await ctx.send(await self.bot._(ctx.guild.id, "xp.no-rr"))
-            await self.rr_remove_role(l[0]['ID'])
-        except Exception as err:
-            self.bot.dispatch("command_error", ctx, err)
-        else:
-            await ctx.send(await self.bot._(ctx.guild.id, "xp.rr-removed", level=level))
+        await interaction.response.defer()
+        roles_list = await self.rr_list_role(interaction.guild_id,level)
+        if len(roles_list) == 0:
+            await interaction.followup.send(await self.bot._(interaction, "xp.no-rr"))
+            return
+        await self.rr_remove_role(roles_list[0]['ID'])
+        await interaction.followup.send(await self.bot._(interaction, "xp.rr-removed", level=level))
 
     @rr_main.command(name="reload")
-    @commands.check(checks.has_manage_roles)
-    @commands.cooldown(1, 300, commands.BucketType.guild)
-    async def rr_reload(self, ctx: MyContext):
+    @app_commands.checks.cooldown(1, 300)
+    async def rr_reload(self, interaction: discord.Interaction):
         """Refresh roles rewards for the whole server
 
         ..Doc server.html#roles-rewards"""
-        try:
-            if not ctx.guild.me.guild_permissions.manage_roles:
-                return await ctx.send(await self.bot._(ctx.guild.id,'moderation.mute.cant-mute'))
-            count = 0
-            rr_list = await self.rr_list_role(ctx.guild.id)
-            if len(rr_list) == 0:
-                await ctx.send(await self.bot._(ctx.guild, "xp.no-rr-2"))
-                return
-            used_system: str = await self.bot.get_config(ctx.guild.id, "xp_type")
-            xps = [
-                {'user': x['userID'], 'xp':x['xp']}
-                for x in await self.db_get_top(limit=None, guild=None if used_system == "global" else ctx.guild)
-            ]
-            for member_data in xps:
-                if member := ctx.guild.get_member(member_data['user']):
-                    level = (await self.calc_level(member_data['xp'], used_system))[0]
-                    count += await self.give_rr(member, level, rr_list, remove=True)
-            await ctx.send(await self.bot._(ctx.guild.id, "xp.rr-reload", role_count=count,member_count=ctx.guild.member_count))
-        except Exception as err:
-            self.bot.dispatch("command_error", ctx, err)
+        if not interaction.guild.me.guild_permissions.manage_roles:
+            await interaction.response.send_message(
+                await self.bot._(interaction,'moderation.mute.cant-mute'), ephemeral=True
+            )
+            return
+        await interaction.response.defer()
+        count = 0
+        rr_list = await self.rr_list_role(interaction.guild_id)
+        if len(rr_list) == 0:
+            await interaction.followup.send(await self.bot._(interaction, "xp.no-rr-2"))
+            return
+        used_system: str = await self.bot.get_config(interaction.guild_id, "xp_type")
+        xps = [
+            {'user': x['userID'], 'xp':x['xp']}
+            for x in await self.db_get_top(limit=None, guild=None if used_system == "global" else interaction.guild)
+        ]
+        for member_data in xps:
+            if member := interaction.guild.get_member(member_data['user']):
+                level = (await self.calc_level(member_data['xp'], used_system))[0]
+                count += await self.give_rr(member, level, rr_list, remove=True)
+        await interaction.followup.send(
+            await self.bot._(interaction, "xp.rr-reload", role_count=count, member_count=interaction.guild.member_count)
+        )
 
 
 async def setup(bot: Axobot):

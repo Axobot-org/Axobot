@@ -161,8 +161,6 @@ class TopPaginator(Paginator):
         emb.add_field(name=field_title, value="\n".join(txt), inline=False)
         # user rank
         emb.add_field(**await self.get_user_rank())
-        # embed footer with user info
-        emb.set_footer(text=self.user, icon_url=self.user.display_avatar)
         return {
             "embed": emb
         }
