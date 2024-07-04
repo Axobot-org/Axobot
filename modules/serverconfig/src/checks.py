@@ -14,11 +14,6 @@ async def check_config(bot: Axobot, guild: discord.Guild, option: str, value: An
         return await antiraid_check(bot, guild, option, value)
     if option == "antiscam":
         return await antiscam_check(bot, guild, option, value)
-    if option in {
-        "ban_allowed_roles", "clear_allowed_roles", "kick_allowed_roles", "mute_allowed_roles", "slowmode_allowed_roles"
-    }:
-        if embed := await moderation_commands_check(bot, guild, option, value):
-            return embed
     if option in {"bot_news", "levelup_channel", "partner_channel", "streaming_channel", "welcome_channel"}:
         levelup_is_channel = option != "levelup_channel" or not isinstance(value, str)
         if levelup_is_channel and (embed := await can_write_in_channel_check(bot, guild, option, value)):
@@ -72,46 +67,6 @@ async def antiscam_check(bot: Axobot, guild: discord.Guild, _option: str, value:
         guild,
         await bot._(guild, "server.tips.antiscam", modlogs_enable=await bot.get_command_mention("modlogs enable"))
     )
-
-async def moderation_commands_check(bot: Axobot, guild: discord.Guild, option: str, value: list[discord.Role] | None):
-    "Check if bot has the required permissions to execute moderation commands, else warn to grant them"
-    if not value:
-        return
-    if option == "ban_allowed_roles" and not guild.me.guild_permissions.ban_members:
-        ban_perm = await bot._(guild, "permissions.list.ban_members")
-        return await _create_warning_embed(
-            bot,
-            guild,
-            await bot._(guild, "server.warnings.moderation_command", perm=ban_perm)
-        )
-    if option == "clear_allowed_roles" and not guild.me.guild_permissions.manage_messages:
-        manage_msg_perms = await bot._(guild, "permissions.list.manage_messages")
-        return await _create_warning_embed(
-            bot,
-            guild,
-            await bot._(guild, "server.warnings.moderation_command", perm=manage_msg_perms)
-        )
-    if option == "kick_allowed_roles" and not guild.me.guild_permissions.kick_members:
-        kick_perm = await bot._(guild, "permissions.list.kick_members")
-        return await _create_warning_embed(
-            bot,
-            guild,
-            await bot._(guild, "server.warnings.moderation_command", perm=kick_perm)
-        )
-    if option == "mute_allowed_roles" and not guild.me.guild_permissions.moderate_members:
-        moderate_perm = await bot._(guild, "permissions.list.moderate_members")
-        return await _create_warning_embed(
-            bot,
-            guild,
-            await bot._(guild, "server.warnings.moderation_command", perm=moderate_perm)
-        )
-    if option == "slowmode_allowed_roles" and not guild.me.guild_permissions.manage_channels:
-        manage_channel_perm = await bot._(guild, "permissions.list.manage_channels")
-        return await _create_warning_embed(
-            bot,
-            guild,
-            await bot._(guild, "server.warnings.moderation_command", perm=manage_channel_perm)
-        )
 
 
 async def can_write_in_channel_check(bot: Axobot, guild: discord.Guild, _option: str,

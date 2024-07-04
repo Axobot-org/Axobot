@@ -18,30 +18,6 @@
             "Le bot possède les permissions suffisantes",
             "Le bot ne possède pas les permissions suffisantes"
         ],
-        "can_ban": [
-            "L'un de vos rôles est autorisé à utiliser cette commande (`ban_allowed_roles`)",
-            "Rôle autorisé manquant (`ban_allowed_roles`)"
-        ],
-        "can_clear": [
-            "L'un de vos rôles est autorisé à utiliser cette commande (`clear_allowed_roles`)",
-            "Rôle autorisé manquant (`clear_allowed_roles`)"
-        ],
-        "can_edit_case": [
-            "L'un de vos rôles est autorisé à utiliser cette commande (`warn_allowed_roles`)",
-            "Rôle autorisé manquant (`warn_allowed_roles`)"
-        ],
-        "can_kick": [
-            "L'un de vos rôles est autorisé à utiliser cette commande (`kick_allowed_roles`)",
-            "Rôle autorisé manquant (`kick_allowed_roles`)"
-        ],
-        "can_mute": [
-            "L'un de vos rôles est autorisé à utiliser cette commande (`mute_allowed_roles`)",
-            "Rôle autorisé manquant (`mute_allowed_roles`)"
-        ],
-        "can_slowmode": [
-            "L'un de vos rôles est autorisé à utiliser cette commande (`slowmode_allowed_roles`)",
-            "Rôle autorisé manquant (`slowmode_allowed_roles`)"
-        ],
         "can_use_cookie": [
             "Vous êtes un élu de chez Aragorn1202",
             "Cette commande est sur Whitelist"
@@ -49,10 +25,6 @@
         "can_use_rss": [
             "Vous avez la permission 'Gérer le serveur'",
             "Permission 'Gérer le serveur' manquante"
-        ],
-        "can_warn": [
-            "L'un de vos rôles est autorisé à utiliser cette commande (`warn_allowed_roles`)",
-            "Rôle autorisé manquant (`warn_allowed_roles`)"
         ],
         "database_connected": [
             "La base de donnée est bien en ligne",
