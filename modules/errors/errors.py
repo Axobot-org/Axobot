@@ -245,7 +245,7 @@ class Errors(commands.Cog):
             await self.on_error(error, None)
 
     @commands.Cog.listener()
-    async def on_error(self, error: Exception, ctx: AllowedCtx | None):
+    async def on_error(self, error: Exception, ctx: AllowedCtx | None = None):
         """Called when an error is raised
 
         Its only purpose is to log the error, ctx param is only useful for traceability"""

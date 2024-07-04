@@ -275,29 +275,29 @@ class BotStats(commands.Cog):
         "Count the number of disabled RSS feeds in any guild"
         table = "rss_feed_beta" if self.bot.beta else "rss_flow"
         query = f"SELECT COUNT(*) FROM {table} WHERE enabled = 0"
-        async with self.bot.db_query(query, fetchone=True, astuple=True) as query_result:
+        async with self.bot.db_main.read(query, fetchone=True, astuple=True) as query_result:
             return query_result[0]
 
     async def db_record_event_collect_values(self, now: datetime):
         "Record into the stats table the total, min, max and median dailies values, as well as the number of dailies rows"
         # check if any daily is present
         query = "SELECT COUNT(*) FROM `axobot`.`event_points` WHERE `beta` = %s"
-        async with self.bot.db_query(query, (self.bot.beta,), fetchone=True, astuple=True) as query_result:
+        async with self.bot.db_main.read(query, (self.bot.beta,), fetchone=True, astuple=True) as query_result:
             if query_result[0] == 0:
                 return
         # unit, is_sum, entity_id, beta
         args = ("points", False, self.bot.entity_id, self.bot.beta)
         # Total
         query = "INSERT INTO `statsbot`.`zbot` SELECT %s, %s, SUM(collect_points) AS value, 0, %s, %s, %s FROM `axobot`.`event_points` WHERE `beta` = %s"
-        async with self.bot.db_query(query, (now, "eventpoints_collect.total", *args)) as _:
+        async with self.bot.db_main.write(query, (now, "eventpoints_collect.total", *args)) as _:
             pass
         # Min
         query = "INSERT INTO `statsbot`.`zbot` SELECT %s, %s, MIN(collect_points) AS value, 0, %s, %s, %s FROM `axobot`.`event_points` WHERE `beta` = %s"
-        async with self.bot.db_query(query, (now, "eventpoints_collect.min", *args)) as _:
+        async with self.bot.db_main.write(query, (now, "eventpoints_collect.min", *args)) as _:
             pass
         # Max
         query = "INSERT INTO `statsbot`.`zbot` SELECT %s, %s, MAX(collect_points) AS value, 0, %s, %s, %s FROM `axobot`.`event_points` WHERE `beta` = %s"
-        async with self.bot.db_query(query, (now, "eventpoints_collect.max", *args)) as _:
+        async with self.bot.db_main.write(query, (now, "eventpoints_collect.max", *args)) as _:
             pass
         # Median
         query = """SET @row_index := -1;
@@ -311,12 +311,12 @@ class BotStats(commands.Cog):
             ) AS subq
             WHERE subq.row_index
             IN (FLOOR(@row_index / 2) , CEIL(@row_index / 2))"""
-        async with self.bot.db_query(query, (now, "eventpoints_collect.median", *args), multi=True) as _:
+        async with self.bot.db_main.write(query, (now, "eventpoints_collect.median", *args), multi=True) as _:
             pass
         # Number of rows
         query = "INSERT INTO `statsbot`.`zbot` SELECT %s, %s, COUNT(*) AS value, 0, %s, %s, %s FROM `axobot`.`event_points` "\
             "WHERE `collect_points` != 0 AND `beta` = %s"
-        async with self.bot.db_query(query, (now, "eventpoints_collect.rows", *args)) as _:
+        async with self.bot.db_main.write(query, (now, "eventpoints_collect.rows", *args)) as _:
             pass
 
     async def db_record_event_points_values(self, now: datetime):
@@ -324,7 +324,7 @@ class BotStats(commands.Cog):
         as well as the number of users having at least 1 point"""
         # check if any daily is present
         query = "SELECT COUNT(*) FROM `axobot`.`event_points` WHERE `beta` = %s"
-        async with self.bot.db_query(query, (self.bot.beta,), fetchone=True, astuple=True) as query_result:
+        async with self.bot.db_main.read(query, (self.bot.beta,), fetchone=True, astuple=True) as query_result:
             if query_result[0] == 0:
                 return
         # unit, is_sum, entity_id, beta
@@ -332,17 +332,17 @@ class BotStats(commands.Cog):
         # Total
         query = "INSERT INTO `statsbot`.`zbot` SELECT %s, %s, SUM(`points`) AS value, 0, %s, %s, %s FROM `axobot`.`event_points`"\
             " WHERE `beta` = %s"
-        async with self.bot.db_query(query, (now, "eventpoints.total", *args)) as _:
+        async with self.bot.db_main.write(query, (now, "eventpoints.total", *args)) as _:
             pass
         # Min
         query = "INSERT INTO `statsbot`.`zbot` SELECT %s, %s, MIN(`points`) AS value, 0, %s, %s, %s FROM `axobot`.`event_points`"\
             " WHERE `beta` = %s"
-        async with self.bot.db_query(query, (now, "eventpoints.min", *args)) as _:
+        async with self.bot.db_main.write(query, (now, "eventpoints.min", *args)) as _:
             pass
         # Max
         query = "INSERT INTO `statsbot`.`zbot` SELECT %s, %s, MAX(`points`) AS value, 0, %s, %s, %s FROM `axobot`.`event_points`"\
             " WHERE `beta` = %s"
-        async with self.bot.db_query(query, (now, "eventpoints.max", *args)) as _:
+        async with self.bot.db_main.write(query, (now, "eventpoints.max", *args)) as _:
             pass
         # Median
         query = """SET @row_index := -1;
@@ -356,19 +356,19 @@ class BotStats(commands.Cog):
             ) AS subq
             WHERE subq.row_index
             IN (FLOOR(@row_index / 2) , CEIL(@row_index / 2))"""
-        async with self.bot.db_query(query, (now, "eventpoints.median", *args), multi=True) as _:
+        async with self.bot.db_main.write(query, (now, "eventpoints.median", *args), multi=True) as _:
             pass
         # Number of rows
         query = "INSERT INTO `statsbot`.`zbot` SELECT %s, %s, COUNT(*) AS value, 0, %s, %s, %s FROM `axobot`.`event_points` "\
             "WHERE `points` != 0 AND `beta` = %s"
-        async with self.bot.db_query(query, (now, "eventpoints.rows", *args)) as _:
+        async with self.bot.db_main.write(query, (now, "eventpoints.rows", *args)) as _:
             pass
 
     async def db_record_serverlogs_enabled(self, now: datetime):
         "Record into the stats table the number of enabled serverlogs, grouped by kind"
         guild_ids = {guild.id for guild in self.bot.guilds}
-        query = """SELECT guild, kind FROM `serverlogs` WHERE `beta` = %s"""
-        async with self.bot.db_query(query, (self.bot.beta,)) as query_results:
+        query = "SELECT guild, kind FROM `serverlogs` WHERE `beta` = %s"
+        async with self.bot.db_main.read(query, (self.bot.beta,)) as query_results:
             enabled_kinds = defaultdict(int)
             for row in query_results:
                 if row["guild"] in guild_ids:
@@ -384,7 +384,7 @@ class BotStats(commands.Cog):
         query = "SELECT `guild_id` FROM `serverconfig` WHERE `option_name` = 'anti_scam' AND `value` = %s"
         count = 0
         guild_ids = {guild.id for guild in self.bot.guilds}
-        async with self.bot.db_query(query, ("True",)) as query_results:
+        async with self.bot.db_main.read(query, ("True",)) as query_results:
             for row in query_results:
                 if row["guild_id"] in guild_ids:
                     count += 1
@@ -405,7 +405,7 @@ class BotStats(commands.Cog):
             query = f"INSERT INTO `{self.emoji_table}` (`ID`,`count`,`last_update`) VALUES (%(i)s, 1, %(l)s) \
                 ON DUPLICATE KEY UPDATE count = `count` + 1, last_update = %(l)s;"
             for data in [{ 'i': x, 'l': current_timestamp } for x in liste]:
-                async with self.bot.db_query(query, data):
+                async with self.bot.db_main.write(query, data):
                     pass
         except Exception as err:
             self.bot.dispatch("error", err)
@@ -422,7 +422,7 @@ class BotStats(commands.Cog):
             query = f"SELECT * from `{self.emoji_table}` WHERE {where_cond}"
             query_args = (tuple(emoji_id), )
         liste = []
-        async with self.bot.db_query(query, query_args) as query_results:
+        async with self.bot.db_main.read(query, query_args) as query_results:
             for x in query_results:
                 x["emoji"] = self.bot.get_emoji(x["ID"])
                 liste.append(x)
@@ -580,7 +580,6 @@ class BotStats(commands.Cog):
             # Push everything
             cnx.commit()
         except mysql.connector.errors.IntegrityError as err: # usually duplicate primary key
-            self.log.warning("Stats loop iteration cancelled: %s", err, exc_info=True)
             self.bot.dispatch("error", err, "Stats loop iteration cancelled")
         # if something goes wrong, we still have to close the cursor
         cursor.close()
@@ -642,7 +641,7 @@ class BotStats(commands.Cog):
         if not self.bot.stats_enabled:
             return
         query = "INSERT INTO `statsbot`.`heartbeat` (`entity_id`) VALUES (%s)"
-        async with self.bot.db_query(query, (self.bot.entity_id,)):
+        async with self.bot.db_main.write(query, (self.bot.entity_id,)):
             self.log.debug("Heartbeat sent to database")
 
     @heartbeat_loop.before_loop

@@ -110,7 +110,7 @@ class RolesReact(commands.Cog):
         self.cache_initialized = False
         self.cache.clear()
         query = f"SELECT * FROM `{self.table}`;"
-        async with self.bot.db_query(query) as query_results:
+        async with self.bot.db_main.read(query) as query_results:
             for row in query_results:
                 await self._add_rr_to_cache(row)
         self.cache_initialized = True
@@ -120,7 +120,7 @@ class RolesReact(commands.Cog):
         if isinstance(emoji, discord.Emoji):
             emoji = emoji.id
         query = f"INSERT INTO `{self.table}` (`guild`,`role`,`emoji`,`description`) VALUES (%(g)s,%(r)s,%(e)s,%(d)s);"
-        async with self.bot.db_query(query, {'g': guild, 'r': role, 'e': emoji, 'd': desc}):
+        async with self.bot.db_main.write(query, {'g': guild, 'r': role, 'e': emoji, 'd': desc}):
             pass
         return True
 
@@ -128,7 +128,7 @@ class RolesReact(commands.Cog):
         """List role reaction in the database"""
         query = f"SELECT * FROM `{self.table}` WHERE guild=%s ORDER BY added_at;"
         rr_list: list[RoleReactionRow] = []
-        async with self.bot.db_query(query, (guild_id,)) as query_results:
+        async with self.bot.db_main.read(query, (guild_id,)) as query_results:
             for row in query_results:
                 rr_list.append(row)
         return rr_list
@@ -138,20 +138,20 @@ class RolesReact(commands.Cog):
         if isinstance(emoji, discord.Emoji):
             emoji = emoji.id
         query = f"SELECT * FROM `{self.table}` WHERE guild=%(g)s AND emoji=%(e)s ORDER BY added_at;"
-        async with self.bot.db_query(query, {"g": guild_id, "e": str(emoji)}, fetchone=True) as query_results:
+        async with self.bot.db_main.read(query, {"g": guild_id, "e": str(emoji)}, fetchone=True) as query_results:
             return query_results or None
 
     async def db_remove_role(self, rr_id: int):
         """Remove a role reaction from the database"""
         query = f"DELETE FROM `{self.table}` WHERE `ID`=%s;"
-        async with self.bot.db_query(query, (rr_id,)):
+        async with self.bot.db_main.write(query, (rr_id,)):
             pass
         return True
 
     async def db_edit_description(self, rr_id: int, new_description: str):
         """Edit the description of a role reaction"""
         query = f"UPDATE `{self.table}` SET `description`=%s WHERE `ID`=%s;"
-        async with self.bot.db_query(query, (new_description, rr_id)):
+        async with self.bot.db_main.write(query, (new_description, rr_id)):
             pass
         return True
 

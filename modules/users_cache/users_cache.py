@@ -35,7 +35,7 @@ class UsersCache(commands.Cog):
 VALUES (%s, %s, %s, %s, %s, CURRENT_TIMESTAMP()) ON DUPLICATE KEY UPDATE `username` = VALUES(`username`), \
 `global_name` = VALUES(`global_name`), `avatar_hash` = VALUES(`avatar_hash`), `is_bot` = VALUES(`is_bot`), \
 `last_seen` = VALUES(`last_seen`);"
-        async with self.bot.db_query(query, (user.id, user.name, global_name, avatar_hash, user.bot)):
+        async with self.bot.db_main.write(query, (user.id, user.name, global_name, avatar_hash, user.bot)):
             pass
 
 
@@ -43,7 +43,7 @@ VALUES (%s, %s, %s, %s, %s, CURRENT_TIMESTAMP()) ON DUPLICATE KEY UPDATE `userna
     async def delete_old_cache_loop(self):
         "Remove old cache data (older than 30 days)"
         query = "DELETE FROM `users_cache` WHERE `last_seen` < DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 30 DAY);"
-        async with self.bot.db_query(query):
+        async with self.bot.db_main.write(query):
             pass
 
     @commands.Cog.listener()

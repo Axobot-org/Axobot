@@ -45,7 +45,7 @@ class PrefixManager:
         # prepare the SQL query
         query = "SELECT `value` FROM `serverconfig` WHERE `guild_id` = %s AND `option_name` = 'prefix' AND `beta` = %s"
         # get the thing
-        async with self.bot.db_query(query, (guild_id, self.bot.beta), fetchone=True) as query_result:
+        async with self.bot.db_main.read(query, (guild_id, self.bot.beta), fetchone=True) as query_result:
             if query_result and len(query_result["value"]) > 0:
                 prefix: str = query_result["value"]
             else:

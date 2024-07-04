@@ -99,13 +99,13 @@ class Tickets(commands.Cog):
     async def db_get_topics(self, guild_id: int) -> list[DBTopicRow]:
         "Fetch the topics associated to a guild"
         query = "SELECT * FROM `tickets` WHERE `guild_id` = %s AND `topic` IS NOT NULL AND `beta` = %s"
-        async with self.bot.db_query(query, (guild_id, self.bot.beta)) as db_query:
+        async with self.bot.db_main.read(query, (guild_id, self.bot.beta)) as db_query:
             return db_query
 
     async def db_get_defaults(self, guild_id: int) -> DBTopicRow | None:
         "Get the default values for a guild"
         query = "SELECT * FROM `tickets` WHERE `guild_id` = %s AND `topic` IS NULL AND `beta` = %s"
-        async with self.bot.db_query(query, (guild_id, self.bot.beta), fetchone=True) as db_query:
+        async with self.bot.db_main.read(query, (guild_id, self.bot.beta), fetchone=True) as db_query:
             return db_query or None
 
     async def db_get_topic_with_defaults(self, guild_id: int, topic_id: int) -> DBTopicRow:
@@ -114,15 +114,26 @@ class Tickets(commands.Cog):
             query = "SELECT * FROM `tickets` WHERE `guild_id` = %s AND `topic` IS NULL AND `beta` = %s"
             args = (guild_id, self.bot.beta)
         else:
-            query = "SELECT t.id, t.guild_id, t.topic, COALESCE(t.topic_emoji, t2.topic_emoji) as topic_emoji, COALESCE(t.prompt, t2.prompt) as `prompt`, COALESCE(t.role, t2.role) as role, COALESCE(t.hint, t2.hint) as `hint`, COALESCE(t.category, t2.category) as `category`, COALESCE(t.name_format, t2.name_format) as name_format, t.beta FROM tickets t LEFT JOIN tickets t2 ON t2.guild_id = t.guild_id AND t2.beta = t.beta AND t2.topic is NULL WHERE t.id = %s AND t.guild_id = %s AND t.beta = %s"
+            query = """
+            SELECT t.id, t.guild_id, t.topic,
+                COALESCE(t.topic_emoji, t2.topic_emoji) as topic_emoji,
+                COALESCE(t.prompt, t2.prompt) as `prompt`,
+                COALESCE(t.role, t2.role) as role,
+                COALESCE(t.hint, t2.hint) as `hint`,
+                COALESCE(t.category, t2.category) as `category`,
+                COALESCE(t.name_format, t2.name_format) as name_format,
+                t.beta
+            FROM tickets t
+            LEFT JOIN tickets t2 ON t2.guild_id = t.guild_id AND t2.beta = t.beta AND t2.topic is NULL
+            WHERE t.id = %s AND t.guild_id = %s AND t.beta = %s"""
             args = (topic_id, guild_id, self.bot.beta)
-        async with self.bot.db_query(query, args, fetchone=True) as db_query:
+        async with self.bot.db_main.read(query, args, fetchone=True) as db_query:
             return db_query or None
 
     async def db_get_guild_default_id(self, guild_id: int) -> int | None:
         "Return the row ID corresponding to the default guild setup, or None"
         query = "SELECT id FROM `tickets` WHERE guild_id = %s AND topic IS NULL AND beta = %s"
-        async with self.bot.db_query(query, (guild_id, self.bot.beta), fetchone=True) as db_query:
+        async with self.bot.db_main.read(query, (guild_id, self.bot.beta), fetchone=True) as db_query:
             if not db_query:
                 return None
             return db_query["id"]
@@ -131,14 +142,14 @@ class Tickets(commands.Cog):
         "Create a new row for default guild setup"
         # INSERT only if not exists
         query = "INSERT INTO `tickets` (guild_id, beta) SELECT %(g)s, %(b)s WHERE (SELECT 1 as `exists` FROM `tickets` WHERE guild_id = %(g)s AND topic IS NULL AND beta = %(b)s) IS NULL"
-        async with self.bot.db_query(query, {'g': guild_id, 'b': self.bot.beta}) as db_query:
+        async with self.bot.db_main.write(query, {'g': guild_id, 'b': self.bot.beta}) as db_query:
             return db_query
 
     async def db_add_topic(self, guild_id: int, name: str, emoji: str | None) -> bool:
         "Add a topic to a guild"
         query = "INSERT INTO `tickets` (`guild_id`, `topic`, `topic_emoji`, `beta`) VALUES (%s, %s, %s, %s)"
         try:
-            async with self.bot.db_query(query, (guild_id, name, emoji, self.bot.beta), returnrowcount=True) as db_query:
+            async with self.bot.db_main.write(query, (guild_id, name, emoji, self.bot.beta), returnrowcount=True) as db_query:
                 return db_query > 0
         except IntegrityError:
             return False
@@ -147,55 +158,55 @@ class Tickets(commands.Cog):
         "Delete multiple topics from a guild"
         topic_ids = ", ".join(map(str, topic_ids))
         query = f"DELETE FROM `tickets` WHERE `guild_id` = %s AND id IN ({topic_ids}) AND `beta` = %s"
-        async with self.bot.db_query(query, (guild_id, self.bot.beta), returnrowcount=True) as db_query:
+        async with self.bot.db_main.write(query, (guild_id, self.bot.beta), returnrowcount=True) as db_query:
             return db_query
 
     async def db_topic_exists(self, guild_id: int, topic_id: int):
         "Check if a topic exists for a guild"
         query = "SELECT 1 FROM `tickets` WHERE `guild_id` = %s AND `id` = %s AND `topic` IS NOT NULL AND `beta` = %s"
-        async with self.bot.db_query(query, (guild_id, topic_id, self.bot.beta)) as db_query:
+        async with self.bot.db_main.read(query, (guild_id, topic_id, self.bot.beta)) as db_query:
             return len(db_query) > 0
 
     async def db_edit_topic_name(self, guild_id: int, topic_id: int, name: str) -> bool:
         "Edit a topic name"
         query = "UPDATE `tickets` SET `topic` = %s WHERE `guild_id` = %s AND `id` = %s AND `beta` = %s"
-        async with self.bot.db_query(query, (name, guild_id, topic_id, self.bot.beta), returnrowcount=True) as db_query:
+        async with self.bot.db_main.write(query, (name, guild_id, topic_id, self.bot.beta), returnrowcount=True) as db_query:
             return db_query > 0
 
     async def db_edit_topic_emoji(self, guild_id: int, topic_id: int, emoji: str | None) -> bool:
         "Edit a topic emoji"
         query = "UPDATE `tickets` SET `topic_emoji` = %s WHERE `guild_id` = %s AND `id` = %s AND `beta` = %s"
-        async with self.bot.db_query(query, (emoji, guild_id, topic_id, self.bot.beta), returnrowcount=True) as db_query:
+        async with self.bot.db_main.write(query, (emoji, guild_id, topic_id, self.bot.beta), returnrowcount=True) as db_query:
             return db_query > 0
 
     async def db_edit_topic_hint(self, guild_id: int, topic_id: int, hint: str | None) -> bool:
         "Edit a topic emoji"
         query = "UPDATE `tickets` SET `hint` = %s WHERE `guild_id` = %s AND `id` = %s AND `beta` = %s"
-        async with self.bot.db_query(query, (hint, guild_id, topic_id, self.bot.beta), returnrowcount=True) as db_query:
+        async with self.bot.db_main.write(query, (hint, guild_id, topic_id, self.bot.beta), returnrowcount=True) as db_query:
             return db_query > 0
 
     async def db_edit_topic_role(self, guild_id: int, topic_id: int, role_id: int | None) -> bool:
         "Edit a topic emoji"
         query = "UPDATE tickets SET role = %s WHERE guild_id = %s AND id = %s AND beta = %s"
-        async with self.bot.db_query(query, (role_id, guild_id, topic_id, self.bot.beta), returnrowcount=True) as db_query:
+        async with self.bot.db_main.write(query, (role_id, guild_id, topic_id, self.bot.beta), returnrowcount=True) as db_query:
             return db_query > 0
 
     async def db_edit_topic_category(self, guild_id: int, topic_id: int, category: int | None) -> bool:
         "Edit a topic category or channel in which tickets will be created"
         query = "UPDATE `tickets` SET `category` = %s WHERE `guild_id` = %s AND `id` = %s AND `beta` = %s"
-        async with self.bot.db_query(query, (category, guild_id, topic_id, self.bot.beta), returnrowcount=True) as db_query:
+        async with self.bot.db_main.write(query, (category, guild_id, topic_id, self.bot.beta), returnrowcount=True) as db_query:
             return db_query > 0
 
     async def db_edit_topic_format(self, guild_id: int, topic_id: int, name_format: str | None) -> bool:
         "Edit a topic channel/thread name format"
         query = "UPDATE `tickets` SET `name_format` = %s WHERE `guild_id` = %s AND `id` = %s AND `beta` = %s"
-        async with self.bot.db_query(query, (name_format, guild_id, topic_id, self.bot.beta), returnrowcount=True) as db_query:
+        async with self.bot.db_main.write(query, (name_format, guild_id, topic_id, self.bot.beta), returnrowcount=True) as db_query:
             return db_query > 0
 
     async def db_edit_prompt(self, guild_id: int, message: str):
         "Edit the prompt displayed for a guild"
         query = "UPDATE tickets SET prompt = %s WHERE guild_id = %s AND topic is NULL AND beta = %s"
-        async with self.bot.db_query(query, (message, guild_id, self.bot.beta)) as _:
+        async with self.bot.db_main.write(query, (message, guild_id, self.bot.beta)) as _:
             pass
 
     async def ask_user_topic(self, interaction: discord.Interaction, multiple = False, message: str | None = None):

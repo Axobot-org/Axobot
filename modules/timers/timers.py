@@ -31,44 +31,44 @@ class Timers(commands.Cog):
         else:
             query = "SELECT * FROM `timed` WHERE action='timer' AND ID=%s AND `beta`=%s"
             q_args = (reminder_id, self.bot.beta)
-        async with self.bot.db_query(query, q_args, fetchone=True) as query_result:
+        async with self.bot.db_main.read(query, q_args, fetchone=True) as query_result:
             return query_result
 
     async def db_get_user_reminders(self, user: int) -> list[dict]:
         "Get every active user reminder"
         query = "SELECT * FROM `timed` WHERE user=%s AND action='timer' AND `beta`=%s"
-        async with self.bot.db_query(query, (user, self.bot.beta)) as query_results:
+        async with self.bot.db_main.read(query, (user, self.bot.beta)) as query_results:
             return query_results
 
     async def db_get_user_reminders_count(self, user: int) -> int:
         "Get the number of active user reminder"
         query = "SELECT COUNT(*) as count FROM `timed` WHERE user=%s AND action='timer' AND `beta`=%s"
-        async with self.bot.db_query(query, (user, self.bot.beta), fetchone=True) as query_results:
+        async with self.bot.db_main.read(query, (user, self.bot.beta), fetchone=True) as query_results:
             return query_results["count"]
 
     async def db_delete_reminder(self, reminder_id: int, user: int):
         "Delete a reminder for a user"
         query = "DELETE FROM `timed` WHERE user=%s AND action='timer' AND ID=%s AND `beta`=%s"
-        async with self.bot.db_query(query, (user, reminder_id, self.bot.beta), returnrowcount=True) as query_result:
+        async with self.bot.db_main.write(query, (user, reminder_id, self.bot.beta), returnrowcount=True) as query_result:
             return query_result > 0
 
     async def db_delete_reminders(self, reminder_ids: list[int], user: int) -> bool:
         "Delete multiple reminders for a user"
         list_placeholder = ",".join(["%s"] * len(reminder_ids))
         query = f"DELETE FROM `timed` WHERE user=%s AND action='timer' AND ID IN ({list_placeholder})"
-        async with self.bot.db_query(query, (user, *reminder_ids), returnrowcount=True) as query_result:
+        async with self.bot.db_main.write(query, (user, *reminder_ids), returnrowcount=True) as query_result:
             return query_result > 0
 
     async def db_delete_all_user_reminders(self, user: int):
         "Delete every reminder for a user"
         query = "DELETE FROM `timed` WHERE user=%s AND action='timer' AND `beta`=%s"
-        async with self.bot.db_query(query, (user, self.bot.beta)) as _:
+        async with self.bot.db_main.write(query, (user, self.bot.beta)) as _:
             pass
 
     async def db_register_reminder_snooze(self, original_duration: int, new_duration: int):
         "Register a snooze"
         query = "INSERT INTO `reminder_snoozes_logs` (`original_duration`, `snooze_duration`, `beta`) VALUES (%s, %s, %s)"
-        async with self.bot.db_query(query, (original_duration, new_duration, self.bot.beta)):
+        async with self.bot.db_main.write(query, (original_duration, new_duration, self.bot.beta)):
             pass
 
     @cached(TTLCache(1_000, ttl=60))

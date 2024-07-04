@@ -317,7 +317,7 @@ class BotEvents(commands.Cog):
                 return True
             query = "INSERT INTO `event_points` (`user_id`, `other_points`, `beta`) VALUES (%s, %s, %s) \
                 ON DUPLICATE KEY UPDATE other_points = other_points + VALUE(`other_points`);"
-            async with self.bot.db_query(query, (user_id, points, self.bot.beta)):
+            async with self.bot.db_main.write(query, (user_id, points, self.bot.beta)):
                 pass
             try:
                 await self.reload_event_rankcard(user_id)
