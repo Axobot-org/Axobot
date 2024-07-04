@@ -24,29 +24,11 @@
         "default": false,
         "is_listed": true
     },
-    "ban_allowed_roles": {
-        "type": "roles_list",
-        "min_count": 1,
-        "max_count": 100,
-        "allow_integrated_roles": true,
-        "allow_everyone": true,
-        "default": null,
-        "is_listed": true
-    },
     "bot_news": {
         "type": "text_channel",
         "allow_threads": true,
         "allow_announcement_channels": true,
         "allow_non_nsfw_channels": true,
-        "default": null,
-        "is_listed": true
-    },
-    "clear_allowed_roles": {
-        "type": "roles_list",
-        "min_count": 1,
-        "max_count": 100,
-        "allow_integrated_roles": true,
-        "allow_everyone": true,
         "default": null,
         "is_listed": true
     },
@@ -87,15 +69,6 @@
         "default": false,
         "is_listed": true
     },
-    "kick_allowed_roles": {
-        "type": "roles_list",
-        "min_count": 1,
-        "max_count": 100,
-        "allow_integrated_roles": true,
-        "allow_everyone": true,
-        "default": null,
-        "is_listed": true
-    },
     "language": {
         "type": "enum",
         "values": ["fr", "en", "lolcat", "fi", "de", "fr2", "cs"],
@@ -130,15 +103,6 @@
         "type": "voice_channel",
         "allow_stage_channels": false,
         "allow_non_nsfw_channels": true,
-        "default": null,
-        "is_listed": true
-    },
-    "mute_allowed_roles": {
-        "type": "roles_list",
-        "min_count": 1,
-        "max_count": 100,
-        "allow_integrated_roles": true,
-        "allow_everyone": true,
         "default": null,
         "is_listed": true
     },
@@ -241,24 +205,6 @@
         "default": false,
         "is_listed": false
     },
-    "say_allowed_roles": {
-        "type": "roles_list",
-        "min_count": 1,
-        "max_count": 100,
-        "allow_integrated_roles": true,
-        "allow_everyone": true,
-        "default": null,
-        "is_listed": true
-    },
-    "slowmode_allowed_roles": {
-        "type": "roles_list",
-        "min_count": 1,
-        "max_count": 100,
-        "allow_integrated_roles": true,
-        "allow_everyone": true,
-        "default": null,
-        "is_listed": true
-    },
     "stream_mention": {
         "type": "role",
         "allow_integrated_roles": true,
@@ -337,15 +283,6 @@
         "min_count": 2,
         "max_count": 2,
         "default": ["👍", "👎"],
-        "is_listed": true
-    },
-    "warn_allowed_roles": {
-        "type": "roles_list",
-        "min_count": 1,
-        "max_count": 100,
-        "allow_integrated_roles": true,
-        "allow_everyone": true,
-        "default": null,
         "is_listed": true
     },
     "welcome": {

@@ -18,30 +18,6 @@
             "The bot has sufficient permissions",
             "The bot does not have sufficient permissions"
         ],
-        "can_ban": [
-            "One of your roles is authorized to use this command (`ban_allowed_roles`)",
-            "Missing allowed role (`ban_allowed_roles`)"
-        ],
-        "can_clear": [
-            "One of your roles is authorized to use this command (`clear_allowed_roles`)",
-            "Missing allowed role (`clear_allowed_roles`)"
-        ],
-        "can_edit_case": [
-            "One of your roles is authorized to use this command (`warn_allowed_roles`)",
-            "Missing allowed role (`warn_allowed_roles`)"
-        ],
-        "can_kick": [
-            "One of your roles is authorized to use this command (`kick_allowed_roles`)",
-            "Missing allowed role (`kick_allowed_roles`)"
-        ],
-        "can_mute": [
-            "One of your roles is authorized to use this command (`mute_allowed_roles`)",
-            "Missing allowed role (`mute_allowed_roles`)"
-        ],
-        "can_slowmode": [
-            "One of your roles is authorized to use this command (`slowmode_allowed_roles`)",
-            "Missing allowed role (`slowmode_allowed_roles`)"
-        ],
         "can_use_cookie": [
             "You are a chosen one from Aragorn1202",
             "This command uses a whitelist"
@@ -49,10 +25,6 @@
         "can_use_rss": [
             "You have 'Manage server' permission",
             "'Manage server' permission is required"
-        ],
-        "can_warn": [
-            "One of your roles is authorized to use this command (`warn_allowed_roles`)",
-            "Missing allowed role (`warn_allowed_roles`)"
         ],
         "database_connected": [
             "The database is online",
