@@ -44,7 +44,7 @@ class Info(commands.Cog):
     async def display_critical(self, interaction: discord.Interaction):
         return interaction.user.guild_permissions.manage_guild
 
-    @app_commands.command(name='info')
+    @app_commands.command(name="info")
     @app_commands.check(checks.bot_can_embed)
     @app_commands.describe(
         query="A name, mention or ID",
@@ -172,7 +172,7 @@ class Info(commands.Cog):
         # Roles
         list_role = []
         for role in member.roles:
-            if str(role) != '@everyone':
+            if str(role) != "@everyone":
                 list_role.append(role.mention)
         # Created at
         now = self.bot.utcnow()
@@ -204,7 +204,7 @@ class Info(commands.Cog):
             embed.add_field(name=await self.bot._(interaction, "info.info.member-3"), value=position, inline=True)
         if self.bot.intents.presences:
             # Status
-            status_value=(await self.bot._(interaction,f"misc.{member.status}")).capitalize()
+            status_value=(await self.bot._(interaction, f"misc.{member.status}")).capitalize()
             embed.add_field(name=await self.bot._(interaction, "info.info.member-4"), value=status_value, inline=True)
             # Activity
             if member.activity is not None and (member.activity.type == discord.ActivityType.custom and
@@ -256,23 +256,23 @@ class Info(commands.Cog):
         if critical_info and not member.bot and self.bot.database_online:
             embed.add_field(
                 name=await self.bot._(interaction, "info.info.member-7"),
-                value=await self.bot.get_cog('Cases').db_get_user_cases_count_from_guild(member.id, interaction.guild.id),
+                value=await self.bot.get_cog("Cases").db_get_user_cases_count_from_guild(member.id, interaction.guild.id),
                 inline=True)
         # Guilds count
         if member.bot:
             async with aiohttp.ClientSession(loop=self.bot.loop) as session:
-                guilds_count = await self.bot.get_cog('Partners').get_bot_guilds(member.id, session)
-                bot_owners = await self.bot.get_cog('Partners').get_bot_owners(member.id, session)
+                guilds_count = await self.bot.get_cog("Partners").get_bot_guilds(member.id, session)
+                bot_owners = await self.bot.get_cog("Partners").get_bot_owners(member.id, session)
             if guilds_count is not None:
                 guilds_count = await FormatUtils.format_nbr(guilds_count, lang)
-                embed.add_field(name=str(await self.bot._(interaction,'misc.servers')).capitalize(),value=guilds_count)
+                embed.add_field(name=str(await self.bot._(interaction,"misc.servers")).capitalize(), value=guilds_count)
             if bot_owners:
                 embed.add_field(
-                    name=(await self.bot._(interaction, 'info.info.guild-1')).capitalize(),
+                    name=(await self.bot._(interaction, "info.info.guild-1")).capitalize(),
                     value=", ".join([str(u) for u in bot_owners])
                 )
         # Roles
-        _roles = await self.bot._(interaction, 'info.info.member-9') + f' [{len(list_role)}]'
+        _roles = await self.bot._(interaction, "info.info.member-9") + f" [{len(list_role)}]"
         if len(list_role) > 0:
             list_role = list_role[:40]
             embed.add_field(name=_roles, value=", ".join(list_role), inline=False)
@@ -280,16 +280,16 @@ class Info(commands.Cog):
             embed.add_field(name=_roles, value=(await self.bot._(interaction, "misc.none")).capitalize(), inline=False)
         # member verification gate
         if member.pending:
-            _waiting = await self.bot._(interaction, 'info.info.member-10')
-            embed.add_field(name=_waiting, value='\u200b', inline=False)
+            _waiting = await self.bot._(interaction, "info.info.member-10")
+            embed.add_field(name=_waiting, value="\u200b", inline=False)
         await interaction.followup.send(embed=embed)
 
     async def role_info(self, interaction: discord.Interaction, role: discord.Role):
         "Get info about a server role"
         lang = await self.bot._(interaction, "_used_locale")
         embed = discord.Embed(colour=role.color)
-        icon_url = role.guild.icon.with_static_format('png') if role.guild.icon else None
-        embed.set_author(name=f"{await self.bot._(interaction,'info.info.role-title')} '{role.name}'", icon_url=icon_url)
+        icon_url = role.guild.icon.with_static_format("png") if role.guild.icon else None
+        embed.set_author(name=f"{await self.bot._(interaction, 'info.info.role-title')} '{role.name}'", icon_url=icon_url)
         since = await self.bot._(interaction, "misc.since")
         # Name
         embed.add_field(name=str(await self.bot._(interaction, "misc.name")).capitalize(),
@@ -386,17 +386,17 @@ class Info(commands.Cog):
         embed.add_field(name=await self.bot._(interaction, "info.info.user-0"), value=on_server.capitalize())
         if user.bot:
             async with aiohttp.ClientSession(loop=self.bot.loop) as session:
-                guilds_count = await self.bot.get_cog('Partners').get_bot_guilds(user.id, session)
-                bot_owners = await self.bot.get_cog('Partners').get_bot_owners(user.id, session)
+                guilds_count = await self.bot.get_cog("Partners").get_bot_guilds(user.id, session)
+                bot_owners = await self.bot.get_cog("Partners").get_bot_owners(user.id, session)
             if guilds_count is not None:
                 guilds_count = await FormatUtils.format_nbr(guilds_count, lang)
                 embed.add_field(
-                    name=str(await self.bot._(interaction, 'misc.servers')).capitalize(),
+                    name=str(await self.bot._(interaction, "misc.servers")).capitalize(),
                     value=guilds_count
                 )
             if bot_owners:
                 embed.add_field(
-                    name=(await self.bot._(interaction, 'info.info.guild-1')).capitalize(),
+                    name=(await self.bot._(interaction, "info.info.guild-1")).capitalize(),
                     value=", ".join([str(u) for u in bot_owners])
                 )
         await interaction.followup.send(embed=embed)
@@ -457,7 +457,7 @@ class Info(commands.Cog):
             date = f"<t:{infos_uses['added_at'].timestamp():.0f}:D>"
             embed.add_field(
                 name=await self.bot._(interaction, "info.info.emoji-5"),
-                value=await self.bot._(interaction, "info.info.emoji-5v", nbr=infos_uses['count'],date=date)
+                value=await self.bot._(interaction, "info.info.emoji-5v", nbr=infos_uses["count"], date=date)
             )
         await interaction.followup.send(embed=embed)
 
@@ -468,7 +468,7 @@ class Info(commands.Cog):
             return
         lang = await self.bot._(interaction, "_used_locale")
         embed = discord.Embed(colour=default_color)
-        icon_url = channel.guild.icon.with_format('png') if channel.guild.icon else None
+        icon_url = channel.guild.icon.with_format("png") if channel.guild.icon else None
         embed.set_author(
             name=await self.bot._(interaction, "info.info.textchan-5") + " '" + channel.name + "'",
             icon_url=icon_url)
@@ -523,7 +523,7 @@ class Info(commands.Cog):
         lang = await self.bot._(interaction, "_used_locale")
         since = await self.bot._(interaction, "misc.since")
         embed = discord.Embed(colour=default_color)
-        icon_url = channel.guild.icon.with_static_format('png') if channel.guild.icon else None
+        icon_url = channel.guild.icon.with_static_format("png") if channel.guild.icon else None
         embed.set_author(name=f"{await self.bot._(interaction, 'info.info.voicechan-0')} '{channel.name}'", icon_url=icon_url)
         # Name
         embed.add_field(name=str(await self.bot._(interaction, "misc.name")).capitalize(), value=channel.name, inline=True)
@@ -542,7 +542,7 @@ class Info(commands.Cog):
             inline=False
         )
         # Bitrate
-        embed.add_field(name="Bitrate",value=str(channel.bitrate/1000)+" kbps")
+        embed.add_field(name="Bitrate", value=str(channel.bitrate/1000)+" kbps")
         # Members count
         users_limit = channel.user_limit if channel.user_limit > 0 else "∞"
         embed.add_field(
@@ -680,7 +680,7 @@ class Info(commands.Cog):
             # Verification level
             embed.add_field(
                 name=await self.bot._(interaction, "info.info.guild-9"),
-                value=(await self.bot._(interaction,f"misc.{guild.verification_level}")).capitalize())
+                value=(await self.bot._(interaction, f"misc.{guild.verification_level}")).capitalize())
         await interaction.followup.send(embed=embed)
 
     async def invite_info(self, interaction: discord.Interaction, invite: discord.Invite):
@@ -688,7 +688,7 @@ class Info(commands.Cog):
         lang = await self.bot._(interaction, "_used_locale")
         since = await self.bot._(interaction, "misc.since")
         embed = discord.Embed(colour=default_color)
-        icon_url = invite.guild.icon.with_static_format('png') if invite.guild.icon else None
+        icon_url = invite.guild.icon.with_static_format("png") if invite.guild.icon else None
         embed.set_author(name=f"{await self.bot._(interaction, 'info.info.inv-4')} '{invite.code}'", icon_url=icon_url)
         # Try to get the complete invite
         if invite.guild in self.bot.guilds:
@@ -770,7 +770,7 @@ class Info(commands.Cog):
             elif isinstance(channel, discord.VoiceChannel):
                 vchan +=1
         embed = discord.Embed(colour=default_color)
-        icon_url = category.guild.icon.with_static_format('png') if category.guild.icon else None
+        icon_url = category.guild.icon.with_static_format("png") if category.guild.icon else None
         embed.set_author(name=f"{await self.bot._(interaction,'info.info.categ-0')} '{category.name}'", icon_url=icon_url)
         # Category name
         embed.add_field(name=str(await self.bot._(interaction, "misc.name")).capitalize(), value=category.name, inline=True)
@@ -805,7 +805,7 @@ class Info(commands.Cog):
         lang = await self.bot._(interaction, "_used_locale")
         since = await self.bot._(interaction, "misc.since")
         embed = discord.Embed(colour=default_color)
-        icon_url = forum.guild.icon.with_static_format('png') if forum.guild.icon else None
+        icon_url = forum.guild.icon.with_static_format("png") if forum.guild.icon else None
         title = await self.bot._(interaction, "info.info.forum.title", name=forum.name)
         embed.set_author(name=title, icon_url=icon_url)
         # Name
@@ -881,7 +881,7 @@ class Info(commands.Cog):
         lang = await self.bot._(interaction, "_used_locale")
         since = await self.bot._(interaction, "misc.since")
         embed = discord.Embed(colour=default_color)
-        icon_url = stage.guild.icon.with_static_format('png') if stage.guild.icon else None
+        icon_url = stage.guild.icon.with_static_format("png") if stage.guild.icon else None
         title = await self.bot._(interaction, "info.info.stage.title", name=stage.name)
         embed.set_author(name=title, icon_url=icon_url)
         # Name
@@ -975,11 +975,11 @@ class Info(commands.Cog):
         else:
             servers_in = []
         # XP card
-        xp_card = await self.bot.get_cog('Utilities').get_xp_style(user)
+        xp_card = await self.bot.get_cog("Utilities").get_xp_style(user)
         # Flags
-        userflags = await self.bot.get_cog('Users').get_userflags(user)
+        userflags = await self.bot.get_cog("Users").get_userflags(user)
         if await self.bot.get_cog("Admin").check_if_admin(user):
-            userflags.append('admin')
+            userflags.append("admin")
         if len(userflags) == 0:
             userflags = ["None"]
         # Votes
@@ -990,7 +990,7 @@ class Info(commands.Cog):
         # Languages
         disp_lang = list()
         if hasattr(user, "mutual_guilds"):
-            for lang in await self.bot.get_cog('Utilities').get_languages(user):
+            for lang in await self.bot.get_cog("Utilities").get_languages(user):
                 disp_lang.append(f"{lang[0]} ({lang[1]*100:.0f}%)")
         if len(disp_lang) == 0:
             disp_lang = ["Unknown"]
@@ -1048,11 +1048,11 @@ class Info(commands.Cog):
         lang: str = await self.bot.get_config(guild.id, "language")
         # Roles rewards
         rr_len: int = await self.bot.get_config(guild.id, "rr_max_number")
-        rr_len: str = '{}/{}'.format(len(await self.bot.get_cog("Xp").rr_list_role(guild.id)), rr_len)
+        rr_len: str = "{}/{}".format(len(await self.bot.get_cog("Xp").rr_list_role(guild.id)), rr_len)
         # Streamers
         if twitch_cog := self.bot.get_cog("Twitch"):
             streamers_len: int =  await self.bot.get_config(guild.id, "streamers_max_number")
-            streamers_len: str = '{}/{}'.format(await twitch_cog.db_get_guild_subscriptions_count(guild.id), streamers_len)
+            streamers_len: str = "{}/{}".format(await twitch_cog.db_get_guild_subscriptions_count(guild.id), streamers_len)
         else:
             streamers_len = "Not available"
         # Prefix
@@ -1089,7 +1089,7 @@ class Info(commands.Cog):
         emb.add_field(name="Streamers count", value=streamers_len)
         await interaction.followup.send(embed=emb)
 
-    @find_main.command(name='channel')
+    @find_main.command(name="channel")
     @discord.app_commands.check(checks.is_support_staff)
     @discord.app_commands.describe(channel="The ID/name of the channel to look for")
     async def find_channel(self, interaction: discord.Interaction, channel: str):
@@ -1111,7 +1111,7 @@ class Info(commands.Cog):
         emb.add_field(name="Type", value=resolved_channel.type.name.capitalize())
         await interaction.followup.send(embed=emb)
 
-    @find_main.command(name='role')
+    @find_main.command(name="role")
     @discord.app_commands.check(checks.is_support_staff)
     @discord.app_commands.describe(role_name="The ID/name of the role to look for")
     async def find_role(self, interaction: discord.Interaction, role_name: str):
@@ -1135,12 +1135,12 @@ class Info(commands.Cog):
         emb.add_field(name="Colour", value=str(role.colour))
         await interaction.followup.send(embed=emb)
 
-    @find_main.command(name='rss')
+    @find_main.command(name="rss")
     @discord.app_commands.check(checks.is_support_staff)
     async def find_rss(self, interaction: discord.Interaction, feed_id: int):
         "Find any active or inactive RSS feed"
         await interaction.response.defer()
-        feed: FeedObject = await self.bot.get_cog('Rss').db_get_feed(feed_id)
+        feed: FeedObject = await self.bot.get_cog("Rss").db_get_feed(feed_id)
         if feed is None:
             await interaction.followup.send("Unknown RSS feed")
             return

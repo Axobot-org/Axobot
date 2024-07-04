@@ -32,7 +32,7 @@ class Halloween(Cog):
                 self.cache = json.load(file)
         except FileNotFoundError:
             with open("halloween-cache.json", "w", encoding="utf-8") as file:
-                file.write('[]')
+                file.write("[]")
             self.cache = []
 
     @commands.hybrid_group(name="halloween", brief="Happy Halloween!")
@@ -109,16 +109,16 @@ A BIG thanks to the Project Blurple and their original code for the colorization
         url = await get_url_from_ctx(ctx, who)
 
         old_msg = await ctx.send(
-            await self.bot._(ctx.channel, 'color-event.colorify.starting', name=fmodifier+'fy', user=ctx.author.mention)
+            await self.bot._(ctx.channel, "color-event.colorify.starting", name=fmodifier+"fy", user=ctx.author.mention)
         )
         try:
             async with aiohttp.ClientSession() as session:
                 async with session.get(str(url)) as image:
                     result = await convert_halloween(await image.read(), fmodifier, method, variations or [], replace_background)
         except RuntimeError as err:
-            await ctx.send(await self.bot._(ctx.channel, 'color-event.unknown-err', err=str(err)))
+            await ctx.send(await self.bot._(ctx.channel, "color-event.unknown-err", err=str(err)))
             return
-        await ctx.reply(await self.bot._(ctx.channel, 'color-event.colorify.success', user=ctx.author.mention), file=result)
+        await ctx.reply(await self.bot._(ctx.channel, "color-event.colorify.success", user=ctx.author.mention), file=result)
         if not isinstance(old_msg, discord.InteractionMessage):
             await old_msg.delete()
         if self.bot.database_online:
@@ -150,7 +150,7 @@ A BIG thanks to the Project Blurple and their original code for the colorization
     @commands.cooldown(2, 60, commands.BucketType.member)
     @commands.cooldown(30, 40, commands.BucketType.guild)
     @commands.check(is_halloween)
-    async def check(self, ctx: MyContext,who: TargetConverterType | None = None):
+    async def check(self, ctx: MyContext, who: TargetConverterType | None = None):
         """Check an image to know if you're cool enough.
 
         ..Example halloween check

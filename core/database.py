@@ -68,7 +68,7 @@ def create_database_query(bot: "Axobot", cnx_axobot: MySQLConnection | CMySQLCon
                         " it must be of type list, tuple or dict")
             return stmt.decode("unicode_escape")
 
-        async def _format_query_c(self, cursor: 'CMySQLCursor'):
+        async def _format_query_c(self, cursor: "CMySQLCursor"):
             # pylint: disable=protected-access
             operation = self.query
             params = self.args

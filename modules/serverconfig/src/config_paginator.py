@@ -54,7 +54,7 @@ class ServerConfigPaginator(Paginator):
             color=self.cog.embed_color,
         )
         if self.guild.icon:
-            embed.set_thumbnail(url=self.guild.icon.with_static_format('png'))
+            embed.set_thumbnail(url=self.guild.icon.with_static_format("png"))
         for option, value in page_config_map.items():
             if (display := await to_display(option, value, self.guild, self.client)) is None:
                 display = "Ø"

@@ -19,7 +19,7 @@ class VoiceMessages(commands.Cog):
         self.file = "voice_msg"
         self.log = logging.getLogger("bot.voice_msg")
         self.stt_ctx_menu = app_commands.ContextMenu(
-            name='Voice to text',
+            name="Voice to text",
             callback=self.handle_message_command,
         )
         self.bot.tree.add_command(self.stt_ctx_menu)
@@ -92,8 +92,8 @@ class VoiceMessages(commands.Cog):
 
     async def _get_transcript(self, attachment: discord.Attachment) -> str:
         "Call the external API to get the audio transcript"
-        headers = {'Authorization': self.bot.others["awhikax_api"]}
-        data = {"model": "small", "audio_url": attachment.url}
+        headers = {"Authorization": self.bot.others["awhikax_api"]}
+        data = {"status": "default", "audio": attachment.url}
         async with self.session.post("https://api.awhikax.com/stt", headers=headers, data=data) as resp:
             if resp.status != 200:
                 return ""

@@ -10,8 +10,8 @@ import requests
 from asyncache import cached
 from cachetools import TTLCache
 
-BITLY_API_VERSION = 'v4'
-BITLY_SERVICE_URL = f'https://api-ssl.bitly.com/{BITLY_API_VERSION}/'
+BITLY_API_VERSION = "v4"
+BITLY_SERVICE_URL = f"https://api-ssl.bitly.com/{BITLY_API_VERSION}/"
 
 class ShortenerServiceError(Exception):
     pass
@@ -58,23 +58,23 @@ class Bitly(BaseShortener):
     # pylint: disable=no-self-use
     def _get_error_from_response(self, response: dict[str, Any]) -> str | None:
         """The exact nature of the error is obtained from the 'message' json attribute"""
-        return response.get('message')
+        return response.get("message")
 
     @cached(TTLCache(10_000, ttl=86400))
-    def shorten_url(self, long_url: str, domain: str='bit.ly'):  # pylint: disable=arguments-differ
+    def shorten_url(self, long_url: str, domain: str="bit.ly"):  # pylint: disable=arguments-differ
         "Shorten a given URL to a bit.ly url"
         params = {
-            'long_url': long_url,
-            'domain': domain
+            "long_url": long_url,
+            "domain": domain
         }
 
-        status, response = self.request('shorten', params)
+        status, response = self.request("shorten", params)
 
         if status >= 400:
             msg = self._get_error_from_response(response)
             raise BitlyError(f"Error occurred while shortening url {long_url}: {msg}")
 
-        short_url: str = response.get('link')
+        short_url: str = response.get("link")
         if not short_url:
             raise BitlyError(f"Error occurred while shortening url {long_url}")
         return short_url
@@ -85,16 +85,16 @@ class Bitly(BaseShortener):
         # Extract info from short_url
         parsed_url = urlparse(short_url)
         params = {
-            'bitlink_id': parsed_url.hostname + parsed_url.path
+            "bitlink_id": parsed_url.hostname + parsed_url.path
         }
 
-        status, response = self.request('expand', params)
+        status, response = self.request("expand", params)
 
         if status >= 400:
             msg = self._get_error_from_response(response)
-            raise BitlyError(f'Error occurred while expanding url {short_url}: {msg}')
+            raise BitlyError(f"Error occurred while expanding url {short_url}: {msg}")
 
-        long_url = response.get('long_url')
+        long_url = response.get("long_url")
         if not long_url:
-            raise BitlyError(f'Error occurred while expanding url {short_url}')
+            raise BitlyError(f"Error occurred while expanding url {short_url}")
         return long_url

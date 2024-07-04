@@ -76,14 +76,14 @@ class TopPaginator(Paginator):
 
     async def fetch_data(self):
         "Fetch the required data to display the leaderboard"
-        self.used_system = await self.client.get_config(self.guild.id, 'xp_type')
+        self.used_system = await self.client.get_config(self.guild.id, "xp_type")
         if self.used_system == "global":
-            if self.scope == 'global':
+            if self.scope == "global":
                 if len(self.cog.cache["global"]) == 0:
                     await self.cog.db_load_cache(None)
                 self.raw_data = [
                     {"user_id": user_id, "xp": data[1]}
-                    for user_id, data in self.cog.cache['global'].items()
+                    for user_id, data in self.cog.cache["global"].items()
                 ]
             else:
                 self.raw_data = [
@@ -117,7 +117,7 @@ class TopPaginator(Paginator):
             if isinstance(user, discord.User):
                 user_name = discord.utils.escape_markdown(user.display_name)
                 if len(user_name) > 18:
-                    user_name = user_name[:15]+'...'
+                    user_name = user_name[:15] + "..."
                 if user == self.user:
                     user_name = "__" + user_name + "__"
             else:
@@ -142,9 +142,9 @@ class TopPaginator(Paginator):
         i = (page-1)*20
         for row in self.positions[(page-1)*20:page*20]:
             i += 1
-            username = row['username']
-            lvl = row['level']
-            xp = row['xp_label']
+            username = row["username"]
+            lvl = row["level"]
+            xp = row["xp_label"]
             txt.append(f"{i} • **{username} |** `lvl {lvl}` **|** `xp {xp}`")
         # title
         if self.scope == "server" or self.used_system != "global":

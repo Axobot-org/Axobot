@@ -14,7 +14,7 @@ from feedparser.util import FeedParserDict
 
 from core.formatutils import FormatUtils
 
-FeedType = Literal['tw', 'yt', 'twitch', 'reddit', 'mc', 'deviant', 'web']
+FeedType = Literal["tw", "yt", "twitch", "reddit", "mc", "deviant", "web"]
 
 if TYPE_CHECKING:
     from core.bot_classes import Axobot
@@ -31,7 +31,7 @@ async def feed_parse(url: str, timeout: int, session: ClientSession | None = Non
     else:
         _session = session
     try:
-        user_agent_header = {'User-Agent': "Axobot feedparser"}
+        user_agent_header = {"User-Agent": "Axobot feedparser"}
         async with _session.get(url, timeout=timeout, headers=user_agent_header) as response:
             html = await response.text()
             headers = response.raw_headers
@@ -135,28 +135,28 @@ class RssMessage:
     def fill_embed_data(self):
         "Fill any interesting value to send in an embed"
         self.embed_data = {
-            'color': discord.Colour.light_grey(),
-            'author_text': None,
-            'footer_text': None,
-            'title': None,
-            'show_date_in_footer': True,
-            'enable_link_in_title': False,
-            'image_location': 'thumbnail',
+            "color": discord.Colour.light_grey(),
+            "author_text": None,
+            "footer_text": None,
+            "title": None,
+            "show_date_in_footer": True,
+            "enable_link_in_title": False,
+            "image_location": "thumbnail",
         }
         if author_text := self.feed.embed_data.get("author_text"):
-            self.embed_data['author_text'] = author_text
+            self.embed_data["author_text"] = author_text
         if title := self.feed.embed_data.get("title"):
-            self.embed_data['title'] = title
+            self.embed_data["title"] = title
         if footer := self.feed.embed_data.get("footer_text"):
-            self.embed_data['footer_text'] = footer
+            self.embed_data["footer_text"] = footer
         if color := self.feed.embed_data.get("color"):
-            self.embed_data['color'] = color
+            self.embed_data["color"] = color
         if (show_date_in_footer := self.feed.embed_data.get("show_date_in_footer")) is not None:
-            self.embed_data['show_date_in_footer'] = show_date_in_footer
+            self.embed_data["show_date_in_footer"] = show_date_in_footer
         if (enable_link_in_title := self.feed.embed_data.get("enable_link_in_title")) is not None:
-            self.embed_data['enable_link_in_title'] = enable_link_in_title
+            self.embed_data["enable_link_in_title"] = enable_link_in_title
         if image_location := self.feed.embed_data.get("image_location"):
-            self.embed_data['image_location'] = image_location
+            self.embed_data["image_location"] = image_location
 
     async def fill_mention(self, guild: discord.Guild):
         "Fill the mentions attribute with required roles mentions"
@@ -218,7 +218,7 @@ class RssMessage:
         "Create a message ready to be sent, either in string or in embed"
         if msg_format is None:
             msg_format = self.feed.structure
-        msg_format = msg_format.replace('\\n','\n')
+        msg_format = msg_format.replace("\\n","\n")
         if self.rt_from is not None:
             self.author = f"{self.author} (retweeted from @{self.rt_from})"
 
@@ -227,20 +227,20 @@ class RssMessage:
         if not self.feed.use_embed:
             return text[:2000]
 
-        emb = discord.Embed(description=text[:4096], color=self.embed_data['color'])
-        if self.embed_data['author_text']:
-            emb.set_author(name=format_text(self.embed_data['author_text'], safedict)[:256])
-        if self.embed_data['footer_text']:
-            emb.set_footer(text=format_text(self.embed_data['footer_text'], safedict)[:2048])
-        if self.embed_data['title'] is None:
-            if self.feed.type != 'tw':
+        emb = discord.Embed(description=text[:4096], color=self.embed_data["color"])
+        if self.embed_data["author_text"]:
+            emb.set_author(name=format_text(self.embed_data["author_text"], safedict)[:256])
+        if self.embed_data["footer_text"]:
+            emb.set_footer(text=format_text(self.embed_data["footer_text"], safedict)[:2048])
+        if self.embed_data["title"] is None:
+            if self.feed.type != "tw":
                 emb.title = self.title[:256]
             else:
                 emb.title = self.author[:256]
         else:
-            emb.title = format_text(self.embed_data['title'], safedict)[:256]
+            emb.title = format_text(self.embed_data["title"], safedict)[:256]
         if "{url}" not in msg_format and "{link}" not in msg_format:
-            emb.add_field(name='URL', value=self.url[:1024])
+            emb.add_field(name="URL", value=self.url[:1024])
         if self.image is not None:
             if self.embed_data["image_location"] == "thumbnail":
                 emb.set_thumbnail(url=self.image)
@@ -280,36 +280,36 @@ class FeedFilterConfig(TypedDict):
 class FeedObject:
     "A feed record from the database"
     def __init__(self, from_dict: dict):
-        self.feed_id: int = from_dict['ID']
+        self.feed_id: int = from_dict["ID"]
         self.added_at: datetime.datetime | None = (
-            from_dict['added_at']
-            if from_dict['added_at']
+            from_dict["added_at"]
+            if from_dict["added_at"]
             else None
         )
-        self.structure: str = from_dict['structure']
-        self.guild_id: int = from_dict['guild']
-        self.channel_id: int = from_dict['channel']
-        self.type: FeedType = from_dict['type']
-        self.link: str = from_dict['link']
-        self.date: datetime.datetime | None= from_dict['date']
-        self.last_entry_id: str | None = from_dict['last_entry_id']
-        self.role_ids: list[str] = [role for role in from_dict['roles'].split(';') if role.isnumeric()]
-        self.use_embed: bool = from_dict['use_embed']
-        self.embed_data: FeedEmbedData = json.loads(from_dict['embed'])
-        self.silent_mention: bool = bool(from_dict['silent_mention'])
-        self.filter_config: FeedFilterConfig = json.loads(from_dict['filter_config']) or {"filter_type": "none", "words": []}
+        self.structure: str = from_dict["structure"]
+        self.guild_id: int = from_dict["guild"]
+        self.channel_id: int = from_dict["channel"]
+        self.type: FeedType = from_dict["type"]
+        self.link: str = from_dict["link"]
+        self.date: datetime.datetime | None= from_dict["date"]
+        self.last_entry_id: str | None = from_dict["last_entry_id"]
+        self.role_ids: list[str] = [role for role in from_dict["roles"].split(';') if role.isnumeric()]
+        self.use_embed: bool = from_dict["use_embed"]
+        self.embed_data: FeedEmbedData = json.loads(from_dict["embed"])
+        self.silent_mention: bool = bool(from_dict["silent_mention"])
+        self.filter_config: FeedFilterConfig = json.loads(from_dict["filter_config"]) or {"filter_type": "none", "words": []}
         self.last_update: datetime.datetime | None = (
-            from_dict['last_update']
-            if from_dict['last_update']
+            from_dict["last_update"]
+            if from_dict["last_update"]
             else None
         )
         self.last_refresh: datetime.datetime | None = (
-            from_dict['last_refresh']
-            if from_dict['last_refresh']
+            from_dict["last_refresh"]
+            if from_dict["last_refresh"]
             else None
         )
-        self.recent_errors: int = from_dict['recent_errors']
-        self.enabled: bool = bool(from_dict['enabled'])
+        self.recent_errors: int = from_dict["recent_errors"]
+        self.enabled: bool = bool(from_dict["enabled"])
 
     def has_recently_been_refreshed(self):
         "Return True if the feed has been refreshed in the last 7 days"
@@ -344,25 +344,25 @@ class FeedObject:
 
     def get_emoji(self, cog: "EmojisManager") -> discord.Emoji | str:
         "Get the representative emoji of a feed type"
-        if self.type == 'yt':
-            return cog.get_emoji('youtube')
-        if self.type == 'twitch':
-            return cog.get_emoji('twitch')
-        if self.type == 'reddit':
-            return cog.get_emoji('reddit')
-        if self.type == 'mc':
-            return cog.get_emoji('minecraft')
-        if self.type == 'deviant':
-            return cog.get_emoji('deviant')
+        if self.type == "yt":
+            return cog.get_emoji("youtube")
+        if self.type == "twitch":
+            return cog.get_emoji("twitch")
+        if self.type == "reddit":
+            return cog.get_emoji("reddit")
+        if self.type == "mc":
+            return cog.get_emoji("minecraft")
+        if self.type == "deviant":
+            return cog.get_emoji("deviant")
         if self.link is not None:
             if self.link.startswith("https://github.com/"):
-                return cog.get_emoji('github')
+                return cog.get_emoji("github")
             if self.link.startswith("https://reddit.com/"):
-                return cog.get_emoji('reddit')
+                return cog.get_emoji("reddit")
             if self.link.startswith("https://youtube.com/"):
-                return cog.get_emoji('youtube')
+                return cog.get_emoji("youtube")
             if self.link.startswith("https://twitrss.me/"):
-                return cog.get_emoji('twitter')
+                return cog.get_emoji("twitter")
             if self.link.startswith("https://minecraft.net/"):
-                return cog.get_emoji('minecraft')
+                return cog.get_emoji("minecraft")
         return "📰"

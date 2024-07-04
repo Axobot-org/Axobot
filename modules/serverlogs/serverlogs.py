@@ -618,7 +618,7 @@ class ServerLogs(commands.Cog):
                                                      and hasattr(entry.after, "nick")
                                                      and entry.after.nick == after_nick
                                                  )):
-            emb.add_field(name="Edited by",value=f"**{entry.user.mention}** ({entry.user.id})")
+            emb.add_field(name="Edited by", value=f"**{entry.user.mention}** ({entry.user.id})")
         await self.validate_logs(after.guild, channel_ids, emb, "member_nick")
 
     async def handle_member_avatar(self, before: discord.Member, after: discord.Member, channel_ids: list[int]):
@@ -1490,7 +1490,7 @@ Minimum age required by anti-raid: {min_age}"
                 emb.description = f"**Could not give welcome role** to user {kwargs.get('user').mention}"
                 emb.add_field(
                     name="Role to give",
-                    value=kwargs.get('role').mention
+                    value=kwargs.get("role").mention
                 )
             elif warning_type in {ServerWarningType.RSS_MISSING_TXT_PERMISSION, ServerWarningType.RSS_MISSING_EMBED_PERMISSION}:
                 emb.description = f"**Could not send RSS message** in channel {kwargs.get('channel').mention}"

@@ -67,8 +67,8 @@ class Quote(commands.Cog):
     async def quote_message(self, message: discord.Message, style: QuoteStyle) -> discord.Message | None:
         "Generate a Quote card from a message and post it to the channel"
         text = remove_markdown(message.clean_content)
-        while '\n\n' in text:
-            text = text.replace('\n\n', '\n')
+        while "\n\n" in text:
+            text = text.replace("\n\n", "\n")
         author_name = message.author.display_name
         author_avatar = await self.get_image_from_url(message.author.display_avatar.replace(format="png", size=256).url)
         generator = QuoteGeneration(
@@ -81,7 +81,7 @@ class Quote(commands.Cog):
         generated_card = generator.draw_card()
 
         img_byte_arr = BytesIO()
-        generated_card.save(img_byte_arr, format='PNG')
+        generated_card.save(img_byte_arr, format="PNG")
         img_byte_arr.seek(0)
         return discord.File(img_byte_arr, filename="quote.png")
 

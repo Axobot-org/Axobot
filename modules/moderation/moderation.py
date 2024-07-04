@@ -176,9 +176,11 @@ Slowmode works up to one message every 6h (21600s)
             return user.guild_permissions.kick_members
 
         if user == interaction.guild.me or (self.bot.database_online and await user_can_kick(user)):
-            return await interaction.followup.send(await self.bot._(interaction, "moderation.kick.cant-staff"))
+            await interaction.followup.send(await self.bot._(interaction, "moderation.kick.cant-staff"))
+            return
         if not self.bot.database_online and interaction.channel.permissions_for(user).kick_members:
-            return await interaction.followup.send(await self.bot._(interaction, "moderation.kick.cant-staff"))
+            await interaction.followup.send(await self.bot._(interaction, "moderation.kick.cant-staff"))
+            return
         if user.roles[-1].position >= interaction.guild.me.roles[-1].position:
             await interaction.followup.send(await self.bot._(interaction, "moderation.kick.too-high"))
             return
@@ -220,9 +222,11 @@ Slowmode works up to one message every 6h (21600s)
 
         await interaction.response.defer(ephemeral=True)
         if user == interaction.guild.me or (self.bot.database_online and await user_can_warn(user)):
-            return await interaction.followup.send(await self.bot._(interaction, "moderation.warn.cant-staff"))
+            await interaction.followup.send(await self.bot._(interaction, "moderation.warn.cant-staff"))
+            return
         if not self.bot.database_online and interaction.channel.permissions_for(user).manage_roles:
-            return await interaction.followup.send(await self.bot._(interaction, "moderation.warn.cant-staff"))
+            await interaction.followup.send(await self.bot._(interaction, "moderation.warn.cant-staff"))
+            return
         if user.bot and not user.id==423928230840500254:
             await interaction.followup.send(await self.bot._(interaction, "moderation.warn.cant-bot"))
             return
@@ -332,7 +336,8 @@ You can also mute this member for a defined duration, then use the following for
             await interaction.followup.send((await self.bot._(interaction, "moderation.mute.staff-mute")) + " " + emoji)
             return
         if not self.bot.database_online and interaction.channel.permissions_for(user).manage_roles:
-            return await interaction.followup.send(await self.bot._(interaction, "moderation.warn.cant-staff"))
+            await interaction.followup.send(await self.bot._(interaction, "moderation.warn.cant-staff"))
+            return
         role = await self.get_muted_role(interaction.guild)
         if not await self.check_mute_context(interaction, role, user):
             return
@@ -342,7 +347,7 @@ You can also mute this member for a defined duration, then use the following for
         if self.bot.database_online and (cases_cog := self.bot.get_cog("Cases")):
             f_reason = reason or "Unspecified"
             case = Case(bot=self.bot, guild_id=interaction.guild.id, user_id=user.id, case_type="tempmute",
-                        mod_id=interaction.user.id, reason=f_reason,date=self.bot.utcnow(), duration=duration)
+                        mod_id=interaction.user.id, reason=f_reason, date=self.bot.utcnow(), duration=duration)
             await cases_cog.db_add_case(case)
             case_id = case.id
             await interaction.followup.send(await self.bot._(interaction,"moderation.mute.mute-success"))
@@ -611,7 +616,8 @@ Permissions for using this command are the same as for the kick
             return
         async def user_can_kick(user):
             try:
-                return await self.bot.get_cog("ServerConfig").check_member_config_permission(user, "kick_allowed_roles")
+                await self.bot.get_cog("ServerConfig").check_member_config_permission(user, "kick_allowed_roles")
+                return
             except commands.errors.CommandError:
                 pass
             return False
@@ -868,13 +874,15 @@ The 'show_reasons' parameter is used to display the mute reasons.
         ..Doc moderator.html#unhoist-members"""
         count = 0
         if not interaction.guild.me.guild_permissions.manage_nicknames:
-            return await interaction.response.send_message(
+            await interaction.response.send_message(
                 await self.bot._(interaction, "moderation.missing-manage-nick"), ephemeral=True
             )
+            return
         if len(interaction.guild.members) > 5000:
-            return await interaction.response.send_message(
+            await interaction.response.send_message(
                 await self.bot._(interaction, "moderation.unhoist-too-many-members"), ephemeral=True
             )
+            return
         await interaction.response.defer(ephemeral=True)
         if characters is None:
             def check(username: str):

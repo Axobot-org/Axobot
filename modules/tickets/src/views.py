@@ -17,7 +17,7 @@ class SelectView(discord.ui.View):
         "Compute Select options from topics list"
         res = []
         for topic in topics:
-            res.append(discord.SelectOption(label=topic['topic'], value=topic['id'], emoji=topic['topic_emoji']))
+            res.append(discord.SelectOption(label=topic["topic"], value=topic["id"], emoji=topic["topic_emoji"]))
         return res
 
 class SendHintText(discord.ui.View):
@@ -106,7 +106,7 @@ class AskTopicSelect(discord.ui.View):
         "Build the options list for Discord"
         res = []
         for topic in topics:
-            res.append(discord.SelectOption(label=topic['topic'], value=topic['id'], emoji=topic['topic_emoji']))
+            res.append(discord.SelectOption(label=topic["topic"], value=topic["id"], emoji=topic["topic_emoji"]))
         return res
 
     async def callback(self, interaction: discord.Interaction):

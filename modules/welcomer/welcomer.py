@@ -58,7 +58,7 @@ class Welcomer(commands.Cog):
         await self.bot.get_cog("ServerConfig").update_memberchannel(member.guild)
         if "MEMBER_VERIFICATION_GATE_ENABLED" not in member.guild.features or not member.pending:
             await self.send_msg(member, "leave")
-        await self.bot.get_cog('Events').check_user_left(member)
+        await self.bot.get_cog("Events").check_user_left(member)
 
     async def _is_raider(self, member: discord.Member):
         "Use the AntiRaid cog to check if a member has just been detected as a potential raider"
@@ -76,7 +76,7 @@ class Welcomer(commands.Cog):
         text: str | None = await self.bot.get_config(member.guild.id, event_type)
         if member.id in self.no_message or (event_type == "welcome" and await self._is_raider(member)):
             return
-        if self.bot.get_cog('Utilities').sync_check_any_link(member.display_name) is not None:
+        if self.bot.get_cog("Utilities").sync_check_any_link(member.display_name) is not None:
             return
         if text:
             channel: discord.TextChannel | None = await self.bot.get_config(member.guild.id, "welcome_channel")
@@ -90,7 +90,7 @@ class Welcomer(commands.Cog):
             botormember = await self.bot._(member.guild, "misc.bot" if member.bot else "misc.member")
             try:
                 text = text.format_map(self.bot.SafeDict(
-                    user=member.mention if event_type=='welcome' else member.display_name,
+                    user=member.mention if event_type=="welcome" else member.display_name,
                     user_idname=str(member),
                     user_id=str(member.id),
                     server=member.guild.name,
@@ -138,11 +138,11 @@ class Welcomer(commands.Cog):
                 self.log.warning("Owner role not found in support server")
                 return
             if role not in member.roles:
-                await member.add_roles(role,reason="This user support me")
+                await member.add_roles(role, reason="This user support me")
 
     async def check_support(self, member: discord.Member):
         """Check if a newscommer of the support server is part of the bot support team"""
-        if await self.bot.get_cog('Users').has_userflag(member, 'support'):
+        if await self.bot.get_cog("Users").has_userflag(member, "support"):
             role = member.guild.get_role(412340503229497361)
             if role is not None:
                 await member.add_roles(role)
@@ -151,7 +151,7 @@ class Welcomer(commands.Cog):
 
     async def check_contributor(self, member: discord.Member):
         """Check if a newscommer of the support server is a contributor"""
-        if await self.bot.get_cog('Users').has_userflag(member, 'contributor'):
+        if await self.bot.get_cog("Users").has_userflag(member, "contributor"):
             role = member.guild.get_role(552428810562437126)
             if role is not None:
                 await member.add_roles(role)
@@ -164,14 +164,14 @@ class Welcomer(commands.Cog):
             return
         used_xp_type: str = await self.bot.get_config(member.guild.id, "xp_type")
         if used_xp_type == "global":
-            xp = await self.bot.get_cog('Xp').db_get_xp(member.id, None)
+            xp = await self.bot.get_cog("Xp").db_get_xp(member.id, None)
         else:
-            xp = await self.bot.get_cog('Xp').db_get_xp(member.id, member.guild.id)
+            xp = await self.bot.get_cog("Xp").db_get_xp(member.id, member.guild.id)
         if xp is not None:
-            await self.bot.get_cog('Xp').give_rr(
+            await self.bot.get_cog("Xp").give_rr(
                 member,
-                (await self.bot.get_cog('Xp').calc_level(xp, used_xp_type))[0],
-                await self.bot.get_cog('Xp').rr_list_role(member.guild.id)
+                (await self.bot.get_cog("Xp").calc_level(xp, used_xp_type))[0],
+                await self.bot.get_cog("Xp").rr_list_role(member.guild.id)
             )
 
     async def check_muted(self, member: discord.Member):

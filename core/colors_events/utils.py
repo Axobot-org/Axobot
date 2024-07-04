@@ -21,10 +21,10 @@ class LinkConverter(str):
     @classmethod
     async def convert(cls, ctx: MyContext, argument: str):
         "Convert an argument into a media link, by using Discord CDN proxy and embed system"
-        if not argument.startswith('https://'):
-            raise commands.errors.BadArgument(f'Could not convert "{argument}" into URL')
-        if argument.startswith('https://cdn.discordapp.com/attachments/'
-                               ) or argument.startswith('https://cdn.discordapp.com/avatars/'):
+        if not argument.startswith("https://"):
+            raise commands.errors.BadArgument(f"Could not convert \"{argument}\" into URL")
+        if argument.startswith("https://cdn.discordapp.com/attachments/"
+                               ) or argument.startswith("https://cdn.discordapp.com/avatars/"):
             return argument
 
         for _ in range(10):
@@ -33,7 +33,7 @@ class LinkConverter(str):
 
             await asyncio.sleep(1)
 
-        raise commands.errors.BadArgument('Discord proxy image did not load in time.')
+        raise commands.errors.BadArgument("Discord proxy image did not load in time.")
 
 class TargetConverter:
     "Represents a target usable for color conversion"
@@ -61,8 +61,8 @@ class ColorVariation(str):
     @classmethod
     async def convert(cls, _ctx: MyContext, argument: str):
         "Convert an argument into a color variation"
-        if not argument.startswith('++'):
-            raise commands.errors.BadArgument('Not a valid flag!')
+        if not argument.startswith("++"):
+            raise commands.errors.BadArgument("Not a valid flag!")
         return argument
 
 async def get_url_from_ctx(ctx: MyContext, who: TargetConverterType | None):
@@ -181,7 +181,7 @@ def place_edges(img: Image.Image, edge_img: Image.Image, modifier: dict[str, Any
             ep = edge_img.getpixel((x, y))
             if (ep[0] > edge_img_minimum):
                 img.putpixel((x, y), edge_colorify((ep[0] - edge_img_minimum) / (edge_img_maximum - edge_img_minimum),
-                                                   modifier['colors'], p))
+                                                   modifier["colors"], p))
     return img
 
 
@@ -189,7 +189,7 @@ def resized_img(x: float, n: int, d: ColorType, m: tuple[float, float, float], l
     return round(((l[n] - d[n]) / 255) * (255 ** m[n] - (255 - x) ** m[n]) ** (1 / m[n]) + d[n])
 
 def edge_detect(img: Image.Image, modifier: dict[str, Any], variation: VariationType, maximum: int, minimum: int):
-    img = img.convert('RGBA')
+    img = img.convert("RGBA")
     edge_img = edge_antialiasing(img)
     img = colorify_image(img, modifier, variation, maximum, minimum)
     new_img = place_edges(img, edge_img, modifier)
@@ -240,26 +240,26 @@ def edge_colorify(x, colors, cur_color):
 
 
 def remove_alpha(img: Image.Image, bg: ColorType):
-    alpha = img.convert('RGBA').getchannel('A')
+    alpha = img.convert("RGBA").getchannel('A')
     background = Image.new("RGBA", img.size, bg)
     background.paste(img, mask=alpha)
     return background
 
 def variations_filter(img: Image.Image, modifier: dict[str, Any], _variation: VariationType, _maximum: int, minimum: int):
-    img = img.convert('LA')
+    img = img.convert("LA")
     pixels = img.getdata()
-    img = img.convert('RGBA')
-    results = [modifier['func']((x - minimum) * 255 / (255 - minimum)) if x >= minimum else 0 for x in range(256)]
+    img = img.convert("RGBA")
+    results = [modifier["func"]((x - minimum) * 255 / (255 - minimum)) if x >= minimum else 0 for x in range(256)]
 
     img.putdata((*map(lambda x: results[x[0]] + (x[1],), pixels),))
     return img
 
 def colorify_image(img: Image.Image, modifier: dict[str, Any], variation: VariationType, maximum: int, minimum: int):
-    img = img.convert('LA')
+    img = img.convert("LA")
     pixels = img.getdata()
-    img = img.convert('RGBA')
+    img = img.convert("RGBA")
     results = [
-        _colorify((x - minimum) / (maximum - minimum), modifier['colors'], variation)
+        _colorify((x - minimum) / (maximum - minimum), modifier["colors"], variation)
         if x >= minimum
         else 0
         for x in range(256)
@@ -322,7 +322,7 @@ def find_max_index(array: list[float]):
 
 def color_ratios(img: Image.Image, colors: list[ColorType]):
     "Calculate the ratio of present colors in the given image (between 0.0 and 1.0)"
-    img = img.convert('RGBA')
+    img = img.convert("RGBA")
     total_pixels = img.width * img.height # number of pixels in the image
     color_pixels = [0 for _ in range(len(colors)+1)] # count number of pixels close to each color
     close_colors = []
@@ -362,12 +362,12 @@ async def convert_image_general(image: Image.Image, modifier: str, method: str, 
     try:
         modifier_converter = dict(modifiers[modifier])
     except KeyError:
-        raise RuntimeError('Invalid image modifier', modifier) from None
+        raise RuntimeError("Invalid image modifier", modifier) from None
 
     try:
         method_converter = methods[method]
     except KeyError:
-        raise RuntimeError('Invalid image method', method) from None
+        raise RuntimeError("Invalid image method", method) from None
 
     selected_variations.sort()
     background_color = None
@@ -380,13 +380,13 @@ async def convert_image_general(image: Image.Image, modifier: str, method: str, 
                 variation_converter = variations[modifier + var]
             except KeyError:
                 try:
-                    variation_converter = variations[modifier + 'bg' + var]
+                    variation_converter = variations[modifier + "bg" + var]
                     background_color = variation_converter
                     continue
                 except KeyError:
-                    raise RuntimeError('Invalid image variation') from None
+                    raise RuntimeError("Invalid image variation") from None
         if not isinstance(variation_converter, tuple):
-            modifier_converter['colors'] = variation_converter(modifier_converter['colors'])
+            modifier_converter["colors"] = variation_converter(modifier_converter["colors"])
         elif method != "--filter":
             base_color_var = variation_maker(base_color_var, variation_converter)
     if method != "--filter":
@@ -396,7 +396,7 @@ async def convert_image_general(image: Image.Image, modifier: str, method: str, 
         frames = []
         durations = []
         try:
-            loop = image.info['loop']
+            loop = image.info["loop"]
         except KeyError:
             loop = None
 
@@ -404,7 +404,7 @@ async def convert_image_general(image: Image.Image, modifier: str, method: str, 
         maximum = 0
 
         for img_frame in ImageSequence.Iterator(image):
-            frame = img_frame.convert('LA')
+            frame = img_frame.convert("LA")
 
             if frame.getextrema()[0][0] < minimum:
                 minimum = frame.getextrema()[0][0]
@@ -417,20 +417,20 @@ async def convert_image_general(image: Image.Image, modifier: str, method: str, 
             if background_color is not None:
                 new_frame = remove_alpha(new_frame, background_color)
 
-            durations.append(frame.info.get('duration',100))
+            durations.append(frame.info.get("duration",100))
             frames.append(new_frame)
 
         out = io.BytesIO()
         try:
-            frames[0].save(out, format='GIF', append_images=frames[1:], save_all=True, loop=loop,
+            frames[0].save(out, format="GIF", append_images=frames[1:], save_all=True, loop=loop,
                             duration=durations)
         except TypeError as err:
             print(err)
-            raise RuntimeError('Invalid GIF') from None
+            raise RuntimeError("Invalid GIF") from None
 
 
     else:
-        image = image.convert('LA')
+        image = image.convert("LA")
 
         minimum = image.getextrema()[0][0]
         maximum = image.getextrema()[0][1]
@@ -439,7 +439,7 @@ async def convert_image_general(image: Image.Image, modifier: str, method: str, 
         if background_color is not None:
             image = remove_alpha(image, background_color)
         out = io.BytesIO()
-        image.save(out, format='png')
+        image.save(out, format="png")
 
     out.seek(0)
     return out
@@ -452,8 +452,8 @@ async def convert_image_with_background(image: Image.Image, modifier: str, metho
     try:
         modifier_converter = dict(modifiers[modifier])
     except KeyError:
-        raise RuntimeError('Invalid image modifier', modifier) from None
-    outer_color, inner_color = modifier_converter['bg_colors']
+        raise RuntimeError("Invalid image modifier", modifier) from None
+    outer_color, inner_color = modifier_converter["bg_colors"]
     # get gradient background from mask
     mask = await get_background_mask(image)
     img_with_background = await apply_gradient(image, mask, inner_color, outer_color)
@@ -471,7 +471,7 @@ async def convert_image_with_background(image: Image.Image, modifier: str, metho
 
     # convert to BytesIO
     out = io.BytesIO()
-    result.save(out, format='png')
+    result.save(out, format="png")
     out.seek(0)
     return out
 
@@ -516,15 +516,15 @@ async def check_image_general(image: bytes, colors_refs: list[ColorType], colors
     colors = []
     for name, ratio in zip(colors_names, ratios, strict=True):
         colors.append({
-            'name': name,
-            'ratio': ratio
+            "name": name,
+            "ratio": ratio
         })
     colors.append({
-        'name': 'Non-Color',
-        'ratio': ratios[-1]
+        "name": "Non-Color",
+        "ratio": ratios[-1]
     })
     data = {
-        'passed': passed,
-        'colors': colors
+        "passed": passed,
+        "colors": colors
     }
     return data

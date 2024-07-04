@@ -20,7 +20,7 @@ def UnionTransformer(*types) -> Type[discord.app_commands.Transformer]: # pylint
             or type_ is None
             or inspect.isclass(type_) and issubclass(type_, discord.app_commands.Transformer)
         ):
-            raise TypeError(f'unsupported type annotation: {type_!r}')
+            raise TypeError(f"unsupported type annotation: {type_!r}")
 
     class UnionTransformerClass(discord.app_commands.Transformer): # pylint: disable=abstract-method
         "Convert arguments to one of the provided types"
@@ -72,7 +72,7 @@ class CardStyleTransformer(discord.app_commands.Transformer):
 
     async def transform(self, interaction: discord.Interaction["Axobot"], value, /):
         "Do the conversion"
-        if value in await interaction.client.get_cog('Utilities').allowed_card_styles(interaction.user):
+        if value in await interaction.client.get_cog("Utilities").allowed_card_styles(interaction.user):
             return value
         raise arguments_errors.InvalidCardStyleError(value)
 
@@ -89,17 +89,17 @@ class BotOrGuildInviteTransformer(discord.app_commands.Transformer): # pylint: d
         "Do the conversion"
         answer = None
         r_invite = re.search(
-            r'^https://discord(?:app)?\.com/(?:api/)?oauth2/authorize\?(?:client_id=(\d{17,19})|scope=([a-z\.\+]+?)|(?:permissions|guild_id|disable_guild_select|redirect_uri)=[^&\s]+)(?:&(?:client_id=(\d{17,19})|scope=([a-z\.\+]+?)|(?:permissions|guild_id|disable_guild_select|redirect_uri)=[^&\s]+))*$',
+            r"^https://discord(?:app)?\.com/(?:api/)?oauth2/authorize\?(?:client_id=(\d{17,19})|scope=([a-z\.\+]+?)|(?:permissions|guild_id|disable_guild_select|redirect_uri)=[^&\s]+)(?:&(?:client_id=(\d{17,19})|scope=([a-z\.\+]+?)|(?:permissions|guild_id|disable_guild_select|redirect_uri)=[^&\s]+))*$",
             value
         )
         if r_invite is None:
-            r_invite = re.search(r'(?:discord\.gg|discordapp\.com/invite)/([^\s/]+)', value)
+            r_invite = re.search(r"(?:discord\.gg|discordapp\.com/invite)/([^\s/]+)", value)
             if r_invite is not None:
                 answer = r_invite.group(1)
         else:
             if (r_invite.group(2) or r_invite.group(4)) and (r_invite.group(1) or r_invite.group(3)):
                 scopes = r_invite.group(2).split('+') if r_invite.group(2) else r_invite.group(4).split('+')
-                if 'bot' in scopes:
+                if "bot" in scopes:
                     answer = int(r_invite.group(1) or r_invite.group(3))
         if r_invite is None or answer is None:
             raise arguments_errors.InvalidBotOrGuildInviteError(value)
@@ -110,9 +110,9 @@ BotOrGuildInviteArgument = discord.app_commands.Transform[str | int, BotOrGuildI
 class URL(str):
     "Represents a decomposed URL"
     def __init__(self, regex_exp: re.Match):
-        self.domain: str = regex_exp.group('domain')
-        self.path: str = regex_exp.group('path')
-        self.is_https: bool = regex_exp.group('https') == 'https'
+        self.domain: str = regex_exp.group("domain")
+        self.path: str = regex_exp.group("path")
+        self.is_https: bool = regex_exp.group("https") == "https"
         self.url: str = regex_exp.group(0)
 
     def __str__(self):
@@ -124,7 +124,7 @@ class URLTransformer(discord.app_commands.Transformer): # pylint: disable=abstra
     async def transform(self, _interaction, value, /) -> URL:
         "Convert a string to a proper URL instance, else raise BadArgument"
         r = re.search(
-            r'(?P<https>https?)://(?:www\.)?(?P<domain>[^/\s]+)(?:/(?P<path>[\S]+))?', value)
+            r"(?P<https>https?)://(?:www\.)?(?P<domain>[^/\s]+)(?:/(?P<path>[\S]+))?", value)
         if r is None:
             raise arguments_errors.InvalidUrlError(value)
         return URL(r)

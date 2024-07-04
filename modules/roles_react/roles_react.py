@@ -33,8 +33,8 @@ class RolesReact(commands.Cog):
 
     def __init__(self, bot: Axobot):
         self.bot = bot
-        self.file = 'roles_react'
-        self.table = 'roles_react_beta' if bot.beta else 'roles_react'
+        self.file = "roles_react"
+        self.table = "roles_react_beta" if bot.beta else "roles_react"
         self.cache: dict[int, dict[int, RoleReactionRow]] = defaultdict(dict)
         self.cache_initialized = False
         self.embed_color = 12118406
@@ -42,7 +42,7 @@ class RolesReact(commands.Cog):
 
     @commands.Cog.listener()
     async def on_ready(self):
-        self.table = 'roles_react_beta' if self.bot.beta else 'roles_react'
+        self.table = "roles_react_beta" if self.bot.beta else "roles_react"
 
     async def prepare_react(self, payload: discord.RawReactionActionEvent) -> tuple[discord.Message, discord.Role] | None:
         "Handle new added/removed reactions and check if they are roles reactions"
@@ -75,11 +75,11 @@ class RolesReact(commands.Cog):
         role = self.bot.get_guild(payload.guild_id).get_role(temp["role"])
         return msg, role
 
-    @commands.Cog.listener('on_raw_reaction_add')
+    @commands.Cog.listener("on_raw_reaction_add")
     async def on_raw_reaction_add(self, payload: discord.RawReactionActionEvent):
         await self.on_raw_reaction_event(payload, True)
 
-    @commands.Cog.listener('on_raw_reaction_remove')
+    @commands.Cog.listener("on_raw_reaction_remove")
     async def on_raw_reaction_remove(self, payload: discord.RawReactionActionEvent):
         await self.on_raw_reaction_event(payload, False)
 
@@ -99,11 +99,11 @@ class RolesReact(commands.Cog):
 
     async def _add_rr_to_cache(self, rr: RoleReactionRow):
         """Add a role reaction to the cache"""
-        if guild := self.bot.get_guild(rr['guild']):
-            rr["emoji_display"] = await self.get_emoji_display_form(guild, rr['emoji'])
+        if guild := self.bot.get_guild(rr["guild"]):
+            rr["emoji_display"] = await self.get_emoji_display_form(guild, rr["emoji"])
         else:
-            rr["emoji_display"] = rr['emoji']
-        self.cache[rr['guild']][rr['ID']] = rr
+            rr["emoji_display"] = rr["emoji"]
+        self.cache[rr["guild"]][rr["ID"]] = rr
 
     async def db_init_cache(self):
         """Get the list of guilds which have roles reactions"""
@@ -166,9 +166,11 @@ class RolesReact(commands.Cog):
                 return
             try:
                 if not guild.me.guild_permissions.manage_roles:
-                    return await channel.send(await self.bot._(guild.id, 'moderation.mute.cant-mute'))
+                    await channel.send(await self.bot._(guild.id, "moderation.mute.cant-mute"))
+                    return
                 if role.position >= guild.me.top_role.position:
-                    return await channel.send(await self.bot._(guild.id, 'moderation.role.too-high', r=role.name))
+                    await channel.send(await self.bot._(guild.id, "moderation.role.too-high", r=role.name))
+                    return
             except discord.Forbidden:
                 return
         if stats_cog := self.bot.get_cog("BotStats"):
@@ -217,12 +219,12 @@ class RolesReact(commands.Cog):
 
         ..Doc roles-reactions.html#add-and-remove-a-reaction"""
         if role == interaction.guild.default_role:
-            raise commands.BadArgument(f'Role "{role.name}" not found')
+            raise commands.BadArgument(f"Role \"{role.name}\" not found")
         await interaction.response.defer()
         if await self.db_get_role_from_emoji(interaction.guild_id, emoji):
             await interaction.followup.send(await self.bot._(interaction, "roles_react.already-1-rr"))
             return
-        max_rr: int = await self.bot.get_config(interaction.guild_id, 'roles_react_max_number')
+        max_rr: int = await self.bot.get_config(interaction.guild_id, "roles_react_max_number")
         existing_list = await self.db_get_roles(interaction.guild_id)
         if len(existing_list) >= max_rr:
             await interaction.followup.send(await self.bot._(interaction, "roles_react.too-many-rr", l=max_rr))
@@ -253,8 +255,8 @@ class RolesReact(commands.Cog):
         if role_react is None:
             await interaction.followup.send(await self.bot._(interaction, "roles_react.no-rr"))
             return
-        await self.db_remove_role(role_react['ID'])
-        role = interaction.guild.get_role(role_react['role'])
+        await self.db_remove_role(role_react["ID"])
+        role = interaction.guild.get_role(role_react["role"])
         if role is None:
             await interaction.followup.send(await self.bot._(interaction, "roles_react.rr-removed-2", e=old_emoji))
         else:
@@ -269,16 +271,16 @@ class RolesReact(commands.Cog):
         """Create a text with the roles list"""
         emojis: list[str | discord.Emoji] = []
         for k in rr_list:
-            emojis.append(await self.get_emoji_display_form(guild, k['emoji']))
+            emojis.append(await self.get_emoji_display_form(guild, k["emoji"]))
         result = [
             (
                 f"{emoji}   <@&{rr['role']}> - *{rr['description']}*"
-                if len(rr['description']) > 0
+                if len(rr["description"]) > 0
                 else f"{emoji}   <@&{rr['role']}>"
             )
             for rr, emoji in zip(rr_list, emojis, strict=True)
         ]
-        return '\n'.join(result), emojis
+        return "\n".join(result), emojis
 
     @rr_main.command(name="list")
     @app_commands.check(checks.database_connected)
@@ -293,7 +295,7 @@ class RolesReact(commands.Cog):
         else:
             roles_list = await self.db_get_roles(interaction.guild_id)
         des, _ = await self.create_list_embed(roles_list, interaction.guild)
-        max_rr: int = await self.bot.get_config(interaction.guild_id, 'roles_react_max_number')
+        max_rr: int = await self.bot.get_config(interaction.guild_id, "roles_react_max_number")
         title = await self.bot._(interaction, "roles_react.rr-list", n=len(roles_list), m=max_rr)
         emb = discord.Embed(title=title, description=des, color=self.embed_color)
         await interaction.followup.send(embed=emb)
@@ -333,7 +335,7 @@ It will only display the whole message with reactions. Still very cool tho
                 self.bot.dispatch("interaction_error", interaction, err)
                 break
         await interaction.followup.send(
-            await self.bot._(interaction, "roles_react.success-sent", msg='<' + msg.jump_url + '>')
+            await self.bot._(interaction, "roles_react.success-sent", msg=f"<{msg.jump_url}>")
         )
 
     @rr_main.command(name="set-description")
@@ -356,11 +358,11 @@ It will only display the whole message with reactions. Still very cool tho
         if role_react is None:
             await interaction.followup.send(await self.bot._(interaction, "roles_react.no-rr"))
             return
-        await self.db_edit_description(role_react['ID'], description[:150])
-        if role := interaction.guild.get_role(role_react['role']):
+        await self.db_edit_description(role_react["ID"], description[:150])
+        if role := interaction.guild.get_role(role_react["role"]):
             role_mention = f"<@&{role.id}>"
         else:
-            role_mention = str(role_react['role'])
+            role_mention = str(role_react["role"])
         if description:
             text_key = "roles_react.rr-description-set"
         else:
@@ -402,7 +404,7 @@ It will only display the whole message with reactions. Still very cool tho
             return
         await interaction.response.defer(ephemeral=True)
         emb = embed.embeds[0]
-        full_list = {x['emoji']: x for x in await self.db_get_roles(interaction.guild_id)}
+        full_list = {x["emoji"]: x for x in await self.db_get_roles(interaction.guild_id)}
         if emojis is not None:
             emojis_ids = [str(x.id) if isinstance(x, discord.Emoji)
                       else str(x) for x in emojis]
@@ -441,7 +443,7 @@ It will only display the whole message with reactions. Still very cool tho
             role = interaction.guild.get_role(rr["role"])
             role_name = role.name if role else str(rr["role"])
             if current in rr["emoji_display"] or current in role_name:
-                options.append((not True, f"{emoji_display} {role_name}", rr['emoji']))
+                options.append((not True, f"{emoji_display} {role_name}", rr["emoji"]))
         options.sort()
         return [
             app_commands.Choice(name=emoji, value=emoji_id)

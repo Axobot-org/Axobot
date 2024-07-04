@@ -45,7 +45,7 @@ class RolesManagement(commands.Cog):
             )
             return
         await interaction.response.defer()
-        await role.edit(colour=color,reason=f"Asked by {interaction.user}")
+        await role.edit(colour=color, reason=f"Asked by {interaction.user}")
         await interaction.followup.send(await self.bot._(interaction, "moderation.role.color-success", role=role.name))
 
     @role_main.command(name="members-list")
@@ -159,7 +159,11 @@ class RolesManagement(commands.Cog):
             count += 1
         answer = await self.bot._(interaction, "moderation.role.give-success", count=count, m=len(n_users))
         if count == self.max_roles_modifications and len(n_users) > count:
-            answer += f'\n⚠️ *{await self.bot._(interaction, "moderation.role.limit-hit", limit=self.max_roles_modifications)}*'
+            answer += (
+                "\n⚠️ *" +
+                await self.bot._(interaction, "moderation.role.limit-hit", limit=self.max_roles_modifications) +
+                '*'
+            )
         await interaction.edit_original_response(content=answer)
 
     @role_main.command(name="revoke")
@@ -183,7 +187,7 @@ class RolesManagement(commands.Cog):
         my_position = interaction.guild.me.roles[-1].position
         if role.position >= my_position:
             await interaction.response.send_message(
-                await self.bot._(interaction, "moderation.role.give-too-high",r=role.name), ephemeral=True
+                await self.bot._(interaction, "moderation.role.give-too-high", r=role.name), ephemeral=True
             )
             return
         if role.position >= interaction.user.roles[-1].position:
@@ -212,7 +216,11 @@ class RolesManagement(commands.Cog):
             count += 1
         answer = await self.bot._(interaction, "moderation.role.remove-success", count=count, m=len(n_users))
         if count == self.max_roles_modifications and len(n_users) > count:
-            answer += f'\n⚠️ *{await self.bot._(interaction, "moderation.role.limit-hit", limit=self.max_roles_modifications)}*'
+            answer += (
+                "\n⚠️ *" +
+                await self.bot._(interaction, "moderation.role.limit-hit", limit=self.max_roles_modifications) +
+                '*'
+            )
         await interaction.edit_original_response(content=answer)
 
 

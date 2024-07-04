@@ -20,7 +20,7 @@ class DeviantartRSS:
     def __init__(self, bot: Axobot):
         self.bot = bot
         self.min_time_between_posts = 120 # seconds
-        self.url_pattern = r'^https://(?:www\.)?deviantart\.com/(\w+)'
+        self.url_pattern = r"^https://(?:www\.)?deviantart\.com/(\w+)"
 
     def is_deviantart_url(self, string: str):
         "Check if an url is a valid deviantart URL"
@@ -37,9 +37,9 @@ class DeviantartRSS:
     async def _get_feed(self, username: str, filter_config: FeedFilterConfig | None=None,
                         session: aiohttp.ClientSession | None=None) -> FeedParserDict:
         "Get a list of feeds from a deviantart username"
-        url = 'https://backend.deviantart.com/rss.xml?q=gallery%3A' + username
+        url = "https://backend.deviantart.com/rss.xml?q=gallery%3A" + username
         feed = await feed_parse(url, 9, session)
-        if feed is None or 'bozo_exception' in feed or not feed.entries:
+        if feed is None or "bozo_exception" in feed or not feed.entries:
             return None
         if filter_config is not None:
             feed.entries = [entry for entry in feed.entries[:50] if await check_filter(entry, filter_config)]
@@ -53,15 +53,15 @@ class DeviantartRSS:
         if feed is None:
             return await self.bot._(channel.guild, "rss.nothing")
         entry = feed.entries[0]
-        img_url = entry['media_content'][0]['url'] if "media_content" in entry else None
-        title = re.search(r"DeviantArt: ([^ ]+)'s gallery", feed.feed['title']).group(1)
+        img_url = entry["media_content"][0]["url"] if "media_content" in entry else None
+        title = re.search(r"DeviantArt: ([^ ]+)'s gallery", feed.feed["title"]).group(1)
         url = "https://www.deviantart.com/" + username
         return RssMessage(
             bot=self.bot,
             feed=FeedObject.unrecorded("deviant", channel.guild.id if channel.guild else None, link=url),
-            url=entry['link'],
-            title=entry['title'],
-            date=entry['published_parsed'],
+            url=entry["link"],
+            title=entry["title"],
+            date=entry["published_parsed"],
             author=title,
             image=img_url
         )
@@ -76,16 +76,16 @@ class DeviantartRSS:
         posts_list: list[RssMessage] = []
         url = "https://www.deviantart.com/" + username
         for entry in feed.entries:
-            if dt.datetime(*entry['published_parsed'][:6], tzinfo=dt.UTC) <= date:
+            if dt.datetime(*entry["published_parsed"][:6], tzinfo=dt.UTC) <= date:
                 break
-            img_url = entry['media_content'][0]['url'] if "media_content" in entry else None
-            title = re.search(r"DeviantArt: ([^ ]+)'s gallery", feed.feed['title']).group(1)
+            img_url = entry["media_content"][0]["url"] if "media_content" in entry else None
+            title = re.search(r"DeviantArt: ([^ ]+)'s gallery", feed.feed["title"]).group(1)
             obj = RssMessage(
                 bot=self.bot,
                 feed=FeedObject.unrecorded("deviant", channel.guild.id if channel.guild else None, link=url),
-                url=entry['link'],
-                title=entry['title'],
-                date=entry['published_parsed'],
+                url=entry["link"],
+                title=entry["title"],
+                date=entry["published_parsed"],
                 author=title,
                 image=img_url
             )

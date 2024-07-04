@@ -98,9 +98,10 @@ class EmojisManagement(commands.Cog):
 
         ..Doc moderator.html#emoji-manager"""
         if not interaction.channel.permissions_for(interaction.guild.me).manage_messages:
-            return await interaction.followup.send(
+            await interaction.followup.send(
                 await self.bot._(interaction, "moderation.need-manage-messages"), ephemeral=True
             )
+            return
         await interaction.response.defer()
         if emoji:
             await message.clear_reaction(emoji)

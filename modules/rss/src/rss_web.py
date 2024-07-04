@@ -23,7 +23,7 @@ class WebRSS:
     def __init__(self, bot: Axobot):
         self.bot = bot
         self.min_time_between_posts = 120 # seconds
-        self.url_pattern = r'^(?:https://)(?:www\.)?(\S+)$'
+        self.url_pattern = r"^(?:https://)(?:www\.)?(\S+)$"
 
     def is_web_url(self, string: str):
         "Check if an url is a valid HTTPS web URL"
@@ -36,7 +36,7 @@ class WebRSS:
         feed = await feed_parse(url, 9, session)
         if feed is None or not feed.entries:
             return None
-        if 'bozo_exception' in feed and not isinstance(feed['bozo_exception'], CharacterEncodingOverride):
+        if "bozo_exception" in feed and not isinstance(feed["bozo_exception"], CharacterEncodingOverride):
             # CharacterEncodingOverride exceptions are ignored
             return None
         date_field_key = await self._get_feed_date_key(feed.entries[0])
@@ -57,15 +57,15 @@ class WebRSS:
         return feed
 
     async def _get_feed_date_key(self, entry: FeedParserDict
-                                 ) -> Literal['published_parsed', 'published', 'updated_parsed'] | None:
+                                 ) -> Literal["published_parsed", "published", "updated_parsed"] | None:
         "Compute which key to use to get the date from a feed"
-        for i in ['published_parsed', 'published', 'updated_parsed']:
+        for i in ["published_parsed", "published", "updated_parsed"]:
             if entry.get(i) is not None:
                 return i
 
     async def _get_entry_title(self, entry: FeedParserDict) -> str | None:
         "Try to find the article ID or title"
-        for i in ['id', 'title', 'updated_parsed']:
+        for i in ["id", "title", "updated_parsed"]:
             if value := entry.get(i):
                 return value
 
@@ -79,33 +79,33 @@ class WebRSS:
         entry = feed.entries[0]
         date_field_key = await self._get_feed_date_key(entry)
         if date_field_key is None:
-            date = 'Unknown'
+            date = "Unknown"
         else:
             date = entry[date_field_key]
-        if 'link' in entry:
-            link = entry['link']
-        elif 'link' in feed:
-            link = feed['link']
+        if "link" in entry:
+            link = entry["link"]
+        elif "link" in feed:
+            link = feed["link"]
         else:
             link = url
-        if 'author' in entry:
-            author = entry['author']
-        elif 'author' in feed:
-            author = feed['author']
-        elif 'title' in feed['feed']:
-            author = feed['feed']['title']
+        if "author" in entry:
+            author = entry["author"]
+        elif "author" in feed:
+            author = feed["author"]
+        elif "title" in feed["feed"]:
+            author = feed["feed"]["title"]
         else:
             author = '?'
-        if 'title' in entry:
-            title = entry['title']
-        elif 'title' in feed:
-            title = feed['title']
+        if "title" in entry:
+            title = entry["title"]
+        elif "title" in feed:
+            title = feed["title"]
         else:
             title = '?'
         post_text = await get_text_from_entry(entry)
         post_description = await get_summary_from_entry(entry)
         img = None
-        img_match = re.search(r'(http(s?):)([/|.\w\s-])*\.(?:jpe?g|gif|png|webp)', str(entry))
+        img_match = re.search(r"(http(s?):)([/|.\w\s-])*\.(?:jpe?g|gif|png|webp)", str(entry))
         if img_match is not None:
             img = img_match.group(0)
         return RssMessage(
@@ -116,7 +116,7 @@ class WebRSS:
             date=date,
             entry_id=await self._get_entry_title(entry),
             author=author,
-            channel=feed.feed['title'] if 'title' in feed.feed else '?',
+            channel=feed.feed["title"] if "title" in feed.feed else '?',
             image=img,
             post_text=post_text,
             post_description=post_description
@@ -153,30 +153,30 @@ class WebRSS:
             if last_entry_id is not None:
                 if entry_id == last_entry_id:
                     continue
-            if 'link' in entry:
-                link = entry['link']
-            elif 'link' in feed:
-                link = feed['link']
+            if "link" in entry:
+                link = entry["link"]
+            elif "link" in feed:
+                link = feed["link"]
             else:
                 link = url
-            if 'author' in entry:
-                author = entry['author']
-            elif 'author' in feed:
-                author = feed['author']
-            elif 'title' in feed['feed']:
-                author = feed['feed']['title']
+            if "author" in entry:
+                author = entry["author"]
+            elif "author" in feed:
+                author = feed["author"]
+            elif "title" in feed["feed"]:
+                author = feed["feed"]["title"]
             else:
                 author = '?'
-            if 'title' in entry:
-                title = entry['title']
-            elif 'title' in feed:
-                title = feed['title']
+            if "title" in entry:
+                title = entry["title"]
+            elif "title" in feed:
+                title = feed["title"]
             else:
                 title = '?'
             post_text = await get_text_from_entry(entry)
             post_description = await get_summary_from_entry(entry)
             img = None
-            img_match = re.search(r'(http(s?):)([/|.\w\s-])*\.(?:jpe?g|gif|png|webp)', str(entry))
+            img_match = re.search(r"(http(s?):)([/|.\w\s-])*\.(?:jpe?g|gif|png|webp)", str(entry))
             if img_match is not None:
                 img = img_match.group(0)
             obj = RssMessage(
@@ -187,7 +187,7 @@ class WebRSS:
                 date=entry_date,
                 entry_id=entry_id,
                 author=author,
-                channel=feed.feed['title'] if 'title' in feed.feed else '?',
+                channel=feed.feed["title"] if "title" in feed.feed else '?',
                 image=img,
                 post_text=post_text,
                 post_description=post_description

@@ -1,13 +1,13 @@
 import re
 
-_MKD_LINE_BEGINNING = r'^([#>]{1,3} ?)(?P<lb_text>\S+)'
-_MKD_CODE = r'(`+)(?P<code_text>[^`]+)(`+)'
-_MKD_UNDERSCORE = r'(_+)(?P<underscore_text>[^_\n]+)(_+)'
-_MKD_ASTERISK = r'(\*+)(?P<asterisk_text>[^*\n]+)(\*+)'
-_MKD_SPOILER = r'(\|\|)(?P<spoiler_text>[^|\n]+)(\|\|)'
-_MKD_TILDE = r'(~~)(?P<tilde_text>[^~\n]+)(~~)'
+_MKD_LINE_BEGINNING = r"^([#>]{1,3} ?)(?P<lb_text>\S+)"
+_MKD_CODE = r"(`+)(?P<code_text>[^`]+)(`+)"
+_MKD_UNDERSCORE = r"(_+)(?P<underscore_text>[^_\n]+)(_+)"
+_MKD_ASTERISK = r"(\*+)(?P<asterisk_text>[^*\n]+)(\*+)"
+_MKD_SPOILER = r"(\|\|)(?P<spoiler_text>[^|\n]+)(\|\|)"
+_MKD_TILDE = r"(~~)(?P<tilde_text>[^~\n]+)(~~)"
 _MKD_FULL_REGEX = re.compile(
-    '(?:' +
+    "(?:" +
     '|'.join([
         _MKD_LINE_BEGINNING,
         _MKD_CODE,

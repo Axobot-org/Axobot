@@ -133,19 +133,19 @@ class ServerConfig(commands.Cog):
 
     async def get_languages(self, ignored_guilds: list[int]):
         "Return stats on used languages"
-        if not self.bot.database_online or 'Languages' not in self.bot.cogs:
+        if not self.bot.database_online or "Languages" not in self.bot.cogs:
             return {}
         query = "SELECT `guild_id`, `value` FROM `serverconfig` WHERE `option_name` = 'language' AND `beta` = %s"
         values_list: list[str] = []
         guilds = {x.id for x in self.bot.guilds if x.id not in ignored_guilds}
         async with self.bot.db_query(query, (self.bot.beta,)) as query_results:
             for row in query_results:
-                if row['guild_id'] in guilds:
-                    values_list.append(row['value'])
+                if row["guild_id"] in guilds:
+                    values_list.append(row["value"])
         for _ in range(len(guilds)-len(values_list)):
-            values_list.append(options_list['language']['default'])
+            values_list.append(options_list["language"]["default"])
         langs: dict[str, int] = {}
-        for lang in options_list['language']['values']:
+        for lang in options_list["language"]["values"]:
             langs[lang] = values_list.count(lang)
         return langs
 
@@ -158,12 +158,12 @@ class ServerConfig(commands.Cog):
         guilds = {x.id for x in self.bot.guilds if x.id not in ignored_guilds}
         async with self.bot.db_query(query, (self.bot.beta,)) as query_results:
             for row in query_results:
-                if row['guild_id'] in guilds:
-                    values_list.append(row['value'])
+                if row["guild_id"] in guilds:
+                    values_list.append(row["value"])
         for _ in range(len(guilds)-len(values_list)):
-            values_list.append(options_list['xp_type']['default'])
+            values_list.append(options_list["xp_type"]["default"])
         types: dict[str, int] = {}
-        for name in options_list['xp_type']['values']:
+        for name in options_list["xp_type"]["values"]:
             types[name] = values_list.count(name)
         return types
 
@@ -216,11 +216,11 @@ class ServerConfig(commands.Cog):
         channel = await self.get_option(guild.id, "membercounter")
         if channel is None:
             return False
-        lang = await self.bot._(guild.id, '_used_locale')
+        lang = await self.bot._(guild.id, "_used_locale")
         text = (await self.bot._(guild.id, "misc.membres")).capitalize()
         if lang == "fr":
             text += ' '
-        text += ': '
+        text += ": "
         text += str(guild.member_count)
         if channel.name == text:
             return False
@@ -246,7 +246,7 @@ class ServerConfig(commands.Cog):
         async with self.bot.db_query(query, (guild_id, option_name, self.bot.beta), fetchone=True) as query_results:
             if len(query_results) == 0:
                 return None
-            return query_results['value']
+            return query_results["value"]
 
     async def db_get_guild(self, guild_id: int) -> dict[str, str] | None:
         "Get a guild from the database"
@@ -256,7 +256,7 @@ class ServerConfig(commands.Cog):
         async with self.bot.db_query(query, (guild_id, self.bot.beta)) as query_results:
             if len(query_results) == 0:
                 return None
-            return {row['option_name']: row['value'] for row in query_results}
+            return {row["option_name"]: row["value"] for row in query_results}
 
     async def db_set_value(self, guild_id: int, option_name: str, new_value: str) -> bool:
         "Edit a value in the database"
@@ -294,7 +294,7 @@ class ServerConfig(commands.Cog):
             raise RuntimeError("Database is offline")
         query = "SELECT `guild_id` FROM `serverconfig` WHERE `option_name` = 'membercounter' AND `beta` = %s"
         async with self.bot.db_query(query, (self.bot.beta,)) as query_results:
-            return [row['guild_id'] for row in query_results]
+            return [row["guild_id"] for row in query_results]
 
     # ---- COMMANDS ----
 
@@ -368,13 +368,15 @@ class ServerConfig(commands.Cog):
             )
             return
         if (opt_data := options_list.get(option)) is None:
-            return await interaction.response.send_message(
+            await interaction.response.send_message(
                 await self.bot._(interaction, "server.option-notfound"), ephemeral=True
             )
+            return
         if not opt_data["is_listed"]:
-            return await interaction.response.send_message(
+            await interaction.response.send_message(
                 await self.bot._(interaction, "server.option-notfound"), ephemeral=True
             )
+            return
         await interaction.response.defer()
         await self.reset_option(interaction.guild_id, option)
         await interaction.followup.send(await self.bot._(interaction, "server.value-deleted", option=option))
@@ -433,7 +435,7 @@ class ServerConfig(commands.Cog):
     async def config_list(self, interaction: discord.Interaction):
         """Get the list of every usable option"""
         options = sorted(options_list.keys())
-        txt = "\n```\n- {}\n```\n".format('\n- '.join(options))
+        txt = "\n```\n- {}\n```\n".format("\n- ".join(options))
         link = "<https://axobot.readthedocs.io/en/latest/server.html#list-of-every-option>"
         await interaction.response.send_message(
             await self.bot._(interaction, "server.config-list", text=txt, link=link),
@@ -520,7 +522,7 @@ class ServerConfig(commands.Cog):
                 await self.bot._(interaction, f"server.enum.{option_name}.{value}")
                 for value in option_data["values"]
             ]
-            return await self.bot._(interaction, "server.set_error.ENUM_INVALID", list=', '.join(translated_values))
+            return await self.bot._(interaction, "server.set_error.ENUM_INVALID", list=", ".join(translated_values))
         if option_data["type"] == "text":
             return await self.bot._(interaction,
                                     "server.set_error.text_err",

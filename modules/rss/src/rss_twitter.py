@@ -22,8 +22,8 @@ class TwitterRSS:
     def __init__(self, bot: Axobot):
         self.bot = bot
         self.min_time_between_posts = 15 # seconds
-        self.api = twitter.Api(**bot.others['twitter'], tweet_mode="extended", timeout=15, application_only_auth=True)
-        self.url_pattern = r'(?:https://)?(?:www\.)?(?:twitter\.com/)([^?\s/]+)'
+        self.api = twitter.Api(**bot.others["twitter"], tweet_mode="extended", timeout=15, application_only_auth=True)
+        self.url_pattern = r"(?:https://)?(?:www\.)?(?:twitter\.com/)([^?\s/]+)"
 
     def is_twitter_url(self, string: str):
         "Check if an url is a valid Twitter URL"
@@ -65,7 +65,7 @@ class TwitterRSS:
                     text = text.replace(match.group(0), '')
         return text
 
-    async def _get_feed_list(self,name: str):
+    async def _get_feed_list(self, name: str):
         "Get tweets from a given Twitter user"
         try:
             if isinstance(name, int) or name.isnumeric():
@@ -75,9 +75,9 @@ class TwitterRSS:
                 posts = self.api.GetUserTimeline(screen_name=name, exclude_replies=True)
                 # username = name
         except twitter.error.TwitterError as err:
-            if err.message == "Not authorized." or 'Unknown error' in err.message:
+            if err.message == "Not authorized." or "Unknown error" in err.message:
                 return None
-            if err.message[0]['code'] == 34:
+            if err.message[0]["code"] == 34:
                 return None
             raise err
         return posts
@@ -96,9 +96,9 @@ class TwitterRSS:
         lastpost = posts[0]
         # detect if retweet
         is_rt = None
-        text = html.unescape(getattr(lastpost, 'full_text', lastpost.text))
+        text = html.unescape(getattr(lastpost, "full_text", lastpost.text))
         if lastpost.retweeted:
-            if possible_rt := re.search(r'^RT @([\w-]+):', text):
+            if possible_rt := re.search(r"^RT @([\w-]+):", text):
                 is_rt = possible_rt.group(1)
         # remove images links if needed
         text = await self.remove_image(channel, text)
@@ -117,7 +117,7 @@ class TwitterRSS:
             retweeted_from=is_rt,
             channel=lastpost.user.name,
             image=img,
-            post_text=getattr(lastpost, 'full_text', lastpost.text)
+            post_text=getattr(lastpost, "full_text", lastpost.text)
         )
 
     async def get_new_posts(self, channel: discord.TextChannel, name: str, date: dt.datetime) -> list[RssMessage]:
@@ -136,9 +136,9 @@ class TwitterRSS:
                 break
             # detect if retweet
             is_rt = None
-            text: str = html.unescape(getattr(post, 'full_text', post.text))
+            text: str = html.unescape(getattr(post, "full_text", post.text))
             if post.retweeted:
-                if possible_rt := re.search(r'^RT @([\w-]+):', text):
+                if possible_rt := re.search(r"^RT @([\w-]+):", text):
                     is_rt = possible_rt.group(1)
             # remove images links if needed
             text = await self.remove_image(channel, text)
@@ -157,7 +157,7 @@ class TwitterRSS:
                 retweeted_from=is_rt,
                 channel=post.user.name,
                 image=img,
-                post_text=getattr(post, 'full_text', post.text)
+                post_text=getattr(post, "full_text", post.text)
             )
             posts_list.append(obj)
         posts_list.reverse()
