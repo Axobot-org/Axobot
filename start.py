@@ -17,7 +17,7 @@ import json
 from random import choice
 from core import tokens
 from core.bot_classes import Axobot
-from core.boot_utils import set_beta_logs, setup_start_parser, setup_logger, load_cogs, load_sql_connection
+from core.boot_utils import set_beta_logs, setup_start_parser, setup_logger, load_cogs
 
 async def main():
     "Load everything and start the bot"
@@ -55,12 +55,11 @@ async def main():
         emb = discord.Embed(description=f"**{client.user.name}** is launching !", color=8311585, timestamp=client.utcnow())
         await client.send_embed(emb)
 
-    load_sql_connection(client)
-    if client.database_online:
-        client.connect_database_axobot()
-    elif len(args.token) < 30:
-        client.log.fatal("Invalid bot token")
-        return
+    if not client.db.test_connection():
+        client.database_online = False
+        if len(args.token) < 30:
+            client.log.fatal("Invalid bot token")
+            return
 
     if args.token == "axobot":
         bot_data = tokens.get_token(client, 1048011651145797673)
@@ -90,8 +89,6 @@ async def main():
     if args.count_open_files:
         client.files_count_enabled = True
 
-
-    client.connect_database_xp()
     client.add_listener(on_ready)
 
     async with client:

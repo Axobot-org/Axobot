@@ -373,6 +373,8 @@ class Xp(commands.Cog):
                 cursor.execute(f"SELECT 1 FROM `{guild}` LIMIT 1;")
                 return guild
             return None
+        finally:
+            cursor.close()
 
 
     async def db_set_xp(self, user_id: int, points: int, action: Literal["add", "set"]="add", guild_id: int | None=None):
@@ -411,7 +413,7 @@ class Xp(commands.Cog):
         else:
             cnx = self.bot.cnx_xp
         table = await self.get_table_name(guild_id)
-        cursor = cnx.cursor(dictionary = True)
+        cursor = cnx.cursor(dictionary=True)
         query = f"DELETE FROM `{table}` WHERE `userID`=%(u)s;"
         cursor.execute(query, {'u': user_id})
         cnx.commit()
@@ -419,91 +421,81 @@ class Xp(commands.Cog):
 
     async def db_get_xp(self, user_id: int, guild_id: int | None) -> int | None:
         "Get the xp of a user in a guild"
-        try:
-            if not self.bot.database_online:
-                await self.bot.unload_module("xp")
-                return None
-            if guild_id is None:
-                cnx = self.bot.cnx_axobot
+        if not self.bot.database_online:
+            await self.bot.unload_module("xp")
+            return None
+        if guild_id is None:
+            cnx = self.bot.cnx_axobot
+        else:
+            cnx = self.bot.cnx_xp
+        table = await self.get_table_name(guild_id, False)
+        if table is None:
+            return None
+        query = f"SELECT `xp` FROM `{table}` WHERE `userID` = %s AND `banned` = 0"
+        cursor = cnx.cursor(dictionary = True)
+        cursor.execute(query, (user_id,))
+        if result := cursor.fetchone():
+            g = "global" if guild_id is None else guild_id
+            if isinstance(g, int) and g not in self.cache:
+                await self.db_load_cache(g)
+            if user_id in self.cache[g].keys():
+                self.cache[g][user_id][1] = result["xp"]
             else:
-                cnx = self.bot.cnx_xp
-            table = await self.get_table_name(guild_id, False)
-            if table is None:
-                return None
-            query = f"SELECT `xp` FROM `{table}` WHERE `userID` = %s AND `banned` = 0"
-            cursor = cnx.cursor(dictionary = True)
-            cursor.execute(query, (user_id,))
-            if result := cursor.fetchone():
-                g = "global" if guild_id is None else guild_id
-                if isinstance(g, int) and g not in self.cache:
-                    await self.db_load_cache(g)
-                if user_id in self.cache[g].keys():
-                    self.cache[g][user_id][1] = result["xp"]
-                else:
-                    self.cache[g][user_id] = [round(time.time())-60, result ["xp"]]
-            cursor.close()
-            return result["xp"] if result else None
-        except Exception as err:
-            self.bot.dispatch("error", err)
+                self.cache[g][user_id] = [round(time.time())-60, result ["xp"]]
+        cursor.close()
+        return result["xp"] if result else None
 
     async def db_get_users_count(self, guild_id: int | None=None):
         """Get the number of ranked users in a guild (or in the global database)"""
-        try:
-            if not self.bot.database_online:
-                await self.bot.unload_module("xp")
-                return None
-            if guild_id is None:
-                cnx = self.bot.cnx_axobot
-            else:
-                cnx = self.bot.cnx_xp
-            table = await self.get_table_name(guild_id, False)
-            if table is None:
-                return 0
-            query = f"SELECT COUNT(*) FROM `{table}` WHERE `banned`=0"
-            cursor = cnx.cursor(dictionary = False)
-            cursor.execute(query)
-            rows = list(cursor)
-            cursor.close()
-            if rows is not None and len(rows) == 1:
-                return rows[0][0]
+        if not self.bot.database_online:
+            await self.bot.unload_module("xp")
+            return None
+        if guild_id is None:
+            cnx = self.bot.cnx_axobot
+        else:
+            cnx = self.bot.cnx_xp
+        table = await self.get_table_name(guild_id, False)
+        if table is None:
             return 0
-        except Exception as err:
-            self.bot.dispatch("error", err)
+        query = f"SELECT COUNT(*) FROM `{table}` WHERE `banned`=0"
+        cursor = cnx.cursor()
+        cursor.execute(query)
+        rows = list(cursor)
+        cursor.close()
+        if rows is not None and len(rows) == 1:
+            return rows[0][0]
+        return 0
 
     async def db_load_cache(self, guild_id: int | None):
         "Load the XP cache for a given guild (or the global cache)"
-        try:
-            if not self.bot.database_online:
-                await self.bot.unload_module("xp")
-                return
-            if guild_id is None:
-                self.log.info("Loading XP cache (global)")
-                cnx = self.bot.cnx_axobot
-                query = f"SELECT `userID`,`xp` FROM `{self.table}` WHERE `banned`=0"
-            else:
-                self.log.info("Loading XP cache (guild %s)", guild_id)
-                table = await self.get_table_name(guild_id, False)
-                if table is None:
-                    self.cache[guild_id] = {}
-                    return
-                cnx = self.bot.cnx_xp
-                query = f"SELECT `userID`,`xp` FROM `{table}` WHERE `banned`=0"
-            cursor = cnx.cursor(dictionary = True)
-            cursor.execute(query)
-            rows = list(cursor)
-            if guild_id is None:
-                self.cache["global"].clear()
-                for row in rows:
-                    self.cache["global"][row["userID"]] = [round(time.time())-60, int(row["xp"])]
-            else:
-                if guild_id not in self.cache:
-                    self.cache[guild_id] = {}
-                for row in rows:
-                    self.cache[guild_id][row["userID"]] = [round(time.time())-60, int(row["xp"])]
-            cursor.close()
+        if not self.bot.database_online:
+            await self.bot.unload_module("xp")
             return
-        except Exception as err:
-            self.bot.dispatch("error", err)
+        if guild_id is None:
+            self.log.info("Loading XP cache (global)")
+            cnx = self.bot.cnx_axobot
+            query = f"SELECT `userID`,`xp` FROM `{self.table}` WHERE `banned`=0"
+        else:
+            self.log.info("Loading XP cache (guild %s)", guild_id)
+            table = await self.get_table_name(guild_id, False)
+            if table is None:
+                self.cache[guild_id] = {}
+                return
+            cnx = self.bot.cnx_xp
+            query = f"SELECT `userID`,`xp` FROM `{table}` WHERE `banned`=0"
+        cursor = cnx.cursor(dictionary=True)
+        cursor.execute(query)
+        rows = list(cursor)
+        if guild_id is None:
+            self.cache["global"].clear()
+            for row in rows:
+                self.cache["global"][row["userID"]] = [round(time.time())-60, int(row["xp"])]
+        else:
+            if guild_id not in self.cache:
+                self.cache[guild_id] = {}
+            for row in rows:
+                self.cache[guild_id][row["userID"]] = [round(time.time())-60, int(row["xp"])]
+        cursor.close()
 
     async def db_get_top(self, limit: int=None, guild: discord.Guild=None):
         "Get the top of the guild (or the global top)"

@@ -485,16 +485,12 @@ class Admin(commands.Cog):
     async def db_reload(self, interaction: discord.Interaction):
         "Reconnecte le bot à la base de donnée"
         await interaction.response.defer()
-        self.bot.cnx_axobot.close()
-        self.bot.connect_database_axobot()
-        self.bot.cnx_xp.close()
-        self.bot.connect_database_xp()
-        if self.bot.cnx_axobot is not None and self.bot.cnx_xp is not None:
-            await interaction.followup.send("Done!")
-            if xp := self.bot.get_cog("Xp"):
-                await xp.reload_sus()
-            if serverconfig := self.bot.get_cog("ServerConfig"):
-                await serverconfig.clear_cache()
+        self.bot.db.disconnect_all()
+        await interaction.followup.send("Done!")
+        if xp := self.bot.get_cog("Xp"):
+            await xp.reload_sus()
+        if serverconfig := self.bot.get_cog("ServerConfig"):
+            await serverconfig.clear_cache()
 
     @db_group.command(name="biggest-tables")
     async def db_biggest(self, interaction: discord.Interaction, database: str | None = None):
