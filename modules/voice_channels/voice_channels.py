@@ -38,7 +38,7 @@ class VoiceChannels(commands.Cog):
         if not self.bot.database_online:
             return
         beta_condition = '' if self.bot.beta else "NOT "
-        async with self.bot.db_query(f"SELECT * FROM {self.table} WHERE {beta_condition}BETA") as query_results:
+        async with self.bot.db_main.read(f"SELECT * FROM {self.table} WHERE {beta_condition}beta") as query_results:
             for row in query_results:
                 guild = int(row["guild"])
                 channel = int(row["channel"])
@@ -47,7 +47,7 @@ class VoiceChannels(commands.Cog):
     async def db_add_channel(self, channel: discord.VoiceChannel):
         "Add a newly created channel to the database and cache"
         arg = (channel.guild.id, channel.id, self.bot.beta)
-        async with self.bot.db_query(f"INSERT INTO `{self.table}` (`guild`,`channel`,`beta`) VALUES (%s, %s, %s)", arg):
+        async with self.bot.db_main.write(f"INSERT INTO `{self.table}` (`guild`,`channel`,`beta`) VALUES (%s, %s, %s)", arg):
             pass
         prev = self.channels.get(channel.guild.id, [])
         self.channels[channel.guild.id] = prev + [channel.id]
@@ -55,7 +55,7 @@ class VoiceChannels(commands.Cog):
     async def db_delete_channel(self, channel: discord.VoiceChannel):
         "Delete a voice channel from the database and cache"
         arg = (channel.guild.id, channel.id)
-        async with self.bot.db_query(f"DELETE FROM {self.table} WHERE guild=%s AND channel=%s", arg):
+        async with self.bot.db_main.write(f"DELETE FROM {self.table} WHERE guild=%s AND channel=%s", arg):
             pass
         try:
             self.channels[channel.guild.id].remove(channel.id)

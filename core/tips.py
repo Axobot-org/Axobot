@@ -73,7 +73,7 @@ class TipsManager:
         if value := self.user_cache.get(user_id):
             return value
         query = "SELECT tip_id, shown_at FROM tips WHERE user_id = %s"
-        async with self.bot.db_query(query, (user_id,)) as query_result:
+        async with self.bot.db_main.read(query, (user_id,)) as query_result:
             self.user_cache[user_id] = query_result
             return query_result
 
@@ -86,14 +86,14 @@ class TipsManager:
         if value := self.guild_cache.get(guild_id):
             return value
         query = "SELECT tip_id, shown_at FROM tips WHERE guild_id = %s"
-        async with self.bot.db_query(query, (guild_id,)) as query_result:
+        async with self.bot.db_main.read(query, (guild_id,)) as query_result:
             self.guild_cache[guild_id] = query_result
             return query_result
 
     async def db_register_user_tip(self, user_id: int, tip: UserTip):
         "Register a tip as shown to a user"
         query = "INSERT INTO tips (user_id, tip_id) VALUES (%s, %s)"
-        async with self.bot.db_query(query, (user_id, tip.value)):
+        async with self.bot.db_main.write(query, (user_id, tip.value)):
             new_record = {"tip_id": tip, "shown_at": self.bot.utcnow()}
             if tips_list := self.user_cache.get(user_id):
                 tips_list.append(new_record)
@@ -103,7 +103,7 @@ class TipsManager:
     async def db_register_guild_tip(self, guild_id: int, tip: GuildTip):
         "Register a tip as shown to a guild"
         query = "INSERT INTO tips (guild_id, tip_id) VALUES (%s, %s)"
-        async with self.bot.db_query(query, (guild_id, tip.value)):
+        async with self.bot.db_main.write(query, (guild_id, tip.value)):
             pass
 
     async def db_get_last_user_tip_shown(self, user_id: int, tip: UserTip) -> datetime.datetime | None:
@@ -114,7 +114,7 @@ class TipsManager:
                 if tip_dict["tip_id"] == tip:
                     return tip_dict["shown_at"]
         query = "SELECT MAX(shown_at) FROM tips WHERE user_id = %s AND tip_id = %s"
-        async with self.bot.db_query(query, (user_id, tip.value), astuple=True) as query_result:
+        async with self.bot.db_main.read(query, (user_id, tip.value), astuple=True) as query_result:
             if query_result[0][0]:
                 return query_result[0][0].replace(tzinfo=datetime.UTC)
             return None
@@ -122,7 +122,7 @@ class TipsManager:
     async def db_get_last_guild_tip_shown(self, guild_id: int, tip: GuildTip) -> datetime.datetime | None:
         "Get the last time a tip has been shown to a guild"
         query = "SELECT MAX(shown_at) FROM tips WHERE guild_id = %s AND tip_id = %s"
-        async with self.bot.db_query(query, (guild_id, tip.value), astuple=True) as query_result:
+        async with self.bot.db_main.read(query, (guild_id, tip.value), astuple=True) as query_result:
             if query_result[0][0]:
                 return query_result[0][0].replace(tzinfo=datetime.UTC)
             return None

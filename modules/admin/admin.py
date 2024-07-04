@@ -284,7 +284,7 @@ class Admin(commands.Cog):
             "fr": self.update["fr"],
             "en": self.update["en"]
         }
-        async with self.bot.db_query(query, args):
+        async with self.bot.db_main.write(query, args):
             pass
         for language in self.update:
             self.update[language] = None
@@ -501,7 +501,7 @@ class Admin(commands.Cog):
             query += f" WHERE table_schema = \"{database}\""
         query += " ORDER BY (data_length + index_length) DESC LIMIT 15"
         await interaction.response.defer()
-        async with self.bot.db_query(query, astuple=True) as query_results:
+        async with self.bot.db_main.read(query, astuple=True) as query_results:
             if len(query_results) == 0:
                 await interaction.followup.send("Invalid or empty database")
                 return
@@ -513,7 +513,7 @@ class Admin(commands.Cog):
     async def get_databases_names(self) -> list[str]:
         "Get every database names visible for the bot"
         query = "SHOW DATABASES"
-        async with self.bot.db_query(query, astuple=True) as query_results:
+        async with self.bot.db_main.read(query, astuple=True) as query_results:
             print(query_results)
             return [row[0] for row in query_results]
 

@@ -36,7 +36,7 @@ class Utilities(commands.Cog):
         if not self.bot.database_online:
             return {}
         query = "SELECT * FROM `bot_infos` WHERE `ID` = %s"
-        async with self.bot.db_query(query, (self.bot.user.id,)) as query_results:
+        async with self.bot.db_main.read(query, (self.bot.user.id,)) as query_results:
             config_list: list[dict] = list(query_results)
         if len(config_list) > 0:
             self.config = config_list[0]
@@ -50,7 +50,7 @@ class Utilities(commands.Cog):
             raise ValueError
         set_query = ", ".join(f"{val[0]}=%s" for val in values)
         query = f"UPDATE `bot_infos` SET {set_query} WHERE `ID`=%s"
-        async with self.bot.db_query(query, tuple(val[1] for val in values) + (bot_id,)):
+        async with self.bot.db_main.write(query, tuple(val[1] for val in values) + (bot_id,)):
             pass
         return True
 

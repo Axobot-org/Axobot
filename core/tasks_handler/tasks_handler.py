@@ -27,9 +27,9 @@ class TaskHandler:
     async def get_events_from_db(self, get_all: bool = False) -> list[DbTask]:
         """Renvoie une liste de tous les events qui doivent être exécutés"""
         try:
-            query = ("SELECT * FROM `timed` WHERE beta=%s")
+            query = "SELECT * FROM `timed` WHERE beta=%s"
             events: list[dict] = []
-            async with self.bot.db_query(query, (self.bot.beta,)) as query_results:
+            async with self.bot.db_main.read(query, (self.bot.beta,)) as query_results:
                 for row in query_results:
                     row["begin"] = row["begin"].replace(tzinfo=timezone.utc)
                     if get_all:
@@ -220,21 +220,21 @@ class TaskHandler:
             "data": data,
             "beta": self.bot.beta
         }
-        async with self.bot.db_query(query, query_args):
+        async with self.bot.db_main.write(query, query_args):
             pass
         return True
 
     async def update_duration(self, task_id: int, new_duration: int):
         """Edit a task duration"""
         query = f"UPDATE `timed` SET `duration`={new_duration} WHERE `ID`={task_id}"
-        async with self.bot.db_query(query):
+        async with self.bot.db_main.write(query):
             pass
         return True
 
     async def remove_task(self, task_id: int):
         """Remove a task (usually after execution)"""
         query = f"DELETE FROM `timed` WHERE `timed`.`ID` = {task_id}"
-        async with self.bot.db_query(query):
+        async with self.bot.db_main.write(query):
             pass
         return True
 
@@ -242,7 +242,7 @@ class TaskHandler:
         """Cancel every automatic unmutes for a member"""
         try:
             query = "DELETE FROM `timed` WHERE action='mute' AND guild=%s AND user=%s AND beta=%s;"
-            async with self.bot.db_query(query, (guild_id, user_id, self.bot.beta)):
+            async with self.bot.db_main.write(query, (guild_id, user_id, self.bot.beta)):
                 pass
         except Exception as err:  # pylint: disable=broad-except
             self.bot.dispatch("error", err)

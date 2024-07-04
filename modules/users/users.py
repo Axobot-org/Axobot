@@ -32,7 +32,7 @@ class Users(commands.Cog):
         if not self.bot.database_online:
             return None
         query = "SELECT * FROM `users` WHERE userID=%s"
-        async with self.bot.db_query(query, (user_id,), fetchone=True) as query_result:
+        async with self.bot.db_main.read(query, (user_id,), fetchone=True) as query_result:
             return query_result or None
 
     @cached(TTLCache(maxsize=100_000, ttl=3600))
@@ -43,7 +43,7 @@ class Users(commands.Cog):
         if not self.bot.database_online:
             return user_options_list[config]
         query = f"SELECT `{config}` FROM `users` WHERE userID=%s"
-        async with self.bot.db_query(query, (user_id,), astuple=True, fetchone=True) as query_result:
+        async with self.bot.db_main.read(query, (user_id,), astuple=True, fetchone=True) as query_result:
             if len(query_result) == 0:
                 return user_options_list[config]
             return bool(query_result[0])
@@ -54,7 +54,7 @@ class Users(commands.Cog):
             return
         query = "INSERT INTO `users` (`userID`, `user_flags`) VALUES (%(user)s, %(flags)s)\
              ON DUPLICATE KEY UPDATE `user_flags`=%(flags)s"
-        async with self.bot.db_query(query, {"flags": flags, "user": user_id}):
+        async with self.bot.db_main.write(query, {"flags": flags, "user": user_id}):
             pass
 
     async def db_edit_user_rankcards(self, user_id: int, rankcards: int):
@@ -63,7 +63,7 @@ class Users(commands.Cog):
             return
         query = "INSERT INTO `users` (`userID`, `rankcards_unlocked`) VALUES (%(user)s, %(rankcards)s)\
              ON DUPLICATE KEY UPDATE `rankcards_unlocked`=%(rankcards)s"
-        async with self.bot.db_query(query, {"rankcards": rankcards, "user": user_id}):
+        async with self.bot.db_main.write(query, {"rankcards": rankcards, "user": user_id}):
             pass
 
     async def db_edit_user_xp_card(self, user_id: int, card_style: str):
@@ -72,7 +72,7 @@ class Users(commands.Cog):
             return
         query = "INSERT INTO `users` (`userID`, `xp_style`) VALUES (%(user)s, %(style)s)\
                 ON DUPLICATE KEY UPDATE `xp_style`=%(style)s"
-        async with self.bot.db_query(query, {"style": card_style, "user": user_id}):
+        async with self.bot.db_main.write(query, {"style": card_style, "user": user_id}):
             pass
 
     async def db_edit_user_config(self, user_id: int, config: str, value: bool):
@@ -83,7 +83,7 @@ class Users(commands.Cog):
             return
         query = f"INSERT INTO `users` (`userID`, `{config}`) VALUES (%(user)s, %(value)s)\
                 ON DUPLICATE KEY UPDATE `{config}`=%(value)s"
-        async with self.bot.db_query(query, {"value": value, "user": user_id}):
+        async with self.bot.db_main.write(query, {"value": value, "user": user_id}):
             pass
 
     async def db_used_rank(self, user_id: int):
@@ -91,7 +91,7 @@ class Users(commands.Cog):
         if not self.bot.database_online:
             return
         query = "INSERT INTO `users` (`userID`, `used_rank`) VALUES (%s, 1) ON DUPLICATE KEY UPDATE `used_rank`=1"
-        async with self.bot.db_query(query, (user_id,)):
+        async with self.bot.db_main.write(query, (user_id,)):
             pass
 
     async def get_userflags(self, user: discord.User) -> list[str]:
@@ -143,7 +143,7 @@ class Users(commands.Cog):
             return {}
         try:
             query = "SELECT xp_style, Count(*) as count FROM `users` WHERE used_rank=1 GROUP BY xp_style"
-            async with self.bot.db_query(query, astuple=True) as query_results:
+            async with self.bot.db_main.read(query, astuple=True) as query_results:
                 result = {x[0]: x[1] for x in query_results}
         except Exception as err:
             self.bot.dispatch("error", err)

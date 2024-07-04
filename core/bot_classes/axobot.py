@@ -8,8 +8,7 @@ import discord
 from discord.ext import commands
 from mysql.connector.connection import MySQLConnection
 
-from core.database import DatabaseConnectionManager
-from core.database.database import create_database_query
+from core.database import DatabaseConnectionManager, DatabaseQueryHandler
 from core.emojis_manager import EmojisManager
 from core.prefix_manager import PrefixManager
 from core.serverconfig.options_list import options as options_list
@@ -67,6 +66,8 @@ class Axobot(commands.bot.AutoShardedBot):
         self.beta = beta # if the bot is in beta mode
         self.entity_id: int = 0 # ID of the bot for the statistics database
         self.db = DatabaseConnectionManager()
+        self.db_main = DatabaseQueryHandler(self, "axobot")
+        self.db_xp = DatabaseQueryHandler(self, "zbot-xp")
         self.log = logging.getLogger("bot") # logs module
         self.xp_enabled: bool = True # if xp is enabled
         self.rss_enabled: bool = True # if rss is enabled
@@ -219,14 +220,6 @@ class Axobot(commands.bot.AutoShardedBot):
     def close_database_cnx(self):
         "Close any opened database connection"
         self.db.disconnect_all()
-
-    @property
-    def db_query(self):
-        return create_database_query(self, self.cnx_axobot)
-
-    @property
-    def db_xp_query(self):
-        return create_database_query(self, self.cnx_xp)
 
     class SafeDict(dict):
         def __missing__(self, key):

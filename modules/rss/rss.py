@@ -1153,14 +1153,14 @@ class Rss(commands.Cog):
     async def db_get_feed(self, feed_id: int) -> FeedObject | None:
         "Get a rss feed from its ID"
         query = f"SELECT * FROM `{self.table}` WHERE `ID`='{feed_id}'"
-        async with self.bot.db_query(query) as query_results:
+        async with self.bot.db_main.read(query) as query_results:
             liste = list(query_results)
         return FeedObject(liste[0]) if len(liste) > 0 else None
 
     async def db_get_guild_feeds(self, guild_id: int):
         """Get every feed of a guild"""
         query = f"SELECT * FROM `{self.table}` WHERE `guild`='{guild_id}'"
-        async with self.bot.db_query(query) as query_results:
+        async with self.bot.db_main.read(query) as query_results:
             liste = [FeedObject(result) for result in query_results]
         return liste
 
@@ -1173,7 +1173,9 @@ class Rss(commands.Cog):
             form = await self.bot._(guild_id, f"rss.{_type}-default-flow")
         query = f"INSERT INTO `{self.table}` (`ID`, `guild`, `channel`, `type`, `link`, `structure`) \
             VALUES (%(i)s, %(g)s, %(c)s, %(t)s, %(l)s, %(f)s)"
-        async with self.bot.db_query(query, { 'i': feed_id, 'g': guild_id, 'c': channel_id, 't': _type, 'l': link, 'f': form }):
+        async with self.bot.db_main.write(
+            query, {'i': feed_id, 'g': guild_id, 'c': channel_id, 't': _type, 'l': link, 'f': form}
+        ):
             pass
         return feed_id
 
@@ -1183,7 +1185,7 @@ class Rss(commands.Cog):
             raise ValueError("Feed IDs must be integers")
         args_placeholder = ",".join(["%s"] * len(feed_ids))
         query = f"DELETE FROM `{self.table}` WHERE ID IN ({args_placeholder})"
-        async with self.bot.db_query(query, feed_ids, returnrowcount=True) as query_result:
+        async with self.bot.db_main.write(query, feed_ids, returnrowcount=True) as query_result:
             return query_result > 0
 
     async def db_enable_feeds(self, feed_ids: list[int], *, enable: bool) -> bool:
@@ -1192,7 +1194,7 @@ class Rss(commands.Cog):
             raise ValueError("Feed IDs must be integers")
         args_placeholder = ",".join(["%s"] * len(feed_ids))
         query = f"UPDATE `{self.table}` SET `enabled`=%s WHERE ID IN ({args_placeholder})"
-        async with self.bot.db_query(query, (enable, *feed_ids), returnrowcount=True) as query_result:
+        async with self.bot.db_main.write(query, (enable, *feed_ids), returnrowcount=True) as query_result:
             return query_result > 0
 
     async def db_get_all_feeds(self):
@@ -1200,7 +1202,7 @@ class Rss(commands.Cog):
         guild_ids = [guild.id for guild in self.bot.guilds]
         args_placeholder = ",".join(["%s"] * len(guild_ids))
         query = f"SELECT * FROM `{self.table}` WHERE `guild` in ({args_placeholder})"
-        async with self.bot.db_query(query, guild_ids) as query_results:
+        async with self.bot.db_main.read(query, guild_ids) as query_results:
             feeds_list = [FeedObject(result) for result in query_results]
         return feeds_list
 
@@ -1209,7 +1211,7 @@ class Rss(commands.Cog):
         query = f"SELECT COUNT(*) as count FROM `{self.table}`"
         if not get_disabled:
             query += " WHERE `guild` in (" + ", ".join([f"'{x.id}'" for x in self.bot.guilds]) + ")"
-        async with self.bot.db_query(query, fetchone=True) as query_results:
+        async with self.bot.db_main.read(query, fetchone=True) as query_results:
             t = query_results["count"]
         return t
 
@@ -1220,7 +1222,7 @@ class Rss(commands.Cog):
             return
         set_query = ", ".join(f"{val[0]}=%s" for val in values)
         query = f"UPDATE `{self.table}` SET {set_query} WHERE `ID`=%s"
-        async with self.bot.db_query(query, [val[1] for val in values] + [feed_id]):
+        async with self.bot.db_main.write(query, [val[1] for val in values] + [feed_id]):
             pass
 
     async def _update_feed_last_entry(self, feed_id: int, last_post_date: datetime.datetime, last_entry_id: str | None):
@@ -1239,12 +1241,12 @@ class Rss(commands.Cog):
         if working_ids:
             working_ids_list = ", ".join(map(str, working_ids))
             query = f"UPDATE `{self.table}` SET `recent_errors` = 0 WHERE `ID` IN ({working_ids_list})"
-            async with self.bot.db_query(query, returnrowcount=True) as query_results:
+            async with self.bot.db_main.write(query, returnrowcount=True) as query_results:
                 self.log.debug("Reset errors for %s feeds", query_results)
         if broken_ids:
             broken_ids_list = ", ".join(map(str, broken_ids))
             query = f"UPDATE `{self.table}` SET `recent_errors` = `recent_errors` + 1 WHERE `ID` IN ({broken_ids_list})"
-            async with self.bot.db_query(query, returnrowcount=True) as query_results:
+            async with self.bot.db_main.write(query, returnrowcount=True) as query_results:
                 return query_results
 
     async def db_set_last_refresh(self, feed_ids: list[int]):
@@ -1253,7 +1255,7 @@ class Rss(commands.Cog):
             return
         ids_list = ", ".join(map(str, feed_ids))
         query = f"UPDATE `{self.table}` SET `last_refresh` = %s WHERE `ID` IN ({ids_list})"
-        async with self.bot.db_query(query, (self.bot.utcnow(),), returnrowcount=True) as query_results:
+        async with self.bot.db_main.write(query, (self.bot.utcnow(),), returnrowcount=True) as query_results:
             self.log.info("Set last refresh date for %s feeds", query_results)
 
     async def send_rss_msg(self, obj: "RssMessage", channel: discord.TextChannel | discord.Thread):

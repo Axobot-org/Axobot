@@ -138,7 +138,7 @@ class ServerConfig(commands.Cog):
         query = "SELECT `guild_id`, `value` FROM `serverconfig` WHERE `option_name` = 'language' AND `beta` = %s"
         values_list: list[str] = []
         guilds = {x.id for x in self.bot.guilds if x.id not in ignored_guilds}
-        async with self.bot.db_query(query, (self.bot.beta,)) as query_results:
+        async with self.bot.db_main.read(query, (self.bot.beta,)) as query_results:
             for row in query_results:
                 if row["guild_id"] in guilds:
                     values_list.append(row["value"])
@@ -156,7 +156,7 @@ class ServerConfig(commands.Cog):
         query = "SELECT `guild_id`, `value` FROM `serverconfig` WHERE `option_name` = 'xp_type' AND `beta` = %s"
         values_list: list[str] = []
         guilds = {x.id for x in self.bot.guilds if x.id not in ignored_guilds}
-        async with self.bot.db_query(query, (self.bot.beta,)) as query_results:
+        async with self.bot.db_main.read(query, (self.bot.beta,)) as query_results:
             for row in query_results:
                 if row["guild_id"] in guilds:
                     values_list.append(row["value"])
@@ -207,6 +207,11 @@ class ServerConfig(commands.Cog):
             self.bot.log.info(log_text)
             await self.bot.send_embed(emb, url="loop")
 
+    @update_every_membercounter.error
+    async def update_every_membercounter_error(self, error: Exception):
+        "Error handler for the update_every_membercounter loop"
+        self.bot.dispatch("error", error, "Membercounter update loop")
+
     async def update_memberchannel(self, guild: discord.Guild):
         "Update a membercounter channel for a specific guild"
         # If we already did an update recently: abort
@@ -243,7 +248,7 @@ class ServerConfig(commands.Cog):
         if not self.bot.database_online:
             raise RuntimeError("Database is offline")
         query = "SELECT `value` FROM `serverconfig` WHERE `guild_id` = %s AND `option_name` = %s AND `beta` = %s"
-        async with self.bot.db_query(query, (guild_id, option_name, self.bot.beta), fetchone=True) as query_results:
+        async with self.bot.db_main.read(query, (guild_id, option_name, self.bot.beta), fetchone=True) as query_results:
             if len(query_results) == 0:
                 return None
             return query_results["value"]
@@ -253,7 +258,7 @@ class ServerConfig(commands.Cog):
         if not self.bot.database_online:
             raise RuntimeError("Database is offline")
         query = "SELECT * FROM `serverconfig` WHERE `guild_id` = %s AND `beta` = %s"
-        async with self.bot.db_query(query, (guild_id, self.bot.beta)) as query_results:
+        async with self.bot.db_main.read(query, (guild_id, self.bot.beta)) as query_results:
             if len(query_results) == 0:
                 return None
             return {row["option_name"]: row["value"] for row in query_results}
@@ -266,7 +271,7 @@ class ServerConfig(commands.Cog):
             raise RuntimeError("Database is offline")
         query = "INSERT INTO `serverconfig` (`guild_id`, `option_name`, `value`, `beta`) VALUES (%s, %s, %s, %s) "\
             "ON DUPLICATE KEY UPDATE `value` = %s"
-        async with self.bot.db_query(query, (guild_id, option_name, new_value, self.bot.beta, new_value), returnrowcount=True
+        async with self.bot.db_main.write(query, (guild_id, option_name, new_value, self.bot.beta, new_value), returnrowcount=True
                                      ) as query_results:
             return query_results > 0
 
@@ -277,7 +282,7 @@ class ServerConfig(commands.Cog):
         if not self.bot.database_online:
             raise RuntimeError("Database is offline")
         query = "DELETE FROM `serverconfig` WHERE `guild_id` = %s AND `option_name` = %s AND `beta` = %s"
-        async with self.bot.db_query(query, (guild_id, option_name, self.bot.beta), returnrowcount=True) as query_results:
+        async with self.bot.db_main.write(query, (guild_id, option_name, self.bot.beta), returnrowcount=True) as query_results:
             return query_results > 0
 
     async def db_delete_guild(self, guild_id: int) -> bool:
@@ -285,7 +290,7 @@ class ServerConfig(commands.Cog):
         if not self.bot.database_online:
             raise RuntimeError("Database is offline")
         query = "DELETE FROM `serverconfig` WHERE `guild_id` = %s AND `beta` = %s"
-        async with self.bot.db_query(query, (guild_id, self.bot.beta), returnrowcount=True) as query_results:
+        async with self.bot.db_main.write(query, (guild_id, self.bot.beta), returnrowcount=True) as query_results:
             return query_results > 0
 
     async def db_get_guilds_with_membercounter(self) -> list[int]:
@@ -293,7 +298,7 @@ class ServerConfig(commands.Cog):
         if not self.bot.database_online:
             raise RuntimeError("Database is offline")
         query = "SELECT `guild_id` FROM `serverconfig` WHERE `option_name` = 'membercounter' AND `beta` = %s"
-        async with self.bot.db_query(query, (self.bot.beta,)) as query_results:
+        async with self.bot.db_main.read(query, (self.bot.beta,)) as query_results:
             return [row["guild_id"] for row in query_results]
 
     # ---- COMMANDS ----

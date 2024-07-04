@@ -194,7 +194,7 @@ FROM
 GROUP BY cmd
 ORDER BY usages DESC LIMIT %(limit)s"""
             query_args = {"entity_id": self.bot.entity_id, "minutes": minutes, "limit": commands_limit}
-            async with self.bot.db_query(query, query_args) as query_result:
+            async with self.bot.db_main.read(query, query_args) as query_result:
                 pass
             return [row for row in query_result if not any(row["cmd"].startswith(x) for x in forbidden)]
 
