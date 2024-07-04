@@ -14,10 +14,10 @@ from mysql.connector.errors import ProgrammingError
 from core.database import create_database_query
 from core.emojis_manager import EmojisManager
 from core.prefix_manager import PrefixManager
+from core.serverconfig.options_list import options as options_list
 from core.tasks_handler import TaskHandler
 from core.tips import TipsManager
 from core.tokens import get_database_connection, get_secrets_dict
-from core.serverconfig.options_list import options as options_list
 
 from .bot_embeds_manager import send_log_embed
 from .consts import PRIVATE_GUILD_ID
@@ -223,18 +223,18 @@ class Axobot(commands.bot.AutoShardedBot):
             if self._cnx[0][0] is not None:
                 self._cnx[0][0].close()
             self.log.debug(
-                'Connecting to MySQL (user %s, database "%s")',
-                self.database_keys['user'],
-                self.database_keys['name_main']
+                "Connecting to MySQL (user %s, database %s)",
+                self.database_keys["user"],
+                self.database_keys["name_main"]
             )
             self._cnx[0][0] = sql_connect(
-                user=self.database_keys['user'],
-                password=self.database_keys['password'],
-                host=self.database_keys['host'],
-                database=self.database_keys['name_main'],
+                user=self.database_keys["user"],
+                password=self.database_keys["password"],
+                host=self.database_keys["host"],
+                database=self.database_keys["name_main"],
                 buffered=True,
-                charset='utf8mb4',
-                collation='utf8mb4_unicode_ci',
+                charset="utf8mb4",
+                collation="utf8mb4_unicode_ci",
                 connection_timeout=5
             )
             self._cnx[0][1] = round(time.time())
@@ -268,15 +268,15 @@ class Axobot(commands.bot.AutoShardedBot):
             if self._cnx[1][0] is not None:
                 self._cnx[1][0].close()
             self.log.debug(
-                'Connecting to MySQL (user %s, database "%s")',
-                self.database_keys['user'],
-                self.database_keys['name_xp']
+                "Connecting to MySQL (user %s, database %s)",
+                self.database_keys["user"],
+                self.database_keys["name_xp"]
             )
             self._cnx[1][0] = sql_connect(
-                user=self.database_keys['user'],
-                password=self.database_keys['password'],
-                host=self.database_keys['host'],
-                database=self.database_keys['name_xp'],
+                user=self.database_keys["user"],
+                password=self.database_keys["password"],
+                host=self.database_keys["host"],
+                database=self.database_keys["name_xp"],
                 buffered=True,
                 connection_timeout=5
             )
@@ -326,11 +326,11 @@ class Axobot(commands.bot.AutoShardedBot):
     @property
     def _(self) -> Callable[..., Awaitable[str]]:
         """Translate something"""
-        cog = self.get_cog('Languages')
+        cog = self.get_cog("Languages")
         if cog is None:
             self.log.error("Unable to load Languages cog")
             async def fake_tr(*args, **_kwargs):
-                return 'en' if args[1] == "_used_locale" else args[1]
+                return "en" if args[1] == "_used_locale" else args[1]
             return fake_tr
         return cog.tr
 

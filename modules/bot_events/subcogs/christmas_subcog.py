@@ -80,7 +80,7 @@ class ChristmasSubcog(AbstractSubcog):
         await self.db_add_user_items(payload.user_id, [item["item_id"]])
         # prepare the notification embed
         translation_source = payload.guild_id or payload.user_id
-        lang = await self.bot._(translation_source, '_used_locale')
+        lang = await self.bot._(translation_source, "_used_locale")
         title = self.translations_data[lang]["events_title"][self.current_event_id]
         desc_key = "bot_events.reaction.positive" if item["points"] >= 0 else "bot_events.reaction.negative"
         name_key = "french_name" if lang in ("fr", "fr2") else "english_name"
@@ -204,7 +204,7 @@ class ChristmasSubcog(AbstractSubcog):
         user_rank_query = await self.db_get_event_rank(user.id)
         if user_rank_query is None:
             return None
-        rank = user_rank_query['rank']
+        rank = user_rank_query["rank"]
         if rank > 3:
             return None
         return {

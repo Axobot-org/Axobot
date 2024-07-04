@@ -62,7 +62,7 @@ class AbstractSubcog(ABC):
             points = 0
         else:
             total_ranked = await self.db_get_participants_count()
-            if user_rank_query['rank'] <= total_ranked:
+            if user_rank_query["rank"] <= total_ranked:
                 user_rank = f"{user_rank_query['rank']}/{total_ranked}"
             else:
                 user_rank = await self.bot._(interaction, "bot_events.unclassed")
@@ -100,7 +100,7 @@ class AbstractSubcog(ABC):
             if related_objective and (min_date := related_objective[0].get("min_date")):
                 parsed_date = datetime.datetime.strptime(min_date, "%Y-%m-%d").replace(tzinfo=datetime.UTC)
                 format_date = await FormatUtils.date(parsed_date, hour=False, seconds=False)
-                desc += f" (**{await self.bot._(interaction, 'bot_events.available-starting', date=format_date)}**)"
+                desc += " (**" + await self.bot._(interaction, "bot_events.available-starting", date=format_date) + "**)"
             # assign correct emoji
             if parsed_date and parsed_date > self.bot.utcnow():
                 emoji = self.bot.emojis_manager.customs["gray_check"]
@@ -128,14 +128,14 @@ class AbstractSubcog(ABC):
             else:
                 _empty_collection = await self.bot._(interaction, "bot_events.collection-empty.other", user=user.display_name)
             return {"name": title, "value": _empty_collection, "inline": True}
-        lang = await self.bot._(interaction, '_used_locale')
+        lang = await self.bot._(interaction, "_used_locale")
         name_key = "french_name" if lang in ("fr", "fr2") else "english_name"
         items.sort(key=lambda item: item["frequency"], reverse=True)
         items_list: list[str] = []
         more_count = 0
         for item in items:
             if len(items_list) >= 32:
-                more_count += item['count']
+                more_count += item["count"]
                 continue
             item_name = item["emoji"] + " " + item[name_key]
             items_list.append(f"{item_name} x{item['count']}")
@@ -150,9 +150,9 @@ class AbstractSubcog(ABC):
             return await self.bot._(self.bot.get_channel(0), "bot_events.nothing-desc")
         top_5_f: list[str] = []
         for i, row in enumerate(top_5):
-            if user := self.bot.get_user(row['user_id']):
+            if user := self.bot.get_user(row["user_id"]):
                 username = user.display_name
-            elif user := await self.bot.fetch_user(row['user_id']):
+            elif user := await self.bot.fetch_user(row["user_id"]):
                 username = user.display_name
             else:
                 username = f"user {row['user_id']}"
@@ -227,7 +227,7 @@ class AbstractSubcog(ABC):
             return 0
         query = "SELECT COUNT(*) as count FROM `event_points` WHERE `points` > 0 AND `beta` = %s;"
         async with self.bot.db_query(query, (self.bot.beta,), fetchone=True) as query_results:
-            return query_results['count']
+            return query_results["count"]
 
     async def db_get_event_rank(self, user_id: int) -> DBUserRank | None:
         "Get the ranking of a user"
@@ -236,7 +236,7 @@ class AbstractSubcog(ABC):
         query = "SELECT `user_id`, `points`, FIND_IN_SET( `points`, \
             ( SELECT GROUP_CONCAT( `points` ORDER BY `points` DESC ) FROM `event_points` WHERE `beta` = %(beta)s ) ) AS rank \
                 FROM `event_points` WHERE `user_id` = %(user)s AND `beta` = %(beta)s"
-        async with self.bot.db_query(query, {'user': user_id, 'beta': self.bot.beta}, fetchone=True) as query_results:
+        async with self.bot.db_query(query, {"user": user_id, "beta": self.bot.beta}, fetchone=True) as query_results:
             return query_results or None
 
     async def db_get_user_collected_items(self, user_id: int, event_type: EventType) -> list[EventItemWithCount]:

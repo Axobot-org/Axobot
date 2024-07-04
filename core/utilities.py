@@ -20,7 +20,7 @@ class Utilities(commands.Cog):
         self.bot = bot
         self.file = "utilities"
         self.config = {}
-        self.table = 'users'
+        self.table = "users"
         self.new_pp = False
         bot.add_check(self.global_check)
 
@@ -40,7 +40,7 @@ class Utilities(commands.Cog):
             config_list: list[dict] = list(query_results)
         if len(config_list) > 0:
             self.config = config_list[0]
-            self.config.pop('token', None)
+            self.config.pop("token", None)
             return self.config
         return None
 
@@ -48,9 +48,9 @@ class Utilities(commands.Cog):
         """Edit the bot's infos in the database"""
         if not isinstance(values, list) or len(values) == 0:
             raise ValueError
-        set_query = ', '.join('{}=%s'.format(val[0]) for val in values)
-        query = f"UPDATE `bot_infos` SET {set_query} WHERE `ID`='{bot_id}'"
-        async with self.bot.db_query(query, (val[1] for val in values)):
+        set_query = ", ".join(f"{val[0]}=%s" for val in values)
+        query = f"UPDATE `bot_infos` SET {set_query} WHERE `ID`=%s"
+        async with self.bot.db_query(query, tuple(val[1] for val in values) + (bot_id,)):
             pass
         return True
 
@@ -89,16 +89,16 @@ class Utilities(commands.Cog):
         if ctx.message.type not in {discord.MessageType.default, discord.MessageType.reply, discord.MessageType.chat_input_command}:
             if not ctx.message.type.value == discord.MessageType.chat_input_command:
                 return False
-        if await self.bot.get_cog('Admin').check_if_admin(ctx):
+        if await self.bot.get_cog("Admin").check_if_admin(ctx):
             return True
         elif not self.config:
             await self.get_bot_infos()
         if len(self.config) == 0 or self.config is None:
             return True
         if ctx.guild is not None:
-            if str(ctx.guild.id) in self.config['banned_guilds'].split(";"):
+            if str(ctx.guild.id) in self.config["banned_guilds"].split(";"):
                 return False
-        if str(ctx.author.id) in self.config['banned_users'].split(";"):
+        if str(ctx.author.id) in self.config["banned_users"].split(";"):
             return False
         return True
 
@@ -116,26 +116,26 @@ class Utilities(commands.Cog):
         "Return the chosen rank card style for a user"
         if config := await self.bot.get_cog("Users").db_get_userinfo(user.id):
             if config["xp_style"]:
-                return config['xp_style']
+                return config["xp_style"]
         return self.bot.get_cog("Xp").default_xp_style
 
     @cached(TTLCache(maxsize=10_000, ttl=60))
     async def allowed_card_styles(self, user: discord.User):
         """Retourne la liste des styles autorisées pour la carte d'xp de cet utilisateur"""
-        liste = ['blue', 'dark', 'green', 'grey', 'orange',
-                 'purple', 'red', 'turquoise', 'yellow']
+        liste = ["blue", "dark", "green", "grey", "orange",
+                 "purple", "red", "turquoise", "yellow"]
         if not self.bot.database_online:
             return sorted(liste)
         liste2 = []
-        if await self.bot.get_cog('Admin').check_if_admin(user):
-            liste2.append('admin')
+        if await self.bot.get_cog("Admin").check_if_admin(user):
+            liste2.append("admin")
         if not self.bot.database_online:
             return sorted(liste2)+sorted(liste)
-        userflags = await self.bot.get_cog('Users').get_userflags(user)
+        userflags = await self.bot.get_cog("Users").get_userflags(user)
         for flag in ("support", "contributor", "partner", "premium"):
             if flag in userflags:
                 liste2.append(flag)
-        for card in await self.bot.get_cog('Users').get_rankcards(user):
+        for card in await self.bot.get_cog("Users").get_rankcards(user):
             liste.append(card)
         return sorted(liste2)+sorted(liste)
 
@@ -167,8 +167,8 @@ class Utilities(commands.Cog):
         async with aiohttp.ClientSession() as session:
             try:  # https://top.gg/bot/1048011651145797673
                 async with session.get(
-                    f'https://top.gg/api/bots/{self.bot.user.id}/check?userId={userid}',
-                    headers={'Authorization': str(self.bot.dbl_token)}
+                    f"https://top.gg/api/bots/{self.bot.user.id}/check?userId={userid}",
+                    headers={"Authorization": str(self.bot.dbl_token)}
                 ) as r:
                     json = await r.json()
                     if "error" in json:

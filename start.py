@@ -27,10 +27,10 @@ async def main():
     log = setup_logger()
     log.info("Starting bot")
 
-    client = Axobot(case_insensitive=True, status=discord.Status('online'))
+    client = Axobot(case_insensitive=True, status=discord.Status("online"))
 
     async def on_ready():
-        print('\nBot connected')
+        print("\nBot connected")
         print("Name:", client.user.name)
         print("ID:", client.user.id)
         if len(client.guilds) < 50:
@@ -39,18 +39,18 @@ async def main():
         else:
             print("Connected on "+str(len(client.guilds))+" guilds")
         print(time.strftime("%d/%m  %H:%M:%S"))
-        print('------')
+        print("------")
         await asyncio.sleep(3)
         with open("status_list.json", 'r', encoding="utf-8") as status_file:
             status_list = json.load(status_file)
         if not client.database_online:
-            activity = discord.Activity(type=discord.ActivityType.listening, name=choice(status_list['no-db']))
+            activity = discord.Activity(type=discord.ActivityType.listening, name=choice(status_list["no-db"]))
             await client.change_presence(activity=activity)
         else:
             if client.beta:
-                status = choice(status_list['beta'])
+                status = choice(status_list["beta"])
             else:
-                status = choice(status_list['axobot'])
+                status = choice(status_list["axobot"])
             await client.change_presence(activity=discord.Game(name=status))
         emb = discord.Embed(description=f"**{client.user.name}** is launching !", color=8311585, timestamp=client.utcnow())
         await client.send_embed(emb)
@@ -62,11 +62,11 @@ async def main():
         client.log.fatal("Invalid bot token")
         return
 
-    if args.token == 'axobot':
+    if args.token == "axobot":
         bot_data = tokens.get_token(client, 1048011651145797673)
         token = bot_data["token"]
         client.entity_id = bot_data["entity_id"]
-    elif args.token == 'beta':
+    elif args.token == "beta":
         bot_data = tokens.get_token(client, 436835675304755200)
         token = bot_data["token"]
         client.entity_id = bot_data["entity_id"]

@@ -44,15 +44,15 @@ class BotStats(commands.Cog):
 
     def __init__(self, bot: Axobot):
         self.bot = bot
-        self.file = 'bot_stats'
+        self.file = "bot_stats"
         self.log = logging.getLogger("bot.stats")
 
-        self.received_events = {'CMD_USE': 0}
+        self.received_events = {"CMD_USE": 0}
         self.commands_uses: dict[str, int] = {}
         self.app_commands_uses: dict[str, int] = {}
-        self.rss_stats: RssStats = {'checked': 0, 'messages': 0, 'errors': 0, 'warnings': 0, 'time': 0}
+        self.rss_stats: RssStats = {"checked": 0, "messages": 0, "errors": 0, "warnings": 0, "time": 0}
         self.rss_loop_finished = False
-        self.xp_cards = {'generated': 0, 'sent': 0}
+        self.xp_cards = {"generated": 0, "sent": 0}
         self.process = psutil.Process()
         self.bot_cpu_records: list[float] = []
         self.total_cpu_records: list[float] = []
@@ -90,7 +90,7 @@ class BotStats(commands.Cog):
 
     @property
     def emoji_table(self):
-        return 'emojis_beta' if self.bot.beta else 'emojis'
+        return "emojis_beta" if self.bot.beta else "emojis"
 
     @tasks.loop(seconds=10)
     async def record_cpu_usage(self):
@@ -130,7 +130,7 @@ class BotStats(commands.Cog):
         "Record the number of open files from the bot process"
         if not self.bot.files_count_enabled:
             return
-        result = subprocess.run(['lsof', '-p', str(self.process.pid)], stdout=subprocess.PIPE, check=True)
+        result = subprocess.run(["lsof", "-p", str(self.process.pid)], stdout=subprocess.PIPE, check=True)
         self.open_files.clear()
         for line in result.stdout.split(b"\n"):
             if line.startswith(b"COMMAND"):
@@ -189,9 +189,9 @@ class BotStats(commands.Cog):
             return
         nbr = self.received_events.get(msg['t'], 0)
         self.received_events[msg['t']] = nbr + 1
-        if msg['t'] == "MESSAGE_CREATE" and msg['d']['author']['id'] == str(self.bot.user.id):
-            nbr2 = self.received_events.get('message_sent', 0)
-            self.received_events['message_sent'] = nbr2 + 1
+        if msg['t'] == "MESSAGE_CREATE" and msg["d"]["author"]["id"] == str(self.bot.user.id):
+            nbr2 = self.received_events.get("message_sent", 0)
+            self.received_events["message_sent"] = nbr2 + 1
 
     @commands.Cog.listener()
     async def on_command_completion(self, ctx: MyContext):
@@ -200,7 +200,7 @@ class BotStats(commands.Cog):
             return # will be handled in on_app_command_completion
         name = ctx.command.qualified_name
         self.commands_uses[name] = self.commands_uses.get(name, 0) + 1
-        self.received_events['CMD_USE'] = self.received_events.get('CMD_USE', 0) + 1
+        self.received_events["CMD_USE"] = self.received_events.get("CMD_USE", 0) + 1
 
     @commands.Cog.listener()
     async def on_app_command_completion(self, _interaction: discord.Interaction,
@@ -208,9 +208,9 @@ class BotStats(commands.Cog):
         "Called when an app command is correctly used by someone"
         name = command.qualified_name.lower()
         self.commands_uses[name] = self.commands_uses.get(name, 0) + 1
-        self.received_events['CMD_USE'] = self.received_events.get('CMD_USE', 0) + 1
+        self.received_events["CMD_USE"] = self.received_events.get("CMD_USE", 0) + 1
         self.app_commands_uses[name] = self.app_commands_uses.get(name, 0) + 1
-        self.received_events['SLASH_CMD_USE'] = self.received_events.get('SLASH_CMD_USE', 0) + 1
+        self.received_events["SLASH_CMD_USE"] = self.received_events.get("SLASH_CMD_USE", 0) + 1
 
     @commands.Cog.listener()
     async def on_serverlog(self, _guild_id: int, _channel_id: int, log_type: str):
@@ -262,7 +262,7 @@ class BotStats(commands.Cog):
     async def _check_voice_msg(self, message: discord.Message):
         "Collect the amount of sent voice messages"
         if message.flags.voice:
-            self.received_events['VOICE_MSG'] = self.received_events.get('VOICE_MSG', 0) + 1
+            self.received_events["VOICE_MSG"] = self.received_events.get("VOICE_MSG", 0) + 1
 
     async def on_serverlogs_audit_search(self, success: bool):
         "Called when a serverlog audit logs search is done"
@@ -273,7 +273,7 @@ class BotStats(commands.Cog):
 
     async def db_get_disabled_rss(self) -> int:
         "Count the number of disabled RSS feeds in any guild"
-        table = 'rss_feed_beta' if self.bot.beta else 'rss_flow'
+        table = "rss_feed_beta" if self.bot.beta else "rss_flow"
         query = f"SELECT COUNT(*) FROM {table} WHERE enabled = 0"
         async with self.bot.db_query(query, fetchone=True, astuple=True) as query_result:
             return query_result[0]
@@ -398,7 +398,7 @@ class BotStats(commands.Cog):
             ctx = await self.bot.get_context(msg)
             if ctx.command is not None:
                 return
-            liste = list(set(re.findall(r'<a?:[\w-]+:(\d{17,19})>',msg.content)))
+            liste = list(set(re.findall(r"<a?:[\w-]+:(\d{17,19})>", msg.content)))
             if len(liste) == 0:
                 return
             current_timestamp = datetime.fromtimestamp(round(time.time()))
@@ -418,13 +418,13 @@ class BotStats(commands.Cog):
             query = f"SELECT * from `{self.emoji_table}` WHERE `ID`=%s"
             query_args = (emoji_id,)
         else:
-            where_cond = "OR".join(['`ID` = %s' for _ in emoji_id])
+            where_cond = "OR".join(["`ID` = %s" for _ in emoji_id])
             query = f"SELECT * from `{self.emoji_table}` WHERE {where_cond}"
             query_args = (tuple(emoji_id), )
         liste = []
         async with self.bot.db_query(query, query_args) as query_results:
             for x in query_results:
-                x['emoji'] = self.bot.get_emoji(x['ID'])
+                x["emoji"] = self.bot.get_emoji(x["ID"])
                 liste.append(x)
         return liste
 
@@ -446,85 +446,85 @@ class BotStats(commands.Cog):
             # WS events stats
             for k, v in self.received_events.items():
                 if v:
-                    cursor.execute(query, (now, 'wsevent.'+k, v, 0, 'event/min', True, self.bot.entity_id))
+                    cursor.execute(query, (now, "wsevent."+k, v, 0, "event/min", True, self.bot.entity_id))
                 self.received_events[k] = 0
             # Commands usages stats
             for k, v in self.commands_uses.items():
-                cursor.execute(query, (now, 'cmd.'+k, v, 0, 'cmd/min', True, self.bot.entity_id))
+                cursor.execute(query, (now, "cmd."+k, v, 0, "cmd/min", True, self.bot.entity_id))
             self.commands_uses.clear()
             for k, v in self.app_commands_uses.items():
-                cursor.execute(query, (now, 'app_cmd.'+k, v, 0, 'cmd/min', True, self.bot.entity_id))
+                cursor.execute(query, (now, "app_cmd."+k, v, 0, "cmd/min", True, self.bot.entity_id))
             self.app_commands_uses.clear()
             # RSS stats
             if self.rss_loop_finished:
                 for k, v in self.rss_stats.items():
-                    cursor.execute(query, (now, 'rss.'+k, v, 0, k, k == "messages", self.bot.entity_id))
+                    cursor.execute(query, (now, "rss."+k, v, 0, k, k == "messages", self.bot.entity_id))
                     self.rss_stats[k] = 0
                 self.rss_loop_finished = False
             cursor.execute(query,
-                           (now, 'rss.disabled', await self.db_get_disabled_rss(), 0, 'disabled', False, self.bot.entity_id))
+                           (now, "rss.disabled", await self.db_get_disabled_rss(), 0, "disabled", False, self.bot.entity_id))
             # XP cards
             if self.xp_cards["generated"]:
                 cursor.execute(query,
-                               (now, 'xp.generated_cards', self.xp_cards["generated"], 0, 'cards/min', True, self.bot.entity_id))
+                               (now, "xp.generated_cards", self.xp_cards["generated"], 0, "cards/min", True, self.bot.entity_id))
                 self.xp_cards["generated"] = 0
             if self.xp_cards["sent"]:
                 cursor.execute(query,
-                               (now, 'xp.sent_cards', self.xp_cards["sent"], 0, 'cards/min', True, self.bot.entity_id))
+                               (now, "xp.sent_cards", self.xp_cards["sent"], 0, "cards/min", True, self.bot.entity_id))
                 self.xp_cards["sent"] = 0
             # Latency
             if latency := await self.get_list_usage(self.latency_records):
-                cursor.execute(query, (now, 'perf.latency', latency, 1, 'ms', False, self.bot.entity_id))
+                cursor.execute(query, (now, "perf.latency", latency, 1, "ms", False, self.bot.entity_id))
                 self.latency_records.clear()
             # SQL queries count / performances
             if sql_perf := await self.get_list_usage(self.sql_performance_records):
                 sql_count = len(self.sql_performance_records)
-                cursor.execute(query, (now, 'perf.sql_count', sql_count, 0, 'queries/min', True, self.bot.entity_id))
-                cursor.execute(query, (now, 'perf.sql', sql_perf, 1, 'ms', False, self.bot.entity_id))
+                cursor.execute(query, (now, "perf.sql_count", sql_count, 0, "queries/min", True, self.bot.entity_id))
+                cursor.execute(query, (now, "perf.sql", sql_perf, 1, "ms", False, self.bot.entity_id))
                 self.sql_performance_records.clear()
             # CPU usage
             if bot_cpu := await self.get_list_usage(self.bot_cpu_records):
-                cursor.execute(query, (now, 'perf.bot_cpu', bot_cpu, 1, '%', False, self.bot.entity_id))
+                cursor.execute(query, (now, "perf.bot_cpu", bot_cpu, 1, '%', False, self.bot.entity_id))
                 self.bot_cpu_records.clear()
             if total_cpu := await self.get_list_usage(self.total_cpu_records):
-                cursor.execute(query, (now, 'perf.total_cpu', total_cpu, 1, '%', False, self.bot.entity_id))
+                cursor.execute(query, (now, "perf.total_cpu", total_cpu, 1, '%', False, self.bot.entity_id))
                 self.total_cpu_records.clear()
             # RAM usage
             bot_ram = round(self.process.memory_info()[0] / 2.**30, 3)
-            cursor.execute(query, (now, 'perf.bot_ram', bot_ram, 1, 'Gb', False, self.bot.entity_id))
+            cursor.execute(query, (now, "perf.bot_ram", bot_ram, 1, "Gb", False, self.bot.entity_id))
             percent_ram, total_ram = await get_ram_data()
-            cursor.execute(query, (now, 'perf.total_ram', round(total_ram / 1e9, 3), 1, 'Gb', False, self.bot.entity_id))
-            cursor.execute(query, (now, 'perf.percent_total_ram', percent_ram, 1, '%', False, self.bot.entity_id))
+            cursor.execute(query, (now, "perf.total_ram", round(total_ram / 1e9, 3), 1, "Gb", False, self.bot.entity_id))
+            cursor.execute(query, (now, "perf.percent_total_ram", percent_ram, 1, '%', False, self.bot.entity_id))
             # Unavailable guilds
             unav, total = 0, 0
             for guild in self.bot.guilds:
                 unav += guild.unavailable
                 total += 1
-            cursor.execute(query, (now, 'guilds.unavailable', round(unav/total, 3)*100, 1, '%', False, self.bot.entity_id))
-            cursor.execute(query, (now, 'guilds.total', total, 0, 'guilds', False, self.bot.entity_id))
+            cursor.execute(query, (now, "guilds.unavailable", round(unav/total, 3)*100, 1, '%', False, self.bot.entity_id))
+            cursor.execute(query, (now, "guilds.total", total, 0, "guilds", False, self.bot.entity_id))
             del unav, total
             # antiscam warn/deletions
             if self.antiscam["warning"]:
                 cursor.execute(query,
-                               (now, 'antiscam.warning', self.antiscam["warning"], 0, 'warning/min', True, self.bot.entity_id))
+                               (now, "antiscam.warning", self.antiscam["warning"], 0, "warning/min", True, self.bot.entity_id))
             if self.antiscam["deletion"]:
                 cursor.execute(query,
-                               (now, 'antiscam.deletion', self.antiscam["deletion"], 0, 'deletion/min', True, self.bot.entity_id))
+                               (now, "antiscam.deletion", self.antiscam["deletion"], 0, "deletion/min", True, self.bot.entity_id))
             self.antiscam["warning"] = self.antiscam["deletion"] = 0
             # antiscam scanned messages
             if antiscam_cog := self.bot.get_cog("AntiScam"):
                 cursor.execute(query,
-                               (now, 'antiscam.scanned',
-                                antiscam_cog.messages_scanned_in_last_minute, 0, 'messages/min', True, self.bot.entity_id))
+                               (now, "antiscam.scanned",
+                                antiscam_cog.messages_scanned_in_last_minute, 0, "messages/min", True, self.bot.entity_id))
                 antiscam_cog.messages_scanned_in_last_minute = 0
             # antiscam activated count
             antiscam_enabled = await self.db_get_antiscam_enabled_count()
-            cursor.execute(query, (now, 'antiscam.activated',antiscam_enabled, 0, 'guilds', False, self.bot.entity_id))
+            cursor.execute(query, (now, "antiscam.activated", antiscam_enabled, 0, "guilds", False, self.bot.entity_id))
             # tickets creation
             if self.ticket_events["creation"]:
                 cursor.execute(query,
-                               (now, 'tickets.creation',
-                                self.ticket_events["creation"], 0, 'tickets/min', True, self.bot.entity_id))
+                               (now, "tickets.creation",
+                                self.ticket_events["creation"], 0, "tickets/min", True, self.bot.entity_id))
                 self.ticket_events["creation"] = 0
             if self.bot.current_event:
                 try:
@@ -538,44 +538,44 @@ class BotStats(commands.Cog):
             for serverlogs_query in await self.db_record_serverlogs_enabled(now):
                 cursor.execute(*serverlogs_query)
             for k, v in self.emitted_serverlogs.items():
-                cursor.execute(query, (now, f'logs.{k}.emitted', v, 0, 'event/min', True, self.bot.entity_id))
+                cursor.execute(query, (now, f"logs.{k}.emitted", v, 0, "event/min", True, self.bot.entity_id))
             self.emitted_serverlogs.clear()
             if self.serverlogs_audit_search is not None:
                 audit_search_percent = round(self.serverlogs_audit_search[1] / self.serverlogs_audit_search[0] * 100, 1)
-                cursor.execute(query, (now, 'logs.audit_search', audit_search_percent, 1, '%', False, self.bot.entity_id))
+                cursor.execute(query, (now, "logs.audit_search", audit_search_percent, 1, '%', False, self.bot.entity_id))
                 self.serverlogs_audit_search = None
             # Last backup save
             if self.last_backup_size:
-                cursor.execute(query, (now, 'backup.size', self.last_backup_size, 1, 'Gb', False, self.bot.entity_id))
+                cursor.execute(query, (now, "backup.size", self.last_backup_size, 1, "Gb", False, self.bot.entity_id))
                 self.last_backup_size = None
             # role reactions
             if self.role_reactions["added"]:
-                cursor.execute(query, (now, 'role_reactions.added', self.role_reactions["added"], 0,
-                                       'reactions', True, self.bot.entity_id))
+                cursor.execute(query, (now, "role_reactions.added", self.role_reactions["added"], 0,
+                                       "reactions", True, self.bot.entity_id))
                 self.role_reactions["added"] = 0
             if self.role_reactions["removed"]:
-                cursor.execute(query, (now, 'role_reactions.removed', self.role_reactions["removed"], 0,
-                                       'reactions', True, self.bot.entity_id))
+                cursor.execute(query, (now, "role_reactions.removed", self.role_reactions["removed"], 0,
+                                       "reactions", True, self.bot.entity_id))
                 self.role_reactions["removed"] = 0
             # snoozed reminders
             for (initial_duration, snooze_duration), count in self.snooze_events.items():
-                cursor.execute(query, (now, f'reminders.snoozed.{initial_duration}.{snooze_duration}', count, 0,
-                                       'reminders',True, self.bot.entity_id))
+                cursor.execute(query, (now, f"reminders.snoozed.{initial_duration}.{snooze_duration}", count, 0,
+                                       "reminders", True, self.bot.entity_id))
             self.snooze_events.clear()
             # Twitch stream events
             for event, count in self.stream_events.items():
-                cursor.execute(query, (now, f'streams.{event}', count, 0,
-                                       'streams', True, self.bot.entity_id))
+                cursor.execute(query, (now, f"streams.{event}", count, 0,
+                                       "streams", True, self.bot.entity_id))
             self.stream_events.clear()
             # voice transcripts
             for (message_duration, generation_duration), count in self.voice_transcript_events.items():
-                cursor.execute(query, (now, f'voice_transcripts.{message_duration:.0f}.{generation_duration:.0f}', count, 0,
-                                       'transcripts', True, self.bot.entity_id))
+                cursor.execute(query, (now, f"voice_transcripts.{message_duration:.0f}.{generation_duration:.0f}", count, 0,
+                                       "transcripts", True, self.bot.entity_id))
             self.voice_transcript_events.clear()
             # Process open files
             for fd, count in self.open_files.items():
-                cursor.execute(query, (now, f'process.open_files.{fd}', count, 0,
-                                       'files', False, self.bot.entity_id))
+                cursor.execute(query, (now, f"process.open_files.{fd}", count, 0,
+                                       "files", False, self.bot.entity_id))
             self.open_files.clear()
             # Push everything
             cnx.commit()
@@ -606,11 +606,11 @@ class BotStats(commands.Cog):
         if len(result) == 0:
             return 0
         result = result[0]
-        if result['type'] == 0:
-            return int(result['value'])
-        if result['type'] == 1:
-            return float(result['value'])
-        return result['value']
+        if result["type"] == 0:
+            return int(result["value"])
+        if result["type"] == 1:
+            return float(result["value"])
+        return result["value"]
 
     @tasks.loop(minutes=4)
     async def status_loop(self):

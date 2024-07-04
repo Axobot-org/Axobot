@@ -62,7 +62,7 @@ class Errors(commands.Cog):
     async def on_command_error(self, ctx: MyContext, error: Exception):
         """The event triggered when an error is raised while invoking a command."""
         # This prevents any commands with local handlers being handled here in on_command_error.
-        if hasattr(ctx.command, 'on_error'):
+        if hasattr(ctx.command, "on_error"):
             return
 
         ignored = (
@@ -75,7 +75,7 @@ class Errors(commands.Cog):
 
         # Allows us to check for original exceptions raised and sent to CommandInvokeError.
         # If nothing is found. We keep the exception passed to on_command_error.
-        error = getattr(error, 'original', error)
+        error = getattr(error, "original", error)
 
         # Anything in ignored will return and prevent anything happening.
         if isinstance(error, ignored) and not isinstance(error, actually_not_ignored):
@@ -86,17 +86,17 @@ class Errors(commands.Cog):
                 await ctx.send(f"`Ignored error:` [{error.__class__.__module__}.{error.__class__.__name__}] {error}")
             return
         elif isinstance(error, commands.CommandError) and str(error) == "User doesn't have required roles":
-            await ctx.send(await self.bot._(ctx.channel, 'errors.notrightroles'), ephemeral=True)
+            await ctx.send(await self.bot._(ctx.channel, "errors.notrightroles"), ephemeral=True)
             return
         elif isinstance(error, commands.CommandError) and str(error) == "Database offline":
-            await ctx.send(await self.bot._(ctx.channel, 'errors.nodb-1'))
+            await ctx.send(await self.bot._(ctx.channel, "errors.nodb-1"))
             return
         elif isinstance(error, commands.ExpectedClosingQuoteError):
-            await ctx.send(await self.bot._(ctx.channel, 'errors.quoteserror'), ephemeral=True)
+            await ctx.send(await self.bot._(ctx.channel, "errors.quoteserror"), ephemeral=True)
             return
         elif isinstance(error, NotDuringEventError):
             cmd = await self.bot.get_command_mention("event info")
-            await ctx.send(await self.bot._(ctx.channel, 'errors.notduringevent', cmd=cmd), ephemeral=True)
+            await ctx.send(await self.bot._(ctx.channel, "errors.notduringevent", cmd=cmd), ephemeral=True)
             return
         elif isinstance(error, commands.errors.CommandOnCooldown):
             if await checks.is_bot_admin(ctx) and not ctx.interaction:
@@ -104,10 +104,10 @@ class Errors(commands.Cog):
                 return
             if await self.can_send_cooldown_error(ctx.author.id):
                 delay = round(error.retry_after, 2 if error.retry_after < 60 else None)
-                await ctx.send(await self.bot._(ctx.channel, 'errors.cooldown', d=delay), ephemeral=True)
+                await ctx.send(await self.bot._(ctx.channel, "errors.cooldown", d=delay), ephemeral=True)
             return
         elif isinstance(error, commands.BadLiteralArgument):
-            await ctx.send(await self.bot._(ctx.channel, 'errors.badlitteral'), ephemeral=True)
+            await ctx.send(await self.bot._(ctx.channel, "errors.badlitteral"), ephemeral=True)
             return
         elif isinstance(error, commands.BadArgument | commands.BadUnionArgument):
             allowed_mentions = discord.AllowedMentions(everyone=False, users=False, roles=False)
@@ -118,94 +118,94 @@ class Errors(commands.Cog):
             raw_error = str(error)
             # value must be less than 1 but received -1
             if isinstance(error, commands.RangeError):
-                return await send_err('errors.rangeerror', min=error.minimum, value=error.value)
+                return await send_err("errors.rangeerror", min=error.minimum, value=error.value)
 
             # Could not convert "limit" into int. OR Converting to "int" failed for parameter "number".
-            reason = re.search(r'Could not convert \"(?P<arg>[^\"]+)\" into (?P<type>[^.\n]+)',raw_error)
+            reason = re.search(r"Could not convert \"(?P<arg>[^\"]+)\" into (?P<type>[^.\n]+)", raw_error)
             if reason is None:
-                reason = re.search(r'Converting to \"(?P<type>[^\"]+)\" failed for parameter \"(?P<arg>[^.\n]+)\"',raw_error)
+                reason = re.search(r"Converting to \"(?P<type>[^\"]+)\" failed for parameter \"(?P<arg>[^.\n]+)\"", raw_error)
             if reason is not None:
-                return await send_err('errors.badarguments', p=reason.group('arg'), t=reason.group('type'))
+                return await send_err("errors.badarguments", p=reason.group("arg"), t=reason.group("type"))
             # zzz is not a recognised boolean option
             if isinstance(error, commands.BadBoolArgument):
-                return await send_err('errors.badboolean', p=error.argument)
+                return await send_err("errors.badboolean", p=error.argument)
             # Member "Z_runner" not found
             if isinstance(error, commands.MemberNotFound):
-                return await send_err('errors.membernotfound', m=error.argument)
+                return await send_err("errors.membernotfound", m=error.argument)
             # User "Z_runner" not found
             if isinstance(error, commands.UserNotFound):
-                return await send_err('errors.usernotfound', u=error.argument)
+                return await send_err("errors.usernotfound", u=error.argument)
             # Role "Admin" not found
             if isinstance(error, commands.RoleNotFound):
-                return await send_err('errors.rolenotfound', r=error.argument)
+                return await send_err("errors.rolenotfound", r=error.argument)
             # Emoji ":shock:" not found
             if isinstance(error, commands.EmojiNotFound):
-                return await send_err('errors.emojinotfound', e=error.argument)
+                return await send_err("errors.emojinotfound", e=error.argument)
              # Colour "blue" is invalid
             if isinstance(error, commands.BadColourArgument):
-                return await send_err('errors.invalidcolor', c=error.argument)
+                return await send_err("errors.invalidcolor", c=error.argument)
             # Channel "twitter" not found.
             if isinstance(error, commands.ChannelNotFound):
-                return await send_err('errors.channotfound', c=error.argument)
+                return await send_err("errors.channotfound", c=error.argument)
             # Message "1243" not found.
             if isinstance(error, commands.MessageNotFound):
-                return await send_err('errors.msgnotfound', msg=error.argument)
+                return await send_err("errors.msgnotfound", msg=error.argument)
             # Guild "1243" not found.
             if isinstance(error, commands.GuildNotFound):
-                return await send_err('errors.guildnotfound', guild=error.argument)
+                return await send_err("errors.guildnotfound", guild=error.argument)
             # abc does not follow a valid ID or mention format
             if isinstance(error, commands.ObjectNotFound):
-                return await send_err('errors.invalidsnowflake')
+                return await send_err("errors.invalidsnowflake")
             # Invalid duration: 2d
             if isinstance(error, arguments_errors.InvalidDurationError):
-                return await send_err('errors.duration', d=error.argument)
+                return await send_err("errors.duration", d=error.argument)
             # Invalid invite: nope
             if isinstance(error, arguments_errors.InvalidBotOrGuildInviteError):
-                return await send_err('errors.invalidinvite', i=error.argument)
+                return await send_err("errors.invalidinvite", i=error.argument)
             # Invalid url: nou
             if isinstance(error, arguments_errors.InvalidUrlError):
-                return await send_err('errors.invalidurl', u=error.argument)
+                return await send_err("errors.invalidurl", u=error.argument)
             # Invalid unicode emoji: lol
             if isinstance(error, arguments_errors.InvalidUnicodeEmojiError):
-                return await send_err('errors.invalidunicode', u=error.argument)
+                return await send_err("errors.invalidunicode", u=error.argument)
             # Invalid ISBN: lol
             if isinstance(error, arguments_errors.InvalidISBNError):
-                return await send_err('errors.invalidisbn')
+                return await send_err("errors.invalidisbn")
             # Invalid card style: aqua
             if isinstance(error, arguments_errors.InvalidCardStyleError):
-                return await send_err('errors.invalidcardstyle', s=error.argument)
+                return await send_err("errors.invalidcardstyle", s=error.argument)
             # Invalid server log type
             if isinstance(error, arguments_errors.InvalidServerLogError):
-                return await send_err('errors.invalidserverlog')
+                return await send_err("errors.invalidserverlog")
             # Invalid member, role or permission
             if isinstance(error, InvalidPermissionTargetError):
-                return await send_err('errors.invalidpermissiontarget')
-            self.log.warning('Unknown BadArgument error type: %s', error)
-        elif isinstance(error,commands.errors.MissingRequiredArgument):
+                return await send_err("errors.invalidpermissiontarget")
+            self.log.warning("Unknown BadArgument error type: %s", error)
+        elif isinstance(error, commands.errors.MissingRequiredArgument):
             await ctx.send(await self.bot._(
-                ctx.channel,'errors.missingargument',
+                ctx.channel,"errors.missingargument",
                 a=error.param.name,
-                e=random.choice([':eyes:','',':confused:',':thinking:',''])
+                e=random.choice([":eyes:",'',":confused:",":thinking:",''])
             ))
             return
-        elif isinstance(error,commands.errors.DisabledCommand):
-            await ctx.send(await self.bot._(ctx.channel,'errors.disabled', c=ctx.invoked_with), ephemeral=True)
+        elif isinstance(error, commands.errors.DisabledCommand):
+            await ctx.send(await self.bot._(ctx.channel,"errors.disabled", c=ctx.invoked_with), ephemeral=True)
             return
-        elif isinstance(error,commands.errors.NoPrivateMessage):
-            await ctx.send(await self.bot._(ctx.channel,'errors.DM'))
+        elif isinstance(error, commands.errors.NoPrivateMessage):
+            await ctx.send(await self.bot._(ctx.channel,"errors.DM"))
             return
         elif isinstance(error, checks.CannotSendEmbed):
-            await ctx.send(await self.bot._(ctx.channel,'errors.cannotembed'))
+            await ctx.send(await self.bot._(ctx.channel,"errors.cannotembed"))
             return
         else:
             cmd = await self.bot.get_command_mention("about")
             try:
-                await ctx.send(await self.bot._(ctx.channel, 'errors.unknown', about=cmd), ephemeral=True)
+                await ctx.send(await self.bot._(ctx.channel, "errors.unknown", about=cmd), ephemeral=True)
             except Exception as newerror:
                 self.log.info("[on_cmd_error] Can't send error on channel %s: %s", ctx.channel.id, newerror)
         # All other Errors not returned come here... And we can just print the default TraceBack.
-        self.log.warning('Ignoring exception in command %s:', ctx.message.content)
-        await self.on_error(error,ctx)
+        self.log.warning("Ignoring exception in command %s:", ctx.message.content)
+        await self.on_error(error, ctx)
 
     @commands.Cog.listener()
     async def on_interaction_error(self, interaction: discord.Interaction, error: discord.app_commands.AppCommandError):
@@ -213,7 +213,7 @@ class Errors(commands.Cog):
         if isinstance(error, discord.app_commands.CommandOnCooldown):
             delay = round(error.retry_after, 2 if error.retry_after < 60 else None)
             await interaction.response.send_message(
-                await self.bot._(interaction, 'errors.cooldown', d=delay),
+                await self.bot._(interaction, "errors.cooldown", d=delay),
                 ephemeral=True)
             return
         if isinstance(error, NotAVoiceMessageError):

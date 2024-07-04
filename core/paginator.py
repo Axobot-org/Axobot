@@ -109,31 +109,31 @@ class Paginator(ui.View):
         self.children[3].disabled = (self.page == count) or stopped
         self.children[4].disabled = (self.page == count) or stopped
 
-    @ui.button(label='\U000025c0 \U000025c0', style=ButtonStyle.secondary)
+    @ui.button(label="\U000025c0 \U000025c0", style=ButtonStyle.secondary)
     async def _first_element(self, interaction: Interaction, _: ui.Button):
         "Jump to the 1st page"
         await self._set_page(interaction, 1)
         await self._update_contents(interaction)
 
-    @ui.button(label='\U000025c0', style=ButtonStyle.blurple)
+    @ui.button(label="\U000025c0", style=ButtonStyle.blurple)
     async def _previous_element(self, interaction: Interaction, _: ui.Button):
         "Go to the previous page"
         await self._set_page(interaction, self.page-1)
         await self._update_contents(interaction)
 
-    @ui.button(label='...', style=ButtonStyle.red)
+    @ui.button(label="...", style=ButtonStyle.red)
     async def _stop(self, interaction: Interaction, _: ui.Button):
         "Stop the view"
         self.stop()
         await self._update_contents(interaction)
 
-    @ui.button(label='\U000025b6', style=ButtonStyle.blurple)
+    @ui.button(label="\U000025b6", style=ButtonStyle.blurple)
     async def _next_element(self, interaction: Interaction, _: ui.Button):
         "Go to the next page"
         await self._set_page(interaction, self.page+1)
         await self._update_contents(interaction)
 
-    @ui.button(label='\U000025b6 \U000025b6', style=ButtonStyle.secondary)
+    @ui.button(label="\U000025b6 \U000025b6", style=ButtonStyle.secondary)
     async def _last_element(self, interaction: Interaction, _: ui.Button):
         "Jump to the last page"
         await self._set_page(interaction, await self.get_page_count())
@@ -251,7 +251,7 @@ class PaginatedSelectView(ui.View):
         self._next_element.disabled = (self.page == pages_count) or pages_count == 1 or stopped
         self._last_element.disabled = (self.page == pages_count) or pages_count == 1 or stopped
 
-    @ui.select(placeholder='...', row=0)
+    @ui.select(placeholder="...", row=0)
     async def _selector(self, interaction: Interaction, selector: ui.Select):
         "The actual selector"
         # remove values that have been unselected
@@ -268,30 +268,30 @@ class PaginatedSelectView(ui.View):
         else:
             await self._update_contents(interaction)
 
-    @ui.button(label='\U000025c0 \U000025c0', style=ButtonStyle.secondary, row=1)
+    @ui.button(label="\U000025c0 \U000025c0", style=ButtonStyle.secondary, row=1)
     async def _first_element(self, interaction: Interaction, _: ui.Button):
         "Jump to the 1st page"
         await self._set_page(1)
         await self._update_contents(interaction)
 
-    @ui.button(label='\U000025c0', style=ButtonStyle.blurple, row=1)
+    @ui.button(label="\U000025c0", style=ButtonStyle.blurple, row=1)
     async def _previous_element(self, interaction: Interaction, _: ui.Button):
         "Go to the previous page"
         await self._set_page(self.page-1)
         await self._update_contents(interaction)
 
-    @ui.button(label='...', style=ButtonStyle.red, row=1)
+    @ui.button(label="...", style=ButtonStyle.red, row=1)
     async def _stop(self, interaction: Interaction, _: ui.Button):
         "Stop the view"
         await self.disable(interaction)
 
-    @ui.button(label='\U000025b6', style=ButtonStyle.blurple, row=1)
+    @ui.button(label="\U000025b6", style=ButtonStyle.blurple, row=1)
     async def _next_element(self, interaction: Interaction, _: ui.Button):
         "Go to the next page"
         await self._set_page(self.page+1)
         await self._update_contents(interaction)
 
-    @ui.button(label='\U000025b6 \U000025b6', style=ButtonStyle.secondary, row=1)
+    @ui.button(label="\U000025b6 \U000025b6", style=ButtonStyle.secondary, row=1)
     async def _last_element(self, interaction: Interaction, _: ui.Button):
         "Jump to the last page"
         await self._set_page(ceil(len(self.options) / 25))

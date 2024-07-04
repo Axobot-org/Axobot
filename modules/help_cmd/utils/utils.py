@@ -16,7 +16,7 @@ class FieldData(TypedDict):
     inline: bool
 
 _IGNORED_CHECK_NAMES = {
-    '_create_cooldown_decorator',
+    "_create_cooldown_decorator",
 }
 
 def get_embed_color(ctx: MyContext):
@@ -72,14 +72,14 @@ async def generate_warnings_field(
                 check_name = await _extract_check_name(check)
                 if check_name in _IGNORED_CHECK_NAMES:
                     continue
-                check_msg_tr = await ctx.bot._(ctx.channel, f'help.check-desc.{check_name}')
-                if 'help.check-desc' in check_msg_tr: # translation was not found
+                check_msg_tr = await ctx.bot._(ctx.channel, f"help.check-desc.{check_name}")
+                if "help.check-desc" in check_msg_tr: # translation was not found
                     ctx.bot.dispatch("error", ValueError(f"No description for help check {check_name} ({check})"))
                     continue
                 if await _run_check_function(ctx, check):
                     warnings.append("✅ " + check_msg_tr[0])
                 else:
-                    warnings.append('❌ ' + check_msg_tr[1])
+                    warnings.append("❌ " + check_msg_tr[1])
             except Exception as err:
                 ctx.bot.dispatch("error", err)
     if len(warnings) > 0:
@@ -91,14 +91,14 @@ async def generate_warnings_field(
 
 async def _extract_check_name(check: Callable) -> str:
     "Get the name of a check"
-    if 'guild_only.<locals>.predicate' in str(check):
-        return 'guild_only'
-    if 'is_owner.<locals>.predicate' in str(check):
-        return 'is_owner'
-    if 'bot_has_permissions.<locals>.predicate' in str(check):
-        return 'bot_has_permissions'
-    if '_has_permissions.<locals>.predicate' in str(check):
-        return 'has_permissions'
+    if "guild_only.<locals>.predicate" in str(check):
+        return "guild_only"
+    if "is_owner.<locals>.predicate" in str(check):
+        return "is_owner"
+    if "bot_has_permissions.<locals>.predicate" in str(check):
+        return "bot_has_permissions"
+    if "_has_permissions.<locals>.predicate" in str(check):
+        return "has_permissions"
     return check.__qualname__.split('.')[0]
 
 async def _run_check_function(ctx: MyContext, check: Callable) -> bool:
@@ -175,4 +175,4 @@ async def _should_dm(ctx: MyContext) -> bool:
     "Check if the answer should be sent in DM or in current channel"
     if ctx.guild is None or not ctx.bot.database_online:
         return False
-    return await ctx.bot.get_config(ctx.guild.id, 'help_in_dm')
+    return await ctx.bot.get_config(ctx.guild.id, "help_in_dm")

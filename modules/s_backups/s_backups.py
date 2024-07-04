@@ -130,98 +130,97 @@ Arguments are:
     async def create_backup(self, interaction: discord.Interaction) -> str:
         "Create a backup of the server and return it as a JSON string"
         async def get_channel_json(chan: discord.abc.GuildChannel) -> dict:
-            chan_js = {'id': chan.id, 'name': chan.name,
-                       'position': chan.position}
+            chan_js = {"id": chan.id, "name": chan.name, "position": chan.position}
             if isinstance(chan, discord.TextChannel):
-                chan_js['type'] = 'TextChannel'
-                chan_js['description'] = chan.topic
-                chan_js['is_nsfw'] = chan.is_nsfw()
-                chan_js['slowmode'] = chan.slowmode_delay
+                chan_js["type"] = "TextChannel"
+                chan_js["description"] = chan.topic
+                chan_js["is_nsfw"] = chan.is_nsfw()
+                chan_js["slowmode"] = chan.slowmode_delay
             elif isinstance(chan, discord.VoiceChannel):
-                chan_js['type'] = 'VoiceChannel'
+                chan_js["type"] = "VoiceChannel"
             else:
-                chan_js['type'] = str(type(chan))
+                chan_js["type"] = str(type(chan))
             perms: list[dict[str, Any]] = []
             for iter_obj, iter_perm in chan.overwrites.items():
-                temp2 = {'id': iter_obj.id}
+                temp2 = {"id": iter_obj.id}
                 if isinstance(iter_obj, discord.Member):
-                    temp2['type'] = 'member'
+                    temp2["type"] = "member"
                 else:
-                    temp2['type'] = 'role'
-                temp2['permissions'] = {}
+                    temp2["type"] = "role"
+                temp2["permissions"] = {}
                 for x in iter(iter_perm):
                     if x[1] is not None:
-                        temp2['permissions'][x[0]] = x[1]
+                        temp2["permissions"][x[0]] = x[1]
                 perms.append(temp2)
-            chan_js['permissions_overwrites'] = perms
+            chan_js["permissions_overwrites"] = perms
             return chan_js
         # ----
         g = interaction.guild
         back = {
-            '_backup_version': 1,
-            'name': g.name,
-            'id': g.id,
-            'owner': g.owner.id,
-            'afk_timeout': g.afk_timeout,
-            'icon': None if g.icon else g.icon.url,
-            'verification_level': g.verification_level.value,
-            'mfa_level': g.mfa_level,
-            'explicit_content_filter': g.explicit_content_filter.value,
-            'default_notifications': g.default_notifications.value,
-            'created_at': int(g.created_at.timestamp()),
-            'afk_channel': g.afk_channel.id if g.afk_channel is not None else None,
-            'system_channel': g.system_channel.id if g.system_channel is not None else None
+            "_backup_version": 1,
+            "name": g.name,
+            "id": g.id,
+            "owner": g.owner.id,
+            "afk_timeout": g.afk_timeout,
+            "icon": None if g.icon else g.icon.url,
+            "verification_level": g.verification_level.value,
+            "mfa_level": g.mfa_level,
+            "explicit_content_filter": g.explicit_content_filter.value,
+            "default_notifications": g.default_notifications.value,
+            "created_at": int(g.created_at.timestamp()),
+            "afk_channel": g.afk_channel.id if g.afk_channel is not None else None,
+            "system_channel": g.system_channel.id if g.system_channel is not None else None
         }
         roles: list[dict[str, Any]] = []
         for x in g.roles:
             roles.append({
-                'id': x.id,
-                'name': x.name,
-                'color': x.colour.value,
-                'position': x.position,
-                'hoist': x.hoist,
-                'mentionable': x.mentionable,
-                'permissions': x.permissions.value
+                "id": x.id,
+                "name": x.name,
+                "color": x.colour.value,
+                "position": x.position,
+                "hoist": x.hoist,
+                "mentionable": x.mentionable,
+                "permissions": x.permissions.value
             })
-        back['roles'] = roles
+        back["roles"] = roles
         categ: list[dict[str, Any]] = []
         for category, channels in g.by_category():
             if category is None:
-                temp = {'id': None}
+                temp = {"id": None}
             else:
                 temp = {
-                    'id': category.id,
-                    'name': category.name,
-                    'position': category.position,
-                    'is_nsfw': category.is_nsfw()
+                    "id": category.id,
+                    "name": category.name,
+                    "position": category.position,
+                    "is_nsfw": category.is_nsfw()
                 }
                 perms: list[dict[str, Any]] = []
                 for iter_obj, iter_perm in category.overwrites.items():
-                    temp2 = {'id': iter_obj.id}
+                    temp2 = {"id": iter_obj.id}
                     if isinstance(iter_obj, discord.Member):
-                        temp2['type'] = 'member'
+                        temp2["type"] = "member"
                     else:
-                        temp2['type'] = 'role'
-                    temp2['permissions'] = {}
+                        temp2["type"] = "role"
+                    temp2["permissions"] = {}
                     for i, value in iter(iter_perm):
                         if value is not None:
-                            temp2['permissions'][i] = value
+                            temp2["permissions"][i] = value
                     perms.append(temp2)
-                temp['permissions_overwrites'] = perms
-            temp['channels'] = []
+                temp["permissions_overwrites"] = perms
+            temp["channels"] = []
             for chan in channels:
-                temp['channels'].append(await get_channel_json(chan))
+                temp["channels"].append(await get_channel_json(chan))
             categ.append(temp)
-        back['categories'] = categ
-        back['emojis'] = {}
+        back["categories"] = categ
+        back["emojis"] = {}
         for err in g.emojis:
-            back['emojis'][err.name] = {"url": str(err.url), "roles": [
+            back["emojis"][err.name] = {"url": str(err.url), "roles": [
                 x.id for x in err.roles]}
         try:
             banned = {}
             async for b in g.bans():
                 banned[b.user.id] = b.reason
-            back['banned_users'] = banned
+            back["banned_users"] = banned
         except discord.errors.Forbidden:
             pass
         except Exception as err:
@@ -230,23 +229,23 @@ Arguments are:
             webs = []
             for w in await g.webhooks():
                 webs.append({
-                    'channel': w.channel_id,
-                    'name': w.name,
-                    'avatar': w.display_avatar.url,
-                    'url': w.url
+                    "channel": w.channel_id,
+                    "name": w.name,
+                    "avatar": w.display_avatar.url,
+                    "url": w.url
                 })
-            back['webhooks'] = webs
+            back["webhooks"] = webs
         except discord.errors.Forbidden:
             pass
         except Exception as err:
             self.bot.dispatch("error", err, interaction)
-        back['members'] = []
+        back["members"] = []
         for memb in g.members:
-            back['members'].append({
-                'id': memb.id,
-                'nickname': memb.nick,
-                'bot': memb.bot,
-                'roles': [x.id for x in memb.roles][1:]
+            back["members"].append({
+                "id": memb.id,
+                "nickname": memb.nick,
+                "bot": memb.bot,
+                "roles": [x.id for x in memb.roles][1:]
             })
         return json.dumps(back, sort_keys=True, indent=4)
 
@@ -274,7 +273,7 @@ Arguments are:
                 logs.append(f"  {symb[0]} Unable to create or update roles: missing permissions")
                 problems[0] += 1
                 return
-            for role_data in sorted(data["roles"], key=lambda role: role['position'], reverse=True):
+            for role_data in sorted(data["roles"], key=lambda role: role["position"], reverse=True):
                 action = "edit"
                 try:
                     rolename = role_data["name"]
@@ -719,7 +718,7 @@ Arguments are:
 
         async def load_backup(self, interaction: discord.Interaction, data: dict, args: LoadArgumentsType) -> tuple[list, list]:
             "Load a backup in a server, for backups version 1"
-            if data.pop('_backup_version', None) != 1:
+            if data.pop("_backup_version", None) != 1:
                 return ([0, 1], ["Unknown backup version"])
             symb = ["`[X]`", "`[-]`", "`[O]`"]
             problems = [0, 0]
@@ -796,10 +795,10 @@ Arguments are:
                     logs.append(f"{symb[2]} Explicit content filter set to "+content_filter.name)
             # icon
             try:
-                icon = None if data['icon'] is None else await self.url_to_byte(data['icon'])
+                icon = None if data["icon"] is None else await self.url_to_byte(data["icon"])
             except aiohttp.ClientError:
                 icon = None
-            if icon is not None or data['icon'] is None:
+            if icon is not None or data["icon"] is None:
                 try:
                     await interaction.guild.edit(icon=icon)
                 except discord.errors.Forbidden:

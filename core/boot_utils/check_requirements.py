@@ -37,7 +37,7 @@ def _get_requirements_from_file(filepath: str):
 def _check_requirements_versions(requirements: list[Requirement]):
     "Check if the requirements are correctly installed"
     # list installed packages
-    lst = os.popen('pip list --format=freeze')
+    lst = os.popen("pip list --format=freeze")
     pack_list = lst.read().split("\n")
     # map installed packages to their parsed version
     packages_map: dict[str, Version] = {}

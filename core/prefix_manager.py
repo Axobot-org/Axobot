@@ -12,7 +12,7 @@ if TYPE_CHECKING:
 class PrefixManager:
     """Manage prefixes for the bot, with cache and everything"""
 
-    def __init__(self, bot: 'Axobot'):
+    def __init__(self, bot: "Axobot"):
         self.bot = bot
         self.cache = TTLCache[int, str](maxsize=1_000, ttl=60*60)
 
@@ -46,8 +46,8 @@ class PrefixManager:
         query = "SELECT `value` FROM `serverconfig` WHERE `guild_id` = %s AND `option_name` = 'prefix' AND `beta` = %s"
         # get the thing
         async with self.bot.db_query(query, (guild_id, self.bot.beta), fetchone=True) as query_result:
-            if query_result and len(query_result['value']) > 0:
-                prefix: str = query_result['value']
+            if query_result and len(query_result["value"]) > 0:
+                prefix: str = query_result["value"]
             else:
                 prefix = options_list["prefix"]["default"]
         # and return

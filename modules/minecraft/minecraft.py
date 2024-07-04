@@ -43,8 +43,8 @@ class MCServer:
 
     async def clear_desc(self):
         "Clear the server description from any tabulation or color syntax"
-        self.desc = re.sub(r'§.', '', self.desc)
-        self.desc = re.sub(r'[ \t\r]{2,}', ' ', self.desc).strip()
+        self.desc = re.sub(r"§.", '', self.desc)
+        self.desc = re.sub(r"[ \t\r]{2,}", ' ', self.desc).strip()
         return self
 
     async def create_msg(self, source: discord.Interaction | discord.Guild, translate):
@@ -170,30 +170,30 @@ class Minecraft(commands.Cog):
         date = f"<t:{isoparse(search['dateModified']).timestamp():.0f}>"
         categories = " - ".join(f"[{category['name']}]({category['url']})" for category in search["categories"])
         versions = set(
-            x['gameVersion'] for x in search['latestFilesIndexes']
+            x["gameVersion"] for x in search["latestFilesIndexes"]
         )
         versions = " - ".join(
             sorted(versions, reverse=True,
                    key=lambda a: list(map(int, a.split('.'))))
         )
         data = {
-            "name": search['name'],
+            "name": search["name"],
             "authors": authors,
             "release": date,
             "categories": categories,
-            "summary": search['summary'],
+            "summary": search["summary"],
             "versions": versions,
-            "downloads": int(search['downloadCount']),
-            "id-curseforge": str(search['id'])
+            "downloads": int(search["downloadCount"]),
+            "id-curseforge": str(search["id"])
         }
-        title = await self.bot._(interaction, "minecraft.mod-title") + " - " + search['name']
+        title = await self.bot._(interaction, "minecraft.mod-title") + " - " + search["name"]
         embed = discord.Embed(
             title=title,
             color=self.embed_color,
-            url=search["links"]['websiteUrl'],
+            url=search["links"]["websiteUrl"],
         )
-        if logo := search['logo']:
-            embed.set_thumbnail(url=logo['thumbnailUrl'])
+        if logo := search["logo"]:
+            embed.set_thumbnail(url=logo["thumbnailUrl"])
         lang = await self.bot._(interaction, "_used_locale")
         for name, data_value in data.items():
             if not data_value:
@@ -235,7 +235,7 @@ class Minecraft(commands.Cog):
             "categories": categories,
             "summary": search["description"],
             "versions": versions,
-            "downloads": int(search['downloads']),
+            "downloads": int(search["downloads"]),
             "id-modrinth": search["slug"]
         }
         title = await self.bot._(interaction, "minecraft.mod-title") + " - " + search["title"]
@@ -319,7 +319,7 @@ class Minecraft(commands.Cog):
             return
         ip, port = validation
         await interaction.response.defer()
-        is_over, flow_limit = await self.bot.get_cog('Rss').is_overflow(interaction.guild)
+        is_over, flow_limit = await self.bot.get_cog("Rss").is_overflow(interaction.guild)
         if is_over:
             await interaction.followup.send(await self.bot._(interaction, "rss.flow-limit", limit=flow_limit))
             return
@@ -333,7 +333,7 @@ class Minecraft(commands.Cog):
             display_ip = ip
         else:
             display_ip = f"{ip}:{port}"
-        await self.bot.get_cog('Rss').db_add_feed(interaction.guild.id, channel.id, 'mc', f"{ip}:{port or ''}")
+        await self.bot.get_cog("Rss").db_add_feed(interaction.guild.id, channel.id, "mc", f"{ip}:{port or ''}")
         await interaction.followup.send(
             await self.bot._(interaction, "minecraft.serv-follow.success", ip=display_ip, channel=channel.mention)
         )
@@ -367,14 +367,14 @@ class Minecraft(commands.Cog):
         except Exception:
             return await self.create_server_2(source, ip, port)
         if "error" in data:
-            if data['error'] != 'timed out':
+            if data["error"] != "timed out":
                 self.bot.log.warning("(mc-server) Error on: " +
-                                  url+"\n   "+data['error'])
+                                  url+"\n   "+data["error"])
             return data["error"]
         players: list[str] = []
         try:
-            for player in data['players']['sample']:
-                players.append(player['name'])
+            for player in data["players"]["sample"]:
+                players.append(player["name"])
                 if len(players) > 30:
                     break
         except KeyError:
@@ -385,13 +385,13 @@ class Minecraft(commands.Cog):
                 str(ip) + str("/"+str(port) if port is not None else '')
         else:
             img_url = None
-        version = data['version']['name']
-        online_players = data['players']['online']
-        max_players = data['players']['max']
-        latency = data['latency']
+        version = data["version"]["name"]
+        online_players = data["players"]["online"]
+        max_players = data["players"]["max"]
+        latency = data["latency"]
         return await MCServer(
             formated_ip, version=version, online_players=online_players, max_players=max_players, players=players, img=img_url,
-            ping=latency, desc=data['description'], api='api.minetools.eu'
+            ping=latency, desc=data["description"], api="api.minetools.eu"
         ).clear_desc()
 
     async def create_server_2(self, source: discord.Interaction | discord.Guild, ip: str, port: str | None):
@@ -413,18 +413,18 @@ class Minecraft(commands.Cog):
             return await self.bot._(source, "minecraft.serv-error")
         if data["debug"]["ping"] is False:
             return await self.bot._(source, "minecraft.no-ping")
-        if 'list' in data['players']:
-            players = data['players']['list'][:20]
+        if "list" in data["players"]:
+            players = data["players"]["list"][:20]
         else:
             players = []
         if "software" in data:
-            version = data["software"]+" "+data['version']
+            version = data["software"]+" "+data["version"]
         else:
-            version = data['version']
+            version = data["version"]
         formated_ip = f"{ip}:{port}" if port is not None else str(ip)
-        desc = "\n".join(data['motd']['clean'])
-        online_players = data['players']['online']
-        max_players = data['players']['max']
+        desc = "\n".join(data["motd"]["clean"])
+        online_players = data["players"]["online"]
+        max_players = data["players"]["max"]
         l = None
         return await MCServer(
             formated_ip, version=version, online_players=online_players, max_players=max_players, players=players, img=None,
@@ -513,18 +513,18 @@ class Minecraft(commands.Cog):
             if msg is None:
                 msg = await self.send_msg_server(obj, channel, i)
                 if msg is not None:
-                    await self.bot.get_cog('Rss').db_update_feed(
+                    await self.bot.get_cog("Rss").db_update_feed(
                         feed.feed_id,
-                        [('structure', str(msg.id)), ('date', self.bot.utcnow())]
+                        [("structure", str(msg.id)), ("date", self.bot.utcnow())]
                     )
                     if send_stats:
                         if statscog := self.bot.get_cog("BotStats"):
-                            statscog.rss_stats['messages'] += 1
+                            statscog.rss_stats["messages"] += 1
                 return True
             err = await self.form_msg_server(obj, guild, i)
             await msg.edit(embed=err)
             if statscog := self.bot.get_cog("BotStats"):
-                statscog.rss_stats['messages'] += 1
+                statscog.rss_stats["messages"] += 1
             return True
         except Exception as err:
             self.bot.dispatch("error", err)

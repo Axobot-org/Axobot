@@ -28,8 +28,8 @@ async def get_command_description(ctx: MyContext, command: commands.Command):
     desc, examples, doc = await extract_info(raw_desc)
     # check for translated description
     if short_desc := await get_command_desc_translation(ctx, command):
-        if len(desc.split('\n')) > 1:
-            long_desc = '\n'.join(desc.split('\n')[1:]).strip()
+        if len(desc.split("\n")) > 1:
+            long_desc = "\n".join(desc.split("\n")[1:]).strip()
             desc = f"{short_desc}\n\n{long_desc}"
         else:
             desc = short_desc
@@ -118,24 +118,24 @@ async def _get_command_params_signature(ctx: MyContext, command: commands.Comman
         optional = False  # postpone evaluation of if it's an optional argument
 
         annotation: Any = param.converter.converter if greedy else param.converter
-        origin = getattr(annotation, '__origin__', None)
+        origin = getattr(annotation, "__origin__", None)
         if not greedy and origin is Union:
             none_cls = type(None)
             union_args = annotation.__args__
             optional = union_args[-1] is none_cls
             if len(union_args) == 2 and optional:
                 annotation = union_args[0]
-                origin = getattr(annotation, '__origin__', None)
+                origin = getattr(annotation, "__origin__", None)
 
         if annotation is Attachment:
             # For discord.Attachment we need to signal to the user that it's an attachment
             # It's not exactly pretty but it's enough to differentiate
             if optional:
-                result.append(f'[{name} (upload a file)]')
+                result.append(f"[{name} (upload a file)]")
             elif greedy:
-                result.append(f'[{name} (upload files)]...')
+                result.append(f"[{name} (upload files)]...")
             else:
-                result.append(f'<{name} (upload a file)>')
+                result.append(f"<{name} (upload a file)>")
             continue
 
         # for typing.Literal[...], typing.Optional[typing.Literal[...]], and Greedy[typing.Literal[...]], the
@@ -147,22 +147,22 @@ async def _get_command_params_signature(ctx: MyContext, command: commands.Comman
             # do [name] since [name=None] or [name=] are not exactly useful for the user.
             if param.displayed_default:
                 result.append(
-                    f'[{name}={param.displayed_default}]' if not greedy else f'[{name}={param.displayed_default}]...'
+                    f"[{name}={param.displayed_default}]" if not greedy else f"[{name}={param.displayed_default}]..."
                 )
                 continue
             else:
-                result.append(f'[{name}]')
+                result.append(f"[{name}]")
 
         elif param.kind == param.VAR_POSITIONAL:
             if command.require_var_positional:
-                result.append(f'<{name}...>')
+                result.append(f"<{name}...>")
             else:
-                result.append(f'[{name}...]')
+                result.append(f"[{name}...]")
         elif greedy:
-            result.append(f'[{name}]...')
+            result.append(f"[{name}]...")
         elif optional:
-            result.append(f'[{name}]')
+            result.append(f"[{name}]")
         else:
-            result.append(f'<{name}>')
+            result.append(f"<{name}>")
 
     return ' '.join(result)

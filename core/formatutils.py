@@ -10,9 +10,9 @@ from dateutil.relativedelta import relativedelta
 def get_locale(lang: str):
     "Get a i18n locale from a given bot language"
     if lang in {"en", "lolcat"}:
-        return 'en_US'
+        return "en_US"
     if lang == "fr2":
-        return 'fr_FR'
+        return "fr_FR"
     return lang+"_"+lang.capitalize()
 
 # pylint: disable=too-few-public-methods, invalid-name
@@ -33,8 +33,8 @@ class FormatUtils:
 
     @staticmethod
     async def time_delta(date1: datetime | int, date2: datetime = None,
-                         lang: str = 'en', year: bool = False, hour: bool = True, seconds: bool = True,
-                         form: Literal["short", "developed"]='developed'):
+                         lang: str = "en", year: bool = False, hour: bool = True, seconds: bool = True,
+                         form: Literal["short", "developed"]="developed"):
         """Translates a two time interval datetime into a readable character string
 
         form can be 'short' (3d 6h) or 'developed' (3 jours 6 heures)
@@ -47,7 +47,7 @@ class FormatUtils:
         kwargs = {
             "threshold": 100000,
             "locale": get_locale(lang),
-            "format": 'narrow' if form=='short' else 'long'
+            "format": "narrow" if form=="short" else "long"
         }
 
         result = ""
@@ -87,7 +87,7 @@ class FormatUtils:
         return result.strip()
 
     @staticmethod
-    async def date(date: datetime | time.struct_time, lang: str = 'en',
+    async def date(date: datetime | time.struct_time, lang: str = "en",
                    year: bool = False, weekday: bool = False, hour: bool = True, seconds: bool = True, digital: bool = False
                    ) -> str:
         """Translates a datetime object into a readable string"""
@@ -154,21 +154,21 @@ class _Duration(float):
         duration: int = 0
         found = False
         for symbol, coef in [('w', 604800), ('d', 86400), ('h', 3600), ('m', 60), ('min', 60)]:
-            r = re.search(r'^(\d+)'+symbol+'$', argument)
+            r = re.search(r"^(\d+)"+symbol+'$', argument)
             if r is not None:
                 duration += int(r.group(1))*coef
                 found = True
-        r = re.search(r'^(\d+)h(\d+)m?$', argument)
+        r = re.search(r"^(\d+)h(\d+)m?$", argument)
         if r is not None:
             duration += int(r.group(1))*3600 + int(r.group(2))*60
             found = True
-        r = re.search(r'^(\d+) ?mo(?:nths?)?$', argument)
+        r = re.search(r"^(\d+) ?mo(?:nths?)?$", argument)
         if r is not None:
             now = then = datetime.now(UTC)
             then += relativedelta(months=int(r.group(1)))
             duration += (then - now).total_seconds()
             found = True
-        r = re.search(r'^(\d+) ?y(?:ears?)?$', argument)
+        r = re.search(r"^(\d+) ?y(?:ears?)?$", argument)
         if r is not None:
             now = then = datetime.now(UTC)
             then += relativedelta(years=int(r.group(1)))

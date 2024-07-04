@@ -10,8 +10,8 @@ from .classes import Message
 
 CLASS = Literal[0, 1]
 
-CUSTOM_ATTRS = {'contains_everyone', 'url_score', 'mentions_count',
-                'punctuation_count', 'max_frequency', 'caps_percentage', 'avg_word_len'}
+CUSTOM_ATTRS = {"contains_everyone", "url_score", "mentions_count",
+                "punctuation_count", "max_frequency", "caps_percentage", "avg_word_len"}
 
 class RoundValueType(TypedDict):
     "Used to know how many decimals to round the values to"
@@ -52,20 +52,20 @@ class SpamDetector:
         "X is the documents list, Y is the labels list"
         n = len(data)
         # number of spam messages
-        self.num_messages['spam'] = sum(1 for record in data if record.category == 1)
+        self.num_messages["spam"] = sum(1 for record in data if record.category == 1)
         # number of ham messages
-        self.num_messages['ham'] = sum(1 for record in data if record.category == 0)
+        self.num_messages["ham"] = sum(1 for record in data if record.category == 0)
         # proba that a given message is spam
-        self.log_class_priors['spam'] = math.log(self.num_messages['spam'] / n)
+        self.log_class_priors["spam"] = math.log(self.num_messages["spam"] / n)
         # proba that a given message is ham
-        self.log_class_priors['ham'] = math.log(self.num_messages['ham'] / n)
+        self.log_class_priors["ham"] = math.log(self.num_messages["ham"] / n)
         # words frequency in spam messages
-        self.attr_counts['spam'] = {}
+        self.attr_counts["spam"] = {}
         # words frequency in ham messages
-        self.attr_counts['ham'] = {}
+        self.attr_counts["ham"] = {}
 
         for record in data:
-            c = 'spam' if record.category == 1 else 'ham'
+            c = "spam" if record.category == 1 else "ham"
             counts = self.get_word_counts(self.tokenize(record.normd_message))
             for word, count in counts.items():
                 if word not in self.vocab:
@@ -99,10 +99,10 @@ class SpamDetector:
 
                 # add Laplace smoothing
                 # apparitions of that word in spam vocab / number of words in spam
-                log_w_given_spam = math.log((self.attr_counts['spam'].get(
-                    word, 0) + 1) / (self.num_messages['spam'] + len(self.vocab)))
-                log_w_given_ham = math.log((self.attr_counts['ham'].get(
-                    word, 0) + 1) / (self.num_messages['ham'] + len(self.vocab)))
+                log_w_given_spam = math.log((self.attr_counts["spam"].get(
+                    word, 0) + 1) / (self.num_messages["spam"] + len(self.vocab)))
+                log_w_given_ham = math.log((self.attr_counts["ham"].get(
+                    word, 0) + 1) / (self.num_messages["ham"] + len(self.vocab)))
                 spam_score += log_w_given_spam
                 ham_score += log_w_given_ham
 
@@ -111,15 +111,15 @@ class SpamDetector:
                 if round_value := self.round_values.get(attr):
                     v = round(v, round_value)
                 attr = '_' + attr + '_' + str(v)
-                log_attr_given_spam = math.log((self.attr_counts['spam'].get(attr, 0) + 1) /
-                                               (self.num_messages['spam'] + len(self.vocab)))
-                log_attr_given_ham = math.log((self.attr_counts['ham'].get(attr, 0) + 1) /
-                                              (self.num_messages['ham'] + len(self.vocab)))
+                log_attr_given_spam = math.log((self.attr_counts["spam"].get(attr, 0) + 1) /
+                                               (self.num_messages["spam"] + len(self.vocab)))
+                log_attr_given_ham = math.log((self.attr_counts["ham"].get(attr, 0) + 1) /
+                                              (self.num_messages["ham"] + len(self.vocab)))
                 spam_score += log_attr_given_spam
                 ham_score += log_attr_given_ham
 
-            spam_score += self.log_class_priors['spam']
-            ham_score += self.log_class_priors['ham']
+            spam_score += self.log_class_priors["spam"]
+            ham_score += self.log_class_priors["ham"]
             if spam_score > ham_score:
                 result.append(1)
             else:
@@ -167,13 +167,13 @@ class RandomForest:
     def get_params(self, deep: bool = True): # pylint: disable=unused-argument
         "Get the current model parameters"
         return {
-            'ntree': self.ntree,
-            'test_percent': self.test_percent,
-            'round_values': self.round_values,
+            "ntree": self.ntree,
+            "test_percent": self.test_percent,
+            "round_values": self.round_values,
         }
 
     def save(self):
-        pickle.dump(self, open(os.path.dirname(__file__)+"/data/bayes_model.pkl", 'wb'))
+        pickle.dump(self, open(os.path.dirname(__file__)+"/data/bayes_model.pkl", "wb"))
 
     def predict(self, x_dataset: list[Message]) -> list[CLASS]:
         "Predict the class index for each given message"
@@ -194,4 +194,4 @@ class RandomForest:
         for tree in self.trees:
             pred = tree.predict([record])[0]
             result[pred] += 1/len(self.trees)
-        return {self.classes_[i]: round(x, 5) for i,x in enumerate(result)}
+        return {self.classes_[i]: round(x, 5) for i, x in enumerate(result)}

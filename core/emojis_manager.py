@@ -943,26 +943,28 @@ class EmojisManager:
 
         self.numbers_names = [f"{str(i).ljust(2, '_')}:{emoji}" for i, emoji in enumerate(numbers)]
 
-        self.customs = {'nothing': '<:_nothing:446782476375949323>',
-                        'blob_dance': '<a:blob_dance:483377042725797908>',
-                        'cookies_eat': '<:cookies_eat:421791321410240514>',
-                        'wat': '<:whut:485924115199426600>',
-                        'red_cross': '<:redcheck:513105827817717762>',
-                        'green_check': '<:greencheck:513105826555363348>',
-                        'gray_check': '<:graycheck:624354118613336084>',
-                        'neutral_check': '<:neutral_check:624596006318899201>',
-                        'blurple': "<:blurple:443024761547653140>",
-                        'owo': '<:owo:499661437589913621>',
-                        'youtube': '<:youtube:447459436982960143>',
-                        'twitter': '<:twitter:958325391196585984>',
-                        'reddit': '<:reddit:447462065204887573>',
-                        'twitch': '<:twitch:544192114440011792>',
-                        'red_alert': '<a:red_alert:499690261107048458>',
-                        'red_warning': '<a:red_warning:499687652073668608>',
-                        'readthedocs': '<:readthedocs:484841075001786368>',
-                        'loading': '<a:loading:589205493013151770>',
-                        'deviant': '<:deviantart:626047669948776448>',
-                        'minecraft': '<:minecraft:958305433439834152>'}
+        self.customs = {
+            "nothing": "<:_nothing:446782476375949323>",
+            "blob_dance": "<a:blob_dance:483377042725797908>",
+            "cookies_eat": "<:cookies_eat:421791321410240514>",
+            "wat": "<:whut:485924115199426600>",
+            "red_cross": "<:redcheck:513105827817717762>",
+            "green_check": "<:greencheck:513105826555363348>",
+            "gray_check": "<:graycheck:624354118613336084>",
+            "neutral_check": "<:neutral_check:624596006318899201>",
+            "blurple": "<:blurple:443024761547653140>",
+            "owo": "<:owo:499661437589913621>",
+            "youtube": "<:youtube:447459436982960143>",
+            "twitter": "<:twitter:958325391196585984>",
+            "reddit": "<:reddit:447462065204887573>",
+            "twitch": "<:twitch:544192114440011792>",
+            "red_alert": "<a:red_alert:499690261107048458>",
+            "red_warning": "<a:red_warning:499687652073668608>",
+            "readthedocs": "<:readthedocs:484841075001786368>",
+            "loading": "<a:loading:589205493013151770>",
+            "deviant": "<:deviantart:626047669948776448>",
+            "minecraft": "<:minecraft:958305433439834152>"
+        }
 
         try:
             resp = requests.get("https://www.unicode.org/Public/emoji/latest/emoji-test.txt", timeout=5)

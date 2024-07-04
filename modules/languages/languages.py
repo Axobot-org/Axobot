@@ -27,14 +27,14 @@ class Languages(discord.ext.commands.Cog):
         self.bot = bot
         self.file = "languages"
         self.languages: tuple[str] = options["language"]["values"]
-        i18n.set('filename_format', '{locale}.{format}')
-        i18n.set('file_format', 'json')
-        i18n.set('fallback', None)
-        i18n.set('on_missing_translation', 'error')
-        i18n.set('skip_locale_root_data', True)
+        i18n.set("filename_format", "{locale}.{format}")
+        i18n.set("file_format", "json")
+        i18n.set("fallback", None)
+        i18n.set("on_missing_translation", "error")
+        i18n.set("skip_locale_root_data", True)
         i18n.unload_everything()
         i18n.load_path.clear()
-        i18n.load_path.append('./lang')
+        i18n.load_path.append("./lang")
 
     async def cog_load(self):
         await self.bot.tree.set_translator(AxobotTranslator(self.bot))
@@ -76,7 +76,7 @@ class Languages(discord.ext.commands.Cog):
 
         if isinstance(source, discord.Member | discord.User):
             # get lang from user
-            used_langs = await self.bot.get_cog('Utilities').get_languages(source, limit=1)
+            used_langs = await self.bot.get_cog("Utilities").get_languages(source, limit=1)
             lang_opt = used_langs[0][0] if len(used_langs) > 0 else self.default_language
         elif not self.bot.database_online or source is None:
             # get default lang
@@ -87,7 +87,7 @@ class Languages(discord.ext.commands.Cog):
             if recipient is None:
                 lang_opt = self.default_language
             else:
-                used_langs = await self.bot.get_cog('Utilities').get_languages(recipient, limit=1)
+                used_langs = await self.bot.get_cog("Utilities").get_languages(recipient, limit=1)
                 lang_opt = used_langs[0][0] if len(used_langs) > 0 else self.default_language
         elif isinstance(source, int):
             # get lang from server ID
@@ -114,7 +114,7 @@ class Languages(discord.ext.commands.Cog):
 
     async def get_translation(self, locale: str, string_id: str, **kwargs) -> str | list:
         "Get a translation from the i18n files directly"
-        if string_id == '_used_locale':
+        if string_id == "_used_locale":
             return locale
         return i18n.t(string_id, locale=locale, **kwargs)
 
@@ -122,7 +122,7 @@ class Languages(discord.ext.commands.Cog):
         "Signal to the dev that a translation is missing"
         try:
             err = f"Message `{string_id}` not found in JSON files (language {lang})"
-            await self.bot.get_cog('Errors').senf_err_msg(err)
+            await self.bot.get_cog("Errors").senf_err_msg(err)
             self.bot.log.warning(err)
         except Exception: # pylint: disable=broad-except
             self.bot.log.error("Something went wrong while reporting a translation as missing", exc_info=True)

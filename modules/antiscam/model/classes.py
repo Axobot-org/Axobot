@@ -9,7 +9,7 @@ from .similarities import check_message
 
 
 def get_mentions_count(msg: str):
-    return len(re.findall(r'<@!?\d{15,}>', msg))
+    return len(re.findall(r"<@!?\d{15,}>", msg))
 
 def get_max_frequency(msg: str):
     counter = Counter(msg.replace(' ', '').lower())
@@ -35,13 +35,13 @@ def get_avg_word_len(msg: str):
     return sum(lengths) / len(lengths)
 
 EMBED_COLORS = {
-    "pending": '#000',
-    "deleted": '#0066ff',
-    "harmless": '#bcc2c2',
-    "scam": '#ffa31a',
-    "raid": '#ff3333',
-    "insults": '#cc33ff',
-    "spam": '#ff1aff'
+    "pending": "#000",
+    "deleted": "#0066ff",
+    "harmless": "#bcc2c2",
+    "scam": "#ffa31a",
+    "raid": "#ff3333",
+    "insults": "#cc33ff",
+    "spam": "#ff1aff"
 }
 
 class Message:
@@ -62,7 +62,7 @@ class Message:
     @classmethod
     def from_raw(cls, raw_message: str, mentions_count: int, websites_reference: dict[str, bool]):
         normd_message = normalize(raw_message)
-        contains_everyone = '@everyone' in raw_message
+        contains_everyone = "@everyone" in raw_message
         url_score = check_message(raw_message, websites_reference)
         max_frequency = get_max_frequency(raw_message)
         punctuation_count = get_punctuation_count(raw_message)
@@ -72,33 +72,33 @@ class Message:
 
     def to_dict(self):
         return {
-            'message': self.message,
-            'normd_message': self.normd_message,
-            'contains_everyone': self.contains_everyone,
-            'url_score': self.url_score,
-            'mentions_count': self.mentions_count,
-            'max_frequency': self.max_frequency,
-            'punctuation_count': self.punctuation_count,
-            'caps_percentage': self.caps_percentage,
-            'avg_word_len': self.avg_word_len,
-            'category': self.category
+            "message": self.message,
+            "normd_message": self.normd_message,
+            "contains_everyone": self.contains_everyone,
+            "url_score": self.url_score,
+            "mentions_count": self.mentions_count,
+            "max_frequency": self.max_frequency,
+            "punctuation_count": self.punctuation_count,
+            "caps_percentage": self.caps_percentage,
+            "avg_word_len": self.avg_word_len,
+            "category": self.category
         }
 
     def to_data_dict(self):
         return {
-            'message': self.normd_message,
-            'contains_everyone': self.contains_everyone,
-            'url_score': self.url_score,
-            'length': len(self.normd_message),
-            'mentions_count': self.mentions_count,
-            'max_frequency': self.max_frequency,
-            'punctuation_count': self.punctuation_count,
-            'caps_percentage': self.caps_percentage,
-            'avg_word_len': self.avg_word_len,
-            'class': self.category
+            "message": self.normd_message,
+            "contains_everyone": self.contains_everyone,
+            "url_score": self.url_score,
+            "length": len(self.normd_message),
+            "mentions_count": self.mentions_count,
+            "max_frequency": self.max_frequency,
+            "punctuation_count": self.punctuation_count,
+            "caps_percentage": self.caps_percentage,
+            "avg_word_len": self.avg_word_len,
+            "class": self.category
         }
 
-ClassType = TypeVar('ClassType')
+ClassType = TypeVar("ClassType")
 class PredictionResult:
     "Represents the results of an AI prediction"
     def __init__(self, probabilities: list[float], classes: list[ClassType]):
@@ -114,9 +114,9 @@ class PredictionResult:
 
     def to_dict(self):
         return {
-            'probabilities': self.probabilities,
-            'result': self.result,
-            'classes': self.classes
+            "probabilities": self.probabilities,
+            "result": self.result,
+            "classes": self.classes
         }
 
     def to_string(self, categories: dict):
@@ -133,20 +133,20 @@ class MsgReportView(discord.ui.View):
             self.add_item(discord.ui.Button(
                 label=f"Confirm {category}",
                 style=discord.ButtonStyle.green,
-                custom_id=f'{category}-{row_id}',
+                custom_id=f"{category}-{row_id}",
                 row=0
             ))
         self.add_item(discord.ui.Button(
             label="Harmless message",
             style=discord.ButtonStyle.gray,
             emoji="👌",
-            custom_id=f'harmless-{row_id}',
+            custom_id=f"harmless-{row_id}",
             row=1
         ))
         self.add_item(discord.ui.Button(
             label="Personal data message",
             style=discord.ButtonStyle.red,
             emoji="🗑",
-            custom_id=f'delete-{row_id}',
+            custom_id=f"delete-{row_id}",
             row=1
         ))

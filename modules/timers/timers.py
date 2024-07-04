@@ -236,7 +236,7 @@ class Timers(commands.Cog):
             reminders_formated_list.append((-end.timestamp(), item))
         reminders_formated_list.sort()
         labels = [item[1] for item in reminders_formated_list]
-        emb = discord.Embed(title=await self.bot._(interaction, "timers.rmd.title"),color=16108042)
+        emb = discord.Embed(title=await self.bot._(interaction, "timers.rmd.title"), color=16108042)
         if len("\n".join(labels)) > 2000:
             step = 5
             for i in range(0, max(25, len(labels)), step):

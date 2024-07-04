@@ -96,7 +96,7 @@ class QuoteGeneration:
         # create the mask
         mask_im = self._create_avatar_mask()
         # apply the mask to a copy of the avatar (to avoid issues with transparency)
-        avatar_with_mask = Image.new('RGBA', avatar.size, (0, 0, 0, 0))
+        avatar_with_mask = Image.new("RGBA", avatar.size, (0, 0, 0, 0))
         avatar_with_mask.paste(avatar, mask=mask_im)
         # paste the avatar onto the destination image
         self.result.paste(avatar, AVATAR_POSITION, avatar_with_mask)
@@ -137,8 +137,8 @@ class QuoteGeneration:
         lines: list[list[str]] = []
         line: list[str] = []
         for word in text.split(' '):
-            if '\n' in word:
-                word, *rest = word.split('\n', 1)
+            if "\n" in word:
+                word, *rest = word.split("\n", 1)
                 if word:
                     line.append(word)
                 lines.append(line)
@@ -152,7 +152,7 @@ class QuoteGeneration:
                 line.append(word)
         if line:
             lines.append(line)
-        return '\n'.join(' '.join(line) for line in lines if line)
+        return "\n".join(' '.join(line) for line in lines if line)
 
     def _generate_quote_text(self):
         text = self._split_text('“' + self.text.strip() + '”')

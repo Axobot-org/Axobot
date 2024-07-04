@@ -41,7 +41,7 @@ class ModelParameters(TypedDict):
 async def extract_tfidf(dataframe: pd.DataFrame):
     "Apply the Term frequency inverse document frequency algorithm"
     # Extract the list of messages only
-    messages_df = dataframe['message']
+    messages_df = dataframe["message"]
     # Create the vector from the messages
     tfidf_model = TfidfVectorizer()
     tfidf_vec = tfidf_model.fit_transform(messages_df)
@@ -49,7 +49,7 @@ async def extract_tfidf(dataframe: pd.DataFrame):
     tfidf_data = pd.DataFrame(tfidf_vec.toarray())
     # Add nearly every column to the new dataframe
     for column in dataframe.columns:
-        if column not in {'class_label', 'message'}:
+        if column not in {"class_label", "message"}:
             tfidf_data[column] = dataframe[column]
     return tfidf_data
 
@@ -59,24 +59,24 @@ async def split_test_train(tfidf_data: pd.DataFrame) -> tuple[list, list, list, 
     cut = round(len(tfidf_data)*0.8)
     df_train = tfidf_data.iloc[:cut]
     # create X (input) and Y (output) training datasets
-    y_data = df_train['class']
-    x_data = df_train.drop('class', axis=1)
+    y_data = df_train["class"]
+    x_data = df_train.drop("class", axis=1)
     # splitting training data into train and validation using sklearn
     # The split ratio for the validation set is 20% of the training data.
     return model_selection.train_test_split(x_data, y_data, test_size=.2, random_state=42)
 
 async def find_best_params(x_train: list, y_train: list) -> ModelParameters:
     "Find the best parameters for our model"
-    lgbmodel_bst = lgb.LGBMClassifier(n_estimators=200, num_leaves=40, importance_type='gain')
+    lgbmodel_bst = lgb.LGBMClassifier(n_estimators=200, num_leaves=40, importance_type="gain")
     param_grid = {
-        'num_leaves': list(range(8, 92, 4)),
-        'min_data_in_leaf': [10, 20, 40, 60, 80, 100],
-        'max_depth': [5, 6, 7, 8, 12, 16, 20, -1],
-        'learning_rate': [0.1, 0.05, 0.01, 0.005],
-        'bagging_freq': [3, 4, 5, 6, 7],
-        'bagging_fraction': np.linspace(0.6, 0.95, 10),
-        'reg_alpha': np.linspace(0.1, 0.95, 10),
-        'reg_lambda': np.linspace(0.1, 0.95, 10),
+        "num_leaves": list(range(8, 92, 4)),
+        "min_data_in_leaf": [10, 20, 40, 60, 80, 100],
+        "max_depth": [5, 6, 7, 8, 12, 16, 20, -1],
+        "learning_rate": [0.1, 0.05, 0.01, 0.005],
+        "bagging_freq": [3, 4, 5, 6, 7],
+        "bagging_fraction": np.linspace(0.6, 0.95, 10),
+        "reg_alpha": np.linspace(0.1, 0.95, 10),
+        "reg_lambda": np.linspace(0.1, 0.95, 10),
         "min_split_gain": [0.0, 0.1, 0.01],
         "min_child_weight": [0.001, 0.01, 0.1, 0.001],
         "min_child_samples": [20, 25, 30, 35],
@@ -89,7 +89,7 @@ async def find_best_params(x_train: list, y_train: list) -> ModelParameters:
 
 async def train_best_model(params: ModelParameters, x_train: list, y_train: list):
     "Train a LGBMClassifier model from the given parameters"
-    best_model = lgb.LGBMClassifier(**params, random_state=1, importance_type='gain')
+    best_model = lgb.LGBMClassifier(**params, random_state=1, importance_type="gain")
     best_model.fit(x_train, y_train)
     return best_model
 
@@ -97,7 +97,7 @@ async def test_model(model: lgb.LGBMClassifier, x_test: list, y_test: list):
     "Test the given model with the given data"
     y_pred = model.predict(x_test)
     score_by_class: tuple[float, float, float] = f1_score(y_test, y_pred, average=None)
-    avg_score: float = f1_score(y_test, y_pred, average='weighted')
+    avg_score: float = f1_score(y_test, y_pred, average="weighted")
     return score_by_class, avg_score
 
 async def train_model(rows: list[RecordedRow]):
@@ -105,7 +105,7 @@ async def train_model(rows: list[RecordedRow]):
     # Convert the list of rows to a pandas dataframe
     df = pd.DataFrame(rows)
     # Add the length of each message as a new column
-    df['length'] = df['message'].apply(len)
+    df["length"] = df["message"].apply(len)
     # Apply TFIDF
     tfidf_data = await extract_tfidf(df)
     # Collect training data

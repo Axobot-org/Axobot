@@ -26,19 +26,19 @@ class RecreateReminderView(discord.ui.View):
                 await self.on_pressed(interaction, duration)
             return on_pressed
         identic_duration = await FormatUtils.time_delta(
-            self.task['duration'],
-            lang=await self.bot._(self._get_translator_context(), '_used_locale'),
-            form='developed'
+            self.task["duration"],
+            lang=await self.bot._(self._get_translator_context(), "_used_locale"),
+            form="developed"
         )
         identic_btn = discord.ui.Button(label="+ " + identic_duration, style=discord.ButtonStyle.blurple, emoji='⏰')
-        identic_btn.callback = on_pressed_decorator(self.task['duration'])
+        identic_btn.callback = on_pressed_decorator(self.task["duration"])
         self.add_item(identic_btn)
         # 10min button
-        if self.task['duration'] != 60 * 10:
+        if self.task["duration"] != 60 * 10:
             ten_min_duration = await FormatUtils.time_delta(
                 60 * 10,
-                lang=await self.bot._(self._get_translator_context(), '_used_locale'),
-                form='developed'
+                lang=await self.bot._(self._get_translator_context(), "_used_locale"),
+                form="developed"
             )
             ten_min_btn = discord.ui.Button(label="+ " + ten_min_duration, style=discord.ButtonStyle.blurple, emoji='⏰')
             ten_min_btn.callback = on_pressed_decorator(60 * 10)
@@ -58,7 +58,7 @@ class RecreateReminderView(discord.ui.View):
             await interaction.response.defer(ephemeral=True)
         self.bot.dispatch("reminder_snooze", self.task["duration"], duration)
         # remove the last hyperlink markdown from the message
-        clean_msg = re.sub(r'\s+\[.+?\]\(.+?\)$', '', self.task['message'])
+        clean_msg = re.sub(r"\s+\[.+?\]\(.+?\)$", '', self.task["message"])
         await self.bot.task_handler.add_task(
                 "timer",
                 duration,
@@ -70,8 +70,8 @@ class RecreateReminderView(discord.ui.View):
             )
         f_duration = await FormatUtils.time_delta(
             duration,
-            lang=await self.bot._(interaction.user, '_used_locale'),
-            form='developed'
+            lang=await self.bot._(interaction.user, "_used_locale"),
+            form="developed"
         )
         await interaction.followup.send(
             await self.bot._(interaction.user, "timers.rmd.recreated", duration=f_duration),
@@ -88,7 +88,7 @@ class RecreateReminderView(discord.ui.View):
         ))
 
     async def interaction_check(self, interaction: discord.Interaction, /):
-        return interaction.user.id == self.task['user']
+        return interaction.user.id == self.task["user"]
 
     async def disable(self, interaction: discord.Interaction | discord.Message):
         "Called when the timeout has expired"

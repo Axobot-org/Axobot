@@ -63,14 +63,14 @@ class Fun(commands.Cog):
                 pass
         return False
 
-    @commands.command(name="cookie", aliases=['cookies', 'crustulum'], hidden=True)
+    @commands.command(name="cookie", aliases=["cookies", "crustulum"], hidden=True)
     @commands.check(can_use_cookie)
     async def cookie(self, ctx: MyContext):
         """COOKIE !!!"""
         if ctx.author.id == 375598088850505728:
             await ctx.send(file=await self.utilities.find_img("cookie-target.gif"))
         else:
-            emoji = self.bot.emojis_manager.customs['cookies_eat']
+            emoji = self.bot.emojis_manager.customs["cookies_eat"]
             if ctx.invoked_with == "crustulum":
                 msg = f"Pyxidem oft {ctx.author.mention} crustularum <@375598088850505728>! {emoji}"
             else:
@@ -94,9 +94,11 @@ class Fun(commands.Cog):
         ..Doc fun.html#roll"""
         possibilities = list({x for x in [x.strip() for x in options.split(',')] if len(x) > 0})
         if len(possibilities) == 0:
-            return await interaction.response.send_message(await self.bot._(interaction, "fun.no-roll"))
+            await interaction.response.send_message(await self.bot._(interaction, "fun.no-roll"))
+            return
         if len(possibilities) == 1:
-            return await interaction.response.send_message(await self.bot._(interaction, "fun.not-enough-roll"))
+            await interaction.response.send_message(await self.bot._(interaction, "fun.not-enough-roll"))
+            return
         choosen = random.choice(possibilities)
         await interaction.response.send_message(choosen)
 
@@ -154,7 +156,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         await interaction.response.defer()
         available_names = await self._get_blame_available_names(interaction.user.id)
         if name in available_names:
-            await interaction.followup.send(file=await self.utilities.find_img(f'blame-{name}.png'))
+            await interaction.followup.send(file=await self.utilities.find_img(f"blame-{name}.png"))
             return
         if name not in available_names:
             txt = "- "+"\n- ".join(sorted(available_names))
@@ -164,10 +166,10 @@ You can specify a verification limit by adding a number in argument (up to 1.000
 
     @cached(TTLCache(1_000, 3600))
     async def _get_blame_available_names(self, user_id: int):
-        l1 = ['discord','mojang','zbot','google','youtube', 'twitter'] # everyone
-        l2 = ['tronics','patate','neil','reddemoon','aragorn1202','platon'] # fr-minecraft semi-public server
-        l3 = ['awhikax','aragorn','adri','zrunner'] # Axobot official server
-        l4 = ['benny'] # benny server
+        l1 = ["discord","mojang","zbot","google","youtube", "twitter"] # everyone
+        l2 = ["tronics","patate","neil","reddemoon","aragorn1202","platon"] # fr-minecraft semi-public server
+        l3 = ["awhikax","aragorn","adri","zrunner"] # Axobot official server
+        l4 = ["benny"] # benny server
         available_names = l1
         if await self.is_in_guild(user_id, 391968999098810388): # fr-minecraft
             available_names += l2
@@ -209,7 +211,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         possibilities = await self.bot._(interaction, "fun.kills-list")
         msg = random.choice(possibilities)
         tries = 0
-        while '{attacker}' in msg and name is None and tries < 50:
+        while "{attacker}" in msg and name is None and tries < 50:
             msg = random.choice(possibilities)
             tries += 1
         await interaction.response.send_message(msg.format(attacker=author, victim=victime, ex=ex))
@@ -228,42 +230,42 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         if category == "cat":
             gif = random.choice([
                 # pylint: disable=line-too-long
-                'https://images6.fanpop.com/image/photos/40800000/tummy-rub-kitten-animated-gif-cute-kittens-40838484-380-227.gif',
-                'https://25.media.tumblr.com/7774fd7794d99b5998318ebd5438ba21/tumblr_n2r7h35U211rudcwro1_400.gif',
-                'https://tenor.com/view/seriously-seriously-cat-cat-really-cat-really-look-cat-look-gif-22182662',
-                'http://coquelico.c.o.pic.centerblog.net/chat-peur.gif',
-                'https://tenor.com/view/nope-bye-cat-leave-done-gif-12387359',
-                'https://tenor.com/view/cute-cat-kitten-kitty-pussy-cat-gif-16577050',
-                'https://tenor.com/view/cat-box-gif-18395469',
-                'https://tenor.com/view/pile-cats-cute-silly-meowtain-gif-5791255',
-                'https://tenor.com/view/cat-fight-cats-cat-love-pet-lover-pelea-gif-13002823369159732311',
-                'https://tenor.com/view/cat-disapear-cat-snow-cat-jump-fail-cat-fun-jump-cats-gif-17569677',
-                'https://tenor.com/view/black-cat-tiny-cat-smol-kitten-airplane-ears-cutie-pie-gif-23391953',
-                'https://tenor.com/view/cat-cats-catsoftheinternet-biting-tale-cat-bite-gif-23554005',
-                'https://tenor.com/view/on-my-way-cat-run-cat-on-my-way-cat-cat-on-my-way-gif-26471384',
-                'https://tenor.com/view/cat-cat-activity-goober-goober-cat-silly-cat-gif-186256394908832033',
-                'https://tenor.com/view/cat-stacked-kittens-kitty-pussy-cats-gif-16220908',
-                'https://tenor.com/view/cute-cat-cats-cats-of-the-internet-cattitude-gif-17600906',
-                'https://tenor.com/view/cat-scared-hide-terrified-frightened-gif-17023981',
-                'https://tenor.com/view/cat-running-away-escape-getaway-bye-gif-16631286',
-                'https://tenor.com/view/bye-cat-box-tight-face-bored-cat-gif-7986182'
+                "https://images6.fanpop.com/image/photos/40800000/tummy-rub-kitten-animated-gif-cute-kittens-40838484-380-227.gif",
+                "https://25.media.tumblr.com/7774fd7794d99b5998318ebd5438ba21/tumblr_n2r7h35U211rudcwro1_400.gif",
+                "https://tenor.com/view/seriously-seriously-cat-cat-really-cat-really-look-cat-look-gif-22182662",
+                "http://coquelico.c.o.pic.centerblog.net/chat-peur.gif",
+                "https://tenor.com/view/nope-bye-cat-leave-done-gif-12387359",
+                "https://tenor.com/view/cute-cat-kitten-kitty-pussy-cat-gif-16577050",
+                "https://tenor.com/view/cat-box-gif-18395469",
+                "https://tenor.com/view/pile-cats-cute-silly-meowtain-gif-5791255",
+                "https://tenor.com/view/cat-fight-cats-cat-love-pet-lover-pelea-gif-13002823369159732311",
+                "https://tenor.com/view/cat-disapear-cat-snow-cat-jump-fail-cat-fun-jump-cats-gif-17569677",
+                "https://tenor.com/view/black-cat-tiny-cat-smol-kitten-airplane-ears-cutie-pie-gif-23391953",
+                "https://tenor.com/view/cat-cats-catsoftheinternet-biting-tale-cat-bite-gif-23554005",
+                "https://tenor.com/view/on-my-way-cat-run-cat-on-my-way-cat-cat-on-my-way-gif-26471384",
+                "https://tenor.com/view/cat-cat-activity-goober-goober-cat-silly-cat-gif-186256394908832033",
+                "https://tenor.com/view/cat-stacked-kittens-kitty-pussy-cats-gif-16220908",
+                "https://tenor.com/view/cute-cat-cats-cats-of-the-internet-cattitude-gif-17600906",
+                "https://tenor.com/view/cat-scared-hide-terrified-frightened-gif-17023981",
+                "https://tenor.com/view/cat-running-away-escape-getaway-bye-gif-16631286",
+                "https://tenor.com/view/bye-cat-box-tight-face-bored-cat-gif-7986182"
             ])
         elif category == "birthday":
             gif = random.choice([
-                'https://tenor.com/view/happy-birthday-cat-cute-birthday-cake-second-birthday-gif-16100991',
-                'https://tenor.com/view/happy-birthday-birthday-cake-goat-licking-lick-gif-15968273',
-                'https://tenor.com/view/celebracion-gif-4928008',
-                'https://tenor.com/view/kitty-birthday-birthday-kitty-happy-birthday-happy-birthday-to-you-hbd-gif-13929089',
-                'https://tenor.com/view/happy-birthday-happy-birthday-to-you-hbd-birthday-celebrate-gif-13366300'
+                "https://tenor.com/view/happy-birthday-cat-cute-birthday-cake-second-birthday-gif-16100991",
+                "https://tenor.com/view/happy-birthday-birthday-cake-goat-licking-lick-gif-15968273",
+                "https://tenor.com/view/celebracion-gif-4928008",
+                "https://tenor.com/view/kitty-birthday-birthday-kitty-happy-birthday-happy-birthday-to-you-hbd-gif-13929089",
+                "https://tenor.com/view/happy-birthday-happy-birthday-to-you-hbd-birthday-celebrate-gif-13366300"
             ])
         elif category == "wink":
             gif = random.choice([
-                'https://tenor.com/view/dr-strange-wink-smirk-trust-me-gif-24332472',
-                'https://tenor.com/view/wink-smile-laugh-wandavision-gif-20321476',
-                'https://tenor.com/view/rowan-atkinson-mr-bean-trying-to-flirt-wink-gif-16439423',
-                'https://tenor.com/view/winking-james-franco-actor-wink-handsome-gif-17801047',
-                'https://tenor.com/view/clin-doeil-wink-playboy-wink-funny-wink-clin-oeil-gif-24871407',
-                'https://tenor.com/view/wink-got-it-dude-rocket-raccoon-hint-gotcha-gif-23822337'
+                "https://tenor.com/view/dr-strange-wink-smirk-trust-me-gif-24332472",
+                "https://tenor.com/view/wink-smile-laugh-wandavision-gif-20321476",
+                "https://tenor.com/view/rowan-atkinson-mr-bean-trying-to-flirt-wink-gif-16439423",
+                "https://tenor.com/view/winking-james-franco-actor-wink-handsome-gif-17801047",
+                "https://tenor.com/view/clin-doeil-wink-playboy-wink-funny-wink-clin-oeil-gif-24871407",
+                "https://tenor.com/view/wink-got-it-dude-rocket-raccoon-hint-gotcha-gif-23822337"
             ])
         else:
             raise ValueError("Invalid category: "+category)
@@ -274,7 +276,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         """Where does that bug come from?
 
         ..Doc fun.html#pibkac"""
-        await interaction.response.send_message(file=await self.utilities.find_img('pibkac.png'))
+        await interaction.response.send_message(file=await self.utilities.find_img("pibkac.png"))
 
     @fun_main.command(name="flip")
     async def piece(self, interaction: discord.Interaction):
@@ -317,7 +319,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
             return
         if not channel.permissions_for(interaction.guild.me).send_messages:
             error = await self.bot._(interaction, "fun.no-say")
-            error += random.choice([' :confused:', '', '', ''])
+            error += random.choice([" :confused:", '', '', ''])
             await interaction.response.send_message(error)
             return
         if self.bot.zombie_mode:
@@ -382,7 +384,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         if not g.ok:
             await interaction.followup.send(content=await self.bot._(interaction, "fun.invalid-city"))
             return
-        tz_name: str | None = self.tf.timezone_at_land(lat=g.json['lat'], lng=g.json['lng'])
+        tz_name: str | None = self.tf.timezone_at_land(lat=g.json["lat"], lng=g.json["lng"])
         if tz_name is None:
             await interaction.followup.send(content=await self.bot._(interaction, "fun.uninhabited-city"))
             return
@@ -390,8 +392,8 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         date = datetime.datetime.now(tz_obj)
         format_d = await FormatUtils.date(date, lang=await self.bot._(interaction, "_used_locale"))
         address = g.current_result.address
-        latitude = round(g.json['lat'],2)
-        longitude = round(g.json['lng'],2)
+        latitude = round(g.json["lat"],2)
+        longitude = round(g.json["lng"],2)
         text = await self.bot._(
             interaction, "fun.hour-result",
             date=format_d,
@@ -440,13 +442,13 @@ You can specify a verification limit by adding a number in argument (up to 1.000
 
         await interaction.response.defer()
         if self.nasa_pict is None \
-                or 'date' not in self.nasa_pict \
+                or "date" not in self.nasa_pict \
                 or (self.bot.utcnow()-get_date(self.nasa_pict["date"])).total_seconds() > 86400:
             async with aiohttp.ClientSession() as session:
                 key = self.bot.others["nasa"]
                 async with session.get(f"https://api.nasa.gov/planetary/apod?api_key={key}") as r:
                     data = await r.json()
-            if all(field in data for field in ['title', 'url', 'explanation', 'date']):
+            if all(field in data for field in ["title", "url", "explanation", "date"]):
                 self.nasa_pict = data
         if self.nasa_pict is None:
             await interaction.followup.send(content=await self.bot._(interaction, "fun.nasa-none"))
@@ -458,7 +460,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
             timestamp=get_date(self.nasa_pict["date"]),
             color=0x0033cc
         )
-        emb.set_image(url=self.nasa_pict['url'])
+        emb.set_image(url=self.nasa_pict["url"])
         emb.set_footer(text="Credits: " + self.nasa_pict.get("copyright", "Not copyrighted"))
         await interaction.followup.send(embed=emb)
 
@@ -476,16 +478,16 @@ You can specify a verification limit by adding a number in argument (up to 1.000
             async with session.get("https://api.greenhouse.io/v1/boards/discord/jobs") as r:
                 data = await r.json()
         if query is None:
-            jobs = data['jobs']
+            jobs = data["jobs"]
             desc = await self.bot._(interaction, "fun.discordjobs.all-count", count=len(jobs))
         else:
             query = query.lower()
             jobs = [
-                x for x in data['jobs']
+                x for x in data["jobs"]
                 if (
-                    query in x['location']['name'].lower()
-                    or query == x['id']
-                    or query in x['title'].lower()
+                    query in x["location"]["name"].lower()
+                    or query == x["id"]
+                    or query in x["title"].lower()
                 )
             ]
             desc = await self.bot._(interaction, "fun.discordjobs.filtered-count", count=len(jobs))
@@ -566,13 +568,13 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         async with aiohttp.ClientSession() as session:
             async with session.get("https://discordstatus.com/api/v2/incidents.json") as r:
                 data = await r.json()
-        last_incident = data['incidents'][0]
-        if last_incident['resolved_at'] is None:
-            impact = await self.bot._(interaction, "fun.discordstatus-impacts."+last_incident['impact'])
+        last_incident = data["incidents"][0]
+        if last_incident["resolved_at"] is None:
+            impact = await self.bot._(interaction, "fun.discordstatus-impacts."+last_incident["impact"])
             title = f"**{last_incident['name']}** (<{last_incident['shortlink']}>)"
             await interaction.followup.send(await self.bot._(interaction, "fun.discordstatus-exists", impact=impact, title=title))
         else:
-            last_date = datetime.datetime.strptime(last_incident['resolved_at'], '%Y-%m-%dT%H:%M:%S.%f%z')
+            last_date = datetime.datetime.strptime(last_incident["resolved_at"], "%Y-%m-%dT%H:%M:%S.%f%z")
             last_date = f"<t:{round(last_date.timestamp())}:F>"
             await interaction.followup.send(await self.bot._(interaction, "fun.discordstatus-nothing", date=last_date))
 
@@ -628,22 +630,25 @@ If you want to use lines break in the texts, use the special character `\\n`
             destination.permissions_for(interaction.user).read_messages
             and destination.permissions_for(interaction.user).send_messages
         ):
-            return await interaction.response.send_message(
+            await interaction.response.send_message(
                 await self.bot._(interaction, "fun.say-no-perm", channel=destination.mention),
                 ephemeral=True
             )
+            return
         if not destination.permissions_for(interaction.guild.me).send_messages:
-            return await interaction.response.send_message(
+            await interaction.response.send_message(
                 await self.bot._(interaction, "fun.embed-invalid-channel"),
                 ephemeral=True
             )
+            return
         if not destination.permissions_for(interaction.guild.me).embed_links:
-            return await interaction.response.send_message(
+            await interaction.response.send_message(
                 await self.bot._(interaction, "fun.no-embed-perm"),
                 ephemeral=True
             )
+            return
         await interaction.response.defer(ephemeral=True)
-        default_color = self.bot.get_cog('ServerConfig').embed_color
+        default_color = self.bot.get_cog("ServerConfig").embed_color
         if content:
             content = content.replace("\\n", "\n")
         emb = discord.Embed(
