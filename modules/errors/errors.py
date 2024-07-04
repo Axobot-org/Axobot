@@ -168,9 +168,6 @@ class Errors(commands.Cog):
             # Invalid unicode emoji: lol
             if isinstance(error, arguments_errors.InvalidUnicodeEmojiError):
                 return await send_err("errors.invalidunicode", u=error.argument)
-            # Invalid ISBN: lol
-            if isinstance(error, arguments_errors.InvalidISBNError):
-                return await send_err("errors.invalidisbn")
             # Invalid card style: aqua
             if isinstance(error, arguments_errors.InvalidCardStyleError):
                 return await send_err("errors.invalidcardstyle", s=error.argument)

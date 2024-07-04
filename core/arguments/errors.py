@@ -28,12 +28,6 @@ class InvalidUnicodeEmojiError(VerboseBadArgumentError):
         self.argument = argument
         super().__init__(f"Invalid unicode emoji: {argument}")
 
-class InvalidISBNError(VerboseBadArgumentError):
-    "Raised when the user argument is not a valid ISBN"
-    def __init__(self, argument: str):
-        self.argument = argument
-        super().__init__(f"Invalid ISBN: {argument}")
-
 class InvalidCardStyleError(VerboseBadArgumentError):
     "Raised when the user argument is not a valid XP card style"
     def __init__(self, argument: str):
