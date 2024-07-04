@@ -162,13 +162,6 @@
         "default": null,
         "is_listed": true
     },
-    "prefix": {
-        "type": "text",
-        "min_length": 1,
-        "max_length": 10,
-        "default": "!",
-        "is_listed": true
-    },
     "private_leaderboard": {
         "type": "boolean",
         "default": true,

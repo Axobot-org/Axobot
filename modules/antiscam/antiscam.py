@@ -319,7 +319,7 @@ class AntiScam(commands.Cog):
         if (
             isinstance(msg.author, discord.User)
             or len(msg.content) < 10
-            or is_immune(msg.author) or await self.bot.potential_command(msg)
+            or is_immune(msg.author)
         ):
             return
         await self.bot.wait_until_ready()

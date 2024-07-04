@@ -119,7 +119,7 @@ class Xp(commands.Cog):
             if time.time() - self.cache["global"][msg.author.id][0] < self.classic_xp_cooldown:
                 return
         content = msg.clean_content
-        if len(content) < self.minimal_size or await self.check_spam(content) or await self.bot.potential_command(msg):
+        if len(content) < self.minimal_size or await self.check_spam(content):
             return
         if len(self.cache["global"]) == 0:
             await self.db_load_cache(None)
@@ -148,8 +148,6 @@ class Xp(commands.Cog):
         if msg.author.id in self.cache[msg.guild.id]:
             if time.time() - self.cache[msg.guild.id][msg.author.id][0] < self.mee6_xp_cooldown:
                 return
-        if await self.bot.potential_command(msg):
-            return
         giv_points = round(random.randint(15,25) * rate)
         if msg.author.id in self.cache[msg.guild.id]:
             prev_points = self.cache[msg.guild.id][msg.author.id][1]
@@ -174,7 +172,7 @@ class Xp(commands.Cog):
             if time.time() - self.cache[msg.guild.id][msg.author.id][0] < self.classic_xp_cooldown:
                 return
         content = msg.clean_content
-        if len(content) < self.minimal_size or await self.check_spam(content) or await self.bot.potential_command(msg):
+        if len(content) < self.minimal_size or await self.check_spam(content):
             return
         giv_points = round(await self.calc_xp(msg) * rate)
         if giv_points == 0:

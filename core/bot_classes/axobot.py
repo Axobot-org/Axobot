@@ -10,7 +10,6 @@ from mysql.connector.connection import MySQLConnection
 
 from core.database import DatabaseConnectionManager, DatabaseQueryHandler
 from core.emojis_manager import EmojisManager
-from core.prefix_manager import PrefixManager
 from core.serverconfig.options_list import options as options_list
 from core.tasks_handler import TaskHandler
 from core.tips import TipsManager
@@ -40,10 +39,9 @@ if TYPE_CHECKING:
 async def get_prefix(bot: "Axobot", msg: discord.Message) -> list:
     """Get the correct bot prefix from a message
     Prefix can change based on guild, but the bot mention will always be an option"""
-    prefixes = [await bot.prefix_manager.get_prefix(msg.guild)]
     if msg.guild is None:
-        prefixes.append("")
-    return commands.when_mentioned_or(*prefixes)(bot, msg)
+        return commands.when_mentioned_or("")(bot, msg)
+    return commands.when_mentioned(bot, msg)
 
 # pylint: disable=too-many-instance-attributes
 class Axobot(commands.bot.AutoShardedBot):
@@ -77,7 +75,6 @@ class Axobot(commands.bot.AutoShardedBot):
         self.zws = "\u200B"  # here's a zero width space
         self.others = get_secrets_dict() # other misc credentials
         self.zombie_mode: bool = zombie_mode # if we should listen without sending any message
-        self.prefix_manager = PrefixManager(self)
         self.task_handler = TaskHandler(self)
         self.emojis_manager = EmojisManager(self)
         self.tips_manager = TipsManager(self)
@@ -268,14 +265,6 @@ class Axobot(commands.bot.AutoShardedBot):
         if isinstance(embeds, discord.Embed):
             embeds = [embeds]
         await send_log_embed(self, embeds, url)
-
-    async def potential_command(self, message: discord.Message):
-        "Check if a message is potentially a bot command"
-        prefixes = await self.get_prefix(message)
-        is_cmd = False
-        for prefix in prefixes:
-            is_cmd = is_cmd or message.content.startswith(prefix)
-        return is_cmd
 
     async def fetch_app_commands(self):
         "Populate the app_commands_list attribute from the Discord API"
