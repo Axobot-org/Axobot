@@ -265,7 +265,7 @@ Slowmode works up to one message every 6h (21600s)
         if not self.bot.database_online:
             return
         query = "INSERT IGNORE INTO `mutes` VALUES (%s, %s, CURRENT_TIMESTAMP)"
-        async with self.bot.db_query(query, (member.id, member.guild.id)):
+        async with self.bot.db_main.write(query, (member.id, member.guild.id)):
             pass
 
     async def check_mute_context(self, interaction: discord.Interaction, role: discord.Role, member: discord.Member):
@@ -377,7 +377,7 @@ You can also mute this member for a defined duration, then use the following for
         if not self.bot.database_online:
             return
         query = "DELETE IGNORE FROM mutes WHERE userid=%s AND guildid=%s"
-        async with self.bot.db_query(query, (user.id, guild.id)):
+        async with self.bot.db_main.write(query, (user.id, guild.id)):
             pass
 
     async def is_muted(self, guild: discord.Guild, member: discord.Member, role: discord.Role | None) -> bool:
@@ -389,7 +389,7 @@ You can also mute this member for a defined duration, then use the following for
                 return False
             return role in member.roles
         query = "SELECT COUNT(*) AS count FROM `mutes` WHERE guildid=%s AND userid=%s"
-        async with self.bot.db_query(query, (guild.id, member.id)) as query_results:
+        async with self.bot.db_main.read(query, (guild.id, member.id)) as query_results:
             result: int = query_results[0]["count"]
         return result > 0
 
@@ -403,11 +403,11 @@ You can also mute this member for a defined duration, then use the following for
                         WHERE {cases_table}.user=userid AND {cases_table}.guild=guildid AND {cases_table}.type LIKE "%mute"
                         ORDER BY `{cases_table}`.`created_at` DESC LIMIT 1
                     ) as reason FROM `mutes` WHERE guildid=%s"""
-            async with self.bot.db_query(query, (guild_id,)) as query_results:
+            async with self.bot.db_main.read(query, (guild_id,)) as query_results:
                 result = {row["userid"]: row["reason"] for row in query_results}
         else:
             query = "SELECT userid FROM `mutes` WHERE guildid=%s"
-            async with self.bot.db_query(query, (guild_id,)) as query_results:
+            async with self.bot.db_main.read(query, (guild_id,)) as query_results:
                 result = [row["userid"] for row in query_results]
         return result
 

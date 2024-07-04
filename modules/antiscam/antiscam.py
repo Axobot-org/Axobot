@@ -61,7 +61,7 @@ class AntiScam(commands.Cog):
             try:
                 data: dict[str, bool] = {}
                 query = "SELECT `domain`, `is_safe` FROM `spam-detection`.`websites`"
-                async with self.bot.db_query(query) as query_result:
+                async with self.bot.db_main.read(query) as query_result:
                     for row in query_result:
                         data[row["domain"]] = row["is_safe"]
                 self.agent.save_websites_locally(data)
@@ -105,7 +105,7 @@ class AntiScam(commands.Cog):
         query = f"INSERT INTO `spam-detection`.`{self.table}` (message, normd_message, contains_everyone, url_score, \
             mentions_count, max_frequency, punctuation_count, caps_percentage, avg_word_len, category) \
                 VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
-        async with self.bot.db_query(query, (
+        async with self.bot.db_main.write(query, (
             msg.message,
             msg.normd_message,
             msg.contains_everyone,
@@ -123,7 +123,7 @@ class AntiScam(commands.Cog):
         "Delete a report message from the database"
         await self.bot.wait_until_ready()
         query = f"DELETE FROM `spam-detection`.`{self.table}` WHERE id = %s"
-        async with self.bot.db_query(query, (msg_id, ), returnrowcount=True) as query_result:
+        async with self.bot.db_main.write(query, (msg_id, ), returnrowcount=True) as query_result:
             return query_result > 0
 
     async def db_update_msg(self, msg_id: int, new_category: str) -> bool:
@@ -131,13 +131,13 @@ class AntiScam(commands.Cog):
         await self.bot.wait_until_ready()
         query = f"UPDATE `spam-detection`.`{self.table}` SET category = %s WHERE id = %s"
         if category_id := self.agent.get_category_id(new_category):
-            async with self.bot.db_query(query, (category_id, msg_id), returnrowcount=True) as query_result:
+            async with self.bot.db_main.write(query, (category_id, msg_id), returnrowcount=True) as query_result:
                 return query_result > 0
         return False
 
     async def db_update_messages(self, table: str):
         "Update the messages table with any new info (updated unicode, websites list, etc.)"
-        async with self.bot.db_query(f"SELECT * FROM `spam-detection`.`{table}`") as query_result:
+        async with self.bot.db_main.read(f"SELECT * FROM `spam-detection`.`{table}`") as query_result:
             messages: list[dict[str, typing.Any]] = query_result
 
         counter = 0
@@ -206,7 +206,7 @@ class AntiScam(commands.Cog):
             caps_percentage, avg_word_len, category FROM `spam-detection`.`{self.table}` \
                 WHERE category IN (1, 2) GROUP BY message ORDER BY RAND()"
         data: list[Message] = []
-        async with self.bot.db_query(query) as query_results:
+        async with self.bot.db_main.read(query) as query_results:
             for row in query_results:
                 if len(row["message"].split(" ")) > 2:
                     data.append(Message(

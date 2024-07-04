@@ -218,7 +218,7 @@ class AbstractSubcog(ABC):
             return None
         query = "SELECT `user_id`, `points` FROM `event_points` WHERE `points` != 0 AND `beta` = %s \
             ORDER BY `points` DESC LIMIT %s"
-        async with self.bot.db_query(query, (self.bot.beta, number)) as query_results:
+        async with self.bot.db_main.read(query, (self.bot.beta, number)) as query_results:
             return query_results
 
     async def db_get_participants_count(self) -> int:
@@ -226,7 +226,7 @@ class AbstractSubcog(ABC):
         if not self.bot.database_online:
             return 0
         query = "SELECT COUNT(*) as count FROM `event_points` WHERE `points` > 0 AND `beta` = %s;"
-        async with self.bot.db_query(query, (self.bot.beta,), fetchone=True) as query_results:
+        async with self.bot.db_main.read(query, (self.bot.beta,), fetchone=True) as query_results:
             return query_results["count"]
 
     async def db_get_event_rank(self, user_id: int) -> DBUserRank | None:
@@ -236,7 +236,7 @@ class AbstractSubcog(ABC):
         query = "SELECT `user_id`, `points`, FIND_IN_SET( `points`, \
             ( SELECT GROUP_CONCAT( `points` ORDER BY `points` DESC ) FROM `event_points` WHERE `beta` = %(beta)s ) ) AS rank \
                 FROM `event_points` WHERE `user_id` = %(user)s AND `beta` = %(beta)s"
-        async with self.bot.db_query(query, {"user": user_id, "beta": self.bot.beta}, fetchone=True) as query_results:
+        async with self.bot.db_main.read(query, {"user": user_id, "beta": self.bot.beta}, fetchone=True) as query_results:
             return query_results or None
 
     async def db_get_user_collected_items(self, user_id: int, event_type: EventType) -> list[EventItemWithCount]:
@@ -249,7 +249,7 @@ class AbstractSubcog(ABC):
             AND c.`beta` = %s
             AND a.`event_type` = %s
         GROUP BY c.`item_id`"""
-        async with self.bot.db_query(query, (user_id, self.bot.beta, event_type)) as query_results:
+        async with self.bot.db_main.read(query, (user_id, self.bot.beta, event_type)) as query_results:
             return query_results
 
     async def db_get_last_user_collect(self, user_id: int) -> datetime.datetime:
@@ -257,7 +257,7 @@ class AbstractSubcog(ABC):
         if not self.bot.database_online:
             return None
         query = "SELECT `last_collect` FROM `event_points` WHERE `user_id` = %s AND `beta` = %s;"
-        async with self.bot.db_query(query, (user_id, self.bot.beta), fetchone=True, astuple=True) as query_result:
+        async with self.bot.db_main.read(query, (user_id, self.bot.beta), fetchone=True, astuple=True) as query_result:
             if not query_result:
                 return None
             query_result: tuple[datetime.datetime]
@@ -273,7 +273,7 @@ class AbstractSubcog(ABC):
             return
         query = "INSERT INTO `event_collected_items` (`user_id`, `item_id`, `beta`) VALUES " + \
             ", ".join(["(%s, %s, %s)"] * len(items_ids)) + ';'
-        async with self.bot.db_query(query, [arg for item_id in items_ids for arg in (user_id, item_id, self.bot.beta)]):
+        async with self.bot.db_main.write(query, [arg for item_id in items_ids for arg in (user_id, item_id, self.bot.beta)]):
             pass
 
     async def db_add_collect(self, user_id: int, points: int, with_strike: bool):
@@ -292,7 +292,7 @@ class AbstractSubcog(ABC):
                     last_collect = CURRENT_TIMESTAMP();"
         else:
             return
-        async with self.bot.db_query(query, (user_id, points, self.bot.beta)):
+        async with self.bot.db_main.write(query, (user_id, points, self.bot.beta)):
             pass
 
     async def db_get_event_items(self, event_type: EventType) -> list[EventItem]:
@@ -300,5 +300,5 @@ class AbstractSubcog(ABC):
         if not self.bot.database_online:
             return []
         query = "SELECT * FROM `event_available_items` WHERE `event_type` = %s;"
-        async with self.bot.db_query(query, (event_type, )) as query_results:
+        async with self.bot.db_main.read(query, (event_type, )) as query_results:
             return query_results

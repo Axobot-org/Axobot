@@ -339,7 +339,7 @@ class Xp(commands.Cog):
         if not self.bot.database_online:
             return
         query = "SELECT userID FROM `users` WHERE `xp_suspect` = 1"
-        async with self.bot.db_query(query) as query_result:
+        async with self.bot.db_main.read(query) as query_result:
             if not query_result:
                 return
             self.sus = {item["userID"] for item in query_result}
@@ -584,7 +584,7 @@ class Xp(commands.Cog):
                 await self.bot.unload_module("xp")
                 return None
             query = f"SELECT SUM(xp) as total FROM `{self.table}`"
-            async with self.bot.db_query(query, fetchone=True) as query_results:
+            async with self.bot.db_main.read(query, fetchone=True) as query_results:
                 result = round(query_results["total"])
             return result
         except Exception as err:
@@ -593,7 +593,7 @@ class Xp(commands.Cog):
     async def db_get_guilds_decays(self):
         "Get a list of guilds where xp decay is enabled"
         query = "SELECT `guild_id`, CAST(`value` AS INT) AS 'value' FROM `serverconfig` WHERE `option_name` = 'xp_decay' AND `value` > 0 AND `beta` = %s"
-        async with self.bot.db_query(query, (self.bot.beta,)) as query_result:
+        async with self.bot.db_main.read(query, (self.bot.beta,)) as query_result:
             return query_result
 
     @tasks.loop(time=datetime.time(hour=0, tzinfo=datetime.UTC))
@@ -612,13 +612,13 @@ class Xp(commands.Cog):
             if await self.bot.get_config(guild_id, "xp_type") == "global":
                 continue
             # apply decay
-            async with self.bot.db_xp_query(decay_query.format(table=guild_id), (value,), returnrowcount=True) as row_count:
+            async with self.bot.db_xp.write(decay_query.format(table=guild_id), (value,), returnrowcount=True) as row_count:
                 users_count += row_count
                 # if xp has been edited, invalidate cache
                 if row_count > 0 and guild_id in self.cache:
                     del self.cache[guild_id]
             # remove members with 0xp or less
-            async with self.bot.db_xp_query(cleanup_query.format(table=guild_id), returnrowcount=True) as row_count:
+            async with self.bot.db_xp.write(cleanup_query.format(table=guild_id), returnrowcount=True) as row_count:
                 self.log.info("xp decay: removed %s members from guild %s", row_count, guild_id)
             guilds_count += 1
         log_text = f"XP decay: removed xp of {users_count} users from {guilds_count} guilds"
@@ -904,7 +904,7 @@ class Xp(commands.Cog):
         """Add a role reward in the database"""
         reward_id = await self.gen_rr_id()
         query = "INSERT INTO `roles_rewards` (`ID`, `guild`, `role`, `level`) VALUES (%(i)s, %(g)s, %(r)s, %(l)s);"
-        async with self.bot.db_query(query, { 'i': reward_id, 'g': guild_id, 'r': role_id, 'l': level }):
+        async with self.bot.db_main.write(query, { 'i': reward_id, 'g': guild_id, 'r': role_id, 'l': level }):
             pass
         return True
 
@@ -916,14 +916,14 @@ class Xp(commands.Cog):
         else:
             query = "SELECT * FROM `roles_rewards` WHERE `guild`=%s AND `level`=%s ORDER BY `level`;"
             query_args = (guild_id, level)
-        async with self.bot.db_query(query, query_args) as query_results:
+        async with self.bot.db_main.read(query, query_args) as query_results:
             liste = list(query_results)
         return liste
 
     async def rr_remove_role(self, role_id: int):
         """Remove a role reward from the database"""
         query = "DELETE FROM `roles_rewards` WHERE `ID` = %s;"
-        async with self.bot.db_query(query, (role_id,)):
+        async with self.bot.db_main.write(query, (role_id,)):
             pass
         return True
 

@@ -52,7 +52,7 @@ class Twitch(commands.Cog):
         "Add a streamer to the database"
         query = "INSERT INTO `streamers` (`guild_id`, `platform`, `user_id`, `user_name`, `beta`) VALUES (%s, %s, %s, %s, %s)"
         try:
-            async with self.bot.db_query(
+            async with self.bot.db_main.write(
                 query, (guild_id, platform, user_id, user_name, self.bot.beta), returnrowcount=True
             ) as query_result:
                 return query_result > 0
@@ -62,7 +62,7 @@ class Twitch(commands.Cog):
     async def db_get_guild_subscriptions_count(self, guild_id: int) -> int | None:
         "Get the number of subscriptions for a guild"
         query = "SELECT COUNT(*) FROM `streamers` WHERE `guild_id` = %s AND `beta` = %s"
-        async with self.bot.db_query(query, (guild_id, self.bot.beta), astuple=True) as query_result:
+        async with self.bot.db_main.read(query, (guild_id, self.bot.beta), astuple=True) as query_result:
             return query_result[0][0] if query_result else None
 
     async def db_get_guild_streamers(self, guild_id: int, platform: PlatformId | None=None) -> list[StreamersDBObject]:
@@ -72,7 +72,7 @@ class Twitch(commands.Cog):
         if platform is not None:
             query += " AND `platform` = %s"
             args.append(platform)
-        async with self.bot.db_query(query, args) as query_result:
+        async with self.bot.db_main.read(query, args) as query_result:
             return query_result
 
     async def db_get_guilds_per_streamers(self, platform: PlatformId | None=None) -> list[GroupedStreamerDBObject]:
@@ -80,7 +80,7 @@ class Twitch(commands.Cog):
         where = "" if platform is None else f"AND `platform` = \"{platform}\""
         query = f"SELECT `platform`, `user_id`, `user_name`, `is_streaming`, JSON_ARRAYAGG(`guild_id`) as \"guild_ids\" "\
             f"FROM `streamers` WHERE `beta` = %s {where} GROUP BY `platform`, `user_id`; "
-        async with self.bot.db_query(query, (self.bot.beta,)) as query_result:
+        async with self.bot.db_main.read(query, (self.bot.beta,)) as query_result:
             return [
                 data | {"guild_ids": json.loads(data["guild_ids"])}
                 for data in query_result
@@ -89,13 +89,13 @@ class Twitch(commands.Cog):
     async def db_remove_streamer(self, guild_id: int, platform: PlatformId, user_id: str):
         "Remove a streamer from the database"
         query = "DELETE FROM `streamers` WHERE `guild_id` = %s AND `platform` = %s AND `user_id` = %s AND `beta` = %s"
-        async with self.bot.db_query(query, (guild_id, platform, user_id, self.bot.beta), returnrowcount=True) as query_result:
+        async with self.bot.db_main.write(query, (guild_id, platform, user_id, self.bot.beta), returnrowcount=True) as query_result:
             return query_result > 0
 
     async def db_set_streamer_status(self, platform: PlatformId, user_id: str, is_streaming: bool):
         "Set the streaming status of a streamer"
         query = "UPDATE `streamers` SET `is_streaming` = %s WHERE `platform` = %s AND `user_id` = %s AND `beta` = %s"
-        async with self.bot.db_query(
+        async with self.bot.db_main.write(
             query, (is_streaming, platform, user_id, self.bot.beta), returnrowcount=True
         ) as query_result:
             return query_result > 0
@@ -103,13 +103,13 @@ class Twitch(commands.Cog):
     async def db_get_streamer_status(self, platform: PlatformId, user_id: str) -> bool | None:
         "Get the streaming status of a streamer"
         query = "SELECT `is_streaming` FROM `streamers` WHERE `platform` = %s AND `user_id` = %s AND `beta` = %s LIMIT 1"
-        async with self.bot.db_query(query, (platform, user_id, self.bot.beta), astuple=True) as query_result:
+        async with self.bot.db_main.read(query, (platform, user_id, self.bot.beta), astuple=True) as query_result:
             return query_result[0][0] if query_result else None
 
     async def db_get_streamer_name(self, platform: PlatformId, user_id: str) -> str | None:
         "Get the last known name of a streamer from its ID and platform"
         query = "SELECT `user_name` FROM `streamers` WHERE `platform` = %s AND `user_id` = %s AND `beta` = %s LIMIT 1"
-        async with self.bot.db_query(query, (platform, user_id, self.bot.beta), astuple=True) as query_result:
+        async with self.bot.db_main.read(query, (platform, user_id, self.bot.beta), astuple=True) as query_result:
             return query_result[0][0] if query_result else None
 
     twitch_main = app_commands.Group(

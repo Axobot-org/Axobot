@@ -98,7 +98,7 @@ class Cases(commands.Cog):
         if not self.bot.database_online:
             return []
         query = f"SELECT * FROM `{self.table}` WHERE `guild` = %s AND `user` = %s"
-        async with self.bot.db_query(query, (guild_id, user_id)) as query_results:
+        async with self.bot.db_main.read(query, (guild_id, user_id)) as query_results:
             return [await self._convert_db_row_to_case(row) for row in query_results]
 
     async def db_get_all_user_cases(self, user_id: int) -> list[Case]:
@@ -106,7 +106,7 @@ class Cases(commands.Cog):
         if not self.bot.database_online:
             return []
         query = f"SELECT * FROM `{self.table}` WHERE `user` = %s"
-        async with self.bot.db_query(query, (user_id,)) as query_results:
+        async with self.bot.db_main.read(query, (user_id,)) as query_results:
             return [await self._convert_db_row_to_case(row) for row in query_results]
 
     async def db_get_case_from_id(self, guild_id: int, case_id: int):
@@ -114,7 +114,7 @@ class Cases(commands.Cog):
         if not self.bot.database_online:
             return None
         query = f"SELECT * FROM `{self.table}` WHERE `guild` = %s AND `ID` = %s"
-        async with self.bot.db_query(query, (guild_id, case_id)) as query_results:
+        async with self.bot.db_main.read(query, (guild_id, case_id)) as query_results:
             if len(query_results) == 1:
                 return await self._convert_db_row_to_case(query_results[0])
         return None
@@ -125,7 +125,7 @@ class Cases(commands.Cog):
             return 0
         try:
             query = f"SELECT COUNT(*) as count FROM `{self.table}` WHERE `user` = %s AND `guild` = %s AND `type` <> 'unban'"
-            async with self.bot.db_query(query, (user_id, guild_id), fetchone=True) as query_results:
+            async with self.bot.db_main.read(query, (user_id, guild_id), fetchone=True) as query_results:
                 if len(query_results) == 1:
                     return query_results["count"]
         except Exception as err:
@@ -139,7 +139,7 @@ class Cases(commands.Cog):
         if not isinstance(case_id, int):
             raise ValueError
         query = f"DELETE FROM `{self.table}` WHERE `ID` = %s"
-        async with self.bot.db_query(query, (case_id,)):
+        async with self.bot.db_main.write(query, (case_id,)):
             pass
         return True
 
@@ -154,7 +154,7 @@ VALUES (%(g)s, %(u)s, %(t)s, %(m)s, %(r)s, %(d)s)"
         query_args = {
             'g': case.guild_id, 'u': case.user_id, 't': case.type, 'm': case.mod_id, 'r': case.reason, 'd': case.duration
             }
-        async with self.bot.db_query(query, query_args) as last_row_id:
+        async with self.bot.db_main.write(query, query_args) as last_row_id:
             case.id = last_row_id
         return True
 
@@ -163,7 +163,7 @@ VALUES (%(g)s, %(u)s, %(t)s, %(m)s, %(r)s, %(d)s)"
         if not self.bot.database_online:
             return False
         query = f"UPDATE `{self.table}` SET `reason` = %s WHERE `ID` = %s"
-        async with self.bot.db_query(query, (new_reason, case_id)):
+        async with self.bot.db_main.write(query, (new_reason, case_id)):
             pass
         return True
 

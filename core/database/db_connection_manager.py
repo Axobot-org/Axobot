@@ -14,6 +14,7 @@ class ConnectionDetails(NamedTuple):
     cnx: MySQLConnection
     creation: int
 
+
 class DatabaseConnectionManager:
     "Handles all database connections."
 

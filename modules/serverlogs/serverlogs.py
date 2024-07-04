@@ -66,7 +66,7 @@ class ServerLogs(commands.Cog):
         if use_cache and (cached := self.cache.get(guild_id)) and channel_id in cached:
             return cached[channel_id]
         query = "SELECT kind FROM serverlogs WHERE guild = %s AND channel = %s AND beta = %s"
-        async with self.bot.db_query(query, (guild_id, channel_id, self.bot.beta)) as query_results:
+        async with self.bot.db_main.read(query, (guild_id, channel_id, self.bot.beta)) as query_results:
             return [row["kind"] for row in query_results]
 
     async def db_get_from_guild(self, guild_id: int, use_cache: bool=True) -> dict[int, list[str]]:
@@ -75,7 +75,7 @@ class ServerLogs(commands.Cog):
         if use_cache and (cached := self.cache.get(guild_id)):
             return cached
         query = "SELECT channel, kind FROM serverlogs WHERE guild = %s AND beta = %s"
-        async with self.bot.db_query(query, (guild_id, self.bot.beta)) as query_results:
+        async with self.bot.db_main.read(query, (guild_id, self.bot.beta)) as query_results:
             res = {}
             for row in query_results:
                 res[row["channel"]] = res.get(row["channel"], []) + [row["kind"]]
@@ -86,7 +86,7 @@ class ServerLogs(commands.Cog):
         "Add logs to a channel"
         query = "INSERT INTO serverlogs (guild, channel, kind, beta) VALUES (%(g)s, %(c)s, %(k)s, %(b)s) "\
             "ON DUPLICATE KEY UPDATE guild=%(g)s"
-        async with self.bot.db_query(query, {'g': guild_id, 'c': channel_id, 'k': kind, 'b': self.bot.beta}) as query_result:
+        async with self.bot.db_main.write(query, {'g': guild_id, 'c': channel_id, 'k': kind, 'b': self.bot.beta}) as query_result:
             if query_result > 0 and guild_id in self.cache:
                 if channel_id in self.cache[guild_id]:
                     self.cache[guild_id][channel_id].append(kind)
@@ -97,7 +97,9 @@ class ServerLogs(commands.Cog):
     async def db_remove(self, guild_id: int, channel_id: int, kind: str) -> bool:
         "Remove logs from a channel"
         query = "DELETE FROM serverlogs WHERE guild = %s AND channel = %s AND kind = %s AND beta = %s"
-        async with self.bot.db_query(query, (guild_id, channel_id, kind, self.bot.beta), returnrowcount=True) as query_result:
+        async with self.bot.db_main.write(
+            query, (guild_id, channel_id, kind, self.bot.beta), returnrowcount=True
+        ) as query_result:
             if query_result > 0 and guild_id in self.cache:
                 if channel_id in self.cache[guild_id]:
                     self.cache[guild_id][channel_id] = [x for x in self.cache[guild_id][channel_id] if x != kind]

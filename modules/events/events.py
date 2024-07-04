@@ -7,6 +7,7 @@ import time
 import aiohttp
 import discord
 from discord.ext import commands, tasks
+from mysql.connector.errors import IntegrityError
 
 from core.bot_classes import SUPPORT_GUILD_ID, Axobot
 
@@ -58,7 +59,10 @@ class Events(commands.Cog):
         "Send a first log on connect"
         if self.bot.database_online:
             await asyncio.sleep(0.1)
-            await self.send_sql_statslogs()
+            try:
+                await self.send_sql_statslogs()
+            except Exception as err:
+                self.bot.dispatch("error", err)
 
     @commands.Cog.listener()
     async def on_guild_join(self, guild: discord.Guild):
@@ -317,9 +321,9 @@ class Events(commands.Cog):
             return
         rss_feeds = await self.bot.get_cog("Rss").db_get_raws_count(get_disabled=True)
         active_rss_feeds = await self.bot.get_cog("Rss").db_get_raws_count()
-        if infoCog := self.bot.get_cog("BotInfo"):
-            member_count, bot_count = infoCog.get_users_nber([])
-            codelines: int = infoCog.codelines
+        if info_cog := self.bot.get_cog("BotInfo"):
+            member_count, bot_count = info_cog.get_users_nber([])
+            codelines: int = info_cog.codelines
         else:
             member_count = len(self.bot.users)
             bot_count = len([1 for x in self.bot.users if x.bot])
@@ -345,8 +349,10 @@ class Events(commands.Cog):
             self.bot.entity_id,
         )
         try:
-            async with self.bot.db_query(query, data):
+            async with self.bot.db_main.write(query, data):
                 pass
+        except IntegrityError: # Duplicate entry
+            pass
         except Exception as err:
             await self.bot.get_cog("Errors").senf_err_msg(query)
             raise err

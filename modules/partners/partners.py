@@ -113,13 +113,13 @@ class Partners(commands.Cog):
     async def db_get_partner(self, partner_id: int, guild_id: int) -> dict | None:
         """Return a partner based on its ID"""
         query = f"SELECT * FROM `{self.table}` WHERE `ID` = %s AND `guild` = %s"
-        async with self.bot.db_query(query, (partner_id, guild_id), fetchone=True) as query_result:
+        async with self.bot.db_main.read(query, (partner_id, guild_id), fetchone=True) as query_result:
             return query_result
 
     async def db_get_partners_of_guild(self, guild_id: int):
         """Return every partners of a guild"""
         query = f"SELECT * FROM `{self.table}` WHERE `guild` = %s"
-        async with self.bot.db_query(query, (guild_id, )) as query_results:
+        async with self.bot.db_main.read(query, (guild_id, )) as query_results:
             results = list(query_results)
         return results
 
@@ -130,7 +130,7 @@ class Partners(commands.Cog):
         condition = " OR ".join(["`target` = %s" for _ in invites])
         params = [invite.code for invite in invites]
         query = f"SELECT * FROM `{self.table}` WHERE `type`='guild' AND ({condition})"
-        async with self.bot.db_query(query, params) as query_results:
+        async with self.bot.db_main.read(query, params) as query_results:
             results = list(query_results)
         return results
 
@@ -140,7 +140,7 @@ class Partners(commands.Cog):
         query = f"INSERT INTO `{self.table}` (`ID`, `guild`, `messageId`, `target`, `type`, `description`) \
             VALUES (%(i)s, %(g)s, %(m)s, %(ta)s, %(ty)s, %(d)s);"
         params = { 'i': new_id, 'g': guild_id, 'm': 0, 'ta': partner_id, 'ty': partner_type, 'd': desc }
-        async with self.bot.db_query(query, params):
+        async with self.bot.db_main.write(query, params):
             pass
         return True
 
@@ -159,7 +159,7 @@ class Partners(commands.Cog):
                 values.append("`messageID` = %(msg)s")
                 params["msg"] = msg
             query = f"UPDATE `{self.table}` SET {', '.join(values)} WHERE `ID` = %(id)s;"
-            async with self.bot.db_query(query, params):
+            async with self.bot.db_main.write(query, params):
                 pass
             return True
         except Exception as err:
@@ -169,7 +169,7 @@ class Partners(commands.Cog):
     async def db_del_partner(self, partner_id: int):
         """Delete a partner from a guild list"""
         query = f"DELETE FROM `{self.table}` WHERE `ID` = %s"
-        async with self.bot.db_query(query, (partner_id,)):
+        async with self.bot.db_main.write(query, (partner_id,)):
             pass
         return True
 
@@ -180,7 +180,7 @@ class Partners(commands.Cog):
         elif bot_id == 155149108183695360:
             bot_id = 161660517914509312
         query = "SELECT server_count FROM `statsbot`.`biggest_bots` WHERE bot_id = %s ORDER BY `date` DESC LIMIT 1"
-        async with self.bot.db_query(query, (bot_id,), fetchone=True) as query_results:
+        async with self.bot.db_main.read(query, (bot_id,), fetchone=True) as query_results:
             if query_results:
                 return query_results["server_count"]
         return None
