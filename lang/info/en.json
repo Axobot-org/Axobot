@@ -167,7 +167,6 @@
         "normal": ":ping_pong:  Pong!\nBot ping: %{bot}ms\nDiscord ping: %{api}ms",
         "pig": ":pig:  Groink!\nBot ping: %{bot}ms\nDiscord ping: %{api}ms"
     },
-    "prefix": "List of currently usable prefixes:",
     "stats": {
         "api_ping": "**API latency:** %{v} ms",
         "bot_version": "**Bot version:** %{v}",

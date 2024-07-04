@@ -167,7 +167,6 @@
         "normal": ":ping_pong:  Pong !\nLatence du bot : %{bot}ms\nLatence de l'API Discord : %{api}ms",
         "pig": ":pig:  Groink !\nLatence du bot : %{bot}ms\nLatence de l'API Discord : %{api}ms"
     },
-    "prefix": "Liste des préfixes actuellement utilisables :",
     "stats": {
         "api_ping": "**Temps de latence de l'api :** %{v} ms",
         "bot_version": "**Version du bot :** %{v}",

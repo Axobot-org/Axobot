@@ -39,7 +39,7 @@ Modify
 
 This subcommand allows you to modify the value of an option. Just enter the exact name of the option and its value. A validation message will then be sent if the request has been correctly executed.
 
-If the value contains several objects, such as a list of roles or channels, they must be separated by spaces, like this: :code:`config set noxp_channels general #commands`. Please note that not all configurations support multiple values (for example, it is not possible to have multiple prefixes).
+If the value contains several objects, such as a list of roles or channels, they must be separated by spaces, like this: :code:`config set noxp_channels general #commands`. Please note that not all configurations support multiple values (for example, it is not possible to have multiple levelup channels).
 
 .. note:: When the value takes the form of roles, for more comfort you are not obliged to mention them: the exact name (as long as it doesn't contain spaces) or the identifier of the role is enough. The same goes for channels or emojis.
 
@@ -81,7 +81,6 @@ List of every option
 * partner_color: The color of the partners embeds. Can be hex, integer or common english names. Default to #a713fe.
 * partner_role: A role given to every administrator of a partner server. Default to None.
 * poll_channels: List of channels in which the bot will add the reactions 👍 and 👎 to each message
-* prefix: Character string that will be the bot prefix, for all commands, beginning with the validation message. The prefix must be between 1 and 5 characters long. By default, :code:`!`.
 * private_leaderboard: Allow non-members to see your server XP leaderboard on our website. Default to False.
 * rank_in_dm: Boolean indicating whether the rank command message should be sent as a private message or not. If the value is set to :code:`True`, the message will be sent in DM or as an ephemeral message.
 * ttt_emojis: List of emojis used to play on tic-tac-toe. Two emojis must be entered: one for the bot, and one for the player. Discord emojis as well as server emojis can work.
