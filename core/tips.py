@@ -151,11 +151,18 @@ class TipsManager:
             description=text,
             color=discord.Color.blurple(),
         )
+        args = {"embed": embed}
         if ephemeral is not None:
-            await ctx.send(embed=embed, ephemeral=ephemeral)
+            args["ephemeral"] = ephemeral
+        if isinstance(ctx, discord.Interaction):
+            if ctx.response.is_done():
+                await ctx.followup.send(**args)
+            else:
+                await ctx.response.send_message(**args)
+            await self.db_register_user_tip(ctx.user.id, tip)
         else:
-            await ctx.send(embed=embed)
-        await self.db_register_user_tip(ctx.author.id, tip)
+            await ctx.send(**args)
+            await self.db_register_user_tip(ctx.author.id, tip)
 
     async def send_guild_tip(self, ctx: Union["MyContext", discord.Interaction], tip: GuildTip, **variables: dict[str, str]):
         "Send a tip into a guild"
