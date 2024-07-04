@@ -45,7 +45,6 @@ class Info(commands.Cog):
         return interaction.user.guild_permissions.manage_guild
 
     @app_commands.command(name="info")
-    @app_commands.check(checks.bot_can_embed)
     @app_commands.describe(
         query="A name, mention or ID",
         query_type="The type of the item to look for"

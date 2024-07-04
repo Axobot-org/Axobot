@@ -10,10 +10,6 @@
         "users-info": "Users information"
     },
     "check-desc": {
-        "bot_can_embed": [
-            "Bot has the permission to send embeds",
-            "You must allow the bot to send embeds"
-        ],
         "bot_has_permissions": [
             "The bot has sufficient permissions",
             "The bot does not have sufficient permissions"
@@ -34,42 +30,6 @@
             "Can only be used in a server",
             "Can only be used in a server"
         ],
-        "has_admin": [
-            "You have 'Administrator' permission",
-            "'Administrator' permission is required"
-        ],
-        "has_audit_logs": [
-            "You have the 'View Audit Logs' permission",
-            "'View Audit Logs' permission missing"
-        ],
-        "has_embed_links": [
-            "You have the 'Embed links' permission",
-            "You need to have 'Embed links' permission"
-        ],
-        "has_manage_channels": [
-            "You have the 'Manage channels' permissions",
-            "'Manage channels' permission missing"
-        ],
-        "has_manage_expressions": [
-            "You have the 'Manage expressions' permission",
-            "You need to have the 'Manage expressions' permission"
-        ],
-        "has_manage_guild": [
-            "You have 'Manage Server' permission",
-            "'Manage Server' permission missing"
-        ],
-        "has_manage_msg": [
-            "You have 'Manage Messages' permission",
-            "'Manage Messages' permission missing"
-        ],
-        "has_manage_nicknames": [
-            "You have 'Manage Nicknames' permission",
-            "'Manage Nicknames' permission missing"
-        ],
-        "has_manage_roles": [
-            "You have 'Manage Roles' permission",
-            "'Manage Roles' permission missing"
-        ],
         "has_permissions": [
             "You have the sufficient Discord permissions",
             "You do not have the right Discord permissions"
@@ -85,10 +45,6 @@
         "is_bot_admin": [
             "You need to be one of the bot Admins",
             "You are not a bot Admin"
-        ],
-        "is_fun_enabled": [
-            "Fun commands are enabled",
-            "Fun commands must be enabled"
         ],
         "is_halloween": [
             "The Halloween event is underway, enjoy it!",
