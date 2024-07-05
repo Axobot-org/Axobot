@@ -10,7 +10,7 @@ from core.bot_classes import Axobot
 
 from .model import AntiScamAgent, Message
 from .model.classes import (EMBED_COLORS, MsgReportView, PredictionResult,
-                            get_avg_word_len, get_caps_count,
+                            get_avg_word_len, get_caps_frequency,
                             get_max_frequency, get_mentions_count,
                             get_punctuation_count)
 from .model.normalization import normalize
@@ -141,30 +141,27 @@ class AntiScam(commands.Cog):
             messages: list[dict[str, typing.Any]] = query_result
 
         counter = 0
-        cursor = self.bot.cnx_axobot.cursor()
-        for msg in messages:
-            mentions_count = msg["mentions_count"] if msg["mentions_count"] > 0 else get_mentions_count(msg["message"])
-            normd_msg = normalize(msg["message"])
-            edits = {
-                "normd_message": normd_msg,
-                "url_score": check_message(msg["message"], self.agent.websites_list),
-                "mentions_count": mentions_count,
-                "max_frequency": get_max_frequency(msg["message"]),
-                "punctuation_count": get_punctuation_count(msg["message"]),
-                "caps_percentage": round(get_caps_count(msg["message"])/len(msg["message"]), 5),
-                "avg_word_len": round(get_avg_word_len(normd_msg), 3)
-            }
-            if all(value == msg[k] for k, value in edits.items()):
-                # avoid updating rows with no new information
-                continue
-            edits = {k: v for k, v in edits.items() if v != msg[k]}
-            counter += 1
-            query = f"UPDATE `spam-detection`.`{table}` SET {', '.join(f'{k}=%s' for k in edits)} WHERE id=%s"
-            params = list(edits.values()) + [msg["id"]]
-            # print(cur.mogrify(query, params))
-            cursor.execute(query, params)
-        self.bot.cnx_axobot.commit()
-        cursor.close()
+        async with self.bot.db_main.multi() as db:
+            for msg in messages:
+                mentions_count = msg["mentions_count"] if msg["mentions_count"] > 0 else get_mentions_count(msg["message"])
+                normd_msg = normalize(msg["message"])
+                edits = {
+                    "normd_message": normd_msg,
+                    "url_score": check_message(msg["message"], self.agent.websites_list),
+                    "mentions_count": mentions_count,
+                    "max_frequency": get_max_frequency(msg["message"]),
+                    "punctuation_count": get_punctuation_count(msg["message"]),
+                    "caps_percentage": get_caps_frequency(msg["message"]),
+                    "avg_word_len": get_avg_word_len(normd_msg)
+                }
+                if all(value == msg[k] for k, value in edits.items()):
+                    # avoid updating rows with no new information
+                    continue
+                edits = {k: v for k, v in edits.items() if v != msg[k]}
+                counter += 1
+                query = f"UPDATE `spam-detection`.`{table}` SET {', '.join(f'{k}=%s' for k in edits)} WHERE id=%s"
+                params = list(edits.values()) + [msg["id"]]
+                await db.write(query, params)
         return counter
 
     async def create_embed(self, msg: Message, author: discord.User, row_id: int, status: str, predicted: PredictionResult):
