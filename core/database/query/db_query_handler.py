@@ -1,5 +1,6 @@
 from typing import TYPE_CHECKING, Literal
 
+from .db_multi_query import DatabaseMutliQueries
 from .db_read_query import DatabaseReadQuery
 from .db_write_query import DatabaseWriteQuery
 
@@ -21,17 +22,25 @@ class DatabaseQueryHandler:
             raise ValueError(f"Expected read query, but received {truncate_query(query)}")
         return DatabaseReadQuery(self.bot, cnx, query, args, fetchone, astuple)
 
-    def write(self,  query: str, args: tuple | dict | None = None, multi: bool = False, returnrowcount: bool = False):
+    def write(self, query: str, args: tuple | dict | None = None, multi: bool = False, returnrowcount: bool = False):
         "Perform a write query to the database"
         cnx = self.bot.db.get_connection(self.database)
         if query_type(query) != "write":
             raise ValueError(f"Expected write query, but received {truncate_query(query)}")
         return DatabaseWriteQuery(self.bot, cnx, query, args, multi, returnrowcount)
 
+    def multi(self):
+        "Create a context manager to execute multiple write queries on the same connection"
+        cnx = self.bot.db.get_connection(self.database)
+        return DatabaseMutliQueries(self.bot, cnx)
+
 
 def query_type(query: str) -> Literal["read", "write"]:
     "Determine the type of given query"
-    first_word = query.strip().split()[0].lower()
+    query = query.strip().lower().replace("\n", '')
+    if query.startswith("set "):
+        query = ';'.join(query.split(';')[1:])
+    first_word = query.split()[0]
     if first_word in ("select", "show", "describe"):
         return "read"
     if first_word in ("insert", "update", "delete", "create", "alter", "drop"):
