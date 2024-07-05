@@ -414,7 +414,7 @@ class ServerConfig(commands.Cog):
         await confirm_view.wait()
         if confirm_view.response_interaction:
             interaction = confirm_view.response_interaction
-            interaction.response.defer()
+            await interaction.response.defer()
         await confirm_view.disable(interaction)
         if not confirm_view.value:
             return
