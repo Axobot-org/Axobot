@@ -1,7 +1,7 @@
 import datetime
 import sys
 import time
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from mysql.connector import errors
 from mysql.connector.connection import MySQLConnection
@@ -12,6 +12,7 @@ from core.database.query.db_abstract_query import DatabaseAbstractQuery
 if TYPE_CHECKING:
     from core.bot_classes.axobot import Axobot
 
+RowType = tuple | dict[str, Any]
 
 class DatabaseReadQuery(DatabaseAbstractQuery):
     "Represents a context manager to execute a SELECT or SHOW query to a database"
@@ -22,7 +23,7 @@ class DatabaseReadQuery(DatabaseAbstractQuery):
         self.fetchone = fetchone
         self.astuple = astuple
 
-    async def __aenter__(self) -> tuple | dict | None:
+    async def __aenter__(self) -> list[RowType] | RowType | None:
         self.cursor = self.cnx.cursor(
             dictionary=(not self.astuple)
         )
