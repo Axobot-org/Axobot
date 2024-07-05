@@ -83,8 +83,12 @@ class BotInfo(commands.Cog):
     async def stats_general(self, interaction: discord.Interaction):
         "General statistics about the bot"
         await interaction.response.defer()
+        # Bot version
+        bot_version = f"[{self.bot_version}]({self.bot.doc_url}changelog.html#v{self.bot_version.replace('.', '-').rstrip('a')})"
+        # Python version
         python_version = sys.version_info
         f_python_version = str(python_version.major)+"."+str(python_version.minor)
+        # API ping
         latency = round(self.bot.latency*1000, 2)
         # RAM/CPU
         ram_usage = round(self.process.memory_info()[0]/2.**30,3)
@@ -119,7 +123,7 @@ class BotInfo(commands.Cog):
         # Generating message
         desc = ""
         for key, var in [
-            ("bot_version", self.bot_version),
+            ("bot_version", bot_version),
             ("servers_count", await n_format(len_servers)),
             ("users_count", (await n_format(users), await n_format(bots))),
             ("codes_lines", await n_format(self.codelines)),
