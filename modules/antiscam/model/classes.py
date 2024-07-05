@@ -9,30 +9,35 @@ from .similarities import check_message
 
 
 def get_mentions_count(msg: str):
+    "Returns the number of user mentions in the message."
     return len(re.findall(r"<@!?\d{15,}>", msg))
 
 def get_max_frequency(msg: str):
+    "Returns the frequency of the most common character in the message, between 0 and 1, rounded to 4 decimals."
     counter = Counter(msg.replace(' ', '').lower())
     s = sum(counter.values())
-    return round(max(v/s for v in counter.values()), 4)
+    return round(max(v/s for v in counter.values()), 5)
 
 def get_punctuation_count(msg: str):
+    "Returns the number of punctuation characters in the message."
     counter = 0
     for c in msg:
         if c in {'.', '!', '?'}:
             counter += 1
     return counter
 
-def get_caps_count(msg: str):
+def get_caps_frequency(msg: str):
+    "Returns the percentage of uppercase characters in the message, between 0 and 1."
     counter = 0
     for c in msg:
         if c != c.lower():
             counter += 1
-    return counter
+    return round(counter / len(msg), 5)
 
 def get_avg_word_len(msg: str):
+    "Returns the average length of words in the message."
     lengths = [len(word) for word in msg.split(' ')]
-    return sum(lengths) / len(lengths)
+    return round(sum(lengths) / len(lengths), 5)
 
 EMBED_COLORS = {
     "pending": "#000",
@@ -47,7 +52,8 @@ EMBED_COLORS = {
 class Message:
     "Represents a potentially malicious message"
 
-    def __init__(self, message: str, normd_message: str, contains_everyone: bool, url_score: int, mentions_count: int, max_frequency: float, punctuation_count: int, caps_percentage: float, avg_word_len: float, category: int):
+    def __init__(self, message: str, normd_message: str, contains_everyone: bool, url_score: int, mentions_count: int,
+                 max_frequency: float, punctuation_count: int, caps_percentage: float, avg_word_len: float, category: int):
         self.message = message
         self.normd_message = normd_message
         self.contains_everyone = contains_everyone
@@ -61,14 +67,16 @@ class Message:
 
     @classmethod
     def from_raw(cls, raw_message: str, mentions_count: int, websites_reference: dict[str, bool]):
+        "Create a Message instance from a string"
         normd_message = normalize(raw_message)
         contains_everyone = "@everyone" in raw_message
         url_score = check_message(raw_message, websites_reference)
         max_frequency = get_max_frequency(raw_message)
         punctuation_count = get_punctuation_count(raw_message)
-        caps_percentage = get_caps_count(raw_message)/len(raw_message)
+        caps_percentage = get_caps_frequency(raw_message)
         avg_word_len = get_avg_word_len(normd_message)
-        return cls(raw_message, normd_message, contains_everyone, url_score, mentions_count, max_frequency, punctuation_count, caps_percentage, avg_word_len, 0)
+        return cls(raw_message, normd_message, contains_everyone, url_score, mentions_count, max_frequency, punctuation_count,
+                   caps_percentage, avg_word_len, 0)
 
     def to_dict(self):
         return {
