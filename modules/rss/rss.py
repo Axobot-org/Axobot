@@ -605,6 +605,8 @@ class Rss(commands.Cog):
             # formatted channel
             if channel := guild.get_channel_or_thread(feed.channel_id):
                 tr_channel = '#' + channel.name
+                if len(tr_channel) > 25:
+                    tr_channel = tr_channel[:25] + '…'
             else:
                 tr_channel = "#deleted"
             # better name format (for Twitter/YouTube ID)
