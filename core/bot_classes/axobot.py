@@ -118,6 +118,14 @@ class Axobot(commands.bot.AutoShardedBot):
                 self.log.warning("[current_event_data] %s", err, exc_info=True)
         return None
 
+    @property
+    def doc_url(self):
+        return (
+            "https://axobot.readthedocs.io/en/latest/",
+            "https://axobot.readthedocs.io/en/develop/",
+            "https://axobot.readthedocs.io/en/latest/",
+        )[self.entity_id]
+
     # pylint: disable=arguments-differ
     async def get_context(self, source: discord.Message, *, cls=MyContext) -> MyContext:
         """Get a custom context class when creating one from a message"""
