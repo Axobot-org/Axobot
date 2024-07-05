@@ -436,7 +436,7 @@ class ServerConfig(commands.Cog):
         """Get the list of every usable option"""
         options = sorted(options_list.keys())
         txt = "\n```\n- {}\n```\n".format("\n- ".join(options))
-        link = "<https://axobot.readthedocs.io/en/latest/server.html#list-of-every-option>"
+        link = f"<https://{self.bot.doc_url}server.html#list-of-every-option>"
         await interaction.response.send_message(
             await self.bot._(interaction, "server.config-list", text=txt, link=link),
             ephemeral=True

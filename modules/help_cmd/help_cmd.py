@@ -29,14 +29,6 @@ class Help(commands.Cog):
         with open(json_path, 'r', encoding="utf-8") as file:
             self.commands_data: dict[str, CommandsCategoryData] = json.load(file)
 
-    @property
-    def doc_url(self):
-        return (
-            "https://axobot.readthedocs.io/en/main/",
-            "https://axobot.readthedocs.io/en/develop/",
-            "https://axobot.readthedocs.io/en/latest/",
-        )[self.bot.entity_id]
-
     async def cog_unload(self):
         self.bot.remove_command("help")
         self.bot.add_command(self.old_cmd)

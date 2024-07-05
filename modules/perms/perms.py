@@ -124,7 +124,7 @@ class Perms(commands.Cog):
             embed.add_field(name=self.bot.zws, value=paragraph)
 
         _whatisthat = await self.bot._(interaction, "permissions.whatisthat")
-        embed.add_field(name=self.bot.zws, value=f"[{_whatisthat}](https://axobot.readthedocs.io/en/latest/perms.html)",
+        embed.add_field(name=self.bot.zws, value=f"[{_whatisthat}]({self.bot.doc_url}perms.html)",
                         inline=False)
         embed.set_author(name=name, icon_url=avatar)
         await interaction.followup.send(embed=embed)
