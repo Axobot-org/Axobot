@@ -1,7 +1,7 @@
 import json
 import re
 from difflib import SequenceMatcher
-from typing import Any
+from typing import Any, Awaitable, Callable
 
 import aiohttp
 import discord
@@ -47,15 +47,12 @@ class MCServer:
         self.desc = re.sub(r"[ \t\r]{2,}", ' ', self.desc).strip()
         return self
 
-    async def create_msg(self, source: discord.Interaction | discord.Guild, translate):
+    async def create_msg(self, source: discord.Interaction | discord.Guild, translate: Callable[[Any, str], Awaitable[str]]):
         "Create a Discord embed from the saved data"
-        if self.players == []:
-            if self.online_players == 0:
-                p = [str(await translate(source, "misc.none")).capitalize()]
-            else:
-                p: list[str] = [await translate(source, "minecraft.no-player-list")]
+        if self.players == [] and self.online_players != 0:
+            players = [await translate(source, "minecraft.no-player-list")]
         else:
-            p = self.players
+            players = [discord.utils.escape_markdown(name) for name in self.players]
         embed = discord.Embed(
             title=await translate(source, "minecraft.serv-title", ip=self.ip),
             color=discord.Colour(0x417505),
@@ -68,10 +65,10 @@ class MCServer:
             name=await translate(source, "minecraft.server.players-count"),
             value=f"{self.online_players}/{self.max_players}"
         )
-        if len(p) > 20:
-            embed.add_field(name=await translate(source, "minecraft.server.players-list-20"), value=", ".join(p[:20]))
-        else:
-            embed.add_field(name=await translate(source, "minecraft.server.players-list-all"), value=", ".join(p))
+        if len(players) > 20:
+            embed.add_field(name=await translate(source, "minecraft.server.players-list-20"), value=", ".join(players[:20]))
+        elif players:
+            embed.add_field(name=await translate(source, "minecraft.server.players-list-all"), value=", ".join(players))
         if self.ping is not None:
             embed.add_field(name=await translate(source, "minecraft.server.latency"), value=f"{self.ping:.0f} ms")
         if self.desc:
