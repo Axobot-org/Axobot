@@ -2,7 +2,6 @@ import logging
 import math
 import re
 import subprocess
-import time
 from collections import defaultdict
 from datetime import datetime
 from typing import Any, TypedDict
@@ -62,10 +61,11 @@ class BotStats(commands.Cog):
         self.antiscam = {"warning": 0, "deletion": 0}
         self.ticket_events = {"creation": 0}
         self.emitted_serverlogs: dict[str, int] = {}
-        self.serverlogs_audit_search: tuple[int, int] | None = None
+        self.emojis_usage: dict[int, int] = defaultdict(int)
         self.last_backup_size: int | None = None
         self.open_files: dict[str, int] = defaultdict(int)
         self.role_reactions = {"added": 0, "removed": 0}
+        self.serverlogs_audit_search: tuple[int, int] | None = None
         self.snooze_events: dict[tuple[int, int], int] = defaultdict(int)
         self.stream_events: dict[str, int] = defaultdict(int)
         self.voice_transcript_events: dict[tuple[float, float], int] = defaultdict(int)
@@ -78,6 +78,7 @@ class BotStats(commands.Cog):
         self.record_open_files.start()
         self.status_loop.start()
         self.heartbeat_loop.start()
+        self.emojis_loop.start()
 
     async def cog_unload(self):
         # pylint: disable=no-member
@@ -87,6 +88,7 @@ class BotStats(commands.Cog):
         self.record_open_files.cancel()
         self.status_loop.stop()
         self.heartbeat_loop.stop()
+        self.emojis_loop.stop()
 
     @property
     def emoji_table(self):
@@ -398,15 +400,8 @@ class BotStats(commands.Cog):
             ctx = await self.bot.get_context(msg)
             if ctx.command is not None:
                 return
-            liste = list(set(re.findall(r"<a?:[\w-]+:(\d{17,19})>", msg.content)))
-            if len(liste) == 0:
-                return
-            current_timestamp = datetime.fromtimestamp(round(time.time()))
-            query = f"INSERT INTO `{self.emoji_table}` (`ID`,`count`,`last_update`) VALUES (%(i)s, 1, %(l)s) \
-                ON DUPLICATE KEY UPDATE count = `count` + 1, last_update = %(l)s;"
-            for data in [{ 'i': x, 'l': current_timestamp } for x in liste]:
-                async with self.bot.db_main.write(query, data):
-                    pass
+            for emoji_id in set(re.findall(r"<a?:[\w-]+:(\d{17,19})>", msg.content)):
+                self.emojis_usage[int(emoji_id)] += 1
         except Exception as err:
             self.bot.dispatch("error", err)
 
@@ -651,6 +646,28 @@ class BotStats(commands.Cog):
     @heartbeat_loop.error
     async def on_heartbeat_loop_error(self, error: Exception):
         self.bot.dispatch("error", error, "When sending heartbeat to statsbot (<@279568324260528128>)")
+
+    @tasks.loop(seconds=30)
+    async def emojis_loop(self):
+        "Register the emojis usage every 30s"
+        if not self.bot.stats_enabled or not self.emojis_usage:
+            return
+        query = f"INSERT INTO `{self.emoji_table}` (`ID`,`count`,`last_update`) VALUES"
+        args: list[int] = []
+        for emoji_id, count in self.emojis_usage.items():
+            query += " (%s, %s, UTC_TIMESTAMP()),"
+            args.extend((emoji_id, count))
+        query = query[:-1] + " ON DUPLICATE KEY UPDATE count = count + VALUES(count), last_update = UTC_TIMESTAMP();"
+        async with self.bot.db_main.write(query, args):
+            self.emojis_usage.clear()
+
+    @emojis_loop.before_loop
+    async def before_emojis_loop(self):
+        await self.bot.wait_until_ready()
+
+    @emojis_loop.error
+    async def on_emojis_loop_error(self, error: Exception):
+        self.bot.dispatch("error", error, "When sending emojis usage to database")
 
 
 async def setup(bot):
