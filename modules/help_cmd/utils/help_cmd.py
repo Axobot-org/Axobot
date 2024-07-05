@@ -64,7 +64,7 @@ async def _generate_command_fields(cog: "HelpCog", ctx: MyContext, command: comm
         fields.append(warnings_field)
     # Documentation URL
     if doc is not None:
-        doc_url = cog.doc_url + doc
+        doc_url = ctx.bot.doc_url + doc
         fields.append({
             "name": (await ctx.bot._(ctx.channel, "misc.doc")).capitalize(),
             "value": doc_url,
