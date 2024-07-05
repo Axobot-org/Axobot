@@ -8,13 +8,13 @@ import string
 import time
 from collections import defaultdict
 from io import BytesIO
-from typing import Literal
+from typing import Any, Literal
 
 import aiohttp
 import discord
-import mysql
 from discord import app_commands
 from discord.ext import commands, tasks
+from mysql.connector.errors import ProgrammingError as MySQLProgrammingError
 from PIL import Image, ImageFont
 
 from core.bot_classes import Axobot
@@ -359,20 +359,16 @@ class Xp(commands.Cog):
         """Get the table name of a guild, and create one if no one exist"""
         if guild is None:
             return self.table
-        cnx = self.bot.cnx_xp
-        cursor = cnx.cursor()
         try:
-            cursor.execute(f"SELECT 1 FROM `{guild}` LIMIT 1;")
-            return guild
-        except mysql.connector.errors.ProgrammingError:
-            if create_if_missing:
-                cursor.execute(f"CREATE TABLE `{guild}` LIKE `example`;")
-                self.log.info("[get_table] XP Table `%s` created", guild)
-                cursor.execute(f"SELECT 1 FROM `{guild}` LIMIT 1;")
+            async with self.bot.db_xp.read(f"SELECT 1 FROM `{guild}` LIMIT 1;"):
                 return guild
+        except MySQLProgrammingError:
+            if create_if_missing:
+                async with self.bot.db_xp.write(f"CREATE TABLE `{guild}` LIKE `example`;"):
+                    self.log.info("[get_table] XP Table `%s` created", guild)
+                async with self.bot.db_xp.read(f"SELECT 1 FROM `{guild}` LIMIT 1;"):
+                    return guild
             return None
-        finally:
-            cursor.close()
 
 
     async def db_set_xp(self, user_id: int, points: int, action: Literal["add", "set"]="add", guild_id: int | None=None):
@@ -384,18 +380,16 @@ class Xp(commands.Cog):
             if points <= 0:
                 return True
             if guild_id is None:
-                cnx = self.bot.cnx_axobot
+                db = self.bot.db_main
             else:
-                cnx = self.bot.cnx_xp
+                db = self.bot.db_xp
             table = await self.get_table_name(guild_id)
-            cursor = cnx.cursor(dictionary = True)
             if action == "add":
                 query = f"INSERT INTO `{table}` (`userID`,`xp`) VALUES (%(u)s, %(p)s) ON DUPLICATE KEY UPDATE xp = xp + %(p)s;"
             else:
                 query = f"INSERT INTO `{table}` (`userID`,`xp`) VALUES (%(u)s, %(p)s) ON DUPLICATE KEY UPDATE xp = %(p)s;"
-            cursor.execute(query, {'p': points, 'u': user_id})
-            cnx.commit()
-            cursor.close()
+            async with db.write(query, {'p': points, 'u': user_id}):
+                pass
             return True
         except Exception as err:
             self.bot.dispatch("error", err)
@@ -405,17 +399,15 @@ class Xp(commands.Cog):
         "Removes a user from the xp table"
         if not self.bot.database_online:
             await self.bot.unload_module("xp")
-            return None
+            return
         if guild_id is None:
-            cnx = self.bot.cnx_axobot
+            db = self.bot.db_main
         else:
-            cnx = self.bot.cnx_xp
+            db = self.bot.db_xp
         table = await self.get_table_name(guild_id)
-        cursor = cnx.cursor(dictionary=True)
         query = f"DELETE FROM `{table}` WHERE `userID`=%(u)s;"
-        cursor.execute(query, {'u': user_id})
-        cnx.commit()
-        cursor.close()
+        async with db.write(query, {'u': user_id}):
+            pass
 
     async def db_get_xp(self, user_id: int, guild_id: int | None) -> int | None:
         "Get the xp of a user in a guild"
@@ -423,25 +415,23 @@ class Xp(commands.Cog):
             await self.bot.unload_module("xp")
             return None
         if guild_id is None:
-            cnx = self.bot.cnx_axobot
+            db = self.bot.db_main
         else:
-            cnx = self.bot.cnx_xp
+            db = self.bot.db_xp
         table = await self.get_table_name(guild_id, False)
         if table is None:
             return None
         query = f"SELECT `xp` FROM `{table}` WHERE `userID` = %s AND `banned` = 0"
-        cursor = cnx.cursor(dictionary = True)
-        cursor.execute(query, (user_id,))
-        if result := cursor.fetchone():
-            g = "global" if guild_id is None else guild_id
-            if isinstance(g, int) and g not in self.cache:
-                await self.db_load_cache(g)
-            if user_id in self.cache[g].keys():
-                self.cache[g][user_id][1] = result["xp"]
-            else:
-                self.cache[g][user_id] = [round(time.time())-60, result ["xp"]]
-        cursor.close()
-        return result["xp"] if result else None
+        async with db.read(query, (user_id,), fetchone=True) as query_result:
+            if query_result:
+                g = "global" if guild_id is None else guild_id
+                if isinstance(g, int) and g not in self.cache:
+                    await self.db_load_cache(g)
+                if user_id in self.cache[g].keys():
+                    self.cache[g][user_id][1] = query_result["xp"]
+                else:
+                    self.cache[g][user_id] = [round(time.time())-60, query_result ["xp"]]
+        return query_result["xp"] if query_result else None
 
     async def db_get_users_count(self, guild_id: int | None=None):
         """Get the number of ranked users in a guild (or in the global database)"""
@@ -449,20 +439,17 @@ class Xp(commands.Cog):
             await self.bot.unload_module("xp")
             return None
         if guild_id is None:
-            cnx = self.bot.cnx_axobot
+            db = self.bot.db_main
         else:
-            cnx = self.bot.cnx_xp
+            db = self.bot.db_xp
         table = await self.get_table_name(guild_id, False)
         if table is None:
             return 0
         query = f"SELECT COUNT(*) FROM `{table}` WHERE `banned`=0"
-        cursor = cnx.cursor()
-        cursor.execute(query)
-        rows = list(cursor)
-        cursor.close()
-        if rows is not None and len(rows) == 1:
-            return rows[0][0]
-        return 0
+        async with db.read(query, fetchone=True, astuple=True) as query_result:
+            if isinstance(query_result, tuple) and len(query_result) == 1:
+                return query_result[0]
+            return 0
 
     async def db_load_cache(self, guild_id: int | None):
         "Load the XP cache for a given guild (or the global cache)"
@@ -471,7 +458,7 @@ class Xp(commands.Cog):
             return
         if guild_id is None:
             self.log.info("Loading XP cache (global)")
-            cnx = self.bot.cnx_axobot
+            db = self.bot.db_main
             query = f"SELECT `userID`,`xp` FROM `{self.table}` WHERE `banned`=0"
         else:
             self.log.info("Loading XP cache (guild %s)", guild_id)
@@ -479,11 +466,11 @@ class Xp(commands.Cog):
             if table is None:
                 self.cache[guild_id] = {}
                 return
-            cnx = self.bot.cnx_xp
+            db = self.bot.db_xp
             query = f"SELECT `userID`,`xp` FROM `{table}` WHERE `banned`=0"
-        cursor = cnx.cursor(dictionary=True)
-        cursor.execute(query)
-        rows = list(cursor)
+        async with db.read(query) as rows:
+            if not isinstance(rows, list):
+                raise TypeError(f"rows should be a list, received {type(rows)}")
         if guild_id is None:
             self.cache["global"].clear()
             for row in rows:
@@ -493,7 +480,6 @@ class Xp(commands.Cog):
                 self.cache[guild_id] = {}
             for row in rows:
                 self.cache[guild_id][row["userID"]] = [round(time.time())-60, int(row["xp"])]
-        cursor.close()
 
     async def db_get_top(self, limit: int=None, guild: discord.Guild=None):
         "Get the top of the guild (or the global top)"
@@ -502,36 +488,36 @@ class Xp(commands.Cog):
                 await self.bot.unload_module("xp")
                 return None
             if guild is not None and await self.bot.get_config(guild.id, "xp_type") != "global":
-                cnx = self.bot.cnx_xp
+                db = self.bot.db_xp
                 table = await self.get_table_name(guild.id, False)
                 query = f"SELECT * FROM `{table}`ORDER BY `xp` DESC"
             else:
-                cnx = self.bot.cnx_axobot
+                db = self.bot.db_main
                 query = f"SELECT * FROM `{self.table}` ORDER BY `xp` DESC"
-            cursor = cnx.cursor(dictionary = True)
             try:
-                cursor.execute(query)
-            except mysql.connector.errors.ProgrammingError as err:
+                async with db.read(query) as rows:
+                    if not isinstance(rows, list):
+                        raise TypeError(f"rows should be a list, received {type(rows)}")
+            except MySQLProgrammingError as err:
                 if err.errno == 1146:
-                    return list()
+                    return []
                 raise err
-            liste = list()
+            result: list[dict[str, Any]]
             if guild is None:
-                liste = list(cursor)
+                result = rows
                 if limit is not None:
-                    liste = liste[:limit]
+                    result = result[:limit]
             else:
+                result = []
                 ids = [x.id for x in guild.members]
                 i = 0
-                l2 = list(cursor)
                 if limit is None:
-                    limit = len(l2)
-                while len(liste)<limit and i<len(l2):
-                    if l2[i]["userID"] in ids:
-                        liste.append(l2[i])
+                    limit = len(rows)
+                while len(result) < limit and i < len(rows):
+                    if rows[i]["userID"] in ids:
+                        result.append(rows[i])
                     i += 1
-            cursor.close()
-            return liste
+            return result
         except Exception as err:
             self.bot.dispatch("error", err)
 
@@ -542,35 +528,34 @@ class Xp(commands.Cog):
                 await self.bot.unload_module("xp")
                 return None
             if guild is not None and await self.bot.get_config(guild.id, "xp_type") != "global":
-                cnx = self.bot.cnx_xp
+                db = self.bot.db_xp
                 table = await self.get_table_name(guild.id, False)
                 query = f"SELECT `userID`,`xp`, @curRank := @curRank + 1 AS rank FROM `{table}` p, \
                     (SELECT @curRank := 0) r WHERE `banned`='0' ORDER BY xp desc;"
             else:
-                cnx = self.bot.cnx_axobot
+                db = self.bot.db_main
                 query = f"SELECT `userID`,`xp`, @curRank := @curRank + 1 AS rank FROM `{self.table}` p, \
                     (SELECT @curRank := 0) r WHERE `banned`='0' ORDER BY xp desc;"
-            cursor = cnx.cursor(dictionary = True)
             try:
-                cursor.execute(query)
-            except mysql.connector.errors.ProgrammingError as err:
+                async with db.read(query) as rows:
+                    if not isinstance(rows, list):
+                        raise TypeError(f"cursor should be a list, received {type(rows)}")
+            except MySQLProgrammingError as err:
                 if err.errno == 1146:
-                    return {"rank":0, "xp":0}
+                    return {"rank": 0, "xp": 0}
                 raise err
             userdata = {}
             i = 0
             users = set()
             if guild is not None:
                 users = {x.id for x in guild.members}
-            for x in cursor:
-                if (guild is not None and x["userID"] in users) or guild is None:
+            for row in rows:
+                if (guild is not None and row["userID"] in users) or guild is None:
                     i += 1
-                if x["userID"]== user_id:
-                    # x["rank"] = i
-                    userdata = x
+                if row["userID"]== user_id:
+                    userdata = dict(row)
                     userdata["rank"] = round(userdata["rank"])
                     break
-            cursor.close()
             return userdata
         except Exception as err:
             self.bot.dispatch("error", err)
