@@ -1,8 +1,9 @@
 import discord
 import i18n
+from asyncache import cached
+from cachetools import TTLCache
 
 from core.bot_classes import Axobot, MyContext
-from core.serverconfig.options_list import options
 from core.translator import AxobotTranslator
 
 SourceType = (
@@ -26,7 +27,6 @@ class Languages(discord.ext.commands.Cog):
     def __init__(self, bot: Axobot):
         self.bot = bot
         self.file = "languages"
-        self.languages: tuple[str] = options["language"]["values"]
         i18n.set("filename_format", "{locale}.{format}")
         i18n.set("file_format", "json")
         i18n.set("fallback", None)
@@ -42,9 +42,13 @@ class Languages(discord.ext.commands.Cog):
     async def cog_unload(self):
         await self.bot.tree.set_translator(None)
 
-    @property
-    def default_language(self) -> str:
-        return options["language"]["default"]
+    @cached(TTLCache(1, ttl=86_400))
+    async def get_available_languages(self) -> tuple[str]:
+        return (await self.bot.get_options_list())["language"]["values"]
+
+    @cached(TTLCache(1, ttl=86_400))
+    async def get_default_language(self) -> str:
+        return (await self.bot.get_options_list())["language"]["default"]
 
     async def tr(self, source: SourceType, string_id: str, **kwargs):
         """Renvoie le texte en fonction de la langue"""
@@ -77,28 +81,28 @@ class Languages(discord.ext.commands.Cog):
         if isinstance(source, discord.Member | discord.User):
             # get lang from user
             used_langs = await self.bot.get_cog("Utilities").get_languages(source, limit=1)
-            lang_opt = used_langs[0][0] if len(used_langs) > 0 else self.default_language
+            lang_opt = used_langs[0][0] if len(used_langs) > 0 else self.get_default_language()
         elif not self.bot.database_online or source is None:
             # get default lang
-            lang_opt = self.default_language
+            lang_opt = self.get_default_language()
         elif isinstance(source, discord.DMChannel):
             # get lang from DM channel
             recipient = await self.bot.get_recipient(source)
             if recipient is None:
-                lang_opt = self.default_language
+                lang_opt = self.get_default_language()
             else:
                 used_langs = await self.bot.get_cog("Utilities").get_languages(recipient, limit=1)
-                lang_opt = used_langs[0][0] if len(used_langs) > 0 else self.default_language
+                lang_opt = used_langs[0][0] if len(used_langs) > 0 else self.get_default_language()
         elif isinstance(source, int):
             # get lang from server ID
             lang_opt: str = await self.bot.get_config(source, "language")
             if lang_opt is None:
-                lang_opt = self.default_language
+                lang_opt = self.get_default_language()
         else:
             raise TypeError(f"Unknown type for translation source: {type(source)}")
-        if lang_opt not in self.languages:
+        if lang_opt not in await self.get_available_languages():
             # if lang not known: fallback to default
-            lang_opt = self.default_language
+            lang_opt = self.get_default_language()
         return await self._recursive_get_translation(lang_opt, string_id, **kwargs)
 
     async def _recursive_get_translation(self, locale: str, string_id: str, **kwargs):

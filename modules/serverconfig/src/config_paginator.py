@@ -5,7 +5,6 @@ import discord
 
 from core.bot_classes import Axobot
 from core.paginator import Paginator
-from core.serverconfig import options_list as opt_list
 
 from .converters import to_display
 
@@ -16,18 +15,20 @@ class ServerConfigPaginator(Paginator):
     "Allow user to see a server config and navigate into its pages"
 
     def __init__(self, client: Axobot, user: discord.User, stop_label: str, guild: discord.Guild, cog: "ServerConfig"):
-        super().__init__(client, user, stop_label, timeout=10)
+        super().__init__(client, user, stop_label, timeout=120)
         self.guild = guild
         self.cog = cog
-        self.options_list = [option for option, value in opt_list.options.items() if value["is_listed"]]
+        self.options_list: list[str]
         self.server_config: dict[str, Any] = {}
         self.items_per_page = 21
 
     async def send_init(self, ctx: discord.Interaction):
         "Create and send 1st page"
+        options_map = await self.client.get_options_list()
+        self.options_list = sorted(option for option, value in options_map.items() if value["is_listed"])
         full_config = await self.client.get_cog("ServerConfig").get_guild_config(self.guild.id, with_defaults=True)
         for option, value in full_config.items():
-            if option in opt_list.options and opt_list.options[option]["is_listed"]:
+            if option in options_map and options_map[option]["is_listed"]:
                 self.server_config[option] = value
         contents = await self.get_page_content(ctx, 1)
         await self._update_buttons()

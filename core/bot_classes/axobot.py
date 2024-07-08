@@ -5,12 +5,12 @@ from typing import (TYPE_CHECKING, Awaitable, Callable, Literal, Optional,
                     overload)
 
 import discord
+from aiohttp import ClientSession
 from discord.ext import commands
 from mysql.connector.connection import MySQLConnection
 
 from core.database import DatabaseConnectionManager, DatabaseQueryHandler
 from core.emojis_manager import EmojisManager
-from core.serverconfig.options_list import options as options_list
 from core.tasks_handler import TaskHandler
 from core.tips import TipsManager
 from core.tokens import get_secrets_dict
@@ -32,6 +32,7 @@ if TYPE_CHECKING:
     from modules.partners.partners import Partners
     from modules.rss.rss import Rss
     from modules.serverconfig.serverconfig import ServerConfig
+    from modules.serverconfig.src.converters import AllRepresentation
     from modules.twitch.twitch import Twitch
     from modules.users.users import Users
     from modules.xp.xp import Xp
@@ -78,6 +79,7 @@ class Axobot(commands.bot.AutoShardedBot):
         self.task_handler = TaskHandler(self)
         self.emojis_manager = EmojisManager(self)
         self.tips_manager = TipsManager(self)
+        self._options_list: dict[str, "AllRepresentation"] | None = None
         # app commands
         self.tree.on_error = self.on_app_cmd_error
         self.app_commands_list: Optional[list[discord.app_commands.AppCommand]] = None
@@ -125,6 +127,21 @@ class Axobot(commands.bot.AutoShardedBot):
             "https://axobot.readthedocs.io/en/develop/",
             "https://axobot.readthedocs.io/en/latest/",
         )[self.entity_id]
+
+    async def get_options_list(self):
+        "Fetch the list of server config options from the API"
+        if self._options_list is None:
+            url = "https://api-beta.zrunner.me" if self.beta else "https://api.zrunner.me"
+            url += "/discord/default-guild-config"
+            self.log.info("Fetching options list from %s", url)
+            async with ClientSession() as session:
+                async with session.get(url) as response:
+                    response.raise_for_status()
+                    api_result = await response.json()
+            self._options_list = {}
+            for _category, options in api_result.items():
+                self._options_list.update(options)
+        return self._options_list
 
     # pylint: disable=arguments-differ
     async def get_context(self, source: discord.Message, *, cls=MyContext) -> MyContext:
@@ -239,8 +256,8 @@ class Axobot(commands.bot.AutoShardedBot):
                 value = await cog.get_option(guild_id, option)
                 if value is not None:
                     return value
-            return options_list.get(option, {"default": None})["default"]
-        return None
+        options_list = await self.get_options_list()
+        return options_list.get(option, {"default": None})["default"]
 
     async def get_recipient(self, channel: discord.DMChannel) -> discord.User | None:
         """Get the recipient of the given DM channel
