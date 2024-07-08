@@ -749,8 +749,7 @@ class LevelupChannelOption(OptionConverter):
             "allow_announcement_channels": True,
             "allow_non_nsfw_channels": True,
         }
-        ctx = await commands.Context.from_interaction(interaction)
         try:
-            return await TextChannelOption.from_input(raw, channel_repr, guild, ctx)
+            return await TextChannelOption.from_input(raw, channel_repr, guild, interaction)
         except ValueError:
             raise ValueError("Invalid levelup channel option", "LEVELUP_CHANNEL_INVALID", representation) from None
