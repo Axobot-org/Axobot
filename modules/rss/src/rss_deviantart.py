@@ -45,17 +45,10 @@ class DeviantartRSS:
             feed.entries = [entry for entry in feed.entries[:50] if await check_filter(entry, filter_config)]
         return feed
 
-    async def get_last_post(self, channel: discord.TextChannel, username: str,
-                            filter_config: FeedFilterConfig | None,
-                            session: aiohttp.ClientSession | None=  None):
-        "Get the last post from a DeviantArt user"
-        feed = await self._get_feed(username, filter_config, session)
-        if feed is None:
-            return await self.bot._(channel.guild, "rss.nothing")
-        entry = feed.entries[0]
+    async def _parse_entry(self, entry: FeedParserDict, feed: FeedParserDict, url: str, channel: discord.TextChannel):
+        "Parse a feed entry to get the relevant information and return a RssMessage object"
         img_url = entry["media_content"][0]["url"] if "media_content" in entry else None
         title = re.search(r"DeviantArt: ([^ ]+)'s gallery", feed.feed["title"]).group(1)
-        url = "https://www.deviantart.com/" + username
         return RssMessage(
             bot=self.bot,
             feed=FeedObject.unrecorded("deviant", channel.guild.id if channel.guild else None, link=url),
@@ -65,6 +58,17 @@ class DeviantartRSS:
             author=title,
             image=img_url
         )
+
+    async def get_last_post(self, channel: discord.TextChannel, username: str,
+                            filter_config: FeedFilterConfig | None,
+                            session: aiohttp.ClientSession | None=  None):
+        "Get the last post from a DeviantArt user"
+        feed = await self._get_feed(username, filter_config, session)
+        if feed is None:
+            return await self.bot._(channel.guild, "rss.nothing")
+        entry = feed.entries[0]
+        url = "https://www.deviantart.com/" + username
+        return await self._parse_entry(entry, feed, url, channel)
 
     async def get_new_posts(self, channel: discord.TextChannel, username: str, date: dt.datetime,
                             filter_config: FeedFilterConfig | None,
@@ -78,17 +82,7 @@ class DeviantartRSS:
         for entry in feed.entries:
             if dt.datetime(*entry["published_parsed"][:6], tzinfo=dt.UTC) <= date:
                 break
-            img_url = entry["media_content"][0]["url"] if "media_content" in entry else None
-            title = re.search(r"DeviantArt: ([^ ]+)'s gallery", feed.feed["title"]).group(1)
-            obj = RssMessage(
-                bot=self.bot,
-                feed=FeedObject.unrecorded("deviant", channel.guild.id if channel.guild else None, link=url),
-                url=entry["link"],
-                title=entry["title"],
-                date=entry["published_parsed"],
-                author=title,
-                image=img_url
-            )
+            obj = await self._parse_entry(entry, feed, url, channel)
             posts_list.append(obj)
         posts_list.reverse()
         return posts_list
