@@ -107,14 +107,8 @@ class YoutubeRSS:
             return [entry for entry in feed.entries[:50] if await check_filter(entry, filter_config)]
         return feed.entries
 
-    async def get_last_post(self, channel: discord.TextChannel, yt_channel_id: str,
-                            filter_config: FeedFilterConfig | None,
-                            session: aiohttp.ClientSession | None=None):
-        "Get the last post from a youtube channel"
-        entries = await self._get_feed_list(yt_channel_id, filter_config, session)
-        if len(entries) == 0:
-            return await self.bot._(channel, "rss.nothing")
-        entry = entries[0]
+    async def _parse_entry(self, entry: FeedParserDict, channel: discord.TextChannel):
+        "Parse a feed entry to get the relevant information and return a RssMessage object"
         img_url = None
         if "media_thumbnail" in entry and len(entry["media_thumbnail"]) > 0:
             img_url = entry["media_thumbnail"][0]["url"]
@@ -130,6 +124,16 @@ class YoutubeRSS:
             image=img_url,
             post_text=post_text
         )
+
+    async def get_last_post(self, channel: discord.TextChannel, yt_channel_id: str,
+                            filter_config: FeedFilterConfig | None,
+                            session: aiohttp.ClientSession | None=None):
+        "Get the last post from a youtube channel"
+        entries = await self._get_feed_list(yt_channel_id, filter_config, session)
+        if len(entries) == 0:
+            return await self.bot._(channel, "rss.nothing")
+        entry = entries[0]
+        return await self._parse_entry(entry, channel)
 
     async def get_new_posts(self, channel: discord.TextChannel, identifiant: str, date: dt.datetime,
                             filter_config: FeedFilterConfig | None,
@@ -147,21 +151,7 @@ class YoutubeRSS:
             if (dt.datetime(*entry_date[:6], tzinfo=dt.UTC) - date).total_seconds() <= self.min_time_between_posts:
                 # we know we can break because entries are sorted by most recent first
                 break
-            img_url = None
-            if "media_thumbnail" in entry and len(entry["media_thumbnail"]) > 0:
-                img_url = entry["media_thumbnail"][0]["url"]
-            post_text = await get_text_from_entry(entry)
-            obj = RssMessage(
-                bot=self.bot,
-                feed=FeedObject.unrecorded("yt", channel.guild.id if channel.guild else None, channel.id),
-                url=entry["link"],
-                title=entry["title"],
-                date=entry_date,
-                author=entry["author"],
-                channel=entry["author"],
-                image=img_url,
-                post_text=post_text
-            )
+            obj = await self._parse_entry(entry, channel)
             posts_list.append(obj)
         posts_list.reverse()
         return posts_list
