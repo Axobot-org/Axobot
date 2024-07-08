@@ -107,5 +107,7 @@ class TwitchApiAgent:
         url = "https://api.twitch.tv/helix/streams"
         params = {"user_id": user_ids}
         async with self.session.get(url, headers=await self._get_headers(), params=params) as resp:
+            if resp.status == 401: # if token has been revoked, get a new one but don't retry (to avoid infinite loop)
+                self._token = None
             resp.raise_for_status()
             return (await resp.json())["data"]
