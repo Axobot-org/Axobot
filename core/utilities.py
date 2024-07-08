@@ -10,7 +10,6 @@ from cachetools import TTLCache
 from discord.ext import commands
 
 from core.bot_classes import Axobot, MyContext
-from core.serverconfig.options_list import options
 
 
 class Utilities(commands.Cog):
@@ -86,7 +85,9 @@ class Utilities(commands.Cog):
             await self.get_bot_infos()
         if not isinstance(ctx, commands.Context) or self.config is None:
             return True
-        if ctx.message.type not in {discord.MessageType.default, discord.MessageType.reply, discord.MessageType.chat_input_command}:
+        if ctx.message.type not in {
+            discord.MessageType.default, discord.MessageType.reply, discord.MessageType.chat_input_command
+        }:
             if not ctx.message.type.value == discord.MessageType.chat_input_command:
                 return False
         if await self.bot.get_cog("Admin").check_if_admin(ctx):
@@ -146,7 +147,7 @@ class Utilities(commands.Cog):
             return [("en", 1.0)]
         languages = []
         disp_lang: list[tuple[str, float]] = []
-        available_langs: list[str] = options["language"]["values"]
+        available_langs: list[str] = (await self.bot.get_options_list())["language"]["values"]
         for guild in user.mutual_guilds:
             lang: str = await self.bot.get_config(guild.id, "language")
             languages.append(lang)

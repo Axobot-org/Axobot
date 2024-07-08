@@ -3,13 +3,10 @@ from typing import Any
 import discord
 
 from core.bot_classes import Axobot
-from core.serverconfig.options_list import options as options_list
 
 
 async def check_config(bot: Axobot, guild: discord.Guild, option: str, value: Any):
     "Check if the config option is correct, or return a custom warning message"
-    if option not in options_list:
-        return None
     if option == "anti_raid":
         return await antiraid_check(bot, guild, option, value)
     if option == "antiscam":

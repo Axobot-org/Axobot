@@ -7,7 +7,6 @@ from cachetools import TTLCache
 from discord.ext import commands, tasks
 
 from core.bot_classes import DISCORD_INVITE_REGEX, Axobot
-from core.serverconfig.options_list import options
 
 
 class AntiRaid(commands.Cog):
@@ -70,7 +69,7 @@ class AntiRaid(commands.Cog):
     async def _get_raid_level(self, guild: discord.Guild) -> int:
         "Get the raid protection level of a guild, between 0 and 5"
         level_name: str = await self.bot.get_config(guild.id, "anti_raid")
-        return options["anti_raid"]["values"].index(level_name)
+        return (await self.bot.get_options_list())["anti_raid"]["values"].index(level_name)
 
     async def on_join_raid_check(self, member: discord.Member):
         """Check if a member should trigger the raid protection, and if so, kick or ban them

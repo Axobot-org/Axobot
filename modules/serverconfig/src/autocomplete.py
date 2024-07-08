@@ -4,7 +4,6 @@ from discord.app_commands import Choice
 from discord.app_commands import locale_str as _T
 
 from core.bot_classes import Axobot
-from core.serverconfig.options_list import options as options_list
 
 from .converters import (BooleanOptionRepresentation,
                          CategoryOptionRepresentation,
@@ -20,6 +19,7 @@ from .converters import (BooleanOptionRepresentation,
 
 async def autocomplete_main(bot: Axobot, interaction: Interaction, option: str, current: str):
     """Main autocompletion function, calling other sub-functions as needed"""
+    options_list = await bot.get_options_list()
     if option not in options_list:
         return []
     option_data = options_list[option]

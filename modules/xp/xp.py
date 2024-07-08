@@ -18,7 +18,6 @@ from mysql.connector.errors import ProgrammingError as MySQLProgrammingError
 from PIL import Image, ImageFont
 
 from core.bot_classes import Axobot
-from core.serverconfig.options_list import options
 from core.tips import UserTip
 
 from .cards import CardGeneration
@@ -663,7 +662,7 @@ class Xp(commands.Cog):
                 return
             xp_used_type: str = await self.bot.get_config(interaction.guild_id, "xp_type")
         else:
-            xp_used_type = options["xp_type"]["default"]
+            xp_used_type = (await self.bot.get_options_list())["xp_type"]["default"]
         xp = await self.db_get_xp(user.id, None if xp_used_type == "global" else interaction.guild_id)
         if xp is None:
             if interaction.user == user:

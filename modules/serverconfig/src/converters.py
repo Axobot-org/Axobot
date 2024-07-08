@@ -9,7 +9,6 @@ from discord.ext import commands
 from core.bot_classes import Axobot
 from core.emojis_manager import EmojisManager
 from core.getch_methods import getch_channel_or_thread
-from core.serverconfig.options_list import options as options_list
 
 log = logging.getLogger("bot")
 UnicodeEmoji = str
@@ -159,9 +158,9 @@ class OptionConverter:
     async def from_input(raw: str, representation: AllRepresentation, guild: discord.Guild, interaction: discord.Interaction):
         raise NotImplementedError
 
-def get_converter(option_name: str):
+def get_converter(option_name: str, options_map: dict[str, AllRepresentation]):
     "Get the correct converter to use for a given config option"
-    if data := options_list.get(option_name):
+    if data := options_map.get(option_name):
         data_type = data["type"]
         if data_type == "int":
             return IntOption
@@ -194,38 +193,42 @@ def get_converter(option_name: str):
         raise ValueError(f"Invalid option type: {data_type}")
     raise ValueError(f"Invalid option name: {option_name}")
 
-async def from_raw(option_name: str, raw: str, guild: discord.Guild):
+async def from_raw(option_name: str, raw: str, guild: discord.Guild, bot: Axobot):
     "Convert an option value to a usable object"
     if raw is None:
         return None
-    converter = get_converter(option_name)
-    return await converter.from_raw(raw, options_list[option_name], guild)
+    options_map = await bot.get_options_list()
+    converter = get_converter(option_name, options_map)
+    return await converter.from_raw(raw, options_map[option_name], guild)
 
-def to_raw(option_name: str, value):
+async def to_raw(option_name: str, value, bot: Axobot):
     "Convert a config object to a string value, for storage in db"
     if value is None:
         return None
-    converter = get_converter(option_name)
+    options_map = await bot.get_options_list()
+    converter = get_converter(option_name, options_map)
     return converter.to_raw(value)
 
-async def to_display(option_name: str, value, guild: discord.Guild, bot: "Axobot") -> str | None:
+async def to_display(option_name: str, value, guild: discord.Guild, bot: Axobot) -> str | None:
     "Convert a config object to a string value, for display in embeds"
     if value is None:
         if option_name == "levelup_msg":
             return "default"
         return None
-    converter = get_converter(option_name)
+    options_map = await bot.get_options_list()
+    converter = get_converter(option_name, options_map)
     result = converter.to_display(option_name, value)
     if isinstance(result, discord.app_commands.locale_str):
         return await bot._(guild, result.message)
     return result
 
-async def from_input(option_name: str, raw: str, guild: discord.Guild, interaction: discord.Interaction):
+async def from_input(option_name: str, raw: str, guild: discord.Guild, interaction: discord.Interaction[Axobot]):
     "Convert a user input to a config object"
     if raw is None:
         return None
-    converter = get_converter(option_name)
-    return await converter.from_input(raw, options_list[option_name], guild, interaction)
+    options_map = await interaction.client.get_options_list()
+    converter = get_converter(option_name, options_map)
+    return await converter.from_input(raw, options_map[option_name], guild, interaction)
 
 class IntOption(OptionConverter):
     "Option converter for integer values"
