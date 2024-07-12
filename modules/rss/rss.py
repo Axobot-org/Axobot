@@ -779,11 +779,16 @@ class Rss(commands.Cog):
                 await self.bot._(interaction, "rss.loop-processing"), ephemeral=True
             )
             return
+        feeds = [f for f in await self.db_get_guild_feeds(interaction.guild_id) if f.enabled]
+        if len(feeds) == 0:
+            await interaction.response.send_message(
+                await self.bot._(interaction, "rss.no-feed-enabled"), ephemeral=True
+            )
+            return
         start = time.time()
         await interaction.response.send_message(
             await self.bot._(interaction, "rss.guild-loading", emoji=self.bot.emojis_manager.customs["loading"])
         )
-        feeds = [f for f in await self.db_get_guild_feeds(interaction.guild_id) if f.enabled]
         await self.refresh_feeds(interaction.guild_id)
         await interaction.edit_original_response(
             content=await self.bot._(interaction, "rss.guild-complete", count=len(feeds), time=round(time.time()-start, 1))
