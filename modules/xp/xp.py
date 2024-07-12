@@ -654,7 +654,7 @@ class Xp(commands.Cog):
                 await self.bot._(interaction, "xp.bot-rank"), ephemeral=True
             )
             return
-        send_in_private = interaction.guild is None or await self.bot.get_config(interaction.guild_id, "rank_in_dm")
+        send_in_private = interaction.guild is None or await self.bot.get_config(interaction.guild_id, "rank_in_private")
         await interaction.response.defer(ephemeral=send_in_private)
         if interaction.guild is not None:
             if not await self.bot.get_config(interaction.guild_id, "enable_xp"):
@@ -685,7 +685,7 @@ class Xp(commands.Cog):
                 rank = "?"
         if isinstance(rank, float):
             rank = int(rank)
-        send_in_private = interaction.guild is None or await self.bot.get_config(interaction.guild_id, "rank_in_dm")
+        send_in_private = interaction.guild is None or await self.bot.get_config(interaction.guild_id, "rank_in_private")
         # If we can send the rank card
         try:
             await self.send_card(interaction, user, xp, rank, ranks_nb, levels_info)
@@ -761,7 +761,7 @@ class Xp(commands.Cog):
         translations_map = await self.get_card_translations_map(interaction)
         card_image = await self.create_card(translations_map, user, style, xp, rank, ranks_nb, levels_info)
         # check if we should send the card in DM or in the channel
-        send_in_private = interaction.guild is None or await self.bot.get_config(interaction.guild_id, "rank_in_dm")
+        send_in_private = interaction.guild is None or await self.bot.get_config(interaction.guild_id, "rank_in_private")
         try:
             await interaction.followup.send(file=card_image, ephemeral=send_in_private)
         except discord.errors.HTTPException:
@@ -802,7 +802,7 @@ class Xp(commands.Cog):
         emb.add_field(name="XP", value=f"{xp}/{levels_info[1]}")
         emb.add_field(name=txts[0].title(), value=levels_info[0])
         emb.add_field(name=txts[1].title(), value=f"{rank}/{ranks_nb}")
-        send_in_private = await self.bot.get_config(interaction.guild_id, "rank_in_dm")
+        send_in_private = await self.bot.get_config(interaction.guild_id, "rank_in_private")
         await interaction.followup.send(embed=emb, ephemeral=send_in_private)
 
     @app_commands.command(name="top")

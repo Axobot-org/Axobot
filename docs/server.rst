@@ -67,7 +67,7 @@ List of every option
 * enable_fun: Boolean indicating if the fun part (documentation in preparation) is activated. If so, all commands in this section will be available. Default is :code:`True`.
 * enable_ttt:Boolean indicating if members of your server can play tic-tac-toe. Default is :code:`True`.
 * enable_xp: Boolean indicating whether the xp system is activated. Default is :code:`True`.
-* help_in_dm: Boolean indicating whether the help command message should be sent as a private message or not. If the value is set to :code:`True`, the message will be sent in DM or as an ephemeral message.
+* help_in_private: Boolean indicating whether the help command message should be sent as a private message or not. If the value is set to :code:`True`, the message will be sent in DM or as an ephemeral message.
 * language: Language of the bot. Currently only the languages :code:`fr` (French), :code:`en` (English), :code:`fi` (Finnish) and :code:`de` (German) are available (also you can use :code:`lolcat` or :code:`fr2` for more fun). The change takes place as soon as the order is validated by the system. Default :code:`fr`.
 * leave: Message sent when a member leave your server. Some variables are usable, the same as for the welcome message.
 * levelup_channel: Channel where the bot will send every levelup announcement message. It can be either a text channel, or "none" for no channel (Axobot won't send any levelup channel), or "any" if you want it in the same channel as the message. Default to any.
@@ -82,7 +82,7 @@ List of every option
 * partner_role: A role given to every administrator of a partner server. Default to None.
 * poll_channels: List of channels in which the bot will add the reactions 👍 and 👎 to each message
 * private_leaderboard: Allow non-members to see your server XP leaderboard on our website. Default to False.
-* rank_in_dm: Boolean indicating whether the rank command message should be sent as a private message or not. If the value is set to :code:`True`, the message will be sent in DM or as an ephemeral message.
+* rank_in_private: Boolean indicating whether the rank command message should be sent as a private message or not. If the value is set to :code:`True`, the message will be sent in DM or as an ephemeral message.
 * ttt_emojis: List of emojis used to play on tic-tac-toe. Two emojis must be entered: one for the bot, and one for the player. Discord emojis as well as server emojis can work.
 * update_mentions: A list of roles which will be mentioned in each update changelog. You can enable those changelogs with the `bot_news` option. Default to None.
 * voice_category: Category used by the automated voice channels system (see `below <server.html#voice-channels-managment>`__)

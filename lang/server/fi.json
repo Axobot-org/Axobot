@@ -55,7 +55,7 @@
         "description": "Server description:\n %{value}",
         "enable_fun": "Onko komennot jotka ovat listassa `!fun` komennossa kytketty päälle? %{value}",
         "enable_xp": "Pitäisiko XP systeemi olla kytketty päälle? %{value}",
-        "help_in_dm": "Lähetetäänkö help viesti yksityis viestillä? %{value}",
+        "help_in_private": "Lähetetäänkö help viesti yksityis viestillä? %{value}",
         "hunter": "Lista kanavista jossa peli *Metsästäjä* on aktiivinen: %{value}",
         "kick_allowed_roles": "Lista rooleista jotka voivat käyttää komentoa 'kick': %{value}",
         "language": "Tämän hetkinen kieli tälle palvelimelle: **%{value}**",
