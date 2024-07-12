@@ -175,4 +175,4 @@ async def _should_dm(ctx: MyContext) -> bool:
     "Check if the answer should be sent in DM or in current channel"
     if ctx.guild is None or not ctx.bot.database_online:
         return False
-    return await ctx.bot.get_config(ctx.guild.id, "help_in_dm")
+    return await ctx.bot.get_config(ctx.guild.id, "help_in_private")
