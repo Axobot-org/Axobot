@@ -58,7 +58,7 @@
             "whitelist": "Le filtre de ce flux a été modifié pour n'autoriser que les posts contenant l'un des mots suivants : %{words}"
         }
     },
-    "flow-limit": "Pour des raisons de performances, vous ne pouvez pas suivre plus de %{limit} flux rss par serveur.",
+    "flow-limit": "Pour des raisons de performances, vous ne pouvez pas suivre plus de %{limit} flux RSS par serveur.",
     "guild-complete": {
         "one": "Votre flux RSS a correctement été rechargé, en %{time} secondes !",
         "many": "%{count} flux RSS ont correctement été rechargés, en %{time} secondes !"
@@ -83,11 +83,12 @@
     "loop-processing": "Une vérification de vos flux RSS est déjà en cours. Veuillez patienter quelques minutes",
     "mc": "Minecraft",
     "move-success": {
-        "many": "%{count} flux rss ont été déplacés dans le salon %{channel} !",
-        "one": "Votre flux rss a bien été déplacé dans le salon %{channel} !"
+        "many": "%{count} flux RSS ont été déplacés dans le salon %{channel} !",
+        "one": "Votre flux RSS a bien été déplacé dans le salon %{channel} !"
     },
-    "no-feed": "Oups, vous n'avez aucun flux rss à gérer !",
-    "no-feed2": "Ce serveur ne possède aucun flux rss !",
+    "no-feed": "Oups, vous n'avez aucun flux RSS à gérer !",
+    "no-feed2": "Ce serveur ne possède aucun flux RSS !",
+    "no-feed-enabled": "Ce serveur n'a aucun flux RSS actif !",
     "no-feed-filter": "Aucun flux ne peut être sélectionné pour cette commande !",
     "no-roles": "Aucun rôle n'a été configuré pour l'instant.",
     "not-a-role": "Ce rôle est introuvable. Réessayez :",
@@ -114,7 +115,7 @@
         "list": "Voici la liste des rôles déjà mentionnés : %{roles}",
         "no-change": "Aucun paramètre n'a été modifié"
     },
-    "success-add": "Le flux rss de type '%{type}' avec le lien <%{url}> a bien été ajouté dans le salon %{channel} !",
+    "success-add": "Le flux RSS de type '%{type}' avec le lien <%{url}> a bien été ajouté dans le salon %{channel} !",
     "test": {
         "empty-result": "Le message généré semble être vide, veuillez vérifier votre template de message et la configuration du flux.",
         "invalid-format": "Votre template semble présenter des erreurs de formatage. Veuillez vous assurer que vous utilisez les variables correctement."
