@@ -46,7 +46,7 @@
         "description": "Server Beschreibung:\n %{value}",
         "enable_fun": "Sind die Befehle, die in `!fun` gelistet sind, erlaubt? %{value}",
         "enable_xp": "Sollte das xp System angemacht werden? %{value}",
-        "help_in_dm": "Sollte die help Nachricht in den Privatnachrichten gesendet werden? %{value}",
+        "help_in_private": "Sollte die help Nachricht in den Privatnachrichten gesendet werden? %{value}",
         "hunter": "Liste der Kanäle, in welchen das *Hunter* Spiel aktiv ist: %{value}",
         "kick_allowed_roles": "Liste der Rollen, mit denen man den Befehl \"kick\" ausführen kann: %{value}",
         "language": "Die aktuelle Zbot Sprache in diesem Server ist: **%{value}**",

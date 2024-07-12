@@ -56,7 +56,7 @@
         "description": "Description du serveur :\n %{value}",
         "enable_fun": "Les commandes répertoriées dans la commande `!fun` sont-elles activées ? %{value}",
         "enable_xp": "Le système d'xp doit-il être activé ? %{value}",
-        "help_in_dm": "Faut que j'envoie le message d'aide en MP ? %{value}",
+        "help_in_private": "Faut que j'envoie le message d'aide en MP ? %{value}",
         "hunter": "Liste des salons dans lesquels le jeu *Hunter* est actif : %{value}",
         "kick_allowed_roles": "Tout ce beau monde peut kick : %{value}",
         "language": "Langue actuelle du bot pour ce serveur : **%{value}**",
