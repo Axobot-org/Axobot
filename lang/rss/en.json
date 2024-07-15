@@ -58,10 +58,10 @@
             "whitelist": "The filter of this feed has been modified to only allow posts containing one the following words: %{words}"
         }
     },
-    "flow-limit": "For performance reasons, you cannot track more than %{limit} rss feeds per server.",
+    "flow-limit": "For performance reasons, you cannot track more than %{limit} RSS feeds per server.",
     "guild-complete": {
-        "one": "Your rss stream has been correctly reloaded, in %{time} seconds!",
-        "many": "%{count} rss streams have been correctly reloaded, in %{time} seconds!"
+        "one": "Your RSS stream has been correctly reloaded, in %{time} seconds!",
+        "many": "%{count} RSS streams have been correctly reloaded, in %{time} seconds!"
     },
     "guild-error": "An error occurred during the procedure: `%{err}`\nIf you think this error is not your own, you can report it to support",
     "guild-loading": "Reloading %{emoji}",
@@ -86,8 +86,9 @@
         "many": "%{count} RSS feeds have been moved to the channel %{channel}!",
         "one": "One RSS feed has been moved in the channel %{channel}!"
     },
-    "no-feed": "Oops, you don't have any rss feeds to manage!",
-    "no-feed2": "This server has no rss feed!",
+    "no-feed": "Oops, you don't have any RSS feeds to manage!",
+    "no-feed2": "This server has no RSS feed!",
+    "no-feed-enabled": "This server has no active RSS feed!",
     "no-feed-filter": "No feed can be selected for this command!",
     "no-roles": "No role has been configured yet.",
     "not-a-role": "This role can't be found. Try again:",
@@ -98,15 +99,23 @@
     },
     "research-timeout": "The web page took too long to answer, I had to interrupt the process :eyes:",
     "roles": {
-        "cant-find": "I can't find this role",
+        "edit-silent-false": {
+            "one": "This feed has been modified to send regular notifications",
+            "many": "These feeds have been modified to send regular notifications"
+        },
+        "edit-silent-true": {
+            "one": "This feed has been modified to send silent notifications",
+            "many": "These feeds have been modified to send silent notifications"
+        },
         "edit-success": {
             "many": "This feed has been modified to mention the roles %{roles}",
             "one": "This feed has been modified to mention the role %{roles}",
             "zero": "This feed has been modified to not mention any role"
         },
-        "list": "Here is the list of roles already notified: %{roles}"
+        "list": "Here is the list of roles already notified: %{roles}",
+        "no-change": "No parameter has been changed"
     },
-    "success-add": "The rss feed of type \"%{type}\" with link <%{url}> has been properly added in the channel %{channel}!",
+    "success-add": "The RSS feed of type \"%{type}\" with link <%{url}> has been properly added in the channel %{channel}!",
     "test": {
         "empty-result": "The generated message seems to be empty, please check your message template and feed configuration.",
         "invalid-format": "Your template seems to have some formatting errors. Please ensure that you are using variables correctly."
