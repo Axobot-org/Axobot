@@ -1,3 +1,5 @@
+from typing import Literal
+
 import discord
 from discord import app_commands
 from discord.ext import commands
@@ -131,13 +133,7 @@ class RolesManagement(commands.Cog):
                 break
             await user.add_roles(role, reason=f"Asked by {interaction.user}")
             count += 1
-        answer = await self.bot._(interaction, "moderation.role.give-success", count=count, m=len(n_users))
-        if count == self.max_roles_modifications and len(n_users) > count:
-            answer += (
-                "\n⚠️ *" +
-                await self.bot._(interaction, "moderation.role.limit-hit", limit=self.max_roles_modifications) +
-                '*'
-            )
+        answer = await self._get_success_msg(interaction, "give", count, len(n_users))
         await interaction.edit_original_response(content=answer)
 
     @role_main.command(name="revoke")
@@ -178,14 +174,19 @@ class RolesManagement(commands.Cog):
                 break
             await user.remove_roles(role, reason=f"Asked by {interaction.user}")
             count += 1
-        answer = await self.bot._(interaction, "moderation.role.remove-success", count=count, m=len(n_users))
-        if count == self.max_roles_modifications and len(n_users) > count:
+        answer = await self._get_success_msg(interaction, "remove", count, len(n_users))
+        await interaction.edit_original_response(content=answer)
+
+    async def _get_success_msg(self, interaction: discord.Interaction, action: Literal["give", "rmeove"], success_count: int,
+                               users_count: int):
+        answer = await self.bot._(interaction, f"moderation.role.{action}-success", count=success_count, m=users_count)
+        if success_count == self.max_roles_modifications and users_count > success_count:
             answer += (
                 "\n⚠️ *" +
                 await self.bot._(interaction, "moderation.role.limit-hit", limit=self.max_roles_modifications) +
                 '*'
             )
-        await interaction.edit_original_response(content=answer)
+        return answer
 
     async def _check_bot_perm(self, interaction: discord.Interaction):
         if not interaction.guild.me.guild_permissions.manage_roles:
