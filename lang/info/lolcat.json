@@ -167,7 +167,6 @@
         "normal": ":ping_pong:  Gotcha!\nMy running speed: %{bot}ms\nHow slow iz discord: %{api}ms",
         "pig": "Haha u made a typo! :pig:\nhow fast I run: %{bot}ms\nHow slow iz discord: %{api}ms"
     },
-    "prefix": "List ov usable prefiXs:",
     "stats": {
         "api_ping": "**How much is discord buzy:** %{v} ms",
         "bot_version": "**Baut vershun:** %{v}",
