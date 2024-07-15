@@ -6,7 +6,7 @@ from mysql.connector import connect as sql_connect
 from mysql.connector import errors as mysql_errors
 from mysql.connector.connection import MySQLConnection
 
-from core.tokens import get_database_connection
+from core.boot_utils.conf_loader import get_secrets_dict
 
 
 class ConnectionDetails(NamedTuple):
@@ -19,7 +19,7 @@ class DatabaseConnectionManager:
     "Handles all database connections."
 
     def __init__(self):
-        self.__database_keys = get_database_connection()
+        self.__database_keys = get_secrets_dict()["database"]
         self.__connections: dict[str, ConnectionDetails] = {}
         self.__log = logging.getLogger("bot.db")
 
@@ -31,7 +31,7 @@ class DatabaseConnectionManager:
                     user=self.__database_keys["user"],
                     password=self.__database_keys["password"],
                     host="127.0.0.1",
-                    database=self.__database_keys["name_main"],
+                    database="axobot",
                     connection_timeout=5
                 )
             except (mysql_errors.InterfaceError, mysql_errors.ProgrammingError, mysql_errors.DatabaseError):
@@ -40,7 +40,7 @@ class DatabaseConnectionManager:
                     user=self.__database_keys["user"],
                     password=self.__database_keys["password"],
                     host=self.__database_keys["host"],
-                    database=self.__database_keys["name_main"],
+                    database="axobot",
                     connection_timeout=10
                 )
                 self.__log.info("Database connected remotely")

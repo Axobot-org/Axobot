@@ -14,7 +14,7 @@ class Bitly(commands.Cog):
     def __init__(self, bot: Axobot):
         self.bot = bot
         self.file = "bitly"
-        self.bitly_client = bitly_api.Bitly(api_key=self.bot.others["bitly"])
+        self.bitly_client = bitly_api.Bitly(api_key=self.bot.secrets["bitly"])
 
     bitly_main = app_commands.Group(
         name="bitly",

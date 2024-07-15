@@ -57,7 +57,7 @@ class BotStats(commands.Cog):
         self.total_cpu_records: list[float] = []
         self.latency_records: list[int] = []
         self.sql_performance_records: list[float] = []
-        self.statuspage_header = {"Content-Type": "application/json", "Authorization": "OAuth " + self.bot.others["statuspage"]}
+        self.statuspage_header = {"Content-Type": "application/json", "Authorization": "OAuth " + self.bot.secrets["statuspage"]}
         self.antiscam = {"warning": 0, "deletion": 0}
         self.ticket_events = {"creation": 0}
         self.emitted_serverlogs: dict[str, int] = {}

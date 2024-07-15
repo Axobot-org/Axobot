@@ -25,7 +25,7 @@ class YoutubeRSS:
     def __init__(self, bot: Axobot):
         self.bot = bot
         self.min_time_between_posts = 120 # seconds
-        self.search_service = Service(5, bot.others["google_api"])
+        self.search_service = Service(5, bot.secrets["google_api"])
         self.url_pattern = re.compile(
             r"(?:https?://)?(?:www\.|m\.)?(?:youtube\.com|youtu\.be)/(?:channel/|user/|c/)?@?([^/\s?]+).*$"
         )

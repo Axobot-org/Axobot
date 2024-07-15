@@ -448,7 +448,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
                 or "date" not in self.nasa_pict \
                 or (self.bot.utcnow()-get_date(self.nasa_pict["date"])).total_seconds() > 86400:
             async with aiohttp.ClientSession() as session:
-                key = self.bot.others["nasa"]
+                key = self.bot.secrets["nasa"]
                 async with session.get(f"https://api.nasa.gov/planetary/apod?api_key={key}") as r:
                     data = await r.json()
             if all(field in data for field in ["title", "url", "explanation", "date"]):

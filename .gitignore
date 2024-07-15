@@ -1,8 +1,7 @@
 # Python executables
 *.pyc
 __pycache__
-core/tokens.py
-core/cryptage.py
+secrets.json
 backup/*
 env/
 

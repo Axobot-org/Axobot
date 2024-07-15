@@ -15,9 +15,8 @@ import asyncio
 import time
 import json
 from random import choice
-from core import tokens
 from core.bot_classes import Axobot
-from core.boot_utils import set_beta_logs, setup_start_parser, setup_logger, load_cogs
+from core.boot_utils import set_beta_logs, setup_start_parser, setup_logger, load_cogs, conf_loader
 
 async def main():
     "Load everything and start the bot"
@@ -62,11 +61,11 @@ async def main():
             return
 
     if args.token == "axobot":
-        bot_data = tokens.get_token(client, 1048011651145797673)
+        bot_data = await conf_loader.load_token(client, 1048011651145797673)
         token = bot_data["token"]
         client.entity_id = bot_data["entity_id"]
     elif args.token == "beta":
-        bot_data = tokens.get_token(client, 436835675304755200)
+        bot_data = await conf_loader.load_token(client, 436835675304755200)
         token = bot_data["token"]
         client.entity_id = bot_data["entity_id"]
         client.beta = True

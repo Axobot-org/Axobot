@@ -266,7 +266,7 @@ class Events(commands.Cog):
         try:# https://top.gg/bot/1048011651145797673
             payload = {"server_count": guild_count}
             headers={
-                "Authorization": self.bot.dbl_token
+                "Authorization": self.bot.secrets["dbl"]
             }
             async with session.post(f"https://top.gg/api/bots/{self.bot.user.id}/stats", json=payload, headers=headers) as resp:
                 self.bot.log.debug(f"top.gg returned {resp.status} for {payload}")
@@ -279,7 +279,7 @@ class Events(commands.Cog):
                 "guilds": guild_count
             }
             headers = {
-                "Authorization": self.bot.others["discordbotlist_axobot"],
+                "Authorization": self.bot.secrets["discordbotlist"],
             }
             async with session.post(f"https://discordbotlist.com/api/v1/bots/{self.bot.user.id}/stats",
                                     json=payload, headers=headers) as resp:
@@ -293,7 +293,7 @@ class Events(commands.Cog):
                 "guildCount": guild_count
             }
             headers = {
-                "Authorization": self.bot.others["discordextremelist"],
+                "Authorization": self.bot.secrets["discordextremelist"],
             }
             async with session.post(f"https://api.discordextremelist.xyz/v2/bot/{self.bot.user.id}/stats",
                                     json=payload, headers=headers) as resp:
