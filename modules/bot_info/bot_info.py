@@ -100,7 +100,7 @@ class BotInfo(commands.Cog):
         ignored_guilds = await self.get_ignored_guilds()
         len_servers = await self.get_guilds_count(ignored_guilds)
         # Languages
-        langs_list = list((await self.bot.get_cog("ServerConfig").get_languages(ignored_guilds)).items())
+        langs_list = list((await self.bot.get_cog("ServerConfig").get_enum_usage_stats("language", ignored_guilds)).items())
         langs_list.sort(reverse=True, key=lambda x: x[1])
         lang_total = sum(x[1] for x in langs_list)
         langs_list = " | ".join([f"{x[0]}: {x[1]/lang_total*100:.0f}%" for x in langs_list if x[1] > 0])

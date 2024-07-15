@@ -187,7 +187,7 @@ class VoiceChannels(commands.Cog):
         async with aiohttp.ClientSession() as session:
             try:
                 async with session.get(MINECRAFT_ENTITIES_URL) as resp:
-                    data: dict[str, list[str]] = json.loads(await resp.text())
+                    data: dict[str, list[str]] = await resp.json()
                     json: list[str] = [
                         name.replace("minecraft:", '').replace('_', ' ') for name in data["values"]
                     ]

@@ -1,7 +1,22 @@
 from enum import IntEnum, unique
 
 
-class RankCardsFlag:
+class _BaseFlagClass:
+    FLAGS: dict[int, str]
+
+    def flags_to_int(self, flags: list) -> int:
+        "Convert a list of flags to its integer value"
+        result = 0
+        for flag, value in self.FLAGS.items():
+            if value in flags:
+                result |= flag
+        return result
+
+    def int_to_flags(self, i: int) -> list:
+        "Convert an integer value to its list of flags"
+        return [v for k, v in self.FLAGS.items() if i & k == k]
+
+class RankCardsFlag(_BaseFlagClass):
     "Flags used for unlocked rank cards"
     FLAGS = {
         1 << 0: "rainbow",
@@ -22,19 +37,7 @@ class RankCardsFlag:
         1 << 15: "april24",
     }
 
-    def flags_to_int(self, flags: list) -> int:
-        "Convert a list of flags to its integer value"
-        result = 0
-        for flag, value in self.FLAGS.items():
-            if value in flags:
-                result |= flag
-        return result
-
-    def int_to_flags(self, i: int) -> list:
-        "Convert an integer value to its list of flags"
-        return [v for k, v in self.FLAGS.items() if i & k == k]
-
-class UserFlag:
+class UserFlag(_BaseFlagClass):
     "Flags used for user permissions/roles"
     FLAGS = {
         1 << 0: "support",
@@ -45,17 +48,6 @@ class UserFlag:
         1 << 5: "cookie"
     }
 
-    def flags_to_int(self, flags: list) -> int:
-        "Convert a list of flags to its integer value"
-        result = 0
-        for flag, value in self.FLAGS.items():
-            if value in flags:
-                result |= flag
-        return result
-
-    def int_to_flags(self, i: int) -> list:
-        "Convert an integer value to its list of flags"
-        return [v for k, v in self.FLAGS.items() if i & k == k]
 
 @unique
 class ServerWarningType(IntEnum):

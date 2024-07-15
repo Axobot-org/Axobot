@@ -128,7 +128,7 @@ class ServerConfig(commands.Cog):
                     config[option_name] = await from_raw(option_name, config[option_name], guild, self.bot)
         return config
 
-    async def get_languages(self, ignored_guilds: list[int]):
+    async def get_enum_usage_stats(self, option_id: str, ignored_guilds: list[int]):
         "Return stats on used languages"
         if not self.bot.database_online or "Languages" not in self.bot.cogs:
             return {}
@@ -141,30 +141,11 @@ class ServerConfig(commands.Cog):
                     values_list.append(row["value"])
         options_list = await self.get_options_list()
         for _ in range(len(guilds) - len(values_list)):
-            values_list.append(options_list["language"]["default"])
+            values_list.append(options_list[option_id]["default"])
         langs: dict[str, int] = {}
-        for lang in options_list["language"]["values"]:
+        for lang in options_list[option_id]["values"]:
             langs[lang] = values_list.count(lang)
         return langs
-
-    async def get_xp_types(self, ignored_guilds: list[int]):
-        "Return stats on used xp types"
-        if not self.bot.database_online:
-            return {}
-        query = "SELECT `guild_id`, `value` FROM `serverconfig` WHERE `option_name` = 'xp_type' AND `beta` = %s"
-        values_list: list[str] = []
-        guilds = {x.id for x in self.bot.guilds if x.id not in ignored_guilds}
-        async with self.bot.db_main.read(query, (self.bot.beta,)) as query_results:
-            for row in query_results:
-                if row["guild_id"] in guilds:
-                    values_list.append(row["value"])
-        options_list = await self.get_options_list()
-        for _ in range(len(guilds)-len(values_list)):
-            values_list.append(options_list["xp_type"]["default"])
-        types: dict[str, int] = {}
-        for name in options_list["xp_type"]["values"]:
-            types[name] = values_list.count(name)
-        return types
 
     async def check_member_config_permission(self, member: discord.Member, option_name: str):
         "Check if a user has the required roles from a specific config"

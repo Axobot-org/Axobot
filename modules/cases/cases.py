@@ -279,12 +279,9 @@ VALUES (%(g)s, %(u)s, %(t)s, %(m)s, %(r)s, %(d)s)"
         ..Example cases search 69
 
         ..Doc moderator.html#search-for-a-case"""
-        if not self.bot.database_online:
-            await interaction.response.send_message(await self.bot._(interaction, "cases.no_database"))
-            return
         await interaction.response.defer()
         case = await self.db_get_case_from_id(interaction.guild_id, case_id)
-        if case is None or case.guild_id != interaction.guild_id:
+        if case is None:
             await interaction.followup.send(await self.bot._(interaction, "cases.not-found"))
             return
         if user := await self.bot.fetch_user(case.user_id):
@@ -329,12 +326,9 @@ VALUES (%(g)s, %(u)s, %(t)s, %(m)s, %(r)s, %(d)s)"
         ..Example cases remove 42
 
         ..Doc moderator.html#remove-case"""
-        if not self.bot.database_online:
-            await interaction.response.send_message(await self.bot._(interaction, "cases.no_database"))
-            return
         await interaction.response.defer()
         case = await self.db_get_case_from_id(interaction.guild_id, case_id)
-        if case is None or case.guild_id != interaction.guild_id:
+        if case is None:
             await interaction.followup.send(await self.bot._(interaction, "cases.not-found"))
             return
         await self.db_delete_case(case.id)

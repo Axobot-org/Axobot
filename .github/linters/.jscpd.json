@@ -5,7 +5,8 @@
     ],
     "ignore": [
       "**/__snapshots__/**",
-      "**/*-old.*"
+      "**/*-old.*",
+      "**/cards_data.json"
     ],
     "absolute": true
   }
