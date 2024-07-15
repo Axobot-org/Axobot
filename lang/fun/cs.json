@@ -161,8 +161,7 @@
         "Pro-tip: Pokud si přejete dočasně deaktivovat RSS kanál, později jej znovu aktivovat, můžete použít příkaz %{rss_disable_cmd}. Naopak příkaz %{rss_delete_cmd} jej trvale smaže!",
         "Věděli jste to? RSS kanály zakázané s %{rss_disable_cmd} se stále počítají do limitu počtu kanálů na server. Pokud potřebujete více místa, použijte místo toho %{rss_delete_cmd}!",
         "Pro-tip: Připojení se k oficiálnímu serveru bot znamená, že můžete získat rychlou pomoc s problémy, získat rady o připravovaných aktualizacích a hlasovat pro připravované funkce. Tak se k nám připojte na <%{support_server_url}>!",
-        "Věděli jste to? Pokud nám chcete pomoci s překladem bot do několika jazyků, můžete se připojit k našemu týmu na našem oficiálním serveru na adrese %{support_server_url}!",
-        "Pro-tip: Antiscamový systém Axobotu používá lokální, přizpůsobenou AI k detekci a mazání podvodných zpráv na vašem serveru. Povolte ji pomocí služby %{antiscam_enable_cmd}"
+        "Věděli jste to? Pokud nám chcete pomoci s překladem bot do několika jazyků, můžete se připojit k našemu týmu na našem oficiálním serveru na adrese %{support_server_url}!"
     ],
     "uninhabited-city": "Neobydlené město :confused:"
 }
