@@ -1,6 +1,7 @@
 import re
 from collections import defaultdict
 from datetime import timedelta
+from typing import Literal
 
 import discord
 from cachetools import TTLCache
@@ -86,65 +87,50 @@ class AntiRaid(commands.Cog):
         account_created_since = (self.bot.utcnow() - member.created_at).total_seconds()
         # Level 4
         if level >= 4:
-            if account_created_since <= 86400: # kick accounts created less than 1d before
-                if await self.kick(member, await self.bot._(member.guild.id,"logs.reason.young")):
-                    self.bot.dispatch("antiraid_kick", member, {"account_creation_treshold": 86400})
-                    return True
-            if account_created_since <= 3600 and can_ban: # ban (2w) members created less than 1h before
-                duration = timedelta(days=14)
-                if await self.ban(member, await self.bot._(member.guild.id,"logs.reason.young"), duration):
-                    self.bot.dispatch("antiraid_ban", member, {
-                        "account_creation_treshold": 3600,
-                        "duration": duration.total_seconds()
-                    })
-                    return True
-            elif account_created_since <= 3600*3 and can_ban: # ban (1w) members created less than 3h before
-                duration = timedelta(days=7)
-                if await self.ban(member, await self.bot._(member.guild.id,"logs.reason.young"), duration):
-                    self.bot.dispatch("antiraid_ban", member, {
-                        "account_creation_treshold": 3600*3,
-                        "duration": duration.total_seconds()
-                    })
-                    return True
+            # kick accounts created less than 1d before
+            if await self._check_score(member, account_created_since, 86400, "kick", "account_creation"):
+                return True
+            # ban (2w) members created less than 1h before
+            if can_ban and await self._check_score(member, account_created_since, 3600, "ban", "account_creation",
+                                                   timedelta(weeks=2)):
+                return True
+            # ban (1w) members created less than 3h before
+            if can_ban and await self._check_score(member, account_created_since, 3600*3, "ban", "account_creation",
+                                                   timedelta(weeks=1)):
+                return True
         # Level 3 or more
         if level >= 3 and can_ban:
             # ban (1w) members with invitations in their nickname
             if self.bot.get_cog("Utilities").sync_check_discord_invite(member.display_name) is not None:
                 duration = timedelta(days=7)
-                if await self.ban(member, await self.bot._(member.guild.id,"logs.reason.invite"), duration):
+                if await self._ban(member, await self.bot._(member.guild.id,"logs.reason.invite"), duration):
                     self.bot.dispatch("antiraid_ban", member, {
                         "discord_invite": True,
                         "duration": duration.total_seconds()
                     })
                     return True
-            if account_created_since <= 3600*1: # ban (1w) accounts created less than 1h before
-                duration = timedelta(days=7)
-                if await self.ban(member, await self.bot._(member.guild.id,"logs.reason.young"), duration):
-                    self.bot.dispatch("antiraid_ban", member, {
-                        "account_creation_treshold": 3600,
-                        "duration": duration.total_seconds()
-                    })
-                    return True
-            if account_created_since <= 3600*12: # kick accounts created less than 45min before
-                if await self.kick(member, await self.bot._(member.guild.id,"logs.reason.young")):
-                    self.bot.dispatch("antiraid_kick", member, {"account_creation_treshold": 3600*12})
-                    return True
+            # ban (1w) accounts created less than 1h before
+            if can_ban and await self._check_score(member, account_created_since, 3600, "ban", "account_creation",
+                                                    timedelta(weeks=1)):
+                return True
+            # kick accounts created less than 12h before
+            if await self._check_score(member, account_created_since, 3600*12, "kick", "account_creation"):
+                return True
         # Level 2 or more
-        if level >= 2: # kick accounts created less than 15min before
-            if account_created_since <= 3600*2:
-                if await self.kick(member, await self.bot._(member.guild.id,"logs.reason.young")):
-                    self.bot.dispatch("antiraid_kick", member, {"account_creation_treshold": 3600*2})
-                    return True
+        if level >= 2:
+            # kick accounts created less than 2h before
+            if await self._check_score(member, account_created_since, 3600*2, "kick", "account_creation"):
+                return True
         # Level 1 or more
         if level >= 1: # kick members with invitations in their nickname
             if self.bot.get_cog("Utilities").sync_check_discord_invite(member.display_name) is not None:
-                if await self.kick(member, await self.bot._(member.guild.id,"logs.reason.invite")):
+                if await self._kick(member, await self.bot._(member.guild.id,"logs.reason.invite")):
                     self.bot.dispatch("antiraid_kick", member, {"discord_invite": True})
                     return True
         # Nothing got triggered
         return False
 
-    async def kick(self, member: discord.Member, reason: str):
+    async def _kick(self, member: discord.Member, reason: str):
         "Try to kick a member from a guild, by checking every needed permission and requirements"
         # if user is too high
         if member.roles[-1].position >= member.guild.me.roles[-1].position:
@@ -163,7 +149,7 @@ class AntiRaid(commands.Cog):
             return False
         return True
 
-    async def ban(self, member: discord.Member, reason: str, duration: timedelta | None = None):
+    async def _ban(self, member: discord.Member, reason: str, duration: timedelta | None = None):
         "Try to ban a member from a guild, by checking every needed permission and requirements"
         # if user is too high
         if member.roles[-1].position >= member.guild.me.roles[-1].position:
@@ -184,7 +170,7 @@ class AntiRaid(commands.Cog):
             await self.bot.task_handler.add_task("ban", duration.total_seconds(), member.id, member.guild.id)
         return True
 
-    async def timeout(self, member: discord.Member, reason: str, duration: timedelta):
+    async def _timeout(self, member: discord.Member, reason: str, duration: timedelta):
         "Try to time-out a member from a guild, by checking every needed permission and requirements"
         # if user is too high
         if member.roles[-1].position >= member.guild.me.roles[-1].position:
@@ -196,6 +182,25 @@ class AntiRaid(commands.Cog):
             await member.timeout(duration, reason=reason)
         except discord.HTTPException:
             return False
+        return True
+
+    async def _check_score(self, member: discord.Member, score: int, treshold: int, action: Literal["timeout", "kick", "ban"],
+                           check_id: str, duration: timedelta | None = None):
+        if score < treshold:
+            return False
+        translation_key = f"logs.reason.{check_id}"
+        if action == "timeout":
+            await self._timeout(member, await self.bot._(member.guild.id, translation_key), duration)
+        if action == "kick":
+            await self._kick(member, await self.bot._(member.guild.id, translation_key))
+        if action == "ban":
+            await self._ban(member, await self.bot._(member.guild.id, translation_key), duration)
+        dispatch_data = {
+            f"{check_id}_treshold": treshold
+        }
+        if duration:
+            dispatch_data["duration"] = duration.total_seconds()
+        self.bot.dispatch(f"antiraid_{action}", member, dispatch_data)
         return True
 
 
@@ -249,66 +254,36 @@ class AntiRaid(commands.Cog):
             return False
         # Level 4
         if level >= 4:
-            if score >= 20: # ban (2w) members with more than 20 mentions
-                duration = timedelta(weeks=2)
-                if await self.ban(member, await self.bot._(member.guild.id,"logs.reason.mentions"), duration=duration):
-                    self.bot.dispatch("antiraid_ban", member, {
-                        "mentions_treshold": 20, "duration": duration.total_seconds()
-                    })
-                    return True
-            if score >= 15: # kick members with more than 15 mentions
-                if await self.kick(member, await self.bot._(member.guild.id,"logs.reason.mentions")):
-                    self.bot.dispatch("antiraid_kick", member, {
-                        "mentions_treshold": 15
-                    })
-                    return True
-            if score >= 10: # timeout (1h) members with more than 10 mentions
-                duration = timedelta(hours=1)
-                if await self.timeout(member, await self.bot._(member.guild.id,"logs.reason.mentions"), duration=duration):
-                    self.bot.dispatch("antiraid_timeout", member, {
-                        "mentions_treshold": 10, "duration": duration.total_seconds()
-                    })
-                    return True
+            # ban (2w) members with more than 20 mentions
+            if await self._check_score(member, score, 20, "ban", "mentions", timedelta(weeks=2)):
+                return True
+            # kick members with more than 15 mentions
+            if await self._check_score(member, score, 15, "kick", "mentions"):
+                return True
+            # timeout (1h) members with more than 10 mentions
+            if await self._check_score(member, score, 10, "timeout", "mentions", timedelta(hours=1)):
+                return True
         # Level 3 or more
         if level >= 3:
-            if score >= 20: # kick members with more than 20 mentions
-                if await self.kick(member, await self.bot._(member.guild.id,"logs.reason.mentions")):
-                    self.bot.dispatch("antiraid_kick", member, {
-                        "mentions_treshold": 20
-                    })
-                    return True
-            if score >= 10: # timeout (30min) members with more than 10 mentions
-                duration = timedelta(minutes=30)
-                if await self.timeout(member, await self.bot._(member.guild.id,"logs.reason.mentions"), duration=duration):
-                    self.bot.dispatch("antiraid_timeout", member, {
-                        "mentions_treshold": 10, "duration": duration.total_seconds()
-                    })
-                    return True
+            # kick members with more than 20 mentions
+            if await self._check_score(member, score, 20, "kick", "mentions"):
+                return True
+            # timeout (30min) members with more than 10 mentions
+            if await self._check_score(member, score, 10, "timeout", "mentions", timedelta(minutes=30)):
+                return True
         # Level 2 or more
         if level >= 2:
-            if score >= 20: # timeout (30min) members with more than 20 mentions
-                duration = timedelta(minutes=30)
-                if await self.timeout(member, await self.bot._(member.guild.id,"logs.reason.mentions"), duration=duration):
-                    self.bot.dispatch("antiraid_timeout", member, {
-                        "mentions_treshold": 20, "duration": duration.total_seconds()
-                    })
-                    return True
-            if score >= 10: # timeout (15min) members with more than 10 mentions
-                duration = timedelta(minutes=15)
-                if await self.timeout(member, await self.bot._(member.guild.id,"logs.reason.mentions"), duration=duration):
-                    self.bot.dispatch("antiraid_timeout", member, {
-                        "mentions_treshold": 10, "duration": duration.total_seconds()
-                    })
-                    return True
+            # timeout (30min) members with more than 20 mentions
+            if await self._check_score(member, score, 20, "timeout", "mentions", timedelta(minutes=30)):
+                return True
+            # timeout (15min) members with more than 10 mentions
+            if await self._check_score(member, score, 10, "timeout", "mentions", timedelta(minutes=15)):
+                return True
         # Level 1 or more
         if level >= 1:
-            if score >= 20: # timeout (30min) members with more than 30 mentions
-                duration = timedelta(minutes=30)
-                if await self.timeout(member, await self.bot._(member.guild.id,"logs.reason.mentions"), duration=duration):
-                    self.bot.dispatch("antiraid_timeout", member, {
-                        "mentions_treshold": 20, "duration": duration.total_seconds()
-                    })
-                    return True
+            # timeout (30min) members with more than 30 mentions
+            if await self._check_score(member, score, 30, "timeout", "mentions", timedelta(minutes=30)):
+                return True
         return False
 
 
@@ -323,66 +298,36 @@ class AntiRaid(commands.Cog):
             return False
         # Level 4
         if level >= 4:
-            if score >= 5: # ban (4w) members with more than 5 invites
-                duration = timedelta(weeks=4)
-                if await self.ban(member, await self.bot._(member.guild.id,"logs.reason.invites"), duration=duration):
-                    self.bot.dispatch("antiraid_ban", member, {
-                        "invites_treshold": 5, "duration": duration.total_seconds()
-                    })
-                    return True
-            if score >= 3: # kick members with more than 3 invites
-                if await self.kick(member, await self.bot._(member.guild.id,"logs.reason.invites")):
-                    self.bot.dispatch("antiraid_kick", member, {
-                        "invites_treshold": 3
-                    })
-                    return True
-            if score >= 2: # timeout (3h) members with more than 2 invites
-                duration = timedelta(hours=3)
-                if await self.timeout(member, await self.bot._(member.guild.id,"logs.reason.invites"), duration=duration):
-                    self.bot.dispatch("antiraid_timeout", member, {
-                        "invites_treshold": 2, "duration": duration.total_seconds()
-                    })
-                    return True
+            # ban (4w) members with more than 5 invites
+            if await self._check_score(member, score, 5, "ban", "invites", timedelta(weeks=4)):
+                return True
+            # kick members with more than 3 invites
+            if await self._check_score(member, score, 3, "kick", "invites"):
+                return True
+            # timeout (3h) members with more than 2 invites
+            if await self._check_score(member, score, 2, "timeout", "invites", timedelta(hours=3)):
+                return True
         # Level 3 or more
         if level >= 3:
-            if score >= 5: # kick members with more than 5 invites
-                if await self.kick(member, await self.bot._(member.guild.id,"logs.reason.invites")):
-                    self.bot.dispatch("antiraid_kick", member, {
-                        "invites_treshold": 5
-                    })
-                    return True
-            if score >= 3: # timeout (3h) members with more than 3 invites
-                duration = timedelta(hours=3)
-                if await self.timeout(member, await self.bot._(member.guild.id,"logs.reason.invites"), duration=duration):
-                    self.bot.dispatch("antiraid_timeout", member, {
-                        "invites_treshold": 3, "duration": duration.total_seconds()
-                    })
-                    return True
+            # kick members with more than 5 invites
+            if await self._check_score(member, score, 5, "kick", "invites"):
+                return True
+            # timeout (3h) members with more than 3 invites
+            if await self._check_score(member, score, 3, "timeout", "invites", timedelta(hours=3)):
+                return True
         # Level 2 or more
         if level >= 2:
-            if score >= 6: # timeout (6h) members with more than 6 invites
-                duration = timedelta(hours=6)
-                if await self.timeout(member, await self.bot._(member.guild.id,"logs.reason.invites"), duration=duration):
-                    self.bot.dispatch("antiraid_timeout", member, {
-                        "invites_treshold": 6, "duration": duration.total_seconds()
-                    })
-                    return True
-            if score >= 3: # timeout (1h) members with more than 3 invites
-                duration = timedelta(hours=1)
-                if await self.timeout(member, await self.bot._(member.guild.id,"logs.reason.invites"), duration=duration):
-                    self.bot.dispatch("antiraid_timeout", member, {
-                        "invites_treshold": 3, "duration": duration.total_seconds()
-                    })
-                    return True
+            # timeout (6h) members with more than 6 invites
+            if await self._check_score(member, score, 6, "timeout", "invites", timedelta(hours=6)):
+                return True
+            # timeout (1h) members with more than 3 invites
+            if await self._check_score(member, score, 3, "timeout", "invites", timedelta(hours=1)):
+                return True
         # Level 1 or more
         if level >= 1:
-            if score >= 5: # timeout (1h) members with more than 5 invites
-                duration = timedelta(hours=1)
-                if await self.timeout(member, await self.bot._(member.guild.id,"logs.reason.invites"), duration=duration):
-                    self.bot.dispatch("antiraid_timeout", member, {
-                        "invites_treshold": 5, "duration": duration.total_seconds()
-                    })
-                    return True
+            # timeout (1h) members with more than 5 invites
+            if await self._check_score(member, score, 5, "timeout", "invites", timedelta(hours=1)):
+                return True
         return False
 
 
