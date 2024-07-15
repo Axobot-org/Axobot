@@ -144,6 +144,16 @@ class TipsManager:
     async def send_user_tip(self, ctx: Union["MyContext", discord.Interaction], tip: UserTip, ephemeral: bool | None = None,
                             **variables: dict[str, str]):
         "Send a tip to a user"
+        await self._send_tip(ctx, tip, ephemeral, **variables)
+        await self.db_register_user_tip(ctx.author.id, tip)
+
+    async def send_guild_tip(self, ctx: Union["MyContext", discord.Interaction], tip: GuildTip, **variables: dict[str, str]):
+        "Send a tip into a guild"
+        await self._send_tip(ctx, tip, ephemeral=None, **variables)
+        await self.db_register_guild_tip(ctx.guild.id, tip)
+
+    async def _send_tip(self, ctx: Union["MyContext", discord.Interaction], tip: UserTip | GuildTip, ephemeral: bool | None,
+                         **variables: dict[str, str]):
         possible_titles = await self.bot._(ctx, "tips.embed.title")
         text = await self.bot._(ctx, f"tips.{tip.value}", **variables)
         embed = discord.Embed(
@@ -159,28 +169,8 @@ class TipsManager:
                 await ctx.followup.send(**args)
             else:
                 await ctx.response.send_message(**args)
-            await self.db_register_user_tip(ctx.user.id, tip)
         else:
             await ctx.send(**args)
-            await self.db_register_user_tip(ctx.author.id, tip)
-
-    async def send_guild_tip(self, ctx: Union["MyContext", discord.Interaction], tip: GuildTip, **variables: dict[str, str]):
-        "Send a tip into a guild"
-        possible_titles = await self.bot._(ctx, "tips.embed.title")
-        text = await self.bot._(ctx, f"tips.{tip.value}", **variables)
-        embed = discord.Embed(
-            title=random.choice(possible_titles),
-            description=text,
-            color=discord.Color.blurple(),
-        )
-        if isinstance(ctx, discord.Interaction):
-            if ctx.response.is_done():
-                await ctx.followup.send(embed=embed)
-            else:
-                await ctx.response.send_message(embed=embed)
-        else:
-            await ctx.send(embed=embed)
-        await self.db_register_guild_tip(ctx.guild.id, tip)
 
     async def generate_random_tip(self, translation_context) -> str:
         "Pick a random tip from the translations list, and format it"

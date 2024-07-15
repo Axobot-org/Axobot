@@ -7,29 +7,15 @@ from discord.utils import stream_supports_colour
 
 def setup_logger():
     """Create the logger module for the whole bot"""
+    # setup root logger
     bot_logger = logging.getLogger("bot")
+    _setup_log_handlers(bot_logger, "logs/debug.log")
 
-    # DEBUG logs to a file
-    file_handler = RotatingFileHandler("logs/debug.log", maxBytes=5e6, backupCount=2, delay=True)
-    file_handler.setLevel(logging.DEBUG)
-    _set_logging_formatter(file_handler)
-    file_handler.set_name("file")
-
-    # INFO logs to console
-    console_handler = logging.StreamHandler(sys.stdout)
-    console_handler.setLevel(logging.INFO)
-    _set_logging_formatter(console_handler)
-    console_handler.set_name("console")
-
-    # add handlers to the logger
-    bot_logger.addHandler(file_handler)
-    bot_logger.addHandler(console_handler)
-
-    # set the logging level to DEBUG (so handlers can filter it)
-    bot_logger.setLevel(logging.DEBUG)
-
-    # add specific logger for database logs
-    _setup_database_logger()
+    # setup database logger
+    db_logger = logging.getLogger("bot.sql")
+    _setup_log_handlers(db_logger, "logs/sql-debug.log")
+    # don't propagate the logs to the bot logger (so DEBUG logs don't appear in the console)
+    db_logger.propagate = False
 
     return bot_logger
 
@@ -49,13 +35,9 @@ def set_beta_logs():
             discord_logger.addHandler(handler)
             break
 
-
-def _setup_database_logger():
-    "Create the logger module for the database, as a sub-logger of the bot logger"
-    db_logger = logging.getLogger("bot.sql")
-
+def _setup_log_handlers(logger: logging.Logger, filename: str):
     # DEBUG logs to a file
-    file_handler = RotatingFileHandler("logs/sql-debug.log", maxBytes=5e6, backupCount=2, delay=True)
+    file_handler = RotatingFileHandler(filename, maxBytes=5e6, backupCount=2, delay=True)
     file_handler.setLevel(logging.DEBUG)
     _set_logging_formatter(file_handler)
     file_handler.set_name("file")
@@ -67,13 +49,11 @@ def _setup_database_logger():
     console_handler.set_name("console")
 
     # add handlers to the logger
-    db_logger.addHandler(file_handler)
-    db_logger.addHandler(console_handler)
+    logger.addHandler(file_handler)
+    logger.addHandler(console_handler)
 
     # set the logging level to DEBUG (so handlers can filter it)
-    db_logger.setLevel(logging.DEBUG)
-    # don't propagate the logs to the bot logger (so DEBUG logs don't appear in the console)
-    db_logger.propagate = False
+    logger.setLevel(logging.DEBUG)
 
 def _set_logging_formatter(handler: logging.StreamHandler):
     "Return a logging formatter with or without colors"

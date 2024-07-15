@@ -236,10 +236,8 @@ class BotEvents(commands.Cog):
             points = 0 if (points is None) else points["points"]
         for reward in rewards:
             if reward["rank_card"] not in cards and points >= reward["points"]:
-                if min_date := reward.get("min_date"):
-                    parsed_date = datetime.datetime.strptime(min_date, "%Y-%m-%d").replace(tzinfo=datetime.UTC)
-                    if self.bot.utcnow() < parsed_date:
-                        continue
+                if self._check_reward_date(reward.get("min_date")):
+                    continue
                 yield reward["rank_card"]
 
     async def check_and_send_card_unlocked_notif(self,
@@ -288,7 +286,7 @@ class BotEvents(commands.Cog):
             )
             await self.bot.send_embed(embed)
 
-    async def reload_event_special_role(self, user: discord.User | int, points: int = None):
+    async def reload_event_special_role(self, user: discord.User | int, points: int | None = None):
         """Grant the current event special role to the provided user, if they have enough points
         'points' argument can be provided to avoid re-fetching the database"""
         if self.current_event is None or len(rewards := await self.get_specific_objectives("role")) == 0:
@@ -304,11 +302,16 @@ class BotEvents(commands.Cog):
             points = 0 if (points is None) else points["points"]
         for reward in rewards:
             if points >= reward["points"]:
-                if min_date := reward.get("min_date"):
-                    parsed_date = datetime.datetime.strptime(min_date, "%Y-%m-%d").replace(tzinfo=datetime.UTC)
-                    if self.bot.utcnow() < parsed_date:
-                        continue
+                if self._check_reward_date(reward.get("min_date")):
+                    continue
                 await member.add_roles(discord.Object(reward["role_id"]))
+
+    def _check_reward_date(self, reward_date: str | None):
+        "Check if the minimal reward date is in the future"
+        if reward_date is None:
+            return False
+        parsed_date = datetime.datetime.strptime(reward_date, "%Y-%m-%d").replace(tzinfo=datetime.UTC)
+        return self.bot.utcnow() < parsed_date
 
     async def db_add_user_points(self, user_id: int, points: int):
         "Add some 'other' events points to a user"

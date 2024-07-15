@@ -34,15 +34,9 @@ class RolesManagement(commands.Cog):
         ..Example role set-color "Admin team" red
 
         ..Doc moderator.html#role-manager"""
-        if not interaction.guild.me.guild_permissions.manage_roles:
-            await interaction.response.send_message(
-                await self.bot._(interaction, "moderation.mute.cant-mute"), ephemeral=True
-            )
+        if not await self._check_bot_perm(interaction):
             return
-        if role.position >= interaction.guild.me.roles[-1].position:
-            await interaction.response.send_message(
-                await self.bot._(interaction, "moderation.role.too-high", r=role.name), ephemeral=True
-            )
+        if not await self._check_bot_position(interaction, role):
             return
         await interaction.response.defer()
         await role.edit(colour=color, reason=f"Asked by {interaction.user}")
@@ -80,21 +74,11 @@ class RolesManagement(commands.Cog):
                 await self.bot._(interaction, "timers.rmd.too-long"), ephemeral=True
             )
             return
-        if not interaction.guild.me.guild_permissions.manage_roles:
-            await interaction.response.send_message(
-                await self.bot._(interaction, "moderation.mute.cant-mute"), ephemeral=True
-            )
+        if not await self._check_bot_perm(interaction):
             return
-        my_position = interaction.guild.me.roles[-1].position
-        if role.position >= my_position:
-            await interaction.response.send_message(
-                await self.bot._(interaction, "moderation.role.give-too-high", r=role.name), ephemeral=True
-            )
+        if not await self._check_bot_position(interaction, role):
             return
-        if role.position >= interaction.user.roles[-1].position:
-            await interaction.response.send_message(
-                await self.bot._(interaction, "moderation.role.give-roles-higher"), ephemeral=True
-            )
+        if not await self._check_user_position(interaction, role):
             return
         await interaction.response.defer()
         await user.add_roles(role, reason=f"Asked by {interaction.user}")
@@ -122,21 +106,11 @@ class RolesManagement(commands.Cog):
         ..Example role grant Slime Theo AsiliS
 
         ..Doc moderator.html#role-manager"""
-        if not interaction.guild.me.guild_permissions.manage_roles:
-            await interaction.response.send_message(
-                await self.bot._(interaction, "moderation.mute.cant-mute"), ephemeral=True
-            )
+        if not await self._check_bot_perm(interaction):
             return
-        my_position = interaction.guild.me.roles[-1].position
-        if role.position >= my_position:
-            await interaction.response.send_message(
-                await self.bot._(interaction, "moderation.role.give-too-high", r=role.name), ephemeral=True
-            )
+        if not await self._check_bot_position(interaction, role):
             return
-        if role.position >= interaction.user.roles[-1].position:
-            await interaction.response.send_message(
-                await self.bot._(interaction, "moderation.role.give-roles-higher"), ephemeral=True
-            )
+        if not await self._check_user_position(interaction, role):
             return
         await interaction.response.defer()
 
@@ -179,21 +153,11 @@ class RolesManagement(commands.Cog):
         ..Example role revoke VIP @muted
 
         ..Doc moderator.html#role-manager"""
-        if not interaction.guild.me.guild_permissions.manage_roles:
-            await interaction.response.send_message(
-                await self.bot._(interaction, "moderation.mute.cant-mute"), ephemeral=True
-            )
+        if not await self._check_bot_perm(interaction):
             return
-        my_position = interaction.guild.me.roles[-1].position
-        if role.position >= my_position:
-            await interaction.response.send_message(
-                await self.bot._(interaction, "moderation.role.give-too-high", r=role.name), ephemeral=True
-            )
+        if not await self._check_bot_position(interaction, role):
             return
-        if role.position >= interaction.user.roles[-1].position:
-            await interaction.response.send_message(
-                await self.bot._(interaction, "moderation.role.give-roles-higher"), ephemeral=True
-            )
+        if not await self._check_user_position(interaction, role):
             return
         await interaction.response.defer()
 
@@ -222,6 +186,30 @@ class RolesManagement(commands.Cog):
                 '*'
             )
         await interaction.edit_original_response(content=answer)
+
+    async def _check_bot_perm(self, interaction: discord.Interaction):
+        if not interaction.guild.me.guild_permissions.manage_roles:
+            await interaction.response.send_message(
+                await self.bot._(interaction, "moderation.mute.cant-mute"), ephemeral=True
+            )
+            return False
+        return True
+
+    async def _check_bot_position(self, interaction: discord.Interaction, role: discord.Role):
+        if role.position >= interaction.guild.me.roles[-1].position:
+            await interaction.response.send_message(
+                await self.bot._(interaction, "moderation.role.too-high", r=role.name), ephemeral=True
+            )
+            return False
+        return True
+
+    async def _check_user_position(self, interaction: discord.Interaction, role: discord.Role):
+        if role.position >= interaction.user.roles[-1].position:
+            await interaction.response.send_message(
+                await self.bot._(interaction, "moderation.role.give-roles-higher"), ephemeral=True
+            )
+            return False
+        return True
 
 
 async def setup(bot: Axobot):

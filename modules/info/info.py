@@ -989,7 +989,7 @@ class Info(commands.Cog):
         # Languages
         disp_lang = list()
         if hasattr(user, "mutual_guilds"):
-            for lang in await self.bot.get_cog("Utilities").get_languages(user):
+            for lang in await self.bot.get_cog("Utilities").get_user_languages(user):
                 disp_lang.append(f"{lang[0]} ({lang[1]*100:.0f}%)")
         if len(disp_lang) == 0:
             disp_lang = ["Unknown"]
