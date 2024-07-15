@@ -169,7 +169,7 @@ class Utilities(commands.Cog):
             try:  # https://top.gg/bot/1048011651145797673
                 async with session.get(
                     f"https://top.gg/api/bots/{self.bot.user.id}/check?userId={userid}",
-                    headers={"Authorization": str(self.bot.dbl_token)}
+                    headers={"Authorization": str(self.bot.secrets["dbl"])}
                 ) as r:
                     json = await r.json()
                     if "error" in json:
