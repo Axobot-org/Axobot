@@ -6,6 +6,7 @@
     "kick": "%{user} (%{userid}) has been kicked",
     "mute": "%{user} (%{userid}) is now muted",
     "reason": {
+        "account_creation": "Automod (too recent account)",
         "autounmute": "automatic unmute",
         "invite": "Automod (Discord invite in their username)",
         "invites": "Automod (spamming Discord invites)",
@@ -13,8 +14,7 @@
         "mentions": "Automod (too many mentions)",
         "unban": "unbanned by %{user}",
         "unmute": "unmuted by %{user}",
-        "welcome_roles": "Automated action (config welcome_roles)",
-        "young": "Automod (too recent account)"
+        "welcome_roles": "Automated action (config welcome_roles)"
     },
     "slowmode-disabled": "Slowmode disabled in %{channel}",
     "slowmode-enabled": "Slowmode enabled in %{channel} (%{seconds}s)",
