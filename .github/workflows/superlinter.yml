@@ -35,9 +35,5 @@ jobs:
           DEFAULT_BRANCH: develop
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VALIDATE_ALL_CODEBASE: false
-          VALIDATE_PYTHON_BLACK: false
-          VALIDATE_PYTHON_ISORT: false
-          VALIDATE_PYTHON_MYPY: false
-          VALIDATE_PYTHON_FLAKE8: false
-          VALIDATE_YAML: false
-          VALIDATE_GITLEAKS: false
+          VALIDATE_PYTHON: true
+          VALIDATE_YAML: true
