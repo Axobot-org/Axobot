@@ -1,8 +1,6 @@
 {
     "command_name": {
         "about": "about",
-        "antiscam disable": "disable",
-        "antiscam enable": "enable",
         "antiscam report": "report",
         "antiscam test": "test",
         "ban": "ban",
@@ -68,7 +66,7 @@
         "rank": "rank",
         "reminders clear": "clear",
         "reminders create": "create",
-        "reminders delete": "delete",
+        "reminders cancel": "cancel",
         "reminders list": "list",
         "remindme": "remindme",
         "Report a scam": "Report a scam",
@@ -380,7 +378,7 @@
             "duration": "duration",
             "message": "message"
         },
-        "reminders delete": {
+        "reminders cancel": {
             "reminder_id": "reminder-id"
         },
         "remindme": {
@@ -414,6 +412,9 @@
         },
         "roles-react remove": {
             "emoji": "emoji"
+        },
+        "roles-react send": {
+            "channel": "channel"
         },
         "roles-react set-description": {
             "description": "description",
@@ -555,7 +556,7 @@
             "user": "user"
         },
         "unhoist": {
-            "chars": "characters"
+            "characters": "characters"
         },
         "unmute": {
             "user": "user"
