@@ -92,7 +92,7 @@ class VoiceMessages(commands.Cog):
 
     async def _get_transcript(self, attachment: discord.Attachment) -> str:
         "Call the external API to get the audio transcript"
-        headers = {"Authorization": self.bot.others["awhikax_api"]}
+        headers = {"Authorization": self.bot.secrets["awhikax_api"]}
         data = {"model": "small", "audio_url": attachment.url}
         async with self.session.post("https://api.awhikax.com/stt", headers=headers, data=data) as resp:
             if resp.status != 200:

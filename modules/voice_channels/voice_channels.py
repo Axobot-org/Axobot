@@ -170,7 +170,7 @@ class VoiceChannels(commands.Cog):
         if len(self.names["random"]) != 0:
             return self.names["random"].pop()
         async with aiohttp.ClientSession() as session:
-            header = {"X-Api-Key": self.bot.others["random_api_token"]}
+            header = {"X-Api-Key": self.bot.secrets["random_api_token"]}
             try:
                 async with session.get(RANDOM_NAMES_URL, headers=header) as resp:
                     json: list[str] = await resp.json()

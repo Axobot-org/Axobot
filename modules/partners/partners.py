@@ -75,7 +75,7 @@ class Partners(commands.Cog):
 
     @property
     def dbl_headers(self):
-        return {"Authorization": self.bot.dbl_token}
+        return {"Authorization": self.bot.secrets["dbl"]}
 
     @tasks.loop(time=[
         datetime.time(hour=7, tzinfo=datetime.UTC),

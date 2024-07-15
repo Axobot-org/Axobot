@@ -36,8 +36,8 @@ class Twitch(commands.Cog):
 
     async def cog_load(self):
         await self.agent.api_login(
-            self.bot.others["twitch"]["client_id"],
-            self.bot.others["twitch"]["client_secret"]
+            self.bot.secrets["twitch"]["client_id"],
+            self.bot.secrets["twitch"]["client_secret"]
         )
         self.log.info("Connected to API")
         self.stream_check_task.start() # pylint: disable=no-member

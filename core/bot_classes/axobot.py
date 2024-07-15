@@ -13,7 +13,7 @@ from core.database import DatabaseConnectionManager, DatabaseQueryHandler
 from core.emojis_manager import EmojisManager
 from core.tasks_handler import TaskHandler
 from core.tips import TipsManager
-from core.tokens import get_secrets_dict
+from core.boot_utils.conf_loader import get_secrets_dict
 
 from .bot_embeds_manager import send_log_embed
 from .consts import PRIVATE_GUILD_ID
@@ -74,7 +74,7 @@ class Axobot(commands.bot.AutoShardedBot):
         self.files_count_enabled: bool = False # if the files count stats system is enabled
         self.internal_loop_enabled: bool = True # if internal loop is enabled
         self.zws = "\u200B"  # here's a zero width space
-        self.others = get_secrets_dict() # other misc credentials
+        self.secrets = get_secrets_dict() # other misc credentials
         self.zombie_mode: bool = zombie_mode # if we should listen without sending any message
         self.task_handler = TaskHandler(self)
         self.emojis_manager = EmojisManager(self)
@@ -83,10 +83,6 @@ class Axobot(commands.bot.AutoShardedBot):
         # app commands
         self.tree.on_error = self.on_app_cmd_error
         self.app_commands_list: Optional[list[discord.app_commands.AppCommand]] = None
-
-    @property
-    def dbl_token(self):
-        return self.others["dbl_axobot"]
 
     async def on_error(self, event_method: Exception | str, *_args, **_kwargs):
         "Called when an event raises an uncaught exception"

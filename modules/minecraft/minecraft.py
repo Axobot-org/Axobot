@@ -142,7 +142,7 @@ class Minecraft(commands.Cog):
         "Get a mod data from the CurseForge API"
         url = "https://api.curseforge.com/v1/mods/search"
         header = {
-            "x-api-key": self.bot.others["curseforge"]
+            "x-api-key": self.bot.secrets["curseforge"]
         }
         params = {
             "gameId": 432,
