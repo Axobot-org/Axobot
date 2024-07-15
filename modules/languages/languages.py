@@ -80,7 +80,7 @@ class Languages(discord.ext.commands.Cog):
 
         if isinstance(source, discord.Member | discord.User):
             # get lang from user
-            used_langs = await self.bot.get_cog("Utilities").get_languages(source, limit=1)
+            used_langs = await self.bot.get_cog("Utilities").get_user_languages(source, limit=1)
             lang_opt = used_langs[0][0] if len(used_langs) > 0 else self.get_default_language()
         elif not self.bot.database_online or source is None:
             # get default lang
@@ -91,7 +91,7 @@ class Languages(discord.ext.commands.Cog):
             if recipient is None:
                 lang_opt = self.get_default_language()
             else:
-                used_langs = await self.bot.get_cog("Utilities").get_languages(recipient, limit=1)
+                used_langs = await self.bot.get_cog("Utilities").get_user_languages(recipient, limit=1)
                 lang_opt = used_langs[0][0] if len(used_langs) > 0 else self.get_default_language()
         elif isinstance(source, int):
             # get lang from server ID

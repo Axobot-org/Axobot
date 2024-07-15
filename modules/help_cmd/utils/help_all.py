@@ -62,9 +62,7 @@ async def _generate_compressed_help(cog: "HelpCog", ctx: MyContext, categories: 
     for category_id, category_commands in categories.items():
         if not category_commands:
             continue
-        category_name = await cog.bot._(ctx.channel, f"help.categories.{category_id}")
-        emoji = cog.commands_data[category_id]["emoji"]
-        title = f"{emoji}  __**{category_name.capitalize()}**__"
+        title = await _get_category_name(cog, ctx, category_id)
         description = await cog.bot._(
             ctx.channel, "help.cmd-count", count=len(category_commands), p='/', cog=category_id
         )
@@ -77,9 +75,7 @@ async def _generate_normal_help(cog: "HelpCog", ctx: MyContext, categories: dict
     for category_id, category_commands in categories.items():
         if not category_commands:
             continue
-        category_name = await cog.bot._(ctx.channel, f"help.categories.{category_id}")
-        emoji = cog.commands_data[category_id]["emoji"]
-        title = f"{emoji}  __**{category_name.capitalize()}**__"
+        title = await _get_category_name(cog, ctx, category_id)
         # make sure the commands list fits in one field
         field_commands: list[str] = []
         for command in category_commands:
@@ -92,3 +88,8 @@ async def _generate_normal_help(cog: "HelpCog", ctx: MyContext, categories: dict
         if field_commands:
             fields.append({"name": title, "value": "\n".join(field_commands), "inline": False})
     return fields
+
+async def _get_category_name(cog: "HelpCog", ctx: MyContext, category_id: str):
+    category_name = await cog.bot._(ctx.channel, f"help.categories.{category_id}")
+    emoji = cog.commands_data[category_id]["emoji"]
+    return f"{emoji}  __**{category_name.capitalize()}**__"

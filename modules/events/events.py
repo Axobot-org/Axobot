@@ -328,9 +328,9 @@ class Events(commands.Cog):
             member_count = len(self.bot.users)
             bot_count = len([1 for x in self.bot.users if x.bot])
             codelines = 0
-        lang_stats = await self.bot.get_cog("ServerConfig").get_languages([])
+        lang_stats = await self.bot.get_cog("ServerConfig").get_enum_usage_stats("language", [])
         rankcards_stats = await self.bot.get_cog("Users").get_rankcards_stats()
-        xptypes_stats = await self.bot.get_cog("ServerConfig").get_xp_types([])
+        xptypes_stats = await self.bot.get_cog("ServerConfig").get_enum_usage_stats("xp_type", [])
         supportserver_members = self.bot.get_guild(SUPPORT_GUILD_ID.id).member_count
         query = "INSERT INTO `log_stats` (`servers_count`, `members_count`, `bots_count`, `dapi_heartbeat`, `codelines_count`, `earned_xp_total`, `rss_feeds`, `active_rss_feeds`, `supportserver_members`, `languages_json`, `used_rankcards_json`, `xp_types_json`, `entity_id`) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
         data = (

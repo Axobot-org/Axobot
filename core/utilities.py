@@ -140,7 +140,7 @@ class Utilities(commands.Cog):
             liste.append(card)
         return sorted(liste2)+sorted(liste)
 
-    async def get_languages(self, user: discord.User, limit: int=0):
+    async def get_user_languages(self, user: discord.User, limit: int=0):
         """Get the most used languages of an user
         If limit=0, return every languages"""
         if not self.bot.database_online:

@@ -246,20 +246,24 @@ def remove_alpha(img: Image.Image, bg: ColorType):
     return background
 
 def variations_filter(img: Image.Image, modifier: dict[str, Any], _variation: VariationType, _maximum: int, minimum: int):
-    img = img.convert("LA")
-    pixels = img.getdata()
-    img = img.convert("RGBA")
-    results = [modifier["func"]((x - minimum) * 255 / (255 - minimum)) if x >= minimum else 0 for x in range(256)]
-
-    img.putdata((*map(lambda x: results[x[0]] + (x[1],), pixels),))
-    return img
+    return _apply_modification(img, modifier, None, math.inf, minimum)
 
 def colorify_image(img: Image.Image, modifier: dict[str, Any], variation: VariationType, maximum: int, minimum: int):
+    return _apply_modification(img, modifier, variation, maximum, minimum)
+
+def _apply_modification(img: Image.Image, modifier: dict[str, Any], variation: VariationType | None, maximum: int, minimum: int):
+    "Apply a filter or a colorification to a given image"
     img = img.convert("LA")
     pixels = img.getdata()
     img = img.convert("RGBA")
+    if variation is None:
+        def edit_color(x: int):
+            return modifier["func"]((x - minimum) * 255 / (255 - minimum))
+    else:
+        def edit_color(x: int):
+            return _colorify((x - minimum) / (maximum - minimum), modifier["colors"], variation)
     results = [
-        _colorify((x - minimum) / (maximum - minimum), modifier["colors"], variation)
+        edit_color(x)
         if x >= minimum
         else 0
         for x in range(256)
