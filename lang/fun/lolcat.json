@@ -161,8 +161,7 @@
         "Pro-tip: if u wanna deactivate a rss feed just temporarily, u can use %{rss_disable_cmd}. Or.... use %{rss_delete_cmd} 2 permanently delete it.",
         "Did u know? disabling a feed w/ %{rss_disable_cmd} wont free u a slot 4 addin' another feed. If u want 2 do dat, try %{rss_delete_cmd} instead!",
         "Pro-tip: our amazingest support server can offer u: very quick help w/ ur problems, cool teasers of upcoming updates, and votes 4 my next features. Come & join us at <%{support_server_url}> !",
-        "Did u know? If ur wanna help us translate my messages, u can join my team on our amazingest server at %{support_server_url} !",
-        "Pro-tip: my supercool antiscam system (used 2 delete vicious msgs) runs on my own server, w/ a homemade model. Wanna try it? Check out %{antiscam_enable_cmd}"
+        "Did u know? If ur wanna help us translate my messages, u can join my team on our amazingest server at %{support_server_url} !"
     ],
     "uninhabited-city": "Tish place have 0 inhabitant :upside_down:"
 }

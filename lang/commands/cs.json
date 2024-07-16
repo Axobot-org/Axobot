@@ -62,8 +62,8 @@
         "profile card-preview": "karta-náhledů",
         "profile config": "nastavení",
         "profile list-card-styles": "seznam-stylů-karet",
-        "Quote": "Citát",
         "quote": "citát",
+        "Quote": "Citát",
         "random-tip": "náhodný-tip",
         "rank": "hodnost",
         "reminders clear": "vyčistit",
@@ -503,6 +503,9 @@
         },
         "tickets portal set-text": {
             "message": "zpráva"
+        },
+        "tickets portal summon": {
+            "channel": "kanál"
         },
         "tickets review-config": {
             "topic_id": "id-téma"

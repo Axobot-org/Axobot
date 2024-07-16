@@ -28,6 +28,7 @@
         "channel": "Nastala chyba, nemohl jsem vytvořit nový kanál tiketu. Ujistěte se prosím, že mám požadovaná oprávnění v kategorii \"%{category}\" a zkuste to znovu.",
         "thread": "Jejda, nemohl jsem vytvořit nové vlákno tiketu. Prosím, ujistěte se, že mám požadovaná oprávnění v %{channel} a zkuste to znovu."
     },
+    "missing-perms-send": "Ups, nemám potřebná oprávnění k odesílání zpráv v kanálu %{channel}. Prosím, udělte mi oprávnění 'Odesílat zprávy' a zkuste to znovu.",
     "missing-perms-setup": {
         "to-member": "Nastala chyba, nemohl jsem správně nastavit váš ticket kanál. Prosím, požádejte moderátora serveru o opravu mých oprávnění, jinak kdokoliv, kdo má přístup ke kategorii ticketů, může být schopen přečíst váš ticket.",
         "to-staff": "Chyba, nemohl jsem nastavit oprávnění kanálu pro váš tiket. Prosím, ujistěte se, že mám oprávnění 'Správa rolí' v kategorii %{category}, jinak kdokoliv, kdo má přístup do této kategorie, může vidět nové tikety."
