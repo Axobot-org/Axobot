@@ -88,6 +88,7 @@
     },
     "no-feed": "Oops, u donot hav any rss feds 2 managez plz!",
     "no-feed2": "Ur server don't has rss thingy!",
+    "no-feed-enabled": "Dis server has no active RSS thingy!",
     "no-feed-filter": "Oopsie, no feed match ur query!",
     "no-roles": "No more role hAVe bean configurated yetz.",
     "not-a-role": "The rOle was not finndz. Try against:",
@@ -98,13 +99,21 @@
     },
     "research-timeout": "This page took toooo long 2 answer, I had to stop teh process :eyes:",
     "roles": {
-        "cant-find": "Err nope, cant find dat role",
+        "edit-silent-false": {
+            "one": "Dis feed haz been changed 2 send cool notifications",
+            "many": "These feeds has been changd 2 send cool notifications"
+        },
+        "edit-silent-true": {
+            "one": "Dis feed haz been changed 2 send quiet notifications",
+            "many": "These feeds has been changd 2 send quiet notifications"
+        },
         "edit-success": {
             "many": "Thes feed have been editd 2 mention the roles %{roles}",
             "one": "Thes feed has been edit 2 mention teh role %{roles}",
             "zero": "Those feeed has beeen modifiedz to do not ping ani role"
         },
-        "list": "Her iz teh lis for rolez alreedy indicatd: %{roles}"
+        "list": "Her iz teh lis for rolez alreedy indicatd: %{roles}",
+        "no-change": "No param has been changd"
     },
     "success-add": "Teh rss feed for type '%{type}' with lik <%{url}> have bein prperly addded in the cannel %{channel} !",
     "test": {

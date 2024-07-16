@@ -1,13 +1,16 @@
 {
     "ban": {
+        "ban-success": "Teh member haz been bannd!",
         "cant-ban": "Perm 'Ban members' needd :confused:",
         "list-error": "Oops, seems like ther are 2 many usr to display :confused:",
         "list-title-0": "List of bannd membrs ov this nice place '{}'",
         "list-title-1": "List of 45 bannd membrs ov this nice place '{}'",
         "list-title-2": "List of 60 bannd membrs ov this nice place '{}'",
         "no-bans": "No mmber seems to be bannd from here",
+        "softban-succes": "Teh member haz been soft-bannd",
         "staff-ban": "NOPE, U can't ban another cool staff guy!",
         "too-high": "Maaaw... 'seems dat dis member iz too high 4 me to ban em :thinking:",
+        "unban-success": "Teh member haz been un-bannd",
         "user-not-banned": "Dis nice guy iz not part of teh bannd members list :upside_down:"
     },
     "ban-chat": "Mber %{user} (%{userid}) has been banned fr0m dis cool servr.",
@@ -29,6 +32,7 @@
     },
     "emoji": {
         "cant-emoji": "Oooops, I'm missng teh perm `Manage expressions` <:owo:499661437589913621>",
+        "cleared": "The react has been rightly cleared :check:!",
         "emoji-valid": {
             "one": "teh %{name} emoji haz been edited to only B usable by %{roles} ppl",
             "many": "teh %{name} emoji haz been edited to only B usable by %{roles} ppl"
@@ -44,6 +48,7 @@
     "kick": {
         "cant-staff": "Yolo NOPE ! U can't kick a-other nice staff mmber!",
         "no-perm": "Perm 'Kick memberz' needed :confused:",
+        "success": "Teh member haz been kickd",
         "too-high": "Seemz that this membr iz tooooo high 4 me to kick 'em out :thinking:"
     },
     "kick-chat": "Membr %{user} (%{userid}) haz been kick from dis servr",
@@ -72,10 +77,12 @@
         "list-title-1": "List ov a few (45) muted members of ur server \"%{guild}\"",
         "list-title-2": "Lits ov 60 muted members of dat guild \"%{guild}\"",
         "mute-high": "Ooops, 't sEEms dat `muted` rol iz tooo high 4 me to give it... Plz fiX dis problem by plac'ng my role higher than this nice `muted` role.",
+        "mute-success": "Teh member haz been silenced",
         "no-mute": "Oooops, seemz dat teh nice `muted` role doznt exist :rofl: Creat'it nd assign perms yourself",
         "no-mutes": "No member seems 2B muted ._.",
         "staff-mute": "U cant prevent another cool staff member frm speek'ng ",
-        "too-high": "Seemz that this membr iz tooooo high 4 me to time 'em out :ohno:"
+        "too-high": "Seemz that this membr iz tooooo high 4 me to time 'em out :ohno:",
+        "unmute-success": "Teh member haz been un-silenced"
     },
     "mute-chat": "Teh mmber %{user} (%{userid}) haz been silencd",
     "mute-dm": "U've been silenced in teh %{guild} :sadcat:",
@@ -118,16 +125,17 @@
         "too-long": "Impossible to set a frequency higher than 6 hourz"
     },
     "unban-chat": "Mmber %{user} (%{userid}) iz no langer bannd fr0m this servr",
+    "unhoist-too-many-members": "Uups, it's not that I'm lazy, u know... But oh wow, dat's a hell ov a big server u got here. Hell naw, i refuse to work dat much thanks.",
     "unhoisted": {
         "many": "%{count} bad names edited!",
         "one": "1 bad name edited .-.",
         "zero": "No bad name editd!"
     },
-    "unhoist-too-many-members": "Uups, it's not that I'm lazy, u know... But oh wow, dat's a hell ov a big server u got here. Hell naw, i refuse to work dat much thanks.",
     "unmute-chat": "Teh mmber %{user} (%{userid}) canow speek 'gain",
     "warn": {
         "cant-bot": "Nope, cant warn anoder cool boat ^^",
         "cant-staff": "Hey NOPE ! U cant warn 'nother staff nice member!",
+        "success": "Teh member haz been warnd",
         "warn-but-db": "Our dataz being offline, so ze warning couldnt be savd. Don't worry, this guy did receive his warning in DM :innocent:"
     },
     "warn-chat": "%{user} (%{userid}) haz been warnd!",

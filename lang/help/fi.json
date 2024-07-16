@@ -2,51 +2,17 @@
     "aliases": "Lyhenteet",
     "categories": {
         "data": "tietoa",
-        "fun": "hauska",
         "moderation": "valvonta",
         "other": "muut",
         "server-settings": "palvelin asetukset",
         "staff": "bot työntekijät",
-        "translators": "kääntäjä tiimi",
         "unclassed": "Ei kategoriassa",
         "users-info": "Käyttäjän tietoa"
     },
     "check-desc": {
-        "bot_can_embed": [
-            "Botilla on lupa lähettää upotettuja linkkejä",
-            "Sinun täytyy sallia botin lähettää upotettuja linkkejä"
-        ],
         "bot_has_permissions": [
             "Botilla on riittävästi käyttöoikeuksia",
             "Botilla ei ole riittävästi käyttöoikeuksia"
-        ],
-        "can_ban": [
-            "Yksi sinun rooleista voi käyttää komentoa (`ban_allowed_roles`)",
-            "Sallittu rooli puuttuu (`ban_allowed_roles`)"
-        ],
-        "can_clear": [
-            "Yksi sinun rooleista voi käyttää komentoa (`clear_allowed_roles`)",
-            "Sallittu rooli puuttuu (`clear_allowed_roles`)"
-        ],
-        "can_edit_case": [
-            "Yksi sinun rooleista voi käyttää komentoa (`warn_allowed_roles`)",
-            "Sallittu rooli puuttuu (`warn_allowed_roles`)"
-        ],
-        "can_kick": [
-            "Yksi sinun rooleista voi käyttää komentoa (`kick_allowed_roles`)",
-            "Sallittu rooli puuttuu (`kick_allowed_roles`)"
-        ],
-        "can_mute": [
-            "Yksi sinun rooleista voi käyttää komentoa (`mute_allowed_roles`)",
-            "Sallittu rooli puuttuu (`mute_allowed_roles`)"
-        ],
-        "can_say": [
-            "Yksi sinun rooleista voi käyttää komentoa (`say_allowed_roles`)",
-            "Sallittu rooli puuttuu (`say_allowed_roles`)"
-        ],
-        "can_slowmode": [
-            "Yksi sinun rooleista voi käyttää komentoa (`slowmode`_allowed_roles)",
-            "Sallittu rooli puuttuu (`slowmode_allowed_roles`)"
         ],
         "can_use_cookie": [
             "Olet yksi valituista jotka Aragorn1202 on valinnut.",
@@ -56,10 +22,6 @@
             "Sinulla on 'Hallinnoi palvelinta' käyttöoikeus",
             "'Hallinnoi palvelinta' käyttöoikeus puuttuu"
         ],
-        "can_warn": [
-            "Yksi sinun rooleista voi käyttää komentoa (`warn_allowed_roles`)",
-            "Sallittu rooli puuttuu (`warn_allowed_roles`)"
-        ],
         "database_connected": [
             "Cancel",
             "Tietokanta ei ole käytössä"
@@ -67,42 +29,6 @@
         "guild_only": [
             "Voidaan vain käyttää palvelimessa",
             "Voidaan vain käyttää palvelimessa"
-        ],
-        "has_admin": [
-            "Sinulla on 'Järjestelmänvalvoja' käyttöoikeus",
-            "'Järjestelmänvalvoja' käyttöoikeus puuttuu"
-        ],
-        "has_audit_logs": [
-            "Sinulla on 'Katso valvontalokia' käyttöoikeus",
-            "'Katso valvontalokia' käyttöoikeus puuttuu"
-        ],
-        "has_embed_links": [
-            "Sinulla on 'Upota linkkejä' käyttöoikeus",
-            "Sinulla täytyy olla 'Upota linkkejä' käyttöoikeus"
-        ],
-        "has_manage_channels": [
-            "Sinulla on 'Hallinnoi kanavia' käyttöoikeus",
-            "'Hallinnoi kanavia' käyttooikeus puuttuu"
-        ],
-        "has_manage_expressions": [
-            "Sinulla on 'Hallinnoi emojeja ja tarroja' käyttöoikeus",
-            "Sinulla täytyy olla 'Hallinnoi emojeja ja tarroja' käyttöoikeus"
-        ],
-        "has_manage_guild": [
-            "Sinulla on 'Hallinnoi palvelinta' käyttöoikeus",
-            "'Hallinnoi palvelinta' käyttöoikeus puuttuu"
-        ],
-        "has_manage_msg": [
-            "Sinulla on 'Hallinnoi viestejä' käyttöoikeus",
-            "'Hallinnoi viestejä' käyttöoikeus puuttuu"
-        ],
-        "has_manage_nicknames": [
-            "Sinulla on 'Hallinnoi nimimerkkejä' käyttöoikeus",
-            "'Hallinnoi nimimerkkejä' käyttöoikeus puuttuu"
-        ],
-        "has_manage_roles": [
-            "Sinulla on 'Hallinnoi rooleja' käyttöoikeus",
-            "'Hallinnoi rooleja' käyttooikeus puuttuu"
         ],
         "has_permissions": [
             "Sinulla on riittävästi käyttöoikeuksia",
@@ -120,10 +46,6 @@
             "Sinun täytyy olla botin ylläpitäjä",
             "Et ole botin ylläpitäjä"
         ],
-        "is_fun_enabled": [
-            "Hauska komennot on nyt päällä",
-            "Hauska komennot täytyy olla kytketty päälle"
-        ],
         "is_halloween": [
             "Halloween tapahtuma on täällä!",
             "Halloween tapahtumia ei tällä hetkellä ole"
@@ -135,10 +57,6 @@
         "is_support_staff": [
             "Sinä olet jäsen botin järjestelmänvalvojista",
             "Sinun täytyy olla jäsen botin järjestelmänvalvojista"
-        ],
-        "is_translator": [
-            "Olet osa kääntäjien tiimiä",
-            "Sinun on oltava osa kääntäjätiimiä"
         ],
         "is_ttt_enabled": [
             "Ristinolla peli on käytössä",
