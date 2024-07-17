@@ -74,7 +74,7 @@ class TicTacToe(commands.Cog):
             elif self.interaction.guild:
                 self.emojis = await self.bot.get_config(self.interaction.guild_id, "ttt_emojis")
             if len(self.emojis) < 2:
-                self.emojis = (":red_circle:", ":blue_circle:")
+                self.emojis = ("🔴", "🔵")
             # if the bot should start, play its turn
             if not self.is_user_turn:
                 await self.bot_turn()
@@ -93,9 +93,9 @@ class TicTacToe(commands.Cog):
                     )
                     button.callback = self.on_click
                 elif self.grid[i] == 'O':
-                    button = discord.ui.Button(style=discord.ButtonStyle.gray, label=self.emojis[0], disabled=True, row=row)
+                    button = discord.ui.Button(style=discord.ButtonStyle.gray, emoji=self.emojis[0], disabled=True, row=row)
                 else:
-                    button = discord.ui.Button(style=discord.ButtonStyle.gray, label=self.emojis[1], disabled=True, row=row)
+                    button = discord.ui.Button(style=discord.ButtonStyle.gray, emoji=self.emojis[1], disabled=True, row=row)
                 self.add_item(button)
             await self.interaction.edit_original_response(content=content, view=self)
 
