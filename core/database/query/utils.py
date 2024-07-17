@@ -53,14 +53,14 @@ async def _format_query_c(cursor: CMySQLCursor, operation: str | bytes, params: 
     # pylint: disable=protected-access
     try:
         if isinstance(operation, str):
-            stmt = operation.encode(cursor._cnx.python_charset)
+            stmt = operation.encode(cursor._connection.python_charset)
         else:
             stmt = operation
     except (UnicodeDecodeError, UnicodeEncodeError) as err:
         raise errors.ProgrammingError(str(err))
 
     if params:
-        prepared = cursor._cnx.prepare_for_mysql(params)
+        prepared = cursor._connection.prepare_for_mysql(params)
         if isinstance(prepared, dict):
             for key, value in prepared.items():
                 stmt = stmt.replace(f"%({key})s".encode(), value)
