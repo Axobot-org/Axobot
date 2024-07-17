@@ -12,7 +12,7 @@ from core.getch_methods import getch_channel_or_thread
 
 log = logging.getLogger("bot")
 UnicodeEmoji = str
-UnicodeEmojis = EmojisManager(None).unicode_set
+EmojisManagerInstance = EmojisManager(None)
 
 class IntOptionRepresentation(TypedDict):
     "Configuration for an integer option"
@@ -647,7 +647,7 @@ class EmojisListOption(OptionConverter):
                 else:
                     log.warning("[EmojisListConverter] Emoji not found: %s", emoji_id)
                     continue
-            elif all(char in UnicodeEmojis for char in emoji_id):
+            elif emoji_id in EmojisManagerInstance.unicode_set:
                 emojis.append(emoji_id)
             else:
                 log.warning("[EmojisListConverter] Invalid emoji: %s", emoji_id)
@@ -667,10 +667,12 @@ class EmojisListOption(OptionConverter):
         emojis: list[UnicodeEmoji | discord.Emoji] = []
         ctx = await commands.Context.from_interaction(interaction)
         for emoji in raw.split():
-            if emoji in UnicodeEmojis:
+            if emoji in EmojisManagerInstance.emoji_map:
+                emoji = EmojisManagerInstance.emoji_map[emoji]
+            if emoji in EmojisManagerInstance.unicode_set:
                 if emoji in emojis:
                     continue
-                emojis.append(str(emoji))
+                emojis.append(emoji)
             else:
                 try:
                     emoji = await commands.EmojiConverter().convert(ctx, emoji)

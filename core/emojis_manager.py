@@ -1,4 +1,4 @@
-import string
+import re
 from typing import TYPE_CHECKING
 
 import discord
@@ -931,6 +931,24 @@ characteres = {':': 582223307944886292,
                ' ': 446782476375949323}
 
 
+UNICODE_FILE_LINE_PATTERN = re.compile(
+    r"^[A-F0-9]{4,5} (?:[A-F0-9]{4,5} )*\s+; (?:fully|minimally)-qualified\s+# (?P<emoji>\S+) E\d+\.\d+ (?P<name>[a-z :\-,]+)$"
+)
+
+
+def convert_unicode_name(name: str) -> str:
+    return (
+        name
+        .replace(' ', '_')
+        .replace(': ', '_')
+        .replace(', ', '_')
+        .replace('light skin tone', 'tone1')
+        .replace('medium-light skin tone', 'tone2')
+        .replace('medium skin tone', 'tone3')
+        .replace('medium-dark skin tone', 'tone4')
+        .replace('dark skin tone', 'tone5')
+    )
+
 class EmojisManager:
     """Class for managing emojis. No more, no less."""
 
@@ -969,11 +987,14 @@ class EmojisManager:
         try:
             resp = requests.get("https://www.unicode.org/Public/emoji/latest/emoji-test.txt", timeout=5)
             self.unicode_set: set[str] = set()
-            for character in resp.text:
-                if character not in string.printable:
-                    self.unicode_set.add(character)
+            for line in resp.text.split("\n"):
+                if match := UNICODE_FILE_LINE_PATTERN.match(line):
+                    self.unicode_set.add(match.group("emoji"))
+                    emoji_name = convert_unicode_name(match.group("name"))
+                    self.emoji_map[':' + emoji_name + ':'] = match.group("emoji")
         except requests.exceptions.ConnectionError:
             pass
+        print(len(self.unicode_set))
 
     async def anti_code(self, text: str) -> str:
         "Convert unicode emojis to their columns-string representation"
