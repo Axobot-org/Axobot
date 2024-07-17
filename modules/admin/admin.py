@@ -121,15 +121,16 @@ class Admin(commands.Cog):
         await interaction.response.defer()
         if scope == "global":
             if self.bot.beta:
-                self.bot.tree.copy_global_to(guild=PRIVATE_GUILD_ID)
-                cmds = await self.bot.tree.sync(guild=PRIVATE_GUILD_ID)
-                txt = f"{len(cmds)} (global + local) app commands synced in staff server"
+                for guild_id in (PRIVATE_GUILD_ID, SUPPORT_GUILD_ID):
+                    self.bot.tree.copy_global_to(guild=guild_id)
+                    cmds = await self.bot.tree.sync(guild=guild_id)
+                txt = f"{len(cmds)} (global + local) app commands synced in support and staff servers"
             else:
                 cmds = await self.bot.tree.sync()
                 txt = f"{len(cmds)} global app commands synced"
         elif scope == "staff-server":
             cmds = await self.bot.tree.sync(guild=PRIVATE_GUILD_ID)
-            txt = f"{len(cmds)} app commands synced in staff server"
+            txt = f"{len(cmds)} app commands synced in the staff server"
         elif scope == "public-server":
             cmds = await self.bot.tree.sync(guild=SUPPORT_GUILD_ID)
             txt = f"{len(cmds)} app commands synced in the support server"
