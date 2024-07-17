@@ -1,6 +1,6 @@
 import json
 import time
-from typing import Any
+from typing import Any, Literal
 
 import discord
 from cachetools import TTLCache
@@ -281,6 +281,20 @@ class ServerConfig(commands.Cog):
         async with self.bot.db_main.read(query, (self.bot.beta,)) as query_results:
             return [row["guild_id"] for row in query_results]
 
+    # ---- EDITION LOGS ----
+
+    @commands.Cog.listener()
+    async def on_config_edit(self, guild_id: int, user_id: int,
+                             event_type: Literal["sconfig_option_set", "sconfig_option_reset", "sconfig_reset_all"],
+                             data: dict[str, Any] | None):
+        "Record a config edit event in the database"
+        if len(event_type) > 64:
+            raise ValueError("Event type cannot exceed 64 characters")
+        query = "INSERT INTO `edition_logs` (`guild_id`, `user_id`, `type`, `data`) VALUES (%s, %s, %s, %s)"
+        async with self.bot.db_main.write(query, (guild_id, user_id, event_type, json.dumps(data))):
+            pass
+
+
     # ---- COMMANDS ----
 
     async def option_name_autocomplete(self, current: str):
@@ -364,6 +378,7 @@ class ServerConfig(commands.Cog):
             return
         await interaction.response.defer()
         await self.reset_option(interaction.guild_id, option)
+        await self.on_config_edit(interaction.guild_id, interaction.user.id, "sconfig_option_reset", {"option": option})
         await interaction.followup.send(await self.bot._(interaction, "server.value-deleted", option=option))
         # send internal log
         msg = f"Reset option in server {interaction.guild_id}: {option}"
@@ -406,6 +421,7 @@ class ServerConfig(commands.Cog):
         if await self.reset_guild_config(interaction.guild_id):
             await interaction.followup.send(await self.bot._(interaction, "server.reset-all.success"))
             # Send internal log
+            await self.on_config_edit(interaction.guild_id, interaction.user.id, "sconfig_reset_all", None)
             msg = f"Reset all options in server {interaction.guild_id}"
             emb = discord.Embed(description=msg, color=self.log_color, timestamp=self.bot.utcnow())
             emb.set_footer(text=interaction.guild.name)
@@ -549,6 +565,8 @@ class ServerConfig(commands.Cog):
                 await interaction.followup.send(await self.bot._(interaction, "server.internal-error"), ephemeral=True)
             return
         await self.set_option(interaction.guild_id, option_name, value)
+        await self.on_config_edit(interaction.guild_id, interaction.user.id, "sconfig_option_set",
+                                  {"option": option_name, "value": await to_raw(option_name, value, self.bot)})
         check_embed = await check_config(self.bot, interaction.guild, option_name, value)
         await interaction.followup.send(
             await self._get_set_success_message(interaction, option_name, value),

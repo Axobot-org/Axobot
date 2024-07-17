@@ -493,6 +493,8 @@ This will remove the role 'muted' for the targeted member
             await interaction.followup.send(await self.bot._(interaction, "moderation.mute-config.err"))
         elif create:
             await interaction.followup.send(await self.bot._(interaction, "moderation.mute-config.success", count=errors_count))
+            self.bot.dispatch("config_edit", interaction.guild_id, interaction.user.id, "sconfig_option_set",
+                              {"option": "muted_role", "value": str(role.id)})
         else:
             await interaction.followup.send(await self.bot._(interaction, "moderation.mute-config.success2", count=errors_count))
 
@@ -945,13 +947,14 @@ The 'show_reasons' parameter is used to display the mute reasons.
         self.bot.dispatch("moderation_clear", interaction.channel, interaction.user, len(messages))
 
 
-    async def configure_muted_role(self, guild: discord.Guild, role: discord.Role = None):
-        """Ajoute le rôle muted au serveur, avec les permissions nécessaires"""
+    async def configure_muted_role(self, guild: discord.Guild, role: discord.Role | None = None):
+        """Ajoute le rôle muted au serveur, avec les permissions nécessaires.
+        Retourne le rôle et le nombre d'erreurs rencontrées"""
         if not guild.me.guild_permissions.manage_roles:
             return None, 0
         if role is None:
             role = await guild.create_role(name="muted")
-        count = 0 # nbr of errors
+        errors_count = 0
         try:
             for x in guild.by_category():
                 category, channelslist = x[0], x[1]
@@ -970,14 +973,14 @@ The 'show_reasons' parameter is used to display the mute reasons.
                                     obj.send_messages = None
                                     await channel.set_permissions(r, overwrite=obj)
                         except discord.errors.Forbidden:
-                            count += 1
+                            errors_count += 1
                 if category is not None and category.permissions_for(guild.me).manage_roles:
                     await category.set_permissions(role, send_messages=False)
         except Exception as err:
             self.bot.dispatch("error", err)
-            count = len(guild.channels)
+            errors_count = len(guild.channels)
         await self.bot.get_cog("ServerConfig").set_option(guild.id, "muted_role", role)
-        return role, count
+        return role, errors_count
 
 
 
