@@ -57,10 +57,6 @@
         "is_support_staff": [
             "Sinä olet jäsen botin järjestelmänvalvojista",
             "Sinun täytyy olla jäsen botin järjestelmänvalvojista"
-        ],
-        "is_ttt_enabled": [
-            "Ristinolla peli on käytössä",
-            "Ristinolla peli täytyy laittaa käyttöön tällä palvelimella"
         ]
     },
     "cmd-count": {
