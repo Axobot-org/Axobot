@@ -165,7 +165,7 @@ class AbstractSubcog(ABC):
             return True
         if not self.bot.database_online and not message.author.guild_permissions.manage_guild:
             return False
-        return await self.bot.get_config(message.guild.id, "enable_fun")
+        return await self.bot.get_config(message.guild.id, "enable_events")
 
     async def get_random_tip_field(self, interaction: discord.Interaction):
         return {

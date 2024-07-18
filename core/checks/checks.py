@@ -44,12 +44,6 @@ async def database_connected(ctx: MyContext | discord.Interaction[Axobot]) -> bo
         return True
     raise commands.CommandError("Database offline")
 
-async def is_ttt_enabled(interaction: discord.Interaction[Axobot]) -> bool:
-    "Check if the tic-tac-toe game is enabled in a given context"
-    if interaction.guild is None:
-        return True
-    return await interaction.client.get_config(interaction.guild_id, "enable_ttt")
-
 async def is_voice_message(interaction: discord.Interaction):
     "Check if the message is a voice message"
     if "resolved" not in interaction.data or "messages" not in interaction.data["resolved"]:

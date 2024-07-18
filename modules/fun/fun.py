@@ -38,7 +38,7 @@ async def can_use_cookie(ctx: MyContext) -> bool:
     return ctx.author.id in allowed_users
 
 class Fun(commands.Cog):
-    """Add some fun commands, no obvious use. You can disable this module with the 'enable_fun' option (command 'config')"""
+    """Add some fun commands, no obvious use."""
 
     def __init__(self, bot: Axobot):
         self.bot = bot

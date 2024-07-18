@@ -6,9 +6,6 @@
 
 This section of the bot contains lots of fun commands, which will be less useful than the other sections, but will add a good atmosphere in your server. Because a server's life is not just about moderation or utilities, Axobot couldn't be without a few moments of fun.
 
-However, if too much fun bothers you, this option can be disabled at any time with the `config command <server.html>`__ (`enable_fun` parameter). The choice is yours!
-
-
 ---------------------
 List of every command
 ---------------------

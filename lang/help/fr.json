@@ -57,10 +57,6 @@
         "is_support_staff": [
             "Vous faites partie du staff du bot",
             "Vous devez faire partie du staff du bot"
-        ],
-        "is_ttt_enabled": [
-            "Le jeu du morpion est activé",
-            "Le jeu du morpion doit être activé sur ce serveur"
         ]
     },
     "cmd-count": {

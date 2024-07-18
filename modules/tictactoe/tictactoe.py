@@ -7,7 +7,6 @@ from discord import app_commands
 from discord.ext import commands
 
 from core.bot_classes import Axobot
-from core.checks.checks import is_ttt_enabled
 
 GridType = list[int | Literal['X', 'O']]
 
@@ -21,7 +20,6 @@ class TicTacToe(commands.Cog):
         self.in_game = {}
 
     @app_commands.command(name="tic-tac-toe")
-    @app_commands.check(is_ttt_enabled)
     async def main(self, interaction: discord.Interaction):
         """A simple mini-game that consists of aligning three chips on a 9-square grid.
     The bot plays in red, the user in blue.

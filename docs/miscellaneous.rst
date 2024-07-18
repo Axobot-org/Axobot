@@ -88,8 +88,6 @@ Tic-tac-toe
 
 Yes, we did it! A first mini-game for our bot, the tic-tac-toe! You can play against the bot in this fast and simplistic game, just by entering the command and clicking on empty cells.
 
-.. note:: If you want to disable the game in your server, you can edit your "enable_ttt" `config option <server.html#list-of-every-option>`__
-
 
 ----
 Poll
