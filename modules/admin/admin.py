@@ -427,13 +427,13 @@ class Admin(commands.Cog):
         await interaction.response.send_message("Pull en cours...")
         repo = Repo(os.getcwd())
         assert not repo.bare
+        msg = await interaction.original_response()
         if branch:
             try:
                 repo.git.checkout(branch)
             except GitCommandError as err:
                 self.bot.dispatch("error", err, interaction)
                 return
-            msg = await interaction.original_response()
             msg = await msg.edit(content=msg.content + f"\nBranche {branch} correctement sélectionnée")
         origin = repo.remotes.origin
         origin.pull()
