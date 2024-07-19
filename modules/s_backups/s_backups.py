@@ -85,7 +85,7 @@ Arguments are:
                 self.backups_loading.remove(interaction.guild_id)
                 return
         except Exception as err:  # pylint: disable=broad-except
-            await self.bot.dispatch("error", err, interaction)
+            self.bot.dispatch("error", err, interaction)
             await interaction.edit_original_response(await self.bot._(interaction, "s_backup.err"))
             self.backups_loading.remove(interaction.guild_id)
             return
@@ -267,7 +267,7 @@ Arguments are:
             return res
 
         async def load_roles(self, interaction: discord.Interaction, problems: list, logs: list, symb: list, data: dict,
-                             args: LoadArgumentsType, roles_list: dict):
+                             args: LoadArgumentsType, roles_list: dict[int, discord.Role]):
             "Create and update roles based on the backup map"
             if not interaction.guild.me.guild_permissions.manage_roles:
                 logs.append(f"  {symb[0]} Unable to create or update roles: missing permissions")
@@ -345,7 +345,8 @@ Arguments are:
             del role, role_data
             for role_data in data["roles"]:
                 role_data: dict[str, Any]
-                if role_data["position"] > 0 and (role := roles_list.get(roles_list[role_data["id"]])):
+                role_id: int = role_data["id"]
+                if role_data["position"] > 0 and role_id in roles_list and (role := roles_list.get(roles_list[role_id])):
                     new_pos = min(
                         max(interaction.guild.me.top_role.position-1, 1), role_data["position"])
                     if role.position == new_pos:
@@ -738,29 +739,30 @@ Arguments are:
                 else:
                     logs.append(f"{symb[2]} AFK timeout duration set to {data['afk_timeout']}s")
             # banned_users
-            try:
-                banned_users = [x.user.id async for x in interaction.guild.bans(limit=None)]
-                users_to_ban = [
-                    x
-                    for x in data["banned_users"].items()
-                    if x[0] not in banned_users
-                ]
-                if len(users_to_ban) == 0:
-                    logs.append(symb[1]+" No user to ban")
-                else:
-                    for x in users_to_ban:
-                        user, reason = x
-                        try:
-                            await interaction.guild.ban(discord.Object(user), reason=reason, delete_message_days=0)
-                        except discord.errors.NotFound:
-                            pass
-                    logs.append(f"{symb[2]} Banned users updated ({len(data['banned_users'])} users)")
-            except discord.errors.Forbidden:
-                logs.append(f"{symb[0]} Unable to ban users: missing permissions")
-                problems[0] += 1
-            except Exception as err:
-                logs.append(f"{symb[0]} Unable to ban users: {err}")
-                problems[1] += 1
+            if "banned_users" in data:
+                try:
+                    banned_users = [x.user.id async for x in interaction.guild.bans(limit=None)]
+                    users_to_ban = [
+                        x
+                        for x in data["banned_users"].items()
+                        if x[0] not in banned_users
+                    ]
+                    if len(users_to_ban) == 0:
+                        logs.append(symb[1]+" No user to ban")
+                    else:
+                        for x in users_to_ban:
+                            user, reason = x
+                            try:
+                                await interaction.guild.ban(discord.Object(user), reason=reason, delete_message_days=0)
+                            except discord.errors.NotFound:
+                                pass
+                        logs.append(f"{symb[2]} Banned users updated ({len(data['banned_users'])} users)")
+                except discord.errors.Forbidden:
+                    logs.append(f"{symb[0]} Unable to ban users: missing permissions")
+                    problems[0] += 1
+                except Exception as err:
+                    logs.append(f"{symb[0]} Unable to ban users: {err}")
+                    problems[1] += 1
             # default_notifications
             if interaction.guild.default_notifications.value == data["default_notifications"]:
                 logs.append(f"{symb[1]} No need to change default notifications")
@@ -879,8 +881,9 @@ Arguments are:
             logs.append(" - Creating emojis")
             await self.load_emojis(interaction, problems, logs, symb, data, args, roles_list)
             # webhooks
-            logs.append(" - Creating webhooks")
-            await self.load_webhooks(interaction, problems, logs, symb, data, args, channels_list)
+            if "webhooks" in data:
+                logs.append(" - Creating webhooks")
+                await self.load_webhooks(interaction, problems, logs, symb, data, args, channels_list)
 
             return problems, logs
 
