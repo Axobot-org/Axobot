@@ -57,10 +57,6 @@
         "is_support_staff": [
             "You are a member of the bot staff",
             "You must be part of the bot staff"
-        ],
-        "is_ttt_enabled": [
-            "The tic-tac-toe game is enabled",
-            "The tic-tac-toe game must be enabled on this server"
         ]
     },
     "cmd-count": {
