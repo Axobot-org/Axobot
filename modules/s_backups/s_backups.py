@@ -1,6 +1,6 @@
 import json
 from io import BytesIO
-from typing import Any, Literal
+from typing import Any
 
 import aiohttp
 import discord
@@ -9,8 +9,16 @@ from discord.ext import commands
 
 from core.bot_classes import Axobot
 
-LoadArgumentsType = list[Literal["delete_old_channels",
-                                 "delete_old_roles", "delete_old_emojis", "delete_old_webhooks"]]
+
+class LoadArguments:
+    """Arguments for the load_backup function"""
+    def __init__(self, match_by_name: bool, delete_old_channels: bool, delete_old_roles: bool, delete_old_emojis: bool,
+                 delete_old_webhooks: bool):
+        self.match_by_name = match_by_name
+        self.delete_old_channels = delete_old_channels
+        self.delete_old_roles = delete_old_roles
+        self.delete_old_emojis = delete_old_emojis
+        self.delete_old_webhooks = delete_old_webhooks
 
 
 class Backups(commands.Cog):
@@ -30,8 +38,17 @@ class Backups(commands.Cog):
 
     @main_backup.command(name="load")
     @app_commands.checks.cooldown(1, 180)
+    @app_commands.describe(
+        backup_file="The JSON file to load, created by the `server-backup create` command",
+        match_by_name="If False, only match channels/roles by ID and do not fallback to name",
+        delete_old_channels="If True, delete every current channel/category that is not in the backup",
+        delete_old_roles="If True, delete every current role that is not in the backup",
+        delete_old_emojis="If True, delete every current emoji that is not in the backup",
+        delete_old_webhooks="If True, delete every current webhook that is not in the backup",
+    )
     async def backup_load(self, interaction: discord.Interaction,
                           backup_file: discord.Attachment,
+                          match_by_name: bool = True,
                           delete_old_channels: bool = False,
                           delete_old_roles: bool = False,
                           delete_old_emojis: bool = False,
@@ -66,15 +83,13 @@ Arguments are:
             await self.bot._(interaction, "s_backup.loading")
         )
         # compiling args
-        arguments: LoadArgumentsType = []
-        if delete_old_channels:
-            arguments.append("delete_old_channels")
-        if delete_old_roles:
-            arguments.append("delete_old_roles")
-        if delete_old_emojis:
-            arguments.append("delete_old_emojis")
-        if delete_old_webhooks:
-            arguments.append("delete_old_webhooks")
+        arguments = LoadArguments(
+            match_by_name,
+            delete_old_channels,
+            delete_old_roles,
+            delete_old_emojis,
+            delete_old_webhooks
+        )
         self.backups_loading.add(interaction.guild_id)
         # try to apply backup
         try:
@@ -213,9 +228,11 @@ Arguments are:
             categ.append(temp)
         back["categories"] = categ
         back["emojis"] = {}
-        for err in g.emojis:
-            back["emojis"][err.name] = {"url": str(err.url), "roles": [
-                x.id for x in err.roles]}
+        for emoji in g.emojis:
+            back["emojis"][emoji.name] = {
+                "url": str(emoji.url),
+                "roles": [x.id for x in emoji.roles]
+            }
         try:
             banned = {}
             async for b in g.bans():
@@ -267,7 +284,7 @@ Arguments are:
             return res
 
         async def load_roles(self, interaction: discord.Interaction, problems: list, logs: list, symb: list, data: dict,
-                             args: LoadArgumentsType, roles_list: dict[int, discord.Role]):
+                             args: LoadArguments, roles_list: dict[int, discord.Role]):
             "Create and update roles based on the backup map"
             if not interaction.guild.me.guild_permissions.manage_roles:
                 logs.append(f"  {symb[0]} Unable to create or update roles: missing permissions")
@@ -279,16 +296,15 @@ Arguments are:
                     rolename = role_data["name"]
                     role = interaction.guild.get_role(role_data["id"])
                     if role is None:
-                        potential_roles = [
-                            x for x in interaction.guild.roles if x.name == role_data["name"]]
-                        if len(potential_roles) == 0:
+                        potential_roles = [x for x in interaction.guild.roles if x.name == role_data["name"]]
+                        if args.match_by_name and len(potential_roles) > 0:
+                            role = potential_roles[0]
+                        else:
                             action = "create"
                             try:
                                 role = await interaction.guild.create_role(name=role_data["name"])
                             except discord.DiscordException:
                                 continue
-                        else:
-                            role = potential_roles[0]
                     if role_data["name"] == "@everyone":
                         if role.permissions.value != role_data["permissions"]:
                             await role.edit(permissions=discord.Permissions(role_data["permissions"]))
@@ -327,22 +343,22 @@ Arguments are:
                     problems[1] += 1
                 else:
                     pass
-            if "delete_old_roles" in args:
-                for role_data in interaction.guild.roles:
-                    if role_data in roles_list.values():
+            if args.delete_old_roles:
+                for role in interaction.guild.roles:
+                    if role in roles_list.values():
                         continue
                     try:
-                        await role_data.delete()
+                        await role.delete()
                     except discord.errors.Forbidden:
-                        logs.append(f"  {symb[0]} Unable to delete role {role_data.name}: missing permissions")
+                        logs.append(f"  {symb[0]} Unable to delete role {role.name}: missing permissions")
                         problems[0] += 1
                     except Exception as err:
                         if "404" not in str(err):
-                            logs.append(f"  {symb[0]} Unable to delete role {role_data.name}: {err}")
+                            logs.append(f"  {symb[0]} Unable to delete role {role.name}: {err}")
                             problems[1] += 1
                     else:
-                        logs.append(f"  {symb[0]} Role {role_data.name} deleted")
-            del role, role_data
+                        logs.append(f"  {symb[0]} Role {role.name} deleted")
+            del role
             for role_data in data["roles"]:
                 role_data: dict[str, Any]
                 role_id: int = role_data["id"]
@@ -363,7 +379,7 @@ Arguments are:
                             problems[1] += 1
 
         async def load_categories(self, interaction: discord.Interaction, problems: list, logs: list, symb: list, data: dict,
-                                  args: LoadArgumentsType, channels_list: dict):
+                                  args: LoadArguments, channels_list: dict):
             "Create and update channel categories based on the backup map"
             if not interaction.guild.me.guild_permissions.manage_channels:
                 logs.append(f"  {symb[0]} Unable to create or update categories: missing permissions")
@@ -377,13 +393,12 @@ Arguments are:
                         categname = categ["name"]
                         c = interaction.guild.get_channel(categ["id"])
                         if c is None:
-                            c = [
-                                x for x in interaction.guild.categories if x.name == categ["name"]]
-                            if len(c) == 0:
+                            potential_categories = [x for x in interaction.guild.categories if x.name == categ["name"]]
+                            if args.match_by_name and len(potential_categories) > 0:
+                                c = potential_categories[0]
+                            else:
                                 action = "create"
                                 c = await interaction.guild.create_category(name=categ["name"])
-                            else:
-                                c = c[0]
                         kwargs = {}
                         if c.name != categ["name"]:
                             kwargs["name"] = categ["name"]
@@ -411,7 +426,7 @@ Arguments are:
                         logs.append(f"  {symb[0]} Unable to {action} category {categname}: {err}")
                     else:
                         pass
-                if "delete_old_channels" in args:
+                if args.delete_old_channels:
                     for categ in interaction.guild.categories:
                         if categ in channels_list.values():
                             continue
@@ -427,7 +442,7 @@ Arguments are:
                             logs.append(f"  {symb[2]} Category {categ.name} deleted")
 
         async def load_channels(self, interaction: discord.Interaction, problems: list, logs: list, symb: list, data: dict,
-                                args: LoadArgumentsType, channels_list: dict):
+                                args: LoadArguments, channels_list: dict):
             "Create and update channels based on the backup map"
             if not interaction.guild.me.guild_permissions.manage_channels:
                 logs.append(f"  {symb[0]} Unable to create or update channels: missing permissions")
@@ -444,20 +459,20 @@ Arguments are:
                         channame = chan["name"]
                         c = interaction.guild.get_channel(chan["id"])
                         if c is None:
-                            c = [
+                            potential_channels = [
                                 x
                                 for x in interaction.guild.text_channels + interaction.guild.voice_channels
                                 if x.name == chan["name"]
                             ]
-                            if len(c) == 0:
+                            if args.match_by_name and len(potential_channels) > 0:
+                                c = potential_channels[0]
+                            else:
                                 action = "create"
                                 _categ = None if categ is None else channels_list[categ]
                                 if chan["type"] == "TextChannel":
                                     c = await interaction.guild.create_text_channel(name=chan["name"], category=_categ)
                                 else:
                                     c = await interaction.guild.create_voice_channel(name=chan["name"], category=_categ)
-                            else:
-                                c = c[0]
                         kwargs = {}
                         if c.name != chan["name"]:
                             kwargs["name"] = chan["name"]
@@ -490,7 +505,7 @@ Arguments are:
                         problems[1] += 1
                     else:
                         pass
-                if "delete_old_channels" in args:
+                if args.delete_old_channels:
                     for channel in interaction.guild.text_channels + interaction.guild.voice_channels:
                         if channel in channels_list.values():
                             continue
@@ -524,7 +539,7 @@ Arguments are:
                     pass
 
         async def load_perms(self, interaction: discord.Interaction, problems: list, logs: list, symb: list, data: dict,
-                             _args: LoadArgumentsType, roles_list: dict, channels_list: dict):
+                             _args: LoadArguments, roles_list: dict, channels_list: dict):
             "Sync category and channel permissions based on the backup map"
             if not interaction.guild.me.guild_permissions.manage_roles:
                 logs.append(f"  {symb[0]} Unable to update permissions: missing permissions")
@@ -558,7 +573,7 @@ Arguments are:
                         logs.append(f"     {symb[2]} Permissions of channel {chan['name']} set")
 
         async def load_members(self, interaction: discord.Interaction, problems: list, logs: list, symb: list, data: dict,
-                               _args: LoadArgumentsType, roles_list: dict):
+                               _args: LoadArguments, roles_list: dict[int, discord.Role]):
             "Sync member nicknames and roles based on the backup map"
             if "members" not in data.keys():
                 return
@@ -577,13 +592,13 @@ Arguments are:
                 if member is None:
                     continue
                 try:
-                    edition = list()
+                    edition: list[str] = []
                     if member.nick != memb["nickname"] and change_nicks and (
                         member.top_role.position < interaction.guild.me.top_role.position and interaction.guild.owner != member
                         ):
                         await member.edit(nick=memb["nickname"])
                         edition.append("nickname")
-                    roles = list()
+                    roles = []
                     for r in memb["roles"]:
                         try:
                             _role = roles_list[r]
@@ -610,7 +625,7 @@ Arguments are:
                         logs.append(f"  {symb[2]} Updated {'and'.join(edition)} for user {member}")
 
         async def load_emojis(self, interaction: discord.Interaction, problems: list, logs: list, symb: list, data: dict,
-                              args: LoadArgumentsType, roles_list: dict):
+                              args: LoadArguments, roles_list: dict):
             "Sync guild emojis based on the backup map"
             if not interaction.guild.me.guild_permissions.manage_expressions:
                 logs.append(
@@ -650,7 +665,7 @@ Arguments are:
                         problems[1] += 1
                     else:
                         logs.append(f"  {symb[2]} Emoji {emojiname} created")
-                if "delete_old_emojis" in args:
+                if args.delete_old_emojis:
                     for emoji in interaction.guild.emojis:
                         if emoji.name in data["emojis"].keys():
                             continue
@@ -667,7 +682,7 @@ Arguments are:
                             logs.append(f"  {symb[2]} Emoji {emoji.name} deleted")
 
         async def load_webhooks(self, interaction: discord.Interaction, problems: list, logs: list, symb: list, data: dict,
-                                args: LoadArgumentsType, channels_list: dict):
+                                args: LoadArguments, channels_list: dict):
             "Sync webhooks based on the backup map"
             if not interaction.guild.me.guild_permissions.manage_webhooks:
                 logs.append(f"  {symb[0]} Unable to create or update webhooks: missing permissions")
@@ -701,7 +716,7 @@ Arguments are:
                     else:
                         logs.append(f"  {symb[2]} Webhook {webhookname} created")
                         created_webhooks_urls.append(webhook["url"])
-                if "delete_old_webhooks" in args:
+                if args.delete_old_webhooks:
                     for web in await interaction.guild.webhooks():
                         if web.url in created_webhooks_urls:
                             continue
@@ -717,7 +732,7 @@ Arguments are:
                         else:
                             logs.append(f"  {symb[2]} Webhook {web.name} deleted")
 
-        async def load_backup(self, interaction: discord.Interaction, data: dict, args: LoadArgumentsType) -> tuple[list, list]:
+        async def load_backup(self, interaction: discord.Interaction, data: dict, args: LoadArguments) -> tuple[list, list]:
             "Load a backup in a server, for backups version 1"
             if data.pop("_backup_version", None) != 1:
                 return ([0, 1], ["Unknown backup version"])
@@ -862,7 +877,7 @@ Arguments are:
                         symb[2]+" Verification level set to "+verif_level.name)
             # roles
             logs.append(" - Creating roles")
-            roles_list = {}
+            roles_list: dict[int, discord.Role] = {}
             await self.load_roles(interaction, problems, logs, symb, data, args, roles_list)
             # categories
             logs.append(" - Creating categories")
