@@ -8,6 +8,7 @@ from discord import app_commands
 from discord.ext import commands, tasks
 
 from core.bot_classes import Axobot
+from core.tips import UserTip
 from core.views import ConfirmView
 
 from .src.autocomplete import autocomplete_main
@@ -453,6 +454,7 @@ class ServerConfig(commands.Cog):
             )
             return
         await interaction.response.defer()
+        await self.send_online_user_tip(interaction)
         if option is None:
             await self.send_all_config(interaction.guild, interaction)
         else:
@@ -461,6 +463,20 @@ class ServerConfig(commands.Cog):
     @config_see.autocomplete("option")
     async def sconfig_see_autocomplete(self, _: discord.Interaction, option: str):
         return await self.option_name_autocomplete(option)
+
+    async def send_online_user_tip(self, interaction: discord.Interaction):
+        "Send a tip about viewing the dashboard online"
+        if not await self.bot.get_cog("Users").db_get_user_config(interaction.user.id, "show_tips"):
+            # tips are disabled
+            return
+        if await self.bot.tips_manager.should_show_user_tip(interaction.user.id, UserTip.ONLINE_DASHBOARD_ACCESS):
+            # user has not seen this tip yet
+            domain = "axobeta.zrunner.me" if self.bot.beta else "axobot.xyz"
+            await self.bot.tips_manager.send_user_tip(
+                interaction,
+                UserTip.ONLINE_DASHBOARD_ACCESS,
+                url=f"https://{domain}/dashboard"
+            )
 
     async def send_all_config(self, guild: discord.Guild, interaction: discord.Interaction):
         "Send the config lookup of a guild into a channel"

@@ -828,9 +828,26 @@ class Xp(commands.Cog):
         view = TopPaginator(self.bot, interaction.user, interaction.guild, scope, page, _quit.capitalize())
         await view.fetch_data()
         msg = await view.send_init(interaction)
+        await self.send_online_leaderboard_tip(interaction, url=view.url, ephemeral=True)
         if msg and await view.wait():
             # only manually disable if it was a timeout (ie. not a user stop)
             await view.disable(msg)
+
+    async def send_online_leaderboard_tip(self, interaction: discord.Interaction, url: str, ephemeral: bool):
+        "Send a tip about the leaderboard being available online"
+        if random.random() > 0.8:
+            return
+        if not await self.bot.get_cog("Users").db_get_user_config(interaction.user.id, "show_tips"):
+            # tips are disabled
+            return
+        if await self.bot.tips_manager.should_show_user_tip(interaction.user.id, UserTip.ONLINE_LEADERBOARD_ACCESS):
+        # user has not seen this tip yet
+            await self.bot.tips_manager.send_user_tip(
+                interaction,
+                UserTip.ONLINE_LEADERBOARD_ACCESS,
+                ephemeral=ephemeral,
+                url=url
+            )
 
 
     @app_commands.command(name="set-xp")

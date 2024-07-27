@@ -54,6 +54,9 @@ class ServerConfigPaginator(Paginator):
             title=title,
             color=self.cog.embed_color,
         )
+        domain = "axobeta.zrunner.me" if self.client.beta else "axobot.xyz"
+        online_desc = await self.client._(self.guild, "xp.see-online")
+        embed.description = f"🌐 [{online_desc}](https://{domain}/dashboard/{self.guild.id})"
         if self.guild.icon:
             embed.set_thumbnail(url=self.guild.icon.with_static_format("png"))
         for option, value in page_config_map.items():

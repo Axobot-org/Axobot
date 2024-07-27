@@ -2,18 +2,20 @@ import datetime
 import random
 from enum import StrEnum
 from enum import auto as enum_auto
-from typing import TYPE_CHECKING, TypedDict, Union
+from typing import TYPE_CHECKING, TypedDict
 
 import discord
 from cachetools import TTLCache
 
 if TYPE_CHECKING:
-    from bot_classes import Axobot, MyContext
+    from bot_classes import Axobot
 
 
 class UserTip(StrEnum):
     "Tips that can be shown to users"
     RANK_CARD_PERSONALISATION = enum_auto()
+    ONLINE_LEADERBOARD_ACCESS = enum_auto()
+    ONLINE_DASHBOARD_ACCESS = enum_auto()
 
 
 class GuildTip(StrEnum):
@@ -27,6 +29,8 @@ class GuildTip(StrEnum):
 
 minTimeBetweenTips: dict[UserTip | GuildTip, datetime.timedelta] = {
     UserTip.RANK_CARD_PERSONALISATION: datetime.timedelta(days=60),
+    UserTip.ONLINE_LEADERBOARD_ACCESS: datetime.timedelta(days=90),
+    UserTip.ONLINE_DASHBOARD_ACCESS: datetime.timedelta(days=30),
     GuildTip.SERVERLOG_ENABLE_ANTISCAM: datetime.timedelta(days=14),
     GuildTip.SERVERLOG_ENABLE_ANTIRAID: datetime.timedelta(days=14),
     GuildTip.SERVERLOG_ENABLE_BOTWARNING: datetime.timedelta(days=25),
@@ -141,21 +145,21 @@ class TipsManager:
             return True
         return self.bot.utcnow() - last_tip > minTimeBetweenTips[tip]
 
-    async def send_user_tip(self, ctx: Union["MyContext", discord.Interaction], tip: UserTip, ephemeral: bool | None = None,
+    async def send_user_tip(self, interaction: discord.Interaction, tip: UserTip, ephemeral: bool | None = None,
                             **variables: dict[str, str]):
         "Send a tip to a user"
-        await self._send_tip(ctx, tip, ephemeral, **variables)
-        await self.db_register_user_tip(ctx.author.id, tip)
+        await self._send_tip(interaction, tip, ephemeral, **variables)
+        await self.db_register_user_tip(interaction.user.id, tip)
 
-    async def send_guild_tip(self, ctx: Union["MyContext", discord.Interaction], tip: GuildTip, **variables: dict[str, str]):
+    async def send_guild_tip(self, interaction: discord.Interaction, tip: GuildTip, **variables: dict[str, str]):
         "Send a tip into a guild"
-        await self._send_tip(ctx, tip, ephemeral=None, **variables)
-        await self.db_register_guild_tip(ctx.guild.id, tip)
+        await self._send_tip(interaction, tip, ephemeral=None, **variables)
+        await self.db_register_guild_tip(interaction.guild.id, tip)
 
-    async def _send_tip(self, ctx: Union["MyContext", discord.Interaction], tip: UserTip | GuildTip, ephemeral: bool | None,
+    async def _send_tip(self, interaction: discord.Interaction, tip: UserTip | GuildTip, ephemeral: bool | None,
                          **variables: dict[str, str]):
-        possible_titles = await self.bot._(ctx, "tips.embed.title")
-        text = await self.bot._(ctx, f"tips.{tip.value}", **variables)
+        possible_titles = await self.bot._(interaction, "tips.embed.title")
+        text = await self.bot._(interaction, f"tips.{tip.value}", **variables)
         embed = discord.Embed(
             title=random.choice(possible_titles),
             description=text,
@@ -164,13 +168,10 @@ class TipsManager:
         args = {"embed": embed}
         if ephemeral is not None:
             args["ephemeral"] = ephemeral
-        if isinstance(ctx, discord.Interaction):
-            if ctx.response.is_done():
-                await ctx.followup.send(**args)
-            else:
-                await ctx.response.send_message(**args)
+        if interaction.response.is_done():
+            await interaction.followup.send(**args)
         else:
-            await ctx.send(**args)
+            await interaction.response.send_message(**args)
 
     async def generate_random_tip(self, translation_context) -> str:
         "Pick a random tip from the translations list, and format it"
