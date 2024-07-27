@@ -155,7 +155,7 @@ class TopPaginator(Paginator):
         if self.display_url:
             domain = "axobeta.zrunner.me" if self.client.beta else "axobot.xyz"
             online_desc = await self.client._(self.guild, "xp.see-online")
-            emb.description = f"[{online_desc}](https://{domain}/leaderboard/{self.guild.id})"
+            emb.description = f"🌐 [{online_desc}](https://{domain}/leaderboard/{self.guild.id})"
         # field name
         field_title = await self.client._(self.guild, "xp.top-name", min=(page-1)*20+1, max=i, page=page, total=self.max_page)
         emb.add_field(name=field_title, value="\n".join(txt), inline=False)
