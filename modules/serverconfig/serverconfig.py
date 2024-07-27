@@ -154,8 +154,6 @@ class ServerConfig(commands.Cog):
             raise ValueError(f"Option {option_name} does not exist")
         if (await self.get_options_list())[option_name]["type"] != "roles_list":
             raise ValueError(f"Option {option_name} is not a roles list")
-        if await self.bot.get_cog("Admin").check_if_god(member):
-            return True
         if not self.bot.database_online or not isinstance(member, discord.Member):
             return False
         raw_roles = await self.get_raw_option(member.guild.id, option_name)

@@ -21,26 +21,23 @@ async def is_bot_admin(ctx: MyContext | discord.Interaction | discord.User):
         user = user.id
     return user in admins_id
 
-async def is_support_staff(ctx: MyContext | discord.Interaction) -> bool:
+async def is_support_staff(interaction: discord.Interaction[Axobot]) -> bool:
     "Check if the user is one of the bot staff, either by flag or by role"
-    user = ctx.author if isinstance(ctx, commands.Context) else ctx.user
-    if user.id in admins_id:
+    if interaction.user.id in admins_id:
         return True
-    bot = ctx.bot if isinstance(ctx, commands.Context) else ctx.client
-    if users_cog := bot.get_cog("Users"):
-        return await users_cog.has_userflag(user, "support")
-    server = bot.get_guild(SUPPORT_GUILD_ID.id)
+    if users_cog := interaction.client.get_cog("Users"):
+        return await users_cog.has_userflag(interaction.user, "support")
+    server = interaction.client.get_guild(SUPPORT_GUILD_ID.id)
     if server is not None:
-        member = server.get_member(user.id)
+        member = server.get_member(interaction.user.id)
         role = server.get_role(412340503229497361)
         if member is not None and role is not None:
             return role in member.roles
     return False
 
-async def database_connected(ctx: MyContext | discord.Interaction[Axobot]) -> bool:
+async def database_connected(interaction: discord.Interaction[Axobot]) -> bool:
     "Check if the database is online and accessible"
-    bot = ctx.client if isinstance(ctx, discord.Interaction) else ctx.bot
-    if bot.database_online:
+    if interaction.client.database_online:
         return True
     raise commands.CommandError("Database offline")
 

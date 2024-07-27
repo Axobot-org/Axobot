@@ -2,8 +2,9 @@ import discord
 import i18n
 from asyncache import cached
 from cachetools import TTLCache
+from discord.ext import commands
 
-from core.bot_classes import Axobot, MyContext
+from core.bot_classes import Axobot
 from core.translator import AxobotTranslator
 
 SourceType = (
@@ -17,7 +18,7 @@ SourceType = (
     | discord.DMChannel
     | discord.Interaction
     | discord.PartialMessageable
-    | MyContext
+    | commands.Context
 )
 
 
@@ -71,7 +72,7 @@ class Languages(discord.ext.commands.Cog):
                 source = source.user
             else:
                 source = None
-        elif isinstance(source, MyContext):
+        elif isinstance(source, commands.Context):
             # get ID from guild
             if source.guild:
                 source = source.guild.id

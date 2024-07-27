@@ -59,7 +59,6 @@ class Admin(commands.Cog):
             self.update = {"fr": None, "en": None}
         self._last_result = None
         self._upvote_emojis = ()
-        self.god_mode = []
 
     @property
     def upvote_emojis(self):
@@ -73,15 +72,6 @@ class Admin(commands.Cog):
 
     async def check_if_admin(self, interaction: discord.Interaction):
         return await checks.is_bot_admin(interaction)
-
-    async def check_if_god(self, ctx: discord.User | discord.Guild | MyContext):
-        "Check if a user is in God mode for a given context"
-        if isinstance(ctx, discord.User):
-            return await checks.is_bot_admin(ctx)
-        elif isinstance(ctx.guild, discord.Guild) and ctx.guild is not None:
-            return await checks.is_bot_admin(ctx) and ctx.guild.id in self.god_mode
-        else:
-            return await checks.is_bot_admin(ctx)
 
     async def add_success_reaction(self, msg: discord.Message):
         "Add a check reaction to a message"
@@ -133,36 +123,6 @@ class Admin(commands.Cog):
         emb = discord.Embed(description=txt, color=discord.Color.blue())
         await self.bot.send_embed(emb)
         await interaction.followup.send(txt + '!')
-
-    @admin_main.command(name="god")
-    async def enable_god_mode(self, interaction: discord.Interaction, enable: bool = True):
-        """Get full powaaaaaa
-
-        Donne les pleins-pouvoirs aux admins du bot sur ce serveur (accès à toutes les commandes de modération)"""
-        if enable:
-            if interaction.guild_id not in self.god_mode:
-                self.god_mode.append(interaction.guild_id)
-                await interaction.response.send_message(
-                    "<:nitro:548569774435598346> Mode superadmin activé sur ce serveur",
-                    ephemeral=True
-                )
-            else:
-                await interaction.response.send_message(
-                    "Mode superadmin déjà activé sur ce serveur",
-                    ephemeral=True
-                )
-        else:
-            if interaction.guild_id in self.god_mode:
-                self.god_mode.remove(interaction.guild_id)
-                await interaction.response.send_message(
-                    "Mode superadmin désactivé sur ce serveur",
-                    ephemeral=True
-                )
-            else:
-                await interaction.response.send_message(
-                    "Ce mode n'est pas actif ici",
-                    ephemeral=True
-                )
 
     @admin_main.command(name="faq")
     async def send_faq(self, interaction: discord.Interaction):

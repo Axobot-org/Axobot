@@ -952,9 +952,9 @@ class Info(commands.Cog):
         description="Help the bot staff to find things",
         guild_ids=[PRIVATE_GUILD_ID.id]
     )
+    find_main.interaction_check = checks.is_support_staff
 
     @find_main.command(name="user")
-    @discord.app_commands.check(checks.is_support_staff)
     async def find_user(self, interaction: discord.Interaction, user: discord.User):
         "Find any user visible by the bot"
         # Servers list
@@ -1026,7 +1026,6 @@ class Info(commands.Cog):
         await interaction.followup.send(embed=embed)
 
     @find_main.command(name="guild")
-    @discord.app_commands.check(checks.is_support_staff)
     @discord.app_commands.describe(guild="The server name or ID")
     async def find_guild(self, interaction: discord.Interaction, guild: str):
         "Find any guild where the bot is"
@@ -1084,7 +1083,6 @@ class Info(commands.Cog):
         await interaction.followup.send(embed=emb)
 
     @find_main.command(name="channel")
-    @discord.app_commands.check(checks.is_support_staff)
     @discord.app_commands.describe(channel="The ID/name of the channel to look for")
     async def find_channel(self, interaction: discord.Interaction, channel: str):
         "Find any channel from any server where the bot is"
@@ -1106,7 +1104,6 @@ class Info(commands.Cog):
         await interaction.followup.send(embed=emb)
 
     @find_main.command(name="role")
-    @discord.app_commands.check(checks.is_support_staff)
     @discord.app_commands.describe(role_name="The ID/name of the role to look for")
     async def find_role(self, interaction: discord.Interaction, role_name: str):
         "Find any role from any server where the bot is"
@@ -1130,7 +1127,6 @@ class Info(commands.Cog):
         await interaction.followup.send(embed=emb)
 
     @find_main.command(name="rss")
-    @discord.app_commands.check(checks.is_support_staff)
     async def find_rss(self, interaction: discord.Interaction, feed_id: int):
         "Find any active or inactive RSS feed"
         await interaction.response.defer()
