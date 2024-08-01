@@ -1,8 +1,6 @@
 {
     "command_name": {
         "about": "o-aplikaci",
-        "antiscam disable": "zakázat",
-        "antiscam enable": "povolit",
         "antiscam report": "nahlásit",
         "antiscam test": "test",
         "ban": "blokovat",
@@ -68,7 +66,7 @@
         "rank": "hodnost",
         "reminders clear": "vyčistit",
         "reminders create": "vytvořit",
-        "reminders delete": "smazat",
+        "reminders cancel": "zrušit",
         "reminders list": "seznam",
         "remindme": "připomenutí",
         "Report a scam": "Nahlásit podvod",
@@ -380,7 +378,7 @@
             "duration": "doba-trvání",
             "message": "zpráva"
         },
-        "reminders delete": {
+        "reminders cancel": {
             "reminder_id": "připomenutí-id"
         },
         "remindme": {
@@ -414,6 +412,9 @@
         },
         "roles-react remove": {
             "emoji": "emoji"
+        },
+        "roles-react send": {
+            "channel": "kanál"
         },
         "roles-react set-description": {
             "description": "popis",
@@ -555,7 +556,7 @@
             "user": "uživatel"
         },
         "unhoist": {
-            "chars": "znaky"
+            "characters": "znaků"
         },
         "unmute": {
             "user": "uživatel"
