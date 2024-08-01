@@ -1,4 +1,5 @@
 {
+    "already_running": "Záloha již běží, prosím počkejte, až bude dokončena",
     "backup-done": "Záloha dokončena!",
     "err": "Došlo k vnitřní chybě... počkejte pár okamžiků nebo kontaktujte podporu (příkaz `about`), pokud se to stane znovu",
     "finished": "Záloha použita! Zde jsou protokoly",
