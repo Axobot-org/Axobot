@@ -1,13 +1,16 @@
 {
     "ban": {
+        "ban-success": "Člen byl zabanován",
         "cant-ban": "Oprávnění \"Banovat členy\" vyžaduje :confused:",
         "list-error": "Ale né, zdá se, že je příliš mnoho uživatelů k zobrazení :confused:",
         "list-title-0": "Seznam zabanovaných členů serveru \"{}\"",
         "list-title-1": "Seznam 45 zabanovaných členů serveru \"{}\"",
         "list-title-2": "Seznam 60 zabanovaných členů serveru \"{}\"",
         "no-bans": "Žádnému členovi zde zřejmě není zabanován vstup",
+        "softban-succes": "Člen byl softbannován",
         "staff-ban": "Nemůžeš zabanovat jiné členy týmu!",
         "too-high": "Zdá se, že tento člen má vyšší funkcni, nemohu ho tedy zabanovat. :thinking:",
+        "unban-success": "Člen byl odbanován",
         "user-not-banned": "Tato osoba není součástí seznamu zabanovaných členů :upside_down:"
     },
     "ban-chat": "Člen %{user} (%{userid}) je nyní zabanován",
@@ -29,6 +32,7 @@
     },
     "emoji": {
         "cant-emoji": "Ale né, chybí mi oprávnění `Správa výrazů` :confused:",
+        "cleared": "Reakce byly vymazány!",
         "emoji-valid": {
             "one": "%{name} emoji bylo změněno tak, aby ji mohla použít pouze role %{roles}",
             "many": "%{name} emoji bylo změněno tak, aby ji mohly používat pouze role %{roles}"
@@ -44,6 +48,7 @@
     "kick": {
         "cant-staff": "Nemůžeš vykopnout jiného člena týmu!",
         "no-perm": "Oprávnění \"Vykopnout členy\" vyžaduje :confused:",
+        "success": "Člen byl vykopnut",
         "too-high": "Zdá se, že tento člen má vyšší oprávnění než já, nemohu ho vykopnout :thinking:"
     },
     "kick-chat": "Člen %{user} (%{userid}) byl vykopnut z tohoto serveru",
@@ -72,10 +77,12 @@
         "list-title-1": "Seznam 45 umlčených členů serveru \"%{guild}\"",
         "list-title-2": "Seznam 60 umlčených členů serveru \"%{guild}\"",
         "mute-high": "Jejda, zdá se, že role \"umlčen\" je pro mě příliš vysoká... Opravte tento problém umístěním mé role vyšre než je role `umlčen`.",
+        "mute-success": "Člen byl umlčen",
         "no-mute": "Jejda, zdá se, že role `umlčen` neexistuje :confused: Prosím vytvořte ji a přiřaďte oprávnění ručně.",
         "no-mutes": "Zdá se, že žádný člen není umlčený",
         "staff-mute": "Nemůžete zabránit jinému členovi týmu v mluvení",
-        "too-high": "Zdá se, že tento člen je pro mě příliš vysoký na to, abych je vypověděl :thinking:"
+        "too-high": "Zdá se, že tento člen je pro mě příliš vysoký na to, abych je vypověděl :thinking:",
+        "unmute-success": "Člen již není umlčen"
     },
     "mute-chat": "Člen %{user} (%{userid}) byl umlčen",
     "mute-dm": "Byli jste umlčeni na serveru %{guild}",
@@ -118,16 +125,17 @@
         "too-long": "Není možné nastavit frekvenci vyšší než 6 hodin"
     },
     "unban-chat": "Člen %{user} (%{userid}) již není na tomto serveru zabanován",
+    "unhoist-too-many-members": "Jejda, váš server má příliš mnoho členů na to, abych to udělal. Pro více informací kontaktujte náš tým podpory.",
     "unhoisted": {
         "many": "%{count} přezdívek bylo upraveno!",
         "one": "1 přezdívka byla upravena",
         "zero": "Nebyla upravena žádná přezdívka"
     },
-    "unhoist-too-many-members": "Jejda, váš server má příliš mnoho členů na to, abych to udělal. Pro více informací kontaktujte náš tým podpory.",
     "unmute-chat": "Člen %{user} (%{userid}) již není umlčen",
     "warn": {
         "cant-bot": "Nemůžu varovat bota ^ ^",
         "cant-staff": "Nemůžete varovat jiného člena týmu!",
+        "success": "Člen byl varován",
         "warn-but-db": "Naše databáze je offline, varování nelze uložit. Nicméně člen obdržel varování v DM"
     },
     "warn-chat": "Člen %{user} (%{userid}) byl varován",
