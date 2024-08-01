@@ -8,10 +8,12 @@
             "Pokusili jste se...?"
         ]
     },
+    "online_dashboard_access": "Můžete přistupovat k libovolnému administračnímu panelu serveru na %{url}",
+    "online_leaderboard_access": "Můžete přistupovat k online žebříčku tohoto serveru na %{url}",
     "rank_card_personalisation": "Pomocí příkazu %{profile_cmd} můžete změnit pozadí své odpovídající karty!",
-    "rss_difference_disable_delete": "Zakázání kanálu znamená, že bot již nebude posílat nové zprávy z tohoto kanálu, ale vždy můžete znovu zapnout pomocí příkazu %{rss_enable_cmd}.\nZakázaný kanál se bude také stále počítat do limitu vašeho kanálu. Pokud chcete kanál smazat a uvolnit místo, použijte místo toho příkaz %{rss_remove_cmd}.",
     "rss_delete_disabled_feeds": "Vypadá to, že jste na serveru zakázali RSS kanály. Axobot nebude zveřejňovat aktualizace pro zakázané kanály, ale přesto se započítávají do limitu kanálů vašeho serveru.\nPokud chcete odebrat kanál a uvolnit slot, použijte příkaz %{rss_remove_cmd}.",
-    "serverlog_enable_antiscam": "Přidali jste antivirové záznamy, ale anti-scam systém není na serveru povolen. Pravděpodobně byste jej měli povolit příkazem %{antiscam_enable_cmd}.",
+    "rss_difference_disable_delete": "Zakázání kanálu znamená, že bot již nebude posílat nové zprávy z tohoto kanálu, ale vždy můžete znovu zapnout pomocí příkazu %{rss_enable_cmd}.\nZakázaný kanál se bude také stále počítat do limitu vašeho kanálu. Pokud chcete kanál smazat a uvolnit místo, použijte místo toho příkaz %{rss_remove_cmd}.",
     "serverlog_enable_antiraid": "Přidali jste anti-raid záznamy, ale anti-rad systém není na serveru povolen. Pravděpodobně byste jej měli povolit příkazem %{config_set_cmd}.",
+    "serverlog_enable_antiscam": "Přidali jste antivirové záznamy, ale anti-scam systém není na serveru povolen. Pravděpodobně byste jej měli povolit příkazem %{antiscam_enable_cmd}.",
     "serverlog_enable_botwarning": "Pravděpodobně byste měli zvážit povolení protokolů varování bota pomocí příkazu %{log_add_cmd}. Upozorní vás, pokud bot narazí na nějaké chybné funkce na vašem serveru, jako je špatná konfigurace nebo nedostatek oprávnění"
 }
