@@ -88,6 +88,7 @@
     },
     "no-feed": "Dobrý pokus, ale nemáte žádné rss kanály ke správě!",
     "no-feed2": "Tento server nemá žádný Rss kanál!",
+    "no-feed-enabled": "Tento server nemá aktivní RSS kanál!",
     "no-feed-filter": "Pro tento příkaz nelze vybrat žádný kanál!",
     "no-roles": "Zatím nebyla nastavena žádná role.",
     "not-a-role": "Tuto roli nelze najít. Zkuste to znovu:",
@@ -98,13 +99,21 @@
     },
     "research-timeout": "Stránce na webu trvalo příliš dlouho odpovědět, musel jsem přerušit proces :eyes:",
     "roles": {
-        "cant-find": "Nemůžu najít tuto roli",
+        "edit-silent-false": {
+            "one": "Tento kanál byl upraven, aby odesílal pravidelná upozornění",
+            "many": "Tyto kanály byly upraveny, aby odesílaly pravidelná upozornění"
+        },
+        "edit-silent-true": {
+            "one": "Tento kanál byl upraven tak, aby odesílal tichá upozornění",
+            "many": "Tyto kanály byly upraveny tak, aby odesílaly tichá upozornění"
+        },
         "edit-success": {
             "many": "Tento kanál byl upraven tak, aby uváděl role %{roles}",
             "one": "Tento kanál byl upraven tak, aby uváděl roli %{roles}",
             "zero": "Tento kanál byl upraven tak, aby nebyla zmíněna žádná role"
         },
-        "list": "Zde je seznam rolí, které již byly oznámeny: %{roles}"
+        "list": "Zde je seznam rolí, které již byly oznámeny: %{roles}",
+        "no-change": "Žádný parametr nebyl změněn"
     },
     "success-add": "Rss kanál typu \"%{type}\" s odkazem <%{url}> byl správně přidán do kanálu %{channel}!",
     "test": {

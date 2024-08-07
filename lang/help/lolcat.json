@@ -57,10 +57,6 @@
         "is_support_staff": [
             "You're a member of the bot staff",
             "U must be part of the bot staff"
-        ],
-        "is_ttt_enabled": [
-            "!ttt iz enabled",
-            "Ewe, !ttt is disabled, use !config for dat"
         ]
     },
     "cmd-count": {

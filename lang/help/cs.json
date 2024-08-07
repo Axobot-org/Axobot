@@ -57,10 +57,6 @@
         "is_support_staff": [
             "Jsi členem bota",
             "Musíš být součástí staff týmu bota"
-        ],
-        "is_ttt_enabled": [
-            "Hra piškvorky je povolena",
-            "Hra piškvorky musí být povolena na tomto serveru"
         ]
     },
     "cmd-count": {

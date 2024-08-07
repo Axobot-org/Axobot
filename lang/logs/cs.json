@@ -6,6 +6,7 @@
     "kick": "%{user} (%{userid}) byl vykopnut",
     "mute": "%{user} (%{userid}) je nyní umlčen",
     "reason": {
+        "account_creation": "Automod (příliš nový účet)",
         "autounmute": "automatické zapnutí ztlumení",
         "invite": "Automod (Discord pozvánka na jejich uživatelské jméno)",
         "invites": "Automod (spamování odkazů na Discord)",
@@ -13,8 +14,7 @@
         "mentions": "Automod (příliš mnoho poznámek)",
         "unban": "odbanován uživatelem %{user}",
         "unmute": "bylo zrušeno umlčení uživatelem %{user}",
-        "welcome_roles": "Automatizovaná akce (uvítací role)",
-        "young": "Automod (účet byl založen teprve nedávno)"
+        "welcome_roles": "Automatizovaná akce (uvítací role)"
     },
     "slowmode-disabled": "Zpomalený režim zakázán v %{channel}",
     "slowmode-enabled": "Pomalý režim povolen v %{channel} (%{seconds}s)",
