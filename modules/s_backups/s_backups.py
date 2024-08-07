@@ -177,7 +177,7 @@ Arguments are:
             "id": g.id,
             "owner": g.owner.id,
             "afk_timeout": g.afk_timeout,
-            "icon": None if g.icon else g.icon.url,
+            "icon": g.icon.url if g.icon else None,
             "verification_level": g.verification_level.value,
             "mfa_level": g.mfa_level,
             "explicit_content_filter": g.explicit_content_filter.value,
