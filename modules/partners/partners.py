@@ -199,7 +199,7 @@ class Partners(commands.Cog):
             if db_count and api_count < db_count*0.95:
                 return db_count
             return api_count
-        return None
+        return db_count
 
     async def get_bot_owners(self, bot_id: int, session: aiohttp.ClientSession) -> list[discord.User | int]:
         """Get the owners list of a bot
