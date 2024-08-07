@@ -994,7 +994,6 @@ class EmojisManager:
                     self.emoji_map[':' + emoji_name + ':'] = match.group("emoji")
         except requests.exceptions.ConnectionError:
             pass
-        print(len(self.unicode_set))
 
     async def anti_code(self, text: str) -> str:
         "Convert unicode emojis to their columns-string representation"
