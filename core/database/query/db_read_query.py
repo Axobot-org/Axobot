@@ -47,10 +47,27 @@ class DatabaseReadQuery(DatabaseAbstractQuery):
         else:
             result = list(map(return_type, self.cursor.fetchall()))
             # convert datetime objects to UTC
-            for row in result:
-                for key, value in (row.items() if isinstance(row, dict) else enumerate(row)):
-                    if isinstance(value, datetime.datetime) and value.tzinfo is None:
-                        row[key] = value.replace(tzinfo=datetime.UTC)
+            result = await convert_tzinfo(result)
 
         await self._save_execution_time(start_time)
         return result
+
+
+async def convert_tzinfo(result: list[dict | tuple]):
+    """Converts datetime objects in a list of dictionaries or tuples to UTC timezone"""
+    updated_result = []
+    for row in result:
+        if isinstance(row, dict):
+            for key, value in row.items():
+                if isinstance(value, datetime.datetime) and value.tzinfo is None:
+                    row[key] = value.replace(tzinfo=datetime.UTC)
+            updated_result.append(row)
+        else:
+            new_values = []
+            for key, value in enumerate(row):
+                if isinstance(value, datetime.datetime) and value.tzinfo is None:
+                    new_values.append(value.replace(tzinfo=datetime.UTC))
+                else:
+                    new_values.append(value)
+            updated_result.append(type(row)(new_values))
+    return updated_result
