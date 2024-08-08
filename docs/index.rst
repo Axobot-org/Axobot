@@ -104,6 +104,7 @@ And even more!
    :maxdepth: 1
    :caption: 💬 Our articles
 
+   articles/v5
    articles/v4
    articles/scam-detector
    articles/mute

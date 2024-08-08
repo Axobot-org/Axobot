@@ -1,0 +1,59 @@
+:og:description: Everything you need to know about our fantastic V5 update!
+
+============
+V5 changelog
+============
+
+Welcome to yet another milestone for Axobot! V5 not only contains a major update of the source code, to make it cleaner, more readable and easier to maintain, but also brings our very first functional website!
+
+This new site already lets you configure your bot online as if you were using the `/config <../server.html#config-options>`__ command, consult your XP ranking even more easily than the `/top <../user.html#get-the-general-ranking>`__ command, and many other quality-of-life improvements. And, of course, there's always more to come!
+
+.. warning:: Very large parts of the code have been changed by this update. This is good news for you, but it probably broke some parts of the bot that we couldn't see. Feel free to report any bug or abnormal behavior on the `support server <https://discord.gg/N55zY88>`__, it will help us and all other users!
+
+Without further ado, here is the almost exhaustive list of changes made by V5:
+
+Epic website!
+-------------
+
+With the release of Axobot V5, we are super excited to introduce our brand new website, available at https://axobot.xyz! This site is designed to enhance your experience by providing a more intuitive and centralized way to interact with and manage the bot.
+
+**Configuration Made Easy:**  
+Gone are the days of relying solely on in-server commands to configure your bot. The website offers an online dashboard where you can manage settings just like you would with the `/config <../server.html#config-options>`__ command, but with a user-friendly interface that simplifies the process. You can now adjust your bot’s configurations from any device with a browser, making it easier than ever to tweak settings on the go.
+
+**XP Rankings at Your Fingertips:**  
+Checking your server’s XP leaderboard has never been easier. The website offers a dedicated page for viewing each server leaderboard, providing a more comprehensive overview than the `/top <../user.html#get-the-general-ranking>`__ command. This feature allows you to easily monitor and celebrate your community’s most active members.
+
+**Future Enhancements:**  
+This is just the beginning! We are determined to continually improving the website, with plans to introduce additional features such as RSS feeds and modlogs management. Stay tuned!
+
+What’s New
+----------
+
+* All prefix-based commands have been migrated to slash commands for a more modern and user-friendly experience. That means :code:`!ban` is no longer a thing, but :code:`/ban` is!
+* Launch of the official Axobot website and online dashboard at https://axobot.xyz.
+* Increased message cache capacity from 1k to 50k messages, to make message edition logs more reliable.
+* Enhanced Unicode emoji support across various functionalities, like the TicTacToe emojis configuration.
+* Improved the Speech to Text feature to be quicker and more accurate, while remaining on our own servers to keep your messages private.
+
+Changes
+-------
+
+* Significant refactoring of the codebase to reduce duplication and improve maintainability. May also inadvertently include some new bugs.
+* Removal of deprecated and unused configuration options: :code:`*_allowed_roles` (as you can now manage permissions directly from Discord), :code:`prefix` (because prefix commands are no longer available) :code:`enable_ttt` and :code:`enable_fun` (you can disable the /tic-tac-toe and /fun commands from Discord too).
+* Added the website URL into the `/about <../infos.html#about>`__, `/config see <../server.html#watch>`__ and `/top <../user.html#get-the-general-ranking>`__ commands.
+
+Corrections
+-----------
+
+* Fixed various issues related to backups, server logs, RSS feed handling, and way more.
+* Updated dependencies and bumped the Python version to 3.11 (which should be a bit faster).
+* Fixed issues with server log display.
+* Corrected problems with command interactions, including defer errors and command usage in specific scenarios.
+* Fixed some markdown escaping issues with the `/minecraft server <../minecraft.html#get-a-server-skin-mod-info>`__ command.
+
+Recap
+-----
+
+Axobot V5 is a major leap forward in terms of functionality, performance, and user experience. The introduction of a dedicated website and online dashboard marks a new chapter in how you can interact with our bot. While this update brings many exciting changes, it may also have introduced some unexpected bugs due to the extensive code overhaul. Please do not hesitate to report any issues you encounter, as your feedback is invaluable in helping us refine and perfect Axobot.
+
+Thank you for your continued support, and we hope you enjoy the enhancements in V5!
