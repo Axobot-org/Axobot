@@ -24,30 +24,30 @@ If you want to know the reasons for this change and tell us what you think about
 What's new
 ----------
 
-* Server logs are finally here! Activate them now with the `modlogs command <moderator.html#server-logs>`__. This is just the beginning, more log types will come later!
+* Server logs are finally here! Activate them now with the `modlogs command <../moderator.html#server-logs>`__. This is just the beginning, more log types will come later!
 * The brand new `AI anti-scam system <scam-detector.html>`__ is here. You can test it and activate it in your servers with the antiscam command
-* The RSS feed selector (e.g. when you want to `delete a feed <rss.html#delete-a-followed-feed>`__) now uses the Discord menus, which makes it much easier to use
+* The RSS feed selector (e.g. when you want to `delete a feed <../rss.html#delete-a-followed-feed>`__) now uses the Discord menus, which makes it much easier to use
 
 Changes
 -------
 
-* `Anti-raid <moderator.html#anti-raid>`__ thresholds have been increased considerably, we advise you to **check the new values to avoid any problems**
-* The display of the `usernames <infos.html#usernames-history>`__ command has been revised and simplified
-* For some commands, the bot will indicate in the `help page <infos.html#help>`__ of the command if it needs permission to `send an embed <perms.html#embed-links>`__
-* The `reminders clear <miscellaneous.html#clear-every-reminders>`__ and `banlist <moderator.html#banlist-mutelist>`__ commands use buttons instead of reactions
-* The join position in the `info member <infos.html#info>`__ command is restricted to small servers (less than 10k members) to limit computation time
-* The discordstatus command, `RSS feeds <rss.html>`__ and some other commands use a custom date format that will display according to your own time zone (kind of like magic but it's real)
-* `RSS feeds <rss.html>`__ now accept the new YouTube link format (youtube.com/c/supercoolusername)
-* Time and duration displays will be translated a bit better (especially in Finnish and German). The displays of large numbers will also be more readable (thousands separator), which is especially visible in the `stats <infos.html#statistics>`__ command
+* `Anti-raid <../moderator.html#anti-raid>`__ thresholds have been increased considerably, we advise you to **check the new values to avoid any problems**
+* The display of the `usernames <../infos.html#usernames-history>`__ command has been revised and simplified
+* For some commands, the bot will indicate in the `help page <../infos.html#help>`__ of the command if it needs permission to `send an embed <../perms.html#embed-links>`__
+* The `reminders clear <../miscellaneous.html#clear-every-reminders>`__ and `banlist <../moderator.html#banlist-mutelist>`__ commands use buttons instead of reactions
+* The join position in the `info member <../infos.html#info>`__ command is restricted to small servers (less than 10k members) to limit computation time
+* The discordstatus command, `RSS feeds <../rss.html>`__ and some other commands use a custom date format that will display according to your own time zone (kind of like magic but it's real)
+* `RSS feeds <../rss.html>`__ now accept the new YouTube link format (youtube.com/c/supercoolusername)
+* Time and duration displays will be translated a bit better (especially in Finnish and German). The displays of large numbers will also be more readable (thousands separator), which is especially visible in the `stats <../infos.html#statistics>`__ command
 
 Correction
 ----------
 
-* Fixed some commands that did not work correctly in threads, like `reminders <miscellaneous.html#reminders>`__
+* Fixed some commands that did not work correctly in threads, like `reminders <../miscellaneous.html#reminders>`__
 * Fixed some translation errors, especially in English
-* `Reminders <miscellaneous.html#reminders>`__ will display correctly when the bot can't use `embed <perms.html#embed-links>`__
-* Fixed the display of the `xp card <user.html#check-the-xp-of-someone>`__ for users who don't have a custom avatar
-* The `info <infos.html#info>`__ command finally displays correctly its sub-commands in the help menu
+* `Reminders <../miscellaneous.html#reminders>`__ will display correctly when the bot can't use `embed <../perms.html#embed-links>`__
+* Fixed the display of the `xp card <../user.html#check-the-xp-of-someone>`__ for users who don't have a custom avatar
+* The `info <../infos.html#info>`__ command finally displays correctly its sub-commands in the help menu
 * The bot responds correctly to messages containing a command
 * The bot will no longer send DMs to banned users who have already left the server
 
