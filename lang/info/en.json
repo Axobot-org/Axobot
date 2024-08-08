@@ -1,10 +1,10 @@
 {
     "about": {
         "server": "My Discord server:",
-        "invite": "A link to invite me to another server:",
         "docs": "The bot documentation:",
         "privacy": "Our Privacy Policy:",
-        "sponsor": "Make a donation:"
+        "sponsor": "Make a donation:",
+        "website": "My website:"
     },
     "about-main": "Hello! I'm %{mention}!\nI'm a bot that allows you to do a lot of things: moderation, xp system, statistics, partners managment and many other super useful commands (and totally pointless ones)!\nYou can start by typing `!help` in this chat to see the list of available commands, then `!config see` will let you see the configuration options.\n\nMy owner (Z_runner) and I would like to thank Awhikax for his support during the various crises, Aragorn1202 for all his ideas and sentences full of good sense, Adri for all these beautiful logos, emojis and profile pics, and the whole translators team for their long work!\n\n:globe_with_meridians: Some links may be useful: %{links}\n\nHave a nice day!",
     "bitly_already_shortened": "This url is already shortened!",

@@ -268,12 +268,12 @@ ORDER BY usages DESC LIMIT %(limit)s"""
 
 ..Doc infos.html#about"""
         urls = ""
-        bot_invite = discord.utils.oauth_url(self.bot.user.id)
+        website = "https://axobeta.zrunner.me" if self.bot.beta else "https://axobot.xyz"
         links = {
             "server": "https://discord.gg/N55zY88",
-            "invite": bot_invite,
+            "website": website,
             "docs": "https://axobot.rtfd.io/",
-            "privacy": "https://zrunner.me/axobot-privacy.pdf",
+            "privacy": website + "/privacy",
             "sponsor": "https://github.com/sponsors/ZRunner",
         }
         for key, url in links.items():

@@ -15,7 +15,7 @@ Welcome to the **Axobot** documentation, a Discord bot coded in Python by a rand
 
     .. grid-item::
 
-        .. button-link:: https://zrunner.me/invite-axobot
+        .. button-link:: https://axobot.xyz
             :color: primary
             :align: right
             :shadow:
