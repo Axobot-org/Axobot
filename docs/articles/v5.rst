@@ -41,6 +41,7 @@ Changes
 * Significant refactoring of the codebase to reduce duplication and improve maintainability. May also inadvertently include some new bugs.
 * Removal of deprecated and unused configuration options: :code:`*_allowed_roles` (as you can now manage permissions directly from Discord), :code:`prefix` (because prefix commands are no longer available) :code:`enable_ttt` and :code:`enable_fun` (you can disable the /tic-tac-toe and /fun commands from Discord too).
 * Added the website URL into the `/about <../infos.html#about>`__, `/config see <../server.html#watch>`__ and `/top <../user.html#get-the-general-ranking>`__ commands.
+* We've taken advantage of the website's creation to update our `Terms of Use <https://axobot.xyz/terms>`__ and `Privacy Policy <https://axobot.xyz/privacy>`__, which you can now find in English on our website.
 
 Corrections
 -----------
