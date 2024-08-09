@@ -7,13 +7,12 @@ from typing import (TYPE_CHECKING, Awaitable, Callable, Literal, Optional,
 import discord
 from aiohttp import ClientSession
 from discord.ext import commands
-from mysql.connector.connection import MySQLConnection
 
+from core.boot_utils.conf_loader import get_secrets_dict
 from core.database import DatabaseConnectionManager, DatabaseQueryHandler
 from core.emojis_manager import EmojisManager
 from core.tasks_handler import TaskHandler
 from core.tips import TipsManager
-from core.boot_utils.conf_loader import get_secrets_dict
 
 from .bot_embeds_manager import send_log_embed
 from .consts import PRIVATE_GUILD_ID
@@ -66,7 +65,7 @@ class Axobot(commands.bot.AutoShardedBot):
         self.entity_id: int = 0 # ID of the bot for the statistics database
         self.db = DatabaseConnectionManager()
         self.db_main = DatabaseQueryHandler(self, "axobot")
-        self.db_xp = DatabaseQueryHandler(self, "zbot-xp")
+        self.db_xp = DatabaseQueryHandler(self, "axobot-xp")
         self.log = logging.getLogger("bot") # logs module
         self.xp_enabled: bool = True # if xp is enabled
         self.rss_enabled: bool = True # if rss is enabled
@@ -228,12 +227,6 @@ class Axobot(commands.bot.AutoShardedBot):
         """Connection to the default database
         Used for almost everything"""
         return self.db.get_connection("axobot")
-
-    @property
-    def cnx_xp(self) -> MySQLConnection:
-        """Connection to the xp database
-        Used for guilds using local xp (1 table per guild)"""
-        return self.db.get_connection("zbot-xp")
 
     def close_database_cnx(self):
         "Close any opened database connection"
