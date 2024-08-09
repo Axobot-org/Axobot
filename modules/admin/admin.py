@@ -192,7 +192,7 @@ class Admin(commands.Cog):
             await interaction.response.defer()
             for i, lang in enumerate(self.update.keys()):
                 text += f"\n{lang}:```\n{self.update.get(lang)}\n```"
-                await interaction.followup.send(text, view=confirm_view if i == len(self.update)-1 else None)
+                await interaction.followup.send(text, view=confirm_view if i == len(self.update)-1 else discord.utils.MISSING)
                 text = ''
         else:
             text += "\n"+"\n".join([f"{lang}:\n```\n{value}\n```" for lang, value in self.update.items()])
