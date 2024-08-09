@@ -158,9 +158,10 @@ class Admin(commands.Cog):
             return
         def check(message: discord.Message):
             return message.author == interaction.user and message.channel == interaction.channel
+        await interaction.response.send_message("C'est parti !")
         msg = None
         for language in self.update:
-            await interaction.response.send_message(f"Message en {language} ?")
+            await interaction.followup.send(f"Message en {language} ?")
             try:
                 msg = await self.bot.wait_for("message", check=check, timeout=60)
             except asyncio.TimeoutError:
