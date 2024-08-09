@@ -1,3 +1,4 @@
+import asyncio
 import datetime
 import logging
 import sys
@@ -79,6 +80,7 @@ class Axobot(commands.bot.AutoShardedBot):
         self.emojis_manager = EmojisManager(self)
         self.tips_manager = TipsManager(self)
         self._options_list: dict[str, "AllRepresentation"] | None = None
+        self._options_list_lock = asyncio.Lock()
         # app commands
         self.tree.on_error = self.on_app_cmd_error
         self.app_commands_list: Optional[list[discord.app_commands.AppCommand]] = None
@@ -125,17 +127,18 @@ class Axobot(commands.bot.AutoShardedBot):
 
     async def get_options_list(self):
         "Fetch the list of server config options from the API"
-        if self._options_list is None:
-            url = "https://api-beta.zrunner.me" if self.beta else "https://api.zrunner.me"
-            url += "/discord/default-guild-config"
-            self.log.info("Fetching options list from %s", url)
-            async with ClientSession() as session:
-                async with session.get(url) as response:
-                    response.raise_for_status()
-                    api_result = await response.json()
-            self._options_list = {}
-            for _category, options in api_result.items():
-                self._options_list.update(options)
+        async with self._options_list_lock:
+            if self._options_list is None:
+                url = "https://api-beta.zrunner.me" if self.beta else "https://api.zrunner.me"
+                url += "/discord/default-guild-config"
+                self.log.info("Fetching options list from %s", url)
+                async with ClientSession() as session:
+                    async with session.get(url) as response:
+                        response.raise_for_status()
+                        api_result = await response.json()
+                self._options_list = {}
+                for _category, options in api_result.items():
+                    self._options_list.update(options)
         return self._options_list
 
     # pylint: disable=arguments-differ
