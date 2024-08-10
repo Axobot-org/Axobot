@@ -88,14 +88,14 @@ class AntiRaid(commands.Cog):
         # Level 4
         if level >= 4:
             # kick accounts created less than 1d before
-            if await self._check_score(member, account_created_since, 86400, "kick", "account_creation"):
+            if await self._check_max_score(member, account_created_since, 86400, "kick", "account_creation"):
                 return True
             # ban (2w) members created less than 1h before
-            if can_ban and await self._check_score(member, account_created_since, 3600, "ban", "account_creation",
+            if can_ban and await self._check_max_score(member, account_created_since, 3600, "ban", "account_creation",
                                                    timedelta(weeks=2)):
                 return True
             # ban (1w) members created less than 3h before
-            if can_ban and await self._check_score(member, account_created_since, 3600*3, "ban", "account_creation",
+            if can_ban and await self._check_max_score(member, account_created_since, 3600*3, "ban", "account_creation",
                                                    timedelta(weeks=1)):
                 return True
         # Level 3 or more
@@ -110,16 +110,16 @@ class AntiRaid(commands.Cog):
                     })
                     return True
             # ban (1w) accounts created less than 1h before
-            if can_ban and await self._check_score(member, account_created_since, 3600, "ban", "account_creation",
+            if can_ban and await self._check_max_score(member, account_created_since, 3600, "ban", "account_creation",
                                                     timedelta(weeks=1)):
                 return True
             # kick accounts created less than 12h before
-            if await self._check_score(member, account_created_since, 3600*12, "kick", "account_creation"):
+            if await self._check_max_score(member, account_created_since, 3600*12, "kick", "account_creation"):
                 return True
         # Level 2 or more
         if level >= 2:
             # kick accounts created less than 2h before
-            if await self._check_score(member, account_created_since, 3600*2, "kick", "account_creation"):
+            if await self._check_max_score(member, account_created_since, 3600*2, "kick", "account_creation"):
                 return True
         # Level 1 or more
         if level >= 1: # kick members with invitations in their nickname
@@ -184,10 +184,22 @@ class AntiRaid(commands.Cog):
             return False
         return True
 
-    async def _check_score(self, member: discord.Member, score: int, treshold: int, action: Literal["timeout", "kick", "ban"],
+    async def _check_min_score(self, member: discord.Member, score: int, treshold: int, action: Literal["timeout", "kick", "ban"],
                            check_id: str, duration: timedelta | None = None):
+        "Check if a score is higher than a treshold, and take actions"
         if score < treshold:
             return False
+        return await self._check_score_action(member, treshold, action, check_id, duration)
+
+    async def _check_max_score(self, member: discord.Member, score: int, treshold: int, action: Literal["timeout", "kick", "ban"],
+                            check_id: str, duration: timedelta | None = None):
+        "Check if a score is lower than a treshold, and take actions"
+        if score > treshold:
+            return False
+        return await self._check_score_action(member, treshold, action, check_id, duration)
+
+    async def _check_score_action(self, member: discord.Member, treshold: int, action: Literal["timeout", "kick", "ban"],
+                           check_id: str, duration: timedelta | None = None):
         translation_key = f"logs.reason.{check_id}"
         if action == "timeout":
             await self._timeout(member, await self.bot._(member.guild.id, translation_key), duration)
@@ -255,34 +267,34 @@ class AntiRaid(commands.Cog):
         # Level 4
         if level >= 4:
             # ban (2w) members with more than 20 mentions
-            if await self._check_score(member, score, 20, "ban", "mentions", timedelta(weeks=2)):
+            if await self._check_min_score(member, score, 20, "ban", "mentions", timedelta(weeks=2)):
                 return True
             # kick members with more than 15 mentions
-            if await self._check_score(member, score, 15, "kick", "mentions"):
+            if await self._check_min_score(member, score, 15, "kick", "mentions"):
                 return True
             # timeout (1h) members with more than 10 mentions
-            if await self._check_score(member, score, 10, "timeout", "mentions", timedelta(hours=1)):
+            if await self._check_min_score(member, score, 10, "timeout", "mentions", timedelta(hours=1)):
                 return True
         # Level 3 or more
         if level >= 3:
             # kick members with more than 20 mentions
-            if await self._check_score(member, score, 20, "kick", "mentions"):
+            if await self._check_min_score(member, score, 20, "kick", "mentions"):
                 return True
             # timeout (30min) members with more than 10 mentions
-            if await self._check_score(member, score, 10, "timeout", "mentions", timedelta(minutes=30)):
+            if await self._check_min_score(member, score, 10, "timeout", "mentions", timedelta(minutes=30)):
                 return True
         # Level 2 or more
         if level >= 2:
             # timeout (30min) members with more than 20 mentions
-            if await self._check_score(member, score, 20, "timeout", "mentions", timedelta(minutes=30)):
+            if await self._check_min_score(member, score, 20, "timeout", "mentions", timedelta(minutes=30)):
                 return True
             # timeout (15min) members with more than 10 mentions
-            if await self._check_score(member, score, 10, "timeout", "mentions", timedelta(minutes=15)):
+            if await self._check_min_score(member, score, 10, "timeout", "mentions", timedelta(minutes=15)):
                 return True
         # Level 1 or more
         if level >= 1:
             # timeout (30min) members with more than 30 mentions
-            if await self._check_score(member, score, 30, "timeout", "mentions", timedelta(minutes=30)):
+            if await self._check_min_score(member, score, 30, "timeout", "mentions", timedelta(minutes=30)):
                 return True
         return False
 
@@ -299,34 +311,34 @@ class AntiRaid(commands.Cog):
         # Level 4
         if level >= 4:
             # ban (4w) members with more than 5 invites
-            if await self._check_score(member, score, 5, "ban", "invites", timedelta(weeks=4)):
+            if await self._check_min_score(member, score, 5, "ban", "invites", timedelta(weeks=4)):
                 return True
             # kick members with more than 3 invites
-            if await self._check_score(member, score, 3, "kick", "invites"):
+            if await self._check_min_score(member, score, 3, "kick", "invites"):
                 return True
             # timeout (3h) members with more than 2 invites
-            if await self._check_score(member, score, 2, "timeout", "invites", timedelta(hours=3)):
+            if await self._check_min_score(member, score, 2, "timeout", "invites", timedelta(hours=3)):
                 return True
         # Level 3 or more
         if level >= 3:
             # kick members with more than 5 invites
-            if await self._check_score(member, score, 5, "kick", "invites"):
+            if await self._check_min_score(member, score, 5, "kick", "invites"):
                 return True
             # timeout (3h) members with more than 3 invites
-            if await self._check_score(member, score, 3, "timeout", "invites", timedelta(hours=3)):
+            if await self._check_min_score(member, score, 3, "timeout", "invites", timedelta(hours=3)):
                 return True
         # Level 2 or more
         if level >= 2:
             # timeout (6h) members with more than 6 invites
-            if await self._check_score(member, score, 6, "timeout", "invites", timedelta(hours=6)):
+            if await self._check_min_score(member, score, 6, "timeout", "invites", timedelta(hours=6)):
                 return True
             # timeout (1h) members with more than 3 invites
-            if await self._check_score(member, score, 3, "timeout", "invites", timedelta(hours=1)):
+            if await self._check_min_score(member, score, 3, "timeout", "invites", timedelta(hours=1)):
                 return True
         # Level 1 or more
         if level >= 1:
             # timeout (1h) members with more than 5 invites
-            if await self._check_score(member, score, 5, "timeout", "invites", timedelta(hours=1)):
+            if await self._check_min_score(member, score, 5, "timeout", "invites", timedelta(hours=1)):
                 return True
         return False
 
