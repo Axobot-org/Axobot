@@ -237,11 +237,14 @@ class Twitch(commands.Cog):
         else:
             try:
                 streamer_obj = await self.agent.get_user_by_name(streamer)
-                avatar = streamer_obj["profile_image_url"].format(width=64, height=64)
-                user_id = streamer_obj["id"]
+                if streamer_obj is None:
+                    await interaction.followup.send(await self.bot._(interaction, "twitch.unknown-streamer"), ephemeral=True)
+                    return
             except ValueError:
                 await interaction.followup.send(await self.bot._(interaction, "twitch.invalid-streamer-name"), ephemeral=True)
                 return
+            user_id = streamer_obj["id"]
+            avatar = streamer_obj["profile_image_url"].format(width=64, height=64)
         resp = await self.agent.get_user_stream_by_id(user_id)
         if len(resp) > 0:
             stream = resp[0]
