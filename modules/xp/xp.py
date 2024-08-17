@@ -615,7 +615,7 @@ class Xp(commands.Cog):
 
     @xp_decay_loop.error
     async def on_xp_decay_loop_error(self, error: Exception):
-        self.bot.dispatch("error", error)
+        self.bot.dispatch("error", error, "XP decay loop has stopped  <@279568324260528128>")
 
 
     async def get_image_from_url(self, url: str):
