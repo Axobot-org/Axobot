@@ -582,7 +582,7 @@ class Xp(commands.Cog):
     async def xp_decay_loop(self):
         "Remove some xp to every member every day at midnight"
         guilds = await self.db_get_guilds_decays()
-        decay_query = "UPDATE `{table}` SET `xp` = `xp` - %s"
+        decay_query = "UPDATE `{table}` SET `xp` = GREATEST(`xp` - %s, 0)"
         cleanup_query = "DELETE FROM `{table}` WHERE `xp` <= 0"
         guilds_count = users_count = 0
         for guild_data in guilds:
