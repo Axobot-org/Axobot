@@ -147,7 +147,7 @@ class WebRSS:
             entry_date = entry.get(date_field_key)
             if isinstance(entry_date, time.struct_time) and entry_date.tm_zone is None:
                 entry_date = dt.datetime(*entry_date[:6], tzinfo=dt.UTC)
-            else:
+            elif entry_date is not None:
                 entry_date = dt.datetime(*entry_date[:6])
             # check if the entry is not too close to (or passed) the last post
             if entry_date is None or (entry_date - date).total_seconds() < self.min_time_between_posts:
