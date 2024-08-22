@@ -80,6 +80,33 @@ class BotOrGuildInviteTransformer(discord.app_commands.Transformer): # pylint: d
 
 BotOrGuildInviteArgument = discord.app_commands.Transform[str | int, BotOrGuildInviteTransformer]
 
+class GuildInviteTransformer(discord.app_commands.Transformer):
+    """Convert a string to a guild invite"""
+
+    async def transform(self, interaction, value, /):
+        "Do the conversion"
+        try:
+            invite = await interaction.client.fetch_invite(value)
+        except discord.NotFound as err:
+            raise arguments_errors.InvalidGuildInviteError(value) from err
+        return invite
+
+    async def autocomplete(self, interaction, value, /):
+        if interaction.guild is None or not interaction.guild.me.guild_permissions.manage_guild:
+            return []
+        value = value.lower()
+        options: list[tuple[bool, str]] = []
+        for invite in await interaction.guild.invites():
+            if value in invite.code.lower():
+                options.append((invite.code.lower().startswith(value), invite.code))
+        options.sort()
+        return [
+            discord.app_commands.Choice(name="discord.gg/"+invite_code, value=invite_code)
+            for _, invite_code in options
+        ][:25]
+
+GuildInviteArgument = discord.app_commands.Transform[discord.Invite, GuildInviteTransformer]
+
 class URL(str):
     "Represents a decomposed URL"
     def __init__(self, regex_exp: re.Match):

@@ -1,0 +1,18 @@
+{
+    "list": {
+        "title": "Invitations suivies",
+        "field-title": "%{name} - %{count} utilisations",
+        "field-value": {
+            "user-and-date": "Créée par %{user} le %{date}",
+            "user": "Créée par %{user}",
+            "date": "Créée le %{date}",
+            "none": "Pas d'autres informations disponibles"
+        }
+    },
+    "missing-permission": "J'ai besoin de la permission `Gérer le serveur` pour lire les invitations.",
+    "rename": {
+        "set-success": "L'invitation `%{link}` a été surnommée '%{name}'.",
+        "reset-success": "Le nom de l'invitation `%{link}` a été supprimé."
+    },
+    "tracking-disabled": "Le suivi d'invitations n'est pas activé sur ce serveur."
+}

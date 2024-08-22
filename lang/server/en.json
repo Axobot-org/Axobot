@@ -106,6 +106,7 @@
         "delete_welcome_on_quick_leave": "Should I delete the welcome message when a member leaves right after joining? %{value}",
         "description": "Server description:\n %{value}",
         "enable_events": "Should the bot's annual fun events (such as Halloween or Christmas celebrations) also take place on this server? %{value}",
+        "enable_invites_tracking": "Should I track the invite usage of new members in the server? %{value}",
         "enable_xp": "Should the xp system be enabled? %{value}",
         "help_in_private": "Send help message in private message? %{value}",
         "hunter": "List of all chat rooms in which the game *Hunter* is active: %{value}",
@@ -155,6 +156,7 @@
             "many": "I'm missing several permissions to apply the anti-raid protection: **%{list}**"
         },
         "channel_write_permissions": "I need to be able to send messages in %{channel} for this option",
+        "manage_guild_permissions": "I need the 'Manage server' permission for this feature to work",
         "moderation_command": "I need the '%{perm}' permission to apply this command",
         "title": "Warning",
         "xp_should_be_enabled": "This option is dedicated to the XP system. You can enable it with the 'enable_xp' configuration option",

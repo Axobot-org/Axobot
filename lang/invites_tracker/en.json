@@ -1,0 +1,18 @@
+{
+    "list": {
+        "title": "Tracked invites",
+        "field-title": "%{name} - %{count} uses",
+        "field-value": {
+            "user-and-date": "Created by %{user} on %{date}",
+            "user": "Created by %{user}",
+            "date": "Created on %{date}",
+            "none": "No further information available"
+        }
+    },
+    "missing-permission": "I need the `Manage Server` permission to read the invites.",
+    "rename": {
+        "set-success": "The invite `%{link}` has been renamed to '%{name}'.",
+        "reset-success": "The name of the invite `%{link}` has been removed."
+    },
+    "tracking-disabled": "The invites tracking is not enabled on this server."
+}
