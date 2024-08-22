@@ -27,6 +27,7 @@ async def load_cogs(bot: "Axobot"):
         "fun",
         # "halloween",
         "info",
+        "invites_tracker",
         "minecraft",
         "moderation",
         "partners",

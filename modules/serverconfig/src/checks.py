@@ -11,6 +11,8 @@ async def check_config(bot: Axobot, guild: discord.Guild, option: str, value: An
         return await antiraid_check(bot, guild, option, value)
     if option == "antiscam":
         return await antiscam_check(bot, guild, option, value)
+    if option == "enable_invites_tracking":
+        return await manage_guild_check(bot, guild, option, value)
     if option in {"bot_news", "levelup_channel", "partner_channel", "streaming_channel", "welcome_channel"}:
         levelup_is_channel = option != "levelup_channel" or not isinstance(value, str)
         if levelup_is_channel and (embed := await can_write_in_channel_check(bot, guild, option, value)):
@@ -64,6 +66,16 @@ async def antiscam_check(bot: Axobot, guild: discord.Guild, _option: str, value:
         guild,
         await bot._(guild, "server.tips.antiscam", modlogs_enable=await bot.get_command_mention("modlogs enable"))
     )
+
+
+async def manage_guild_check(bot: Axobot, guild: discord.Guild, _option: str, value: bool):
+    "Check if the bot can manage guild (for invites), else warn to grant permissions"
+    if value and not guild.me.guild_permissions.manage_guild:
+        return await _create_warning_embed(
+            bot,
+            guild,
+            await bot._(guild, "server.warnings.manage_guild_permissions")
+        )
 
 
 async def can_write_in_channel_check(bot: Axobot, guild: discord.Guild, _option: str,

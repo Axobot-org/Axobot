@@ -106,6 +106,7 @@
         "delete_welcome_on_quick_leave": "Supprimer le message de bienvenue lorsqu'un membre quitte le serveur juste après avoir rejoint ? %{value}",
         "description": "Description du serveur :\n %{value}",
         "enable_events": "Les événements amusants annuels du bot (tels que les célébrations d'Halloween ou de Noël) doivent-ils aussi avoir lieu dans ce serveur ? %{value}",
+        "enable_invites_tracking": "Dois-je comptabiliser l'utilisation des invitations par les nouveaux membres dans le serveur ? %{value}",
         "enable_xp": "Le système d'xp doit-il être activé ? %{value}",
         "help_in_private": "Envoyer le message d'aide en messages privés ? %{value}",
         "hunter": "Liste des salons dans lesquels le jeu *Hunter* est actif : %{value}",
@@ -155,6 +156,7 @@
             "many": "Il me manque plusieurs permissions pour appliquer la protection anti-raid : **%{list}**"
         },
         "channel_write_permissions": "J'ai besoin de la permission d'envoyer des messages dans %{channel} pour cette option",
+        "manage_guild_permissions": "J'ai besoin de la permission 'Gérer le serveur' pour que cette option fonctionne",
         "moderation_command": "J'ai besoin de la permission '%{perm}' pour appliquer cette commande",
         "title": "Avertissement",
         "xp_should_be_enabled": "Cette option est dédiée au système d'XP. Vous pouvez l'activer avec l'option de configuration 'enable_xp'",

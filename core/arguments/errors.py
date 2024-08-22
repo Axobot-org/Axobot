@@ -16,6 +16,12 @@ class InvalidBotOrGuildInviteError(VerboseBadArgumentError):
         self.argument = argument
         super().__init__(f"Invalid bot or guild invite: {argument}")
 
+class InvalidGuildInviteError(VerboseBadArgumentError):
+    "Raised when the guild invite is invalid"
+    def __init__(self, argument: str):
+        self.argument = argument
+        super().__init__(f"Invalid guild invite: {argument}")
+
 class InvalidUrlError(VerboseBadArgumentError):
     "Raised when the user argument is not a valid url"
     def __init__(self, argument: str):
