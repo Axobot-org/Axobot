@@ -756,10 +756,34 @@ class ServerLogs(commands.Cog):
                 colour=discord.Color.green()
             )
             emb.set_author(name=str(member), icon_url=member.display_avatar)
+            # try to wait for the invitation tracker event
+            try:
+                _, invite = await self.bot.wait_for("invite_used", timeout=2)
+            except asyncio.TimeoutError:
+                pass
+            else:
+                emb.add_field(
+                    name="Invitation used",
+                    value=await self._create_invite_field(invite)
+                )
             emb.add_field(name="Account created at", value=f"<t:{member.created_at.timestamp():.0f}>", inline=False)
             if specs := await self.get_member_specs(member):
                 emb.add_field(name="Specificities", value=", ".join(specs), inline=False)
             await self.validate_logs(member.guild, channel_ids, emb, "member_join")
+
+    async def _create_invite_field(self, invite: dict[str, int | str | None]):
+        "Create a field value for an invite used by a new member"
+        text: list[str] = []
+        if invite["name"]:
+            invite_name = f"'{invite['name']}' ({invite['invite_id']})"
+        else:
+            invite_name = f"'{invite['invite_id']}'"
+        text.append(f"Invite {invite_name}")
+        if invite["user_id"]:
+            text.append(f"Created by <@{invite['user_id']}> ({invite['user_id']})")
+        if invite["last_count"]:
+            text.append(f"Used {invite['last_count']} times now")
+        return "\n".join(text)
 
     @commands.Cog.listener()
     async def on_raw_member_remove(self, payload: discord.RawMemberRemoveEvent):
