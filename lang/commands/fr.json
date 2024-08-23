@@ -32,6 +32,11 @@
         "event profile": "profil",
         "help": "aide",
         "info": "info",
+        "invites-tracker disable": "désactiver",
+        "invites-tracker enable": "activer",
+        "invites-tracker list-invites": "liste-invitations",
+        "invites-tracker resync": "resynchroniser",
+        "invites-tracker set-name": "renommer",
         "kick": "expulser",
         "last-post": "dernier-post",
         "membercount": "nb-membres",
@@ -62,9 +67,9 @@
         "quote": "citation",
         "random-tip": "astuce-aléatoire",
         "rank": "rang",
+        "reminders cancel": "annuler",
         "reminders clear": "tout-annuler",
         "reminders create": "ajouter",
-        "reminders cancel": "annuler",
         "reminders list": "liste",
         "remindme": "rappelle-moi",
         "Report a scam": "Signaler une arnaque",
@@ -131,12 +136,17 @@
         "cases remove": "Supprime un casier de modération",
         "cases search": "Affiche les détails d'un casier de modération",
         "clear": "Supprime des messages du salon",
+        "invites-tracker disable": "Arrête le suivi de l'utilisation des invitations dans votre serveur",
+        "invites-tracker enable": "Commence le suivi l'utilisation des invitations dans votre serveur",
+        "invites-tracker list-invites": "Liste les invitations suivies et de leur utilisation",
+        "invites-tracker resync": "Synchronise les invitations de la base de données avec celles du serveur",
+        "invites-tracker set-name": "Spécifie un nom personnalisé pour un lien d'invitation",
         "membercount": "Donne quelques stats sur les membres du serveur",
         "minecraft follow-server": "Suis les informations d'un serveur en temps réel dans ton salon",
         "minecraft mod": "Obtiens des informations sur tout mod enregistré sur CurseForge ou Modrinth",
         "minecraft server": "Obtiens des informations sur un serveur Minecraft Java",
         "minecraft skin": "Obtiens le skin de n'importe quel joueur Minecraft Java",
-        "partners add": "Ajouter un partenaire à votre serveur",
+        "partners add": "Ajoute un partenaire à votre serveur",
         "partners list": "Liste les partenaires de votre serveur",
         "partners refresh": "Rafraîchit les informations de vos partenaires dans le salon dédié",
         "partners remove": "Supprime un partenariat de votre serveur",
@@ -157,6 +167,7 @@
         "config": "Configure le bot pour ton serveur",
         "emoji": "Gère les émojis de votre serveur",
         "event": "Participe aux événements spéciaux du bot",
+        "invites-tracker": "Suivez l'utilisation des invitations du serveur",
         "minecraft": "Recherche d'informations sur les serveurs/joueurs/mods de Minecraft",
         "modlogs": "Active ou désactive les logs de modération",
         "partners": "Gère les partenariats de votre serveur",
@@ -179,6 +190,7 @@
         "config": "config",
         "emoji": "émoji",
         "event": "événement",
+        "invites-tracker": "invitations-tracker",
         "minecraft": "minecraft",
         "modlogs": "logs-modération",
         "partners": "partenaires",
@@ -284,6 +296,10 @@
             "query": "recherche",
             "query_type": "type-de-recherche"
         },
+        "invites-tracker set-name": {
+            "invite": "invitation",
+            "name": "nom"
+        },
         "kick": {
             "reason": "raison",
             "user": "utilisateur"
@@ -373,12 +389,12 @@
         "rank": {
             "user": "utilisateur"
         },
+        "reminders cancel": {
+            "reminder_id": "id-du-rappel"
+        },
         "reminders create": {
             "duration": "durée",
             "message": "message"
-        },
-        "reminders cancel": {
-            "reminder_id": "id-du-rappel"
         },
         "remindme": {
             "duration": "durée",

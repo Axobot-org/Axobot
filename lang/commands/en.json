@@ -32,6 +32,11 @@
         "event profile": "profile",
         "help": "help",
         "info": "info",
+        "invites-tracker disable": "disable",
+        "invites-tracker enable": "enable",
+        "invites-tracker list-invites": "list-invites",
+        "invites-tracker resync": "resync",
+        "invites-tracker set-name": "set-name",
         "kick": "kick",
         "last-post": "last-post",
         "membercount": "membercount",
@@ -64,9 +69,9 @@
         "Quote": "Quote",
         "random-tip": "random-tip",
         "rank": "rank",
+        "reminders cancel": "cancel",
         "reminders clear": "clear",
         "reminders create": "create",
-        "reminders cancel": "cancel",
         "reminders list": "list",
         "remindme": "remindme",
         "Report a scam": "Report a scam",
@@ -133,6 +138,12 @@
         "cases list": "List all the moderation cases of a user",
         "cases remove": "Permanently delete a moderation case",
         "cases search": "Find the details of a moderation case",
+        "clear": "Delete some messages in a channel",
+        "invites-tracker disable": "Stop tracking invitations usage in your server",
+        "invites-tracker enable": "Start tracking invitations usage in your server",
+        "invites-tracker list-invites": "List the tracked invites and their usage",
+        "invites-tracker resync": "Ensure that the invites stored in the database are up to date",
+        "invites-tracker set-name": "Specify a custom name for an invite URL",
         "membercount": "Get some stats about your server members",
         "minecraft follow-server": "Follow a server's info in real time in your channel",
         "minecraft mod": "Get info about any mod registered on CurseForge or Modrinth",
@@ -158,6 +169,7 @@
         "config": "Configure the bot for your server",
         "emoji": "Manage your emojis",
         "event": "Participate in bot special events",
+        "invites-tracker": "Track your invitations usage",
         "minecraft": "Search for info about servers/players/mods from Minecraft",
         "modlogs": "Enable or disable server logs in specific channels",
         "partners": "Manage the partners of your server",
@@ -180,6 +192,7 @@
         "config": "config",
         "emoji": "emoji",
         "event": "event",
+        "invites-tracker": "invites-tracker",
         "minecraft": "minecraft",
         "modlogs": "modlogs",
         "partners": "partners",
@@ -285,6 +298,10 @@
             "query": "query",
             "query_type": "query-type"
         },
+        "invites-tracker set-name": {
+            "invite": "invite",
+            "name": "name"
+        },
         "kick": {
             "reason": "reason",
             "user": "user"
@@ -374,12 +391,12 @@
         "rank": {
             "user": "user"
         },
+        "reminders cancel": {
+            "reminder_id": "reminder-id"
+        },
         "reminders create": {
             "duration": "duration",
             "message": "message"
-        },
-        "reminders cancel": {
-            "reminder_id": "reminder-id"
         },
         "remindme": {
             "duration": "duration",
