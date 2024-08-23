@@ -1,3 +1,4 @@
+base_path: /lang
 files:
-  - source: /lang/*/en.json
+  - source: /*/en.json
     translation: /%original_path%/%two_letters_code%.json
