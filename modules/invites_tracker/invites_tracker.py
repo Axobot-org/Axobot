@@ -175,7 +175,8 @@ class InvitesTracker(commands.Cog):
         invite="The invite URL to rename",
         name="The custom name to give to the invite, or 'none' to reset it"
     )
-    async def name_invite(self, interaction: discord.Interaction, invite: GuildInviteArgument, name: str):
+    async def name_invite(self, interaction: discord.Interaction, invite: GuildInviteArgument,
+                          name: app_commands.Range[str, 1, 60]):
         "Specify a custom name to give to an invite URL"
         if not await self.is_tracker_enabled(interaction.guild_id):
             await interaction.response.send_message(
