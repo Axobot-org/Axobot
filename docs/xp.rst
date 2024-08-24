@@ -1,8 +1,8 @@
 :og:description: Track your members' activity on your server with the Axobot XP system! Gain levels, rise in the ranking, and reward your most active members with special roles!
 
-=========
-XP system
-=========
+============
+🎖️ XP system
+============
 
 The XP system is a point system for evaluating a person's activity on a server. Each message earns its author a certain number of points, which can be used to gain levels and move up the rankings. In order not to make the system too easy, each level is a bit more difficult to reach than the previous one, and of course there are security measures against spam or cheating.
 
