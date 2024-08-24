@@ -8,9 +8,10 @@ Config options
 --------------
 
 
-Recently, Axobot has features that can be modified per server, to make each server unique. You will find the language of the bot, the activation of certain options (such as the xp system), the list of roles authorized to use certain commands (ban, clear...), the welcome messages, and many other options.
+Axobot has a number of features that can be modified on a per-server basis to make each server unique. You can set the language of the bot, enable certain options (such as the `XP system <xp.html>`__ or our `anti-scam AI <moderator.html#anti-scam>`__), set a custom welcome messages, and many other options.
 
-The list of options continues to grow as development progresses, that's why a website is planned to make server configuration easier.
+.. note::
+    The number of options available and the wide variety of values accepted can easily seem confusing. That's why in mid-2024 we launched a new online dashboard, which you can access at https://axobot.xyz/dashboard!
 
 
 Watch
