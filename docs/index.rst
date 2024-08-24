@@ -85,6 +85,7 @@ And even more!
    perms
    moderator
    server
+   invites-tracking
    tickets
    user
    infos

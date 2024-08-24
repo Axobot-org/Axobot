@@ -26,7 +26,7 @@ Allows the bot to read server logs (adding roles, changing names, editing channe
 Manage Server
 -------------
 
-Allows the bot to change the name, image and region of the server, or get the list of all invites. Used for: `invite <infos.html#invite>`__
+Allows the bot to change the name, image and region of the server, or get the list of all invites. Used for: `invite tracking <invites-tracking.html>`__
 
 Manage Roles
 ------------
