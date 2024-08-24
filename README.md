@@ -42,7 +42,7 @@ If you can't use Discord and you really need to contact me, you can send me an e
 
 ## LICENSE
 
-This program is subject to a **MIT-type license**, which means that you are free to reuse such content for commercial or non-commercial purposes, provided that "**the copyright notice and the permission notice is included in all copies or substantial portions of the Software**". For more information, refer to the [LICENSE](https://github.com/ZRunner/Axobot/blob/main/LICENSE) file in the source code.
+This program is subject to a **MIT-type license**, which means that you are free to reuse such content for commercial or non-commercial purposes, provided that "**the copyright notice and the permission notice is included in all copies or substantial portions of the Software**". For more information, refer to the [LICENSE](https://github.com/Axobot-org/Axobot/blob/main/LICENSE) file in the source code.
 
 
 ## Discord Bots Lists
