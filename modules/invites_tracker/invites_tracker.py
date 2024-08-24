@@ -7,9 +7,9 @@ from discord.ext import commands
 
 from core.arguments.args import GuildInviteArgument
 from core.bot_classes import Axobot
-from core.formatutils import FormatUtils
 
 from .src.types import TrackedInvite
+from .src.views import TrackedInvitesPaginator
 
 
 class InvitesTracker(commands.Cog):
@@ -199,41 +199,14 @@ class InvitesTracker(commands.Cog):
             return
         await interaction.response.defer()
         invites = await self.db_get_invites(interaction.guild_id)
-        embed = discord.Embed(
-            title=await self.bot._(interaction, "invites_tracker.list.title"),
-            color=discord.Color.blurple()
+        _quit = await self.bot._(interaction, "misc.quit")
+        view = TrackedInvitesPaginator(
+            self.bot,
+            interaction.user,
+            invites,
+            stop_label=_quit.capitalize()
         )
-        lang = await self.bot._(interaction, "_used_locale")
-        for invite in invites:
-            if invite["name"]:
-                name = f"{invite['name']} ({invite['invite_id']})"
-            else:
-                name = invite["invite_id"]
-            creation_user = None if not invite['user_id'] else f"<@{invite['user_id']}>"
-            creation_date = None if not invite['creation_date'] else f"<t:{invite['creation_date'].timestamp():.0f}>"
-            if creation_user and creation_date:
-                value = await self.bot._(
-                    interaction, "invites_tracker.list.field-value.user-and-date", user=creation_user, date=creation_date
-                )
-            elif creation_user:
-                value = await self.bot._(
-                    interaction, "invites_tracker.list.field-value.user", user=creation_user
-                )
-            elif creation_date:
-                value = await self.bot._(
-                    interaction, "invites_tracker.list.field-value.date", date=creation_date
-                )
-            else:
-                value = await self.bot._(
-                    interaction, "invites_tracker.list.field-value.none"
-                )
-            invites_count = await FormatUtils.format_nbr(invite["last_count"], lang)
-            embed.add_field(
-                name=await self.bot._(interaction, "invites_tracker.list.field-title", name=name, count=invites_count),
-                value=value,
-                inline=False
-            )
-        await interaction.followup.send(embed=embed)
+        await view.send_init(interaction)
 
 
 async def setup(bot):
