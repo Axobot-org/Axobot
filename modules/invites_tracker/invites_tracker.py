@@ -58,10 +58,17 @@ class InvitesTracker(commands.Cog):
     async def sync_guild_invites(self, guild: discord.Guild):
         "Sync the tracked invites with the current invites of a guild"
         count = 0
-        for invite in await guild.invites():
+        guild_invites = await guild.invites()
+        # add/update existing invitations
+        for invite in guild_invites:
             user_id = invite.inviter.id if invite.inviter else None
             await self.db_add_invite(guild.id, invite.code, user_id, invite.created_at, invite.uses)
             count += 1
+        # delete removed invitations
+        for tracked_invite in await self.db_get_invites(guild.id):
+            if not next((i for i in guild_invites if i.code == tracked_invite["invite_id"]), None):
+                await self.db_delete_invite(guild.id, tracked_invite["invite_id"])
+                count += 1
         return count
 
     async def check_invites_usage(self, guild: discord.Guild):
