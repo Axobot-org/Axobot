@@ -289,8 +289,9 @@ class ServerConfig(commands.Cog):
         "Record a config edit event in the database"
         if len(event_type) > 64:
             raise ValueError("Event type cannot exceed 64 characters")
-        query = "INSERT INTO `edition_logs` (`guild_id`, `user_id`, `type`, `data`) VALUES (%s, %s, %s, %s)"
-        async with self.bot.db_main.write(query, (guild_id, user_id, event_type, json.dumps(data))):
+        query = "INSERT INTO `edition_logs` (`guild_id`, `user_id`, `type`, `data`, `origin`, `beta`) "\
+            "VALUES (%s, %s, %s, %s, 'bot', %s)"
+        async with self.bot.db_main.write(query, (guild_id, user_id, event_type, json.dumps(data)), self.bot.beta):
             pass
 
 
