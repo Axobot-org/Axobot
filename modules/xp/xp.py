@@ -645,7 +645,7 @@ class Xp(commands.Cog):
 
         ..Example rank @z_runner
 
-        ..Doc user.html#check-the-xp-of-someone
+        ..Doc xp.html#check-the-xp-of-someone
         """
         if user is None:
             user = interaction.user
@@ -817,7 +817,7 @@ class Xp(commands.Cog):
 
         ..Example top 7
 
-        ..Doc user.html#get-the-general-ranking"""
+        ..Doc xp.html#get-the-general-ranking"""
         if interaction.guild is not None and not await self.bot.get_config(interaction.guild_id, "enable_xp"):
             await interaction.response.send_message(
                 await self.bot._(interaction, "xp.xp-disabled"), ephemeral=True
@@ -940,7 +940,7 @@ class Xp(commands.Cog):
 
         ..Example rr add 10 Slowly farming
 
-        ..Doc server.html#roles-rewards"""
+        ..Doc xp.html#roles-rewards"""
         if role.name == "@everyone":
             raise commands.BadArgument(f"Role \"{role.name}\" not found")
         await interaction.response.defer()
@@ -959,7 +959,7 @@ class Xp(commands.Cog):
     async def rr_list(self, interaction: discord.Interaction):
         """List every roles rewards of your server
 
-        ..Doc server.html#roles-rewards"""
+        ..Doc xp.html#roles-rewards"""
         await interaction.response.defer()
         if roles_list := await self.rr_list_role(interaction.guild_id):
             desc = '\n'.join([
@@ -985,7 +985,7 @@ class Xp(commands.Cog):
 
         ..Example roles-rewards remove 10
 
-        ..Doc server.html#roles-rewards"""
+        ..Doc xp.html#roles-rewards"""
         await interaction.response.defer()
         roles_list = await self.rr_list_role(interaction.guild_id, level)
         if len(roles_list) == 0:
@@ -999,7 +999,7 @@ class Xp(commands.Cog):
     async def rr_reload(self, interaction: discord.Interaction):
         """Refresh roles rewards for the whole server
 
-        ..Doc server.html#roles-rewards"""
+        ..Doc xp.html#roles-rewards"""
         if not interaction.guild.me.guild_permissions.manage_roles:
             await interaction.response.send_message(
                 await self.bot._(interaction, "moderation.mute.cant-mute"), ephemeral=True

@@ -38,7 +38,7 @@ Welcome to the **Axobot** documentation, a Discord bot coded in Python by a rand
 .. grid:: 2
 
     .. grid-item-card:: 🎖️ XP System
-        :link: server.html#xp-system
+        :link: xp.html
         :margin: 0 3 0 0
 
         Give XP to your active members and let them level up and getting roles!
@@ -82,19 +82,20 @@ And even more!
    :maxdepth: 2
    :caption: 📂 List of available sections
 
-   perms
-   moderator
-   server
+   fun
+   infos
    invites-tracking
+   minecraft
+   miscellaneous
+   moderator
+   perms
+   roles-reactions
+   rss
+   server
+   streamers
    tickets
    user
-   infos
-   minecraft
-   rss
-   roles-reactions
-   streamers
-   fun
-   miscellaneous
+   xp
 
 .. toctree::
    :maxdepth: 1

@@ -46,7 +46,7 @@ Correction
 * Fixed some commands that did not work correctly in threads, like `reminders <../miscellaneous.html#reminders>`__
 * Fixed some translation errors, especially in English
 * `Reminders <../miscellaneous.html#reminders>`__ will display correctly when the bot can't use `embed <../perms.html#embed-links>`__
-* Fixed the display of the `xp card <../user.html#check-the-xp-of-someone>`__ for users who don't have a custom avatar
+* Fixed the display of the `xp card <../xp.html#check-the-xp-of-someone>`__ for users who don't have a custom avatar
 * The `info <../infos.html#info>`__ command finally displays correctly its sub-commands in the help menu
 * The bot responds correctly to messages containing a command
 * The bot will no longer send DMs to banned users who have already left the server
