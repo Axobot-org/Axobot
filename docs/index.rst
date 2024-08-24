@@ -78,9 +78,12 @@ Welcome to the **Axobot** documentation, a Discord bot coded in Python by a rand
 And even more!
 
 
+
+📂 Available sections
+---------------------
+
 .. toctree::
    :maxdepth: 2
-   :caption: 📂 List of available sections
 
    fun
    infos
@@ -97,14 +100,21 @@ And even more!
    user
    xp
 
+
+📢 Changelog
+------------
+
 .. toctree::
    :maxdepth: 1
 
    changelog
 
+
+💬 Our articles
+---------------
+
 .. toctree::
    :maxdepth: 1
-   :caption: 💬 Our articles
 
    articles/v5
    articles/v4

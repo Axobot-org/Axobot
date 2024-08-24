@@ -175,6 +175,6 @@ texinfo_documents = [
 html_theme_options = {
     "toc_title": "On this page",
     "show_toc_level": 2,
-    "repository_url": "https://github.com/ZRunner/Axobot",
+    "repository_url": "https://github.com/Axobot-org/Axobot",
     "use_repository_button": True,
 }
