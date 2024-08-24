@@ -1,6 +1,6 @@
-======
-🗞️ Rss
-======
+============
+🗞️ RSS feeds
+============
 
 More and more bots offer the feature to follow news feeds, sometimes `RSS feeds <https://en.wikipedia.org/wiki/RSS>`__, but most often YouTube channels or Reddit communities. Axobot allows you to track any RSS/atom feed, as well as any YouTube/Twitch/DeviantArt channel.
 
