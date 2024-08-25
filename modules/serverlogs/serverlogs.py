@@ -778,7 +778,12 @@ class ServerLogs(commands.Cog):
             invite_name = f"'{invite['name']}' ({invite['invite_id']})"
         else:
             invite_name = f"'{invite['invite_id']}'"
-        text.append(f"Invite {invite_name}")
+        if invite["max_uses"] == 1:
+            text.append(f"Single use invite {invite_name}")
+        elif invite["ephemeral"]:
+            text.append(f"Ephemeral invite {invite_name}")
+        else:
+            text.append(f"Invite {invite_name}")
         if invite["user_id"]:
             text.append(f"Created by <@{invite['user_id']}> ({invite['user_id']})")
         if invite["last_count"]:

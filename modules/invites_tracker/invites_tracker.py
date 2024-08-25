@@ -122,6 +122,8 @@ class InvitesTracker(commands.Cog):
         if used_invite:
             discord_invite, tracked_invite = used_invite
             tracked_invite["last_count"] = discord_invite.uses
+            tracked_invite["max_uses"] = discord_invite.max_uses
+            tracked_invite["ephemeral"] = discord_invite.max_age is not None
             self.bot.dispatch("invite_used", member, tracked_invite)
             await self.db_update_invite_count(member.guild.id, discord_invite.code, discord_invite.uses)
         else:
