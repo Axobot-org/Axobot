@@ -4,6 +4,7 @@ __pycache__
 secrets.json
 backup/*
 env/
+modules/test/
 
 # Mac folders
 .DS_Store
