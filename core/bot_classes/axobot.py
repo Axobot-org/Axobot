@@ -305,3 +305,26 @@ class Axobot(commands.bot.AutoShardedBot):
             return f"`{command.qualified_name}`"
         self.log.error("Trying to mention invalid command: %s", command_name)
         return f"`{command_name}`"
+
+    async def can_use_command(self, interaction: discord.Interaction, member: discord.Member):
+        "Check if a given user can use a slash command"
+        if member.bot:
+            return False
+        if member.guild_permissions.administrator:
+            return True
+        command_name = interaction.data["name"]
+        command = await self.fetch_app_command_by_name(command_name)
+        if command is None:
+            raise RuntimeError(f"Global command '{command_name}' not found")
+        try:
+            command_perms = await command.fetch_permissions(interaction.guild)
+        except discord.NotFound:
+            return member.guild_permissions <= interaction.command.default_permissions
+        can_use = False
+        user_roles = set(role.id for role in member.roles)
+        for perm in command_perms.permissions:
+            if perm.type == discord.AppCommandPermissionType.user and perm.id == member.id:
+                return perm.permission
+            if perm.type == discord.AppCommandPermissionType.role and perm.id in user_roles:
+                can_use = can_use or perm.permission
+        return can_use
