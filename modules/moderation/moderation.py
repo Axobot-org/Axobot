@@ -172,13 +172,7 @@ Slowmode works up to one message every 6h (21600s)
             return
         await interaction.response.defer(ephemeral=True)
 
-        async def user_can_kick(user: discord.Member):
-            return user.guild_permissions.kick_members
-
-        if user == interaction.guild.me or (self.bot.database_online and await user_can_kick(user)):
-            await interaction.followup.send(await self.bot._(interaction, "moderation.kick.cant-staff"))
-            return
-        if not self.bot.database_online and interaction.channel.permissions_for(user).kick_members:
+        if user == interaction.guild.me or await self.bot.can_use_command(interaction, user):
             await interaction.followup.send(await self.bot._(interaction, "moderation.kick.cant-staff"))
             return
         if user.roles[-1].position >= interaction.guild.me.roles[-1].position:
@@ -217,14 +211,8 @@ Slowmode works up to one message every 6h (21600s)
 ..Example warn @someone Please just stop, next one is a mute duh
 
 ..Doc moderator.html#warn"""
-        async def user_can_warn(user: discord.Member):
-            return user.guild_permissions.moderate_members
-
         await interaction.response.defer(ephemeral=True)
-        if user == interaction.guild.me or (self.bot.database_online and await user_can_warn(user)):
-            await interaction.followup.send(await self.bot._(interaction, "moderation.warn.cant-staff"))
-            return
-        if not self.bot.database_online and interaction.channel.permissions_for(user).manage_roles:
+        if user == interaction.guild.me or await self.bot.can_use_command(interaction, user):
             await interaction.followup.send(await self.bot._(interaction, "moderation.warn.cant-staff"))
             return
         if user.bot and not user.id==423928230840500254:
@@ -335,7 +323,7 @@ You can also mute this member for a defined duration, then use the following for
             ])
             await interaction.followup.send((await self.bot._(interaction, "moderation.mute.staff-mute")) + " " + emoji)
             return
-        if not self.bot.database_online and interaction.channel.permissions_for(user).manage_roles:
+        if await self.bot.can_use_command(interaction, user):
             await interaction.followup.send(await self.bot._(interaction, "moderation.warn.cant-staff"))
             return
         role = await self.get_muted_role(interaction.guild)
@@ -533,9 +521,8 @@ The 'days_to_delete' option represents the number of days worth of messages to d
         if not interaction.guild.me.guild_permissions.ban_members:
             await interaction.followup.send(await self.bot._(interaction, "moderation.ban.cant-ban"))
             return
-        if user in interaction.guild.members:
-            member = interaction.guild.get_member(user.id)
-            if user == interaction.guild.me or member.guild_permissions.ban_members:
+        if member := interaction.guild.get_member(user.id):
+            if member == interaction.guild.me or await self.bot.can_use_command(interaction, member):
                 await interaction.followup.send(await self.bot._(interaction, "moderation.ban.staff-ban"))
                 return
             if member.roles[-1].position >= interaction.guild.me.roles[-1].position:
@@ -616,15 +603,8 @@ Permissions for using this command are the same as for the kick
         if not interaction.guild.me.guild_permissions.ban_members:
             await interaction.response.send_message(await self.bot._(interaction, "moderation.ban.cant-ban"), ephemeral=True)
             return
-        async def user_can_kick(user: discord.Member):
-            return user.guild_permissions.kick_members
 
-        if user == interaction.guild.me or (self.bot.database_online and await user_can_kick(user)):
-            await interaction.response.send_message(
-                await self.bot._(interaction, "moderation.kick.cant-staff"), ephemeral=True
-            )
-            return
-        if not self.bot.database_online and user.guild_permissions.kick_members:
+        if user == interaction.guild.me or await self.bot.can_use_command(interaction, user):
             await interaction.response.send_message(
                 await self.bot._(interaction, "moderation.kick.cant-staff"), ephemeral=True
             )
