@@ -43,14 +43,12 @@ async def main():
         with open("status_list.json", 'r', encoding="utf-8") as status_file:
             status_list = json.load(status_file)
         if not client.database_online:
-            activity = discord.Activity(type=discord.ActivityType.listening, name=choice(status_list["no-db"]))
-            await client.change_presence(activity=activity)
+            status = choice(status_list["no-db"])
+        if client.beta:
+            status = choice(status_list["beta"])
         else:
-            if client.beta:
-                status = choice(status_list["beta"])
-            else:
-                status = choice(status_list["axobot"])
-            await client.change_presence(activity=discord.Game(name=status))
+            status = choice(status_list["axobot"])
+        await client.change_presence(activity=discord.CustomActivity(name=status))
         emb = discord.Embed(description=f"**{client.user.name}** is launching !", color=8311585, timestamp=client.utcnow())
         await client.send_embed(emb)
 

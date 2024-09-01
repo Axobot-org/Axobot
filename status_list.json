@@ -1,27 +1,30 @@
 {
     "axobot": [
-        "now with slash commands!",
-        "something",
-        "type / for the win",
-        "minecraft",
-        "tic-tac-toe",
-        "with Wumpus",
-        "axolotl adventures",
-        "in an Axolotl bucket",
-        "with OpenAI voice-to-text"
+        "Now with slash commands!",
+        "Now with a dashboard!",
+        "U should totally try /",
+        "Minecraft is a cool game",
+        "Playing tic-tac-toe",
+        "Playing with Wumpus",
+        "Playing Axolotl Adventures",
+        "Chillin' in an axolotl bucket",
+        "Toying with OpenAI voice-to-text",
+        "Axolotls are clearly the superior species",
+        "Ducks are cool too"
     ],
     "beta": [
         "SNAPSHOOT",
-        "snapshot day",
+        "it's snapshot day my friend",
         "somethin iz brokn",
         "bip-bop-bip-bop",
-        "with Discord API"
+        "Playing with Discord API",
+        "I'm pretty sure I saw a duck out there"
     ],
     "no-db": [
-        "a signal",
-        "a sign of life",
-        "nothing",
-        "a signal",
-        "a lost database"
+        "Looking for a signal",
+        "Looking for a sign of life",
+        "Wait, there's no data here?!",
+        "Looks like I've lost a database",
+        "Having an existential crisis..."
     ]
 }
