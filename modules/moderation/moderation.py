@@ -20,8 +20,12 @@ importlib.reload(args)
 
 CLEAR_MAX_MESSAGES = 10_000
 
-async def member_is_higher(target: discord.Member, moderator: discord.Member):
+async def target_is_higher(target: discord.Member, moderator: discord.Member):
     "Check if the target highest role is at the same position or higher than the moderator"
+    if target == target.guild.owner:
+        return True
+    if moderator == target.guild.owner:
+        return False
     return target.top_role.position >= moderator.top_role.position
 
 class Moderation(commands.Cog):
@@ -176,7 +180,7 @@ Slowmode works up to one message every 6h (21600s)
             return
         await interaction.response.defer(ephemeral=True)
 
-        if user == interaction.guild.me or await member_is_higher(user, interaction.user):
+        if user == interaction.guild.me or await target_is_higher(user, interaction.user):
             await interaction.followup.send(await self.bot._(interaction, "moderation.kick.cant-staff"))
             return
         if user.roles[-1].position >= interaction.guild.me.roles[-1].position:
@@ -216,7 +220,7 @@ Slowmode works up to one message every 6h (21600s)
 
 ..Doc moderator.html#warn"""
         await interaction.response.defer(ephemeral=True)
-        if user == interaction.guild.me or await member_is_higher(user, interaction.user):
+        if user == interaction.guild.me or await target_is_higher(user, interaction.user):
             await interaction.followup.send(await self.bot._(interaction, "moderation.warn.cant-staff"))
             return
         if user.bot and not user.id==423928230840500254:
@@ -313,7 +317,7 @@ You can also mute this member for a defined duration, then use the following for
         f_duration = await FormatUtils.time_delta(duration, lang=await self.bot._(interaction, "_used_locale"), form="short")
         await interaction.response.defer(ephemeral=True)
 
-        if user == interaction.guild.me or await member_is_higher(user, interaction.user):
+        if user == interaction.guild.me or await target_is_higher(user, interaction.user):
             emoji = random.choice([
                 ":confused:",
                 ":no_mouth:",
@@ -520,7 +524,7 @@ The 'days_to_delete' option represents the number of days worth of messages to d
             await interaction.followup.send(await self.bot._(interaction, "moderation.ban.cant-ban"))
             return
         if member := interaction.guild.get_member(user.id):
-            if member == interaction.guild.me or await member_is_higher(member, interaction.user):
+            if member == interaction.guild.me or await target_is_higher(member, interaction.user):
                 await interaction.followup.send(await self.bot._(interaction, "moderation.ban.staff-ban"))
                 return
             if member.roles[-1].position >= interaction.guild.me.roles[-1].position:
@@ -602,7 +606,7 @@ Permissions for using this command are the same as for the kick
             await interaction.response.send_message(await self.bot._(interaction, "moderation.ban.cant-ban"), ephemeral=True)
             return
 
-        if user == interaction.guild.me or await member_is_higher(user, interaction.user):
+        if user == interaction.guild.me or await target_is_higher(user, interaction.user):
             await interaction.response.send_message(
                 await self.bot._(interaction, "moderation.kick.cant-staff"), ephemeral=True
             )
