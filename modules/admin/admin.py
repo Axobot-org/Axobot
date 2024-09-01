@@ -794,13 +794,12 @@ Cette option affecte tous les serveurs"""
         await interaction.response.send_message("Chargement des idées...")
         server = self.bot.get_guild(SUPPORT_GUILD_ID.id if not self.bot.beta else PRIVATE_GUILD_ID.id)
         if server is None:
-            await interaction.response.send_message("Serveur introuvable")
+            await interaction.followup.send("Serveur introuvable")
             return
         channel = server.get_channel(488769306524385301 if not self.bot.beta else 929864644678549534)
         if channel is None:
-            await interaction.response.send_message("Salon introuvable")
+            await interaction.followup.send("Salon introuvable")
             return
-        await interaction.response.defer()
         ideas_list = await self._get_ideas_list(channel)
         count = len(ideas_list)
         ideas_list = ideas_list[:number]
