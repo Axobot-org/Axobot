@@ -50,7 +50,7 @@ Slowmode works up to one message every 6h (21600s)
 
 ..Doc moderator.html#slowmode"""
         if not interaction.channel.permissions_for(interaction.guild.me).manage_channels:
-            await interaction.response.send_message(await self.bot._(interaction, "moderation.no-perm"), ephemeral=True)
+            await interaction.response.send_message(await self.bot._(interaction, "moderation.slowmode.no-perm"), ephemeral=True)
             return
         await interaction.response.defer()
         if seconds == 0:
