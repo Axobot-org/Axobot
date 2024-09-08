@@ -122,6 +122,7 @@
         "enabled": "The %{channel} channel is now in slowmode. Wait %{s} seconds before sending a message.",
         "info": "The slowmode of this channel is currently at {} seconds",
         "invalid": "This value is invalid",
+        "no-perm": "Permission `Manage channel` needed :confused:",
         "too-long": "Impossible to set a frequency higher than six hours"
     },
     "unban-chat": "The member %{user} (%{userid}) is no longer banned from this server",
