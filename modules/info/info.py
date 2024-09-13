@@ -805,7 +805,11 @@ class Info(commands.Cog):
         since = await self.bot._(interaction, "misc.since")
         embed = discord.Embed(colour=default_color)
         icon_url = forum.guild.icon.with_static_format("png") if forum.guild.icon else None
-        title = await self.bot._(interaction, "info.info.forum.title", name=forum.name)
+        title = await self.bot._(
+            interaction,
+            "info.info.forum.media-title" if forum.is_media() else "info.info.forum.title",
+            name=forum.name
+        )
         embed.set_author(name=title, icon_url=icon_url)
         # Name
         embed.add_field(name=str(await self.bot._(interaction, "misc.name")).capitalize(), value=forum.name, inline=True)
