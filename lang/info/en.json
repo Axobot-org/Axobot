@@ -26,6 +26,7 @@
         "emoji-5v": "%{nbr} (1st registered use: %{date})",
         "forum": {
             "title": "Forum '%{name}'",
+            "media-title": "Media forum '%{name}'",
             "tags": "Post tags",
             "default-emoji": "Default reaction emoji",
             "guidelines": "Guidelines",
