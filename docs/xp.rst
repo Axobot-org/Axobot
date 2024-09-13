@@ -55,7 +55,7 @@ If you give the argument `server`, the top will only show users who are currentl
 Roles rewards
 -------------
 
-Roles rewards are roles given to your members when they reach a certain level of XP. These levels are defined by you (or by anyone with "Manage Server" permission), and you can add up to 7 rewards per server.
+Roles rewards are roles given to your members when they reach a certain level of XP. These levels are defined by you (or by anyone with "Manage Server" permission), and you can add up to 10 rewards per server.
 
 The main command to manage these roles is :code:`roles-rewards` (or its alias :code:`rr`). Here is the list of commands currently available :
 
