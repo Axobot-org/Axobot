@@ -58,7 +58,7 @@ CardStyleArgument = discord.app_commands.Transform[str, CardStyleTransformer]
 class BotOrGuildInviteTransformer(discord.app_commands.Transformer): # pylint: disable=abstract-method
     """Converts a string to a bot invite or a guild invite"""
 
-    async def transform(self, _interaction: discord.Interaction["Axobot"], value, /):
+    async def transform(self, interaction: discord.Interaction["Axobot"], value, /):
         "Do the conversion"
         answer = None
         r_invite = re.search(
@@ -68,7 +68,13 @@ class BotOrGuildInviteTransformer(discord.app_commands.Transformer): # pylint: d
         if r_invite is None:
             r_invite = re.search(r"(?:discord\.gg|discordapp\.com/invite)/([^\s/]+)", value)
             if r_invite is not None:
-                answer = r_invite.group(1)
+                try:
+                    invite = await interaction.client.fetch_invite(r_invite.group(1))
+                except discord.NotFound:
+                    pass
+                else:
+                    if invite.type == discord.InviteType.guild:
+                        answer = invite
         else:
             if (r_invite.group(2) or r_invite.group(4)) and (r_invite.group(1) or r_invite.group(3)):
                 scopes = r_invite.group(2).split('+') if r_invite.group(2) else r_invite.group(4).split('+')
@@ -89,6 +95,8 @@ class GuildInviteTransformer(discord.app_commands.Transformer):
             invite = await interaction.client.fetch_invite(value)
         except discord.NotFound as err:
             raise arguments_errors.InvalidGuildInviteError(value) from err
+        if invite.type != discord.InviteType.guild:
+            raise arguments_errors.InvalidGuildInviteError(value)
         return invite
 
     async def autocomplete(self, interaction, value, /):
