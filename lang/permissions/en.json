@@ -48,11 +48,13 @@
         "stream": "Go live",
         "use_application_commands": "Use application commands",
         "use_embedded_activities": "Launch activities in voice channels",
+        "use_external_apps": "Use external apps",
         "use_external_sounds": "Use external sounds",
         "use_slash_commands": "Use slash commands",
         "use_soundboard": "Use soundboard",
         "use_voice_activation": "Use voice activity",
         "view_audit_log": "View audit logs",
+        "view_creator_monetization_analytics": "View creator monetization analytics",
         "view_guild_insights": "View guild insights"
     },
     "target": {
