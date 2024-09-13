@@ -48,11 +48,13 @@
         "stream": "Passer en direct",
         "use_application_commands": "Utiliser les commandes d'app",
         "use_embedded_activities": "Lancer des activités dans les salons vocaux",
+        "use_external_apps": "Utiliser des applications externes",
         "use_external_sounds": "Utiliser des sons externes",
         "use_slash_commands": "Utiliser les commandes slash",
         "use_soundboard": "Utiliser le Soundboard",
         "use_voice_activation": "Utiliser la Détection de la voix",
         "view_audit_log": "Voir les logs du serveur",
+        "view_creator_monetization_analytics": "Voir les analyses de monétisation du serveur",
         "view_guild_insights": "Voir les analyses de serveur"
     },
     "target": {
