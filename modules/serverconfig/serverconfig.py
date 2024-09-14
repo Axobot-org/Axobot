@@ -291,7 +291,7 @@ class ServerConfig(commands.Cog):
             raise ValueError("Event type cannot exceed 64 characters")
         query = "INSERT INTO `edition_logs` (`guild_id`, `user_id`, `type`, `data`, `origin`, `beta`) "\
             "VALUES (%s, %s, %s, %s, 'bot', %s)"
-        async with self.bot.db_main.write(query, (guild_id, user_id, event_type, json.dumps(data)), self.bot.beta):
+        async with self.bot.db_main.write(query, (guild_id, user_id, event_type, json.dumps(data), self.bot.beta)):
             pass
 
 

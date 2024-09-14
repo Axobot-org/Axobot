@@ -218,6 +218,8 @@ class Admin(commands.Cog):
             allowed_mentions = discord.AllowedMentions(everyone=False, roles=True)
             try:
                 await channel.send(self.update[lang]+"\n\n"+mentions, allowed_mentions=allowed_mentions)
+            except discord.Forbidden:
+                pass
             except Exception as err:
                 self.bot.dispatch("error", err, interaction)
             else:
