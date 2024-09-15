@@ -61,7 +61,7 @@ class Xp(commands.Cog):
 
     @commands.Cog.listener()
     async def on_ready(self):
-        "Load cache + start decay loop"
+        "Load global cache"
         if not self.bot.database_online:
             await self.bot.unload_module("xp")
             return
@@ -582,7 +582,7 @@ class Xp(commands.Cog):
     async def xp_decay_loop(self):
         "Remove some xp to every member every day at midnight"
         guilds = await self.db_get_guilds_decays()
-        decay_query = "UPDATE `{table}` SET `xp` = GREATEST(`xp` - %s, 0)"
+        decay_query = "UPDATE `{table}` SET `xp` = GREATEST(CAST(`xp` AS SIGNED) - %s, 0)"
         cleanup_query = "DELETE FROM `{table}` WHERE `xp` <= 0"
         guilds_count = users_count = 0
         for guild_data in guilds:

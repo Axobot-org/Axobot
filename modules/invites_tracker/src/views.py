@@ -15,7 +15,7 @@ class TrackedInvitesPaginator(Paginator):
 
     def __init__(self, client: Axobot, user: User, invites: list[TrackedInvite], stop_label: str):
         super().__init__(client, user, stop_label)
-        self.invites = invites
+        self.invites = sorted(invites, key=lambda invite: invite["last_count"], reverse=True)
 
     async def get_page_count(self):
         length = len(self.invites)
@@ -58,6 +58,9 @@ class TrackedInvitesPaginator(Paginator):
                 value=value,
                 inline=False
             )
+        if (pages_count := await self.get_page_count()) > 1:
+            footer = f"{page}/{pages_count}"
+            embed.set_footer(text=footer)
         return {
             "embed": embed
         }
