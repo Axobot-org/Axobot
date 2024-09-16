@@ -55,10 +55,17 @@ class InvitesTracker(commands.Cog):
             pass
 
 
+    async def _get_guild_invites_with_vanity(self, guild: discord.Guild):
+        "Get the guild invites, including the vanity invite if it exists"
+        guild_invites = await guild.invites()
+        if vanity_invite := await guild.vanity_invite():
+            guild_invites.append(vanity_invite)
+        return guild_invites
+
     async def sync_guild_invites(self, guild: discord.Guild):
         "Sync the tracked invites with the current invites of a guild"
         count = 0
-        guild_invites = await guild.invites()
+        guild_invites = await self._get_guild_invites_with_vanity(guild)
         # add/update existing invitations
         for invite in guild_invites:
             user_id = invite.inviter.id if invite.inviter else None
@@ -74,7 +81,7 @@ class InvitesTracker(commands.Cog):
     async def check_invites_usage(self, guild: discord.Guild):
         "Detect which invite was just used, by comparing the stored usage with the current usage"
         tracked_invites = await self.db_get_invites(guild.id)
-        guild_invites = await guild.invites()
+        guild_invites = await self._get_guild_invites_with_vanity(guild)
         # first, check if an invite was used exactly once
         for tracked_invite in tracked_invites:
             invite = next((i for i in guild_invites if i.code == tracked_invite["invite_id"]), None)
