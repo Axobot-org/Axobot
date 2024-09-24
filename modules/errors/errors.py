@@ -278,7 +278,7 @@ class Errors(commands.Cog):
                 context = f"{ctx.guild.name} | {ctx.channel.name}"
             # if channel is the private beta channel, send it there
             if isinstance(ctx, MyContext | discord.Interaction) and ctx.channel.id == 625319425465384960:
-                await ctx.channel.send(f"{context}\n```py\n{trace[:1950]}\n```")
+                await ctx.channel.send(f"{context}\n```py\n{trace[:1920]}\n```")
             else:
                 await self.send_error_msg_autoformat(context, trace)
             self.log.warning("Error: %s", error, exc_info=exc_info)
@@ -288,11 +288,11 @@ class Errors(commands.Cog):
     async def send_error_msg_autoformat(self, context: str, python_message: str):
         """Envoie un message dans le salon d'erreur"""
         success = True
-        for i in range(0, len(python_message), 1950):
+        for i in range(0, len(python_message), 1920):
             if i == 0:
-                msg = context + f"\n```py\n{python_message[i:i+1950]}\n```"
+                msg = context + f"\n```py\n{python_message[i:i+1920]}\n```"
             else:
-                msg = f"```py\n{python_message[i:i+1950]}\n```"
+                msg = f"```py\n{python_message[i:i+1920]}\n```"
             success = success and await self.senf_err_msg(msg)
         return success
 
