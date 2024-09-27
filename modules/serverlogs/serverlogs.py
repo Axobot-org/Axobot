@@ -403,10 +403,10 @@ class ServerLogs(commands.Cog):
         if not msg.guild_id:
             return
         if channel_ids := await self.is_log_enabled(msg.guild_id, "message_update"):
-            old_content: str = None
-            author: discord.User = None
-            guild: discord.Guild = None
-            link: str = None
+            old_content: str | None = None
+            author: discord.User | None = None
+            guild: discord.Guild
+            link: str
             if msg.cached_message:
                 if msg.cached_message.author.bot:
                     return
@@ -422,7 +422,7 @@ class ServerLogs(commands.Cog):
                 guild = self.bot.get_guild(msg.guild_id)
                 link = f"https://discord.com/channels/{msg.guild_id}/{msg.channel_id}/{msg.message_id}"
             new_content = msg.data.get("content")
-            if new_content is None: # and msg.data.get("flags", 0) & 32:
+            if new_content is None or old_content == new_content: # and msg.data.get("flags", 0) & 32:
                 return
             emb = discord.Embed(
                 description=f"**[Message]({link}) updated in <#{msg.channel_id}>**",
