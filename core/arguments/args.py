@@ -221,8 +221,7 @@ class UnicodeEmojiTransformer(discord.app_commands.Transformer): # pylint: disab
 
     async def transform(self, interaction: discord.Interaction["Axobot"], value, /):
         "Check if a string is a unicod emoji, else raise BadArgument"
-        unicodes = interaction.client.emojis_manager.unicode_set
-        if all(char in unicodes for char in value):
+        if value in interaction.client.emojis_manager.unicode_set:
             return value
         raise arguments_errors.InvalidUnicodeEmojiError(value)
 
