@@ -494,10 +494,16 @@ You can specify a verification limit by adding a number in argument (up to 1.000
                 )
             ]
             desc = await self.bot._(interaction, "fun.discordjobs.filtered-count", count=len(jobs))
-        formatted_jobs = [
-            f"[{x['title'] if len(x['title'])<50 else x['title'][:49]+'…'}]({x['absolute_url']})"
-            for x in jobs
-        ]
+        formatted_jobs: list[str] = []
+        for job in jobs:
+            max_title_length = min(50, 102 - len(job["absolute_url"]) - 4)
+            if len(job["title"]) < max_title_length:
+                title: str = job["title"]
+            else:
+                title = job["title"][:max_title_length-1] + "…"
+                if title.endswith(" (…"):
+                    title = title[:-3] + "…"
+            formatted_jobs.append(f"[{title}]({job['absolute_url']})")
         _title = await self.bot._(interaction, "fun.discordjobs.title")
         class JobsPaginator(Paginator):
             "Paginator used to display jobs offers"
