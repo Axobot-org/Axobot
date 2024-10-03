@@ -6,15 +6,15 @@
     "kick": "%{user} (%{userid}) had been kik",
     "mute": "%{user} (%{userid}) Is know mwuted",
     "reason": {
-        "account_creation": "Automod (too recent account)",
-        "autounmute": "automatic unmute",
+        "account_creation": "",
+        "autounmute": "",
         "invite": "Automod (got an invite in their username, duh)",
         "invites": "Automod (spam ov Discord invites)",
-        "memberchan": "Automated action (config membercount)",
+        "memberchan": "",
         "mentions": "Automod (spam-ping bad)",
-        "unban": "unbanned by %{user}",
-        "unmute": "unmuted by %{user}",
-        "welcome_roles": "Automated action (config welcome_roles)"
+        "unban": "",
+        "unmute": "",
+        "welcome_roles": ""
     },
     "slowmode-disabled": "Shlowmode disabld in %{channel}",
     "slowmode-enabled": "Slwmod enable in %{channel} (%{seconds}s)",

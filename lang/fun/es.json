@@ -1,32 +1,117 @@
 {
-    "afk": {
-        "afk-done": "¡Ahora eres AFK!",
-        "afk-user-noreason": "¡Este miembro es AFK!",
-        "afk-user-reason": "Este miembro es AFK, porque {reason}",
-        "unafk-done": "Ya no eres más AFK."
-    },
+    "bbw-too-many": "",
     "blame-0": "Lista de nombres disponibles para **{user}**",
-    "cant-react": "No tengo suficientes permisos para usar reacciones!",
     "cookie": "{user} ofreció una caja de cookies a <@375598088850505728>! {emoji}",
     "count": {
         "counting": "Cuenta en curso...",
+        "forbidden": "",
         "missing-perms": "Oops, no puedo leer la historia de este canal. Por favor, verifique mis permisos....",
         "result-user": "En los últimos {limit} mensajes, {user} han publicado {x} mensajes ({p}%)",
         "result-you": "En los últimos {limit} posts, has publicado {x} mensajes ({p}%)",
         "too-much": "Quieres volar Discord! {e} Por razones de rendimiento, impondré un límite de {l} mensajes."
     },
+    "discordjobs": {
+        "all-count": {
+            "zero": "",
+            "one": "",
+            "many": ""
+        },
+        "filtered-count": {
+            "zero": "",
+            "one": "",
+            "many": ""
+        },
+        "title": ""
+    },
+    "discordlinks": {
+        "title": "",
+        "server-status": "",
+        "tos": "",
+        "bug-report": "",
+        "feedback": "",
+        "selfbot": "",
+        "dev-tos": "",
+        "how-id": "",
+        "age-requirement": "",
+        "betterdiscord": "",
+        "downloads": ""
+    },
+    "discordstatus-exists": "",
+    "discordstatus-impacts": {
+        "major": "",
+        "minor": "",
+        "none": ""
+    },
+    "discordstatus-nothing": "",
+    "embed-invalid-channel": "",
+    "embed-invalid-image": "",
+    "embed-sent": "",
     "error": "Ha ocurrido un error: `{err}`",
-    "fun-list": "Aquí está la lista de comandos divertidos disponibles:",
+    "flip": {
+        "tails": "",
+        "heads": "",
+        "edge": ""
+    },
+    "hour-result": "",
     "invalid-city": "Ciudad inválida :confused:",
-    "markdown": "__**Markdown Rules** en *Discord*__\n\n`*cursiva*` = *cursiva*\n`__subrayar__` = __subrayar__\n`**negrita**` = **negrita**\n`***negrita cursiva***` = ***negrita cursiva***\n`~~strikeout~~` = ~~strikeout~~\n`__*subrayar cursiva*__` = __*subrayar cursiva*__\n`__**subrayar negrita**__` = __**subrayar negrita**__\n`__***subrayar negrita cursiva***__` = __***subrayar negrita cursiva***__\n`||spoiler||` = ||spoiler||\n> cita = `> cita`\n\\`código\\` = `código`\n \\ para ignorar\n\nPara bloques de código, cf <https://discord.gg/DGahTNn>",
-    "no-database": "Como nuestra base de datos está desconectada, el acceso a los comandos de diversión está restringido a personas con permiso \"Gestionar Servidor\"",
+    "kills-list": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+    ],
+    "nasa-none": "",
     "no-embed-perm": "No tengo permiso para \"Insertar Enlaces\" :confused:",
     "no-emoji": "¡Incapaz de encontrar este emoji!",
-    "no-fun": "Los comandos divertidos han sido desactivados en este servidor. Para ver su lista, mira este enlace : https://axobot.rtfd.io/en/latest/fun.html",
-    "no-reaction": "Incapaz de adicionar reacciones. Por favor, verifique mis permisos...",
     "no-roll": "No se encontró ninguna opción",
     "no-say": "No se puede enviar mensajes en este canal",
-    "no-voicechan": "Debe estar en un canal de voz para poder usar este comando.",
+    "not-enough-roll": "",
     "osekour": [
         "Espera, estoy terminando de ver mi película.",
         "¡Ya vamos! Pero, ¿por qué ya no contestas? ¡No finjas muerte!",
@@ -40,17 +125,13 @@
         "Lo siento, hay más de 3 copos de nieve: estamos atrapados en el garaje.",
         "Tendremos que esperar hasta el final de nuestra huelga.... ¡¿Estás diciendo que no lo sabes?! Han pasado dos meses desde que empezamos!"
     ],
-    "piece-0": [
-        "¡Cara!",
-        "¡Cruz!"
-    ],
-    "piece-1": "¡Falló, se cayó en el borde!",
     "react-0": "No se puede encontrar el mensaje correspondiente. Debe introducir el ID del mensaje en el primer argumento y el emoji en el segundo. :upside_down:\n También verifique que tengo permiso de leer el historial de mensajes.",
+    "react-done": {
+        "one": "",
+        "many": ""
+    },
+    "say-done": "",
     "say-no-perm": "You do not have permission to send messages in the channel {channel}",
-    "thanos": [
-        "{0} fue salvado por Thanos",
-        "Thanos decidió reducir {0} a cenizas. Por el bien de la humanidad..."
-    ],
     "tip-list": [
         "¿Sabías eso? Hay varios idiomas para el bot, incluyendo uno muy divertido: `lolcat`",
         "Consejo profesional: para modificar el idioma del bot, use el comando %{config_cmd} !",
@@ -73,8 +154,14 @@
         "Consejo profesional: El bot tiene un Discord, donde puedes ver los errores actuales y votar por las próximas novedades! Usa el comando %{about_cmd} para obtener la invitación.",
         "Consejo profesional: El comando `prefix` le permite tener una lista de los prefijos actualmente utilizables en el servidor.",
         "¿Sabías eso? Puede dar una descripción de su servidor que puede ser usada en otros servidores, a través de la opción `description` del comando %{config_cmd}.",
-        "¿Sabías eso? En algunos eventos especiales, es posible obtener tarjetas xp de colección. No olvides seguir las noticias en el servidor oficial!"
+        "¿Sabías eso? En algunos eventos especiales, es posible obtener tarjetas xp de colección. No olvides seguir las noticias en el servidor oficial!",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
     ],
-    "uninhabited-city": "Ciudad deshabitada :confused:",
-    "vote-0": "¡Usted no puede poner más de 20 opciones y menos un número negativo de opciones!"
+    "uninhabited-city": "Ciudad deshabitada :confused:"
 }
