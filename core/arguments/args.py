@@ -73,7 +73,7 @@ class BotOrGuildInviteTransformer(discord.app_commands.Transformer): # pylint: d
                 except discord.NotFound:
                     pass
                 else:
-                    if invite.type == discord.InviteType.guild:
+                    if invite.type == discord.enums.InviteType.guild:
                         answer = invite
         else:
             if (r_invite.group(2) or r_invite.group(4)) and (r_invite.group(1) or r_invite.group(3)):
@@ -95,7 +95,7 @@ class GuildInviteTransformer(discord.app_commands.Transformer):
             invite = await interaction.client.fetch_invite(value)
         except discord.NotFound as err:
             raise arguments_errors.InvalidGuildInviteError(value) from err
-        if invite.type != discord.InviteType.guild:
+        if invite.type != discord.enums.InviteType.guild:
             raise arguments_errors.InvalidGuildInviteError(value)
         return invite
 
