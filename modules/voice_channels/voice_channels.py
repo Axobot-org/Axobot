@@ -8,6 +8,7 @@ from discord.ext import commands
 
 from core.bot_classes import Axobot
 from core.checks import checks
+from core.safedict import SafeDict
 
 RANDOM_NAMES_URL = "https://randommer.io/api/Name?nameType=surname&quantity=20"
 MINECRAFT_ENTITIES_URL = "https://raw.githubusercontent.com/PixiGeko/Minecraft-generated-data/master/1.21/releases/1.21/"\
@@ -151,7 +152,7 @@ class VoiceChannels(commands.Cog):
             args["random"] = await self.get_random_name()
         if "{minecraft}" in chan_name:
             args["minecraft"] = await self.get_mc_name()
-        chan_name = chan_name.format_map(self.bot.SafeDict(args))
+        chan_name = chan_name.format_map(SafeDict(args))
         # actually create the channel
         new_channel = await category.create_voice_channel(name=chan_name, position=p, overwrites=over)
         # move user

@@ -8,6 +8,7 @@ from discord.ext import commands
 
 from core.bot_classes import SUPPORT_GUILD_ID, Axobot
 from core.enums import ServerWarningType
+from core.safedict import SafeDict
 
 
 class Welcomer(commands.Cog):
@@ -89,7 +90,7 @@ class Welcomer(commands.Cog):
                     return
             botormember = await self.bot._(member.guild, "misc.bot" if member.bot else "misc.member")
             try:
-                text = text.format_map(self.bot.SafeDict(
+                text = text.format_map(SafeDict(
                     user=member.mention if event_type=="welcome" else member.display_name,
                     user_idname=str(member),
                     user_id=str(member.id),

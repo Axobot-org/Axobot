@@ -18,6 +18,7 @@ from mysql.connector.errors import ProgrammingError as MySQLProgrammingError
 from PIL import Image, ImageFont
 
 from core.bot_classes import Axobot
+from core.safedict import SafeDict
 from core.tips import UserTip
 
 from .cards import CardGeneration
@@ -228,7 +229,7 @@ class Xp(commands.Cog):
             item = random.choice(await self.bot._(msg.channel, "xp.levelup-items"))
         else:
             item = ''
-        text = text.format_map(self.bot.SafeDict(
+        text = text.format_map(SafeDict(
             user=msg.author.mention,
             level=lvl,
             random=item,

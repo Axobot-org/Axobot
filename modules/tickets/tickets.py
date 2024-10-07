@@ -9,6 +9,7 @@ from mysql.connector.errors import IntegrityError
 from core.arguments import PartialorUnicodeEmojiArgument
 from core.bot_classes import Axobot
 from core.enums import ServerWarningType
+from core.safedict import SafeDict
 
 from .src.types import DBTopicRow, TicketCreationEvent
 from .src.views import AskTitleModal, AskTopicSelect, SelectView, SendHintText
@@ -290,7 +291,7 @@ class Tickets(commands.Cog):
             topic_name = await self.bot._(interaction.guild_id, "tickets.other")
         else:
             topic_name = topic["topic"]
-        return channel_name.format_map(self.bot.SafeDict({
+        return channel_name.format_map(SafeDict({
             "username": interaction.user.global_name or interaction.user.name,
             "userid": interaction.user.id,
             "topic": topic_name,
