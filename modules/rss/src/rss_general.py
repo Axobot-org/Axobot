@@ -195,10 +195,8 @@ class RssMessage:
         _author = discord.utils.escape_markdown(self.author) if self.author else "?"
         # full post text
         post_text = self.post_text or ""
-        post_text_size_limit = 3800 if self.feed.use_embed else 1800
         # post description/summary
         description = self.post_description or ""
-        description_size_limit = 1500
         return self.bot.SafeDict(
             channel=_channel,
             title=self.title,
@@ -210,11 +208,11 @@ class RssMessage:
             mentions=", ".join(self.mentions),
             logo=self.logo,
             author=_author,
-            full_text=post_text[:post_text_size_limit] + '…' if len(post_text) > post_text_size_limit else post_text,
-            description=description[:description_size_limit] + '…' if len(description) > description_size_limit else description,
+            full_text=post_text,
+            description=description
         )
 
-    async def create_msg(self, msg_format: str=None):
+    async def create_msg(self, msg_format: str | None = None):
         "Create a message ready to be sent, either in string or in embed"
         if msg_format is None:
             msg_format = self.feed.structure
@@ -223,22 +221,22 @@ class RssMessage:
             self.author = f"{self.author} (retweeted from @{self.rt_from})"
 
         safedict = await self._generate_safedict()
-        text = format_text(msg_format, safedict)
+        text = self._format_text(msg_format, safedict, 3900 if self.feed.use_embed else 2000)
         if not self.feed.use_embed:
             return text[:2000]
 
         emb = discord.Embed(description=text[:4096], color=self.embed_data["color"])
         if self.embed_data["author_text"]:
-            emb.set_author(name=format_text(self.embed_data["author_text"], safedict)[:256])
+            emb.set_author(name=self._format_text(self.embed_data["author_text"], safedict, 256))
         if self.embed_data["footer_text"]:
-            emb.set_footer(text=format_text(self.embed_data["footer_text"], safedict)[:2048])
+            emb.set_footer(text=self._format_text(self.embed_data["footer_text"], safedict, 2048))
         if self.embed_data["title"] is None:
             if self.feed.type != "tw":
                 emb.title = self.title[:256]
             else:
                 emb.title = self.author[:256]
         else:
-            emb.title = format_text(self.embed_data["title"], safedict)[:256]
+            emb.title = self._format_text(self.embed_data["title"], safedict, 256)
         if "{url}" not in msg_format and "{link}" not in msg_format:
             emb.add_field(name="URL", value=self.url[:1024])
         if self.image is not None:
@@ -252,12 +250,45 @@ class RssMessage:
             emb.url = self.url
         return emb
 
-def format_text(source: str, data: "Axobot.SafeDict"):
-    "Try to safely format a string with a dictionary of data, raise a custom error if it fails"
-    try:
-        return source.format_map(data)
-    except (ValueError, TypeError) as err:
-        raise InvalidFormatError from err
+    def _format_text(self, source: str, data: "Axobot.SafeDict", max_length: int):
+        "Try to safely format a string with a dictionary of data, raise a custom error if it fails"
+        fixed_message_data = self.bot.SafeDict(data)
+        for key in ("full_text", "description"):
+            fixed_message_data.pop(key)
+        try:
+            fixed_message_length = len(source.format_map(fixed_message_data))
+        except (ValueError, TypeError) as err:
+            raise InvalidFormatError from err
+        if (
+            "{full_text}" in source
+            and "{description}" in source
+            and data["full_text"]
+            and data["description"]
+            and fixed_message_length + len(data["description"]) + len(data["full_text"]) > max_length
+        ):
+            # distribute remaining length between full_text and description with a 80/20 ratio
+            remaining_length = max_length - fixed_message_length
+            description_max_length = int(0.2 * remaining_length)
+            if len(data["description"]) > description_max_length:
+                data["description"] = data["description"][:description_max_length] + '…'
+            full_text_max_length = remaining_length - len(data["description"])
+            if len(data["full_text"]) > full_text_max_length:
+                data["full_text"] = data["full_text"][:full_text_max_length] + '…'
+        elif "{full_text}" in source and fixed_message_length + len(data["full_text"]) > max_length:
+            # reduce full_text to fit in the max_length
+            full_text_max_length = max_length - fixed_message_length
+            if len(data["full_text"]) > full_text_max_length:
+                data["full_text"] = data["full_text"][:full_text_max_length] + '…'
+        elif "{description}" in source and fixed_message_length + len(data["description"]) > max_length:
+            # reduce description to fit in the max_length
+            description_max_length = max_length - fixed_message_length
+            if len(data["description"]) > description_max_length:
+                data["description"] = data["description"][:max_length - fixed_message_length] + '…'
+
+        try:
+            return source.format_map(data)[:max_length]
+        except (ValueError, TypeError) as err:
+            raise InvalidFormatError from err
 
 class InvalidFormatError(Exception):
     pass
