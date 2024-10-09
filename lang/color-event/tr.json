@@ -1,0 +1,22 @@
+{
+    "colorify": {
+        "starting": "",
+        "success": ""
+    },
+    "blurple": {
+        "check": {
+            "intro": "",
+            "result": "",
+            "reward": ""
+        }
+    },
+    "halloween": {
+        "check": {
+            "intro": "",
+            "result": "",
+            "reward": ""
+        }
+    },
+    "missing-attachment-perm": "",
+    "unknown-err": ""
+}

@@ -1,85 +1,40 @@
 {
-    "adv-fields": [
-        "Name",
-        "ID",
-        "Typ",
-        "Aktion",
-        "Parent",
-        "Children",
-        "Hinzugefügt in der Version"
-    ],
-    "adv-help": "Dieser Befehl gibt dir die Möglichkeit Informationen über jede Minecraft Errungenschaft zu erhalten. Gib dafür einfach `%{p}mc advancement <name>` ein.",
-    "block-fields": [
-        "ID",
-        "Stack größe",
-        "Creative mod tab",
-        "Schadenspunkte",
-        "Haltbarkeit",
-        "Werkzeuge zum abbauen",
-        "Mobs, welche dieses Item einsammeln können",
-        "Hinzugefügt in der Version"
-    ],
-    "block-help": "Dieser Befehl gibt dir die Möglichkeit Informationen über jeden Minecraft Block zu erhalten. Gib dafür einfach `%{p}mc block <name>` ein",
     "cant-embed": "Embed konnte nicht gefunden werden. Bitte stelle sicher, dass ich die \"Embed links\" Berechtigung habe.",
-    "cmd-fields": [
-        "Name",
-        "Syntax",
-        "Beispiel",
-        "Hinzugefügt in der Version"
-    ],
-    "cmd-help": "Dieser Befehl gibt dir die Möglichkeit Informationen über jeden Minecraft Befehl zu erhalten.  Gib dafür einfach `%{p}mc command <name>` ein.",
-    "contact-mail": "Wenn dir irgendein Fehler oder etwas falsches auffällt wende dich bitte an uns oder melde es direkt [auf der Seite](https://fr-minecraft.net).",
-    "dimensions": "Weite: %{la}\nLänge: %{lo}\nHöhe: %{ha}",
-    "entity-fields": [
-        "ID",
-        "Typ",
-        "Lebenspunkte",
-        "Angriffspunkte",
-        "Todes XP",
-        "Bevorzugte Biome",
-        "Hinzugefügt in der Version"
-    ],
-    "entity-help": "Dieser Befehl gibt dir die Möglichkeit Informationen über jedes Minecraft Entity zu erhalten. Gib dafür einfach `%{p}mc entity <name>` ein.",
-    "item-fields": [
-        "ID",
-        "Size of a stack",
-        "Kreativmodus Tab",
-        "Schadenspunkte",
-        "Haltbarkeit",
-        "Werkzeuge zum abbauen",
-        "Mobs, die dieses Item droppen könnten",
-        "Hinzugefügt in der Version"
-    ],
-    "item-help": "Dieser Befehl gibt dir die Möglichkeit Informationen über jedes Minecraft Item zu erhalten. Gib dafür einfach `%{p}mc item <name>` ein",
-    "mojang_desc": {
-        "account.mojang.com": "Mojang Account Management Seite",
-        "api.mojang.com": "API-Service von Mojang",
-        "authserver.mojang.com": "Authentication server",
-        "minecraft.net": "Offizielle Seite",
-        "mojang.com": "Offizielle Webseite",
-        "session.minecraft.net": "Mehrspieler Sitzung (veraltet)",
-        "sessionserver.mojang.com": "Authentifizierungsserver",
-        "textures.minecraft.net": "Texture Server (skin & capes)"
+    "invalid-ip": "",
+    "mod-fields": {
+        "author": "",
+        "authors": "",
+        "categories": "",
+        "downloads": "",
+        "id-curseforge": "",
+        "id-modrinth": "",
+        "name": "",
+        "release": "",
+        "summary": "",
+        "versions": ""
     },
-    "names": [
-        "Block",
-        "Entity",
-        "Item",
-        "Befehl",
-        "Errungenschaft"
-    ],
-    "no-adv": "Errungenschaft konnte nicht gefunden werden",
+    "mod-title": "",
     "no-api": "Error: Keine Verbindung zur API möglich",
-    "no-block": "Block konnte nicht gefunden werden",
-    "no-cmd": "Befehl konnte nicht gefunden werden",
-    "no-entity": "Entity konnte nicht gefunden werden",
-    "no-item": "Item konnte nicht gefunden werden",
+    "no-embed": "",
+    "no-mod": "",
     "no-ping": "Error: Es ist nicht möglich diesen Server zu erreichen",
-    "serv-0": "Anzahl Spieler",
-    "serv-1": "Liste der ersten 20 verbundenen Spieler",
-    "serv-2": "Liste aller Spieler, die online sind",
-    "serv-3": "Verzögerung",
+    "no-player-list": "",
+    "player-not-found": "",
+    "player-skin-download": "",
+    "player-skin-title": "",
+    "server": {
+        "description": "",
+        "from-provider": "",
+        "latency": "",
+        "players-count": "",
+        "players-list-20": "",
+        "players-list-all": "",
+        "version": ""
+    },
+    "serv-follow": {
+        "missing-perms": "",
+        "success": ""
+    },
     "serv-error": "Oops, ein unbekannnter Fehler ist aufgetaucht. Bitte versuche es nocheinmal :confused:",
-    "serv-title": "Server Information %{ip}",
-    "success-add": "Eine Nachricht mit allen Serverdetails %{ip} durde zu dem Kanal %{channel}!"
+    "serv-title": "Server Information %{ip}"
 }

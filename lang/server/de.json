@@ -1,77 +1,165 @@
 {
-    "config-help": "Dieser Befehl wird hauptsächlich genutzt, um dein Server zu konfigurieren. Wenn du `%{p}config see [optional]` machst, wirst du ein Überblick über die aktuellen Konfigurationen und Server Administratoren können `%{p}config set <option> value1, value2...` eingeben, um die Konfigurationen zu verwalten oder `%{p}config del <option>` eingibst, wird die Option zurückgesetzt (`%{p}config set <option>` funktioniert genau so).\nDie Liste der verfügbaren Optionen ist hier:\n<https://axobot.rtfd.io/en/latest/server.html#list-of-every-option> aber der Index ohne irgendwelche Erklärungen, kann mit dem Befehl `%{p}config list` gefunden werden",
-    "config-list": "Liste mit den verfügbaren Optionen: %{text} Mehr infos bei %{link}",
-    "edit-error": {
-        "anti_raid": "Dieses Level existiert nicht. Hier ist die Liste der aktuell unterstützen Levels: %{list}",
-        "boolean": "Die \"%{name}\" Option erwartet ein booleschen (True/False) Parameter im Wert 😇",
-        "channel": "Der Kanal \"%{channel}\" wurde nicht gefunden 😕 (Gebe die exakte Erwähnung, Name oder ID von dem Kanal ein)",
-        "color": "Diese Farbe ist ungültig",
-        "emoji": "Das Emoji %{emoji} wurde nicht gefunden",
-        "lang": "Diese Sprache ist nicht verfügbar. Hier ist die Liste der aktuell unterstützten Sprachen: %{list}",
-        "numeric": "Die \"%{name}\" Option erwartet eine Nummer in Parameter 😇",
-        "prefix": {
-            "invalid": "Ups, es sieht so aus, als ob der Prefix ungültig ist 🤔 Wenn das Problem bestehen bleibt, nutze einen anderen",
-            "long": "Dieser Prefix ist zu lang, um ihn zu benutzen!"
+    "bool": {
+        "true": "",
+        "false": ""
+    },
+    "enum": {
+        "anti_raid": {
+            "none": "",
+            "smooth": "",
+            "careful": "",
+            "high": "",
+            "extreme": ""
         },
-        "role": "Die Rolle \"%{role}\" wurde nicht gefunden 😕 (prüfe die Schreibung und die speziellen Zeichen)",
-        "xp": "Dieses xp Sytem existiert nicht. Hier ist die Liste, der verfügbaren Systeme: %{list}",
-        "xp_rate": "Die xp Rate muss zwischen %{min} und %{max} liegen"
+        "language": {
+            "fr": "",
+            "en": "",
+            "lolcat": "",
+            "fi": "",
+            "de": "",
+            "fr2": "",
+            "cs": ""
+        },
+        "levelup_channel": {
+            "none": "",
+            "any": "",
+            "dm": ""
+        },
+        "xp_type": {
+            "global": "",
+            "mee6-like": "",
+            "local": ""
+        }
     },
-    "edit-success": {
-        "boolean": "Die \"%{opt}\" Option wurde um dem Wert *%{val}* verändert",
-        "channel": "Die \"%{opt}\" Option wurde verändert mit den Kanälen %{val}",
-        "color": "Die Farbe für diese Option \"%{opt} ist jetzt %{val}",
-        "emoji": "Das Emoji für die Option \"%{opt}\" ist jetzt %{val}",
-        "lang": "Die Zbot Sprache ist jetzt %{val}",
-        "prefix": "Der Prefix wurde erfolgreich zu `%{val}` ausgetauscht",
-        "raid": "Das anti-raid Sicherheitslevel ist jetzt **%{name}** (%{index})",
-        "role": "Die \"%{opt}\" Option wurde verändert mit den folgenden Rollen: %{val}",
-        "text": "Die Option \"%{opt}\" wurde mit folgendem Text ersetzt:\n```\n%{val}\n```",
-        "xp": "Das xp System ist jetzt %{val}",
-        "xp_rate": "Die xp Rate ist jetzt %{val}"
-    },
+    "config-list": "Liste mit den verfügbaren Optionen: %{text} Mehr infos bei %{link}",
+    "deleted-channel": "",
+    "deleted-role": "",
     "internal-error": "Ups, ein interner Fehler ist aufgetreten...",
+    "need-manage-server": "",
     "not-found": "Der Server %{guild} ist noch nicht in die Datenbank registriert",
     "opt_title": "Option \"%{opt}\" von dem Server %{guild}",
     "option-notfound": "Diese Option existiert nicht 😕",
+    "reset-all": {
+        "confirmation": "",
+        "success": "",
+        "error": ""
+    },
     "see-0": "Gebe `!config help` für mehr details ein",
     "see-title": "%{guild} Server Konfigurationen",
+    "set_error": {
+        "BOOLEAN_INVALID": "",
+        "CATEGORY_INVALID": "",
+        "channels_list": "",
+        "CHANNEL_ANNOUNCEMENT": "",
+        "CHANNEL_INVALID": "",
+        "CHANNEL_NON_NSFW": "",
+        "CHANNEL_NOT_TEXT": "",
+        "CHANNEL_NOT_VOICE": "",
+        "CHANNEL_STAGE": "",
+        "CHANNEL_THREAD": "",
+        "COLOR_INVALID": "",
+        "emojis_list": "",
+        "emojis_list_exact": "",
+        "EMOJI_INVALID": "",
+        "ENUM_INVALID": "",
+        "float_err": "",
+        "int_err": "",
+        "LEVELUP_CHANNEL_INVALID": "",
+        "roles_list": "",
+        "ROLE_EVERYONE": "",
+        "ROLE_INTEGRATED": "",
+        "ROLE_INVALID": "",
+        "text_err": ""
+    },
+    "set_success": {
+        "int": "",
+        "float": "",
+        "boolean": {
+            "true": "",
+            "false": ""
+        },
+        "enum": "",
+        "text": "",
+        "role": "",
+        "roles_list": "",
+        "text_channel": "",
+        "text_channels_list": "",
+        "voice_channel": "",
+        "category": "",
+        "emojis_list": "",
+        "color": "",
+        "levelup_channel": {
+            "any": "",
+            "channel": "",
+            "none": "",
+            "dm": ""
+        }
+    },
     "server_desc": {
         "anti_caps_lock": "Sollte Zbot eine Nachricht senden, wenn ein Mitglied zu viele Großbuchstaben sendet? %{value}",
         "anti_raid": "Level der Anti-Raid Schutzes: %{value}\n*([Dokumentation](https://axobot.rtfd.io/en/latest/moderator.html#anti-raid))*",
+        "anti_raid_ignored_roles": "",
+        "anti_scam": "",
         "autoremove_xp": "Erfahrungspunkte täglich entfernen von inaktiven Mitgliedern: %{value}",
-        "ban_allowed_roles": "Liste der Rollen, mit denen man den Befehl \"ban\" ausführen kann: %{value}",
         "bot_news": "Liste der Kanäle, wo die Zbot news gesendet werden: %{value}",
-        "clear_allowed_roles": "Liste der Rollen, mit denen man den Befehl \"clear\" ausführen kann: %{value}",
+        "compress_help": "",
+        "delete_welcome_on_quick_leave": "",
         "description": "Server Beschreibung:\n %{value}",
-        "enable_fun": "Sind die Befehle, die in `!fun` gelistet sind, erlaubt? %{value}",
+        "enable_events": "",
+        "enable_invites_tracking": "",
         "enable_xp": "Sollte das xp System angemacht werden? %{value}",
         "help_in_private": "Sollte die help Nachricht in den Privatnachrichten gesendet werden? %{value}",
         "hunter": "Liste der Kanäle, in welchen das *Hunter* Spiel aktiv ist: %{value}",
-        "kick_allowed_roles": "Liste der Rollen, mit denen man den Befehl \"kick\" ausführen kann: %{value}",
         "language": "Die aktuelle Zbot Sprache in diesem Server ist: **%{value}**",
         "leave": "Nachricht, die gesendet wird, wenn ein Mitglied den Server verlässt: %{value}",
+        "levelup_channel": "",
         "levelup_msg": "Nachricht, die gesendet wird, wenn ein Mitglied ein xp Level aufsteigt: %{value}",
+        "levelup_silent_mention": "",
         "membercounter": "Kanal zeigt Mitglieder als Zahlen in seinem Namen an: %{value}",
-        "mute_allowed_roles": "Liste der Rollen, mit denen man den Befehl \"mute\" ausführen kann: %{value}",
         "muted_role": "Rolle für die muted Mitglieder: %{value}",
         "noxp_channels": "Kanäle, wo man kein xp bekommen kann: %{value}",
+        "noxp_roles": "",
         "partner_channel": "Kanäle, wo die Partner gesendet werden: %{value}",
         "partner_color": "Farbe der eingebetteten Partner: %{value}",
         "partner_role": "Role, die den Partnern gegeben wird: %{value}",
         "poll_channels": "Liste der Kanäle, wo 👍 und 👎 Reaktionen automatisch zu jeder Nachricht hinzugefügt werden: %{value}",
-        "prefix": "Aktueller Bot Prefix: %{value}",
+        "private_leaderboard": "",
+        "rank_in_private": "",
         "save_roles": "Sollten Rollen gesichert werden, wenn ein Mitglied den Server verlässt und dann zurückkommt? %{value}",
-        "say_allowed_roles": "Liste der Rollen, mit denen man den Befehl \"say\" ausführen kann: %{value}",
-        "slowmode_allowed_roles": "Liste der Rollen, mit denen man den Befehl \"slowmode\" und \"freeze\" ausführen kann: %{value}",
+        "streaming_channel": "",
+        "stream_mention": "",
+        "streaming_role": "",
+        "ttt_emojis": "",
         "update_mentions": "Rollen, die im Bot Kanal Log erwähnt werden: %{value}",
         "verification_role": "Rollen, die weggenommen werden, wenn ein Nutzer den `verify` Befehl nutzt: %{value}",
+        "voice_category": "",
+        "voice_channel": "",
+        "voice_channel_format": "",
+        "voice_roles": "",
         "vote_emojis": "Emojis, die für die abstimmungs Reaktionen genutzt werden: %{value}",
-        "warn_allowed_roles": "Liste der Rollen, mit denen man den Befehl \"warn\" und \"cases\" ausführen kann: %{value}",
         "welcome": "Nachricht, die gesendet wird, wenn ein neues Mitglied kommt: %{value}",
         "welcome_channel": "Liste der Kanäle, wo Willkommens-/ Verlassensnachricht gesendet werden werden: %{value}",
         "welcome_roles": "Liste der Rollen, die automatisch neuen Mitgliedern gegeben werden: %{value}",
+        "welcome_silent_mention": "",
+        "xp_decay": "",
         "xp_rate": "Modifikator für XP-Einnahmen: %{value}",
         "xp_type": "Das xp System ist: %{value}"
+    },
+    "tips": {
+        "antiscam_enable_logs": "",
+        "title": ""
+    },
+    "value-deleted": "",
+    "warnings": {
+        "antiraid_perms_missing": {
+            "one": "",
+            "many": ""
+        },
+        "channel_write_permissions": "",
+        "manage_guild_permissions": "",
+        "moderation_command": "",
+        "title": "",
+        "xp_should_be_enabled": "",
+        "xp_should_be_local": ""
     }
 }

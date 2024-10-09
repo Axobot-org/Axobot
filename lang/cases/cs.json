@@ -4,7 +4,7 @@
     "display": {
         "date": "**Datum:** %{data}",
         "duration": "**Doba trvání:** %{data}",
-        "guild": "**Server:** %{data}",
+        "guild": "",
         "moderator": "**Moderátor:** %{data}",
         "reason": "**Důvod:** %{data}",
         "title": "Záznam z %{user} (%{user_id})",
