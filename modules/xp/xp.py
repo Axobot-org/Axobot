@@ -897,14 +897,10 @@ class Xp(commands.Cog):
         emb.set_author(name=self.bot.user, icon_url=self.bot.user.display_avatar)
         await self.bot.send_embed(emb)
 
-    async def gen_rr_id(self):
-        return round(time.time()/2)
-
     async def rr_add_role(self, guild_id: int, role_id: int, level:int):
         """Add a role reward in the database"""
-        reward_id = await self.gen_rr_id()
-        query = "INSERT INTO `roles_rewards` (`ID`, `guild`, `role`, `level`) VALUES (%(i)s, %(g)s, %(r)s, %(l)s);"
-        async with self.bot.db_main.write(query, { 'i': reward_id, 'g': guild_id, 'r': role_id, 'l': level }):
+        query = "INSERT INTO `roles_rewards` (`guild`, `role`, `level`) VALUES (%(g)s, %(r)s, %(l)s);"
+        async with self.bot.db_main.write(query, { 'g': guild_id, 'r': role_id, 'l': level }):
             pass
         return True
 
