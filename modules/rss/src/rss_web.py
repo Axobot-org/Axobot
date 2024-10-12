@@ -93,9 +93,10 @@ class WebRSS:
             title = '?'
         post_text = await get_text_from_entry(entry)
         post_description = await get_summary_from_entry(entry)
-        img = None
-        img_match = re.search(r"(http(s?):)([/|.\w\s-])*\.(?:jpe?g|gif|png|webp)", str(entry))
-        if img_match is not None:
+        img: str | None = None
+        if "media_thumbnail" in entry and len(entry["media_thumbnail"]) > 0 and "url" in entry["media_thumbnail"][0]:
+            img = entry["media_thumbnail"][0]["url"]
+        elif img_match := re.search(r"(http(s?):)([/|.\w\s-])*\.(?:jpe?g|gif|png|webp)", str(entry)):
             img = img_match.group(0)
         return RssMessage(
             bot=self.bot,
