@@ -37,7 +37,7 @@ def set_beta_logs():
 
 def _setup_log_handlers(logger: logging.Logger, filename: str):
     # DEBUG logs to a file
-    file_handler = RotatingFileHandler(filename, maxBytes=5e6, backupCount=2, delay=True)
+    file_handler = RotatingFileHandler(filename, maxBytes=20e6, backupCount=5, delay=True)
     file_handler.setLevel(logging.DEBUG)
     _set_logging_formatter(file_handler)
     file_handler.set_name("file")
