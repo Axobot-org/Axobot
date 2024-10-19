@@ -1,5 +1,8 @@
 {
     "command_name": {
+        "Quote": "Quote",
+        "Report a scam": "Report a scam",
+        "Voice to text": "Voice to text",
         "about": "about",
         "antiscam report": "report",
         "antiscam test": "test",
@@ -66,7 +69,6 @@
         "profile config": "config",
         "profile list-card-styles": "list-card-styles",
         "quote": "quote",
-        "Quote": "Quote",
         "random-tip": "random-tip",
         "rank": "rank",
         "reminders cancel": "cancel",
@@ -74,7 +76,6 @@
         "reminders create": "create",
         "reminders list": "list",
         "remindme": "remindme",
-        "Report a scam": "Report a scam",
         "role grant": "grant",
         "role members-list": "members-list",
         "role revoke": "revoke",
@@ -130,7 +131,6 @@
         "unban": "unban",
         "unhoist": "unhoist",
         "unmute": "unmute",
-        "Voice to text": "Voice to text",
         "warn": "warn"
     },
     "command_short_description": {
@@ -159,8 +159,10 @@
         "partners set-invite": "Edit the invite URL of a partner",
         "quote": "Quote a message with a nice generated image",
         "random-tip": "Get a random tip or trivia about the bot",
+        "rank": "Check how much XP you've got from your activity",
         "set-xp": "Set the XP of a user in your server",
-        "tic-tac-toe": "Play a game of Tic Tac Toe against the bot"
+        "tic-tac-toe": "Play a game of Tic Tac Toe against the bot",
+        "top": "Get the top XP members of your server"
     },
     "group_description": {
         "antiscam": "Everything related to the antiscam feature",

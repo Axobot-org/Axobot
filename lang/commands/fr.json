@@ -1,5 +1,8 @@
 {
     "command_name": {
+        "Quote": "Citer",
+        "Report a scam": "Signaler une arnaque",
+        "Voice to text": "Transcription audio",
         "about": "à-propos",
         "antiscam report": "signaler",
         "antiscam test": "tester",
@@ -63,7 +66,6 @@
         "profile card-preview": "aperçu-carte",
         "profile config": "config",
         "profile list-card-styles": "liste-styles-cartes",
-        "Quote": "Citer",
         "quote": "citation",
         "random-tip": "astuce-aléatoire",
         "rank": "rang",
@@ -72,7 +74,6 @@
         "reminders create": "ajouter",
         "reminders list": "liste",
         "remindme": "rappelle-moi",
-        "Report a scam": "Signaler une arnaque",
         "role grant": "donner",
         "role members-list": "liste-des-membres",
         "role revoke": "révoquer",
@@ -125,7 +126,6 @@
         "twitch subscribe": "s-abonner",
         "twitch unsubscribe": "se-désabonner",
         "unban": "débannir",
-        "Voice to text": "Transcription audio",
         "warn": "avertir"
     },
     "command_short_description": {
@@ -156,9 +156,11 @@
         "partners set-invite": "Modifie l'URL d'invitation d'un partenaire",
         "quote": "Cite un message avec une jolie image générée",
         "random-tip": "Affiche une astuce aléatoire à propos du bot",
+        "rank": "Regardez combien d'XP vous avez obtenu grâce à votre activité",
         "set-xp": "Modifie l'XP d'un utilisateur dans le serveur",
         "slowmode": "Ralenti le spam du salon en activant le mode lent",
-        "tic-tac-toe": "Joue une partie de morpion (TicTacToe) contre le bot"
+        "tic-tac-toe": "Joue une partie de morpion (TicTacToe) contre le bot",
+        "top": "Affiche le top d'XP des membres du serveur"
     },
     "group_description": {
         "antiscam": "Tout ce qui concerne la fonction d'anti-arnaque",
