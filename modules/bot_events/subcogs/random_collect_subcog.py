@@ -1,10 +1,10 @@
+import time
 from collections import defaultdict
 from random import choice, choices, lognormvariate, randint, random
 
 import discord
 
 from core.bot_classes import Axobot
-from core.formatutils import FormatUtils
 
 from ..data.dict_types import EventData, EventItem, EventType
 from .abstract_subcog import AbstractSubcog
@@ -17,10 +17,12 @@ class RandomCollectSubcog(AbstractSubcog):
                  current_event: EventType | None, current_event_data: EventData, current_event_id: str | None):
         super().__init__(bot, current_event, current_event_data, current_event_id)
 
-        self.collect_reward = [-8, 25]
+        self.collect_reward = [-8, 25] # points given when no item is collected
         self.collect_cooldown = 60*60 # (1h) time in seconds between 2 collects
         self.collect_max_strike_period = 3600 * 2 # (2h) time in seconds after which the strike level is reset to 0
-        self.collect_bonus_per_strike = 1.05 # the amount of points is multiplied by this number for each strike level
+        self.collect_bonus_per_strike = 1.07 # the amount of points is multiplied by this number for each strike level
+        self.normvariate_params = (2.8, 1.2) # parameters for the lognormal distribution (average, standard deviation)
+        self.max_items_per_collect = 10 # maximum number of items that can be collected at once
 
     async def on_message(self, msg):
         "Add random reaction to some messages"
@@ -86,9 +88,8 @@ class RandomCollectSubcog(AbstractSubcog):
         can_collect, is_strike = await self.check_user_collect_availability(interaction.user.id, seconds_since_last_collect)
         if not can_collect:
             # cooldown error
-            time_remaining = self.collect_cooldown - seconds_since_last_collect
-            remaining = await FormatUtils.time_delta(time_remaining, lang=lang)
-            txt = await self.bot._(interaction, "bot_events.collect.too-quick", time=remaining)
+            time_to_next_collect = time.time() - seconds_since_last_collect + self.collect_cooldown
+            txt = await self.bot._(interaction, "bot_events.collect.too-quick", time=f"<t:{time_to_next_collect:.0f}:R>")
         else:
             # grant points
             items = await self.get_random_items()
@@ -147,7 +148,7 @@ class RandomCollectSubcog(AbstractSubcog):
         "Get some random items to win during an event"
         if self.current_event is None:
             return []
-        items_count = min(round(lognormvariate(1.1, 0.9)), 8) # random number between 0 and 8
+        items_count = min(round(lognormvariate(*self.normvariate_params)), self.max_items_per_collect)
         if items_count <= 0:
             return []
         items = await self.db_get_event_items(self.current_event)

@@ -289,5 +289,47 @@
             ],
             "probability": 0.18
         }
+    },
+    "halloween-2024": {
+        "begin": "2024-10-29",
+        "end": "2024-11-01",
+        "type": "halloween",
+        "icon": "https://zrunner.me/cdn/halloween_2024.png",
+        "color": 16089635,
+        "objectives": [
+            {
+                "points": 250,
+                "reward_type": "rankcard",
+                "rank_card": "halloween24"
+            },
+            {
+                "points": 500,
+                "reward_type": "role",
+                "role_id": 1299069272340955191
+            }
+        ],
+        "emojis": {
+            "reactions_list": [
+                "🦇",
+                "🎃",
+                "🕷️",
+                "👻",
+                "🪦",
+                "🧙"
+            ],
+            "triggers": [
+                "booh",
+                "halloween",
+                "witch",
+                "ghost",
+                "pumpkin",
+                "tombstone",
+                "sorcière",
+                "fantôme",
+                "citrouille",
+                "tombe"
+            ],
+            "probability": 0.05
+        }
     }
 }
