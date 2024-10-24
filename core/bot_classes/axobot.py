@@ -16,7 +16,6 @@ from core.tasks_handler import TaskHandler
 from core.tips import TipsManager
 
 from .bot_embeds_manager import send_log_embed
-from .consts import PRIVATE_GUILD_ID
 from .my_context import MyContext
 
 if TYPE_CHECKING:
@@ -281,8 +280,7 @@ class Axobot(commands.bot.AutoShardedBot):
 
     async def fetch_app_commands(self):
         "Populate the app_commands_list attribute from the Discord API"
-        target = PRIVATE_GUILD_ID if self.beta else None
-        self.app_commands_list = await self.tree.fetch_commands(guild=target)
+        self.app_commands_list = await self.tree.fetch_commands(guild=None)
 
     async def fetch_app_command_by_name(self, name: str) -> discord.app_commands.AppCommand | None:
         "Get a specific app command from the Discord API"
