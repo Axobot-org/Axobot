@@ -169,9 +169,9 @@ You can specify a verification limit by adding a number in argument (up to 1.000
 
     @cached(TTLCache(1_000, 3600))
     async def _get_blame_available_names(self, user_id: int):
-        l1 = ["discord","mojang","zbot","google","youtube", "twitter"] # everyone
+        l1 = ["axobot","discord","mojang","google","youtube", "twitter"] # everyone
         l2 = ["tronics","patate","neil","reddemoon","aragorn1202","platon"] # fr-minecraft semi-public server
-        l3 = ["awhikax","aragorn","adri","zrunner"] # Axobot official server
+        l3 = ["awhikax","aragorn","adri","zbot","zrunner"] # Axobot official server
         l4 = ["benny"] # benny server
         available_names = l1
         if await self.is_in_guild(user_id, 391968999098810388): # fr-minecraft
