@@ -91,7 +91,7 @@ class Welcomer(commands.Cog):
             botormember = await self.bot._(member.guild, "misc.bot" if member.bot else "misc.member")
             try:
                 text = text.format_map(SafeDict(
-                    user=member.mention if event_type=="welcome" else member.display_name,
+                    user=member.mention if event_type=="welcome" else (member.global_name or member.name),
                     user_idname=str(member),
                     user_id=str(member.id),
                     server=member.guild.name,
