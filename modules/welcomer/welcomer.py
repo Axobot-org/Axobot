@@ -172,7 +172,7 @@ class Welcomer(commands.Cog):
             await self.bot.get_cog("Xp").give_rr(
                 member,
                 (await self.bot.get_cog("Xp").calc_level(xp, used_xp_type))[0],
-                await self.bot.get_cog("Xp").rr_list_role(member.guild.id)
+                await self.bot.get_cog("Xp").db_list_rr(member.guild.id)
             )
 
     async def check_muted(self, member: discord.Member):

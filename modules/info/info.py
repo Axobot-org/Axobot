@@ -1050,7 +1050,7 @@ class Info(commands.Cog):
         lang: str = await self.bot.get_config(guild.id, "language")
         # Roles rewards
         rr_len: int = await self.bot.get_config(guild.id, "rr_max_number")
-        rr_len: str = "{}/{}".format(len(await self.bot.get_cog("Xp").rr_list_role(guild.id)), rr_len)
+        rr_len: str = "{}/{}".format(len(await self.bot.get_cog("Xp").db_list_rr(guild.id)), rr_len)
         # Streamers
         if twitch_cog := self.bot.get_cog("Twitch"):
             streamers_len: int =  await self.bot.get_config(guild.id, "streamers_max_number")

@@ -90,6 +90,11 @@ class Xp(commands.Cog):
             return msg.author.dm_channel or await msg.author.create_dm()
         return value
 
+    @commands.Cog.listener()
+    async def on_guild_role_delete(self, role: discord.Role):
+        """Remove role rewards when a role is deleted"""
+        await self.db_remove_rr_from_role(role.guild.id, role.id)
+
     @commands.Cog.listener(name="on_message")
     async def add_xp(self, msg: discord.Message):
         """Attribue un certain nombre d'xp à un message"""
@@ -139,7 +144,7 @@ class Xp(commands.Cog):
         ex_lvl, _, _ = await self.calc_level(prev_points, "global")
         if 0 < ex_lvl < new_lvl:
             await self.send_levelup(msg, new_lvl)
-            await self.give_rr(msg.author, new_lvl, await self.rr_list_role(msg.guild.id))
+            await self.give_rr(msg.author, new_lvl, await self.db_list_rr(msg.guild.id))
 
     async def add_xp_1(self, msg:discord.Message, rate: float):
         """MEE6-like xp type"""
@@ -162,7 +167,7 @@ class Xp(commands.Cog):
         ex_lvl, _, _ = await self.calc_level(prev_points, "mee6-like")
         if 0 < ex_lvl < new_lvl:
             await self.send_levelup(msg, new_lvl)
-            await self.give_rr(msg.author, new_lvl, await self.rr_list_role(msg.guild.id))
+            await self.give_rr(msg.author, new_lvl, await self.db_list_rr(msg.guild.id))
 
     async def add_xp_2(self, msg:discord.Message, rate: float):
         """Local xp type"""
@@ -190,7 +195,7 @@ class Xp(commands.Cog):
         ex_lvl, _, _ = await self.calc_level(prev_points, "local")
         if 0 < ex_lvl < new_lvl:
             await self.send_levelup(msg, new_lvl)
-            await self.give_rr(msg.author, new_lvl, await self.rr_list_role(msg.guild.id))
+            await self.give_rr(msg.author, new_lvl, await self.db_list_rr(msg.guild.id))
 
 
     async def check_noxp(self, msg: discord.Message) -> bool:
@@ -897,14 +902,14 @@ class Xp(commands.Cog):
         emb.set_author(name=self.bot.user, icon_url=self.bot.user.display_avatar)
         await self.bot.send_embed(emb)
 
-    async def rr_add_role(self, guild_id: int, role_id: int, level:int):
+    async def db_add_rr(self, guild_id: int, role_id: int, level:int):
         """Add a role reward in the database"""
         query = "INSERT INTO `roles_rewards` (`guild`, `role`, `level`) VALUES (%(g)s, %(r)s, %(l)s);"
         async with self.bot.db_main.write(query, { 'g': guild_id, 'r': role_id, 'l': level }):
             pass
         return True
 
-    async def rr_list_role(self, guild_id: int, level: int = -1):
+    async def db_list_rr(self, guild_id: int, level: int = -1):
         """List role rewards in the database"""
         if level < 0:
             query = "SELECT * FROM `roles_rewards` WHERE `guild`=%s ORDER BY `level`;"
@@ -916,10 +921,17 @@ class Xp(commands.Cog):
             liste = list(query_results)
         return liste
 
-    async def rr_remove_role(self, role_id: int):
+    async def db_remove_rr(self, role_reward_id: int):
         """Remove a role reward from the database"""
         query = "DELETE FROM `roles_rewards` WHERE `ID` = %s;"
-        async with self.bot.db_main.write(query, (role_id,)):
+        async with self.bot.db_main.write(query, (role_reward_id,)):
+            pass
+        return True
+
+    async def db_remove_rr_from_role(self, guild_id: int, role_id: int):
+        """Remove a role reward from the database"""
+        query = "DELETE FROM `roles_rewards` WHERE `guild` = %s AND `role` = %s;"
+        async with self.bot.db_main.write(query, (guild_id, role_id)):
             pass
         return True
 
@@ -941,7 +953,7 @@ class Xp(commands.Cog):
         if role.name == "@everyone":
             raise commands.BadArgument(f"Role \"{role.name}\" not found")
         await interaction.response.defer()
-        l = await self.rr_list_role(interaction.guild_id)
+        l = await self.db_list_rr(interaction.guild_id)
         if len([x for x in l if x["level"]==level]) > 0:
             await interaction.followup.send(await self.bot._(interaction, "xp.already-1-rr"))
             return
@@ -949,7 +961,7 @@ class Xp(commands.Cog):
         if len(l) >= max_rr:
             await interaction.followup.send(await self.bot._(interaction, "xp.too-many-rr", c=len(l)))
             return
-        await self.rr_add_role(interaction.guild_id, role.id, level)
+        await self.db_add_rr(interaction.guild_id, role.id, level)
         await interaction.followup.send(await self.bot._(interaction, "xp.rr-added", role=role.name, level=level))
 
     @rr_main.command(name="list")
@@ -958,7 +970,7 @@ class Xp(commands.Cog):
 
         ..Doc xp.html#roles-rewards"""
         await interaction.response.defer()
-        if roles_list := await self.rr_list_role(interaction.guild_id):
+        if roles_list := await self.db_list_rr(interaction.guild_id):
             desc = '\n'.join([
                 f"• <@&{x['role']}> : lvl {x['level']}"
                 for x in roles_list
@@ -984,11 +996,11 @@ class Xp(commands.Cog):
 
         ..Doc xp.html#roles-rewards"""
         await interaction.response.defer()
-        roles_list = await self.rr_list_role(interaction.guild_id, level)
+        roles_list = await self.db_list_rr(interaction.guild_id, level)
         if len(roles_list) == 0:
             await interaction.followup.send(await self.bot._(interaction, "xp.no-rr"))
             return
-        await self.rr_remove_role(roles_list[0]["ID"])
+        await self.db_remove_rr(roles_list[0]["ID"])
         await interaction.followup.send(await self.bot._(interaction, "xp.rr-removed", level=level))
 
     @rr_main.command(name="reload")
@@ -1004,7 +1016,7 @@ class Xp(commands.Cog):
             return
         await interaction.response.defer()
         count = 0
-        rr_list = await self.rr_list_role(interaction.guild_id)
+        rr_list = await self.db_list_rr(interaction.guild_id)
         if len(rr_list) == 0:
             await interaction.followup.send(await self.bot._(interaction, "xp.no-rr-2"))
             return
