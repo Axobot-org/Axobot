@@ -35,7 +35,7 @@ author = "ZRunner"
 # The short X.Y version
 version = "5.0"
 # The full version, including alpha/beta/rc tags
-release = "5.0.1"
+release = "5.0.2"
 
 _documentation_name = "Axobot Documentation"
 
