@@ -1,3 +1,5 @@
+import inspect
+
 from discord import Locale
 from discord.app_commands import Argument as AppArgument
 from discord.app_commands import Command, Group
@@ -24,7 +26,7 @@ async def get_command_description(ctx: MyContext, command: AppCommandOrGroup):
     if isinstance(command, Group):
         raw_desc = command.description.strip()
     else:
-        raw_desc = command.callback.__doc__ or ""
+        raw_desc = inspect.cleandoc(command.callback.__doc__ or "")
     desc = str | None
     desc, examples, doc = await extract_info(raw_desc)
     # check for translated description
