@@ -242,7 +242,7 @@ class Rss(commands.Cog):
             return
         await interaction.response.defer()
         identifiant = await self.youtube_rss.get_channel_by_any_url(link)
-        feed_type = None
+        feed_type = display_type = None
         if identifiant is not None:
             feed_type = "yt"
             display_type = "youtube"
@@ -268,7 +268,7 @@ class Rss(commands.Cog):
         elif not link.startswith("https"):
             await interaction.followup.send(await self.bot._(interaction, "rss.invalid-link"))
             return
-        if feed_type is None or not await self.check_rss_url(link):
+        if feed_type is None or display_type is None or not await self.check_rss_url(link):
             await interaction.followup.send(await self.bot._(interaction, "rss.invalid-flow"))
             return
         destination_channel = channel or interaction.channel
