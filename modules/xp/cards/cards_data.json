@@ -246,6 +246,50 @@
                 "total_xp_with_text": [230, 185, 11]
             }
         },
+        "blue": {
+            "xp_bar": [32, 223, 156],
+            "texts": {
+                "username": [158, 206, 250],
+                "level": [207, 230, 252],
+                "rank": [158, 206, 250],
+                "participants": [150, 195, 240],
+                "xp_to_next_level_with_text": [124, 197, 118],
+                "total_xp_with_text": [124, 197, 118]
+            }
+        },
+        "orange": {
+            "xp_bar": [255, 145, 0],
+            "texts": {
+                "username": [255, 235, 180],
+                "level": [255, 175, 0],
+                "rank": [255, 120, 0],
+                "participants": [255, 100, 0],
+                "xp_to_next_level_with_text": [230, 190, 80],
+                "total_xp_with_text": [230, 190, 80]
+            }
+        },
+        "purple": {
+            "xp_bar": [104, 38, 217],
+            "texts": {
+                "username": [220, 195, 255],
+                "level": [195, 180, 235],
+                "rank": [180, 135, 220],
+                "participants": [150, 110, 195],
+                "xp_to_next_level_with_text": [190, 160, 230],
+                "total_xp_with_text": [190, 160, 230]
+            }
+        },
+        "turquoise": {
+            "xp_bar": [32, 223, 156],
+            "texts": {
+                "username": [230, 245, 245],
+                "level": [235, 245, 245],
+                "rank": [230, 245, 245],
+                "participants": [200, 235, 230],
+                "xp_to_next_level_with_text": [124, 197, 118],
+                "total_xp_with_text": [124, 197, 118]
+            }
+        },
         "christmas20": {
             "xp_bar": [204, 255, 255],
             "texts": {
@@ -310,6 +354,17 @@
                 "participants": [255, 255, 255],
                 "xp_to_next_level_with_text": [255, 255, 255],
                 "total_xp_with_text": [255, 255, 255]
+            }
+        },
+        "halloween24": {
+            "xp_bar": [220, 25, 10],
+            "texts": {
+                "username": [255, 153, 51],
+                "level": [255, 140, 26],
+                "rank": [255, 140, 26],
+                "participants": [205, 100, 10],
+                "xp_to_next_level_with_text": [240, 80, 30],
+                "total_xp_with_text": [240, 80, 30]
             }
         },
         "premium": {

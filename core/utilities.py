@@ -123,22 +123,24 @@ class Utilities(commands.Cog):
     @cached(TTLCache(maxsize=10_000, ttl=60))
     async def allowed_card_styles(self, user: discord.User):
         """Retourne la liste des styles autorisées pour la carte d'xp de cet utilisateur"""
-        liste = ["blue", "dark", "green", "grey", "orange",
-                 "purple", "red", "turquoise", "yellow"]
+        base_styles = [
+            "blue", "dark", "green", "grey", "orange",
+            "purple", "red", "turquoise", "yellow"
+        ]
         if not self.bot.database_online:
-            return sorted(liste)
-        liste2 = []
+            return sorted(base_styles)
+        rolebased_styles = []
         if await self.bot.get_cog("Admin").check_if_admin(user):
-            liste2.append("admin")
+            rolebased_styles.append("admin")
         if not self.bot.database_online:
-            return sorted(liste2)+sorted(liste)
+            return sorted(rolebased_styles) + sorted(base_styles)
         userflags = await self.bot.get_cog("Users").get_userflags(user)
         for flag in ("support", "contributor", "partner", "premium"):
             if flag in userflags:
-                liste2.append(flag)
+                rolebased_styles.append(flag)
         for card in await self.bot.get_cog("Users").get_rankcards(user):
-            liste.append(card)
-        return sorted(liste2)+sorted(liste)
+            base_styles.append(card)
+        return sorted(rolebased_styles) + sorted(base_styles)
 
     async def get_user_languages(self, user: discord.User, limit: int=0):
         """Get the most used languages of an user

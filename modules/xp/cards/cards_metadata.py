@@ -6,7 +6,6 @@ from .card_types import (CardData, CardMetaData, ColorsData, TextData,
 
 V1_CARDS = {
     "april22",
-    "blue",
     "blurple19",
     "blurple20",
     "blurple21",
@@ -15,29 +14,31 @@ V1_CARDS = {
     "christmas20",
     "christmas22",
     "dark",
-    "green",
     "grey",
     "halloween20",
     "halloween21",
     "halloween22",
-    "orange",
-    "purple",
     "rainbow",
     "red",
-    "turquoise",
     "yellow",
 }
 
 V3_CARDS = {
     "admin",
+    "blue",
     "contributor",
+    "green",
+    "orange",
     "partner",
     "premium",
+    "purple",
     "support",
+    "turquoise",
     "blurple23",
     "halloween23",
     "christmas23",
     "april24",
+    "halloween24",
 }
 
 JSON_DATA_FILE = os.path.dirname(__file__) + "/cards_data.json"
