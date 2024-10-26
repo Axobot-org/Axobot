@@ -232,6 +232,16 @@ class ServerConfig(commands.Cog):
                 return None
             return query_results["value"]
 
+    async def db_get_guilds_with_value(self, option_name: str, value: str) -> list[int]:
+        "Get a list of guilds with a specific value"
+        if option_name not in (await self.get_options_list()):
+            raise ValueError(f"Option {option_name} does not exist")
+        if not self.bot.database_online:
+            raise RuntimeError("Database is offline")
+        query = "SELECT `guild_id` FROM `serverconfig` WHERE `option_name` = %s AND `value` = %s AND `beta` = %s"
+        async with self.bot.db_main.read(query, (option_name, value, self.bot.beta)) as query_results:
+            return [row["guild_id"] for row in query_results]
+
     async def db_get_guild(self, guild_id: int) -> dict[str, str] | None:
         "Get a guild from the database"
         if not self.bot.database_online:

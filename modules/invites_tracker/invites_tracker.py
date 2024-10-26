@@ -1,9 +1,10 @@
 import asyncio
+import logging
 from datetime import datetime
 
 import discord
 from discord import app_commands
-from discord.ext import commands
+from discord.ext import commands, tasks
 
 from core.arguments.args import GuildInviteArgument
 from core.bot_classes import Axobot
@@ -18,6 +19,13 @@ class InvitesTracker(commands.Cog):
     def __init__(self, bot: Axobot):
         self.bot = bot
         self.file = "invites_tracker"
+        self.log = logging.getLogger("bot.rss")
+
+    async def cog_load(self):
+        self.sync_all_guilds_invites.start() # pylint: disable=no-member
+
+    async def cog_unload(self):
+        self.sync_all_guilds_invites.cancel() # pylint: disable=no-member
 
     async def db_get_invites(self, guild_id: int) -> list[TrackedInvite]:
         "Get a list of tracked invites associated to a guild"
@@ -25,7 +33,8 @@ class InvitesTracker(commands.Cog):
         async with self.bot.db_main.read(query, (guild_id, self.bot.beta)) as query_result:
             return query_result
 
-    async def db_add_invite(self, guild_id: int, invite_id: str, user_id: int | None, creation_date: datetime, usage_count: int):
+    async def db_add_invite(self, guild_id: int, invite_id: str, user_id: int | None, creation_date: datetime | None,
+                            usage_count: int):
         "Insert a tracked invite in the database, or update it if it already exists"
         query = (
             "INSERT INTO `invites_tracker` "\
@@ -58,8 +67,11 @@ class InvitesTracker(commands.Cog):
     async def _get_guild_invites_with_vanity(self, guild: discord.Guild):
         "Get the guild invites, including the vanity invite if it exists"
         guild_invites = await guild.invites()
-        if vanity_invite := await guild.vanity_invite():
-            guild_invites.append(vanity_invite)
+        try:
+            if vanity_invite := await guild.vanity_invite():
+                guild_invites.append(vanity_invite)
+        except discord.Forbidden:
+            pass
         return guild_invites
 
     async def sync_guild_invites(self, guild: discord.Guild):
@@ -104,6 +116,34 @@ class InvitesTracker(commands.Cog):
         return await self.bot.get_config(guild_id, "enable_invites_tracking")
 
 
+    @tasks.loop(hours=6)
+    async def sync_all_guilds_invites(self):
+        "Sync the tracked invites of all guilds"
+        synced_invites = 0
+        for guild_id in await self.bot.get_guilds_with_config("enable_invites_tracking", str(True)):
+            try:
+                guild = self.bot.get_guild(guild_id)
+                if guild and guild.me.guild_permissions.manage_guild:
+                    synced_invites += await self.sync_guild_invites(guild)
+            except Exception as err:
+                self.bot.dispatch("error", err)
+        self.log.info("Synced %s invites", synced_invites)
+        try:
+            emb = discord.Embed(
+                description=f"{synced_invites} **synced invitations**",
+                color=0x6699ff,
+                timestamp=self.bot.utcnow()
+            )
+            emb.set_author(name=self.bot.user, icon_url=self.bot.user.display_avatar)
+            await self.bot.send_embed(emb, url="loop")
+        except Exception as err:
+            self.bot.dispatch("error", err)
+
+    @sync_all_guilds_invites.before_loop
+    async def before_printer(self):
+        """Wait until the bot is ready"""
+        await self.bot.wait_until_ready()
+
     @commands.Cog.listener()
     async def on_invite_create(self, invite: discord.Invite):
         "Update the tracked invite when a new invite is created"
@@ -134,7 +174,7 @@ class InvitesTracker(commands.Cog):
             self.bot.dispatch("invite_used", member, tracked_invite)
             await self.db_update_invite_count(member.guild.id, discord_invite.code, discord_invite.uses)
         else:
-            self.bot.log.warn(f"Could not detect the invite used in guild {member.guild.id}")
+            self.bot.log.warning(f"Could not detect the invite used in guild {member.guild.id}")
 
 
     invites_main = app_commands.Group(
@@ -177,6 +217,7 @@ class InvitesTracker(commands.Cog):
         await interaction.response.defer()
         count = await self.sync_guild_invites(interaction.guild)
         await interaction.followup.send(f"Synced {count} invites")
+        self.log.info("Synced %s invites from guild", (count, interaction.guild_id))
 
     @invites_main.command(name="set-name")
     @app_commands.checks.cooldown(4, 30)

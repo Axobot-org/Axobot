@@ -246,6 +246,13 @@ class Axobot(commands.bot.AutoShardedBot):
         options_list = await self.get_options_list()
         return options_list.get(option, {"default": None})["default"]
 
+    async def get_guilds_with_config(self, option_name: str, option_value: str):
+        """Get a list of guilds with a specific config option set to a specific value"""
+        cog = self.get_cog("ServerConfig")
+        if cog and self.database_online:
+            return await cog.db_get_guilds_with_value(option_name, option_value)
+        return []
+
     async def get_recipient(self, channel: discord.DMChannel) -> discord.User | None:
         """Get the recipient of the given DM channel
 
