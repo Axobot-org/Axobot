@@ -269,19 +269,19 @@ class AntiRaid(commands.Cog):
             # ban (2w) members with more than 20 mentions
             if await self._check_min_score(member, score, 20, "ban", "mentions", timedelta(weeks=2)):
                 return True
-            # kick members with more than 15 mentions
-            if await self._check_min_score(member, score, 15, "kick", "mentions"):
+            # kick members with more than 12 mentions
+            if await self._check_min_score(member, score, 12, "kick", "mentions"):
                 return True
-            # timeout (1h) members with more than 10 mentions
-            if await self._check_min_score(member, score, 10, "timeout", "mentions", timedelta(hours=1)):
+            # timeout (1h) members with more than 5 mentions
+            if await self._check_min_score(member, score, 5, "timeout", "mentions", timedelta(hours=1)):
                 return True
         # Level 3 or more
         if level >= 3:
             # kick members with more than 20 mentions
             if await self._check_min_score(member, score, 20, "kick", "mentions"):
                 return True
-            # timeout (30min) members with more than 10 mentions
-            if await self._check_min_score(member, score, 10, "timeout", "mentions", timedelta(minutes=30)):
+            # timeout (30min) members with more than 8 mentions
+            if await self._check_min_score(member, score, 8, "timeout", "mentions", timedelta(minutes=30)):
                 return True
         # Level 2 or more
         if level >= 2:
