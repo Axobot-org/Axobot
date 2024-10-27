@@ -20,9 +20,9 @@ class RandomCollectSubcog(AbstractSubcog):
         self.collect_reward = [-8, 25] # points given when no item is collected
         self.collect_cooldown = 60*60 # (1h) time in seconds between 2 collects
         self.collect_max_strike_period = 3600 * 2 # (2h) time in seconds after which the strike level is reset to 0
-        self.collect_bonus_per_strike = 1.07 # the amount of points is multiplied by this number for each strike level
-        self.normvariate_params = (2.8, 1.2) # parameters for the lognormal distribution (average, standard deviation)
-        self.max_items_per_collect = 10 # maximum number of items that can be collected at once
+        self.collect_bonus_per_strike = 1.05 # the amount of points is multiplied by this number for each strike level
+        self.normvariate_params = (2.4, 1.0) # parameters for the lognormal distribution (average, standard deviation)
+        self.max_items_per_collect = 8 # maximum number of items that can be collected at once
 
     async def on_message(self, msg):
         "Add random reaction to some messages"

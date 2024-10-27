@@ -298,7 +298,7 @@
         "color": 16089635,
         "objectives": [
             {
-                "points": 250,
+                "points": 300,
                 "reward_type": "rankcard",
                 "rank_card": "halloween24"
             },
