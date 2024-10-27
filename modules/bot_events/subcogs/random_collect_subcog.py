@@ -99,7 +99,7 @@ class RandomCollectSubcog(AbstractSubcog):
                 bonus = 0
             else:
                 points = sum(item["points"] for item in items)
-                bonus = max(0, await self.adjust_points_to_strike(points, strike_level) - points)
+                bonus = await self.get_bonus_from_strike(points, strike_level)
                 await self.db_add_user_items(interaction.user.id, [item["item_id"] for item in items])
             txt = await self.generate_collect_message(interaction, items, points + bonus)
             if strike_level and bonus != 0:
@@ -174,10 +174,11 @@ class RandomCollectSubcog(AbstractSubcog):
             return True, True
         return True, False
 
-    async def adjust_points_to_strike(self, points: int, strike_level: int):
+    async def get_bonus_from_strike(self, points: int, strike_level: int):
         "Get a random amount of points for the /collect command, depending on the strike level"
-        strike_coef = self.collect_bonus_per_strike ** strike_level
-        return round(points * strike_coef)
+        strike_coef = self.collect_bonus_per_strike ** strike_level - 1
+        bonus = round(min(points, 50) * strike_coef)
+        return max(0, bonus)
 
     async def db_get_user_strike_level(self, user_id: int) -> int:
         "Get the strike level of a user"
