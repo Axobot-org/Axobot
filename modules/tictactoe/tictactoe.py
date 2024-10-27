@@ -64,7 +64,7 @@ class TicTacToe(commands.Cog):
         async def init_game(self):
             "Init the emojis used to play"
             if self.bot.current_event == "halloween":
-                self.emojis = ("🎃", ":bat:")
+                self.emojis = ("🎃", "🦇")
             elif self.bot.current_event == "christmas":
                 self.emojis = ("☃️", "🎄")
             elif self.bot.current_event == "fish":
@@ -95,7 +95,10 @@ class TicTacToe(commands.Cog):
                 else:
                     button = discord.ui.Button(style=discord.ButtonStyle.gray, emoji=self.emojis[1], disabled=True, row=row)
                 self.add_item(button)
-            await self.interaction.edit_original_response(content=content, view=self)
+            try:
+                await self.interaction.edit_original_response(content=content, view=self)
+            except discord.HTTPException as err:
+                self.bot.dispatch("error", err, "During a tictactoe game")
 
         async def test_valid_cell(self, case_id: int):
             """Check if the cell is empty"""
