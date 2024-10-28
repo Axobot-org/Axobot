@@ -289,6 +289,7 @@ class AbstractSubcog(ABC):
             query = "INSERT INTO `event_points` (`user_id`, `collect_points`, `last_collect`, `beta`) \
                 VALUES (%s, %s, CURRENT_TIMESTAMP(), %s) \
                 ON DUPLICATE KEY UPDATE collect_points = collect_points + VALUE(`collect_points`), \
+                    strike_level = 0, \
                     last_collect = CURRENT_TIMESTAMP();"
         else:
             return
