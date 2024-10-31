@@ -33,7 +33,7 @@ class DatabaseAbstractQuery(ABC):
 
     async def _format_query(self):
         "Create a formatted query string from the query and its arguments."
-        await format_query(self.cursor, self.query, self.args)
+        return await format_query(self.cursor, self.query, self.args)
 
     async def _save_execution_time(self, start_time: float):
         await save_execution_time(self.bot, start_time)
