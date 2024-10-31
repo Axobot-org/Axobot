@@ -218,13 +218,10 @@ class Partners(commands.Cog):
                     owners.append(owner_id)
         return owners
 
-    async def get_partners_channels(self):
+    async def get_partners_channels(self) -> list[discord.abc.GuildChannel]:
         """Return every partners channels"""
-        channels: list[discord.abc.GuildChannel] = []
-        for guild in self.bot.guilds:
-            if channel := await self.bot.get_config(guild.id, "partner_channel"):
-                channels.append(channel)
-        return channels
+        guilds_map: dict[int, discord.abc.GuildChannel] = await self.bot.db_get_guilds_with_option("partner_channel")
+        return list(guilds_map.values())
 
     async def update_partners(self, channel: discord.TextChannel, color: int | None = None) -> int:
         """Update every partners of a channel"""

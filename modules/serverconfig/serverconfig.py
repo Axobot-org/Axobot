@@ -242,6 +242,28 @@ class ServerConfig(commands.Cog):
         async with self.bot.db_main.read(query, (option_name, value, self.bot.beta)) as query_results:
             return [row["guild_id"] for row in query_results]
 
+    async def db_get_guilds_with_option(self, option_name: str):
+        "Get a list of guilds with a specific option"
+        if option_name not in (await self.get_options_list()):
+            raise ValueError(f"Option {option_name} does not exist")
+        if not self.bot.database_online:
+            raise RuntimeError("Database is offline")
+        query = "SELECT `guild_id`, `value` FROM `serverconfig` WHERE `option_name` = %s AND `beta` = %s"
+        result: dict[int, Any] = {}
+        async with self.bot.db_main.read(query, (option_name, self.bot.beta)) as query_results:
+            for row in query_results:
+                guild_id, raw_value = row["guild_id"], row["value"]
+                if self.enable_caching and (cache_value := self.cache.get((guild_id, option_name), None)):
+                    result[guild_id] = cache_value
+                elif guild := self.bot.get_guild(guild_id):
+                    value = await from_raw(option_name, raw_value, guild, self.bot)
+                    if value is None:
+                        continue
+                    if self.enable_caching:
+                        self.cache[(guild_id, option_name)] = value
+                    result[guild_id] = value
+        return result
+
     async def db_get_guild(self, guild_id: int) -> dict[str, str] | None:
         "Get a guild from the database"
         if not self.bot.database_online:

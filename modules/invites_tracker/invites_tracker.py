@@ -120,7 +120,7 @@ class InvitesTracker(commands.Cog):
     async def sync_all_guilds_invites(self):
         "Sync the tracked invites of all guilds"
         synced_invites = 0
-        for guild_id in await self.bot.get_guilds_with_config("enable_invites_tracking", str(True)):
+        for guild_id in await self.bot.get_guilds_with_value("enable_invites_tracking", str(True)):
             try:
                 guild = self.bot.get_guild(guild_id)
                 if guild and guild.me.guild_permissions.manage_guild:
