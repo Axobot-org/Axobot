@@ -55,15 +55,16 @@ class RolesReact(commands.Cog):
         chan = self.bot.get_channel(payload.channel_id)
         if chan is None or isinstance(chan, discord.abc.PrivateChannel):
             return None
-        try:
-            msg = await chan.fetch_message(payload.message_id)
-        except discord.NotFound: # we don't care about those
-            return None
-        except Exception as err:
-            self.bot.log.warning(
-                f"Could not fetch roles-reactions message {payload.message_id} in guild {payload.guild_id}: {err}"
-            )
-            return None
+        if (msg := self.bot.cached_messages[payload.message_id]) is None:
+            try:
+                msg = await chan.fetch_message(payload.message_id)
+            except discord.NotFound: # we don't care about those
+                return None
+            except Exception as err:
+                self.bot.log.warning(
+                    f"Could not fetch roles-reactions message {payload.message_id} in guild {payload.guild_id}: {err}"
+                )
+                return None
         if len(msg.embeds) == 0 or msg.embeds[0].footer.text not in self.footer_texts:
             return None
         temp = await self.db_get_role_from_emoji(
