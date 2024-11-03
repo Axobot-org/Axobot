@@ -162,7 +162,7 @@ class InvitesTracker(commands.Cog):
     @commands.Cog.listener()
     async def on_member_join(self, member: discord.Member):
         "Detect which invite was used when a member joins the server"
-        if not member.guild.me.guild_permissions.manage_guild:
+        if not member.guild.me.guild_permissions.manage_guild or not await self.is_tracker_enabled(member.guild.id):
             return
         await asyncio.sleep(1) # Wait for the invite to be updated
         used_invite = await self.check_invites_usage(member.guild)
