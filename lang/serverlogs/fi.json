@@ -1,0 +1,36 @@
+{
+    "autocompletion-all": "",
+    "categories": {
+        "automod": "",
+        "members": "",
+        "messages": "",
+        "moderation": "",
+        "other": "",
+        "roles": "",
+        "tickets": "",
+        "voice": ""
+    },
+    "disabled": {
+        "current": "",
+        "other": ""
+    },
+    "embed-warning": "",
+    "enabled": {
+        "current": "",
+        "other": "",
+        "already-enabled-list": {
+            "one": "",
+            "many": ""
+        }
+    },
+    "kick-warning": "",
+    "list": {
+        "all": "",
+        "channel": "",
+        "emojis": "",
+        "guild": "",
+        "none": ""
+    },
+    "none-added": "",
+    "none-removed": ""
+}

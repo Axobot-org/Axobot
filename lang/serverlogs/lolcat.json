@@ -6,8 +6,8 @@
         "messages": "Msgs",
         "moderation": "Moderashun",
         "other": "Ozers",
-        "roles": "Roles",
-        "tickets": "Tickets",
+        "roles": "",
+        "tickets": "",
         "voice": "VOICE"
     },
     "disabled": {

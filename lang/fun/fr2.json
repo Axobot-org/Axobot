@@ -1,15 +1,6 @@
 {
-    "afk": {
-        "afk-done": "Tu es AFK, c'est bon !",
-        "afk-user-noreason": "Il est AFK !",
-        "afk-user-reason": "Hey ! Il est AFK, pour la raison %{reason}.",
-        "no-perm": "Oops, je ne peux pas modifier ton pseudo :blobconfused: J'vais essayer de m'en souvenir quand même",
-        "unafk-cant": "Mais... T'es pas AFK 🙄",
-        "unafk-done": "Yeeeeeeeeeee ! De retour ! Fini l'AFK !"
-    },
     "bbw-too-many": "Gneh !\nLa grille est trop grande pour Discord !",
     "blame-0": "Liste des noms disponibles pour le membre **%{user}**",
-    "cant-react": "Je n'ai pas les perms suffisantes pour envoyer des réactions !",
     "cookie": "%{user} a offert une boîte de cookies à <@375598088850505728> ! %{emoji}",
     "count": {
         "counting": "Comptage en cours...",
@@ -19,8 +10,32 @@
         "result-you": "Sur les %{limit} derniers messages, vous en avez posté %{x} (%{p}%)",
         "too-much": "Mais vous voulez faire exploser Discord ! %{e} Pour des raisons évidentes de performances, je dois imposer une limite à %{l} messages :ZbotThug:"
     },
-    "discordjobs-count": "%{c} offres trouvées",
-    "discordjobs-title": "Métiers disponibles chez Discord",
+    "discordjobs": {
+        "all-count": {
+            "zero": "",
+            "one": "",
+            "many": ""
+        },
+        "filtered-count": {
+            "zero": "",
+            "one": "",
+            "many": ""
+        },
+        "title": ""
+    },
+    "discordlinks": {
+        "title": "",
+        "server-status": "",
+        "tos": "",
+        "bug-report": "",
+        "feedback": "",
+        "selfbot": "",
+        "dev-tos": "",
+        "how-id": "",
+        "age-requirement": "",
+        "betterdiscord": "",
+        "downloads": ""
+    },
     "discordstatus-exists": "GNEH ! Il y a actuellement un %{impact} incident chez Discord : %{title}",
     "discordstatus-impacts": {
         "major": "majeur",
@@ -30,8 +45,14 @@
     "discordstatus-nothing": "Rien à report pour le moment 😅 !\nLe dernier problème était en %{date}.",
     "embed-invalid-channel": "Ptdr je peux pas envoyer des messages dans ce salon",
     "embed-invalid-image": "L'url entrée en tant qu'image est invalide :/",
+    "embed-sent": "",
     "error": "Une erreur est survenue: `%{err}`",
-    "fun-list": "Voici la liste des commandes fun dispos :",
+    "flip": {
+        "tails": "",
+        "heads": "",
+        "edge": ""
+    },
+    "hour-result": "",
     "invalid-city": "Nom de ville invalide",
     "kills-list": [
         "Oh toi, tu vas mourir ! :rip:",
@@ -56,18 +77,40 @@
         "{victim} a tenté de faire un calin à un creeper :rip:",
         "{victim}, les bains de lave sont chauds, mais la lave, ça brûle... :rip:",
         "{victim} a tenté un rocket jump :rip:",
-        "{ex}.exe *a cessé de fonctionner* :rip:"
+        "{ex}.exe *a cessé de fonctionner* :rip:",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
     ],
-    "markdown": "__**Règles du Markdown** sur *Discord*__\n\n`*italique*` = *italique*\n`__souligné__` = __souligné__\n`**gras**` = **gras**\n`***gras italique***` = ***gras italique***\n`~~barré~~` = ~~barré~~\n`__*souligné italique*__` = __*souligné italique*__\n`__**souligné gras**__` = __**souligné gras**__\n`__***souligné gras italique***__` = __***souligné gras italique***__\n`||spoiler||` = ||spoiler||\n> citation = `> citation`\n\\`code\\` = `code`\n\\\\ pour ignorer\n\nPour les blocs de code, cf <https://discord.gg/DGahTNn>",
     "nasa-none": "Euuuuuuuh\nAlors\n\nJ'arrive pas à capter les infos de la NASA pour le moment.\nTu peux réessayer dans 2-3 minutes ?",
-    "no-database": "Notre base de donnée étant hors ligne, l'accès aux commandes fun est restreint aux personnes ayant la permission de Gérer le Serveur",
     "no-embed-perm": "J'ai pas la perm \"Intégrer des liens\" :confused:",
     "no-emoji": "Impossible de trouver cet emoji !",
-    "no-fun": "Les commandes fun ont été désactivées sur ce serveur. Pour voir leur liste, regardez https://axobot.rtfd.io/en/latest/fun.html",
-    "no-reaction": ":whut:\nImpossible d'ajouter les réactions. Vérifiez mes permis !",
     "no-roll": "Aucun élément trouvé :rip: !",
     "no-say": "Impossible d'envoyer un message dans ce salon...",
-    "no-voicechan": "Vous devez être connecté à un salon vocal pour utiliser cette commande.",
     "not-enough-roll": "Il doit y avoir deux éléments distincts",
     "osekour": [
         "Attends, je finis de regarder mon film",
@@ -82,17 +125,13 @@
         "Désolé, il y a plus de 3 flocons de neige: nous sommes coincés au garage",
         "Il va falloir attendre la fin de notre grève... Comment ça, vous n'êtes pas au courant ?! Ça fait pourtant bien deux mois que nous avons commencé !"
     ],
-    "piece-0": [
-        "Pile :rip: !",
-        "Face :thinksmart: !"
-    ],
-    "piece-1": "Raté, c'est tombé sur la tranche !",
     "react-0": "Impossible de trouver le message correspondant. Il faut rentrer l'ID du message en 1er argument, et l'émoji en 2e :upside_down:\n Vérifie aussi que je possède la perm de lire l'historique des messages !",
+    "react-done": {
+        "one": "",
+        "many": ""
+    },
+    "say-done": "",
     "say-no-perm": "T'as pas la perm d'envoyer des messages dans %{channel}",
-    "thanos": [
-        "{0} a été épargné par Thanos le divin...",
-        "Thanos a décidé de réduire {0} en cendres. Comme la moitié de l'univers, en fait !"
-    ],
     "tip-list": [
         "Le saviez-vous ? Il existe plusieurs langues pour le bot, dont une très amusante à tester : le lolcat",
         "Pro-tip : pour changer la langue du bot, utilisez la commande %{config_cmd} !",
@@ -115,8 +154,14 @@
         "Pro-tip : Le bot possède un Discord, où vous pourrez voir les bugs actuels et voter pour les prochaines mises à jour ! Utilisez la commande %{about_cmd} pour en obtenir le lien",
         "Pro-tip : la commande `prefix` permet d'avoir la liste des préfixes actuellement utilisables dans le serveur",
         "Le saviez-vous ? Vous pouvez donner une description de votre serveur qui pourra être utilisée dans d’autres serveurs, via l’option `description` de la commande %{config_cmd}",
-        "Le saviez-vous ? Lors de certains événements spéciaux, il est possible d'obtenir des cartes d'xp collector. N'oubliez pas de suivre les news via le serveur officiel !"
+        "Le saviez-vous ? Lors de certains événements spéciaux, il est possible d'obtenir des cartes d'xp collector. N'oubliez pas de suivre les news via le serveur officiel !",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
     ],
-    "uninhabited-city": "Endroit inhabité",
-    "vote-0": "Tu... Sais que tu peux pas mettre plus de 20 choix, et encore moins un nombre négatif de choix ?"
+    "uninhabited-city": "Endroit inhabité"
 }

@@ -7,28 +7,56 @@
         "watch": "guarda"
     },
     "added_at": "aggiungi lui",
-    "aucune": "nessuna",
+    "beginning": "",
     "bot": "robot",
+    "btn": {
+        "cancel": {
+            "answer": "",
+            "label": ""
+        },
+        "confirm": {
+            "answer": "",
+            "label": ""
+        },
+        "delete": {
+            "answer": "",
+            "label": ""
+        }
+    },
+    "case": "",
     "category": "categoria",
     "click_here": "Clic qui",
-    "depuis": "da",
     "dnd": "non disturbare",
+    "doc": "",
+    "done!": "",
+    "duration": "",
+    "end": "",
+    "example": {
+        "one": "",
+        "many": ""
+    },
     "extreme": "estremo",
     "ghost": "Fantasma",
     "high": "elevato",
+    "highest": "",
     "idle": "inattivo",
     "low": "debole",
     "medium": "mezzo",
     "member": "membro",
     "membres": "membri",
-    "nom": "nome",
-    "non": "no",
+    "name": "",
+    "no": "",
     "none": "nessuno",
     "offline": "disconnesso",
     "online": "in linea",
-    "oui": "si",
-    "server": "server",
+    "quit": "",
+    "reason": "",
+    "request_by": "",
+    "server": "",
     "servers": "server",
+    "since": "",
     "unknown": "sconosciuto",
-    "version": "verzione"
+    "verified": "",
+    "version": "verzione",
+    "yes": ""
 }
