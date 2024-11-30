@@ -28,10 +28,10 @@ ADVENT_CALENDAR: dict[int, list[int]] = {
     11: [36, 41, 43, 49],
     12: [32, 33, 35, 46, 53, 55],
     13: [36, 40, 42, 58],
-    14: [38],
-    15: [42, 50],
-    16: [39, 60, 62],
-    17: [45, 25, 25, 53],
+    14: [42, 50],
+    15: [38],
+    16: [34],
+    17: [39, 60, 62],
     18: [33, 48, 56, 58],
     19: [36, 45, 45, 50],
     20: [35, 39, 42, 43, 57],
@@ -221,9 +221,8 @@ the end of the event? Don't forget to join our [support server](https://discord.
 
     async def generate_collect_message(self, interaction: discord.Interaction, items: list[EventItem], last_collect_day: dt.date):
         "Generate the message to send after a /collect command"
-        past_christmas = await self.is_past_christmas()
         if not items:
-            if past_christmas:
+            if await self.is_past_christmas():
                 return await self.bot._(interaction, "bot_events.calendar.collected-all")
             return await self.bot._(interaction, "bot_events.calendar.collected-day")
         # 1 item collected

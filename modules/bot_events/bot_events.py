@@ -12,7 +12,7 @@ from core.checks.checks import database_connected
 from core.formatutils import FormatUtils
 
 from .data import EventData, EventRewardRole, EventType
-from .subcogs import AbstractSubcog, RandomCollectSubcog
+from .subcogs import AbstractSubcog, ChristmasSubcog
 
 
 class BotEvents(commands.Cog):
@@ -32,7 +32,7 @@ class BotEvents(commands.Cog):
         self.coming_event_id: str | None = None
         self.update_current_event()
 
-        self._subcog: AbstractSubcog = RandomCollectSubcog(
+        self._subcog: AbstractSubcog = ChristmasSubcog(
             self.bot, self.current_event, self.current_event_data, self.current_event_id)
 
     @property
@@ -40,7 +40,7 @@ class BotEvents(commands.Cog):
         "Return the subcog populated with the current event data"
         if self._subcog.current_event != self.current_event or self._subcog.current_event_data != self.current_event_data:
             self.log.debug("Updating subcog with new data")
-            self._subcog = RandomCollectSubcog(self.bot, self.current_event, self.current_event_data, self.current_event_id)
+            self._subcog = ChristmasSubcog(self.bot, self.current_event, self.current_event_data, self.current_event_id)
         return self._subcog
 
     async def cog_load(self):
@@ -217,7 +217,7 @@ class BotEvents(commands.Cog):
         await self.subcog.profile_cmd(interaction, user)
 
     @events_main.command(name="collect")
-    @app_commands.checks.cooldown(1, 60)
+    @app_commands.checks.cooldown(2, 60)
     @app_commands.check(database_connected)
     async def event_collect(self, interaction: discord.Interaction):
         "Get some event points every hour"
@@ -240,8 +240,11 @@ class BotEvents(commands.Cog):
                     continue
                 yield reward["rank_card"]
 
-    async def check_and_send_card_unlocked_notif(self,
-                                                 interaction: discord.Interaction | discord.TextChannel, user: discord.User | int):
+    async def check_and_send_card_unlocked_notif(
+            self,
+            interaction: discord.Interaction | discord.TextChannel,
+            user: discord.User | int
+        ):
         "Check if the user meets the requirements to unlock the event rank card, and send a notification if so"
         if isinstance(user, int):
             user = self.bot.get_user(user)

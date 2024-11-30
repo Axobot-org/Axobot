@@ -331,5 +331,51 @@
             ],
             "probability": 0.05
         }
+    },
+    "christmas-2024": {
+        "begin": "2024-11-01",
+        "end": "2024-12-31",
+        "type": "christmas",
+        "icon": "https://zrunner.me/cdn/christmas_2024.png",
+        "color": 4886759,
+        "objectives": [
+            {
+                "points": 300,
+                "reward_type": "role",
+                "role_id": 1312417584456532090
+            },
+            {
+                "points": 600,
+                "reward_type": "rankcard",
+                "rank_card": "christmas24",
+                "min_date": "2023-12-25"
+            }
+        ],
+        "emojis": {
+            "reactions_list": [],
+            "triggers": [
+                "christmas",
+                "xmas",
+                "present",
+                "noël",
+                "santa",
+                "gift",
+                "cadeau",
+                "snow",
+                "neige",
+                "ice",
+                "glace",
+                "ho ho ho",
+                "reinder",
+                "sleight",
+                "traîneau",
+                "candy cane",
+                "sucre d'orge",
+                "elf ",
+                "lutin",
+                "cookie"
+            ],
+            "probability": 0.1
+        }
     }
 }
