@@ -33,7 +33,7 @@ class InvitesTracker(commands.Cog):
         async with self.bot.db_main.read(query, (guild_id, self.bot.beta)) as query_result:
             return query_result
 
-    async def db_add_invite(self, guild_id: int, invite_id: str, user_id: int | None, creation_date: datetime | None,
+    async def db_upsert_invite(self, guild_id: int, invite_id: str, user_id: int | None, creation_date: datetime | None,
                             usage_count: int):
         "Insert a tracked invite in the database, or update it if it already exists"
         query = (
@@ -81,7 +81,7 @@ class InvitesTracker(commands.Cog):
         # add/update existing invitations
         for invite in guild_invites:
             user_id = invite.inviter.id if invite.inviter else None
-            await self.db_add_invite(guild.id, invite.code, user_id, invite.created_at, invite.uses)
+            await self.db_upsert_invite(guild.id, invite.code, user_id, invite.created_at, invite.uses)
             count += 1
         # delete removed invitations
         for tracked_invite in await self.db_get_invites(guild.id):
@@ -150,7 +150,7 @@ class InvitesTracker(commands.Cog):
         if invite.guild is None or not await self.is_tracker_enabled(invite.guild.id):
             return
         inviter_id = invite.inviter.id if invite.inviter else None
-        await self.db_add_invite(invite.guild.id, invite.code, inviter_id, invite.created_at, invite.uses or 0)
+        await self.db_upsert_invite(invite.guild.id, invite.code, inviter_id, invite.created_at, invite.uses or 0)
 
     @commands.Cog.listener()
     async def on_invite_delete(self, invite: discord.Invite):
@@ -165,8 +165,7 @@ class InvitesTracker(commands.Cog):
         if not member.guild.me.guild_permissions.manage_guild or not await self.is_tracker_enabled(member.guild.id):
             return
         await asyncio.sleep(1) # Wait for the invite to be updated
-        used_invite = await self.check_invites_usage(member.guild)
-        if used_invite:
+        if used_invite := await self.check_invites_usage(member.guild):
             discord_invite, tracked_invite = used_invite
             tracked_invite["last_count"] = discord_invite.uses
             tracked_invite["max_uses"] = discord_invite.max_uses
@@ -175,6 +174,7 @@ class InvitesTracker(commands.Cog):
             await self.db_update_invite_count(member.guild.id, discord_invite.code, discord_invite.uses)
         else:
             self.bot.log.warning(f"Could not detect the invite used in guild {member.guild.id}")
+        self.bot.dispatch("invite_tracker_search", used_invite is not None)
 
 
     invites_main = app_commands.Group(

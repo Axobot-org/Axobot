@@ -66,6 +66,7 @@ class BotStats(commands.Cog):
         self.open_files: dict[str, int] = defaultdict(int)
         self.role_reactions = {"added": 0, "removed": 0}
         self.serverlogs_audit_search: tuple[int, int] | None = None
+        self.invite_tracker_search: tuple[int, int] | None = None
         self.snooze_events: dict[tuple[int, int], int] = defaultdict(int)
         self.stream_events: dict[str, int] = defaultdict(int)
         self.voice_transcript_events: dict[tuple[float, float], int] = defaultdict(int)
@@ -272,6 +273,13 @@ class BotStats(commands.Cog):
             self.serverlogs_audit_search = (prev[0]+1, prev[1]+success)
         else:
             self.serverlogs_audit_search = (1, success)
+
+    async def on_invite_tracker_search(self, success: bool):
+        "Called when an invite tracker search is done"
+        if prev := self.invite_tracker_search:
+            self.invite_tracker_search = (prev[0]+1, prev[1]+success)
+        else:
+            self.invite_tracker_search = (1, success)
 
     async def db_get_disabled_rss(self) -> int:
         "Count the number of disabled RSS feeds in any guild"
@@ -539,6 +547,11 @@ class BotStats(commands.Cog):
                 audit_search_percent = round(self.serverlogs_audit_search[1] / self.serverlogs_audit_search[0] * 100, 1)
                 cursor.execute(query, (now, "logs.audit_search", audit_search_percent, 1, '%', False, self.bot.entity_id))
                 self.serverlogs_audit_search = None
+            # Invites tracker
+            if self.invite_tracker_search is not None:
+                invite_search_percent = round(self.invite_tracker_search[1] / self.invite_tracker_search[0] * 100, 1)
+                cursor.execute(query, (now, "logs.invite_search", invite_search_percent, 1, '%', False, self.bot.entity_id))
+                self.invite_tracker_search = None
             # Last backup save
             if self.last_backup_size:
                 cursor.execute(query, (now, "backup.size", self.last_backup_size, 1, "Gb", False, self.bot.entity_id))
