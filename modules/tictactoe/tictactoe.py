@@ -183,9 +183,15 @@ class TicTacToe(commands.Cog):
                 return False
             self.stop()
             await self.update_grid(result)
-            if not is_draw and self.is_user_turn:
-                await self.bot.dispatch("tictactoe_win", self.interaction)
+            if not is_draw:
+                if self.is_user_turn:
+                    self.bot.dispatch("tictactoe_win", self.interaction)
+                else:
+                    self.bot.dispatch("tictactoe_lose", self.interaction)
             return True
+
+        async def on_error(self, interaction, error, item, /):
+            await self.bot.dispatch("error", error, interaction)
 
 
 async def setup(bot):

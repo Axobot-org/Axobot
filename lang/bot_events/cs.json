@@ -51,8 +51,10 @@
     },
     "soon": "Událost se blíží! Sledujte informace, protože začne %{date}",
     "tictactoe": {
-        "reward-title": "Tic-tac-toe vítezství!",
-        "reward-desc": "Tím, že jsi vyhrál tuto hru, jsi získal ** body%{points} události**!"
+        "won": {
+            "title": "Tic-tac-toe vítezství!",
+            "desc": "Tím, že jsi vyhrál tuto hru, jsi získal ** body%{points} události**!"
+        }
     },
     "tip-title": "Náhodný tip",
     "unclassed": "nezařazené",

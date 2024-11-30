@@ -51,8 +51,10 @@
     },
     "soon": "Hey hey hey! ur too soon, try checking on %{date}! :hype:  ",
     "tictactoe": {
-        "reward-title": "WOW, u won against the most supremely smartest tic-tac-toe AI ever!",
-        "reward-desc": "So uh, as a reward, I've gave u **%{points} event points**, check 'em with `/event profile`!"
+        "won": {
+            "title": "WOW, u won against the most supremely smartest tic-tac-toe AI ever!",
+            "desc": "So uh, as a reward, I've gave u **%{points} event points**, check 'em with `/event profile`!"
+        }
     },
     "tip-title": "Cool tip",
     "unclassed": "unclassd",

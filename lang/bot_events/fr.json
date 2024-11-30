@@ -51,8 +51,14 @@
     },
     "soon": "Un événement arrive bientôt ! Surveillez les informations, car il débutera le %{date}",
     "tictactoe": {
-        "reward-title": "Victoire au morpion !",
-        "reward-desc": "En remportant ce match, tu as gagné **%{points} points d'événement** !"
+        "lost": {
+            "title": "Défaite au morpion",
+            "desc": "En perdant ce match, tu as perdu **%{points} points d'événement**..."
+        },
+        "won": {
+            "title": "Victoire au morpion !",
+            "desc": "En remportant ce match, tu as gagné **%{points} points d'événement** !"
+        }
     },
     "tip-title": "Astuce aléatoire",
     "unclassed": "Non classé",

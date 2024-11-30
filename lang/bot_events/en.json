@@ -51,8 +51,14 @@
     },
     "soon": "An event is coming soon! Watch for information as it will begin on %{date}",
     "tictactoe": {
-        "reward-title": "Tic-tac-toe victory!",
-        "reward-desc": "By winning this game, you earned **%{points} event points**!"
+        "lost": {
+            "title": "Tic-tac-toe defeat",
+            "desc": "By losing this game, you lost **%{points} event points**..."
+        },
+        "won": {
+            "title": "Tic-tac-toe victory!",
+            "desc": "By winning this game, you earned **%{points} event points**!"
+        }
     },
     "tip-title": "Random tip",
     "unclassed": "unclassed",

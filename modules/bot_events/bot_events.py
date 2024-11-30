@@ -147,8 +147,8 @@ class BotEvents(commands.Cog):
         user = interaction.user
         # send win reward embed
         emb = discord.Embed(
-            title=await self.bot._(interaction, "bot_events.tictactoe.reward-title"),
-            description=await self.bot._(interaction, "bot_events.tictactoe.reward-desc", points=points),
+            title=await self.bot._(interaction, "bot_events.tictactoe.won.title"),
+            description=await self.bot._(interaction, "bot_events.tictactoe.won.desc", points=points),
             color=self.current_event_data["color"],
         )
         emb.set_author(name=user.global_name, icon_url=user.display_avatar)
@@ -156,6 +156,37 @@ class BotEvents(commands.Cog):
         # send card unlocked notif
         await self.check_and_send_card_unlocked_notif(interaction, user)
         # give points
+        await self.db_add_user_points(user.id, points)
+
+    @commands.Cog.listener()
+    async def on_tictactoe_lose(self, interaction: discord.Interaction):
+        "Grant points to the user if they lost a game of tictactoe"
+        if not self.current_event:
+            return
+        user = interaction.user
+        # check if user points is high enough to add some difficulty (ie. remove points on loss)
+        if not self.current_event_data["objectives"]:
+            return
+        user_points = await self.db_get_user_points(user.id)
+        first_cap = self.current_event_data["objectives"][0]["points"]
+        last_cap = self.current_event_data["objectives"][-1]["points"]
+        if user_points < first_cap * 1.1:
+            return
+        if first_cap == last_cap or user_points < last_cap * 1.1:
+            # remove 3 points if user has more than 110% of the first objective
+            points = -3
+        else:
+            # remove 5 points if user has more than 110% of the max objective
+            points = -5
+        # send loss reward embed
+        emb = discord.Embed(
+            title=await self.bot._(interaction, "bot_events.tictactoe.lost.title"),
+            description=await self.bot._(interaction, "bot_events.tictactoe.lost.desc", points=-points),
+            color=self.current_event_data["color"],
+        )
+        emb.set_author(name=user.global_name, icon_url=user.display_avatar)
+        await interaction.followup.send(embed=emb)
+        # remove points
         await self.db_add_user_points(user.id, points)
 
     events_main = app_commands.Group(
@@ -343,6 +374,16 @@ class BotEvents(commands.Cog):
             return False
         parsed_date = datetime.datetime.strptime(reward_date, "%Y-%m-%d").replace(tzinfo=datetime.UTC)
         return self.bot.utcnow() < parsed_date
+
+    async def db_get_user_points(self, user_id: int) -> int | None:
+        "Get the user's event points"
+        if not self.bot.database_online or self.bot.current_event is None:
+            return None
+        query = "SELECT `points` FROM `event_points` WHERE `user_id` = %s AND `beta` = %s;"
+        async with self.bot.db_main.read(query, (user_id, self.bot.beta), fetchone=True) as query_result:
+            if query_result:
+                return query_result["points"]
+        return None
 
     async def db_add_user_points(self, user_id: int, points: int):
         "Add some 'other' events points to a user"
