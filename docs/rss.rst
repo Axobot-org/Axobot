@@ -12,9 +12,9 @@ To manage this plugin (add, edit or remove feeds), you will need at least the Ma
 See the last post
 -----------------
 
-**Syntax:** :code:`last-post <name|link> [youtube|twitch|deviant|web]`
+**Syntax:** :code:`last-post <name|link> [bluesky|deviantart|twitch|youtube|web]`
 
-This command allows you to see the last post of a youtube channel, a user on Twitch or DeviantArt, or from any valid RSS feed. If you provide a full URL, the bot will automatically detect the type of feed. If you only provide the name of the channel, you will have to specify the type of feed.
+This command allows you to see the last post of a YouTube channel, a user on Twitch/DeviantArt/Bluesky, or from any valid RSS feed. If you provide a full URL, the bot will automatically detect the type of feed. If you only provide the name of the channel, you will have to specify the type of feed.
 
 .. note:: No specific permission is required for this command. Remember to allow the use of external emojis to get a prettier look.
 
@@ -27,7 +27,7 @@ Follow a feed
 
 If you want to automatically track an rss feed, this command should be used. You can only track a maximum feeds, which will be reloaded every 20 minutes. Note that Minecraft server tracing also counts as an rss feed, and therefore will cost you a slot (which are currently limited to 10 per server).
 
-For YouTube channels, simply give the link of the channel, so that the bot automatically detects the type and name of the channel. If no type is recognized, the 'web' type will be selected.
+For YouTube, Twitch or Bluesky channels, simply give the link of the channel, so that the bot automatically detects the type and name of the channel. If no type is recognized, the 'web' type will be selected.
 
 .. note:: To post a message, the bot does not need any specific permission. But if it's a Minecraft server feed (see the `corresponding section <minecraft.html>`__), don't forget the "`Read message history <perms.html#read-message-history>`__" permission!
 

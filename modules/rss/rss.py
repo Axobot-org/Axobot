@@ -24,6 +24,7 @@ from core.formatutils import FormatUtils
 from core.paginator import PaginatedSelectView, Paginator
 from core.tips import GuildTip
 from core.views import ConfirmView, TextInputModal
+from modules.rss.src.rss_bluesky import BlueskyRSS
 
 from .src import (FeedEmbedData, FeedObject, FeedType, RssMessage, YoutubeRSS,
                   feed_parse)
@@ -72,6 +73,7 @@ class Rss(commands.Cog):
         self.web_rss = WebRSS(self.bot)
         self.deviant_rss = DeviantartRSS(self.bot)
         self.twitch_rss = TwitchRSS(self.bot)
+        self.bluesky_rss = BlueskyRSS(self.bot)
 
         self.cache: dict[str, list[RssMessage]] = {}
         # launch rss loop
@@ -92,7 +94,7 @@ class Rss(commands.Cog):
     @app_commands.rename(feed_type="type")
     @app_commands.checks.cooldown(3, 20)
     async def rss_last_post(self, interaction: discord.Interaction, url: str,
-                            feed_type: Literal["youtube", "twitter", "twitch", "deviantart", "web"] | None):
+                            feed_type: Literal["bluesky", "deviantart", "twitch", "youtube", "web"] | None):
         """Search the last post of a feed
 
         ..Example rss last-post https://www.youtube.com/channel/UCZ5XnGb-3t7jCkXdawN2tkA
@@ -116,6 +118,8 @@ class Rss(commands.Cog):
             await self.last_post_twitch(interaction, url)
         elif feed_type == "deviantart":
             await self.last_post_deviant(interaction, url)
+        elif feed_type == "bluesky":
+            await self.last_post_bluesky(interaction, url)
         elif feed_type == "web":
             await self.last_post_web(interaction, url)
         else:
@@ -131,6 +135,8 @@ class Rss(commands.Cog):
             return "twitch"
         if self.deviant_rss.is_deviantart_url(url):
             return "deviantart"
+        if self.bluesky_rss.is_bluesky_url(url):
+            return "bluesky"
         if self.web_rss.is_web_url(url):
             return "web"
         return None
@@ -187,6 +193,21 @@ class Rss(commands.Cog):
             await interaction.followup.send(text)
         else:
             form = await self.bot._(interaction, "rss.deviant-form-last")
+            obj = await text.create_msg(form)
+            if isinstance(obj, discord.Embed):
+                await interaction.followup.send(embed=obj)
+            else:
+                await interaction.followup.send(obj)
+
+    async def last_post_bluesky(self, interaction: discord.Interaction, user: str):
+        "Search for the last post of a bluesky user"
+        if extracted_user := await self.bluesky_rss.get_username_by_url(user):
+            user = extracted_user
+        text = await self.bluesky_rss.get_last_post(interaction.channel, user, filter_config=None)
+        if isinstance(text, str):
+            await interaction.followup.send(text)
+        else:
+            form = await self.bot._(interaction, "rss.bluesky-form-last")
             obj = await text.create_msg(form)
             if isinstance(obj, discord.Embed):
                 await interaction.followup.send(embed=obj)
@@ -259,6 +280,11 @@ class Rss(commands.Cog):
             if identifiant is not None:
                 feed_type = "deviant"
                 display_type = "deviantart"
+        if identifiant is None:
+            identifiant = await self.bluesky_rss.get_username_by_url(link)
+            if identifiant is not None:
+                feed_type = "bluesky"
+                display_type = "bluesky"
         if identifiant is not None and not link.startswith("https://"):
             link = "https://"+link
         if identifiant is None and link.startswith("https"):
@@ -1132,6 +1158,8 @@ class Rss(commands.Cog):
             return True
         if self.deviant_rss.is_deviantart_url(url):
             return True
+        if self.bluesky_rss.is_bluesky_url(url):
+            return True
         # check web feed
         feed = await feed_parse(url, 8)
         if feed is None:
@@ -1153,6 +1181,8 @@ class Rss(commands.Cog):
             numb = int("50"+numb)
         elif feed_type == "twitch":
             numb = int("60"+numb)
+        elif feed_type == "bluesky":
+            numb = int("70"+numb)
         else:
             numb = int("66"+numb)
         return numb
@@ -1339,6 +1369,11 @@ class Rss(commands.Cog):
                         objs = await self.twitch_rss.get_last_post(chan, feed.link, feed.filter_config, session)
                     else:
                         objs = await self.twitch_rss.get_new_posts(chan, feed.link, feed.date, feed.filter_config, session)
+                elif feed.type == "bluesky":
+                    if feed.date is None:
+                        objs = await self.bluesky_rss.get_last_post(chan, feed.link, feed.filter_config, session)
+                    else:
+                        objs = await self.bluesky_rss.get_new_posts(chan, feed.link, feed.date, feed.filter_config, session)
                 else:
                     self.bot.dispatch("error", RuntimeError(f"Unknown feed type {feed.type}"))
                     return False

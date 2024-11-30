@@ -4,6 +4,9 @@
         "many": "Entrez les rôles à mentionner pour ces flux (au choix leurs noms, IDs ou mentions), séparés par des espaces."
     },
     "ask-roles-hint-example": "Par exemple:\n> Membres \"Super VIP\" @Notifs",
+    "bluesky": "Bluesky",
+    "bluesky-default-flow": "{logo}  | Nouveau post de {author} ! ({date})\n\n{title}\n\nLien : {link}\n\n{mentions}",
+    "bluesky-form-last": "{logo}  | Voici le dernier post de {author}:\nÉcrit le {date}\n\n{title}\n\nLien : {url}",
     "change-txt": {
         "title": "Modifiez le texte de votre flux",
         "label": "Modèle de message",

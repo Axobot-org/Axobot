@@ -4,6 +4,9 @@
         "many": "Type the roles to mention for these feeds (either names, IDs or mentions), separated by spaces."
     },
     "ask-roles-hint-example": "For example:\n> Members \"Super VIP\" @Ping roles",
+    "bluesky": "Bluesky",
+    "bluesky-default-flow": "{logo}  | New post of {author}! ({date})\n\n{title}\n\nLink: {link}\n\n{mentions}",
+    "bluesky-form-last": "{logo}  | Here is the last post of {author}:\nWritten on {date}\n\n{title}\n\nLink: {url}",
     "change-txt": {
         "title": "Edit your feed text",
         "label": "Message template",

@@ -15,7 +15,7 @@ from feedparser.util import FeedParserDict
 from core.formatutils import FormatUtils
 from core.safedict import SafeDict
 
-FeedType = Literal["tw", "yt", "twitch", "reddit", "mc", "deviant", "web"]
+FeedType = Literal["tw", "yt", "twitch", "reddit", "mc", "deviant", "bluesky", "web"]
 
 if TYPE_CHECKING:
     from core.bot_classes import Axobot
@@ -386,6 +386,8 @@ class FeedObject:
             return cog.get_emoji("minecraft")
         if self.type == "deviant":
             return cog.get_emoji("deviant")
+        if self.type == "bluesky":
+            return cog.get_emoji("bluesky")
         if self.link is not None:
             if self.link.startswith("https://github.com/"):
                 return cog.get_emoji("github")

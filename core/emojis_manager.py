@@ -1012,5 +1012,6 @@ class EmojisManager:
             "minecraft": 958305433439834152,
             "github": 1130174138267480244,
             "readthedocs": 484841075001786368,
+            "bluesky": 1312561135794393232,
         }
         return self.bot.get_emoji(ids[name])

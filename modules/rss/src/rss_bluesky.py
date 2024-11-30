@@ -8,27 +8,28 @@ import aiohttp
 import discord
 from feedparser.util import FeedParserDict
 
+from .convert_post_to_text import get_text_from_entry
 from .rss_general import (FeedFilterConfig, FeedObject, RssMessage,
                           check_filter, feed_parse)
 
 if TYPE_CHECKING:
     from core.bot_classes import Axobot
 
-class DeviantartRSS:
-    "Utilities class for any deviantart RSS action"
+class BlueskyRSS:
+    "Utilities class for any Bluesky RSS action"
 
     def __init__(self, bot: Axobot):
         self.bot = bot
-        self.min_time_between_posts = 120 # seconds
-        self.url_pattern = r"^https://(?:www\.)?deviantart\.com/(\w+)"
+        self.min_time_between_posts = 60 # seconds
+        self.url_pattern = r"^https://(?:www\.)?bsky.app/profile/([\w._:-]+)$"
 
-    def is_deviantart_url(self, string: str):
-        "Check if an url is a valid deviantart URL"
+    def is_bluesky_url(self, string: str):
+        "Check if an url is a valid Bluesky URL"
         matches = re.match(self.url_pattern, string)
         return bool(matches)
 
     async def get_username_by_url(self, url: str) -> str | None:
-        "Extract the DevianArt username from a URL"
+        "Extract the Bluesky username from a URL"
         matches = re.match(self.url_pattern, url)
         if not matches:
             return None
@@ -36,8 +37,8 @@ class DeviantartRSS:
 
     async def _get_feed(self, username: str, filter_config: FeedFilterConfig | None=None,
                         session: aiohttp.ClientSession | None=None) -> FeedParserDict:
-        "Get a list of feeds from a deviantart username"
-        url = "https://backend.deviantart.com/rss.xml?q=gallery%3A" + username
+        "Get a list of feeds from a Bluesky username"
+        url = f"https://bsky.app/profile/{username}/rss"
         feed = await feed_parse(url, 9, session)
         if feed is None or "bozo_exception" in feed or not feed.entries:
             return None
@@ -47,42 +48,48 @@ class DeviantartRSS:
 
     async def _parse_entry(self, entry: FeedParserDict, feed: FeedParserDict, url: str, channel: discord.TextChannel):
         "Parse a feed entry to get the relevant information and return a RssMessage object"
-        img_url = entry["media_content"][0]["url"] if "media_content" in entry else None
-        title = re.search(r"DeviantArt: ([^ ]+)'s gallery", feed.feed["title"]).group(1)
+        full_author = feed["feed"]["title"]
+        author = re.search(r"^@[\w.-_]+ - (\S+)$", full_author).group(1)
+        post_text = await get_text_from_entry(entry)
         return RssMessage(
             bot=self.bot,
-            feed=FeedObject.unrecorded("deviant", channel.guild.id if channel.guild else None, link=url),
+            feed=FeedObject.unrecorded("bluesky", channel.guild.id if channel.guild else None, link=url),
             url=entry["link"],
-            title=entry["title"],
             date=entry["published_parsed"],
-            author=title,
-            image=img_url
-        )
+            entry_id=entry["id"],
+            title=post_text,
+            author=author,
+            channel=full_author,
+            post_text=post_text
+       )
 
     async def get_last_post(self, channel: discord.TextChannel, username: str,
                             filter_config: FeedFilterConfig | None,
-                            session: aiohttp.ClientSession | None =  None):
-        "Get the last post from a DeviantArt user"
+                            session: aiohttp.ClientSession | None=None) -> RssMessage | str:
+        "Get the last post from a Bluesky user"
         feed = await self._get_feed(username, filter_config, session)
-        if feed is None:
+        if feed is None or not feed.entries:
             return await self.bot._(channel.guild, "rss.nothing")
         entry = feed.entries[0]
-        url = "https://www.deviantart.com/" + username
+        url = f"https://bsky.app/profile/{username}/rss"
         return await self._parse_entry(entry, feed, url, channel)
 
     async def get_new_posts(self, channel: discord.TextChannel, username: str, date: dt.datetime,
                             filter_config: FeedFilterConfig | None,
                             session: aiohttp.ClientSession | None=None) -> list[RssMessage]:
-        "Get all new posts from a DeviantArt user"
+        "Get all new posts from a Bluesky user"
         feed = await self._get_feed(username, filter_config, session)
-        if feed is None:
+        if feed is None or not feed.entries:
             return []
         posts_list: list[RssMessage] = []
-        url = "https://www.deviantart.com/" + username
+        url = f"https://bsky.app/profile/{username}/rss"
         for entry in feed.entries:
-            if (dt.datetime(*entry["published_parsed"][:6], tzinfo=dt.UTC) - date).total_seconds() <= self.min_time_between_posts:
+            # don't return more than 10 posts
+            if len(posts_list) > 10:
                 break
-            obj = await self._parse_entry(entry, feed, url, channel)
-            posts_list.append(obj)
+            # don't return posts older than the date
+            if (dt.datetime(*entry["published_parsed"][:6], tzinfo=dt.UTC) - date).total_seconds() < self.min_time_between_posts:
+                break
+            posts_list.append(await self._parse_entry(entry, feed, url, channel))
         posts_list.reverse()
         return posts_list

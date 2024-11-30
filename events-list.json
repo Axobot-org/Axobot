@@ -333,7 +333,7 @@
         }
     },
     "christmas-2024": {
-        "begin": "2024-11-01",
+        "begin": "2024-12-01",
         "end": "2024-12-31",
         "type": "christmas",
         "icon": "https://zrunner.me/cdn/christmas_2024.png",
