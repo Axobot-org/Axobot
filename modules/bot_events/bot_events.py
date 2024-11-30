@@ -1,6 +1,8 @@
 import datetime
 import json
 import logging
+import time
+from collections import defaultdict
 from typing import AsyncGenerator, Literal
 
 import discord
@@ -34,6 +36,7 @@ class BotEvents(commands.Cog):
 
         self._subcog: AbstractSubcog = ChristmasSubcog(
             self.bot, self.current_event, self.current_event_data, self.current_event_id)
+        self.last_ttt_win: dict[int, int] = defaultdict(int) # map of user_id -> timestamp
 
     @property
     def subcog(self) -> AbstractSubcog:
@@ -129,6 +132,31 @@ class BotEvents(commands.Cog):
             return
         if self.current_event:
             await self.subcog.on_raw_reaction_add(payload)
+
+    @commands.Cog.listener()
+    async def on_tictactoe_win(self, interaction: discord.Interaction):
+        "Grant points to the user if they won a game of tictactoe"
+        if not self.current_event:
+            return
+        now = time.time()
+        # limit to 1 win per minute
+        if self.last_ttt_win[interaction.user.id] + 60 > now:
+            return
+        self.last_ttt_win[interaction.user.id] = now
+        points = 7
+        user = interaction.user
+        # send win reward embed
+        emb = discord.Embed(
+            title=await self.bot._(interaction, "bot_events.tictactoe.reward-title"),
+            description=await self.bot._(interaction, "bot_events.tictactoe.reward-desc", points=points),
+            color=self.current_event_data["color"],
+        )
+        emb.set_author(name=user.global_name, icon_url=user.display_avatar)
+        await interaction.followup.send(embed=emb)
+        # send card unlocked notif
+        await self.check_and_send_card_unlocked_notif(interaction, user)
+        # give points
+        await self.db_add_user_points(user.id, points)
 
     events_main = app_commands.Group(
         name="event",

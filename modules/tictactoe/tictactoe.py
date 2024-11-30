@@ -184,27 +184,8 @@ class TicTacToe(commands.Cog):
             self.stop()
             await self.update_grid(result)
             if not is_draw and self.is_user_turn:
-                # give event points if user won
-                await self.cog.give_event_points(self.interaction, self.interaction.user, 8)
+                await self.bot.dispatch("tictactoe_win", self.interaction)
             return True
-
-    async def give_event_points(self, interaction: discord.Interaction, user: discord.User, points: int):
-        "Give points to a user and check if they had unlocked a card"
-        if cog := self.bot.get_cog("BotEvents"):
-            if not cog.current_event:
-                return
-            # send win reward embed
-            emb = discord.Embed(
-                title=await self.bot._(interaction, "bot_events.tictactoe.reward-title"),
-                description=await self.bot._(interaction, "bot_events.tictactoe.reward-desc", points=points),
-                color=cog.current_event_data["color"],
-            )
-            emb.set_author(name=user.global_name, icon_url=user.display_avatar)
-            await interaction.followup.send(embed=emb)
-            # send card unlocked notif
-            await cog.check_and_send_card_unlocked_notif(interaction, user)
-            # give points
-            await cog.db_add_user_points(user.id, points)
 
 
 async def setup(bot):
