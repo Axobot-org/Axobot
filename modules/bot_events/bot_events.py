@@ -36,6 +36,7 @@ class BotEvents(commands.Cog):
 
         self._subcog: AbstractSubcog = ChristmasSubcog(
             self.bot, self.current_event, self.current_event_data, self.current_event_id)
+        self.min_delay_between_ttt_wins = 30 # seconds between 2 tictactoe wins
         self.last_ttt_win: dict[int, int] = defaultdict(int) # map of user_id -> timestamp
 
     @property
@@ -140,7 +141,7 @@ class BotEvents(commands.Cog):
             return
         now = time.time()
         # limit to 1 win per minute
-        if self.last_ttt_win[interaction.user.id] + 60 > now:
+        if self.last_ttt_win[interaction.user.id] + self.min_delay_between_ttt_wins > now:
             return
         self.last_ttt_win[interaction.user.id] = now
         points = 7
