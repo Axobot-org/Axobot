@@ -32,8 +32,8 @@ class TicTacToe(commands.Cog):
         await interaction.response.defer()
         self.in_game[interaction.user.id] = time.time()
         game = self.Game(interaction, self)
-        await game.init_game()
         u_begin = await self.bot._(interaction, "tictactoe.user-begin" if game.is_user_turn else "tictactoe.bot-begin")
+        await game.init_game()
         tip = await self.bot._(interaction, "tictactoe.tip", symb1=game.emojis[0], symb2=game.emojis[1])
         await interaction.edit_original_response(content=u_begin.format(interaction.user.mention) + tip, view=game)
         await game.wait()
@@ -43,7 +43,7 @@ class TicTacToe(commands.Cog):
         "An actual tictactoe game running"
 
         def __init__(self, interaction: discord.Interaction, cog: "TicTacToe"):
-            super().__init__(timeout=60)
+            super().__init__(timeout=120)
             self.cog = cog
             self.interaction = interaction
             self.bot = cog.bot
@@ -132,7 +132,7 @@ class TicTacToe(commands.Cog):
             await interaction.response.defer()
             case_id = int(interaction.data["custom_id"].split("_")[1])
             if not await self.test_valid_cell(case_id):
-                self.bot.dispatch("error", ValueError("Invalid cell"), "During a tictactoe game")
+                self.bot.dispatch("error", ValueError(f"Invalid cell: {case_id}"), "During a tictactoe game")
                 return
             self.grid = await self.replace_cell(self.is_user_turn, case_id)
             self.interaction = interaction
@@ -143,23 +143,30 @@ class TicTacToe(commands.Cog):
 
         async def bot_turn(self):
             "Make the bot play its turn"
-            # Prepare the fallback answer as a random empty cell
-            case_id = random.choice([i for i, x in enumerate(self.grid) if isinstance(x, int)])
-            # Check if the user is about to win, or if the bot can win
-            for k in range(0, 9):
-                if await self.test_valid_cell(k):
-                    for i in [True, False]:
-                        grid_copy = await self.replace_cell(i, k)
-                        if await self.test_victory(grid_copy):
-                            case_id = k
-                            break
+            chosen_cell = await self._find_optimal_cell()
+            if chosen_cell is None:
+            # Fallback to a random empty cell
+                chosen_cell = random.choice([i for i, x in enumerate(self.grid) if isinstance(x, int)])
             # Update the game state
-            self.grid = await self.replace_cell(self.is_user_turn, case_id)
+            self.grid = await self.replace_cell(self.is_user_turn, chosen_cell)
             if await self.check_game_end():
                 return
             self.is_user_turn = True
             # Edit the message
             await self.update_grid()
+
+        async def _find_optimal_cell(self):
+            possible_cells: list[int] = []
+            # Check if the user is about to win, or if the bot can win
+            for cell in range(0, 9):
+                if await self.test_valid_cell(cell):
+                    for is_user in [True, False]:
+                        grid_copy = await self.replace_cell(is_user, cell)
+                        if await self.test_victory(grid_copy):
+                            possible_cells.append(cell)
+            if possible_cells:
+                return random.choice(possible_cells)
+            return None
 
         async def check_game_end(self):
             "Check if anyone won the game, or if no cell is empty"
