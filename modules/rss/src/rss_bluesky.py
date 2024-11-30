@@ -49,7 +49,7 @@ class BlueskyRSS:
     async def _parse_entry(self, entry: FeedParserDict, feed: FeedParserDict, url: str, channel: discord.TextChannel):
         "Parse a feed entry to get the relevant information and return a RssMessage object"
         full_author = feed["feed"]["title"]
-        author = re.search(r"^@[\w.-_]+ - (\S+)$", full_author).group(1)
+        author = re.search(r"^@[\w._-]+ - (\S+)$", full_author).group(1)
         post_text = await get_text_from_entry(entry)
         return RssMessage(
             bot=self.bot,
