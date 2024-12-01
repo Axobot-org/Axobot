@@ -171,13 +171,13 @@ class BotEvents(commands.Cog):
         user_points = await self.db_get_user_points(user.id)
         first_cap = self.current_event_data["objectives"][0]["points"]
         last_cap = self.current_event_data["objectives"][-1]["points"]
-        if user_points < first_cap * 1.1:
+        if user_points is None or user_points < first_cap * 1.1:
             return
         if first_cap == last_cap or user_points < last_cap * 1.1:
             # remove 3 points if user has more than 110% of the first objective
             points = -3
         else:
-            # remove 5 points if user has more than 110% of the max objective
+            # remove 5 points if user has more than 110% of the last objective
             points = -5
         # send loss reward embed
         emb = discord.Embed(
