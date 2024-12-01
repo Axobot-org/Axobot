@@ -313,3 +313,16 @@ class Axobot(commands.bot.AutoShardedBot):
             return f"`{command.qualified_name}`"
         self.log.error("Trying to mention invalid command: %s", command_name)
         return f"`{command_name}`"
+
+    async def get_message_from_cache(self, message_id: int) -> discord.Message | None:
+        "Get a message from the cache"
+        for msg in self.cached_messages:
+            if msg.id == message_id:
+                return msg
+        return None
+
+    async def add_message_to_cache(self, message: discord.Message):
+        "Force add a message to the cache"
+        if await self.get_message_from_cache(message.id) is None:
+            # pylint: disable=protected-access
+            self._connection._messages.append(message)
