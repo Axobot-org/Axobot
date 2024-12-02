@@ -181,12 +181,13 @@ class AbstractSubcog(ABC):
             return 1e9
         return (self.bot.utcnow() - last_collect).total_seconds()
 
-    async def add_collect(self, user_id: int, points: int,
+    async def add_collect(self, user_id: int, points: int, /,
+                          ignore_last_collect: bool = False,
                           send_notif_to_interaction: discord.Interaction | discord.TextChannel | None = None):
         "Add collect points to a user"
         if not self.bot.database_online or self.bot.current_event is None:
             return
-        await self.db_add_collect(user_id, points, with_strike=False)
+        await self.db_add_collect(user_id, points, ignore_last_collect)
         if cog := self.bot.get_cog("BotEvents"):
             try:
                 if send_notif_to_interaction:
@@ -196,12 +197,12 @@ class AbstractSubcog(ABC):
             except Exception as err:
                 self.bot.dispatch("error", err)
 
-    async def add_collect_and_strike(self, user_id: int, points: int,
+    async def add_collect_and_strike(self, user_id: int, points: int, /,
                                      send_notif_to_interaction: discord.Interaction | discord.TextChannel | None = None):
         """Add collect points to a user and increase the strike level by 1"""
         if not self.bot.database_online or self.bot.current_event is None:
             return True
-        await self.db_add_collect(user_id, points, with_strike=True)
+        await self.db_add_collect_and_increase_strike(user_id, points)
         if cog := self.bot.get_cog("BotEvents"):
             try:
                 if send_notif_to_interaction:
@@ -276,23 +277,33 @@ class AbstractSubcog(ABC):
         async with self.bot.db_main.write(query, [arg for item_id in items_ids for arg in (user_id, item_id, self.bot.beta)]):
             pass
 
-    async def db_add_collect(self, user_id: int, points: int, with_strike: bool):
+    async def db_add_collect(self, user_id: int, points: int, ignore_last_collect: bool):
         """Add collect points to a user, and maybe increase the strike level by 1"""
-        if not self.bot.database_online or self.bot.current_event is None:
+        if not self.bot.database_online or not points or self.bot.current_event is None:
             return
-        if with_strike:
-            query = "INSERT INTO `event_points` (`user_id`, `collect_points`, `strike_level`, `beta`) VALUES (%s, %s, 1, %s) \
-                ON DUPLICATE KEY UPDATE collect_points = collect_points + VALUE(`collect_points`), \
-                    strike_level = strike_level + 1, \
-                    last_collect = CURRENT_TIMESTAMP();"
-        elif points:
+        if ignore_last_collect:
+            query = "INSERT INTO `event_points` (`user_id`, `collect_points`, `beta`) \
+                VALUES (%s, %s, %s) \
+                ON DUPLICATE KEY UPDATE \
+                    collect_points = collect_points + VALUE(`collect_points`), \
+                    strike_level = 0;"
+        else:
             query = "INSERT INTO `event_points` (`user_id`, `collect_points`, `last_collect`, `beta`) \
                 VALUES (%s, %s, CURRENT_TIMESTAMP(), %s) \
                 ON DUPLICATE KEY UPDATE collect_points = collect_points + VALUE(`collect_points`), \
                     strike_level = 0, \
                     last_collect = CURRENT_TIMESTAMP();"
-        else:
+        async with self.bot.db_main.write(query, (user_id, points, self.bot.beta)):
+            pass
+
+    async def db_add_collect_and_increase_strike(self, user_id: int, points: int):
+        """Add collect points to a user and increase the strike level by 1"""
+        if not self.bot.database_online or not points or self.bot.current_event is None:
             return
+        query = "INSERT INTO `event_points` (`user_id`, `collect_points`, `strike_level`, `beta`) VALUES (%s, %s, 1, %s) \
+            ON DUPLICATE KEY UPDATE collect_points = collect_points + VALUE(`collect_points`), \
+                strike_level = strike_level + 1, \
+                last_collect = CURRENT_TIMESTAMP();"
         async with self.bot.db_main.write(query, (user_id, points, self.bot.beta)):
             pass
 

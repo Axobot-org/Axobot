@@ -103,7 +103,7 @@ class ChristmasSubcog(AbstractSubcog):
             await user.dm_channel.send(embed=embed)
             notif_channel = user.dm_channel
         # add points (and potentially grant reward rank card)
-        await self.add_collect(payload.user_id, item["points"], send_notif_to_interaction=notif_channel)
+        await self.add_collect(payload.user_id, item["points"], ignore_last_collect=True, send_notif_to_interaction=notif_channel)
 
     async def profile_cmd(self, interaction, user):
         "Displays the profile of the user"
