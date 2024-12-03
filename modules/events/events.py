@@ -204,14 +204,14 @@ class Events(commands.Cog):
                 if entry.action == discord.AuditLogAction.kick and entry.target == member:
                     await self.add_points(self.table["kick"])
                     break
-                elif entry.action == discord.AuditLogAction.ban and entry.target == member:
+                if entry.action == discord.AuditLogAction.ban and entry.target == member:
                     await self.add_points(self.table["ban"])
                     break
         except discord.Forbidden:
             pass
         except Exception as err:
             if member.guild.id != 264445053596991498:
-                self.bot.log.warning("[check_user_left] %s (user %s/server %s)", err, member.id, member.guild.id)
+                self.bot.dispatch("error", err, f"Checking user left (user {member.id}/server {member.guild.id})")
 
     @tasks.loop(seconds=1.0)
     async def loop(self):
