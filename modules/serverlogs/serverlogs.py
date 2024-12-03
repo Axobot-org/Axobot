@@ -757,15 +757,16 @@ class ServerLogs(commands.Cog):
             )
             emb.set_author(name=str(member), icon_url=member.display_avatar)
             # try to wait for the invitation tracker event
-            try:
-                _, invite = await self.bot.wait_for("invite_used", timeout=2)
-            except asyncio.TimeoutError:
-                pass
-            else:
-                emb.add_field(
-                    name="Invitation used",
-                    value=await self._create_invite_field(invite)
-                )
+            if await self.bot.get_config(member.guild, "enable_invites_tracking"):
+                try:
+                    _, invite = await self.bot.wait_for("invite_used", timeout=3)
+                except asyncio.TimeoutError:
+                    pass
+                else:
+                    emb.add_field(
+                        name="Invitation used",
+                        value=await self._create_invite_field(invite)
+                    )
             emb.add_field(name="Account created at", value=f"<t:{member.created_at.timestamp():.0f}>", inline=False)
             if specs := await self.get_member_specs(member):
                 emb.add_field(name="Specificities", value=", ".join(specs), inline=False)
