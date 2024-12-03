@@ -274,6 +274,7 @@ class BotStats(commands.Cog):
         else:
             self.serverlogs_audit_search = (1, success)
 
+    @commands.Cog.listener()
     async def on_invite_tracker_search(self, success: bool):
         "Called when an invite tracker search is done"
         if prev := self.invite_tracker_search:
@@ -550,7 +551,7 @@ class BotStats(commands.Cog):
             # Invites tracker
             if self.invite_tracker_search is not None:
                 invite_search_percent = round(self.invite_tracker_search[1] / self.invite_tracker_search[0] * 100, 1)
-                cursor.execute(query, (now, "logs.invite_search", invite_search_percent, 1, '%', False, self.bot.entity_id))
+                cursor.execute(query, (now, "invite_search", invite_search_percent, 1, '%', False, self.bot.entity_id))
                 self.invite_tracker_search = None
             # Last backup save
             if self.last_backup_size:
