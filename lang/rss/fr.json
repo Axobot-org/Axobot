@@ -5,7 +5,7 @@
     },
     "ask-roles-hint-example": "Par exemple:\n> Membres \"Super VIP\" @Notifs",
     "bluesky": "Bluesky",
-    "bluesky-default-flow": "{logo}  | Nouveau post de {author} ! ({date})\n\n{title}\n\nLien : {link}\n\n{mentions}",
+    "bluesky-default-flow": "{logo}  | Nouveau post de {author} ! ({date})\n\n{title}\n\nLien : {link}",
     "bluesky-form-last": "{logo}  | Voici le dernier post de {author}:\nÉcrit le {date}\n\n{title}\n\nLien : {url}",
     "change-txt": {
         "title": "Modifiez le texte de votre flux",
@@ -24,7 +24,6 @@
                 "timestamp": "`{timestamp}`: la date Unix de publication en secondes, utilisable dans la notation de timestamp de Discord",
                 "link": "`{link}` ou `{url}`: un lien vers le post",
                 "logo": "`{logo}`: un emoji représentant le type de post (web, Reddit, YouTube...)",
-                "mentions": "`{mentions}`: la liste des rôles mentionnés",
                 "title": "`{title}`: le titre du post",
                 "full_text": "`{full_text}`: le texte complet du post, si disponible",
                 "description": "`{description}`: la description/le résumé du post, si disponible"
@@ -50,7 +49,7 @@
         "one": "Le flux a été réactivé avec succès !"
     },
     "deviant": "DeviantArt",
-    "deviant-default-flow": "{logo}  | Nouvelle création de {author} : **{title}**\nPubliée le {date}\nLien : {link}\n{mentions}",
+    "deviant-default-flow": "{logo}  | Nouvelle création de {author} : **{title}**\nPubliée le {date}\nLien : {link}",
     "deviant-form-last": "{logo}  | Voici la dernière création de {author}:\n{title}\nPubliée le {date}\nLien : {url}",
     "embed-json-changed": "L'embed de ce flux a bien été modifié",
     "filter": {
@@ -129,11 +128,11 @@
     },
     "too-long": "Vous avez trop attendu, désolé :hourglass:",
     "tw": "Twitter",
-    "tw-default-flow": "{logo}  | Nouveau tweet de {author} ! ({date})\n\n{title}\n\nLien : {link}\n\n{mentions}",
+    "tw-default-flow": "{logo}  | Nouveau tweet de {author} ! ({date})\n\n{title}\n\nLien : {link}",
     "tw-form-last": "{logo}  | Voici le dernier tweet de {author}:\nÉcrit le {date}\n\n{title}\n\nLien : {url}\n",
     "tw-no-tweet": "Il semble que cet utilisateur n'ait jamais tweeté :confused:",
     "twitch": "Twitch",
-    "twitch-default-flow": "{logo}  | Nouveau clip de {author} ! ({date})\n\n{title}\n\nLien : {link}\n\n{mentions}",
+    "twitch-default-flow": "{logo}  | Nouveau clip de {author} ! ({date})\n\n{title}\n\nLien : {link}",
     "twitch-form-last": "{logo}  | Voici la dernière vidéo de {author}:\n{title}\nPubliée le {date}\nLien : {url}\n",
     "twitch-invalid": "Oups, impossible de trouver une chaîne Twitch avec ce nom !",
     "use_embed-same": "L'utilisation d'embeds pour ce flux n'a pas changé",
@@ -141,11 +140,11 @@
     "use_embed_false": "Ce flux n'utilise pas d'embed pour être envoyé. Voulez-vous utiliser les embeds pour ce flux ? (true/false)",
     "use_embed_true": "Ce flux utilise actuellement les embeds pour être envoyé. Voulez-vous toujours utiliser les embeds pour ce flux ? (true/false)",
     "web": "Web",
-    "web-default-flow": "{logo}  | Nouveau post sur {channel} ({date}) :\n    {title}\n\n{link}\n\n{mentions}",
+    "web-default-flow": "{logo}  | Nouveau post sur {channel} ({date}) :\n    {title}\n\n{link}",
     "web-form-last": "{logo}  | Voici le dernier post de {channel}:\n**{title}**\n*Ecrit le {date}*\nLien : {link}",
     "web-invalid": "Oups, cette adresse url est invalide :confused:",
     "yt": "YouTube",
-    "yt-default-flow": "{logo}  | Nouvelle vidéo de {author} : **{title}**\nPubliée le {date}\nLien : {link}\n{mentions}",
+    "yt-default-flow": "{logo}  | Nouvelle vidéo de {author} : **{title}**\nPubliée le {date}\nLien : {link}",
     "yt-form-last": "{logo}  | Voici la dernière vidéo de {author}:\n{title}\nPubliée le {date}\nLien : {url}",
     "yt-invalid": "Oups, impossible de trouver une chaîne YouTube avec cet ID !"
 }

@@ -888,7 +888,6 @@ class Rss(commands.Cog):
         - `{timestamp}`: the Unix time of the post in seconds, usable in Discord timestamp markdown
         - `{link}` or `{url}`: a link to the post
         - `{logo}`: an emoji representing the type of post (web, Reddit, YouTube...)
-        - `{mentions}`: the list of mentioned roles
         - `{title}`: the title of the post
         - `{full_text}`: the full text of the post
         - `{description}`: the description/summary of the post
@@ -953,8 +952,8 @@ class Rss(commands.Cog):
         text = await self.bot._(interaction, "rss.change-txt.confirmation.current-structure", button_label=confirm_label)
         text += f"\n```{current_feed_structure}```"
         embed_description = await self.bot._(interaction, "rss.change-txt.confirmation.variables-explanation")
-        for variable in sorted(("author", "channel", "date", "long_date", "timestamp", "link", "logo", "mentions", "title",
-                         "full_text", "description")):
+        for variable in sorted(
+            ("author", "channel", "date", "long_date", "timestamp", "link", "logo", "title", "full_text", "description")):
             embed_description += "\n- " + await self.bot._(interaction, f"rss.change-txt.confirmation.variables.{variable}")
         embed = discord.Embed(
             title=await self.bot._(interaction, "rss.change-txt.confirmation.variables-title"),
@@ -1004,7 +1003,6 @@ class Rss(commands.Cog):
         - `{timestamp}`: the Unix time of the post in seconds, usable in Discord timestamp markdown
         - `{link}` or `{url}`: a link to the post
         - `{logo}`: an emoji representing the type of post (web, Reddit, YouTube...)
-        - `{mentions}`: the list of mentioned roles
         - `{title}`: the title of the post
         - `{full_text}`: the full text of the post
         - `{description}`: the description/summary of the post

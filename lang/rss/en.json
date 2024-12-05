@@ -5,7 +5,7 @@
     },
     "ask-roles-hint-example": "For example:\n> Members \"Super VIP\" @Ping roles",
     "bluesky": "Bluesky",
-    "bluesky-default-flow": "{logo}  | New post of {author}! ({date})\n\n{title}\n\nLink: {link}\n\n{mentions}",
+    "bluesky-default-flow": "{logo}  | New post of {author}! ({date})\n\n{title}\n\nLink: {link}",
     "bluesky-form-last": "{logo}  | Here is the last post of {author}:\nWritten on {date}\n\n{title}\n\nLink: {url}",
     "change-txt": {
         "title": "Edit your feed text",
@@ -24,7 +24,6 @@
                 "timestamp": "`{timestamp}`: the Unix time of the post in seconds, usable in Discord timestamp markdown",
                 "link": "`{link}` or `{url}`: a link to the post",
                 "logo": "`{logo}`: an emoji representing the type of post (web, Reddit, YouTube...)",
-                "mentions": "`{mentions}`: the list of mentioned roles",
                 "title": "`{title}`: the title of the post",
                 "full_text": "`{full_text}`: the full text of the post, if available",
                 "description": "`{description}`: the description/summary of the post, if available"
@@ -50,7 +49,7 @@
         "one": "The feed has been successfully enabled!"
     },
     "deviant": "DeviantArt",
-    "deviant-default-flow": "{logo}  | New creation by {author}: **{title}**\nPublished on {date}\nLink: {link}\n{mentions}",
+    "deviant-default-flow": "{logo}  | New creation by {author}: **{title}**\nPublished on {date}\nLink: {link}",
     "deviant-form-last": "{logo}  | Here is the new creation of {author}:\n{title}\nPublished on {date}\nLink: {url}",
     "embed-json-changed": "The embed of this feed has been modified",
     "filter": {
@@ -129,11 +128,11 @@
     },
     "too-long": "You waited too long, sorry :hourglass:",
     "tw": "Twitter",
-    "tw-default-flow": "{logo}  | New tweet of {author}! ({date})\n\n{title}\n\nLink: {link}\n\n{mentions}",
+    "tw-default-flow": "{logo}  | New tweet of {author}! ({date})\n\n{title}\n\nLink: {link}",
     "tw-form-last": "{logo}  |  Here is the last tweet of {author}:\nWritten on {date}\n\n{title}\n\nLink: {url}",
     "tw-no-tweet": "It looks like this user has never tweeted :confused:",
     "twitch": "Twitch",
-    "twitch-default-flow": "{logo}  | New clip by {author}! ({date})\n\n{title}\n\nLink: {link}\n\n{mentions}",
+    "twitch-default-flow": "{logo}  | New clip by {author}! ({date})\n\n{title}\n\nLink: {link}",
     "twitch-form-last": "{logo}  | Here is the last video of {author}:\n{title}\nPublished on {date}\nLink: {url}\n",
     "twitch-invalid": "Oops, I couldn't find any Twitch channel with this name!",
     "use_embed-same": "The use of embeds for this feed has not changed",
@@ -141,11 +140,11 @@
     "use_embed_false": "This feed does not use embed to be sent. Do you want to use an embed for this feed? (true/false)",
     "use_embed_true": "This feed currently uses embeds to be sent. Do you still want to use an embed for this feed? (true/false)",
     "web": "Web",
-    "web-default-flow": "{logo}  | New post on {channel} ({date}):\n        {title}\n\n{link}\n\n{mentions}",
+    "web-default-flow": "{logo}  | New post on {channel} ({date}):\n        {title}\n\n{link}",
     "web-form-last": "{logo}  |  Here is the last post on {channel}:\n**{title}**\n*Written on {date}*\nLink: {link}",
     "web-invalid": "Oops, this url address is invalid :confused:",
     "yt": "YouTube",
-    "yt-default-flow": "{logo}  | New video of {author}: **{title}**\nPublished on {date}\nLink: {link}\n{mentions}",
+    "yt-default-flow": "{logo}  | New video of {author}: **{title}**\nPublished on {date}\nLink: {link}",
     "yt-form-last": "{logo}  | Here is the last video of {author}:\n{title}\nPublished on {date}\nLink: {url}",
     "yt-invalid": "Oops, I couldn't find any YouTube channel with this ID!"
 }
