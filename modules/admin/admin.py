@@ -118,6 +118,8 @@ class Admin(commands.Cog):
         elif scope == "public-server":
             cmds = await self.bot.tree.sync(guild=SUPPORT_GUILD_ID)
             txt = f"{len(cmds)} app commands synced in the support server"
+        else:
+            raise ValueError(f"Invalid scope: {scope}")
         self.bot.app_commands_list = None
         self.bot.log.info(txt)
         emb = discord.Embed(description=txt, color=discord.Color.blue())
