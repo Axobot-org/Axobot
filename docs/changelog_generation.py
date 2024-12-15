@@ -79,6 +79,10 @@ def _convert_to_rst(text: str):
     text = re.sub(r"`([^`]+)`", r"``\1``", text)
     # convert markdown links
     text = re.sub(r"\[([^\]]+)\]\(<?([^>)]+)>?\)", r"`\1 <\2>`__", text)
+    # convert discord custom emojis
+    text = re.sub(r"<a?:(\w+):\d+>", '', text).replace("  ", " ")
+    # convert discord command mentions
+    text = re.sub(r"</([\w ]+):\d+>", r"``/\1``", text)
     return text
 
 if __name__ == "__main__":
