@@ -231,10 +231,10 @@ the end of the event? Don't forget to join our [support server](https://discord.
         today = await self.today()
         total_points = sum(item["points"] for item in items)
         text = "### "
-        if today.day == last_collect_day.day or last_collect_day.month != 12:
+        if (today - last_collect_day).days <= 1 or last_collect_day.month != 12:
             text += await self.bot._(interaction, "bot_events.calendar.today-gifts", points=total_points)
         else:
-            missed_days = min(today.day - last_collect_day.day, 3)
+            missed_days = min(today.day - last_collect_day.day - 1, 3)
             text = await self.bot._(interaction, "bot_events.calendar.today-gifts-late", days=missed_days, points=total_points)
         items_group: dict[int, int] = defaultdict(int)
         for item in items:
