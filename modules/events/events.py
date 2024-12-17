@@ -223,9 +223,6 @@ class Events(commands.Cog):
             # Timed tasks - every 20s
             if now.second%20 == 0 and self.bot.database_online:
                 await self.bot.task_handler.check_tasks()
-            # Clear old rank cards - every 20min
-            elif now.minute%20 == 0 and self.bot.database_online:
-                await self.bot.get_cog("Xp").clear_cards()
             # Bots lists updates - every day
             elif now.hour == 0 and now.day != self.dbl_last_sending.day:
                 await self.dbl_send_data()

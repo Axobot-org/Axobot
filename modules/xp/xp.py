@@ -1,6 +1,5 @@
 import datetime
 import logging
-import operator
 import os
 import random
 import re
@@ -623,6 +622,29 @@ class Xp(commands.Cog):
     async def on_xp_decay_loop_error(self, error: Exception):
         self.bot.dispatch("error", error, "XP decay loop has stopped  <@279568324260528128>")
 
+    @tasks.loop(hours=1)
+    async def clear_cards_loop(self, delete_all: bool=False):
+        """Delete outdated rank cards
+
+        A card is 'outdated' if the user generated another card with more total xp,
+        so we sort the files list by total xp (descending) and keep only the first card of each user"""
+        folder_path = "./assets/cards/"
+        files = os.listdir(folder_path)
+        done: set[str] = set()
+        for f in sorted([f.split('-') for f in files], key=lambda f: int(f[1]), reverse=True):
+            if delete_all or f[0] in done:
+                os.remove(folder_path + "-".join(f))
+            else:
+                done.add(f[0])
+
+    @clear_cards_loop.before_loop
+    async def before_clear_cards_loop(self):
+        await self.bot.wait_until_ready()
+
+    @clear_cards_loop.error
+    async def on_clear_cards_loop_error(self, error: Exception):
+        self.bot.dispatch("error", error, "XP decay loop has stopped  <@279568324260528128>")
+
 
     async def get_image_from_url(self, url: str):
         "Download an image from an url"
@@ -630,15 +652,6 @@ class Xp(commands.Cog):
             async with session.get(url) as response:
                 return Image.open(BytesIO(await response.read()))
 
-    async def clear_cards(self, delete_all: bool=False):
-        """Delete outdated rank cards"""
-        files =  os.listdir("./assets/cards/")
-        done: set[str] = set()
-        for f in sorted([f.split('-')+["./assets/cards/"+f] for f in files], key=operator.itemgetter(1), reverse=True):
-            if delete_all or f[0] in done:
-                os.remove(f[3])
-            else:
-                done.add(f[0])
 
     @app_commands.command(name="rank")
     @app_commands.describe(user="The user to get the rank of. If not specified, it will be you.")
