@@ -634,7 +634,7 @@ class Xp(commands.Cog):
         folder_path = "./assets/cards/"
         files = os.listdir(folder_path)
         done: set[str] = set()
-        for f in sorted([f.split('-') for f in files], key=lambda f: int(f[1]), reverse=True):
+        for f in sorted([f.split('-') for f in files if not f.startswith('.')], key=lambda f: int(f[1]), reverse=True):
             if delete_all or f[0] in done:
                 os.remove(folder_path + "-".join(f))
             else:
