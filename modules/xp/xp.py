@@ -71,11 +71,14 @@ class Xp(commands.Cog):
     async def cog_load(self):
         # pylint: disable=no-member
         self.xp_decay_loop.start()
+        self.clear_cards_loop.start()
 
     async def cog_unload(self):
         # pylint: disable=no-member
-        if self.xp_decay_loop.is_running():
+        if self.xp_decay_loop.is_running()():
             self.xp_decay_loop.stop()
+        if self.clear_cards_loop.is_running():
+            self.clear_cards_loop.stop()
 
     async def get_lvlup_chan(self, msg: discord.Message) -> (
             None | discord.DMChannel | discord.TextChannel | discord.VoiceChannel | discord.StageChannel | discord.Thread):
