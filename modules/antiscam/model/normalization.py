@@ -24,7 +24,7 @@ RE_DISCORD_USER = re.compile(r"<@!?\d{15,}>")
 RE_DISCORD_ROLE = re.compile(r"<@&\d{15,}>")
 RE_DISCORD_EMOJI = re.compile(r"<a?:\w+:\d+>")
 RE_DISCORD_CHANNEL = re.compile(r"<#&?\d{15,}>")
-RE_DISCORD_INVITE = re.compile(r"(https?://)?(www\.)?(discord\.(gg|io|me|li)|discordapp\.com/invite)/ ?[\w-]{3,}")
+RE_DISCORD_INVITE = re.compile(r"(https?://)?(www\.)?(discord\.(gg|io|me|li)|discordapp\.com/invite)/ ?[\w-]{3,}(?:\?[\w=&-]+)?")
 RE_DISCORD_ID = re.compile(r"(?P<pre>\D|^)(\d{17,19})(?P<post>\D|$)")
 
 STOP_WORDS = set(stopwords.words("english"))
