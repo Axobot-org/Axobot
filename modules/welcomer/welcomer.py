@@ -59,7 +59,6 @@ class Welcomer(commands.Cog):
         await self.bot.get_cog("ServerConfig").update_memberchannel(member.guild)
         if "MEMBER_VERIFICATION_GATE_ENABLED" not in member.guild.features or not member.pending:
             await self.send_msg(member, "leave")
-        await self.bot.get_cog("Events").check_user_left(member)
 
     async def _is_raider(self, member: discord.Member):
         "Use the AntiRaid cog to check if a member has just been detected as a potential raider"
