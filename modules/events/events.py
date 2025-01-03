@@ -195,8 +195,11 @@ class Events(commands.Cog):
             await self.add_points(-self.table["ban"])
 
 
+    @commands.Cog.listener(name="member_remove")
     async def check_user_left(self, member: discord.Member):
         "Check if someone has been kicked or banned by the bot"
+        if member.id == self.bot.user.id:
+            return
         try:
             async for entry in member.guild.audit_logs(user=member.guild.me, limit=15):
                 if entry.created_at < self.bot.utcnow() - datetime.timedelta(seconds=60):
