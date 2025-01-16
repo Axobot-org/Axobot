@@ -91,8 +91,8 @@ class WebRSS:
             title = feed["title"]
         else:
             title = '?'
-        post_text = await get_text_from_entry(entry)
-        post_description = await get_summary_from_entry(entry)
+        post_text = await get_text_from_entry({"link": link} | entry)
+        post_description = await get_summary_from_entry({"link": link} | entry)
         img: str | None = None
         if "media_thumbnail" in entry and len(entry["media_thumbnail"]) > 0 and "url" in entry["media_thumbnail"][0]:
             img = entry["media_thumbnail"][0]["url"]
