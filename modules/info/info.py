@@ -360,6 +360,8 @@ class Info(commands.Cog):
                 on_server = await self.bot._(interaction, "misc.yes")
             else:
                 on_server = await self.bot._(interaction, "misc.no")
+        else:
+            on_server = None
         embed = discord.Embed(colour=default_color)
         embed.set_thumbnail(url=user.display_avatar.with_static_format("png"))
         embed.set_author(name=user.display_name, icon_url=user.display_avatar.with_format("png"))
@@ -382,7 +384,8 @@ class Info(commands.Cog):
         # is bot
         embed.add_field(name="Bot", value=botb.capitalize())
         # is in server
-        embed.add_field(name=await self.bot._(interaction, "info.info.user-0"), value=on_server.capitalize())
+        if on_server:
+            embed.add_field(name=await self.bot._(interaction, "info.info.user-0"), value=on_server.capitalize())
         if user.bot:
             async with aiohttp.ClientSession(loop=self.bot.loop) as session:
                 guilds_count = await self.bot.get_cog("Partners").get_bot_guilds(user.id, session)
