@@ -32,6 +32,7 @@ QueryTypesTyping = Literal[
     "id",
 ]
 QUERY_TYPES: tuple[str] = get_args(QueryTypesTyping)
+DM_QUERY_TYPES: tuple[str] = ["emoji", "user", "invite", "id"]
 
 
 class Info(commands.Cog):
@@ -105,10 +106,10 @@ class Info(commands.Cog):
 
     async def _guess_query_type(self, query: str, interaction: discord.Interaction):
         "Guess the query type from the given query"
-        if query == "server":
+        if query == "server" and interaction.guild:
             return "server", interaction.guild
         ctx = await commands.Context.from_interaction(interaction)
-        for query_type in QUERY_TYPES:
+        for query_type in (QUERY_TYPES if interaction.guild else DM_QUERY_TYPES):
             try:
                 result = await self._convert_query(query, query_type, ctx)
             except commands.BadArgument:
