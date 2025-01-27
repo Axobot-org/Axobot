@@ -11,6 +11,7 @@ from discord.ext import commands, tasks
 from mysql.connector.errors import IntegrityError
 
 from core.bot_classes import Axobot
+from core.enums import ServerWarningType
 
 from .api.api_agent import TwitchApiAgent
 from .api.types import (GroupedStreamerDBObject, PlatformId, StreamersDBObject,
@@ -89,7 +90,8 @@ class Twitch(commands.Cog):
     async def db_remove_streamer(self, guild_id: int, platform: PlatformId, user_id: str):
         "Remove a streamer from the database"
         query = "DELETE FROM `streamers` WHERE `guild_id` = %s AND `platform` = %s AND `user_id` = %s AND `beta` = %s"
-        async with self.bot.db_main.write(query, (guild_id, platform, user_id, self.bot.beta), returnrowcount=True) as query_result:
+        async with self.bot.db_main.write(
+            query, (guild_id, platform, user_id, self.bot.beta), returnrowcount=True) as query_result:
             return query_result > 0
 
     async def db_set_streamer_status(self, platform: PlatformId, user_id: str, is_streaming: bool):
@@ -320,7 +322,12 @@ class Twitch(commands.Cog):
         "When a stream starts, send a notification to the subscribed guild"
         # Send notification
         if channel := await self.bot.get_config(guild.id, "streaming_channel"):
-            await self.send_stream_alert(stream, channel)
+            try:
+                await self.send_stream_alert(stream, channel)
+            except discord.Forbidden:
+                self.log.info("Cannot send notif to channel %s in guild %s: Forbidden", channel.id, guild.id)
+                self.bot.dispatch("server_warning", ServerWarningType.STREAM_NOTIFICATION_MISSING_PERMISSIONS,
+                                  guild, channel_id=channel.id, username=stream["user_name"])
         # Grant role
         if role := await self.bot.get_config(guild.id, "streaming_role"):
             if member := await self.find_streamer_in_guild(stream["user_name"], guild):
@@ -328,6 +335,8 @@ class Twitch(commands.Cog):
                     await member.add_roles(role, reason="Twitch streamer is live")
                 except discord.Forbidden:
                     self.log.info("Cannot add role %s to member %s in guild %s: Forbidden", role.id, member.id, guild.id)
+                    self.bot.dispatch("server_warning", ServerWarningType.STREAM_ROLE_MISSING_PERMISSIONS,
+                                    guild, role_id=role.id, member=member, username=stream["user_name"])
 
     @commands.Cog.listener()
     async def on_stream_ends(self, _streamer_name: str, guild: discord.Guild):
