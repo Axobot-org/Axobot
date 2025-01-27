@@ -18,6 +18,12 @@ class DatabaseKeys(TypedDict):
     password: str
     host: str
 
+class WebhooksKeys(TypedDict):
+    "Store the webhook URLs for the bot logs"
+    prod: str
+    loop: str
+    beta: str
+
 class TwitchKeys(TypedDict):
     "Store the client ID and secret for the Twitch API"
     client_id: str
@@ -27,6 +33,7 @@ class SecretKeys(TypedDict):
     "Map containing all the secret keys used by the bot"
     fernet_key: str
     database: DatabaseKeys
+    webhooks: WebhooksKeys
     dbl: str
     bitly: str
     discordbotlist: str

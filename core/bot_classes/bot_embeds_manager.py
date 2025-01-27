@@ -4,29 +4,21 @@ import aiohttp
 import discord
 
 if TYPE_CHECKING:
-    from core.bot_classes import Axobot
     from discord.types.embed import Embed as EmbedData
+    from core.bot_classes import Axobot
 
 class JSONEmbed(TypedDict):
     embed: "EmbedData"
 
 BASE_URL = "https://discord.com/api/webhooks/"
 
-__logs = {
-    "classic": "625369482587537408/uGh5fJWD6S1XAddNKOGohvyfXWOxPmsodQQPcp7iasagi5kJm8DKfbzmf7-UFb5u3gnd",
-    "loop": "625369730127101964/04KUvJxdb-Dl-BIkIdBydqZIoziBn5qy06YugIO3T4uOUYqMIT4YgoP6C0kv6CrrA8h8",
-    "members": "625369820145123328/6XENir2vqOBpGLIplX96AILOVIW4V_YVyqV8QhbtvVZ7Mcj9gKZpty8aaYF5JrkUCfl-",
-    "beta": "625369903389736960/9xvl-UiQg5_QEekMReMVjf8BtvULzWT1BsU7gG0EulhtPQGc8EoAcc2QoHyVAYKmwlsv",
-}
-
-
 async def send_log_embed(bot: "Axobot", embeds: list[discord.Embed | JSONEmbed], url: str | None=None):
     """Sensend_log_embedlist of embeds to a discord channel"""
+    webhook_maps = bot.secrets["webhooks"]
     if url is None:
-        url = BASE_URL + __logs["beta"] if bot.beta else BASE_URL + __logs["classic"]
-    else:
-        if url in __logs:
-            url = BASE_URL + __logs[url]
+        url = BASE_URL + webhook_maps["beta" if bot.beta else "prod"]
+    elif url in webhook_maps:
+        url = BASE_URL + webhook_maps[url]
     embeds_list = []
     for embed in embeds:
         if isinstance(embed, discord.Embed):
@@ -42,4 +34,3 @@ async def send_log_embed(bot: "Axobot", embeds: list[discord.Embed | JSONEmbed],
             if "error" in msg:
                 err_msg = f"`Webhook error {url}:` [{resp.status}] {msg}"
                 await bot.get_cog("Errors").senf_err_msg(err_msg)
-
