@@ -1587,7 +1587,20 @@ Minimum age required by anti-raid: {min_age}"
                 user = kwargs.get("user")
                 emb.description = f"**Could not remove temporary role** {role.mention} from user {user.mention}"
                 emb.add_field(name="Reason", value="Missing permission")
+            elif warning_type == ServerWarningType.STREAM_NOTIFICATION_MISSING_PERMISSIONS:
+                channel_mention = f"<#{kwargs.get('channel_id')}>"
+                username = kwargs.get("username")
+                emb.description = f"**Could not send stream notification** in channel {channel_mention}"
+                emb.add_field(name="Streamer username", value=username)
+            elif warning_type == ServerWarningType.STREAM_ROLE_MISSING_PERMISSIONS:
+                role_mention = f"<@&{kwargs.get('role_id')}>"
+                member_mention = kwargs.get("member").mention
+                username = kwargs.get("username")
+                emb.description = f"**Could not give stream role** to user {member_mention}"
+                emb.add_field(name="Streamer username", value=username)
+                emb.add_field(name="Role to give", value=role_mention)
             else:
+                self.bot.dispatch("error", f"Unknown warning type: {warning_type}")
                 return
             await self.validate_logs(guild, channel_ids, emb, "bot_warnings")
 

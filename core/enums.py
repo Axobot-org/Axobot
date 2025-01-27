@@ -78,3 +78,7 @@ class ServerWarningType(IntEnum):
     TEMP_ROLE_REMOVE_FORBIDDEN = 11
     # channel, feed_id
     RSS_INVALID_FORMAT = 12
+    # channel_id, username
+    STREAM_NOTIFICATION_MISSING_PERMISSIONS = 13
+    # role_id, member, username
+    STREAM_ROLE_MISSING_PERMISSIONS = 14
