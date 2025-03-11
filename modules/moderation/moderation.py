@@ -124,7 +124,7 @@ Slowmode works up to one message every 6h (21600s)
 
         def check(msg: discord.Message):
             # do not delete invocation message
-            if msg.interaction is not None and interaction.id == msg.interaction.id:
+            if msg.interaction_metadata is not None and interaction.id == msg.interaction_metadata.id:
                 return False
             if is_pinned is not None and msg.pinned != is_pinned:
                 return False
@@ -151,9 +151,9 @@ Slowmode works up to one message every 6h (21600s)
         def check(msg: discord.Message):
             if msg.pinned or (interaction.message and msg.id == interaction.message.id):
                 return False
-            if interaction is None or msg.interaction is None:
+            if interaction is None or msg.interaction_metadata is None:
                 return True
-            return interaction.id != msg.interaction.id
+            return interaction.id != msg.interaction_metadata.id
 
         try:
             deleted = await interaction.channel.purge(limit=number, check=check)
