@@ -1,5 +1,5 @@
-
 from math import ceil, floor
+
 
 async def get_level_from_xp_global(xp: int) -> int:
     "Returns the level from the given xp"

@@ -136,6 +136,7 @@
         "voice_channel": "Channel from which automatic voice chat rooms will be created: %{value}",
         "voice_channel_format": "Format of automatic voice channel names: %{value}",
         "voice_roles": "Roles given to members in a vocal channel: %{value}",
+        "voice_xp_per_min": "XP earned per minute in a voice channel: %{value}",
         "vote_emojis": "Emojis used for poll reactions: %{value}",
         "welcome": "Message sent when a member arrives: %{value}",
         "welcome_channel": "List of channels where to send welcome/leave messages: %{value}",
@@ -151,6 +152,7 @@
     },
     "value-deleted": "The \"%{option}\" option value has been reset to its default value",
     "warnings": {
+        "afk_channel": "Your server must have an AFK channel to use this option",
         "antiraid_perms_missing": {
             "one": "I need the '**%{perm}**' permission to apply the anti-raid protection",
             "many": "I'm missing several permissions to apply the anti-raid protection: **%{list}**"

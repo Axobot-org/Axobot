@@ -136,6 +136,7 @@
         "voice_channel": "Salon à partir duquel seront créés les salons vocaux automatiques : %{value}",
         "voice_channel_format": "Format des noms des salons vocaux automatiques : %{value}",
         "voice_roles": "Rôles donné aux membre en vocal : %{value}",
+        "voice_xp_per_min": "XP obtenus par minute en vocal : %{value}",
         "vote_emojis": "Emojis utilisés pour les réactions de vote : %{value}",
         "welcome": "Message envoyé lorsqu'un membre arrive : %{value}",
         "welcome_channel": "Liste des salons dans lesquels envoyer les messages de bienvenue/départs : %{value}",
@@ -151,6 +152,7 @@
     },
     "value-deleted": "La valeur de l'option '%{option}' a bien été remise à sa valeur par défaut",
     "warnings": {
+        "afk_channel": "Votre serveur doit disposer d'un salon AFK pour utiliser cette option.",
         "antiraid_perms_missing": {
             "one": "J'ai besoin de la permission '**%{perm}**' pour appliquer la protection anti-raid",
             "many": "Il me manque plusieurs permissions pour appliquer la protection anti-raid : **%{list}**"

@@ -1,3 +1,4 @@
+import asyncio
 import datetime
 import logging
 import os
@@ -22,9 +23,11 @@ from core.tips import UserTip
 
 from .cards import CardGeneration
 from .src.top_paginator import LeaderboardScope, TopPaginator
+from .src.types import UserVoiceConnection
 from .src.xp_math import (get_level_from_xp_global, get_level_from_xp_mee6,
                           get_xp_from_level_global, get_xp_from_level_mee6)
 
+XpSystemType = Literal["global", "mee6-like", "local"]
 
 class Xp(commands.Cog):
     "XP system"
@@ -34,19 +37,30 @@ class Xp(commands.Cog):
         self.file = "xp"
         self.log = logging.getLogger("bot.xp")
 
-        self.cache: dict[int | Literal["global"], dict[int, tuple[int, int]]] = {"global": {}}
-        self.levels = [0]
+        # map userId -> (last xp timestamp, xp count)
+        self.leaderboard_cache: dict[int | Literal["global"], dict[int, tuple[int, int]]] = {"global": {}}
+        # set of users suspected of cheating
+        self.sus: set[int] | None = None
+        # map of (guildId, userId) -> voice connection data
+        self.voice_cache: dict[tuple[int, int], UserVoiceConnection] = {}
+        # embed color for rank/top messages
         self.embed_color = discord.Colour(0xffcf50)
+        # database table used to store global xp (local systems are stored in a different database)
         self.table = "xp_beta" if bot.beta else "xp"
-        self.classic_xp_cooldown = 5 # seconds between each xp gain for global/local
-        self.mee6_xp_cooldown = 60 # seconds between each xp gain for mee6-like
+        # seconds between each xp gain for global/local
+        self.classic_xp_cooldown = 5
+        # seconds between each xp gain for mee6-like
+        self.mee6_xp_cooldown = 60
+        # minimal length of a message to grant xp
         self.minimal_size = 5
+        # maximum rate of each character in a message
         self.spam_rate = 0.20
+        # xp granted per character
         self.xp_per_char = 0.11
+        # maximum xp granted per message
         self.max_xp_per_msg = 70
-        self.sus = None
+        # default xp card style
         self.default_xp_style = "dark"
-        self.types = ["global","mee6-like","local"]
 
         verdana_font = "./assets/fonts/Verdana.ttf"
         roboto_font = "./assets/fonts/Roboto-Medium.ttf"
@@ -75,21 +89,21 @@ class Xp(commands.Cog):
 
     async def cog_unload(self):
         # pylint: disable=no-member
-        if self.xp_decay_loop.is_running()():
+        if self.xp_decay_loop.is_running():
             self.xp_decay_loop.stop()
         if self.clear_cards_loop.is_running():
             self.clear_cards_loop.stop()
 
-    async def get_lvlup_chan(self, msg: discord.Message) -> (
+    async def get_lvlup_channel(self, member: discord.Member, fallback: discord.abc.GuildChannel | None) -> (
             None | discord.DMChannel | discord.TextChannel | discord.VoiceChannel | discord.StageChannel | discord.Thread):
         "Find the channel where to send the levelup message"
-        value = await self.bot.get_config(msg.guild.id, "levelup_channel")
+        value = await self.bot.get_config(member.guild.id, "levelup_channel")
         if value == "none":
             return None
-        if value == "any":
-            return msg.channel
-        if value == "dm":
-            return msg.author.dm_channel or await msg.author.create_dm()
+        if value == "any" and fallback is not None:
+            return fallback
+        if value in ("dm", "any"):
+            return member.dm_channel or await member.create_dm()
         return value
 
     @commands.Cog.listener()
@@ -97,13 +111,40 @@ class Xp(commands.Cog):
         """Remove role rewards when a role is deleted"""
         await self.db_remove_rr_from_role(role.guild.id, role.id)
 
+    @commands.Cog.listener()
+    async def on_voice_state_update(self, member: discord.Member, before: discord.VoiceState, after: discord.VoiceState):
+        """Register voice activity for potential XP rewards"""
+        if member.bot or member.guild is None or not self.bot.database_online or not self.bot.xp_enabled:
+            return
+        if isinstance(before.channel, discord.VoiceChannel) and isinstance(after.channel, discord.VoiceChannel):
+            return
+        if (
+            before.channel is None
+            and after.channel != member.guild.afk_channel
+            and isinstance(after.channel, discord.VoiceChannel)
+        ): # user joined a channel
+            self.voice_cache[(member.guild.id, member.id)] = UserVoiceConnection()
+        elif (
+            after.channel is None
+            and before.channel != member.guild.afk_channel
+            and isinstance(before.channel, discord.VoiceChannel)
+        ): # user left a channel
+            if connection_data := self.voice_cache.pop((member.guild.id, member.id), None):
+                if member.guild.afk_channel is None or member.guild.afk_timeout == 0:
+                    return
+                used_xp_type: str = await self.bot.get_config(member.guild.id, "xp_type")
+                if used_xp_type not in {"local", "mee6-like"}:
+                    return
+                if await self.is_member_restricted_from_xp(member, before.channel):
+                    return
+                await self.register_voice_xp(member, used_xp_type, before.channel.id, connection_data)
+
     @commands.Cog.listener(name="on_message")
     async def add_xp(self, msg: discord.Message):
-        """Attribue un certain nombre d'xp à un message"""
+        """Check conditions and grant xp to a user for written messages"""
         if msg.author.bot or msg.is_system() or msg.flags.forwarded or msg.guild is None or not self.bot.xp_enabled:
             return
-        used_xp_type: str = await self.bot.get_config(msg.guild.id, "xp_type")
-        if await self.check_noxp(msg) or not await self.bot.get_config(msg.guild.id, "enable_xp"):
+        if await self.is_member_restricted_from_xp(msg.author, msg.channel):
             return
         rate: float = await self.bot.get_config(msg.guild.id, "xp_rate")
         if self.sus is None:
@@ -111,72 +152,84 @@ class Xp(commands.Cog):
                 await self.reload_sus()
             else:
                 self.sus = set()
+        used_xp_type: str = await self.bot.get_config(msg.guild.id, "xp_type")
         if self.bot.zombie_mode:
             return
         if used_xp_type == "global":
-            await self.add_xp_0(msg, rate)
+            await self.register_written_xp__global(msg, rate)
         elif used_xp_type == "mee6-like":
-            await self.add_xp_1(msg, rate)
+            await self.register_written_xp__mee6(msg, rate)
         elif used_xp_type == "local":
-            await self.add_xp_2(msg, rate)
+            await self.register_written_xp__local(msg, rate)
 
-    async def add_xp_0(self, msg: discord.Message, _rate: float):
+    async def register_voice_xp(self, member: discord.Member, used_xp_type: XpSystemType,
+                                voice_channel_id: int,
+                                connection_data: UserVoiceConnection):
+        """Register voice activity for potential XP rewards
+        This method assumes the xp system is not 'global', and always write to the guild table instead of the global table"""
+        valuable_time_spent = connection_data.time_since_connection() - member.guild.afk_timeout * 1.5
+        if valuable_time_spent < 0:
+            # user may have been AFK
+            return
+        time_since_last_xp = connection_data.time_since_last_xp()
+        if time_since_last_xp is None:
+            time_since_last_xp = valuable_time_spent
+        if time_since_last_xp is not None and time_since_last_xp < 60:
+            # already got some XP for the last minute
+            return
+        if xp_per_minute := await self.bot.get_config(member.guild.id, "voice_xp_per_min"):
+            prev_points = await self.get_member_xp(member, member.guild.id)
+            xp = round(xp_per_minute * time_since_last_xp / 60)
+            await self.db_set_xp(member.id, xp, "add", member.guild.id)
+            connection_data.last_xp_time = time.time()
+            await asyncio.sleep(0.5) # wait for potential temporary channels to be deleted
+            try:
+                voice_channel = await member.guild.fetch_channel(voice_channel_id)
+            except discord.HTTPException:
+                voice_channel = None
+            await self.update_cache_and_execute_actions(member, voice_channel, used_xp_type, prev_points, xp)
+
+    async def register_written_xp__global(self, msg: discord.Message, _rate: float):
         """Global xp type"""
-        if msg.author.id in self.cache["global"]:
-            if time.time() - self.cache["global"][msg.author.id][0] < self.classic_xp_cooldown:
+        if msg.author.id in self.leaderboard_cache["global"]:
+            if time.time() - self.leaderboard_cache["global"][msg.author.id][0] < self.classic_xp_cooldown:
                 return
         content = msg.clean_content
         if len(content) < self.minimal_size or await self.check_spam(content):
             return
-        if len(self.cache["global"]) == 0:
+        if len(self.leaderboard_cache["global"]) == 0:
             await self.db_load_cache(None)
         giv_points = await self.calc_xp(msg)
         if giv_points == 0:
             return
-        if msg.author.id in self.cache["global"]:
-            prev_points = self.cache["global"][msg.author.id][1]
-        else:
-            prev_points = await self.db_get_xp(msg.author.id, None) or 0
+        prev_points = await self.get_member_xp(msg.author, "global")
         await self.db_set_xp(msg.author.id, giv_points, "add")
         # check for sus people
         if msg.author.id in self.sus:
             await self.send_sus_msg(msg, giv_points)
-        self.cache["global"][msg.author.id] = [round(time.time()), prev_points+giv_points]
-        new_lvl, _, _ = await self.calc_level(self.cache["global"][msg.author.id][1], "global")
-        ex_lvl, _, _ = await self.calc_level(prev_points, "global")
-        if 0 < ex_lvl < new_lvl:
-            await self.send_levelup(msg, new_lvl)
-            await self.give_rr(msg.author, new_lvl, await self.db_list_rr(msg.guild.id))
+        await self.update_cache_and_execute_actions(msg.author, msg.channel, "global", prev_points, giv_points)
 
-    async def add_xp_1(self, msg:discord.Message, rate: float):
+    async def register_written_xp__mee6(self, msg:discord.Message, rate: float):
         """MEE6-like xp type"""
-        if msg.guild.id not in self.cache:
+        if msg.guild.id not in self.leaderboard_cache:
             await self.db_load_cache(msg.guild.id)
-        if msg.author.id in self.cache[msg.guild.id]:
-            if time.time() - self.cache[msg.guild.id][msg.author.id][0] < self.mee6_xp_cooldown:
+        if msg.author.id in self.leaderboard_cache[msg.guild.id]:
+            if time.time() - self.leaderboard_cache[msg.guild.id][msg.author.id][0] < self.mee6_xp_cooldown:
                 return
         giv_points = round(random.randint(15,25) * rate)
-        if msg.author.id in self.cache[msg.guild.id]:
-            prev_points = self.cache[msg.guild.id][msg.author.id][1]
-        else:
-            prev_points = await self.db_get_xp(msg.author.id, msg.guild.id) or 0
+        prev_points = await self.get_member_xp(msg.author, msg.guild.id)
         await self.db_set_xp(msg.author.id, giv_points, "add", msg.guild.id)
         # check for sus people
         if msg.author.id in self.sus:
             await self.send_sus_msg(msg, giv_points)
-        self.cache[msg.guild.id][msg.author.id] = [round(time.time()), prev_points+giv_points]
-        new_lvl, _, _ = await self.calc_level(self.cache[msg.guild.id][msg.author.id][1], "mee6-like")
-        ex_lvl, _, _ = await self.calc_level(prev_points, "mee6-like")
-        if 0 < ex_lvl < new_lvl:
-            await self.send_levelup(msg, new_lvl)
-            await self.give_rr(msg.author, new_lvl, await self.db_list_rr(msg.guild.id))
+        await self.update_cache_and_execute_actions(msg.author, msg.channel, "mee6-like", prev_points, giv_points)
 
-    async def add_xp_2(self, msg:discord.Message, rate: float):
+    async def register_written_xp__local(self, msg:discord.Message, rate: float):
         """Local xp type"""
-        if msg.guild.id not in self.cache:
+        if msg.guild.id not in self.leaderboard_cache:
             await self.db_load_cache(msg.guild.id)
-        if msg.author.id in self.cache[msg.guild.id]:
-            if time.time() - self.cache[msg.guild.id][msg.author.id][0] < self.classic_xp_cooldown:
+        if msg.author.id in self.leaderboard_cache[msg.guild.id]:
+            if time.time() - self.leaderboard_cache[msg.guild.id][msg.author.id][0] < self.classic_xp_cooldown:
                 return
         content = msg.clean_content
         if len(content) < self.minimal_size or await self.check_spam(content):
@@ -184,73 +237,81 @@ class Xp(commands.Cog):
         giv_points = round(await self.calc_xp(msg) * rate)
         if giv_points == 0:
             return
-        if msg.author.id in self.cache[msg.guild.id]:
-            prev_points = self.cache[msg.guild.id][msg.author.id][1]
-        else:
-            prev_points = await self.db_get_xp(msg.author.id, msg.guild.id) or 0
+        prev_points = await self.get_member_xp(msg.author, msg.guild.id)
         await self.db_set_xp(msg.author.id, giv_points, "add", msg.guild.id)
         # check for sus people
         if msg.author.id in self.sus:
             await self.send_sus_msg(msg, giv_points)
-        self.cache[msg.guild.id][msg.author.id] = [round(time.time()), prev_points+giv_points]
-        new_lvl, _, _ = await self.calc_level(self.cache[msg.guild.id][msg.author.id][1], "local")
-        ex_lvl, _, _ = await self.calc_level(prev_points, "local")
-        if 0 < ex_lvl < new_lvl:
-            await self.send_levelup(msg, new_lvl)
-            await self.give_rr(msg.author, new_lvl, await self.db_list_rr(msg.guild.id))
+        await self.update_cache_and_execute_actions(msg.author, msg.channel, "local", prev_points, giv_points)
 
-
-    async def check_noxp(self, msg: discord.Message) -> bool:
-        "Returns True if the user cannot get xp in these conditions"
-        if msg.guild is None:
-            return False
-        chans: list[discord.abc.Messageable] | None = await self.bot.get_config(msg.guild.id, "noxp_channels")
-        if chans is not None and msg.channel in chans:
+    async def is_member_restricted_from_xp(self, member: discord.Member, channel: discord.abc.GuildChannel) -> bool:
+        "Returns True if the user cannot get xp due to the guild configuration"
+        if not await self.bot.get_config(channel.guild.id, "enable_xp"):
             return True
-        roles: list[discord.Role] | None = await self.bot.get_config(msg.guild.id, "noxp_roles")
+        chans: list[discord.abc.Messageable] | None = await self.bot.get_config(channel.guild.id, "noxp_channels")
+        if chans is not None and channel in chans:
+            return True
+        roles: list[discord.Role] | None = await self.bot.get_config(channel.guild.id, "noxp_roles")
         if roles is not None:
             for role in roles:
-                if role in msg.author.roles:
+                if role in member.roles:
                     return True
         return False
 
+    async def get_member_xp(self, member: discord.Member, system_id: int | Literal["global"]):
+        "Get the current member XP value from the cache, or fetch from database"
+        if member.id in self.leaderboard_cache.get(system_id, {}):
+            return self.leaderboard_cache[system_id][member.id][1]
+        if system_id == "global":
+            return await self.db_get_xp(member.id, None) or 0
+        return await self.db_get_xp(member.id, member.guild.id) or 0
 
-    async def send_levelup(self, msg: discord.Message, lvl: int):
+    async def update_cache_and_execute_actions(self, member: discord.Member, channel: discord.abc.GuildChannel,
+                                               system: XpSystemType, prev_points: int, points_to_give: int):
+        """Update the XP cache, check for new level reached, and if need be send levelup/give role rewards"""
+        system_id = "global" if system == "global" else member.guild.id
+        self.leaderboard_cache[system_id][member.id] = [round(time.time()), prev_points+points_to_give]
+        new_lvl, _, _ = await self.calc_level(self.leaderboard_cache[system_id][member.id][1], system)
+        ex_lvl, _, _ = await self.calc_level(prev_points, system)
+        if 0 < ex_lvl < new_lvl:
+            await self.send_levelup(member, channel, new_lvl)
+            await self.give_rr(member, new_lvl, await self.db_list_rr(system_id))
+
+    async def send_levelup(self, member: discord.Member, channel: discord.abc.GuildChannel | None, lvl: int):
         """Envoie le message de levelup"""
-        if self.bot.zombie_mode:
+        if self.bot.zombie_mode or member.guild is None:
             return
-        if msg.guild is None:
-            return
-        destination = await self.get_lvlup_chan(msg)
+        destination = await self.get_lvlup_channel(member, channel)
         # if no destination could be found, or destination is in guild and bot can't send messages: abort
         if destination is None or (
-            not isinstance(destination, discord.DMChannel) and not destination.permissions_for(msg.guild.me).send_messages
+            not isinstance(destination, discord.DMChannel) and not destination.permissions_for(member.guild.me).send_messages
         ):
             return
-        text: str | None = await self.bot.get_config(msg.guild.id, "levelup_msg")
+        text: str | None = await self.bot.get_config(member.guild.id, "levelup_msg")
+        i18n_source = channel or member.guild
         if text is None or len(text) == 0:
-            text = random.choice(await self.bot._(msg.channel, "xp.default_levelup"))
+            text = random.choice(await self.bot._(i18n_source, "xp.default_levelup"))
             while "{random}" not in text and random.random() < 0.7:
-                text = random.choice(await self.bot._(msg.channel, "xp.default_levelup"))
+                text = random.choice(await self.bot._(i18n_source, "xp.default_levelup"))
         if "{random}" in text:
-            item = random.choice(await self.bot._(msg.channel, "xp.levelup-items"))
+            item = random.choice(await self.bot._(i18n_source, "xp.levelup-items"))
         else:
             item = ''
         text = text.format_map(SafeDict(
-            user=msg.author.mention,
+            user=member.mention,
             level=lvl,
             random=item,
-            username=msg.author.display_name
+            username=member.display_name
         ))
-        silent_message: bool = await self.bot.get_config(msg.guild.id, "levelup_silent_mention")
-        if isinstance(destination, discord.DMChannel) and msg.guild:
+        silent_message: bool = await self.bot.get_config(member.guild.id, "levelup_silent_mention")
+        if isinstance(destination, discord.DMChannel) and member.guild:
             embed = discord.Embed(
                 title=await self.bot._(destination, "xp.levelup-dm.title"),
                 color=discord.Color.gold(),
                 description=text
             )
-            footer = await self.bot._(destination, "xp.levelup-dm.footer", servername=msg.guild.name)
-            embed.set_footer(text=footer, icon_url=msg.guild.icon)
+            footer = await self.bot._(destination, "xp.levelup-dm.footer", servername=member.guild.name)
+            embed.set_footer(text=footer, icon_url=member.guild.icon)
             await destination.send(embed=embed, silent=silent_message)
         else:
             await destination.send(text, silent=silent_message)
@@ -278,7 +339,7 @@ class Xp(commands.Cog):
             content = content.replace(match.group(0),"")
         return min(round(len(content)*self.xp_per_char), self.max_xp_per_msg)
 
-    async def calc_level(self, xp: int, system: Literal["global", "mee6-like", "local"]):
+    async def calc_level(self, xp: int, system: XpSystemType):
         """Calculate the level corresponding to a given xp amount
         Returns the current level, the xp needed for the next level and the xp needed for the current level"""
         if system == "mee6-like":
@@ -432,12 +493,12 @@ class Xp(commands.Cog):
         async with db.read(query, (user_id,), fetchone=True) as query_result:
             if query_result:
                 g = "global" if guild_id is None else guild_id
-                if isinstance(g, int) and g not in self.cache:
+                if isinstance(g, int) and g not in self.leaderboard_cache:
                     await self.db_load_cache(g)
-                if user_id in self.cache[g].keys():
-                    self.cache[g][user_id][1] = query_result["xp"]
+                if user_id in self.leaderboard_cache[g].keys():
+                    self.leaderboard_cache[g][user_id][1] = query_result["xp"]
                 else:
-                    self.cache[g][user_id] = [round(time.time())-60, query_result ["xp"]]
+                    self.leaderboard_cache[g][user_id] = [round(time.time())-60, query_result ["xp"]]
         return query_result["xp"] if query_result else None
 
     async def db_get_users_count(self, guild_id: int | None=None):
@@ -471,7 +532,7 @@ class Xp(commands.Cog):
             self.log.info("Loading XP cache (guild %s)", guild_id)
             table = await self.get_table_name(guild_id, False)
             if table is None:
-                self.cache[guild_id] = {}
+                self.leaderboard_cache[guild_id] = {}
                 return
             db = self.bot.db_xp
             query = f"SELECT `userID`,`xp` FROM `{table}` WHERE `banned`=0"
@@ -479,14 +540,14 @@ class Xp(commands.Cog):
             if not isinstance(rows, list):
                 raise TypeError(f"rows should be a list, received {type(rows)}")
         if guild_id is None:
-            self.cache["global"].clear()
+            self.leaderboard_cache["global"].clear()
             for row in rows:
-                self.cache["global"][row["userID"]] = [round(time.time())-60, int(row["xp"])]
+                self.leaderboard_cache["global"][row["userID"]] = [round(time.time())-60, int(row["xp"])]
         else:
-            if guild_id not in self.cache:
-                self.cache[guild_id] = {}
+            if guild_id not in self.leaderboard_cache:
+                self.leaderboard_cache[guild_id] = {}
             for row in rows:
-                self.cache[guild_id][row["userID"]] = [round(time.time())-60, int(row["xp"])]
+                self.leaderboard_cache[guild_id][row["userID"]] = [round(time.time())-60, int(row["xp"])]
 
     async def db_get_top(self, limit: int=None, guild: discord.Guild=None):
         "Get the top of the guild (or the global top)"
@@ -605,8 +666,8 @@ class Xp(commands.Cog):
             async with self.bot.db_xp.write(decay_query.format(table=guild_id), (value,), returnrowcount=True) as row_count:
                 users_count += row_count
                 # if xp has been edited, invalidate cache
-                if row_count > 0 and guild_id in self.cache:
-                    del self.cache[guild_id]
+                if row_count > 0 and guild_id in self.leaderboard_cache:
+                    del self.leaderboard_cache[guild_id]
             # remove members with 0xp or less
             async with self.bot.db_xp.write(cleanup_query.format(table=guild_id), returnrowcount=True) as row_count:
                 self.log.info("xp decay: removed %s members from guild %s", row_count, guild_id)
@@ -907,9 +968,9 @@ class Xp(commands.Cog):
         # confirm success
         await interaction.followup.send(await self.bot._(interaction, "xp.change-xp-ok", user=str(user), xp=xp))
         # update cache
-        if interaction.guild_id not in self.cache:
+        if interaction.guild_id not in self.leaderboard_cache:
             await self.db_load_cache(interaction.guild_id)
-        self.cache[interaction.guild_id][user.id] = [round(time.time()), xp]
+        self.leaderboard_cache[interaction.guild_id][user.id] = [round(time.time()), xp]
         # send internal logs of the change
         desc = f"XP of user {user} `{user.id}` edited (from {prev_xp} to {xp}) in server `{interaction.guild_id}`"
         self.log.info(desc)
