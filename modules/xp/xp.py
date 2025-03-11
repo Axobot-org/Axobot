@@ -146,7 +146,6 @@ class Xp(commands.Cog):
             return
         if await self.is_member_restricted_from_xp(msg.author, msg.channel):
             return
-        rate: float = await self.bot.get_config(msg.guild.id, "xp_rate")
         if self.sus is None:
             if self.bot.get_cog("Utilities"):
                 await self.reload_sus()
@@ -156,8 +155,10 @@ class Xp(commands.Cog):
         if self.bot.zombie_mode:
             return
         if used_xp_type == "global":
-            await self.register_written_xp__global(msg, rate)
-        elif used_xp_type == "mee6-like":
+            await self.register_written_xp__global(msg)
+            return
+        rate: float = await self.bot.get_config(msg.guild.id, "xp_rate")
+        if used_xp_type == "mee6-like":
             await self.register_written_xp__mee6(msg, rate)
         elif used_xp_type == "local":
             await self.register_written_xp__local(msg, rate)
@@ -179,7 +180,8 @@ class Xp(commands.Cog):
             return
         if xp_per_minute := await self.bot.get_config(member.guild.id, "voice_xp_per_min"):
             prev_points = await self.get_member_xp(member, member.guild.id)
-            xp = round(xp_per_minute * time_since_last_xp / 60)
+            rate: float = await self.bot.get_config(member.guild.id, "xp_rate")
+            xp = round(xp_per_minute * rate * time_since_last_xp / 60)
             await self.db_set_xp(member.id, xp, "add", member.guild.id)
             connection_data.last_xp_time = time.time()
             await asyncio.sleep(0.5) # wait for potential temporary channels to be deleted
@@ -189,7 +191,7 @@ class Xp(commands.Cog):
                 voice_channel = None
             await self.update_cache_and_execute_actions(member, voice_channel, used_xp_type, prev_points, xp)
 
-    async def register_written_xp__global(self, msg: discord.Message, _rate: float):
+    async def register_written_xp__global(self, msg: discord.Message):
         """Global xp type"""
         if msg.author.id in self.leaderboard_cache["global"]:
             if time.time() - self.leaderboard_cache["global"][msg.author.id][0] < self.classic_xp_cooldown:
