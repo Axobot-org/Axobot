@@ -320,7 +320,7 @@ class AntiScam(commands.Cog):
         ):
             return
         await self.bot.wait_until_ready()
-        if msg.guild is not None and not await self.bot.get_config(msg.guild.id, "anti_scam"):
+        if not self.bot.database_online or msg.guild is None or not await self.bot.get_config(msg.guild.id, "anti_scam"):
             return
         # if content already analyzed, get the harmless probability from cache
         if (result := self.recent_scans.get(msg.content)) is not None:
@@ -360,7 +360,7 @@ class AntiScam(commands.Cog):
     @commands.Cog.listener()
     async def on_interaction(self, interaction: discord.Interaction):
         "Receive interactions from an antiscam report embed and take actions based on it"
-        if interaction.type != discord.InteractionType.component:
+        if interaction.type != discord.InteractionType.component or not self.bot.database_online:
             return
         btn_id: str = interaction.data.get("custom_id", None)
         if btn_id is None or '-' not in btn_id:
