@@ -100,7 +100,7 @@ class Xp(commands.Cog):
     @commands.Cog.listener(name="on_message")
     async def add_xp(self, msg: discord.Message):
         """Attribue un certain nombre d'xp à un message"""
-        if msg.author.bot or msg.is_system() or msg.guild is None or not self.bot.xp_enabled:
+        if msg.author.bot or msg.is_system() or msg.flags.forwarded or msg.guild is None or not self.bot.xp_enabled:
             return
         used_xp_type: str = await self.bot.get_config(msg.guild.id, "xp_type")
         if await self.check_noxp(msg) or not await self.bot.get_config(msg.guild.id, "enable_xp"):
