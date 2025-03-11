@@ -109,7 +109,8 @@ class Xp(commands.Cog):
     @commands.Cog.listener()
     async def on_guild_role_delete(self, role: discord.Role):
         """Remove role rewards when a role is deleted"""
-        await self.db_remove_rr_from_role(role.guild.id, role.id)
+        if self.bot.database_online:
+            await self.db_remove_rr_from_role(role.guild.id, role.id)
 
     @commands.Cog.listener()
     async def on_voice_state_update(self, member: discord.Member, before: discord.VoiceState, after: discord.VoiceState):
@@ -142,7 +143,9 @@ class Xp(commands.Cog):
     @commands.Cog.listener(name="on_message")
     async def add_xp(self, msg: discord.Message):
         """Check conditions and grant xp to a user for written messages"""
-        if msg.author.bot or msg.is_system() or msg.flags.forwarded or msg.guild is None or not self.bot.xp_enabled:
+        if not self.bot.xp_enabled or not self.bot.database_online:
+            return
+        if msg.author.bot or msg.is_system() or msg.flags.forwarded or msg.guild is None:
             return
         if await self.is_member_restricted_from_xp(msg.author, msg.channel):
             return
