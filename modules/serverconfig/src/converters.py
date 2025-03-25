@@ -14,6 +14,8 @@ log = logging.getLogger("bot")
 UnicodeEmoji = str
 EmojisManagerInstance = EmojisManager(None)
 
+GuildMessageableChannel = discord.TextChannel | discord.Thread | discord.VoiceChannel | discord.StageChannel
+
 class IntOptionRepresentation(TypedDict):
     "Configuration for an integer option"
     type: Literal["int"]
@@ -507,7 +509,7 @@ class TextChannelsListOption(OptionConverter):
     "Option converter for a list of discord text channel values"
     @staticmethod
     async def from_raw(raw: str, representation: TextChannelsListOptionRepresentation, guild: discord.Guild
-                       ) -> list[discord.TextChannel | discord.Thread]:
+                       ) -> list[GuildMessageableChannel]:
         channel_ids = json.loads(raw)
         if any(not isinstance(id, int) for id in channel_ids):
             log.warning("[TextChannelsListConverter] Invalid channel ids: %s", channel_ids)
@@ -524,28 +526,32 @@ class TextChannelsListOption(OptionConverter):
         return channels
 
     @staticmethod
-    def to_raw(value: list[discord.TextChannel | discord.Thread]):
+    def to_raw(value: list[GuildMessageableChannel]):
         return json.dumps([channel.id for channel in value])
 
     @staticmethod
-    def to_display(_option_name, value: list[discord.TextChannel | discord.Thread]):
+    def to_display(_option_name, value: list[GuildMessageableChannel]):
         return ", ".join(channel.mention for channel in value)
 
     @staticmethod
     async def from_input(raw: str, representation: TextChannelsListOptionRepresentation, guild: discord.Guild,
                          interaction: discord.Interaction):
-        channels: list[discord.TextChannel | discord.Thread] = []
+        channels: list[GuildMessageableChannel] = []
         ctx = await commands.Context.from_interaction(interaction)
         for word in raw.split(" "):
             try:
                 channel = await commands.GuildChannelConverter().convert(ctx, word)
             except commands.BadArgument:
                 raise ValueError("Invalid channel", "CHANNEL_INVALID", representation, word) from None
-            if not isinstance(channel, discord.TextChannel | discord.Thread):
+            if not isinstance(channel, GuildMessageableChannel):
                 raise ValueError("Channel is not a text channel", "CHANNEL_NOT_TEXT", representation)
             if (not representation["allow_threads"]) and isinstance(channel, discord.Thread):
                 raise ValueError("Threads are not allowed", "CHANNEL_THREAD", representation)
-            if (not representation["allow_announcement_channels"]) and channel.is_news():
+            if (
+                (not representation["allow_announcement_channels"])
+                and isinstance(channel, discord.TextChannel | discord.Thread)
+                and channel.is_news()
+            ):
                 raise ValueError("Announcement channels are not allowed", "CHANNEL_ANNOUNCEMENT", representation)
             if not (representation["allow_non_nsfw_channels"] or channel.is_nsfw()):
                 raise ValueError("Non-NSFW channels are not allowed", "CHANNEL_NON_NSFW", representation)

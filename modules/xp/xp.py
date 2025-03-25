@@ -20,6 +20,7 @@ from PIL import Image, ImageFont
 from core.bot_classes import Axobot
 from core.safedict import SafeDict
 from core.tips import UserTip
+from modules.serverconfig.src.converters import GuildMessageableChannel
 
 from .cards import CardGeneration
 from .src.top_paginator import LeaderboardScope, TopPaginator
@@ -253,8 +254,8 @@ class Xp(commands.Cog):
         "Returns True if the user cannot get xp due to the guild configuration"
         if not await self.bot.get_config(channel.guild.id, "enable_xp"):
             return True
-        chans: list[discord.abc.Messageable] | None = await self.bot.get_config(channel.guild.id, "noxp_channels")
-        if chans is not None and channel in chans:
+        noxp_channels: list[GuildMessageableChannel] | None = await self.bot.get_config(channel.guild.id, "noxp_channels")
+        if noxp_channels is not None and channel in noxp_channels:
             return True
         roles: list[discord.Role] | None = await self.bot.get_config(channel.guild.id, "noxp_roles")
         if roles is not None:
