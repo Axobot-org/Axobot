@@ -13,6 +13,7 @@ from typing import Any, Literal
 import aiohttp
 import discord
 from discord import app_commands
+from discord.channel import VocalGuildChannel
 from discord.ext import commands, tasks
 from mysql.connector.errors import ProgrammingError as MySQLProgrammingError
 from PIL import Image, ImageFont
@@ -85,11 +86,14 @@ class Xp(commands.Cog):
 
     async def cog_load(self):
         # pylint: disable=no-member
+        self.voice_xp_loop.start()
         self.xp_decay_loop.start()
         self.clear_cards_loop.start()
 
     async def cog_unload(self):
         # pylint: disable=no-member
+        if self.voice_xp_loop.is_running():
+            self.voice_xp_loop.stop()
         if self.xp_decay_loop.is_running():
             self.xp_decay_loop.stop()
         if self.clear_cards_loop.is_running():
@@ -118,26 +122,34 @@ class Xp(commands.Cog):
         """Register voice activity for potential XP rewards"""
         if member.bot or member.guild is None or not self.bot.database_online or not self.bot.xp_enabled:
             return
-        if isinstance(before.channel, discord.VoiceChannel) and isinstance(after.channel, discord.VoiceChannel):
-            return
         if (
             before.channel is None
             and after.channel != member.guild.afk_channel
-            and isinstance(after.channel, discord.VoiceChannel)
+            and isinstance(after.channel, VocalGuildChannel)
         ): # user joined a channel
             self.voice_cache[(member.guild.id, member.id)] = UserVoiceConnection()
         elif (
-            after.channel is None
-            and before.channel != member.guild.afk_channel
-            and isinstance(before.channel, discord.VoiceChannel)
-        ): # user left a channel
-            if connection_data := self.voice_cache.pop((member.guild.id, member.id), None):
+            before.channel != member.guild.afk_channel
+            and isinstance(before.channel, VocalGuildChannel)
+        ): # user changed state (eg. unmute) or left a voice channel
+            if (member.guild.id, member.id) not in self.voice_cache and after.channel is not None:
+                # user was not in the cache, but still in a voice channel
+                self.voice_cache[(member.guild.id, member.id)] = UserVoiceConnection()
+            if connection_data := self.voice_cache.get((member.guild.id, member.id), None):
+                if after.channel is None:
+                    # member left the channel, remove from cache
+                    del self.voice_cache[(member.guild.id, member.id)]
+                if await self.member_cannot_speak(before):
+                    connection_data.reset_xp_time()
+                    return
                 if member.guild.afk_channel is None or member.guild.afk_timeout == 0:
                     return
                 used_xp_type: str = await self.bot.get_config(member.guild.id, "xp_type")
                 if used_xp_type not in {"local", "mee6-like"}:
+                    connection_data.reset_xp_time()
                     return
                 if await self.is_member_restricted_from_xp(member, before.channel):
+                    connection_data.reset_xp_time()
                     return
                 await self.register_voice_xp(member, used_xp_type, before.channel.id, connection_data)
 
@@ -179,21 +191,31 @@ class Xp(commands.Cog):
         time_since_last_xp = connection_data.time_since_last_xp()
         if time_since_last_xp is None:
             time_since_last_xp = valuable_time_spent
-        if time_since_last_xp is not None and time_since_last_xp < 60:
-            # already got some XP for the last minute
+        if time_since_last_xp is not None and time_since_last_xp < 10:
+            # already got some XP in the last 10s
             return
         if xp_per_minute := await self.bot.get_config(member.guild.id, "voice_xp_per_min"):
             prev_points = await self.get_member_xp(member, member.guild.id)
             rate: float = await self.bot.get_config(member.guild.id, "xp_rate")
             xp = round(xp_per_minute * rate * time_since_last_xp / 60)
+            print(f"{valuable_time_spent = }  {time_since_last_xp = }  {xp = }")
             await self.db_set_xp(member.id, xp, "add", member.guild.id)
-            connection_data.last_xp_time = time.time()
+            connection_data.reset_xp_time()
             await asyncio.sleep(0.5) # wait for potential temporary channels to be deleted
             try:
-                voice_channel = await member.guild.fetch_channel(voice_channel_id)
+                voice_channel = member.guild.get_channel(voice_channel_id) or await member.guild.fetch_channel(voice_channel_id)
             except discord.HTTPException:
                 voice_channel = None
             await self.update_cache_and_execute_actions(member, voice_channel, used_xp_type, prev_points, xp)
+
+    async def member_cannot_speak(self, voice_state: discord.VoiceState) -> bool:
+        return (
+            voice_state.deaf # forbidden to hear
+            or voice_state.self_deaf # disabled hearing
+            or voice_state.mute # forbidden to speak
+            or voice_state.self_mute # disabled speaking
+            or voice_state.suppress # stage spectator
+        )
 
     async def register_written_xp__global(self, msg: discord.Message):
         """Global xp type"""
@@ -652,6 +674,42 @@ class Xp(commands.Cog):
         query = "SELECT `guild_id`, CAST(`value` AS INT) AS 'value' FROM `serverconfig` WHERE `option_name` = 'xp_decay' AND `value` > 0 AND `beta` = %s"
         async with self.bot.db_main.read(query, (self.bot.beta,)) as query_result:
             return query_result
+
+    @tasks.loop(minutes=1)
+    async def voice_xp_loop(self):
+        "Grant xp related to voice activity every minute"
+        if not self.voice_cache or not self.bot.xp_enabled or not self.bot.database_online:
+            return
+        for (guild_id, user_id), connection_data in self.voice_cache.items():
+            guild = self.bot.get_guild(guild_id)
+            if guild is None:
+                continue
+            if guild.afk_channel is None or guild.afk_timeout == 0:
+                continue
+            member = guild.get_member(user_id)
+            if member is None or member.bot or not member.voice or not member.voice.channel:
+                continue
+            if await self.member_cannot_speak(member.voice):
+                connection_data.reset_xp_time()
+                continue
+            if member.voice.channel == member.guild.afk_channel:
+                connection_data.reset_xp_time()
+                continue
+            if await self.is_member_restricted_from_xp(member, member.voice.channel):
+                connection_data.reset_xp_time()
+                return
+            used_xp_type: str = await self.bot.get_config(guild.id, "xp_type")
+            if used_xp_type not in {"local", "mee6-like"}:
+                continue
+            await self.register_voice_xp(member, used_xp_type, member.voice.channel.id, connection_data)
+
+    @voice_xp_loop.before_loop
+    async def before_voice_xp_loop(self):
+        await self.bot.wait_until_ready()
+
+    @voice_xp_loop.error
+    async def on_voice_xp_loop_error(self, error: Exception):
+        self.bot.dispatch("error", error, "Voice XP loop has stopped  <@279568324260528128>")
 
     @tasks.loop(time=datetime.time(hour=0, tzinfo=datetime.UTC))
     async def xp_decay_loop(self):

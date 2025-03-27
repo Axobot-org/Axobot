@@ -16,3 +16,7 @@ class UserVoiceConnection:
         if self.last_xp_time is None:
             return None
         return time() - self.last_xp_time
+
+    def reset_xp_time(self):
+        "Resets the last XP time to the current time"
+        self.last_xp_time = time()
