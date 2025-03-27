@@ -160,7 +160,7 @@
         "Pro-tip: If you wish to temporarily deactivate an RSS feed, to reactivate it later, you can use the %{rss_disable_cmd} command. Conversely, the command %{rss_delete_cmd} will delete it permanently!",
         "Did you know? RSS feeds disabled with %{rss_disable_cmd} still count towards the limit on the number of feeds per server. If you need more space, use %{rss_delete_cmd} instead!",
         "Pro-tip: Joining the official bot server means you can get quick help with problems, get hints about upcoming updates, and vote for upcoming features. So join us on <%{support_server_url}>!",
-        "Did you know? If you want to help us translate the bot into several languages, you can join our team on our official server at %{support_server_url}!",
+        "Did you know? If you want to help us translate the bot into several languages, you can join our team on our official server at <%{support_server_url}>!",
         "Pro-tip: Axobot's antiscam system uses a local, customized AI to detect and delete scam messages on your server. Enable it with %{antiscam_enable_cmd}"
     ],
     "uninhabited-city": "Uninhabited city :confused:"
