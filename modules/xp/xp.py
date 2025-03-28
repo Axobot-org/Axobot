@@ -198,7 +198,6 @@ class Xp(commands.Cog):
             prev_points = await self.get_member_xp(member, member.guild.id)
             rate: float = await self.bot.get_config(member.guild.id, "xp_rate")
             xp = round(xp_per_minute * rate * time_since_last_xp / 60)
-            print(f"{valuable_time_spent = }  {time_since_last_xp = }  {xp = }")
             await self.db_set_xp(member.id, xp, "add", member.guild.id)
             connection_data.reset_xp_time()
             await asyncio.sleep(0.5) # wait for potential temporary channels to be deleted
