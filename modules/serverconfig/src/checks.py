@@ -17,10 +17,12 @@ async def check_config(bot: Axobot, guild: discord.Guild, option: str, value: An
         levelup_is_channel = option != "levelup_channel" or not isinstance(value, str)
         if levelup_is_channel and (embed := await can_write_in_channel_check(bot, guild, option, value)):
             return embed
-    if option in {"levelup_channel", "levelup_msg", "noxp_channels", "noxp_roles", "xp_decay", "xp_rate", "xp_type"}:
+    if option in {
+        "levelup_channel", "levelup_msg", "noxp_channels", "noxp_roles", "voice_xp_per_min", "xp_decay", "xp_rate", "xp_type"
+    }:
         if embed := await xp_is_enabled_check(bot, guild, option, value):
             return embed
-    if option in {"xp_decay", "xp_rate"}:
+    if option in {"voice_xp_per_min", "xp_decay", "xp_rate"}:
         if embed := await xp_is_local_check(bot, guild, option, value):
             return embed
 
@@ -77,6 +79,16 @@ async def manage_guild_check(bot: Axobot, guild: discord.Guild, _option: str, va
             await bot._(guild, "server.warnings.manage_guild_permissions")
         )
 
+async def guild_has_afk_channel(bot: Axobot, guild: discord.Guild, _option: str, value: Any):
+    "Check if the guild has an AFK channel, else warn to create one"
+    if not value:
+        return None
+    if not guild.afk_channel or guild.afk_timeout == 0:
+        return await _create_warning_embed(
+            bot,
+            guild,
+            await bot._(guild, "server.warnings.afk_channel")
+        )
 
 async def can_write_in_channel_check(bot: Axobot, guild: discord.Guild, _option: str,
                                      value: discord.TextChannel | list[discord.TextChannel]):

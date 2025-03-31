@@ -279,6 +279,28 @@
                 "total_xp_with_text": [190, 160, 230]
             }
         },
+        "rainbow": {
+            "xp_bar": [255,176,74],
+            "texts": {
+                "username": [0,249,0],
+                "level": [255,212,120],
+                "rank": [0,150,255],
+                "participants": [105,157,206],
+                "xp_to_next_level_with_text": [255,188,0],
+                "total_xp_with_text": [255,142,22]
+            }
+        },
+        "red": {
+            "xp_bar": [230, 0, 0],
+            "texts": {
+                "username": [254, 251, 0],
+                "level": [255, 26, 26],
+                "rank": [255, 51, 51],
+                "participants": [255, 51, 51],
+                "xp_to_next_level_with_text": [230, 185, 11],
+                "total_xp_with_text": [230, 185, 11]
+            }
+        },
         "turquoise": {
             "xp_bar": [32, 223, 156],
             "texts": {
@@ -288,6 +310,17 @@
                 "participants": [200, 235, 230],
                 "xp_to_next_level_with_text": [124, 197, 118],
                 "total_xp_with_text": [124, 197, 118]
+            }
+        },
+        "yellow": {
+            "xp_bar": [255, 255, 0],
+            "texts": {
+                "username": [255, 255, 165],
+                "level": [255, 212, 120],
+                "rank": [255, 212, 120],
+                "participants": [255, 166, 77],
+                "xp_to_next_level_with_text": [255, 166, 77],
+                "total_xp_with_text": [255, 153, 51]
             }
         },
         "christmas20": {
@@ -376,6 +409,17 @@
                 "participants": [255, 255, 255],
                 "xp_to_next_level_with_text": [255, 255, 255],
                 "total_xp_with_text": [255, 255, 255]
+            }
+        },
+        "april25": {
+            "xp_bar": [255, 0, 136],
+            "texts": {
+                "username": [246, 140, 250],
+                "level": [0, 249, 0],
+                "rank": [117, 213, 255],
+                "participants": [255, 234, 0],
+                "xp_to_next_level_with_text": [255, 147, 0],
+                "total_xp_with_text": [127, 255, 255]
             }
         },
         "premium": {

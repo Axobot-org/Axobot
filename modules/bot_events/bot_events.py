@@ -14,7 +14,7 @@ from core.checks.checks import database_connected
 from core.formatutils import FormatUtils
 
 from .data import EventData, EventRewardRole, EventType
-from .subcogs import AbstractSubcog, ChristmasSubcog
+from .subcogs import AbstractSubcog, SingleReactionSubcog
 
 
 class BotEvents(commands.Cog):
@@ -34,7 +34,7 @@ class BotEvents(commands.Cog):
         self.coming_event_id: str | None = None
         self.update_current_event()
 
-        self._subcog: AbstractSubcog = ChristmasSubcog(
+        self._subcog: AbstractSubcog = SingleReactionSubcog(
             self.bot, self.current_event, self.current_event_data, self.current_event_id)
         self.min_delay_between_ttt_wins = 30 # seconds between 2 tictactoe wins
         self.last_ttt_win: dict[int, int] = defaultdict(int) # map of user_id -> timestamp
@@ -44,7 +44,7 @@ class BotEvents(commands.Cog):
         "Return the subcog populated with the current event data"
         if self._subcog.current_event != self.current_event or self._subcog.current_event_data != self.current_event_data:
             self.log.debug("Updating subcog with new data")
-            self._subcog = ChristmasSubcog(self.bot, self.current_event, self.current_event_data, self.current_event_id)
+            self._subcog = SingleReactionSubcog(self.bot, self.current_event, self.current_event_data, self.current_event_id)
         return self._subcog
 
     async def cog_load(self):
@@ -144,7 +144,7 @@ class BotEvents(commands.Cog):
         if self.last_ttt_win[interaction.user.id] + self.min_delay_between_ttt_wins > now:
             return
         self.last_ttt_win[interaction.user.id] = now
-        points = 7
+        points = 3
         user = interaction.user
         # send win reward embed
         emb = discord.Embed(

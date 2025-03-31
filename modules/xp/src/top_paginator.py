@@ -81,11 +81,11 @@ class TopPaginator(Paginator):
         self.used_system = await self.client.get_config(self.guild.id, "xp_type")
         if self.used_system == "global":
             if self.scope == "global":
-                if len(self.cog.cache["global"]) == 0:
+                if len(self.cog.leaderboard_cache["global"]) == 0:
                     await self.cog.db_load_cache(None)
                 self.raw_data = [
                     {"user_id": user_id, "xp": data[1]}
-                    for user_id, data in self.cog.cache["global"].items()
+                    for user_id, data in self.cog.leaderboard_cache["global"].items()
                 ]
             else:
                 self.raw_data = [
@@ -93,11 +93,11 @@ class TopPaginator(Paginator):
                     for row in await self.cog.db_get_top(10000, guild=self.guild)
                 ]
         else:
-            if not self.guild.id in self.cog.cache.keys():
+            if not self.guild.id in self.cog.leaderboard_cache.keys():
                 await self.cog.db_load_cache(self.guild.id)
             self.raw_data = [
                     {"user_id": user_id, "xp": data[1]}
-                    for user_id, data in self.cog.cache[self.guild.id].items()
+                    for user_id, data in self.cog.leaderboard_cache[self.guild.id].items()
                 ]
         self.raw_data.sort(key=lambda x: x["xp"], reverse=True)
         self.max_page = ceil(len(self.raw_data)/20)

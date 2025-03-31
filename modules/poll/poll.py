@@ -4,6 +4,7 @@ from discord.ext import commands
 
 from core.bot_classes import Axobot
 from core.views import TextInputModal
+from modules.serverconfig.src.converters import GuildMessageableChannel
 
 
 class PollCog(commands.Cog):
@@ -30,7 +31,7 @@ class PollCog(commands.Cog):
         if message.guild is None or not self.bot.is_ready() or not self.bot.database_online or message.content.startswith('.'):
             return
         try:
-            channels: list[discord.TextChannel] | None = await self.bot.get_config(message.guild.id, "poll_channels")
+            channels: list[GuildMessageableChannel] | None = await self.bot.get_config(message.guild.id, "poll_channels")
             if channels is None:
                 return
             if message.channel in channels and not message.author.bot:

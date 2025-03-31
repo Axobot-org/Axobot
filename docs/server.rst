@@ -89,6 +89,7 @@ List of every option
 * voice_channel: Channel used by the automated voice channels system (see `below <server.html#voice-channels-managment>`__)
 * voice_channel_format: Name format used by the automated voice channels system (see `below <server.html#voice-channels-managment>`__)
 * voice_roles: List of roles given to people being in a voice channel
+* voice_xp_per_min: XP gained per minute in a voice channel. This number will be multiplied by the XP rate value. Default is :code:`0`.
 * vote_emojis: List of emojis that the bot will have to use when there is a voting message. This case may occur when using the poll command, or in a poll channel.
 * welcome: Message sent when a member joins your server.
 * welcome_channel: List of channels where messages when a member joins/leaves the server will be sent. By default, none.

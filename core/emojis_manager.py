@@ -985,7 +985,7 @@ class EmojisManager:
         }
 
         try:
-            resp = requests.get("https://www.unicode.org/Public/emoji/15.0/emoji-test.txt", timeout=5)
+            resp = requests.get("https://www.unicode.org/Public/emoji/15.1/emoji-test.txt", timeout=5)
             self.unicode_set: set[str] = set()
             for line in resp.text.split("\n"):
                 if match := UNICODE_FILE_LINE_PATTERN.match(line):

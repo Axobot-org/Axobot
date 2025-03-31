@@ -377,5 +377,40 @@
             ],
             "probability": 0.1
         }
+    },
+    "april-2025": {
+        "begin": "2025-04-01",
+        "end": "2025-04-02",
+        "type": "fish",
+        "icon": "https://zrunner.me/cdn/fish25.png",
+        "color": 16733391,
+        "objectives": [
+            {
+                "points": 1,
+                "reward_type": "rankcard",
+                "rank_card": "april25"
+            }
+        ],
+        "emojis": {
+            "reactions_list": [],
+            "triggers": [
+                "fish",
+                "poisson",
+                "pêche",
+                "april",
+                "avril",
+                "joke",
+                "prank",
+                "blague",
+                "surprise",
+                "fake news",
+                "fool",
+                "luck",
+                "chance",
+                "axolotl",
+                "axobot"
+            ],
+            "probability": 0.18
+        }
     }
 }

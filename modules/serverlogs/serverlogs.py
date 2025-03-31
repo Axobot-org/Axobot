@@ -584,11 +584,26 @@ class ServerLogs(commands.Cog):
             description=f"**Member {before.mention} ({before.id}) updated**",
             color=discord.Color.blurple()
         )
-        if removed_roles:
-            emb.add_field(name="Roles revoked", value=' '.join(r.mention for r in removed_roles), inline=False)
-        if added_roles:
-            emb.add_field(name="Roles granted", value=' '.join(r.mention for r in added_roles), inline=False)
         emb.set_author(name=str(after), icon_url=after.display_avatar)
+
+        def add_fields(name: str, roles: list[discord.Role]):
+            "Add as many fields as necessary to avoid hitting the 1024 characters limit"
+            value = ""
+            for role in roles:
+                role_mention = role.mention
+                if len(value) + len(role_mention) + 1 > 1020:
+                    emb.add_field(name=name, value=value, inline=False)
+                    value = role_mention
+                else:
+                    value += f" {role_mention}"
+            if value:
+                emb.add_field(name=name, value=value, inline=False)
+
+        if removed_roles:
+            add_fields("Roles revoked", removed_roles)
+        if added_roles:
+            add_fields("Roles granted", added_roles)
+
         # if we have access to audit logs and no role come from an integration, try to get the user who edited the roles
         if any(not role.managed for role in added_roles+removed_roles):
             if entry := await self.search_audit_logs(before.guild, discord.AuditLogAction.member_role_update,
