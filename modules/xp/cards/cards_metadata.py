@@ -18,9 +18,6 @@ V1_CARDS = {
     "halloween20",
     "halloween21",
     "halloween22",
-    "rainbow",
-    "red",
-    "yellow",
 }
 
 V3_CARDS = {
@@ -32,14 +29,18 @@ V3_CARDS = {
     "partner",
     "premium",
     "purple",
+    "rainbow",
+    "red",
     "support",
     "turquoise",
+    "yellow",
     "blurple23",
     "halloween23",
     "christmas23",
     "april24",
     "halloween24",
     "christmas24",
+    "april25",
 }
 
 JSON_DATA_FILE = os.path.dirname(__file__) + "/cards_data.json"
