@@ -1,0 +1,92 @@
+{
+    "cancelled": "",
+    "category-edited": {
+        "category-permission-warning": "",
+        "channel-privacy-warning": "",
+        "default-category": "",
+        "default-channel": ""
+    },
+    "choose-topic-edition": "",
+    "choose-topics-deletion": "",
+    "default-topic-prompt": "",
+    "emote-edited": "",
+    "format": {
+        "edited": {
+            "default": "",
+            "topic": ""
+        },
+        "too-long": ""
+    },
+    "hint-edited": {
+        "default": "",
+        "topic": ""
+    },
+    "hint-useful": "",
+    "hint-useless": "",
+    "missing-category-config": "",
+    "missing-perms-creation": {
+        "channel": "",
+        "thread": ""
+    },
+    "missing-perms-send": "",
+    "missing-perms-setup": {
+        "to-member": "",
+        "to-staff": ""
+    },
+    "name-edited": "",
+    "nothing-to-edit": "",
+    "other": "",
+    "review": {
+        "category": "",
+        "channel": "",
+        "default": "",
+        "deleted-category": "",
+        "deleted-role": "",
+        "embed": {
+            "desc-global": "",
+            "desc-topic": "",
+            "title-global": "",
+            "title-topic": ""
+        },
+        "emoji": "",
+        "format": "",
+        "hint": "",
+        "no-config": "",
+        "prompt": "",
+        "role": "",
+        "topic-no-config": "",
+        "topic-not-found": ""
+    },
+    "role-edited": {
+        "default": "",
+        "default-reset": "",
+        "topic": "",
+        "topic-reset": ""
+    },
+    "selection-placeholder": "",
+    "text-edited": "",
+    "ticket-created": "",
+    "ticket-introduction": {
+        "description": "",
+        "title": ""
+    },
+    "title-modal": {
+        "label": "",
+        "placeholder": "",
+        "title": ""
+    },
+    "too-quick": "",
+    "topic": {
+        "cant-create": "",
+        "created": "",
+        "deleted": {
+            "one": "",
+            "many": ""
+        },
+        "list": "",
+        "no-server-topic": "",
+        "other-already-exists": "",
+        "too-long": "",
+        "too-many": ""
+    }
+}

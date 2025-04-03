@@ -1,56 +1,148 @@
 {
-    "change-txt": "Tämän hetken viesti sisältää\n\n```%{text}```\nLähetä teksti mitä käytetään kun tehdään uusi viesti. Voit käyttää monia muuttujia, tässä on lista niistä:\n- `{author}`: the author of the post\n- `{channel}`: Discord kanava minne viesti lähetetään\n- `{date}`: lähettämisen aika (UTC)\n- `{link}` tai `{url}`: linkki viestille\n- `{logo}`: hymiö joka esittää viestin tyylin (Twitter, YouTube, jne.)\n- `{mentions}`: lista mainituista rooleista\n- `{title}`: viestin otsikko",
+    "ask-roles-hint": {
+        "one": "",
+        "many": ""
+    },
+    "ask-roles-hint-example": "",
+    "change-txt": {
+        "title": "",
+        "label": "",
+        "modal-success": "",
+        "placeholder": "",
+        "confirmation": {
+            "current-structure": "",
+            "variables-title": "",
+            "variables-explanation": "",
+            "variables": {
+                "author": "",
+                "channel": "",
+                "date": "",
+                "long_date": "",
+                "timestamp": "",
+                "link": "",
+                "logo": "",
+                "mentions": "",
+                "title": "",
+                "full_text": "",
+                "description": ""
+            }
+        }
+    },
     "choose-delete": "Valitse virtaus poistolle",
+    "choose-disable": "",
+    "choose-enable": "",
     "choose-mentions-1": "Valitse virtaus muokkaukselle",
     "choose-roles": "Mitkä roolit aiotaan mainita?",
-    "deviant": "DeviantArt",
+    "choose-test": "",
+    "delete-success": {
+        "many": "",
+        "one": ""
+    },
+    "disable-success": {
+        "many": "",
+        "one": ""
+    },
+    "enable-success": {
+        "many": "",
+        "one": ""
+    },
+    "deviant": "",
     "deviant-default-flow": "{logo}  | Uusi luomus tekijä: {author} : **{title}**\nJulkaistu {date}\nLinkki: {link}\n{mentions}",
     "deviant-form-last": "{logo}  | Tässä uusi luomus tekijältä {author}:\n{title}\nJulkaistu {date}\nLinkki: {url}",
     "embed-json-changed": "Upotettu linkki tällä virtauksella on muokattu",
+    "filter": {
+        "same": "",
+        "success": {
+            "blacklist": "",
+            "reset": "",
+            "whitelist": ""
+        }
+    },
     "flow-limit": "Suorituskykyjen syystä, et voi seurata enempää kuin %{limit} rss syötettä per palvelin.",
-    "guild-complete": "%{count} rss suoratoistoa on päivitetty, %{time} sekunnissa!",
+    "guild-complete": {
+        "one": "",
+        "many": ""
+    },
     "guild-error": "Virhe tapahtui menettelyssä: `%{err}`\nJos luulet että tämä virhe ei ole sinun, ota yhteyttä tukeen",
     "guild-loading": "Päivitetään %{emoji}",
     "invalid-flow": "Tämä url on pätemätön (tyhjä tai ei saatavilla) 😕",
     "invalid-link": "Ups, url osoite on pätemätön tai ei valmis 😕",
     "list": "*Lähetä numero virtauksesta muokkaukselle*\n\n**Linkki - Tyyli - Kanava - Maininnat**",
-    "list-title": "Lista rss lähteistä palvelimelta %{server}",
+    "list-disabled": "",
+    "list-result": "",
+    "list-result-filter": {
+        "none": "",
+        "blacklist": "",
+        "whitelist": ""
+    },
+    "list-title": {
+        "one": "",
+        "many": ""
+    },
     "list2": "*Lähetä numero virtauksesta poistamiselle*\n\n**Linkki - Tyyli - Kanava**",
-    "mc": "Minecraft",
+    "loop-processing": "",
+    "mc": "",
+    "move-success": {
+        "many": "",
+        "one": ""
+    },
     "no-feed": "Ups, sinulla ei ole mitään rss lähetyksiä joita voisit hallita!",
     "no-feed2": "Tällä palvelimella ei ole yhtään rss lähdettä!",
+    "no-feed-enabled": "",
+    "no-feed-filter": "",
     "no-roles": "Mitään roolia ei ole konfiguroitu vielä.",
     "not-a-role": "Roolia `{}` ei löytynyt. Yritä uudelleen:",
     "nothing": "En löytänyt mitään tällä haulla 😕",
+    "picker-placeholder": {
+        "single": "",
+        "multi": ""
+    },
     "research-timeout": "Web sivulla kesti liian kauan vastata, minun täytyi keskeyttää prosessi 👀",
     "roles": {
+        "edit-silent-false": {
+            "one": "",
+            "many": ""
+        },
+        "edit-silent-true": {
+            "one": "",
+            "many": ""
+        },
         "edit-success": {
             "many": "Tätä lähetystä on muokattu mainitsemaan roolit %{roles}",
+            "one": "",
             "zero": "Tätä lähetystä on muokattu että se ei mainitse rooleja"
         },
-        "list": "Tässä on lista rooleista jotka on jo annettu: %{roles}"
+        "list": "Tässä on lista rooleista jotka on jo annettu: %{roles}",
+        "no-change": ""
     },
     "success-add": "Rss lähetys tyylillä \"%{type}\" linkillä <%{url}> on lisätty kanavalle %{channel}!",
-    "text-success": "Teksti lähetyksestä #%{id} on muokattu!\n Uusi teksti : \n\n```%{text}```",
+    "test": {
+        "empty-result": "",
+        "invalid-format": ""
+    },
+    "text-success": {
+        "single": "",
+        "multiple": ""
+    },
     "too-long": "Odotit liian kauan, anteeksi ⌛",
-    "tw": "Twitter",
+    "tw": "",
     "tw-default-flow": "{logo}  | Uusi twiitti käyttäjältä {author}! ({date})\n\n{title}\n\nLinkki: {link}\n\n{mentions}",
     "tw-form-last": "{logo}  |  Tässä on uusin twiitti käyttäjältä {author}:\nJulkaistu {date}\n\n{title}\n\nLinkki : {url}",
-    "tw-help": "Jos haluat ettiä twitter kanavan, sinun täytyy antaa sen tunniste. Aiot löytää sen url linkin lopussa, yleensä se on käyttäjän nimi. Esimerkiksi, %https://twitter.com/Mc_AsiliS*, sinun täytyy antaa `Mc_AsiliS`.",
-    "twitch": "Twitch",
+    "tw-no-tweet": "",
+    "twitch": "",
     "twitch-default-flow": "{logo}  | Uusi striimi käyttäjältä {author}! ({date})\n\n{title}\n\nLinkki: {link}\n\n{mentions}",
     "twitch-form-last": "{logo}  | Tässä on viimeisin video käyttäjältä {author}:\n{title}\nJulkaistu {date}\nLinkki : {url}",
+    "twitch-invalid": "",
     "use_embed-same": "Upotettujen linkkejen käyttöön tälle virtaukselle ei ole vaihettu",
     "use_embed-success": "Ominaisuus on vaihdettu tähän: %{v} virralle n°%{id}!",
     "use_embed_false": "Tämä lähetys ei käytä upotettua linkkiä lähettämiseen. Haluatko käyttää upotettua linkkiä? (true/false)",
     "use_embed_true": "Tämä lähetys ei käytä upotettua linkkiä lähettämiseen. Haluatko käyttää upotettua linkkiä? (true/false)",
-    "web": "Web",
+    "web": "",
     "web-default-flow": "{logo}  | Uusi lähetys käyttäjällä {channel} ({date}) :\n    {title}\n\n{link}\n\n{mentions}",
     "web-form-last": "{logo}  |  Tässä on viimeisin lähetys käyttäjältä {channel}:\n**{title}**\n*Julkaistu {date}*\nLinkki : {link}",
-    "web-help": "Jos haluat etsiä rss lähetyksen mistä tahansa verkkosivulta, lähetä rss/atom lähetys url paramittarina. Jos lähetys on sopiva, minä aion lähettää sinulle viimeisimmän artikkelin lähetty verkkosivulle. *Vinkki: jotkut rss lähetykset on jo täytettynä minun koodilla. Joskus voit vain laittaa `fr-minecraft` tai `minecraft.net`* 😉",
     "web-invalid": "Ups, tämå url osoite on pätemätön 😕",
-    "yt": "YouTube",
+    "yt": "",
     "yt-default-flow": "{logo}  | Uusi video käyttäjältä {author}: **{title}**\nJulkaistu {date}\nLinkki : {link}\n{mentions}",
     "yt-form-last": "{logo}  | Tässä on viimeisin video käyttäjältä {author}:\n{title}\nJulkaistu {date}\nLinkki : {url}",
-    "yt-help": "Jos haluat etsiä youtube kanavan, sinun täytyy antaa kanava tunniste. Aiot löytää sen url linkin lopussa, se voi olla sen nimi tai jotain kirjaimia/numeroita. *Vinkki: jotkut kanavat on jo täytettynä minun koodilla. Joskus voit vain laittaa `neil3000` tai `0xisius`* 😉"
+    "yt-invalid": ""
 }

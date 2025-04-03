@@ -1,0 +1,62 @@
+{
+    "activity": {
+        "listen": "",
+        "nothing": "",
+        "play": "",
+        "stream": "",
+        "watch": ""
+    },
+    "added_at": "",
+    "beginning": "",
+    "bot": "",
+    "btn": {
+        "cancel": {
+            "answer": "",
+            "label": ""
+        },
+        "confirm": {
+            "answer": "",
+            "label": ""
+        },
+        "delete": {
+            "answer": "",
+            "label": ""
+        }
+    },
+    "case": "",
+    "category": "",
+    "click_here": "",
+    "dnd": "",
+    "doc": "",
+    "done!": "",
+    "duration": "",
+    "end": "",
+    "example": {
+        "one": "",
+        "many": ""
+    },
+    "extreme": "",
+    "ghost": "",
+    "high": "",
+    "highest": "",
+    "idle": "",
+    "low": "",
+    "medium": "",
+    "member": "",
+    "membres": "",
+    "name": "",
+    "no": "",
+    "none": "",
+    "offline": "",
+    "online": "",
+    "quit": "",
+    "reason": "",
+    "request_by": "",
+    "server": "",
+    "servers": "",
+    "since": "",
+    "unknown": "",
+    "verified": "",
+    "version": "",
+    "yes": ""
+}
