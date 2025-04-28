@@ -2,9 +2,9 @@ aiohttp
 asyncache~=0.3.1
 Babel~=2.15.0
 beautifulsoup4~=4.12.0
-cryptography~=43.0.0
+cryptography~=44.0.0
 discord.py~=2.5.0
-emoji~=2.11.0
+emoji~=2.14.0
 feedparser~=6.0.0
 geocoder
 GitPython
@@ -13,7 +13,7 @@ i18nice~=0.15.0
 imageio
 isbnlib
 LRFutils==0.1.2
-markdownify~=0.13.0
+markdownify~=0.14.0
 mysql-connector-python~=9.0
 nltk>=3.7
 Pillow~=10.3.0
