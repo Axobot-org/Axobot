@@ -1,10 +1,10 @@
 {
     "about": {
         "server": "Můj Discord server:",
-        "invite": "Odkaz na pozvání na jiný server:",
         "docs": "Dokumentace bota:",
         "privacy": "Zásady ochrany osobních údajů:",
-        "sponsor": "Přispět:"
+        "sponsor": "Přispět:",
+        "website": ""
     },
     "about-main": "Ahoj! Jsem %{mention}!\nJsem bot, který vám umožní spoustu věcí: moderování, systém xp, statistiky, řízení partnerů a mnoho dalších super užitečných příkazů (a úplně zbytečných)!\nMůžete začít zadáním `!help` v tomto chatu, abyste viděli seznam dostupných příkazů, pak `!config see` vám umožní vidět možnosti konfigurace.\n\nMůj majitel (Z_runner) a já bychom chtěli poděkovat Awhikaxovi za jeho podporu během různých krizí, Aragorn1202 za všechny jeho nápady a věty plné zdravého rozumu, Adri za všechna ta krásná loga, emodži a profilové fotky a celému týmu překladatelů za jejich dlouholetou práci!\n\n:globe_with_meridians: Některé odkazy mohou být užitečné: %{links}\n\nPřeji hezký den!",
     "bitly_already_shortened": "Tato adresa url je již zkrácena!",
@@ -26,6 +26,7 @@
         "emoji-5v": "%{nbr} (První registrované použití: %{date})",
         "forum": {
             "title": "Fórum '%{name}'",
+            "media-title": "",
             "tags": "Štítky příspěvku",
             "default-emoji": "Výchozí reakční emoji",
             "guidelines": "Pokyny",
@@ -35,7 +36,7 @@
             "sort-order-creation": "Čas vytvoření",
             "sort-order-none": "Nedefinováno"
         },
-        "guild-0": "Server",
+        "guild-0": "",
         "guild-1": "Vlastník",
         "guild-10": "Čas před tím, než bude použito AFK",
         "guild-11.1": "20 prvních rolí (celkem %{c})",
@@ -47,7 +48,7 @@
         "guild-14v": "Bitrate: %{bit}kbps\nMaximální velikost souborů: %{fil}MB\nPočet Emojis: %{emo}",
         "guild-15": "Url pozvánky",
         "guild-16": "Statický: %{s}/%{l} | Animovaný: %{a}/%{l}",
-        "guild-2": "Region",
+        "guild-2": "",
         "guild-3": "Text : %{txt} | Slovo: %{voc} (kategorie%{cat})",
         "guild-4": "Online členové",
         "guild-5": "Počet emoji",
@@ -121,13 +122,13 @@
         "member-7": "Přestupky",
         "member-8": "Vlastní aktivita",
         "member-9": "Role",
-        "role-0": "ID",
+        "role-0": "",
         "role-1": "Barva",
         "role-2": "Zmínitelné",
         "role-3": "Počet členů",
         "role-5": "Hierarchická pozice",
         "role-6": "Jedinečný člen s touto rolí",
-        "role-title": "Role",
+        "role-title": "",
         "role-specificities": {
             "field-name": "Specifikace",
             "hoist": "Zobrazeno samostatně",
@@ -149,7 +150,7 @@
         },
         "textchan-0": "Kategorie",
         "textchan-1": "Popis",
-        "textchan-2": "NSFW",
+        "textchan-2": "",
         "textchan-3": "Počet webhooků",
         "textchan-4": ":warning: chybí oprávnění!",
         "textchan-5": "Kanál",
@@ -164,8 +165,8 @@
     "membercount-4": "Počet neověřených uživatelů",
     "not-found": "Nelze najít %{N}",
     "ping": {
-        "normal": ":ping_pong:  Pong!\nBot ping: %{bot}ms\nDiscord ping: %{api}ms",
-        "pig": ":pig:  Groink!\nBot ping: %{bot}ms\nDiscord ping: %{api}ms"
+        "normal": "",
+        "pig": ""
     },
     "stats": {
         "api_ping": "**API latence:** %{v} ms",

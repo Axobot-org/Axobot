@@ -1,0 +1,32 @@
+{
+    "rmd": {
+        "cancelled": "",
+        "cleared": "",
+        "confirm": "",
+        "custom-duration": {
+            "button": "",
+            "title": "",
+            "input": ""
+        },
+        "delete": {
+            "error": "",
+            "success": {
+                "one": "",
+                "many": ""
+            },
+            "title": ""
+        },
+        "embed-asked": "",
+        "embed-date": "",
+        "embed-link": "",
+        "embed-title": "",
+        "empty": "",
+        "item": "",
+        "recreated": "",
+        "saved": "",
+        "select-placeholder": "",
+        "title": "",
+        "too-long": "",
+        "too-short": ""
+    }
+}

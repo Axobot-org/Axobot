@@ -2,7 +2,7 @@
     "command_name": {
         "about": "o-aplikaci",
         "antiscam report": "nahlásit",
-        "antiscam test": "test",
+        "antiscam test": "",
         "ban": "blokovat",
         "banlist": "seznam-blokovaných",
         "bitly create": "vytvořit",
@@ -32,13 +32,18 @@
         "event profile": "profil",
         "help": "pomoc",
         "info": "informace",
+        "invites-tracker disable": "",
+        "invites-tracker enable": "",
+        "invites-tracker list-invites": "",
+        "invites-tracker resync": "",
+        "invites-tracker set-name": "",
         "kick": "vyhodit",
         "last-post": "poslední-příspěvek",
         "membercount": "počet-členů",
         "minecraft follow-server": "sledovací-server",
-        "minecraft mod": "mod",
-        "minecraft server": "server",
-        "minecraft skin": "skin",
+        "minecraft mod": "",
+        "minecraft server": "",
+        "minecraft skin": "",
         "modlogs disable": "zakázat",
         "modlogs enable": "povolit",
         "modlogs list": "seznam",
@@ -54,7 +59,7 @@
         "partners set-description": "nastavit-popis",
         "partners set-invite": "nastavit-pozvánku",
         "permissions": "oprávnění",
-        "ping": "ping",
+        "ping": "",
         "poll": "anketa",
         "profile card": "karta",
         "profile card-preview": "karta-náhledů",
@@ -64,13 +69,13 @@
         "Quote": "Citát",
         "random-tip": "náhodný-tip",
         "rank": "hodnost",
+        "reminders cancel": "zrušit",
         "reminders clear": "vyčistit",
         "reminders create": "vytvořit",
-        "reminders cancel": "zrušit",
         "reminders list": "seznam",
         "remindme": "připomenutí",
         "Report a scam": "Nahlásit podvod",
-        "role grant": "grant",
+        "role grant": "",
         "role members-list": "seznam-členů",
         "role revoke": "odvolat",
         "role set-color": "nastavit-barvu",
@@ -96,7 +101,7 @@
         "rss set-filter": "nastavit-filtr",
         "rss set-mentions": "nastavit-zmíňky",
         "rss set-text": "nastavit-text",
-        "rss test": "test",
+        "rss test": "",
         "set-xp": "nastavit-xp",
         "slowmode": "pomalý-režim",
         "softban": "před-banem",
@@ -133,6 +138,12 @@
         "cases list": "Seznam všech případů moderování uživatele",
         "cases remove": "Trvale smazat případ moderace",
         "cases search": "Najít podrobnosti moderování případu",
+        "clear": "",
+        "invites-tracker disable": "",
+        "invites-tracker enable": "",
+        "invites-tracker list-invites": "",
+        "invites-tracker resync": "",
+        "invites-tracker set-name": "",
         "membercount": "Získejte nějaké statistiky o členech vašeho serveru",
         "minecraft follow-server": "Sledujte informace o serveru v reálném čase ve vašem kanálu",
         "minecraft mod": "Získejte informace o jakémkoli modu registrovaném na CurseForge nebo Modrinth",
@@ -158,6 +169,7 @@
         "config": "Konfigurace bota pro váš server",
         "emoji": "Spravujte své emoji",
         "event": "Zůčastni se speciálních událostí",
+        "invites-tracker": "",
         "minecraft": "Hledat informace o serverech/hráčích/modech z Minecraftu",
         "modlogs": "Povolit nebo zakázat protokoly serveru v určitých kanálech",
         "partners": "Spravujte partnery vašeho serveru",
@@ -174,32 +186,33 @@
     },
     "group_name": {
         "antiscam": "proti-podvodu",
-        "bitly": "bitly",
+        "bitly": "",
         "blurple": "rozostřit",
         "cases": "případy",
         "config": "nastavení",
-        "emoji": "emoji",
+        "emoji": "",
         "event": "událost",
-        "minecraft": "minecraft",
+        "invites-tracker": "",
+        "minecraft": "",
         "modlogs": "záznam-moderátorů",
         "partners": "partneři",
         "profile": "profil",
         "reminders": "připomínky",
-        "role": "role",
+        "role": "",
         "roles-react": "reakce-rolí",
         "roles-rewards": "odměny-rolí",
-        "rss": "rss",
+        "rss": "",
         "tickets": "tikety",
         "tickets portal": "portál",
         "tickets topic": "příspěvek",
-        "twitch": "twitch"
+        "twitch": ""
     },
     "param_name": {
         "antiscam report": {
             "message": "zpráva"
         },
         "antiscam test": {
-            "text": "text"
+            "text": ""
         },
         "ban": {
             "days_to_delete": "dnů-k-odstranění",
@@ -211,10 +224,10 @@
             "show_reasons": "ukázat-důvody"
         },
         "bitly create": {
-            "url": "url"
+            "url": ""
         },
         "bitly find": {
-            "url": "url"
+            "url": ""
         },
         "blurple check": {
             "who": "kdo"
@@ -264,15 +277,15 @@
             "start_message": "zpráva-od"
         },
         "emoji clear": {
-            "emoji": "emoji",
+            "emoji": "",
             "message": "zpráva"
         },
         "emoji rename": {
-            "emoji": "emoji",
+            "emoji": "",
             "name": "jméno"
         },
         "emoji restrict": {
-            "emoji": "emoji",
+            "emoji": "",
             "roles": "role"
         },
         "event profile": {
@@ -285,25 +298,29 @@
             "query": "dotaz",
             "query_type": "typ-dotazu"
         },
+        "invites-tracker set-name": {
+            "invite": "",
+            "name": ""
+        },
         "kick": {
             "reason": "důvod",
             "user": "uživatel"
         },
         "last-post": {
             "type": "zpětný-zdroj",
-            "url": "url"
+            "url": ""
         },
         "minecraft follow-server": {
             "channel": "kanál",
-            "ip": "ip",
-            "port": "port"
+            "ip": "",
+            "port": ""
         },
         "minecraft mod": {
             "mod_name": "jméno-modu"
         },
         "minecraft server": {
-            "ip": "ip",
-            "port": "port"
+            "ip": "",
+            "port": ""
         },
         "minecraft skin": {
             "username": "uživatelské-jméno"
@@ -332,21 +349,21 @@
             "invite": "pozvat"
         },
         "partners remove": {
-            "partner": "partner"
+            "partner": ""
         },
         "partners reset-description": {
-            "partner": "partner"
+            "partner": ""
         },
         "partners set-color": {
             "color": "barva"
         },
         "partners set-description": {
             "description": "popis",
-            "partner": "partner"
+            "partner": ""
         },
         "partners set-invite": {
             "new_invite": "nová-pozvánka",
-            "partner": "partner"
+            "partner": ""
         },
         "permissions": {
             "channel": "kanál",
@@ -355,7 +372,7 @@
         "poll": {
             "channel": "kanál",
             "options_count": "počet-možností",
-            "text": "text"
+            "text": ""
         },
         "profile card": {
             "style": "styl"
@@ -374,60 +391,60 @@
         "rank": {
             "user": "uživatel"
         },
+        "reminders cancel": {
+            "reminder_id": "připomenutí-id"
+        },
         "reminders create": {
             "duration": "doba-trvání",
             "message": "zpráva"
-        },
-        "reminders cancel": {
-            "reminder_id": "připomenutí-id"
         },
         "remindme": {
             "duration": "doba-trvání",
             "message": "zpráva"
         },
         "role grant": {
-            "role": "role",
+            "role": "",
             "users": "uživatelé"
         },
         "role members-list": {
-            "role": "role"
+            "role": ""
         },
         "role revoke": {
-            "role": "role",
+            "role": "",
             "users": "uživatelé"
         },
         "role set-color": {
             "color": "barva",
-            "role": "role"
+            "role": ""
         },
         "role temporary-grant": {
-            "role": "role",
+            "role": "",
             "time": "čas",
             "user": "uživatel"
         },
         "roles-react add": {
             "description": "popis",
-            "emoji": "emoji",
-            "role": "role"
+            "emoji": "",
+            "role": ""
         },
         "roles-react remove": {
-            "emoji": "emoji"
+            "emoji": ""
         },
         "roles-react send": {
             "channel": "kanál"
         },
         "roles-react set-description": {
             "description": "popis",
-            "emoji": "emoji"
+            "emoji": ""
         },
         "roles-react update": {
             "change_description": "změnit-popis",
-            "embed": "embed",
+            "embed": "",
             "emojis": "emoji"
         },
         "roles-rewards add": {
             "level": "úroveň",
-            "role": "role"
+            "role": ""
         },
         "roles-rewards remove": {
             "level": "úroveň"
@@ -471,14 +488,14 @@
         },
         "rss set-text": {
             "feed": "zdroj",
-            "text": "text"
+            "text": ""
         },
         "rss test": {
             "feed": "zdroj"
         },
         "set-xp": {
             "user": "uživatel",
-            "xp": "xp"
+            "xp": ""
         },
         "slowmode": {
             "seconds": "sekundy"
@@ -500,7 +517,7 @@
             "message": "zpráva"
         },
         "tickets portal set-role": {
-            "role": "role"
+            "role": ""
         },
         "tickets portal set-text": {
             "message": "zpráva"
@@ -512,14 +529,14 @@
             "topic_id": "id-téma"
         },
         "tickets topic add": {
-            "emote": "emote",
+            "emote": "",
             "name": "jméno"
         },
         "tickets topic remove": {
             "topic_id": "id-téma"
         },
         "tickets topic set-emote": {
-            "emote": "emote",
+            "emote": "",
             "topic_id": "id-téma"
         },
         "tickets topic set-format": {
@@ -532,10 +549,10 @@
         },
         "tickets topic set-name": {
             "name": "jméno",
-            "topic_id": "topic-id"
+            "topic_id": ""
         },
         "tickets topic set-role": {
-            "role": "role",
+            "role": "",
             "topic_id": "id-téma"
         },
         "top": {
@@ -543,13 +560,13 @@
             "scope": "rozsah"
         },
         "twitch check-stream": {
-            "streamer": "streamer"
+            "streamer": ""
         },
         "twitch subscribe": {
-            "streamer": "streamer"
+            "streamer": ""
         },
         "twitch unsubscribe": {
-            "streamer": "streamer"
+            "streamer": ""
         },
         "unban": {
             "reason": "důvod",

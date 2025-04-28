@@ -2,12 +2,10 @@
     "aliases": "Alias",
     "categories": {
         "data": "données",
-        "fun": "fun",
         "moderation": "modération",
         "other": "autres",
         "server-settings": "configuration",
         "staff": "staff du bot",
-        "translators": "équipe de traducteurs",
         "unclassed": "non classé",
         "users-info": "Infos sur les utilisateurs"
     },
@@ -15,38 +13,6 @@
         "bot_has_permissions": [
             "C'est bon, j'ai les bonnes perms :wink: !",
             "Houlà ! Il me manque des perms, là !"
-        ],
-        "can_ban": [
-            "Un de tes rôles peut utiliser cette commande (`ban_allowed_roles`)",
-            "Tu n'as pas le rôle pour le faire ! (`ban_allowed_roles`)"
-        ],
-        "can_clear": [
-            "Un de tes rôles peut utiliser cette commande (`clear_allowed_roles`)",
-            "Tu n'as pas le rôle pour le faire ! (`clear_allowed_roles`)"
-        ],
-        "can_edit_case": [
-            "Un de tes rôles peut utiliser cette commande (`warn_allowed_roles`)",
-            "Tu n'as pas le rôle pour le faire ! (`warn_allowed_roles`)"
-        ],
-        "can_kick": [
-            "Un de tes rôles peut utiliser cette commande (`kick_allowed_roles`)",
-            "Tu n'as pas le rôle pour le faire ! (`kick_allowed_roles`)"
-        ],
-        "can_mute": [
-            "Un de tes rôles peut utiliser cette commande (`mute_allowed_roles`)",
-            "Tu n'as pas le rôle pour le faire ! (`mute_allowed_roles`)"
-        ],
-        "can_say": [
-            "Un de tes rôles peut utiliser cette commande (`say_allowed_roles`)",
-            "Tu n'as pas le rôle pour le faire ! (`say_allowed_roles`)"
-        ],
-        "can_slowmode": [
-            "Un de tes rôles peut utiliser cette commande (`slowmode_allowed_roles`)",
-            "Tu n'as pas le rôle pour le faire ! (`slowmode_allowed_roles`)"
-        ],
-        "can_use_RSS": [
-            "Tu es admin.",
-            "Désolé mec (ou meuf, jsp), t'as pas la perm pour utiliser la commande (t'es pas admin) !"
         ],
         "can_use_cookie": [
             "Tu es un élu de chez Aragorn1202...",
@@ -56,10 +22,6 @@
             "T'as la permission \"Gérer le serveur\"",
             "La perm \"Gérer le serveur\" est manquante"
         ],
-        "can_warn": [
-            "Un de tes rôles peut utiliser cette commande (`warn_allowed_roles`)",
-            "Tu n'as pas le rôle pour le faire ! (`warn_allowed_roles`)"
-        ],
         "database_connected": [
             "La base de donnée est en ligne :wink:",
             "O_o\nProblème de db, elle est pas en ligne !\nOn va fixer ça."
@@ -68,41 +30,21 @@
             "Euh... Ça s'utilise uniquement dans un serveur",
             "Euh... Ça s'utilise uniquement dans un serveur"
         ],
-        "has_admin": [
-            "Tu as la perm 'Administrateur'",
-            "Perm 'Administrateur' manquante !"
-        ],
-        "has_embed_links": [
-            "Tu as la perm \"Intégrer des liens\"",
-            "Tu dois avoir la perm \"Intégrer des liens\""
-        ],
-        "has_manage_guild": [
-            "Tu as la perm 'Gérer le serveur'",
-            "Tu dois avoir la perm  'Gérer le serveur' manquante"
-        ],
-        "has_manage_msg": [
-            "Tu as la perm 'Gérer les messages'",
-            "Perm 'Gérer les messages' manquante"
-        ],
-        "has_manage_nicknames": [
-            "Tu as la perm 'Gérer les pseudos'",
-            "Perm 'Gérer les pseudos' manquante"
-        ],
-        "has_manage_roles": [
-            "Tu as la perm 'Gérer les rôles'",
-            "Perm 'Gérer les rôles' manquante"
-        ],
         "has_permissions": [
             "Vous avez les perms Discord suffisantes",
             "Vous n'avez pas les perms Discord suffisantes"
         ],
+        "in_support_server": [
+            "",
+            ""
+        ],
+        "is_blurple": [
+            "",
+            ""
+        ],
         "is_bot_admin": [
             "Il faut être administrateur du bot",
             "T'es malheureusement pas un admin du bot..."
-        ],
-        "is_fun_enabled": [
-            "Les commandes de fun sont activées.",
-            "Les commandes de fun doivent être activées."
         ],
         "is_halloween": [
             "L'évènement halloween est là 🎃 ! Amuse-toi bien !",
@@ -115,26 +57,23 @@
         "is_support_staff": [
             "Tu fais partie du staff du bot",
             "Tu fais pas partie du staff du bot... Non ?"
-        ],
-        "is_translator": [
-            "Tu fais bien partie de l'équipe de traducteurs, il me semble !",
-            "Tu dois faire partie de l'équipe de traducteurs..."
-        ],
-        "is_ttt_enabled": [
-            "Le morpion est activé :D",
-            "Le morpion doit-être activé sur ce serveur"
-        ],
-        "verify_role_exists": [
-            "Un rôle de vérification est configuré",
-            "Aucun rôle de vérification n'a été configuré"
         ]
     },
-    "cmd-count": "%{nbr} de commandes",
+    "cmd-count": {
+        "zero": "",
+        "one": "",
+        "many": ""
+    },
     "cmd-not-found": "Aucune commande nommée \"%{cmd}\"... Tu as peut-être fait une PhotEuh D'Ortograff ?",
     "cog-empty-dm": "Euh... Aucune des commandes de cette catégorie n'est dispo en MP !",
-    "description": "Description",
+    "description": "",
     "embed_title": "Hey ! Voici la liste des commandes disponibles pour {u}",
+    "embed_title_dm": "",
     "footer": "Entre simplement {}help commande pour plus d'informations sur la fameuse commande",
+    "more-subcmds": {
+        "one": "",
+        "many": ""
+    },
     "no-desc-cmd": "Aucune description pour la commande",
     "no-desc-cog": "Aucune description pour ce module.",
     "no-subcmd": "La commande %{cmd} n'a aucune sous-commande",

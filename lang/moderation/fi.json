@@ -1,13 +1,16 @@
 {
     "ban": {
+        "ban-success": "",
         "cant-ban": "Käyttöoikeus \"Antaa porttikieltoja jäsenille\" tarvitaan 😕",
         "list-error": "Ups, näyttää siltä että tässä on liian monta jäsentä näytettävänä 😕",
         "list-title-0": "Lista jäsenistä joilla on porttikielto \"{}\"",
         "list-title-1": "Lista 45 käyttäjästä joilla on porttikielto tältä palvelimelta \"{}\"",
         "list-title-2": "Lista 60 käyttäjästä joilla on porttikielto tältä palvelimelta \"{}\"",
         "no-bans": "Näyttää siltä että kenelläkään ei ole porttikieltoa",
+        "softban-succes": "",
         "staff-ban": "Et voi antaa porttikieltoa toiselle työntekijälle!",
         "too-high": "Näyttää siltä että tämä jäsen on liian korkea että voisin antaa hänelle porttikiellon :thinking:",
+        "unban-success": "",
         "user-not-banned": "Tällä jäsenellä ei ole porttikieltoa 🙃"
     },
     "ban-chat": "Käyttäjällä %{user} (%{userid}) on nyt porttikielto",
@@ -29,17 +32,23 @@
     },
     "emoji": {
         "cant-emoji": "Ups, minulta puuttuu käyttöoikeus `Hallinnoi hymiöitä` :confused:",
-        "emoji-valid": "Nyt hymiötä %{name} voi vain käyttää roolit `%{roles}`",
+        "cleared": "",
+        "emoji-valid": {
+            "one": "",
+            "many": ""
+        },
         "list": "{} (`:{}:`) lisätty {} {}",
         "list-title": "Hymiöt palvelimella %{guild}",
         "private": "[Rajoitettu]",
         "renamed": "Hymiö %{emoji} on nimetty uudelleen!",
+        "unrestricted": "",
         "wrong-guild": "Ups, näyttää siltä että tämä hymiö ei ole tästä palvelimesta 🤔"
     },
     "error": "Ups, tuntematon virhe tapahtui. Yritä uudelleen myöhemmin tai ota yhteyttä tukeen",
     "kick": {
         "cant-staff": "Et voi potkia toista työntekijää!",
         "no-perm": "Käyttöoikeus \"Potkia jäseniä\" tarvitaan 😕",
+        "success": "",
         "too-high": "Näyttää siltä että tämä jäsen on liian korkealla niin en voi potkia häntä ulos :thinking:"
     },
     "kick-chat": "Käyttäjä %{user} (%{userid}) on nyt potkittu ulos tältä palvelimelta",
@@ -68,10 +77,12 @@
         "list-title-1": "Lista 45 jäähyllä olevasta jäsenestä palvelimella \"%{guild}\"",
         "list-title-2": "Lista 60 jäähyllä olevasta jäsenestä palvelimella \"%{guild}\"",
         "mute-high": "Ups, näyttää siltä että `mykistetty` rooli on liian korkealla että voisin antaa sen... Korjaa tämä sillä että laita minun roolini `Mykistetty` roolin yläpuolelle.",
+        "mute-success": "",
         "no-mute": "Ups, näyttää siltä että `mykistetty` rooli ei ole olemassa 😕 Tede yksi ja anna käyttöoikeudet manuallisesti.",
         "no-mutes": "Kenelläkään ei näytä olevan porttikieltoa täällä",
         "staff-mute": "Et voi mykistää toista työntekijää",
-        "too-high": "Näyttää siltä että tämä jäsen on liian korkealla niin en voi asettaa häntä jäähylle :thinking:"
+        "too-high": "Näyttää siltä että tämä jäsen on liian korkealla niin en voi asettaa häntä jäähylle :thinking:",
+        "unmute-success": ""
     },
     "mute-chat": "Käyttäjä %{user} (%{userid}) on pistetty jäähylle",
     "mute-dm": "Sinut on pistetty jäähylle palvelimella %{guild}",
@@ -111,19 +122,21 @@
         "enabled": "%{channel} on nyt etanatilassa. Odota %{s} sekunttia ennenkun lähetät viestin.",
         "info": "Etanatila tällä kanavalla on %{s} sekunttia",
         "invalid": "Tätä ominaisuutta ei ole",
+        "no-perm": "",
         "too-long": "Mahdotonta asettaa pituus isommaksi kuin kuusi tuntia"
     },
     "unban-chat": "Käyttäjällä %{user} (%{userid}) ei ole enää porttikieltoa",
+    "unhoist-too-many-members": "Hups, palvelimellasi on liian monta jäsentä, jotta voin tehdä tuon toiminnon. Ota yhteyttä tukitiimiin saadaksesi lisätietoja.",
     "unhoisted": {
         "many": "%{count} muokattua nimimerkkiä!",
         "one": "1 nimimerkki muutettu!",
         "zero": "Lempinimiä ei ole muutettu"
     },
-    "unhoist-too-many-members": "Hups, palvelimellasi on liian monta jäsentä, jotta voin tehdä tuon toiminnon. Ota yhteyttä tukitiimiin saadaksesi lisätietoja.",
     "unmute-chat": "Käyttäjältä %{user} (%{userid}) on poistettu jäähy",
     "warn": {
         "cant-bot": "En voi varoittaa bottia ^^",
         "cant-staff": "Et voi varoittaa toista työntekijää!",
+        "success": "",
         "warn-but-db": "Meidän tietokanta on poissa käytöstä, varoitusta ei voitu tallentaa. Mutta, jäsen sai yksityis viestin"
     },
     "warn-chat": "Käyttäjää %{user} (%{userid}) on varoitettu",

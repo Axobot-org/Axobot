@@ -1,102 +1,40 @@
 {
-    "adv-fields": [
-        "Nom",
-        "Identifiant",
-        "Type",
-        "Action",
-        "Parent",
-        "Enfants",
-        "Version d'ajout"
-    ],
-    "adv-help": "Cette commande permet d'obtenir des informations sur n'importe quel progrès du jeu Minecraft (parfois ausis appelé 'avancement'). Il te suffit d'entrer le nom ou l'identifiant du progrès.",
-    "block-fields": [
-        "ID",
-        "Taille d'un stack",
-        "Onglet du mode créatif",
-        "Points de dégâts",
-        "Points de durabilité",
-        "Outil capable de le détruire",
-        "Mobs pouvant lâcher cet item",
-        "Version d'ajout"
-    ],
-    "block-help": "Cette commande permet d'obtenir des informations sur n'importe quel bloc de Minecraft. Vous pouvez donner son nom complet ou partiel, en français ou en anglais, ou même son identifiant. Il suffit d'entrer `%{p}mc block <nom>`",
     "cant-embed": "Impossible d'envoyez l'embed. Vérifie que la permission \"Embed links\" est bien activée plz !",
-    "cmd-fields": [
-        "Nom",
-        "Syntaxe",
-        "Exemples",
-        "Version d'ajout"
-    ],
-    "cmd-help": "Cette commande permet d'obtenir des informations sur n'importe quelle commande de Minecraft. Il suffit d'entrer `%{p}mc command <nom>`",
-    "contact-mail": "Si tu constates une erreur dans les informations données, merci de me contacter rapidement, ou de rapporter l'erreur directement [sur le site](https://fr-minecraft.net).",
-    "dimensions": "Largeur: %{la}\nLongueur: %{lo}\nHauteur: %{ha}",
-    "entity-fields": [
-        "ID",
-        "Type",
-        "Points de vie",
-        "Points d'attaque",
-        "Points d'expérience lâchées à la mort",
-        "Biomes de prédilection",
-        "Version d'ajout"
-    ],
-    "entity-help": "Cette commande permet d'obtenir des informations sur n'importe quelle entité de Minecraft. Vous pouvez donner son nom complet ou partiel, en français ou en anglais, ou même son identifiant. Il suffit d'entrer `%{p}mc entity <nom>`",
-    "item-fields": [
-        "ID",
-        "Taille d'un stack",
-        "Onglet du mode créatif",
-        "Points de dégâts",
-        "Points de durabilité",
-        "Outil capable de le détruire",
-        "Mobs pouvant lâcher cet item",
-        "Version d'ajout"
-    ],
-    "item-help": "Cette commande permet d'obtenir des informations sur n'importe quel item de Minecraft. Vous pouvez donner son nom complet ou partiel, en français ou en anglais, ou même son identifiant. Il suffit d'entrer `%{p}mc item <nom>`",
-    "mod-fields": [
-        "Nom",
-        "Auteurs",
-        "Résumé 🧐",
-        "Langue principale",
-        "Dernière mise-à-jour",
-        "Versions du jeu",
-        "Téléchargements",
-        "ID"
-    ],
-    "mod-help": "Cette commande donne des infos sur un grand nombre de mods Minecraft.\nTu peux donner son nom complet ou partiel, entre simplement `%{p}mc mod <nom>`.\nLe mod doit être enregistré sur CurseForge pour apparaître.",
-    "mojang_desc": {
-        "account.mojang.com": "Site de gestion des comptes Mojang",
-        "api.mojang.com": "Service d'API fournit par Mojang",
-        "authserver.mojang.com": "Serveur d'authentification",
-        "minecraft.net": "Site officiel",
-        "mojang.com": "Site officiel",
-        "session.minecraft.net": "Sessions multijoueurs (obsolètes)",
-        "sessionserver.mojang.com": "Sessions multijoueurs",
-        "textures.minecraft.net": "Serveur de textures (skin & capes)"
+    "invalid-ip": "",
+    "mod-fields": {
+        "author": "",
+        "authors": "",
+        "categories": "",
+        "downloads": "",
+        "id-curseforge": "",
+        "id-modrinth": "",
+        "name": "",
+        "release": "",
+        "summary": "",
+        "versions": ""
     },
-    "names": [
-        "Bloc",
-        "Entité",
-        "Item",
-        "Commande",
-        "Progrès",
-        "Mod"
-    ],
-    "no-adv": "Progrès introuvable",
+    "mod-title": "",
     "no-api": "Erreur : Impossible de se connecter à l'API",
-    "no-block": "Bloc introuvable",
-    "no-cmd": "Commande introuvable",
     "no-embed": "Impossible d'envoyer le résultat ! Donne moi la perm pour '*attacher des liens*' pour que je puisse te l'envoyer.",
-    "no-entity": "Entité introuvable",
-    "no-item": "Item introuvable",
     "no-mod": "J'arrive pas à trouver ce mod. ¯\\_(ツ)_/¯",
     "no-ping": "Erreur : Impossible de ping ce serveur",
+    "no-player-list": "",
     "player-not-found": "J'ai pu trouver AUCUN joueur de MC Java qui utilise ce pseudo.",
     "player-skin-download": "Clique ici pour télécharger 😉",
     "player-skin-title": "Skin du joueur %{player}",
-    "serv-0": "Nombre de joueurs",
-    "serv-1": "Liste des 20 premiers joueurs connectés",
-    "serv-2": "Liste des joueurs connectés",
-    "serv-3": "Latence",
+    "server": {
+        "description": "",
+        "from-provider": "",
+        "latency": "",
+        "players-count": "",
+        "players-list-20": "",
+        "players-list-all": "",
+        "version": ""
+    },
+    "serv-follow": {
+        "missing-perms": "",
+        "success": ""
+    },
     "serv-error": "Oups, une erreur inconnue s'est produite. Tu peux réessayer plus tard ? :confused:",
-    "serv-title": "Informations du serveur %{ip}",
-    "success-add": "Un message avec les détails du serveur %{ip} a bien été ajouté dans le salon %{channel} !"
+    "serv-title": "Informations du serveur %{ip}"
 }
