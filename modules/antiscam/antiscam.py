@@ -80,7 +80,7 @@ class AntiScam(commands.Cog):
         if self.cleanup_recent_scans_loop.is_running():
             self.cleanup_recent_scans_loop.stop()
 
-    @tasks.loop(hours=3)
+    @tasks.loop(hours=24)
     async def cleanup_recent_scans_loop(self):
         "Cleanup the recent scans cache every 3 hours"
         self.recent_scans.clear()

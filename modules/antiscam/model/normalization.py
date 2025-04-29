@@ -2,11 +2,8 @@ import os
 import re
 from json import load
 
-from emoji.unicode_codes import get_aliases_unicode_dict
 from nltk import SnowballStemmer
 from nltk.corpus import stopwords
-
-UNICODE_EMOJI: dict[str, str] = get_aliases_unicode_dict()
 
 RE_EMAIL = re.compile(r"[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+")
 RE_WEB = re.compile(
@@ -32,11 +29,11 @@ AFFIXES_STEM = SnowballStemmer("english")
 PROTECTED_WORDS = ("discordchannel", "discorduser", "discordemoji", "discordrole", "discordid",
                    "emailaddress", "webaddress", "phonenumber", "moneysymbol", "number", "discordinvite", "emoji")
 
-with open(os.path.dirname(__file__)+"/data/unicode_map.json", 'r', encoding="utf-8") as file:
+with open(os.path.dirname(__file__) + "/data/unicode_confusable_map.json", 'r', encoding="utf-8") as file:
     UNICODE_MAP: dict[str, str] = load(file)
-
-emojis_iter = map(lambda y: y, UNICODE_EMOJI.keys())
-RE_EMOJI = re.compile('|'.join(re.escape(em) for em in emojis_iter))
+with open(os.path.dirname(__file__) + "/data/discord_emoji_names.json", 'r', encoding="utf-8") as file:
+    unicode_emojis_list: list[str] = load(file)
+    RE_EMOJI = re.compile('|'.join(re.escape(em) for em in unicode_emojis_list))
 
 
 def normalize(message: str) -> str:

@@ -26,7 +26,7 @@ from core.enums import RankCardsFlag, UserFlag
 from core.formatutils import FormatUtils
 from core.views import ConfirmView
 from docs import conf
-from modules.antiscam.model import update_unicode_map
+from modules.antiscam.model import update_unicode_maps
 from modules.antiscam.model.training_bayes import train_model
 from modules.rss.src.rss_general import feed_parse
 
@@ -932,12 +932,12 @@ Cette option affecte tous les serveurs"""
 
     @antiscam_group.command(name="fetch-unicode")
     async def antiscam_fetch_unicode(self, interaction: discord.Interaction):
-        "Récupérer la table unicode des caractères confusables"
+        "Récupère certaines listes de caractères/émojis utilisés pour la normalisation des messages"
         if not self.bot.beta:
             await interaction.response.send_message("Not usable in production!")
             return
         await interaction.response.defer()
-        await update_unicode_map()
+        await update_unicode_maps()
         await interaction.followup.send("Done!")
 
     @antiscam_group.command(name="update-table")
