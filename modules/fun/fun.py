@@ -678,10 +678,10 @@ If you want to use lines break in the texts, use the special character `\\n`
         except discord.errors.HTTPException as err:
             if err.code == 400:
                 await interaction.followup.send(
-                    await self.bot._(interaction.response.send_message, "fun.embed-invalid-image")
+                    await self.bot._(interaction, "fun.embed-invalid-image")
                 )
             else:
-                await interaction.followup.send(await self.bot._(interaction.response.send_message, "fun.error", err=err))
+                await interaction.followup.send(await self.bot._(interaction, "fun.error", err=err))
             return
         await interaction.followup.send(
             await self.bot._(interaction, "fun.embed-sent", message_url=msg.jump_url)
