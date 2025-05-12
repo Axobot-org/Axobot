@@ -4,6 +4,7 @@ import asyncio
 import datetime
 import json
 import logging
+import re
 import time
 from typing import TYPE_CHECKING, Any, Literal, TypedDict
 
@@ -212,6 +213,34 @@ class RssMessage:
             full_text=post_text,
             description=description
         )
+
+    def get_allowed_mentions(self, guild: discord.Guild) -> discord.AllowedMentions:
+        "Parse the feed template to get the allowed users/roles mentions"
+        # By default, no mentions are allowed
+        allowed_mentions = discord.AllowedMentions.none()
+        # Parse everyone/here from template
+        if "@everyone" in self.feed.structure or "@here" in self.feed.structure or f"<@&{guild.id}>" in self.feed.structure:
+            allowed_mentions.everyone = True
+        # Add configured role IDs
+        if self.feed.role_ids:
+            allowed_mentions.roles = [
+                discord.Object(id=int(role_id))
+                for role_id in self.feed.role_ids
+            ]
+        # Parse role IDs from template
+        for role_match in re.finditer(r"<@&(\d+)>", self.feed.structure):
+            role_id = role_match.group(1)
+            if not allowed_mentions.roles:
+                allowed_mentions.roles = []
+            allowed_mentions.roles.append(discord.Object(id=int(role_id)))
+        # Parse user IDs from template
+        for user_match in re.finditer(r"<@!?(\d+)>", self.feed.structure):
+            user_id = user_match.group(1)
+            if not allowed_mentions.users:
+                allowed_mentions.users = []
+            allowed_mentions.users.append(discord.Object(id=int(user_id)))
+        # Return result
+        return allowed_mentions
 
     async def create_msg(self, msg_format: str | None = None):
         "Create a message ready to be sent, either in string or in embed"

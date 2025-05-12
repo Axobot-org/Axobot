@@ -429,7 +429,7 @@ class Rss(commands.Cog):
             self.bot.dispatch("interaction_error", interaction, err)
 
     @rss_main.command(name="test")
-    async def feed_test(self, interaction: discord.Interaction, feed: str):
+    async def feed_test(self, interaction: discord.Interaction, feed: str, with_mentions: bool = False):
         """Test a RSS feed format
         This will send the last post of the feed following the format you set up
 
@@ -465,7 +465,10 @@ class Rss(commands.Cog):
         msg.feed = feed_object
         msg.fill_embed_data()
         await msg.fill_mention(interaction.guild)
-        allowed_mentions = discord.AllowedMentions.none()
+        if with_mentions:
+            allowed_mentions = msg.get_allowed_mentions(interaction.guild)
+        else:
+            allowed_mentions = discord.AllowedMentions.none()
         try:
             content = await msg.create_msg()
         except InvalidFormatError:
@@ -1298,9 +1301,7 @@ class Rss(commands.Cog):
         content = await obj.create_msg()
         if self.bot.zombie_mode:
             return True
-        allowed_mentions = discord.AllowedMentions(everyone=False, roles=[
-            discord.Object(id=int(role_id)) for role_id in obj.feed.role_ids
-        ])
+        allowed_mentions = obj.get_allowed_mentions(channel.guild)
         try:
             if isinstance(content, discord.Embed):
                 await channel.send(

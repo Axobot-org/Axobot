@@ -452,7 +452,8 @@
             "level": "level"
         },
         "rss add": {
-            "link": "link"
+            "link": "link",
+            "channel": "channel"
         },
         "rss disable": {
             "feed": "feed"
@@ -493,7 +494,8 @@
             "text": "text"
         },
         "rss test": {
-            "feed": "feed"
+            "feed": "feed",
+            "with_mentions": "with-mentions"
         },
         "set-xp": {
             "user": "user",

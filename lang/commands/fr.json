@@ -447,7 +447,8 @@
             "level": "niveau"
         },
         "rss add": {
-            "link": "lien"
+            "link": "lien",
+            "channel": "salon"
         },
         "rss disable": {
             "feed": "flux"
@@ -488,7 +489,8 @@
             "text": "texte"
         },
         "rss test": {
-            "feed": "flux"
+            "feed": "flux",
+            "with_mentions": "avec-mentions"
         },
         "set-xp": {
             "user": "utilisateur",
