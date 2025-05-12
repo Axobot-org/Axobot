@@ -109,18 +109,24 @@ class Info(commands.Cog):
         if query == "server" and interaction.guild:
             return "server", interaction.guild
         ctx = await commands.Context.from_interaction(interaction)
+        is_bot_admin = await checks.is_bot_admin(interaction)
         for query_type in (QUERY_TYPES if interaction.guild else DM_QUERY_TYPES):
+            if is_bot_admin and query_type == "id":
+                continue
             try:
                 result = await self._convert_query(query, query_type, ctx)
             except commands.BadArgument:
                 continue
             else:
                 return query_type, result
-        if await checks.is_bot_admin(interaction):
+        if is_bot_admin:
             try:
                 return "server", await commands.GuildConverter().convert(ctx, query)
             except commands.BadArgument:
-                pass
+                try:
+                    return "id", await self._convert_query(query, "id", ctx)
+                except commands.BadArgument:
+                    pass
 
     async def _convert_query(self, query: str, query_type: QueryTypesTyping, ctx: commands.Context):
         "Try to convert the query to the given type"
