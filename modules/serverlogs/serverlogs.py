@@ -523,6 +523,8 @@ class ServerLogs(commands.Cog):
             if len(invites) == 1:
                 try:
                     invite = await self.bot.fetch_invite(invites[0])
+                except ValueError:
+                    self.bot.log.warning("Invalid invite link: %s", invites[0])
                 except discord.HTTPException:
                     pass
                 else:
