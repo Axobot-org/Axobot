@@ -278,7 +278,11 @@ ORDER BY usages DESC LIMIT %(limit)s"""
         }
         for key, url in links.items():
             urls += "\n:arrow_forward: " + await self.bot._(interaction, f"info.about.{key}") + " <" + url + ">"
-        msg = await self.bot._(interaction, "info.about-main", mention=self.bot.user.mention, links=urls)
+        command_mentions = {
+            f"{name.replace(' ', '_')}_cmd": await self.bot.get_command_mention(name)
+            for name in ("help", "config see")
+        }
+        msg = await self.bot._(interaction, "info.about-main", mention=self.bot.user.mention, links=urls, **command_mentions)
         await interaction.response.send_message(embed=discord.Embed(description=msg, color=16298524))
 
     @app_commands.command(name="random-tip")
