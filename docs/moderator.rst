@@ -284,9 +284,11 @@ Types of logs
 * **message_update:** A message is edited
 * **message_delete:** A message is deleted
 * **moderation_case:** A moderation case has been edited or deleted with the :code:`case` command
+* **react_usage:** A member used the :code:`react` command
 * **role_creation:** A role is created
 * **role_deletion:** A role is deleted
 * **role_update:** A role has been edited
+* **say_usage:** A member used the :code:`say` command
 * **server_update:** The server has been edited (icon, name, or features)
 * **slowmode:** A channel has been put on slowmode with the :code:`slowmode` command
 * **ticket_creation:** A `ticket <tickets.html>`__ has been opened

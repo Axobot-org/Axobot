@@ -9,7 +9,7 @@ LOGS_CATEGORIES = {
     "moderation": {"clear", "member_ban", "member_unban", "member_timeout", "member_kick", "member_warn",
                     "moderation_case", "slowmode"},
     "messages": {"message_update", "message_delete", "discord_invite", "ghost_ping"},
-    "other": {"bot_warnings", "server_update"},
+    "other": {"bot_warnings", "react_usage", "say_usage", "server_update"},
     "roles": {"role_creation", "role_update", "role_deletion"},
     "tickets": {"ticket_creation"},
     "voice": {"voice_join", "voice_move", "voice_leave"}
