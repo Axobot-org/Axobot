@@ -329,6 +329,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
             return
         await channel.send(text)
         await interaction.response.send_message(await self.bot._(interaction, "fun.say-done"), ephemeral=True)
+        self.bot.dispatch("say_usage", interaction.user, text, channel.id)
 
     @app_commands.command(name="react")
     @app_commands.guild_only()
@@ -364,6 +365,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
                 return
             count += 1
         await interaction.followup.send(content=await self.bot._(interaction, "fun.react-done", count=count))
+        self.bot.dispatch("react_usage", interaction.user, message, reactions)
 
     @fun_main.command(name="google")
     @app_commands.checks.cooldown(2, 10)
@@ -678,10 +680,10 @@ If you want to use lines break in the texts, use the special character `\\n`
         except discord.errors.HTTPException as err:
             if err.code == 400:
                 await interaction.followup.send(
-                    await self.bot._(interaction.response.send_message, "fun.embed-invalid-image")
+                    await self.bot._(interaction, "fun.embed-invalid-image")
                 )
             else:
-                await interaction.followup.send(await self.bot._(interaction.response.send_message, "fun.error", err=err))
+                await interaction.followup.send(await self.bot._(interaction, "fun.error", err=err))
             return
         await interaction.followup.send(
             await self.bot._(interaction, "fun.embed-sent", message_url=msg.jump_url)

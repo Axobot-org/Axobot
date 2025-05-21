@@ -7,7 +7,7 @@ async def getch_channel_or_thread(guild: discord.Guild, channel_id: int):
         return channel
     try:
         return await guild.fetch_channel(channel_id)
-    except discord.NotFound:
+    except (discord.NotFound, discord.Forbidden):
         return None
 
 async def getch_member(guild: discord.Guild, member_id: int):

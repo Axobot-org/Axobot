@@ -127,18 +127,18 @@ class Xp(commands.Cog):
             and after.channel != member.guild.afk_channel
             and isinstance(after.channel, VocalGuildChannel)
         ): # user joined a channel
-            self.voice_cache[(member.guild.id, member.id)] = UserVoiceConnection()
+            self.voice_cache[member.guild.id, member.id] = UserVoiceConnection()
         elif (
             before.channel != member.guild.afk_channel
             and isinstance(before.channel, VocalGuildChannel)
         ): # user changed state (eg. unmute) or left a voice channel
             if (member.guild.id, member.id) not in self.voice_cache and after.channel is not None:
                 # user was not in the cache, but still in a voice channel
-                self.voice_cache[(member.guild.id, member.id)] = UserVoiceConnection()
+                self.voice_cache[member.guild.id, member.id] = UserVoiceConnection()
             if connection_data := self.voice_cache.get((member.guild.id, member.id), None):
                 if after.channel is None:
                     # member left the channel, remove from cache
-                    del self.voice_cache[(member.guild.id, member.id)]
+                    del self.voice_cache[member.guild.id, member.id]
                 if await self.member_cannot_speak(before):
                     connection_data.reset_xp_time()
                     return
@@ -679,7 +679,8 @@ class Xp(commands.Cog):
         "Grant xp related to voice activity every minute"
         if not self.voice_cache or not self.bot.xp_enabled or not self.bot.database_online:
             return
-        for (guild_id, user_id), connection_data in self.voice_cache.items():
+        keys_to_check = list(self.voice_cache.keys())
+        for (guild_id, user_id) in keys_to_check:
             guild = self.bot.get_guild(guild_id)
             if guild is None:
                 continue
@@ -687,6 +688,9 @@ class Xp(commands.Cog):
                 continue
             member = guild.get_member(user_id)
             if member is None or member.bot or not member.voice or not member.voice.channel:
+                continue
+            connection_data = self.voice_cache.get((guild_id, user_id), None)
+            if connection_data is None:
                 continue
             if await self.member_cannot_speak(member.voice):
                 connection_data.reset_xp_time()

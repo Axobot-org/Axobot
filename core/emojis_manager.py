@@ -932,7 +932,8 @@ characteres = {':': 582223307944886292,
 
 
 UNICODE_FILE_LINE_PATTERN = re.compile(
-    r"^[A-F0-9]{4,5} (?:[A-F0-9]{4,5} )*\s+; (?:fully|minimally)-qualified\s+# (?P<emoji>\S+) E\d+\.\d+ (?P<name>[a-z :\-,]+)$"
+    r"^[A-F0-9]{4,5} (?:[A-F0-9]{4,5} )*\s+; (?:fully|minimally)-qualified\s+# (?P<emoji>\S+) E\d+\.\d+ (?P<name>[\w :\,-]+)$",
+    re.IGNORECASE
 )
 
 

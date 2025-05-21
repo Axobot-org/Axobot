@@ -88,15 +88,29 @@ class AntiScamAgent:
 
         return PredictionResult(prediction.values(), prediction.keys())
 
-async def update_unicode_map():
-    "Update the unicode map file from the unicode.org website of confusable characters"
-    async with aiohttp.ClientSession() as session:
-        async with session.get("https://www.unicode.org/Public/security/latest/confusables.txt") as resp:
-            lines = (await resp.text()).split("\n")
-    json_data = {}
-    for line in lines:
-        data = list(map(lambda x: x.strip(), line.split('#',1)[0].split(';')[:2]))
-        if len(data) == 2:
-            json_data[data[0]] = data[1]
-    with open(os.path.dirname(__file__)+"/data/unicode_map.json", 'w', encoding="utf8") as json_file:
+async def update_unicode_maps():
+    "Update the Unicode maps from the unicode.org website"
+    async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(10)) as session:
+        await _update_unicode_confusable_map(session)
+        await _update_discord_emoji_names_list(session)
+
+async def _update_unicode_confusable_map(session: aiohttp.ClientSession):
+    "Update the Unicode map file from the unicode.org website of confusable characters"
+    json_data: dict[str, str] = {}
+    async with session.get("https://www.unicode.org/Public/security/latest/confusables.txt") as resp:
+        for line in (await resp.text()).split("\n"):
+            data = list(map(lambda x: x.strip(), line.split('#',1)[0].split(';')[:2]))
+            if len(data) == 2:
+                json_data[data[0]] = data[1]
+    with open(os.path.dirname(__file__) + "/data/unicode_confusable_map.json", 'w', encoding="utf8") as json_file:
+        json.dump(json_data, json_file)
+
+async def _update_discord_emoji_names_list(session: aiohttp.ClientSession):
+    "Update the list of Discord emoji names from an unofficial source"
+    json_data: list[str] = []
+    async with session.get("https://emzi0767.mzgit.io/discord-emoji/discordEmojiMap-canary.min.json") as resp:
+        data = await resp.json()
+        for emoji in data["emojiDefinitions"]:
+            json_data += [name for name in emoji["namesWithColons"] if name.startswith(':') and name.endswith(':')]
+    with open(os.path.dirname(__file__) + "/data/discord_emoji_names.json", 'w', encoding="utf8") as json_file:
         json.dump(json_data, json_file)

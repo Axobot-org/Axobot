@@ -523,6 +523,8 @@ class ServerLogs(commands.Cog):
             if len(invites) == 1:
                 try:
                     invite = await self.bot.fetch_invite(invites[0])
+                except ValueError:
+                    self.bot.log.warning("Invalid invite link: %s", invites[0])
                 except discord.HTTPException:
                     pass
                 else:
@@ -1663,6 +1665,37 @@ Minimum age required by anti-raid: {min_age}"
                     emb.add_field(name="Time spent in the channel", value=duration)
                     del self.voice_join_timestamps[(member.id, before.channel.id)]
                 await self.validate_logs(member.guild, channel_ids, emb, "voice_move")
+
+    @commands.Cog.listener()
+    async def on_say_usage(self, author: discord.Member, text: str, channel_id: int):
+        """Triggered when someone uses the say command
+        Corresponding log: say_usage"""
+        if channel_ids := await self.is_log_enabled(author.guild.id, "say_usage"):
+            emb = discord.Embed(
+                description=f"**{author.mention} ({author.id}) used the /say command**",
+                colour=discord.Color.blurple()
+            )
+            emb.add_field(name="Channel", value=f"<#{channel_id}>")
+            emb.add_field(name="Text", value=text[:1024])
+            emb.set_author(name=author, icon_url=author.display_avatar)
+            await self.validate_logs(author.guild, channel_ids, emb, "say_usage")
+
+    @commands.Cog.listener()
+    async def on_react_usage(self, author: discord.Member, message: discord.Message, reactions: list[discord.Emoji | str]):
+        """Triggered when someone uses the react command
+        Corresponding log: react_usage"""
+        if channel_ids := await self.is_log_enabled(author.guild.id, "react_usage"):
+            emb = discord.Embed(
+                description=f"**{author.mention} ({author.id}) used the /react command**",
+                colour=discord.Color.blurple()
+            )
+            emb.add_field(name="Message", value=message.jump_url)
+            emb.add_field(
+                name="Reaction" if len(reactions) == 1 else "Reactions",
+                value=" ".join(str(r) for r in reactions)
+            )
+            emb.set_author(name=author, icon_url=author.display_avatar)
+            await self.validate_logs(author.guild, channel_ids, emb, "react_usage")
 
 
 async def setup(bot):

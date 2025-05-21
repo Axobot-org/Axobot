@@ -259,6 +259,7 @@ class GreedyDiscordOrUnicodeEmojiTransformer(discord.app_commands.Transformer): 
         return [
             await DiscordOrUnicodeEmojiTransformer().transform(interaction, word)
             for word in value.split(" ")
+            if word
         ]
 
 GreedyDiscordOrUnicodeEmojiArgument = discord.app_commands.Transform[

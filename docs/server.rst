@@ -17,11 +17,9 @@ Axobot has a number of features that can be modified on a per-server basis to ma
 Watch
 -----
 
-**Syntax:** :code:`config see [option | page]`
+**Syntax:** :code:`config see [option]`
 
-The `see` subcommand allows you to see the value of a configuration, with a mini explanatory sentence. If no option is specified, the entire configuration will be displayed in a single message. Note that the bot can suffer a slight latency since this data is stored in an external database.
-
-The page number is used because the options are too numerous to be displayed on a single screen. They have therefore been grouped by page of 20, accessible via this number (default 1).
+The `see` subcommand allows you to see the value of a configuration, with a mini explanatory sentence. If no option is specified, the entire configuration will be displayed in a single message.
 
 A detailed list of all options is available `below <#list-of-every-option>`__ .
 
@@ -45,11 +43,10 @@ If the value contains several objects, such as a list of roles or channels, they
 .. note:: When the value takes the form of roles, for more comfort you are not obliged to mention them: the exact name (as long as it doesn't contain spaces) or the identifier of the role is enough. The same goes for channels or emojis.
 
 
-
-Delete
+Reset
 ------
 
-**Syntax:** :code:`config del <option>`
+**Syntax:** :code:`config reset <option>`
 
 This subcommand can be useful to reset an option to its default value. By executing this command, the option will be deleted and will take the same value as originally.
 
