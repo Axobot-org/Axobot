@@ -239,6 +239,11 @@ class RssMessage:
             if not allowed_mentions.users:
                 allowed_mentions.users = []
             allowed_mentions.users.append(discord.Object(id=int(user_id)))
+        # Remove duplicates from roles and users
+        if allowed_mentions.roles:
+            allowed_mentions.roles = list(set(allowed_mentions.roles))
+        if allowed_mentions.users:
+            allowed_mentions.users = list(set(allowed_mentions.users))
         # Return result
         return allowed_mentions
 
