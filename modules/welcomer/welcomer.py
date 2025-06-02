@@ -8,6 +8,7 @@ from discord.ext import commands
 
 from core.bot_classes import SUPPORT_GUILD_ID, Axobot
 from core.enums import ServerWarningType
+from core.parse_mentions import parse_allowed_mentions
 from core.safedict import SafeDict
 
 
@@ -74,45 +75,47 @@ class Welcomer(commands.Cog):
         if self.bot.zombie_mode:
             return
         text: str | None = await self.bot.get_config(member.guild.id, event_type)
+        if not text:
+            return
         if member.id in self.no_message or (event_type == "welcome" and await self._is_raider(member)):
             return
         if self.bot.get_cog("Utilities").sync_check_any_link(member.display_name) is not None:
             return
-        if text:
-            channel: discord.TextChannel | None = await self.bot.get_config(member.guild.id, "welcome_channel")
-            if channel is None:
+        channel: discord.TextChannel | None = await self.bot.get_config(member.guild.id, "welcome_channel")
+        if channel is None:
+            return
+        if event_type == "leave" and (msg_id := self.join_cache.get((member.guild.id, member.id))):
+            # if the user just joined, delete the welcome message and abort
+            if await self.delete_cached_welcome_message(channel, msg_id):
+                # if the welcome message was deleted, don't send the leave message
                 return
-            if event_type == "leave" and (msg_id := self.join_cache.get((member.guild.id, member.id))):
-                # if the user just joined, delete the welcome message and abort
-                if await self.delete_cached_welcome_message(channel, msg_id):
-                    # if the welcome message was deleted, don't send the leave message
-                    return
-            botormember = await self.bot._(member.guild, "misc.bot" if member.bot else "misc.member")
-            try:
-                text = text.format_map(SafeDict(
-                    user=member.mention if event_type=="welcome" else (member.global_name or member.name),
-                    user_idname=str(member),
-                    user_id=str(member.id),
-                    server=member.guild.name,
-                    owner=member.guild.owner.display_name if member.guild.owner else "",
-                    member_count=member.guild.member_count,
-                    type=botormember
-                ))
-                silent: bool = (
-                    False if event_type == "leave"
-                    else await self.bot.get_config(member.guild.id, "welcome_silent_mention")
-                )
-                msg = await channel.send(text, silent=silent)
-                if event_type == "welcome":
-                    self.join_cache[member.guild.id, member.id] = msg.id
-            except discord.Forbidden:
-                self.bot.dispatch("server_warning",
-                                    ServerWarningType.WELCOME_MISSING_TXT_PERMISSIONS,
-                                    member.guild,
-                                    channel=channel,
-                                    is_join=event_type == "welcome")
-            except Exception as err:
-                self.bot.dispatch("error", err, f"{member.guild} | {channel.name}")
+        botormember = await self.bot._(member.guild, "misc.bot" if member.bot else "misc.member")
+        allowed_mentions = self.parse_welcome_allowed_mentions(member, text)
+        try:
+            text = text.format_map(SafeDict(
+                user=member.mention if event_type=="welcome" else (member.global_name or member.name),
+                user_idname=str(member),
+                user_id=str(member.id),
+                server=member.guild.name,
+                owner=member.guild.owner.display_name if member.guild.owner else "",
+                member_count=member.guild.member_count,
+                type=botormember
+            ))
+            silent: bool = (
+                False if event_type == "leave"
+                else await self.bot.get_config(member.guild.id, "welcome_silent_mention")
+            )
+            msg = await channel.send(text, silent=silent, allowed_mentions=allowed_mentions)
+            if event_type == "welcome":
+                self.join_cache[member.guild.id, member.id] = msg.id
+        except discord.Forbidden:
+            self.bot.dispatch("server_warning",
+                                ServerWarningType.WELCOME_MISSING_TXT_PERMISSIONS,
+                                member.guild,
+                                channel=channel,
+                                is_join=event_type == "welcome")
+        except Exception as err:
+            self.bot.dispatch("error", err, f"{member.guild} | {channel.name}")
 
     async def delete_cached_welcome_message(self, channel: discord.TextChannel, message_id: int):
         "Try to delete a cached welcome message"
@@ -128,6 +131,10 @@ class Welcomer(commands.Cog):
         except Exception as err:
             self.bot.dispatch("error", err, f"While deleting welcome message in {channel.guild.id} | {channel.id}")
         return False
+
+    async def parse_welcome_allowed_mentions(self, member: discord.Member, text: str):
+        """Parse the allowed mentions in a welcome/leave message"""
+        return parse_allowed_mentions(text, base=discord.AllowedMentions(users=[member]))
 
     async def check_owner_server(self, member: discord.Member):
         """Check if a newscommer of the support server is the owner of a server"""

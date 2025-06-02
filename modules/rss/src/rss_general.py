@@ -4,7 +4,6 @@ import asyncio
 import datetime
 import json
 import logging
-import re
 import time
 from typing import TYPE_CHECKING, Any, Literal, TypedDict
 
@@ -14,6 +13,7 @@ from aiohttp import ClientSession, client_exceptions
 from feedparser.util import FeedParserDict
 
 from core.formatutils import FormatUtils
+from core.parse_mentions import parse_allowed_mentions
 from core.safedict import SafeDict
 
 FeedType = Literal["tw", "yt", "twitch", "reddit", "mc", "deviant", "bluesky", "web"]
@@ -214,36 +214,18 @@ class RssMessage:
             description=description
         )
 
-    def get_allowed_mentions(self, guild: discord.Guild) -> discord.AllowedMentions:
+    def get_allowed_mentions(self) -> discord.AllowedMentions:
         "Parse the feed template to get the allowed users/roles mentions"
         # By default, no mentions are allowed
         allowed_mentions = discord.AllowedMentions.none()
-        # Parse everyone/here from template
-        if "@everyone" in self.feed.structure or "@here" in self.feed.structure or f"<@&{guild.id}>" in self.feed.structure:
-            allowed_mentions.everyone = True
         # Add configured role IDs
         if self.feed.role_ids:
             allowed_mentions.roles = [
                 discord.Object(id=int(role_id))
                 for role_id in self.feed.role_ids
             ]
-        # Parse role IDs from template
-        for role_match in re.finditer(r"<@&(\d+)>", self.feed.structure):
-            role_id = role_match.group(1)
-            if not allowed_mentions.roles:
-                allowed_mentions.roles = []
-            allowed_mentions.roles.append(discord.Object(id=int(role_id)))
-        # Parse user IDs from template
-        for user_match in re.finditer(r"<@!?(\d+)>", self.feed.structure):
-            user_id = user_match.group(1)
-            if not allowed_mentions.users:
-                allowed_mentions.users = []
-            allowed_mentions.users.append(discord.Object(id=int(user_id)))
-        # Remove duplicates from roles and users
-        if allowed_mentions.roles:
-            allowed_mentions.roles = list(set(allowed_mentions.roles))
-        if allowed_mentions.users:
-            allowed_mentions.users = list(set(allowed_mentions.users))
+        # Parse role and user mentions from the template
+        allowed_mentions = parse_allowed_mentions(self.feed.structure, base=allowed_mentions)
         # Return result
         return allowed_mentions
 
