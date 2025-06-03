@@ -102,6 +102,13 @@ If the bot can't send the new command format, it will try to send the old one.""
             cmd_mention = await self.bot.get_command_mention(cmd.qualified_name)
             await send(await self.bot._(ctx.channel, "help.no-subcmd", cmd=cmd_mention))
             return
+        elif cmd := self.bot.tree.get_command(args[0]):
+            if isinstance(cmd, Group):
+                await send(await self.bot._(ctx.channel, "help.subcmd-not-found", name=last_arg))
+                return
+            cmd_mention = await self.bot.get_command_mention(cmd.qualified_name)
+            await send(await self.bot._(ctx.channel, "help.no-subcmd", cmd=cmd_mention))
+            return
         await self._send_error_unknown_command(ctx, send, parent)
 
     async def _find_command_from_name(self, args: list[str], parent_command: Command | None) -> Command | Group | None:
