@@ -63,6 +63,22 @@ class WebRSS:
             if entry.get(i) is not None:
                 return i
 
+    async def _get_entry_datetime(self, entry: FeedParserDict) -> dt.datetime | None:
+        "Try to find the entry publication date and return it as a datetime object"
+        entry_date = entry.get(await self._get_feed_date_key(entry))
+        if isinstance(entry_date, time.struct_time):
+            if entry_date.tm_zone is None:
+                timezone = dt.UTC
+            else:
+                timezone = dt.timezone(dt.timedelta(seconds=entry_date.tm_gmtoff))
+            return dt.datetime(*entry_date[:6], tzinfo=timezone)
+        if isinstance(entry_date, dt.datetime):
+            if entry_date.tzinfo is None:
+                return entry_date.replace(tzinfo=dt.UTC)
+            return entry_date
+        self.bot.dispatch("error", f"Invalid date type for entry {entry.get('title', 'Unknown')}: {type(entry_date)}")
+        return None
+
     async def _get_entry_id(self, entry: FeedParserDict) -> str | None:
         "Try to find the article ID or title"
         for i in ["id", "title", "updated_parsed"]:
@@ -145,11 +161,7 @@ class WebRSS:
         for entry in feed.entries:
             if len(posts_list) > 10:
                 break
-            entry_date = entry.get(date_field_key)
-            if isinstance(entry_date, time.struct_time) and entry_date.tm_zone is None:
-                entry_date = dt.datetime(*entry_date[:6], tzinfo=dt.UTC)
-            elif entry_date is not None:
-                entry_date = dt.datetime(*entry_date[:6])
+            entry_date = await self._get_entry_datetime(entry)
             # check if the entry is not too close to (or passed) the last post
             if entry_date is None or (entry_date - date).total_seconds() < self.min_time_between_posts:
                 # we know we can break because entries are sorted by most recent first
