@@ -39,14 +39,16 @@ class WebRSS:
         if "bozo_exception" in feed and not isinstance(feed["bozo_exception"], CharacterEncodingOverride):
             # CharacterEncodingOverride exceptions are ignored
             return None
-        date_field_key = await self._get_feed_date_key(feed.entries[0])
-        if date_field_key is not None and len(feed.entries) > 1:
+        if len(feed.entries) > 1:
             # Remove entries that are older than the next one
             try:
-                while (len(feed.entries) > 1) \
-                    and (feed.entries[1][date_field_key] is not None) \
-                        and (feed.entries[0][date_field_key] < feed.entries[1][date_field_key]):
+                entry_date = await self._get_entry_datetime(feed.entries[0])
+                while entry_date is not None \
+                    and (len(feed.entries) > 1) \
+                    and (next_entry_date := await self._get_entry_datetime(feed.entries[1])) \
+                    and (entry_date < next_entry_date):
                     del feed.entries[0]
+                    entry_date = next_entry_date
             except KeyError:
                 pass
         if filter_config is not None:
@@ -136,11 +138,7 @@ class WebRSS:
         if not feed:
             return await self.bot._(channel, "rss.web-invalid")
         entry = feed.entries[0]
-        date_field_key = await self._get_feed_date_key(entry)
-        if date_field_key is None:
-            entry_date = "Unknown"
-        else:
-            entry_date = entry[date_field_key]
+        entry_date = await self._get_entry_datetime(entry) or "Unknown"
         return await self._parse_entry(entry, feed, url, entry_date, channel)
 
     async def get_new_posts(self, channel: discord.TextChannel, url: str, date: dt.datetime,
