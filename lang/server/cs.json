@@ -14,7 +14,7 @@
         "language": {
             "fr": "Francouzština",
             "en": "Angličtina",
-            "lolcat": "lolcat",
+            "lolcat": "",
             "fi": "Finština",
             "de": "Němčina",
             "fr2": "Známá Francouzština",
@@ -27,7 +27,7 @@
         },
         "xp_type": {
             "global": "globální",
-            "mee6-like": "mee6-like",
+            "mee6-like": "",
             "local": "místní"
         }
     },
@@ -106,6 +106,7 @@
         "delete_welcome_on_quick_leave": "Mám odstranit uvítací zprávu, když člen opustí ihned po připojení? %{value}",
         "description": "Popis serveru:\n %{value}",
         "enable_events": "Měly by se každoroční zábavné akce bota (například oslavy Halloweenu nebo Vánoc) konat také na tomto serveru? %{value}",
+        "enable_invites_tracking": "",
         "enable_xp": "Měl by být povolen xp systém? %{value}",
         "help_in_private": "Odeslat zprávu nápovědy v soukromé zprávě? %{value}",
         "hunter": "Seznam všech chatovacích místností, ve kterých je hra *lovec* aktivní: %{value}",
@@ -146,7 +147,7 @@
     },
     "tips": {
         "antiscam_enable_logs": "Logy pro antiscam systém můžete povolit příkazem %{modlogs_enable}",
-        "title": "Pro tip"
+        "title": ""
     },
     "value-deleted": "Hodnota volby \"%{option} byla obnovena na výchozí hodnotu",
     "warnings": {
@@ -155,6 +156,7 @@
             "many": "Chybí mi některé oprávnění k použití funkce anti-raid. **%{list}**"
         },
         "channel_write_permissions": "Potřebuji mít možnost posílat zprávy v %{channel} pro tuto možnost",
+        "manage_guild_permissions": "",
         "moderation_command": "Potřebuji oprávnění '%{perm}' pro použití tohoto příkazu",
         "title": "Varování",
         "xp_should_be_enabled": "Tato volba je určena pro XP systém. Můžete ji povolit s nastavením 'enable_xp'",
