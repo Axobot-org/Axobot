@@ -4,7 +4,6 @@ import asyncio
 import datetime
 import json
 import logging
-import re
 import time
 from typing import TYPE_CHECKING, Any, Literal, TypedDict
 
@@ -14,6 +13,7 @@ from aiohttp import ClientSession, client_exceptions
 from feedparser.util import FeedParserDict
 
 from core.formatutils import FormatUtils
+from core.parse_mentions import parse_allowed_mentions
 from core.safedict import SafeDict
 
 FeedType = Literal["tw", "yt", "twitch", "reddit", "mc", "deviant", "bluesky", "web"]
@@ -113,12 +113,18 @@ class RssMessage:
         if isinstance(date, datetime.datetime):
             self.date = date.replace(tzinfo=datetime.UTC)
         elif isinstance(date, time.struct_time):
-            self.date = datetime.datetime(*date[:6]).replace(tzinfo=datetime.UTC)
+            struct_timezone = date.tm_zone
+            self.date = datetime.datetime(*date[:6])
+            if struct_timezone is None:
+                self.date = self.date.replace(tzinfo=datetime.UTC)
+            else:
+                timezone = datetime.timezone(datetime.timedelta(seconds=date.tm_gmtoff))
+                self.date = self.date.replace(tzinfo=timezone)
         elif isinstance(date, str):
             try:
                 self.date = datetime.datetime.fromisoformat(date)
             except ValueError:
-                self.date = date
+                self.date = None
         else:
             self.date = None
         self.entry_id = entry_id
@@ -214,31 +220,18 @@ class RssMessage:
             description=description
         )
 
-    def get_allowed_mentions(self, guild: discord.Guild) -> discord.AllowedMentions:
+    def get_allowed_mentions(self) -> discord.AllowedMentions:
         "Parse the feed template to get the allowed users/roles mentions"
         # By default, no mentions are allowed
         allowed_mentions = discord.AllowedMentions.none()
-        # Parse everyone/here from template
-        if "@everyone" in self.feed.structure or "@here" in self.feed.structure or f"<@&{guild.id}>" in self.feed.structure:
-            allowed_mentions.everyone = True
         # Add configured role IDs
         if self.feed.role_ids:
             allowed_mentions.roles = [
                 discord.Object(id=int(role_id))
                 for role_id in self.feed.role_ids
             ]
-        # Parse role IDs from template
-        for role_match in re.finditer(r"<@&(\d+)>", self.feed.structure):
-            role_id = role_match.group(1)
-            if not allowed_mentions.roles:
-                allowed_mentions.roles = []
-            allowed_mentions.roles.append(discord.Object(id=int(role_id)))
-        # Parse user IDs from template
-        for user_match in re.finditer(r"<@!?(\d+)>", self.feed.structure):
-            user_id = user_match.group(1)
-            if not allowed_mentions.users:
-                allowed_mentions.users = []
-            allowed_mentions.users.append(discord.Object(id=int(user_id)))
+        # Parse role and user mentions from the template
+        allowed_mentions = parse_allowed_mentions(self.feed.structure, base=allowed_mentions)
         # Return result
         return allowed_mentions
 

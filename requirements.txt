@@ -14,7 +14,7 @@ imageio
 isbnlib
 LRFutils==0.1.2
 markdownify~=0.14.0
-mysql-connector-python~=9.0
+mysql-connector-python~=9.1.0
 nltk>=3.7
 Pillow~=10.3.0
 psutil>=5.8

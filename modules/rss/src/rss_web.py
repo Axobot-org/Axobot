@@ -39,14 +39,16 @@ class WebRSS:
         if "bozo_exception" in feed and not isinstance(feed["bozo_exception"], CharacterEncodingOverride):
             # CharacterEncodingOverride exceptions are ignored
             return None
-        date_field_key = await self._get_feed_date_key(feed.entries[0])
-        if date_field_key is not None and len(feed.entries) > 1:
+        if len(feed.entries) > 1:
             # Remove entries that are older than the next one
             try:
-                while (len(feed.entries) > 1) \
-                    and (feed.entries[1][date_field_key] is not None) \
-                        and (feed.entries[0][date_field_key] < feed.entries[1][date_field_key]):
+                entry_date = await self._get_entry_datetime(feed.entries[0])
+                while entry_date is not None \
+                    and (len(feed.entries) > 1) \
+                    and (next_entry_date := await self._get_entry_datetime(feed.entries[1])) \
+                    and (entry_date < next_entry_date):
                     del feed.entries[0]
+                    entry_date = next_entry_date
             except KeyError:
                 pass
         if filter_config is not None:
@@ -62,6 +64,22 @@ class WebRSS:
         for i in ["published_parsed", "published", "updated_parsed"]:
             if entry.get(i) is not None:
                 return i
+
+    async def _get_entry_datetime(self, entry: FeedParserDict) -> dt.datetime | None:
+        "Try to find the entry publication date and return it as a datetime object"
+        entry_date = entry.get(await self._get_feed_date_key(entry))
+        if isinstance(entry_date, time.struct_time):
+            if entry_date.tm_zone is None:
+                timezone = dt.UTC
+            else:
+                timezone = dt.timezone(dt.timedelta(seconds=entry_date.tm_gmtoff))
+            return dt.datetime(*entry_date[:6], tzinfo=timezone)
+        if isinstance(entry_date, dt.datetime):
+            if entry_date.tzinfo is None:
+                return entry_date.replace(tzinfo=dt.UTC)
+            return entry_date
+        self.bot.dispatch("error", f"Invalid date type for entry {entry.get('title', 'Unknown')}: {type(entry_date)}")
+        return None
 
     async def _get_entry_id(self, entry: FeedParserDict) -> str | None:
         "Try to find the article ID or title"
@@ -120,11 +138,7 @@ class WebRSS:
         if not feed:
             return await self.bot._(channel, "rss.web-invalid")
         entry = feed.entries[0]
-        date_field_key = await self._get_feed_date_key(entry)
-        if date_field_key is None:
-            entry_date = "Unknown"
-        else:
-            entry_date = entry[date_field_key]
+        entry_date = await self._get_entry_datetime(entry) or "Unknown"
         return await self._parse_entry(entry, feed, url, entry_date, channel)
 
     async def get_new_posts(self, channel: discord.TextChannel, url: str, date: dt.datetime,
@@ -145,11 +159,7 @@ class WebRSS:
         for entry in feed.entries:
             if len(posts_list) > 10:
                 break
-            entry_date = entry.get(date_field_key)
-            if isinstance(entry_date, time.struct_time) and entry_date.tm_zone is None:
-                entry_date = dt.datetime(*entry_date[:6], tzinfo=dt.UTC)
-            elif entry_date is not None:
-                entry_date = dt.datetime(*entry_date[:6])
+            entry_date = await self._get_entry_datetime(entry)
             # check if the entry is not too close to (or passed) the last post
             if entry_date is None or (entry_date - date).total_seconds() < self.min_time_between_posts:
                 # we know we can break because entries are sorted by most recent first

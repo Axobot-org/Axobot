@@ -466,7 +466,7 @@ class Rss(commands.Cog):
         msg.fill_embed_data()
         await msg.fill_mention(interaction.guild)
         if with_mentions:
-            allowed_mentions = msg.get_allowed_mentions(interaction.guild)
+            allowed_mentions = msg.get_allowed_mentions()
         else:
             allowed_mentions = discord.AllowedMentions.none()
         try:
@@ -1301,7 +1301,7 @@ class Rss(commands.Cog):
         content = await obj.create_msg()
         if self.bot.zombie_mode:
             return True
-        allowed_mentions = obj.get_allowed_mentions(channel.guild)
+        allowed_mentions = obj.get_allowed_mentions()
         try:
             if isinstance(content, discord.Embed):
                 await channel.send(
