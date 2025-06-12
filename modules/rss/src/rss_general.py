@@ -113,12 +113,18 @@ class RssMessage:
         if isinstance(date, datetime.datetime):
             self.date = date.replace(tzinfo=datetime.UTC)
         elif isinstance(date, time.struct_time):
-            self.date = datetime.datetime(*date[:6]).replace(tzinfo=datetime.UTC)
+            struct_timezone = date.tm_zone
+            self.date = datetime.datetime(*date[:6])
+            if struct_timezone is None:
+                self.date = self.date.replace(tzinfo=datetime.UTC)
+            else:
+                timezone = datetime.timezone(datetime.timedelta(seconds=date.tm_gmtoff))
+                self.date = self.date.replace(tzinfo=timezone)
         elif isinstance(date, str):
             try:
                 self.date = datetime.datetime.fromisoformat(date)
             except ValueError:
-                self.date = date
+                self.date = None
         else:
             self.date = None
         self.entry_id = entry_id
