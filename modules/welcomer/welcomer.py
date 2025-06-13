@@ -90,7 +90,7 @@ class Welcomer(commands.Cog):
                 # if the welcome message was deleted, don't send the leave message
                 return
         botormember = await self.bot._(member.guild, "misc.bot" if member.bot else "misc.member")
-        allowed_mentions = self.parse_welcome_allowed_mentions(member, text)
+        allowed_mentions = await self.parse_welcome_allowed_mentions(member, text)
         try:
             text = text.format_map(SafeDict(
                 user=member.mention if event_type=="welcome" else (member.global_name or member.name),
