@@ -134,7 +134,7 @@ class Welcomer(commands.Cog):
 
     async def parse_welcome_allowed_mentions(self, member: discord.Member, text: str):
         """Parse the allowed mentions in a welcome/leave message"""
-        return parse_allowed_mentions(text, base=discord.AllowedMentions(users=[member]))
+        return parse_allowed_mentions(text, base=discord.AllowedMentions(users=[member], roles=False))
 
     async def check_owner_server(self, member: discord.Member):
         """Check if a newscommer of the support server is the owner of a server"""
