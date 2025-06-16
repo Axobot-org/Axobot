@@ -8,7 +8,6 @@
     "not-zbot-embed": "This msg dont has any rolereact colorful box",
     "not-zbot-msg": "Uh oh, dis msg is not from me 👀",
     "reactions-edited": "The react has been rightly updat :check:",
-    "role-given": "The role %{r} has been given",
     "role-lost": "ThE rolE %{r} HAS BEeN reMoVEd fR0M yOUr ROLEs",
     "role-not-in-list": "Tish role iz NOT part ov the giveable r0ls",
     "rr-added": "Da role %{r} has been added for the emoji %{e}",
@@ -16,7 +15,6 @@
     "rr-description-set": "Ive correctly changed teh tag for ur role %{role}",
     "rr-embed": "tAkInG on A ROle",
     "rr-list": "lIsT 0v REacti0n RoLes (%{n}/%{m})",
-    "rr-removed": "The role %{r} can no longer be given via the emoji %{e}",
     "rr-removed-2": "Dat emoji %{e} is can again gaving a role",
     "success-sent": "Teh msg has been sent 2 %{msg}, yay!",
     "too-many-rr": "You have 'ready reached da limit ov %{l} roles"

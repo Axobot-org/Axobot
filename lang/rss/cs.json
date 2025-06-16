@@ -46,7 +46,7 @@
         "many": "Kanály %{count} byly úspěšně povoleny!",
         "one": "Kanál byl úspěšně aktivován!"
     },
-    "deviant": "DeviantArt",
+    "deviant": "",
     "deviant-default-flow": "{logo} | Nová tvorba {author}: **{title}**\nPublikováno dne {date}\nOdkaz: {link}\n{mentions}",
     "deviant-form-last": "{logo} | Zde je nový výtvor {author}:\n{title}\nPublikováno dne {date}\nOdkaz: {url}",
     "embed-json-changed": "Vložený embed v kanálu byl upraven",
@@ -64,7 +64,7 @@
         "many": "%{count} rss streamů bylo správně obnoveno, za %{time} sekund!"
     },
     "guild-error": "Během postupu došlo k chybě: `%{err}`\nPokud si myslíte, že tato chyba není způsobena vámí, můžete ji nahlásit na podporu",
-    "guild-loading": "Reloading %{emoji}",
+    "guild-loading": "",
     "invalid-flow": "Tato adresa URL je neplatná (prázdná nebo nedostupná RSS kanály) :confused:",
     "invalid-link": "Dobrý pokus, ale tato adresa url je neplatná nebo nekompletní :confused:",
     "list": "*Zadejte počet kanálů pro úpravy*\n\n**Odkaz - Typ - Kanál - Zmínky**\n",
@@ -81,7 +81,7 @@
     },
     "list2": "*Zadejte počet kanálů, které chcete odstranit*\n\n**Odkaz - Typ - Kanál**\n",
     "loop-processing": "Kontrola vašich RSS kanálů již probíhá. Počkejte prosím několik minut",
-    "mc": "Minecraft",
+    "mc": "",
     "move-success": {
         "many": "%{count} RSS kanály byly přesunuty do kanálu %{channel}!",
         "one": "Jeden RSS kanál byl přesunut do kanálu %{channel}!"
@@ -125,11 +125,11 @@
         "multiple": "Text kanálu byl změněn!\n Nový text: \n```\n%{text}\n```"
     },
     "too-long": "Čekal jsi příliš dlouho, omlouváme se :hourglass:",
-    "tw": "Twitter",
+    "tw": "",
     "tw-default-flow": "{logo}  | Nový tweet {author}! ({date})\n\n{title}\n\nOdkaz: {link}\n\n{mentions}",
     "tw-form-last": "{logo}  | Zde je poslední tweet {author}:\nPublikováno {date}\n\n{title}\n\nOdkaz: {url}",
     "tw-no-tweet": "Vypadá to, že tento uživatel nikdy netweetoval :confused:",
-    "twitch": "Twitch",
+    "twitch": "",
     "twitch-default-flow": "{logo}  | Nový tweet {author}! ({date})\n\n{title}\n\nOdkaz: {link}\n\n{mentions}",
     "twitch-form-last": "{logo} | Zde je poslední video {author}:\n{title}\nPublikováno dne {date}\nOdkaz: {url}\n",
     "twitch-invalid": "Ale ne, nemohl jsem najít žádný Twitch kanál s tímto jménem!",
@@ -137,11 +137,11 @@
     "use_embed-success": "Hodnota byla upravena na %{v} pro kanál n°%{id}!",
     "use_embed_false": "Tento kanál nepoužívá embed k odeslání. Chcete pro tento kanál použít embed? (true/false)",
     "use_embed_true": "Tento kanál aktuálně používá embedy k odeslání. Přejete si stále používat embed pro tento kanál? (true/false)",
-    "web": "Web",
+    "web": "",
     "web-default-flow": "{logo}  | Nový příspěvek na {channel} ({date}):\n        {title}\n\n{link}\n\n{mentions}",
     "web-form-last": "{logo} | Zde je poslední příspěvek na {channel}:\n**{title}**\n*Zapsáno dne {date}*\nOdkaz: {link}",
     "web-invalid": "Dobrý pokus, ale tato adresa url je neplatná :confused:",
-    "yt": "YouTube",
+    "yt": "",
     "yt-default-flow": "{logo} | Nové video {author}: **{title}**\nPublikováno dne {date}\nOdkaz: {link}\n{mentions}",
     "yt-form-last": "{logo} | Zde je poslední video {author}:\n{title}\nPublikováno dne {date}\nOdkaz: {url}",
     "yt-invalid": "Ale né, nemohl jsem najít žádný YouTube kanál s tímto ID!"

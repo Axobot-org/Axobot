@@ -122,6 +122,7 @@
         "enabled": "The %{channel} channl iz naw in very-cold-mode. Wait %{s} secondz be4 sending a mesage.",
         "info": "Da slow mode ov this chat iz currently at %{s}s",
         "invalid": "Nope, dis valu iz invalid",
+        "no-perm": "",
         "too-long": "Impossible to set a frequency higher than 6 hourz"
     },
     "unban-chat": "Mmber %{user} (%{userid}) iz no langer bannd fr0m this servr",

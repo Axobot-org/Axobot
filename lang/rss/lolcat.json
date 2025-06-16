@@ -46,7 +46,7 @@
         "many": "%{count} feeds had correctly been enabled, cap'!",
         "one": "Dis feed had correctly been enabled, cap'!"
     },
-    "deviant": "DeviantArt",
+    "deviant": "",
     "deviant-default-flow": "{logo}  | New draw by {author} : **{title}**\nDated on {date}\nURL: {link}\n{mentions}",
     "deviant-form-last": "{logo}  | Here is da brand new thing of {author}:\n{title}\nDarwn on {date}\nZelda: {url}",
     "embed-json-changed": "The embed ov feed have been modifed",
@@ -71,7 +71,7 @@
     "list-disabled": "(disabld)",
     "list-result": "{emoji} {link}\nDisc chan: {channel}\nPings: {roles} | {filter}\nId: {id}\nLast thing: {last_post}",
     "list-result-filter": {
-        "none": "No filter",
+        "none": "",
         "blacklist": "Black filter",
         "whitelist": "White filter"
     },

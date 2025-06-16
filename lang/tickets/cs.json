@@ -48,7 +48,7 @@
             "title-global": "Souhrn o globálním nastavení",
             "title-topic": "Kontrola konfigurace pro téma \"%{topic}\""
         },
-        "emoji": "Emoji",
+        "emoji": "",
         "format": "Formát jména",
         "hint": "Zpráva nápovědy",
         "no-config": "Tento server nepoužívá systém tiketu",
