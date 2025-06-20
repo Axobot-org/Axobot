@@ -1506,7 +1506,6 @@ class Rss(commands.Cog):
             self.log.warning(desc[1])
         if guild_id is None:
             self.loop_processing = False
-        self.web_rss.clear_cache()
 
     @tasks.loop(minutes=20)
     async def rss_loop(self):
