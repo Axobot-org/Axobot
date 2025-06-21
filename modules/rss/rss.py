@@ -42,6 +42,13 @@ MentionsArgument = discord.app_commands.Transform[
     args.UnionTransformer(args.GreedyRolesTransformer, "none", None)
 ]
 
+TIME_BETWEEN_LOOPS = 20
+RSS_LOOPS_OCCURRENCES = [
+    datetime.time(hour=hours, minute=minutes, tzinfo=datetime.timezone.utc)
+    for hours in range(24)
+    for minutes in range(5, 60, TIME_BETWEEN_LOOPS) # every 20min starting at 5 minutes past the hour
+]
+
 
 TWITTER_ERROR_MESSAGE = "Due to the latest Twitter API changes, Twitter feeds are no longer supported by Axobot. Join our \
 Discord server (command `/about`) to find out more."
@@ -59,7 +66,6 @@ class Rss(commands.Cog):
 
     def __init__(self, bot: Axobot):
         self.bot = bot
-        self.time_loop = 20 # min minutes between two rss loops
         self.time_between_feeds_check = 0.15 # seconds between two rss checks within a loop
         self.max_messages = 15 # max messages sent per feed per loop
 
@@ -67,17 +73,13 @@ class Rss(commands.Cog):
         self.log = logging.getLogger("bot.rss")
         self.embed_color = discord.Color(6017876)
         self.loop_processing = False
-        self.errors_treshold = 24 * (60 / self.time_loop) # max errors allowed before disabling a feed (24h)
+        self.errors_treshold = 24 * (60 / TIME_BETWEEN_LOOPS) # max errors allowed before disabling a feed (24h)
 
         self.youtube_rss = YoutubeRSS(self.bot)
         self.web_rss = WebRSS(self.bot)
         self.deviant_rss = DeviantartRSS(self.bot)
         self.twitch_rss = TwitchRSS(self.bot)
         self.bluesky_rss = BlueskyRSS(self.bot)
-
-        self.cache: dict[str, list[RssMessage]] = {}
-        # launch rss loop
-        self.rss_loop.change_interval(minutes=self.time_loop) # pylint: disable=no-member
 
     @property
     def table(self):
@@ -1239,7 +1241,7 @@ class Rss(commands.Cog):
         """Get every feed of the database from known guilds"""
         guild_ids = [guild.id for guild in self.bot.guilds]
         args_placeholder = ",".join(["%s"] * len(guild_ids))
-        query = f"SELECT * FROM `{self.table}` WHERE `guild` in ({args_placeholder})"
+        query = f"SELECT * FROM `{self.table}` WHERE `guild` in ({args_placeholder}) AND `enabled`=1"
         async with self.bot.db_main.read(query, guild_ids) as query_results:
             feeds_list = [FeedObject(result) for result in query_results]
         return feeds_list
@@ -1340,52 +1342,47 @@ class Rss(commands.Cog):
                 self.bot.dispatch("server_warning", ServerWarningType.RSS_UNKNOWN_CHANNEL, guild,
                                   channel_id=feed.channel_id, feed_id=feed.feed_id)
                 return False
-            if feed.link in self.cache:
-                objs = self.cache[feed.link]
-            else:
-                if feed.type == "yt":
-                    if feed.date is None:
-                        objs = await self.youtube_rss.get_last_post(chan, feed.link, feed.filter_config, session)
-                    else:
-                        objs = await self.youtube_rss.get_new_posts(chan, feed.link, feed.date, feed.filter_config, session)
-                elif feed.type == "tw":
-                    self.bot.dispatch("server_warning", ServerWarningType.RSS_TWITTER_DISABLED, guild,
-                                      channel_id=feed.channel_id, feed_id=feed.feed_id)
-                    return False
-                elif feed.type == "web":
-                    if feed.date is None:
-                        objs = await self.web_rss.get_last_post(chan, feed.link, feed.filter_config, session)
-                    else:
-                        objs = await self.web_rss.get_new_posts(chan, feed.link, feed.date, feed.filter_config,
-                                                                feed.last_entry_id, session)
-                elif feed.type == "deviant":
-                    if feed.date is None:
-                        objs = await self.deviant_rss.get_last_post(chan, feed.link, feed.filter_config, session)
-                    else:
-                        objs = await self.deviant_rss.get_new_posts(chan, feed.link, feed.date, feed.filter_config, session)
-                elif feed.type == "twitch":
-                    if feed.date is None:
-                        objs = await self.twitch_rss.get_last_post(chan, feed.link, feed.filter_config, session)
-                    else:
-                        objs = await self.twitch_rss.get_new_posts(chan, feed.link, feed.date, feed.filter_config, session)
-                elif feed.type == "bluesky":
-                    if feed.date is None:
-                        objs = await self.bluesky_rss.get_last_post(chan, feed.link, feed.filter_config, session)
-                    else:
-                        objs = await self.bluesky_rss.get_new_posts(chan, feed.link, feed.date, feed.filter_config, session)
+            if feed.type == "yt":
+                if feed.date is None:
+                    objs = await self.youtube_rss.get_last_post(chan, feed.link, feed.filter_config, session)
                 else:
-                    self.bot.dispatch("error", RuntimeError(f"Unknown feed type {feed.type}"))
-                    return False
-                # transform single object into list
-                if isinstance(objs, RssMessage):
-                    objs = [objs]
+                    objs = await self.youtube_rss.get_new_posts(chan, feed.link, feed.date, feed.filter_config, session)
+            elif feed.type == "tw":
+                self.bot.dispatch("server_warning", ServerWarningType.RSS_TWITTER_DISABLED, guild,
+                                    channel_id=feed.channel_id, feed_id=feed.feed_id)
+                return False
+            elif feed.type == "web":
+                if feed.date is None:
+                    objs = await self.web_rss.get_last_post(chan, feed.link, feed.filter_config, session)
+                else:
+                    objs = await self.web_rss.get_new_posts(chan, feed.link, feed.date, feed.filter_config,
+                                                            feed.last_entry_id, session)
+            elif feed.type == "deviant":
+                if feed.date is None:
+                    objs = await self.deviant_rss.get_last_post(chan, feed.link, feed.filter_config, session)
+                else:
+                    objs = await self.deviant_rss.get_new_posts(chan, feed.link, feed.date, feed.filter_config, session)
+            elif feed.type == "twitch":
+                if feed.date is None:
+                    objs = await self.twitch_rss.get_last_post(chan, feed.link, feed.filter_config, session)
+                else:
+                    objs = await self.twitch_rss.get_new_posts(chan, feed.link, feed.date, feed.filter_config, session)
+            elif feed.type == "bluesky":
+                if feed.date is None:
+                    objs = await self.bluesky_rss.get_last_post(chan, feed.link, feed.filter_config, session)
+                else:
+                    objs = await self.bluesky_rss.get_new_posts(chan, feed.link, feed.date, feed.filter_config, session)
+            else:
+                self.bot.dispatch("error", RuntimeError(f"Unknown feed type {feed.type}"))
+                return False
+            # transform single object into list
+            if isinstance(objs, RssMessage):
+                objs = [objs]
             if isinstance(objs, str | int | None) or len(objs) == 0:
                 return True
             elif isinstance(objs, list):
                 if len(objs) == 0:
                     return True
-                # update cache
-                self.cache[feed.link] = objs
                 latest_post_date = None
                 latest_entry_id = None
                 sent_messages = 0
@@ -1512,9 +1509,8 @@ class Rss(commands.Cog):
             self.log.warning(desc[1])
         if guild_id is None:
             self.loop_processing = False
-        self.cache.clear()
 
-    @tasks.loop(minutes=20)
+    @tasks.loop(time=RSS_LOOPS_OCCURRENCES)
     async def rss_loop(self):
         "Main method that call the loop method once every 20min - considering RSS is enabled and working"
         if not self.bot.rss_enabled:

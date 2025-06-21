@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING, Any, Literal
 
 import aiohttp
 import discord
+from cachetools import TTLCache
 from feedparser import CharacterEncodingOverride
 from feedparser.util import FeedParserDict
 
@@ -24,6 +25,7 @@ class WebRSS:
         self.bot = bot
         self.min_time_between_posts = 120 # seconds
         self.url_pattern = r"^(?:https://)(?:www\.)?(\S+)$"
+        self._cache = TTLCache[str, FeedParserDict](maxsize=1_000, ttl=60 * 5)
 
     def is_web_url(self, string: str):
         "Check if an url is a valid HTTPS web URL"
@@ -33,7 +35,10 @@ class WebRSS:
     async def _get_feed(self, url: str, filter_config: FeedFilterConfig | None=None,
                         session: aiohttp.ClientSession | None=None) -> FeedParserDict:
         "Get a list of feeds from a web URL"
-        feed = await feed_parse(url, 9, session)
+        if (feed := self._cache.get(url)) is None:
+            feed = await feed_parse(url, 9, session)
+            if feed is not None:
+                self._cache[url] = feed
         if feed is None or not feed.entries:
             return None
         if "bozo_exception" in feed and not isinstance(feed["bozo_exception"], CharacterEncodingOverride):
