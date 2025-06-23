@@ -1,6 +1,16 @@
 {
-    "cases-0": "%{nbr} Grund gefunden: (%{start}-%{end})",
+    "records_number": "",
     "deleted": "Der Fall #%{ID} wurde gelöscht!",
+    "display": {
+        "date": "",
+        "duration": "",
+        "guild": "",
+        "moderator": "",
+        "reason": "",
+        "title": "",
+        "type": "",
+        "user": ""
+    },
     "list-0": "**Typ:** {T}\n**Moderator:** {M}\n**Datum:** {D}\n**Grund:** *{R}*",
     "list-1": "**Server:** {G}\n**Typ:** {T}\n**Moderator:** {M}\n**Datum:** {D}\n**Grund:** *{R}*",
     "no-case": "Dieser Nutzer hat keine Verstöße!",

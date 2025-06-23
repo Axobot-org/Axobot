@@ -51,6 +51,10 @@
     },
     "soon": "Událost se blíží! Sledujte informace, protože začne %{date}",
     "tictactoe": {
+        "lost": {
+            "title": "",
+            "desc": ""
+        },
         "won": {
             "title": "Tic-tac-toe vítezství!",
             "desc": "Tím, že jsi vyhrál tuto hru, jsi získal ** body%{points} události**!"

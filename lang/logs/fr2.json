@@ -6,13 +6,15 @@
     "kick": "%{user} (%{userid}) a été expulsé du serveur",
     "mute": "%{user} (%{userid}) est maintenant muet",
     "reason": {
+        "account_creation": "",
         "autounmute": "unmute automatique",
         "invite": "Automod (invitation Discord)",
+        "invites": "",
         "memberchan": "Action automatique (config membercount)",
+        "mentions": "",
         "unban": "unban par %{user}",
         "unmute": "unmute par %{user}",
-        "welcome_roles": "Action automatique (config welcome_roles)",
-        "young": "Automod (compte trop récent)"
+        "welcome_roles": "Action automatique (config welcome_roles)"
     },
     "slowmode-disabled": "Slowmode désactivé dans le salon %{channel}",
     "slowmode-enabled": "Slowmode activé dans le salon %{channel} (%{seconds}s)",

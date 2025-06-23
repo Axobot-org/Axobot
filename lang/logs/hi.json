@@ -1,0 +1,25 @@
+{
+    "ban": "",
+    "case-del": "",
+    "case-reason": "",
+    "clear": "",
+    "kick": "",
+    "mute": "",
+    "reason": {
+        "account_creation": "",
+        "autounmute": "",
+        "invite": "",
+        "invites": "",
+        "memberchan": "",
+        "mentions": "",
+        "unban": "",
+        "unmute": "",
+        "welcome_roles": ""
+    },
+    "slowmode-disabled": "",
+    "slowmode-enabled": "",
+    "softban": "",
+    "unban": "",
+    "unmute": "",
+    "warn": ""
+}

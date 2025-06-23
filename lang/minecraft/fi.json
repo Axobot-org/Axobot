@@ -1,104 +1,40 @@
 {
-    "adv-fields": [
-        "Nimi",
-        "Tunniste",
-        "Tyyppi",
-        "Toiminta",
-        "Aikuinen",
-        "Lapsi",
-        "Lisätty versiossa"
-    ],
-    "adv-help": "Tämä komento antaa tietoa mistä tahansa edistyksestä pelistä Minecraft. Lähetä edistyksen nimi tai tunniste.",
-    "block-fields": [
-        "Tunniste",
-        "Kasan koko",
-        "Luova muoto välilehti",
-        "Vauriopisteet",
-        "Kestävyys",
-        "Työkalu joka pystyy rikkoa sen",
-        "Mobit jotka voivat ryöstää sen",
-        "Lisätty versiossa",
-        "Lisätty versiossa"
-    ],
-    "block-help": "Tämä komento antaa sinun saamaan tietoa mistä tahansa Minecraft palikasta. Voit antaa sen nimen, Ranskaksi tai Englanniksi. Lähetä `%{p}mc block <nimi>`",
     "cant-embed": "En voi lähettää upotettua linkkiä. Varmista että minulla on \"Upota linkkejä\" käyttöoikeudet.",
-    "cmd-fields": [
-        "Nimu",
-        "Syntaxi",
-        "Esimerkit",
-        "Lisätty versiossa"
-    ],
-    "cmd-help": "Tämä komento antaa mahdollisuuden saada tietoa mistä tahansa Minecraftin komennosta. Sinun täytyy vain lähettää `%{p}mc command <nimi>`",
-    "contact-mail": "Jos huomaat virheen annetuissa tiedoissa, ota minuun yhteyttä personaalisesti, tai ota yhteyttä tänne: [sivustolla](https://fr-minecraft.net).",
-    "dimensions": "Leveys: %{la}\nPituus: %{lo}\nKorkeus: %{ha}",
-    "entity-fields": [
-        "Tunniste",
-        "Tyyli",
-        "Terveys Pisteet",
-        "Hyökkäys Pisteet",
-        "Kokemuspisteet, jotka vapautuvat kuolemaan",
-        "Suositeltavat bioomit",
-        "Lisätty versiossa"
-    ],
-    "entity-help": "Tämä komento antaa sinulle mahdollisuuden saada tietoa mistä tahansa Minecraft entiteetistä. Voit antaa sen täyden tai osittaisen nimen, Ranskaksi tai Englanniksi, tai jopa sen tunnisteen. Lähetä `%{p}mc entity <nimi>`",
-    "item-fields": [
-        "Tunniste",
-        "Koko kasasta",
-        "Luova muoto välilehti",
-        "Vahingoitus pisteet",
-        "Kestävyys pisteet",
-        "Työkalu joka voi rikkoa sen",
-        "Mobit jotka voivat tiputtaa tämän esineen",
-        "Lisätty versiossa"
-    ],
-    "item-help": "Tämä komento antaa sinulle mahdollisuuden saada tietoa mistä tahansa Minecraft esineestä. Voit antaa sen täyden tai osittaisen nimen, Ranskaksi tai Englanniksi, tai jopa sen tunnisteen. Lähetä `%{p}mc item <nimi>`",
+    "invalid-ip": "",
     "mod-fields": {
+        "author": "",
         "authors": "Tekijät",
         "categories": "Kategoriat",
         "downloads": "Latausten määrä",
-        "id": "CurseForge ID",
+        "id-curseforge": "",
+        "id-modrinth": "",
         "name": "Nimi",
         "release": "Viimeisin päivitys",
         "summary": "Yhteenveto",
         "versions": "Pelin versiot"
     },
-    "mod-help": "Tämö komento kertoo tietoa suuresta osasta Minecraftin modeista. Voit joko antaa sen täyden tai osan nimestä, kirjoita vain `%{p}mc mod <nimi>`. Modin täytyy olla CurseFrogissa",
-    "mojang_desc": {
-        "account.mojang.com": "Mojang käyttäjä johtajien sivu",
-        "api.mojang.com": "API palvelu jonka Mojang antaa",
-        "authserver.mojang.com": "Todennus palvelin",
-        "minecraft.net": "Oikea netti sivu",
-        "mojang.com": "Oikea netti sivu",
-        "session.minecraft.net": "Monipeli istunnot",
-        "sessionserver.mojang.com": "Monipeli istunnot",
-        "textures.minecraft.net": "Teema palvelin (skini & viitat)"
-    },
-    "names": [
-        "Palikka",
-        "Entiteetti",
-        "Esine",
-        "Komento",
-        "Ennakkosuoritus",
-        "Modi"
-    ],
-    "no-adv": "Mahdotonta löytää tämä ennakkosuoritus",
+    "mod-title": "",
     "no-api": "Virhe: Mahdotonta yhdistää API:hin",
-    "no-block": "Mahdotonta löytää tämä palikka",
-    "no-cmd": "Mahdotonta löytää tämä komento",
     "no-embed": "En pysty lähettää vastausta! Tarvitsen 'Upottaa Linkkejä' käyttöoikeuden.",
-    "no-entity": "Mahdotonta löytää tämä entiteetti",
-    "no-item": "Mahdotonta löytää tämä esine",
     "no-mod": "En löytänyt tuota modia",
     "no-ping": "Virhe: Mahdotonta mainits tätä palvelinta",
     "no-player-list": "Ei saatavilla",
     "player-not-found": "En voinut löytää Minecraft Java pelaajaa tuolla nimellä",
     "player-skin-download": "Paina tästä lataaksesi",
     "player-skin-title": "Käyttäjän %{player} skini",
-    "serv-0": "Numero pelaajista",
-    "serv-1": "Lista 20 ensimmäisestä pealaajasta yhdistettynä",
-    "serv-2": "Lista paikalla olevista pelaajista",
-    "serv-3": "Latency",
+    "server": {
+        "description": "",
+        "from-provider": "",
+        "latency": "",
+        "players-count": "",
+        "players-list-20": "",
+        "players-list-all": "",
+        "version": ""
+    },
+    "serv-follow": {
+        "missing-perms": "",
+        "success": ""
+    },
     "serv-error": "Ups, tuntematon virhe havaittu. Yritä uudelleen myöhemmin :confused:",
-    "serv-title": "Palvelin tiedot %{ip}",
-    "success-add": "Viesti palvelimen tiedoista %{ip} on lisätty kanavalle %{channel} !"
+    "serv-title": "Palvelin tiedot %{ip}"
 }

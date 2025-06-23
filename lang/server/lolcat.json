@@ -14,11 +14,11 @@
         "language": {
             "fr": "Baguette",
             "en": "'merican",
-            "lolcat": "lolcat",
+            "lolcat": "",
             "fi": "Finnnish",
-            "de": "German",
+            "de": "",
             "fr2": "FriendlyFrench",
-            "cs": "Czech"
+            "cs": ""
         },
         "levelup_channel": {
             "none": "no msg",
@@ -104,8 +104,9 @@
         "bot_news": "Liist for channnnels were 2 sendz bot nweZ: %{value}",
         "compress_help": "Shuld teh help cmd be smoller? %{value}",
         "delete_welcome_on_quick_leave": "Shuld I delete teh welcome msg whenever someone quick-join-and-leave-faster-than-a-cheetah? %{value}",
-        "description": "Server description:\n %{value}",
+        "description": "",
         "enable_events": "Shuld recurrent fun events (like Halloween or Xmas) also take place on dis server? %{value}",
+        "enable_invites_tracking": "",
         "enable_xp": "Shald teh xperiense systèm be enabld? %{value}",
         "help_in_private": "Sent help mess:a:ge on private msg? %{value}",
         "hunter": "Lyst for al cat roums in wich teh gamz *Hunter* are actved: %{value}",
@@ -135,26 +136,29 @@
         "voice_channel": "Chan from which i'll make voice chat rooms with cat magik: %{value}",
         "voice_channel_format": "How ur voice channelz will look like: %{value}",
         "voice_roles": "Roles gave to folks speaking together (or alone, I don't minde uwu): %{value}",
+        "voice_xp_per_min": "",
         "vote_emojis": "Emojiz use 4 powll reacts: %{value}",
         "welcome": "Missge snt whem a mber arived :: %{value}",
         "welcome_channel": "Lst of canels whe're to sen wilcume/leivz mesage': %{value}",
         "welcome_roles": "Lizt from rles otomaticall giveD 2 knew mmbr: %{value}",
         "welcome_silent_mention": "Shuld the welcome msg thing avoid notifications? %{value}",
         "xp_decay": "How much xp shud I remove from ppl everyday? %{value}",
-        "xp_rate": "XP earnings modifier: %{value}",
-        "xp_type": "XP system used: %{value}"
+        "xp_rate": "",
+        "xp_type": ""
     },
     "tips": {
         "antiscam_enable_logs": "U can get logs for dis system with %{modlogs_enable} :)",
-        "title": "Pro tip"
+        "title": ""
     },
     "value-deleted": "Teh \"%{option}\" opshun had been reset 2 default sir",
     "warnings": {
+        "afk_channel": "",
         "antiraid_perms_missing": {
             "one": "He protec but he also attac- wait no, i need teh '**%{perm}**' perm for that :/",
             "many": "Uh oh, looks like i miss a few perms if u wanna do that: **%{list}**"
         },
         "channel_write_permissions": "Whoopsie, did u forget 2 allow me 2 send msg in %{channel}?",
+        "manage_guild_permissions": "",
         "moderation_command": "I need 2b able 2 %{perm} for dis command hehe",
         "title": "YOUR ATTENTION PLEASE - THIS IS A SERIOUS WARNING - I guess",
         "xp_should_be_enabled": "Dis opshun is for teh xp system, u might wanna enable it first wiz /config set 'enable_xp'",

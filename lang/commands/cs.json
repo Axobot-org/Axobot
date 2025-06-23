@@ -1,5 +1,8 @@
 {
     "command_name": {
+        "Quote": "Citát",
+        "Report a scam": "Nahlásit podvod",
+        "Voice to text": "Převod hlasu na text",
         "about": "o-aplikaci",
         "antiscam report": "nahlásit",
         "antiscam test": "test",
@@ -32,6 +35,11 @@
         "event profile": "profil",
         "help": "pomoc",
         "info": "informace",
+        "invites-tracker disable": "deaktivovat",
+        "invites-tracker enable": "povolit",
+        "invites-tracker list-invites": "seznam-pozvánek",
+        "invites-tracker resync": "opakovaně synchronizovat",
+        "invites-tracker set-name": "nastavit-jméno",
         "kick": "vyhodit",
         "last-post": "poslední-příspěvek",
         "membercount": "počet-členů",
@@ -61,15 +69,13 @@
         "profile config": "nastavení",
         "profile list-card-styles": "seznam-stylů-karet",
         "quote": "citát",
-        "Quote": "Citát",
         "random-tip": "náhodný-tip",
         "rank": "hodnost",
+        "reminders cancel": "zrušit",
         "reminders clear": "vyčistit",
         "reminders create": "vytvořit",
-        "reminders cancel": "zrušit",
         "reminders list": "seznam",
         "remindme": "připomenutí",
-        "Report a scam": "Nahlásit podvod",
         "role grant": "grant",
         "role members-list": "seznam-členů",
         "role revoke": "odvolat",
@@ -125,7 +131,6 @@
         "unban": "odblokovat",
         "unhoist": "odstranit-symbolu-u-uživatelů",
         "unmute": "zrušit-umlčení",
-        "Voice to text": "Převod hlasu na text",
         "warn": "varovat"
     },
     "command_short_description": {
@@ -133,6 +138,12 @@
         "cases list": "Seznam všech případů moderování uživatele",
         "cases remove": "Trvale smazat případ moderace",
         "cases search": "Najít podrobnosti moderování případu",
+        "clear": "Odstranit některé zprávy z kanálu",
+        "invites-tracker disable": "Zastavit používání pozvánek ke sledování na vašem serveru",
+        "invites-tracker enable": "Začněte používat pozvánky k sledování na vašem serveru",
+        "invites-tracker list-invites": "Seznam sledovaných pozvánek a jejich použití",
+        "invites-tracker resync": "Ujistěte se, že pozvánky uložené v databázi jsou aktuální",
+        "invites-tracker set-name": "Zadejte vlastní název pro URL pozvánky",
         "membercount": "Získejte nějaké statistiky o členech vašeho serveru",
         "minecraft follow-server": "Sledujte informace o serveru v reálném čase ve vašem kanálu",
         "minecraft mod": "Získejte informace o jakémkoli modu registrovaném na CurseForge nebo Modrinth",
@@ -148,8 +159,10 @@
         "partners set-invite": "Editovat zvaci URL partnera",
         "quote": "Citujte zprávu s pěkně vygenerovaným obrázkem",
         "random-tip": "Získejte náhodný tip nebo zajímavost o botovi",
+        "rank": "",
         "set-xp": "Nastavte XP uživateli na vašem serveru",
-        "tic-tac-toe": "Hrajte hru Piškvorky proti botovi"
+        "tic-tac-toe": "Hrajte hru Piškvorky proti botovi",
+        "top": ""
     },
     "group_description": {
         "antiscam": "Vše, co souvisí s funkcí antiscam",
@@ -158,6 +171,7 @@
         "config": "Konfigurace bota pro váš server",
         "emoji": "Spravujte své emoji",
         "event": "Zůčastni se speciálních událostí",
+        "invites-tracker": "Sledujte využití pozvánek",
         "minecraft": "Hledat informace o serverech/hráčích/modech z Minecraftu",
         "modlogs": "Povolit nebo zakázat protokoly serveru v určitých kanálech",
         "partners": "Spravujte partnery vašeho serveru",
@@ -180,6 +194,7 @@
         "config": "nastavení",
         "emoji": "emoji",
         "event": "událost",
+        "invites-tracker": "pozvánky-tracker",
         "minecraft": "minecraft",
         "modlogs": "záznam-moderátorů",
         "partners": "partneři",
@@ -285,6 +300,10 @@
             "query": "dotaz",
             "query_type": "typ-dotazu"
         },
+        "invites-tracker set-name": {
+            "invite": "pozvat",
+            "name": "jméno"
+        },
         "kick": {
             "reason": "důvod",
             "user": "uživatel"
@@ -374,12 +393,12 @@
         "rank": {
             "user": "uživatel"
         },
+        "reminders cancel": {
+            "reminder_id": "připomenutí-id"
+        },
         "reminders create": {
             "duration": "doba-trvání",
             "message": "zpráva"
-        },
-        "reminders cancel": {
-            "reminder_id": "připomenutí-id"
         },
         "remindme": {
             "duration": "doba-trvání",
@@ -433,7 +452,8 @@
             "level": "úroveň"
         },
         "rss add": {
-            "link": "odkaz"
+            "link": "odkaz",
+            "channel": ""
         },
         "rss disable": {
             "feed": "zdroj"
@@ -474,7 +494,8 @@
             "text": "text"
         },
         "rss test": {
-            "feed": "zdroj"
+            "feed": "zdroj",
+            "with_mentions": ""
         },
         "set-xp": {
             "user": "uživatel",

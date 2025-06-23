@@ -4,6 +4,9 @@
         "many": "Zadejte role uvedené pro tyto kanály (jména, ID nebo zmínění), oddělené mezerami."
     },
     "ask-roles-hint-example": "Například:\n> Členové \"Super VIP\" @Ping role",
+    "bluesky": "",
+    "bluesky-default-flow": "",
+    "bluesky-form-last": "",
     "change-txt": {
         "title": "Upravit text kanálu",
         "label": "Šablona zprávy",
@@ -21,7 +24,6 @@
                 "timestamp": "`{timestamp}`: Unixový čas příspěvku v sekundách, použitelný ve značce časové značky Discord",
                 "link": "`{link}` nebo `{url}`: odkaz na příspěvek",
                 "logo": "`{logo}`: emoji reprezentující typ příspěvku (web, Reddit, YouTube...)",
-                "mentions": "`{mentions}`: seznam zmíněných rolí",
                 "title": "`{title}`: název příspěvku",
                 "full_text": "`{full_text}`: úplný text příspěvku, pokud je k dispozici",
                 "description": "`{description}`: popis/shrnutí příspěvku, pokud je k dispozici"
@@ -64,7 +66,7 @@
         "many": "%{count} rss streamů bylo správně obnoveno, za %{time} sekund!"
     },
     "guild-error": "Během postupu došlo k chybě: `%{err}`\nPokud si myslíte, že tato chyba není způsobena vámí, můžete ji nahlásit na podporu",
-    "guild-loading": "Reloading %{emoji}",
+    "guild-loading": "Znovu načítám %{emoji}",
     "invalid-flow": "Tato adresa URL je neplatná (prázdná nebo nedostupná RSS kanály) :confused:",
     "invalid-link": "Dobrý pokus, ale tato adresa url je neplatná nebo nekompletní :confused:",
     "list": "*Zadejte počet kanálů pro úpravy*\n\n**Odkaz - Typ - Kanál - Zmínky**\n",

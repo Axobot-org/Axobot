@@ -1,59 +1,150 @@
 {
-    "change-txt": "Le message contient *actuellement* \n```\n%{text}\n```\nTu peux entrer le texte à utiliser lors d'un nouveau post. Tu peux également utiliser ces variables :\n- `{author}` : l'auteur du post\n- `{channel}` : le salon Discord dans lequel est posté le message\n- `{date}` : la date du post (UTC)\n- `{link}` ou `{url}` : un lien vers le post\n- `{logo}` : un emoji représentant le type de post (web, Twitter, YouTube...)\n- `{mentions}` : la liste des rôles mentionnés\n- `{title}` : le titre du post",
+    "ask-roles-hint": {
+        "one": "",
+        "many": ""
+    },
+    "ask-roles-hint-example": "",
+    "bluesky": "",
+    "bluesky-default-flow": "",
+    "bluesky-form-last": "",
+    "change-txt": {
+        "title": "",
+        "label": "",
+        "modal-success": "",
+        "placeholder": "",
+        "confirmation": {
+            "current-structure": "",
+            "variables-title": "",
+            "variables-explanation": "",
+            "variables": {
+                "author": "",
+                "channel": "",
+                "date": "",
+                "long_date": "",
+                "timestamp": "",
+                "link": "",
+                "logo": "",
+                "title": "",
+                "full_text": "",
+                "description": ""
+            }
+        }
+    },
     "choose-delete": "Hey ! Tu choisis le flux à supprimer ?",
+    "choose-disable": "",
+    "choose-enable": "",
     "choose-mentions-1": "Quel flux je dois modifier ?",
     "choose-roles": "Quels vont être les rôles à mentionner ?",
-    "deviant": "DeviantArt",
+    "choose-test": "",
+    "delete-success": {
+        "many": "",
+        "one": ""
+    },
+    "disable-success": {
+        "many": "",
+        "one": ""
+    },
+    "enable-success": {
+        "many": "",
+        "one": ""
+    },
+    "deviant": "",
     "deviant-default-flow": "{logo}  | Nouvelle création de {author} : **{title}**\nPubliée le {date}\nLien : {link}\n{mentions}",
     "deviant-form-last": "{logo}  | Voici la dernière création de {author}:\n{title}\nPubliée le {date}\nLien : {url}",
     "embed-json-changed": "L'embed de ce flux a bien été modifié",
+    "filter": {
+        "same": "",
+        "success": {
+            "blacklist": "",
+            "reset": "",
+            "whitelist": ""
+        }
+    },
     "flow-limit": "Pour des raisons de performances, tu peux pas suivre plus de %{limit} flux rss par serveur.",
-    "guild-complete": "%{count} flux rss ont correctement été rechargés, en %{time} secondes !",
+    "guild-complete": {
+        "one": "",
+        "many": ""
+    },
     "guild-error": "Une erreur est survenue pendant la procédure : `%{err}`\nSi tu penses que cette erreur ne vient pas de toi, avertis-en le support plz.",
     "guild-loading": "Rechargement en cours %{loading}",
     "invalid-flow": "Cet url est invalide (flux rss vide ou inaccessible) :blobconfused:",
     "invalid-link": "Oups, cette adresse url est invalide ou incomplète :confused:",
     "list": "*Entre le numéro du flux à modifier*\n\n**Lien - Type - Salon - Roles**\n",
+    "list-disabled": "",
     "list-result": "{emoji} {link}\nSalon discord : {channel}\nPings : {roles}\nID : {id}\nDernier post : {last_post}",
-    "list-title": "Liste des flux rss du serveur %{server}",
+    "list-result-filter": {
+        "none": "",
+        "blacklist": "",
+        "whitelist": ""
+    },
+    "list-title": {
+        "one": "",
+        "many": ""
+    },
     "list2": "*Entre le numéro du flux à supprimer*\n\n**Lien - Type - Salon**\n",
     "loop-processing": "Une check de vos flux RSS est déjà en cours. Veuillez attendre quelques minutes.",
-    "mc": "Minecraft",
+    "mc": "",
+    "move-success": {
+        "many": "",
+        "one": ""
+    },
     "no-feed": "Wait :confused:\n\n T'as aucun flux RSS à gérer :grinning: !",
     "no-feed2": "Ce serv à aucun flux RSS",
+    "no-feed-enabled": "",
+    "no-feed-filter": "",
     "no-roles": ":shrug:\n\nT'as configuré aucun rôle !",
     "not-a-role": "J'ai beau chercher, je trouve pas ce rôle...\nTu réessaies ?",
     "nothing": "Je n'ai rien trouvé sur cette recherche :confused:",
+    "picker-placeholder": {
+        "single": "",
+        "multi": ""
+    },
     "research-timeout": "La page web a mis trop de temps à répondre, j'ai dû interrompre le processus :eyes:",
     "roles": {
+        "edit-silent-false": {
+            "one": "",
+            "many": ""
+        },
+        "edit-silent-true": {
+            "one": "",
+            "many": ""
+        },
         "edit-success": {
             "many": "Ce flux a bien été modifié pour mentionner les rôles %{roles}",
             "one": "Ce flux a bien été modifié pour mentionner le rôle %{roles}",
             "zero": "Ce flux a bien été modifié pour ne mentionner aucun rôle ! Évitons les pings inutiles."
         },
-        "list": "Hop ! La liste des rôles déjà mentionnés : %{roles}"
+        "list": "Hop ! La liste des rôles déjà mentionnés : %{roles}",
+        "no-change": ""
     },
     "success-add": "Le flux RSS de type '%{type}' avec le lien <%{url}> a bien été ajouté dans le salon %{channel} !",
-    "text-success": "Le texte du flux n°%{id} a bien été modifié ! Du coup, maintenant c'est ça : \n```\n%{text}\n```",
+    "test": {
+        "empty-result": "",
+        "invalid-format": ""
+    },
+    "text-success": {
+        "single": "",
+        "multiple": ""
+    },
     "too-long": "Vous avez trop attendu, désolé :hourglass: !",
-    "tw": "Twitter",
+    "tw": "",
     "tw-default-flow": "{logo}  | Waaaaw ! {author} a tweeté quelque chose ! ({date})\n\n{title}\n\nHop, accès direct à Twitter : {link}\n\n{mentions}",
     "tw-form-last": "{logo}  | Le dernier tweet de {author} est servi le {date}, sur son list frais de\n```{title}```\n\nPassage spatio-temporel vers Twitter : {url}\n",
-    "tw-help": "Pour rechercher un twitter, faut entrer l'identifiant de ce twitter. Tu la trouveras à la fin de son url, elle correspond généralement au nom de l'utilisateur. Par exemple, pour *https://twitter.com/Mc_AsiliS*, il faut rentrer `Mc_AsiliS`.",
-    "twitch": "Twitch",
+    "tw-no-tweet": "",
+    "twitch": "",
     "twitch-default-flow": "{logo}  | Nouveau live de {author} ! On y va, vite ! ({date})\n\n{title}\n\nLien : {link}\n\n{mentions}",
     "twitch-form-last": "{logo}  | Ta-daaaam ! La dernière vidéo de {author} !\n{title}\nPubliée le {date}\nLien : {url}\n",
+    "twitch-invalid": "",
     "use_embed-same": "L'utilisation d'embeds pour ce flux n'a pas changée",
     "use_embed-success": "La valeur a bien été modifiée à %{v} pour le flux n°%{id} !",
     "use_embed_false": "Ce flux n'utilise pas d'embed pour être envoyé. Ça te dit de les activer ? (true/false)",
     "use_embed_true": "Ce flux utilise actuellement les embeds pour être envoyé. Tu veux les désactiver ? (true/false)",
-    "web": "Web",
+    "web": "",
     "web-default-flow": "{logo}  | Yaaaaay ! :grin: Nouveau post sur {channel} ({date}) :\n    {title}\n\n{link}\n\n{mentions}",
     "web-form-last": "{logo}  | Ceci est le dernier post de {channel} :\n**{title}**\n*Ecrit le {date}*\nLien : {link}",
-    "web-help": "Pour rechercher un flux RSS à partir de n'importe quel site web, il suffit d'entrer l'url du flux RSS/atom en paramètre. Si le flux est valide, je te renverrai le dernier article posté sur ce site. *Astuce : certains flux RSS sont déjà renseignées dans mon code. Vous pouvez parfois vous contenter de mettre `fr-minecraft` ou `minecraft.net`* :wink:",
     "web-invalid": ":owo: Cette adresse url est complètement broken ! :confused:",
-    "yt": "YouTube",
+    "yt": "",
     "yt-default-flow": "{logo}  | Nouvelle vidéo de {author} : **{title}**\nPubliée le {date}\nLien : {link}\n{mentions}",
     "yt-form-last": "{logo}  | Ceci est la toute dernière vidéo de {author} ! \n{title}\nPubliée le {date}\nLien : {url}",
-    "yt-help": "Pour rechercher une chaîne youtube, vous devez entrer l'identifiant de cette chaîne. Tu la trouveras à la fin de l'url de la chaine, elle peut être soit le nom, soit une suite de caractères aléatoires. *Astuce : certaines chaînes sont déjà renseignées dans mon code. Vous pouvez parfois vous contenter de mettre `neil3000` ou `Oxisius`* :wink:"
+    "yt-invalid": ""
 }

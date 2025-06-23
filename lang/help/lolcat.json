@@ -51,8 +51,8 @@
             "Err: pumpkin theme not found"
         ],
         "is_owner": [
-            "You must be the owner of the bot",
-            "You are not the owner of the bot"
+            "",
+            ""
         ],
         "is_support_staff": [
             "You're a member of the bot staff",
@@ -79,6 +79,6 @@
     "no-subcmd": "Teh kommand %{cmd} had no sub~~scribe~~command",
     "not-enabled": ":warning: This command iz def not enable",
     "subcmd-not-found": "Thiz commnd have no sUbcommant newmed \"%{name}\"",
-    "subcmds": "Subcommands",
+    "subcmds": "",
     "warning": "Warns"
 }
