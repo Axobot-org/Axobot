@@ -6,7 +6,7 @@ on:
   push:
     paths:
       - 'lang/**/en.json'
-    branches: [ develop ]
+    branches: [ develop, crowdin-action ]
   workflow_dispatch:
 
 permissions:
