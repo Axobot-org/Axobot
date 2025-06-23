@@ -1,10 +1,31 @@
 {
     "rmd": {
+        "cancelled": "",
+        "cleared": "",
+        "confirm": "",
+        "custom-duration": {
+            "button": "",
+            "title": "",
+            "input": ""
+        },
+        "delete": {
+            "error": "",
+            "success": {
+                "one": "",
+                "many": ""
+            },
+            "title": ""
+        },
         "embed-asked": "%{user}, du hast mich vor %{duration} gefragt, dass ich dich daran erinnern soll:",
         "embed-date": "gefragt um",
         "embed-link": "Originale Nachricht",
         "embed-title": "Erinnerung",
+        "empty": "",
+        "item": "",
+        "recreated": "",
         "saved": "Habs! Ich werde dich in %{duration} erinnern",
+        "select-placeholder": "",
+        "title": "",
         "too-long": "Es ist nicht möglich es auf eine so lange Zeit zu setzen",
         "too-short": "Du hast eine ungültige Zeit eingegeben"
     }

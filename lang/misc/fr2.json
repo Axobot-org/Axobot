@@ -7,36 +7,56 @@
         "watch": "regarde"
     },
     "added_at": "Ajouté le",
-    "aucune": "aucune",
     "beginning": "début",
-    "bot": "bot",
+    "bot": "",
+    "btn": {
+        "cancel": {
+            "answer": "",
+            "label": ""
+        },
+        "confirm": {
+            "answer": "",
+            "label": ""
+        },
+        "delete": {
+            "answer": "",
+            "label": ""
+        }
+    },
     "case": "casier",
     "category": "catégorie",
     "click_here": "Clique ici !",
-    "depuis": "depuis",
     "dnd": "ne pas déranger",
     "doc": "Documentention",
+    "done!": "",
     "duration": "durée",
     "end": "fin",
-    "example": "exemple",
+    "example": {
+        "one": "",
+        "many": ""
+    },
     "extreme": "extrême",
     "ghost": "Fantôme",
     "high": "élevé",
+    "highest": "",
     "idle": "inactif",
     "low": "faible",
     "medium": "moyen",
     "member": "membre",
     "membres": "membres",
-    "nom": "nom",
-    "non": "non",
+    "name": "",
+    "no": "",
     "none": "aucun",
     "offline": "hors ligne",
     "online": "en ligne",
-    "oui": "oui",
+    "quit": "",
     "reason": "raison",
     "request_by": "Demandé par %{user} =B",
     "server": "serveur",
     "servers": "serveurs",
+    "since": "",
     "unknown": "Inconnu",
-    "version": "version"
+    "verified": "",
+    "version": "",
+    "yes": ""
 }

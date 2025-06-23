@@ -1,8 +1,19 @@
 {
-    "cases-0": "%{nbr} casos encontrado: (%{start}-%{end})",
+    "records_number": "",
     "deleted": "¡El caso #%{ID} ha sido borrado!",
+    "display": {
+        "date": "",
+        "duration": "",
+        "guild": "",
+        "moderator": "",
+        "reason": "",
+        "title": "",
+        "type": "",
+        "user": ""
+    },
     "list-0": "**Tipo:** {T}\n**Moderador:** {M}\n**Fecha:** {D}\n**Razón:** *{R}*",
     "list-1": "**Servidor:** {G}\n**Tipo:** {T}\n**Moderador:** {M}\n**Fecha:** {D}\n**Razón:** *{R}*",
+    "no-case": "",
     "no-user": "No se puede encontrar a este usuario :eyes:",
     "no_database": "Debido a una interrupción temporal de la base de datos, este comando ha sido desactivado",
     "not-found": "Este caso no fue encontrado :confused:",

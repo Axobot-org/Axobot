@@ -2,12 +2,10 @@
     "aliases": "Apodos:",
     "categories": {
         "data": "información",
-        "fun": "diversión",
         "moderation": "moderación",
         "other": "otras",
         "server-settings": "configuración del servidor",
         "staff": "personal del bot",
-        "translators": "equipo de traducción",
         "unclassed": "Sin clase",
         "users-info": "Información de los usuarios"
     },
@@ -15,34 +13,6 @@
         "bot_has_permissions": [
             "El bot tiene suficientes permisos",
             "El bot no tiene suficientes permisos"
-        ],
-        "can_ban": [
-            "Uno de sus roles está autorizado a usar este comando (`ban_allowed_roles`)",
-            "Falta el rol permitido (`ban_allowed_roles`)"
-        ],
-        "can_clear": [
-            "Uno de sus roles está autorizado a usar este comando (`clear`_allowed_roles)",
-            "Falta el rol permitido (`clear_allowed_roles`)"
-        ],
-        "can_edit_case": [
-            "Uno de sus roles está autorizado a usar este comando (`warn_allowed_roles`)",
-            "Falta el rol permitido (`warn_allowed_roles`)"
-        ],
-        "can_kick": [
-            "Uno de sus roles está autorizado a usar este comando (`kick_allowed_roles`)",
-            "Falta el rol permitido (`kick_allowed_roles`)"
-        ],
-        "can_mute": [
-            "Uno de sus roles está autorizado a usar este comando (`mute_allowed_roles`)",
-            "Falta el rol permitido (`mute_allowed_roles`)"
-        ],
-        "can_say": [
-            "Uno de sus roles está autorizado a usar este comando (`say_allowed_roles`)",
-            "Falta el rol permitido (`say_allowed_roles`)"
-        ],
-        "can_slowmode": [
-            "Uno de sus roles está autorizado a usar este comando (`slowmode_allowed_roles`)",
-            "Falta el rol permitido (`slowmode_allowed_roles`)"
         ],
         "can_use_cookie": [
             "Eres un elegido de Aragorn1202",
@@ -52,49 +22,33 @@
             "Tienes el permiso 'Gestionar Servidor'",
             "Falta el permiso 'Gestionar Servidor'"
         ],
-        "can_warn": [
-            "Uno de sus roles está autorizado a usar este comando (`warn_allowed_roles`)",
-            "Falta el rol permitido (`warn_allowed_roles`)"
+        "database_connected": [
+            "",
+            ""
         ],
         "guild_only": [
             "Sólo se puede utilizar en un servidor",
             "Sólo se puede utilizar en un servidor"
         ],
-        "has_admin": [
-            "Tienes el permiso 'Administrador'",
-            "Falta el permiso 'Administrador'"
-        ],
-        "has_embed_links": [
-            "Tienes el permiso 'Insertar Enlaces'",
-            "Falta el permiso 'Insertar Enlaces'"
-        ],
-        "has_manage_guild": [
-            "Tienes el permiso 'Gestionar Servidor'",
-            "Falta el permiso 'Gestionar Servidor'"
-        ],
-        "has_manage_msg": [
-            "Tienes el permiso 'Gestionar Mensajes'",
-            "Falta el permiso 'Gestionar Mensajes'"
-        ],
-        "has_manage_nicknames": [
-            "Tienes el permiso 'Gestionar Apodos'",
-            "Falta el permiso 'Gestionar Apodos'"
-        ],
-        "has_manage_roles": [
-            "Tienes el permiso 'Gestionar Roles'",
-            "Falta el permiso 'Gestionar Roles'"
-        ],
         "has_permissions": [
             "Tienes los suficientes permisos de Discord",
             "No tienes los permisos de Discordia correctos"
+        ],
+        "in_support_server": [
+            "",
+            ""
+        ],
+        "is_blurple": [
+            "",
+            ""
         ],
         "is_bot_admin": [
             "Necesitas ser uno de los Administradores del bot",
             "No eres un Administrador del bot"
         ],
-        "is_fun_enabled": [
-            "Los comandos divertidos están activados",
-            "Los comandos divertidos deben estar activados"
+        "is_halloween": [
+            "",
+            ""
         ],
         "is_owner": [
             "Necesitas ser el propietario del bot",
@@ -103,22 +57,28 @@
         "is_support_staff": [
             "Usted es un miembro del personal del bot",
             "Debes ser parte del personal del bot"
-        ],
-        "is_translator": [
-            "Usted es un miembro del equipo de traductores",
-            "Debes ser parte del equipo de traductores"
-        ],
-        "verify_role_exists": [
-            "Se ha establecido un rol de verificación",
-            "No se ha añadido un rol de verificación"
         ]
     },
+    "cmd-count": {
+        "zero": "",
+        "one": "",
+        "many": ""
+    },
     "cmd-not-found": "No hay no comando con nombre \"%{cmd}\"",
+    "cog-empty-dm": "",
+    "description": "",
     "embed_title": "Comandos disponibles para %{u}",
+    "embed_title_dm": "",
     "footer": "Escriba {}help command para obtener más información sobre un comando",
+    "more-subcmds": {
+        "one": "",
+        "many": ""
+    },
     "no-desc-cmd": "No hay descripción para este comando",
     "no-desc-cog": "No hay descripción para este módulo.",
     "no-subcmd": "El comando `%{cmd}` no tiene subcomando",
     "not-enabled": ":warning: Este comando está desactivado",
-    "subcmd-not-found": "Este comando no tiene un subcomando llamado \"%{name}\""
+    "subcmd-not-found": "Este comando no tiene un subcomando llamado \"%{name}\"",
+    "subcmds": "",
+    "warning": ""
 }

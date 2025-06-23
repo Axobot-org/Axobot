@@ -2,12 +2,10 @@
     "aliases": "Takma isimler",
     "categories": {
         "data": "bilgi",
-        "fun": "eğlence",
         "moderation": "Moderasyon",
         "other": "diğerleri",
         "server-settings": "sunucu ayarları",
         "staff": "bot yetkilileri",
-        "translators": "çeviri takımı",
         "unclassed": "Sınıflandırılmamış",
         "users-info": "Kullanıcılar bilgisi"
     },
@@ -16,41 +14,13 @@
             "Bot eksik yetkilere sahip",
             "Bot eksik yetkilere sahip değil"
         ],
-        "can_ban": [
-            "Rollerinizden birisi (`ban_allowed_roles`) komutunu kullanmak için yetkilendirildi",
-            "eksik izinlendirilmiş rol (`ban_allowed_roles`)"
-        ],
-        "can_clear": [
-            "Rollerinizden birisi (`clear_allowed_roles`) komutunu kullanmak için yetkilendirildi",
-            "eksik izinlendirilmiş rol (`clear_allowed_roles`)"
-        ],
-        "can_edit_case": [
-            "Rollerinizden birisi (`warn_allowed_roles`) komutunu kullanmak için yetkilendirildi",
-            "eksik izinlendirilmiş rol (`warn_allowed_roles`)"
-        ],
-        "can_kick": [
-            "Rollerinizden birisi (`kick_allowed_roles`) komutunu kullanmak için yetkilendirildi",
-            "eksik izinlendirilmiş rol (`kick_allowed_roles`)"
-        ],
-        "can_mute": [
-            "Rollerinizden birisi (`mute_allowed_roles`) komutunu kullanmak için yetkilendirildi",
-            "eksik izinlendirilmiş rol (`mute_allowed_roles`)"
-        ],
-        "can_say": [
-            "Rollerinizden birisi (`say_allowed_roles`) komutunu kullanmak için yetkilendirildi",
-            "eksik izinlendirilmiş rol (`say_allowed_roles`)"
-        ],
-        "can_slowmode": [
-            "Rollerinizden birisi (`slowmode_allowed_roles`) komutunu kullanmak için yetkilendirildi",
-            "eksik izinlendirilmiş rol (`slowmode_allowed_roles`)"
-        ],
         "can_use_cookie": [
             "Aragorn1202 tarafından seçilmiş birisin",
             "Bu komut beyaz listeyi kullanır"
         ],
-        "can_warn": [
-            "Rollerinizden birisi (`warn_allowed_roles`) komutunu kullanmak için yetkilendirildi",
-            "Eksik izinlendirilmiş rol  (`warn_allowed_roles`)"
+        "can_use_rss": [
+            "",
+            ""
         ],
         "database_connected": [
             "Veritabanı çevrimiçi",
@@ -64,13 +34,21 @@
             "Eksik Discord yetkilerine sahipsin",
             "Gerekli Discord izinleriniz yok"
         ],
+        "in_support_server": [
+            "",
+            ""
+        ],
+        "is_blurple": [
+            "",
+            ""
+        ],
         "is_bot_admin": [
             "Bot adminlerinden biri olmak gerek",
             "Bot admini değilsin"
         ],
-        "is_fun_enabled": [
-            "Eğlence komutları aktif",
-            "Eğlence komutları aktif edilmek zorunda"
+        "is_halloween": [
+            "",
+            ""
         ],
         "is_owner": [
             "Botun sahibi olmak zorundasın",
@@ -79,21 +57,23 @@
         "is_support_staff": [
             "Botun yetkililerinden birisin",
             "Botun yetkililerinden biri olmalısın"
-        ],
-        "is_translator": [
-            "Çeviri takımından birisin.",
-            "Çeviri takımının bir parçası olman gerekiyor"
-        ],
-        "verify_role_exists": [
-            "Doğrulama rolü ayarlandı",
-            "Hiçbir doğrulama rolü eklenmedi"
         ]
     },
-    "checks": "Gerekliler:",
+    "cmd-count": {
+        "zero": "",
+        "one": "",
+        "many": ""
+    },
     "cmd-not-found": "\"%{cmd}\" isimli bir komut yok",
+    "cog-empty-dm": "",
     "description": "Açıklama",
     "embed_title": "%{u} için aktif komutlar",
+    "embed_title_dm": "",
     "footer": "Bir komut üzerinde daha fazla bilgi almak için {}help yazın",
+    "more-subcmds": {
+        "one": "",
+        "many": ""
+    },
     "no-desc-cmd": "Bu komut için bir açıklama yok",
     "no-desc-cog": "Bu cog. için bir açıklama yok",
     "no-subcmd": "`%{cmd}` komutunun alt komutu yok",

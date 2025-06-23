@@ -2,12 +2,10 @@
     "aliases": "Alias :",
     "categories": {
         "data": "informazioni",
-        "fun": "divertente",
         "moderation": "moderazione",
         "other": "altri",
         "server-settings": "configurazione",
         "staff": "staff del robot",
-        "translators": "squadra di traduttore",
         "unclassed": "non classificato",
         "users-info": "Informazioni sulle utenti"
     },
@@ -16,61 +14,41 @@
             "Il robot ha le autorizzazioni sufficiente",
             "Il robot non ha le autorizzazioni sufficiente"
         ],
-        "can_ban": [
-            "Uno di tuoi ruoli può usare questo controllo (`ban_allowed_roles`)",
-            "Ruolo autorizzato mancante (`ban_allowed_roles`)"
-        ],
-        "can_clear": [
-            "Uno di tuoi ruoli può usare questo controllo (`clear_allowed_roles`)",
-            "Ruolo autorizzato mancante (`clear_allowed_roles`)"
-        ],
-        "can_edit_case": [
-            "Uno di tuoi ruoli può usare questo controllo (`warn_allowed_roles`)",
-            "Ruolo autorizzato mancante (`warn_allowed_roles`)"
-        ],
-        "can_kick": [
-            "Uno di tuoi ruoli può usare questo controllo (`kick_allowed_roles`)",
-            "Ruolo autorizzato mancante (`kick_allowed_roles`)"
-        ],
-        "can_mute": [
-            "Uno di tuoi ruoli può usare questo controllo (`mute_allowed_roles`)",
-            "Ruolo autorizzato mancante (`mute_allowed_roles`)"
-        ],
-        "can_say": [
-            "Uno di tuoi ruoli può usare questo controllo (`say_allowed_roles`)",
-            "Ruolo autorizzato mancante (`say_allowed_roles`)"
-        ],
-        "can_slowmode": [
-            "Uno di tuoi ruoli può usare questo controllo (`slowmode_allowed_roles`)",
-            "Ruolo autorizzato mancante (`slowmode_allowed_roles`)"
-        ],
         "can_use_cookie": [
             "Lei è un prescelto da Aragorn1202",
             "Questo controllo è su Whitelist"
         ],
-        "can_warn": [
-            "Uno di tuoi ruoli può usare questo controllo (`warn_allowed_roles`)",
-            "Ruolo autorizzato mancante (`warn_allowed_roles`)"
+        "can_use_rss": [
+            "",
+            ""
+        ],
+        "database_connected": [
+            "",
+            ""
         ],
         "guild_only": [
             "Utilizzabile solo in un server",
             "Utilizzabile solo in un server"
         ],
-        "has_admin": [
-            "Hai la permizione 'Amministratore'",
-            "Permizione 'Amministratore' mancante"
-        ],
         "has_permissions": [
             "Hai le permizioni Discord sufficienti",
             "Non hai le permizioni Discord sufficienti"
+        ],
+        "in_support_server": [
+            "",
+            ""
+        ],
+        "is_blurple": [
+            "",
+            ""
         ],
         "is_bot_admin": [
             "Bisogna essere amministratore del robot",
             "Non sei amministratore del robot"
         ],
-        "is_fun_enabled": [
-            "I controlli di divertente sono attive",
-            "I controlli di divertente devono essere attive"
+        "is_halloween": [
+            "",
+            ""
         ],
         "is_owner": [
             "Bisogna essere il proprietario del robot",
@@ -79,24 +57,28 @@
         "is_support_staff": [
             "Sei nello staff del robot",
             "Devi essere nello staff del robot"
-        ],
-        "is_translator": [
-            "Sei bene nella squadra di traduttore",
-            "Devi essere nella squadra di traduttore"
-        ],
-        "verify_role_exists": [
-            "Un ruolo di verificazione è configurato",
-            "Nessuno ruolo di verificazione è stato configurato"
         ]
     },
-    "checks": "Condizioni :",
+    "cmd-count": {
+        "zero": "",
+        "one": "",
+        "many": ""
+    },
     "cmd-not-found": "Nessuno cotrollo nominato \"%{cmd}\"",
+    "cog-empty-dm": "",
+    "description": "",
     "embed_title": "Lista di cotrolli disponibile per %{u}",
+    "embed_title_dm": "",
     "footer": "Scrivi {}help commande per più informazioni su uno controllo",
+    "more-subcmds": {
+        "one": "",
+        "many": ""
+    },
     "no-desc-cmd": "Nessuna descrizione per questo controllo",
     "no-desc-cog": "Nessuna descrizione per questo modulo.",
     "no-subcmd": "Il controllo %{cmd} non ha nessuno sotto controllo",
     "not-enabled": ":warning: Questo controllo è disabile",
     "subcmd-not-found": "Questo controllo non ha aucune nessuno sotto controllo identificato \"%{name}\"",
-    "subcmds": "Sotti controlli :"
+    "subcmds": "Sotti controlli :",
+    "warning": ""
 }

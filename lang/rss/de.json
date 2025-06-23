@@ -1,51 +1,150 @@
 {
+    "ask-roles-hint": {
+        "one": "",
+        "many": ""
+    },
+    "ask-roles-hint-example": "",
+    "bluesky": "",
+    "bluesky-default-flow": "",
+    "bluesky-form-last": "",
+    "change-txt": {
+        "title": "",
+        "label": "",
+        "modal-success": "",
+        "placeholder": "",
+        "confirmation": {
+            "current-structure": "",
+            "variables-title": "",
+            "variables-explanation": "",
+            "variables": {
+                "author": "",
+                "channel": "",
+                "date": "",
+                "long_date": "",
+                "timestamp": "",
+                "link": "",
+                "logo": "",
+                "title": "",
+                "full_text": "",
+                "description": ""
+            }
+        }
+    },
     "choose-delete": "Bitte wähle das aus, was gelöscht werden soll",
+    "choose-disable": "",
+    "choose-enable": "",
     "choose-mentions-1": "Bitte wähle das aus, was verändert werden soll",
     "choose-roles": "Welche Rollen sollen erwähnt werden?",
+    "choose-test": "",
+    "delete-success": {
+        "many": "",
+        "one": ""
+    },
+    "disable-success": {
+        "many": "",
+        "one": ""
+    },
+    "enable-success": {
+        "many": "",
+        "one": ""
+    },
     "deviant": "AbweichendeKunst",
     "deviant-default-flow": "{logo} | Neue Kreation von {author} : **{title}**\nVeröffentlicht am {date}\nLink: {link}\n{mentions}",
     "deviant-form-last": "{logo} | Hier ist die neuste Kreation von {author}:\n{title}\nVeröffentlicht am {date}\nLink: {url}",
     "embed-json-changed": "Der eingebettete Feed wurde verändert",
+    "filter": {
+        "same": "",
+        "success": {
+            "blacklist": "",
+            "reset": "",
+            "whitelist": ""
+        }
+    },
     "flow-limit": "Wegen auftretenden Fehlern, kannst du nicht mehr, als %{limit} rss Feeds pro Server haben.",
-    "guild-complete": "%{count} rss Streams wurden in %{time} Sekunden neu geladen!",
+    "guild-complete": {
+        "one": "",
+        "many": ""
+    },
     "guild-error": "Ein Fehler ist während dem Verfahren aufgetreten: `%{err}`\nWenn du denkst, dass es nicht dein Fehler war, gehe zu Zbot Support",
+    "guild-loading": "",
     "invalid-flow": "Diese url ist ungültig (leere oder mache einen zugänglichen rss Flow) 😕",
     "invalid-link": "Ups, diese url Adresse ist ungültig oder nicht vollendet 😕",
     "list": "*Schreibe die Nummer von dem Flow um ihn zu verändern*\n\n**Link - Nachricht - Kanal - Erwähnungen**",
+    "list-disabled": "",
+    "list-result": "",
+    "list-result-filter": {
+        "none": "",
+        "blacklist": "",
+        "whitelist": ""
+    },
+    "list-title": {
+        "one": "",
+        "many": ""
+    },
     "list2": "*Schreibe die Nummer von dem Flow, der gelöscht werden soll*\n\n**Link - Nachricht - Kanal**",
-    "mc": "Minecraft",
+    "loop-processing": "",
+    "mc": "",
+    "move-success": {
+        "many": "",
+        "one": ""
+    },
     "no-feed": "Ups, du kannst keine rss Feeds verwalten!",
+    "no-feed2": "",
+    "no-feed-enabled": "",
+    "no-feed-filter": "",
     "no-roles": "Es wurde noch keine Rolle konfiguriert.",
+    "not-a-role": "",
     "nothing": "Ich habe nichts bei meiner Suche gefunden 😕",
+    "picker-placeholder": {
+        "single": "",
+        "multi": ""
+    },
     "research-timeout": "Die Webseite hat zu lange gebraucht, um zu antworten, also habe ich den Vorgang abgebrochen 👀",
     "roles": {
+        "edit-silent-false": {
+            "one": "",
+            "many": ""
+        },
+        "edit-silent-true": {
+            "one": "",
+            "many": ""
+        },
         "edit-success": {
             "many": "Der Feed wurde verändert, dass die Rolle %{role} erwähnt werden",
+            "one": "",
             "zero": "Der Feed wurde verändert, dass keine Rollen erwähnt werden"
         },
-        "list": "Hier ist die Liste, der Rollen, die aktuell angezeigt werden: %{roles}"
+        "list": "Hier ist die Liste, der Rollen, die aktuell angezeigt werden: %{roles}",
+        "no-change": ""
     },
     "success-add": "Der rss Feed von der Art \"%{type}\" mit dem Link <%{url}> wurde erfolgreich in den Kanal %channel{} hinzugefügt!",
-    "text-success": "Der Text mit dem Feed #%{id} wurde verändert!\nNeuer Text: \n```\n%{text}\n```",
+    "test": {
+        "empty-result": "",
+        "invalid-format": ""
+    },
+    "text-success": {
+        "single": "",
+        "multiple": ""
+    },
     "too-long": "Du hast zu lange gerbraucht, tut mir leid ⌛",
-    "tw": "Twitter",
+    "tw": "",
     "tw-default-flow": "{logo} | Neuer tweet von {author}! ({date})\n\n{title}\n\nLink: {link}\n\n{mentions}",
     "tw-form-last": "{logo} | Hier ist der neuste tweet von {author}:\nGeschrieben am {date}\n\n{title}\n\nLink: {url}",
-    "tw-help": "Um ein Twitter Kanal zu suchen musst du die ID von dem Kanal eingeben. Du wirst alles am Ende der url finden, die normalerweise den Namen von dem User zeigt, z.B bei %https://twitter.com/Mc_Asilis musst du `Mc_Asilis` eingeben.",
-    "twitch": "Twitch",
+    "tw-no-tweet": "",
+    "twitch": "",
     "twitch-default-flow": "{logo} | Neuer Stream von {author}! ({date})\n\n{title}\n\nLink: {link}\n\n{mentions}",
     "twitch-form-last": "{logo} | Hier ist das neuste Video von {author}:\n{title}\nVeröffentlicht am {date}\nLink: {url}",
+    "twitch-invalid": "",
     "use_embed-same": "Das nutzen von Einbettungen für dies kann nicht geändert werden",
     "use_embed-success": "Der Wert wurde geändert zu %{v} für n°%{id}!",
     "use_embed_false": "Der Feed nutzt keine Einbettungen zum senden. Willst du hier einbetten? (true/false)",
     "use_embed_true": "Hier werden aktuell Einbettungen zum senden genutzt. Willst du hier immernoch Einbettungen nutzen? (true/false)",
-    "web": "Web",
+    "web": "",
     "web-default-flow": "{logo} | Neuer Post von {channel} ({date}):\n    {title}\n\n{link}\n\n{mentions}",
     "web-form-last": "{logo} | Hier ist der neuste Post von {channel}:\n**{title}**\n*Geschrieben am {date}*\nLink: {link}",
-    "web-help": "Um ein rss Feed von einer Webseite zu suchen musst du die rss/atom Feed url, als ein Parameter angeben. Wenn der Feed gültig ist, werde ich den letzten Artikel der Webseite posten.\n*Tipp: ein paar rss Feeds sind schon in meinem Code. Manchmal kannst du einfach `fr-minecraft` oder `minecraft.net` nehmen* 😉",
     "web-invalid": "Ups, diese url Adresse ist ungültig 😕",
-    "yt": "YouTube",
+    "yt": "",
     "yt-default-flow": "{logo} | Neues Video von {author}: **{title}**\nHochgeladen am {date}\nLink: {link}\n{mentions}",
     "yt-form-last": "{logo} | Hier ist das neuste Video von {author}:\n{title}\nHochgeladen am {date}\nLink: {url}",
-    "yt-help": "Um ein YouTube Kanal zu suchen musst du die Kanal ID eingeben. Du wirst sie am Ende der string url finden, es kann der Name oder eine Folge von zufälligen Zeichen sein.\n*Tipp: einige Kanäle sind schon in meinem Code. Manchmal kannst du einfach ` neil3000` oder `Oxisius` nehmen* 😉"
+    "yt-invalid": ""
 }

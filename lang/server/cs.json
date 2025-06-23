@@ -106,6 +106,7 @@
         "delete_welcome_on_quick_leave": "Mám odstranit uvítací zprávu, když člen opustí ihned po připojení? %{value}",
         "description": "Popis serveru:\n %{value}",
         "enable_events": "Měly by se každoroční zábavné akce bota (například oslavy Halloweenu nebo Vánoc) konat také na tomto serveru? %{value}",
+        "enable_invites_tracking": "Měl bych sledovat využití nových členů na serveru? %{value}",
         "enable_xp": "Měl by být povolen xp systém? %{value}",
         "help_in_private": "Odeslat zprávu nápovědy v soukromé zprávě? %{value}",
         "hunter": "Seznam všech chatovacích místností, ve kterých je hra *lovec* aktivní: %{value}",
@@ -135,6 +136,7 @@
         "voice_channel": "Kanál, ze kterého budou vytvořeny automatické hlasové chatovací místnosti: %{value}",
         "voice_channel_format": "Formát automatických názvů hlasových kanálů: %{value}",
         "voice_roles": "Role přidělené členům v hlasovém kanálu: %{value}",
+        "voice_xp_per_min": "",
         "vote_emojis": "Emojis použitý pro anketní reakce: %{value}",
         "welcome": "Zpráva odeslána, když člen dorazí: %{value}",
         "welcome_channel": "Seznam kanálů pro odesílání uvítání/zanechání zpráv: %{value}",
@@ -150,11 +152,13 @@
     },
     "value-deleted": "Hodnota volby \"%{option} byla obnovena na výchozí hodnotu",
     "warnings": {
+        "afk_channel": "",
         "antiraid_perms_missing": {
             "one": "Potřebuji oprávnění '**%{perm}**' pro použití funkce anti-raid",
             "many": "Chybí mi některé oprávnění k použití funkce anti-raid. **%{list}**"
         },
         "channel_write_permissions": "Potřebuji mít možnost posílat zprávy v %{channel} pro tuto možnost",
+        "manage_guild_permissions": "Potřebuji oprávnění 'Správa serveru', aby tato funkce fungovala",
         "moderation_command": "Potřebuji oprávnění '%{perm}' pro použití tohoto příkazu",
         "title": "Varování",
         "xp_should_be_enabled": "Tato volba je určena pro XP systém. Můžete ji povolit s nastavením 'enable_xp'",

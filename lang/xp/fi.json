@@ -54,7 +54,7 @@
     "del-user": "<poistettu käyttäjä>",
     "high-page": "Ei ole noin monta sivua!",
     "levelup-dm": {
-        "title": "Levelup!",
+        "title": "",
         "footer": "Palvelimelta %{servername}"
     },
     "levelup-items": [

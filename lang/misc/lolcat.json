@@ -7,7 +7,7 @@
         "watch": "watchin"
     },
     "added_at": "Addd at",
-    "beginning": "beginning",
+    "beginning": "",
     "bot": "robot",
     "btn": {
         "cancel": {
@@ -23,30 +23,30 @@
             "label": "Trash that"
         }
     },
-    "case": "case",
+    "case": "",
     "category": "box",
     "click_here": "BLUE BUTTON TO CLICK",
     "dnd": "donot disturb me",
     "doc": "Doc",
     "done!": "Did it! :proudcat:",
     "duration": "how long",
-    "end": "end",
+    "end": "",
     "example": {
         "one": "exmple",
         "many": "exmples"
     },
     "extreme": "Xtrem",
     "ghost": "Goast",
-    "high": "high",
+    "high": "",
     "highest": "super high",
-    "idle": "idle",
-    "low": "low",
+    "idle": "",
+    "low": "",
     "medium": "meadium",
     "member": "human",
     "membres": "memberz",
     "name": "näme",
     "no": "noooo",
-    "none": "none",
+    "none": "",
     "offline": "oofline",
     "online": "on-line",
     "quit": "leave me alone!",
