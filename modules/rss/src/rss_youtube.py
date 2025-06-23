@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import datetime as dt
 import re
-from operator import itemgetter
 from typing import TYPE_CHECKING
 
 import aiohttp
@@ -10,6 +9,8 @@ import discord
 from asyncache import cached
 from cachetools import TTLCache
 from feedparser.util import FeedParserDict
+
+from core.caching.postition_cached import position_cached
 
 from . import FeedObject, RssMessage, feed_parse, get_text_from_entry
 from .rss_general import FeedFilterConfig, check_filter
@@ -37,29 +38,10 @@ class YoutubeRSS:
         matches = re.match(self.url_pattern, string)
         return bool(matches)
 
-    @cached(TTLCache(maxsize=10_000, ttl=3600), key=itemgetter(2))
+    @position_cached(TTLCache(maxsize=10_000, ttl=3600), key=2)
     async def _is_valid_channel_id(self, session: aiohttp.ClientSession, name: str):
         async with session.get("https://www.youtube.com/channel/"+name) as resp:
             return resp.status < 400
-
-    @cached(TTLCache(maxsize=10_000, ttl=3600), key=itemgetter(2))
-    async def _is_valid_channel_name(self, session: aiohttp.ClientSession, name: str):
-        async with session.get("https://www.youtube.com/user/"+name) as resp:
-            return resp.status < 400
-
-    @cached(TTLCache(maxsize=10_000, ttl=3600), key=itemgetter(2))
-    async def _is_valid_channel_custom_url(self, session: aiohttp.ClientSession, name: str):
-        async with session.get("https://www.youtube.com/c/"+name) as resp:
-            return resp.status < 400
-
-    async def is_valid_channel(self, name: str):
-        "Check if a channel identifier is actually valid"
-        if name is None or not isinstance(name, str):
-            return False
-        async with aiohttp.ClientSession(cookies=self.cookies) as session:
-            return await self._is_valid_channel_id(session, name) \
-                or await self._is_valid_channel_name(session, name) \
-                or await self._is_valid_channel_custom_url(session, name)
 
     @cached(TTLCache(maxsize=10_000, ttl=86400))
     async def get_channel_by_any_url(self, url: str):
