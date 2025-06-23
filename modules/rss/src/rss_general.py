@@ -5,16 +5,15 @@ import datetime
 import json
 import logging
 import time
-from operator import itemgetter
 from typing import TYPE_CHECKING, Any, Literal, TypedDict
 
 import discord
 import feedparser
 from aiohttp import ClientSession, client_exceptions
-from asyncache import cached
 from cachetools import TTLCache
 from feedparser.util import FeedParserDict
 
+from core.caching.postition_cached import position_cached
 from core.formatutils import FormatUtils
 from core.parse_mentions import parse_allowed_mentions
 from core.safedict import SafeDict
@@ -27,7 +26,7 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger("bot.rss")
 
-@cached(TTLCache(maxsize=1_000, ttl=60 * 5),  key=itemgetter(0))
+@position_cached(TTLCache(maxsize=1_000, ttl=60 * 5), key=0)
 async def feed_parse(url: str, timeout: int, session: ClientSession | None = None
                      ) -> feedparser.FeedParserDict | None:
     """Asynchronous parsing using cool methods"""
