@@ -1,0 +1,18 @@
+{
+    "list": {
+        "title": "Sledované pozvánky",
+        "field-title": "%{name} - %{count} použití",
+        "field-value": {
+            "user-and-date": "Vytvořeno uživatelem %{user} dne %{date}",
+            "user": "Vytvořil %{user}",
+            "date": "Vytvořeno dne %{date}",
+            "none": "Žádné další informace nejsou k dispozici"
+        }
+    },
+    "missing-permission": "Potřebuji oprávnění `Spravovat Server` ke čtení pozvání.",
+    "rename": {
+        "set-success": "Pozvánka `%{link}` byla přejmenována na '%{name}'.",
+        "reset-success": "Název pozvánky `%{link}` byl odstraněn."
+    },
+    "tracking-disabled": "Sledování pozvánek není na tomto serveru povoleno."
+}

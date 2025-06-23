@@ -2,12 +2,10 @@
     "aliases": "Adressen",
     "categories": {
         "data": "Informationen",
-        "fun": "Spaß",
         "moderation": "Moderation",
         "other": "Andere",
         "server-settings": "Server Einstellungen",
         "staff": "Bot Team",
-        "translators": "Übersetzungteam",
         "unclassed": "Nicht klassifiziert",
         "users-info": "Benutzerinformation"
     },
@@ -15,34 +13,6 @@
         "bot_has_permissions": [
             "Der Bots hat die benötigten Berechtigungen",
             "Der Bot hat nicht die benötigten Berechtigungen"
-        ],
-        "can_ban": [
-            "Eine deiner Rollen besitzt die Berechtigung für diesen Befehl (`ban_allowed_roles`)",
-            "Fehlende Berechtigung (`ban_allowed_roles`)"
-        ],
-        "can_clear": [
-            "Eine deiner Rollen besitzt die Berechtigung für diesen Befehl (`clear_allowed_roles`)",
-            "Fehlende Berechtigung (`clear_allowed_roles`)"
-        ],
-        "can_edit_case": [
-            "Eine deiner Rollen besitzt die Berechtigung für diesen Befehl (`warn_allowed_roles`)",
-            "Dir fehlt die Rolle (`warn_allowed_roles`)"
-        ],
-        "can_kick": [
-            "Eine deiner Rollen besitzt die Berechtigung für diesen Befehl (`kick_allowed_roles`)",
-            "Fehlende Berechtigung (`kick_allowed_roles`)"
-        ],
-        "can_mute": [
-            "Eine deiner Rollen besitzt die Berechtigung für diesen Befehl (`mute_allowed_roles`)",
-            "Fehlende Berechtigung (`mute_allowed_roles`)"
-        ],
-        "can_say": [
-            "Eine deiner Rollen besitzt die Berechtigung für diesen Befehl (`say_allowed_roles`)",
-            "Fehlende Berechtigung (`say_allowed_roles`)"
-        ],
-        "can_slowmode": [
-            "Eine deiner Rollen besitzt die Berechtigung für diesen Befehl (`slowmode_allowed_roles`)",
-            "Fehlende Berechtigung (`slowmode_allowed_roles`)"
         ],
         "can_use_cookie": [
             "Du wurdest von Aragorn1202 ausgewählt!",
@@ -52,10 +22,6 @@
             "Du hast 'Manage Server' Berechtigungen",
             "'Manage Server' Berechtigung fehlt"
         ],
-        "can_warn": [
-            "Eine deiner Rollen besitzt die Berechtigung für diesen Befehl (`warn_allowed_roles`)",
-            "Fehlende Berechtigung (`warn_allowed_roles`)"
-        ],
         "database_connected": [
             "Die Datenbank ist online",
             "Die Datenbank ist offline"
@@ -64,41 +30,21 @@
             "Kann nur auf Servern benutzt werden",
             "Kann nur auf Servern benutzt werden"
         ],
-        "has_admin": [
-            "Du hast die 'Administrator' Berechtigung",
-            "'Administrator' Berechtigung fehlt"
-        ],
-        "has_embed_links": [
-            "Du hast die 'Embed links' Berechtigung",
-            "Du musst die 'Embed links' Berechtigung haben"
-        ],
-        "has_manage_guild": [
-            "Du hast die 'Manage Server' Berechtigung",
-            "'Manage Server' Berechtigung fehlt"
-        ],
-        "has_manage_msg": [
-            "Du hast die 'Manage Messages' Berechtigung",
-            "'Manage Messages' Berechtigung fehlt"
-        ],
-        "has_manage_nicknames": [
-            "Du hast die 'Manage Nicknames' Berechtigung",
-            "'Manage Nicknames' Berechtigung fehlt"
-        ],
-        "has_manage_roles": [
-            "Du hast die 'Manage Roles' Berechtigung",
-            "'Manage Roles' Berechtigung fehlt"
-        ],
         "has_permissions": [
             "Du hast die benötigten Discordberechtigungen",
             "Du hast nicht die benötigten Discordberechtigungen"
         ],
+        "in_support_server": [
+            "",
+            ""
+        ],
+        "is_blurple": [
+            "",
+            ""
+        ],
         "is_bot_admin": [
             "Dafür musst du ein Bot Administrator sein",
             "Du bist kein Bot Administrator"
-        ],
-        "is_fun_enabled": [
-            "Spaßbefehle sind aktiviert",
-            "Spaßbefehle sind momentan deaktiviert"
         ],
         "is_halloween": [
             "Das Halloween Event ist da, viel spaß!",
@@ -111,21 +57,23 @@
         "is_support_staff": [
             "Du bist ein Mitglied des Botteams",
             "Dafür musst du ein Mitglied des Botteams sein"
-        ],
-        "is_translator": [
-            "Du bist ein Teil des Übersetzerteams",
-            "Dafür musst du Teil des Übersetzerteams sein"
-        ],
-        "verify_role_exists": [
-            "Eine Verifikationsrolle wurde eingerichtet",
-            "Keine Verifikationsrolle hinzugefügt"
         ]
     },
-    "cmd-count": "%{nbr} Befehle",
+    "cmd-count": {
+        "zero": "",
+        "one": "",
+        "many": ""
+    },
     "cmd-not-found": "Es gibt keinen \"%{cmd}\" Befehl",
+    "cog-empty-dm": "",
     "description": "Beschreibung",
     "embed_title": "Nutzbare Befehle für %{u}",
+    "embed_title_dm": "",
     "footer": "Gib '{}help' ein um mehr Infos über unsere Commands zu erhalten",
+    "more-subcmds": {
+        "one": "",
+        "many": ""
+    },
     "no-desc-cmd": "Keine Bescheibung für diesen Befehl",
     "no-desc-cog": "Keine Beschreibung für diese cog.",
     "no-subcmd": "Der Befehl `%{cmd}` hat keine Unterbefehle",

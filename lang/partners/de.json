@@ -1,7 +1,7 @@
 {
     "added-partner": "Dieser Partner wurde erfolgreich hinzugefügt",
     "already-added": "Das ist schon dein Partner!",
-    "bot-uptime": "Uptime",
+    "bot-uptime": "",
     "changed-desc": "Die Beschreibung wurde erfolgreich geändert!",
     "changed-invite": "Die Einladung wurde modifiziert!",
     "confirm-bot": "Möchtest du den Bot `%{bot}` wirklich von deinen Partnern entfernen?",
@@ -12,7 +12,6 @@
     "invalid-invite": "Ungültige Einladung",
     "invalid-partner": "Partner konnte nicht gefunden werden",
     "missing-manage-guild": "Einladung konnte nicht gefunden werden (mir fehlt die \"Manage server\" Berechtigung)",
-    "missing-reactions": "Berechtigung \"Add reactions\" fehlt :confused:",
     "no-channel": "Du hast keinen Partnerchannel erstellt",
     "no-partner": "Du hast keine Partner",
     "no-partner-2": "Dieser ist kein Partner von deinem",
@@ -22,8 +21,11 @@
         "Liste aller Partner deines Servers"
     ],
     "reloaded": {
-        "many": "%{count} Partner wurden neu geladen"
+        "many": "%{count} Partner wurden neu geladen",
+        "one": "",
+        "zero": ""
     },
+    "reset-desc": "",
     "unknown-error": "Ein unbekannte Fehler ist aufgetaucht. Bitte kontaktiere den Support für mehr Informationen",
     "unknown-server": "Serverpartner konnte nicht gefunden werden"
 }

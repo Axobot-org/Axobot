@@ -1,8 +1,19 @@
 {
-    "cases-0": "%{nbr} bulunan olaylar: (%{start}-%{end})",
+    "records_number": "",
     "deleted": "#%{ID} olayı silindi!",
+    "display": {
+        "date": "",
+        "duration": "",
+        "guild": "",
+        "moderator": "",
+        "reason": "",
+        "title": "",
+        "type": "",
+        "user": ""
+    },
     "list-0": "**Kullanıcı:** {U}\n**Sunucu:** {G}\n**Tür** {T}\n**Moderatör:** {M}\n**Tarih** {D}\n**Neden** *{R}*",
     "list-1": "**Sunucu:** {G}\n**Tür** {T}\n**Moderatör:** {M}\n**Tarih:** {D}\n**Neden** *{R}*",
+    "no-case": "",
     "no-user": "Bu kullanıcı bulunamıyor 👀",
     "no_database": "Geçici bir veritabanı kesintisi nedeniyle, bu komut devredışı bırakıldı",
     "not-found": "Bu olay bulunamadı 😕",

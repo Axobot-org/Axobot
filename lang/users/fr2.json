@@ -12,9 +12,9 @@
             "false": "Les cartes d'xp animées ne sont actuellement pas autorisées pour vous",
             "true": "Les cartes d'xp animées sont actuellement autorisées pour vous"
         },
-        "auto_unafk": {
-            "false": "Tu dois enlever ton tag AFK toi-même",
-            "true": "Je t'enlèverai ton tag AFK dès que tu postera un message"
+        "show_tips": {
+            "false": "",
+            "true": ""
         },
         "usernames_log": {
             "false": "T'as désactivé l'enregistrement de vos noms d'utilisateurs ainsi que de vos surnoms",

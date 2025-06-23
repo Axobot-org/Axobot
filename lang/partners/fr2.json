@@ -12,7 +12,6 @@
     "invalid-invite": "Invitation invalide !",
     "invalid-partner": "Partenaire introuvable !",
     "missing-manage-guild": "Impossible de voir les invitations de ce serveur (perm 'Gérer le serveur' manquante)",
-    "missing-reactions": "Perm 'Ajouter des réactions' manquante :blobconfused:",
     "no-channel": "Aucun salon de partenaires n'a été configuré",
     "no-partner": "Tu n'as aucun partenaire",
     "no-partner-2": "Aucun serveur n'a de partenariat avec toi.",
@@ -26,6 +25,7 @@
         "one": "1 partenaire a été rechargé",
         "zero": "Oups, tu ne sembes avoir aucun partenaire !"
     },
+    "reset-desc": "",
     "unknown-error": "Une erreur inconnue est survenue. Contacte le support pour plus d'informations !",
     "unknown-server": "Serveur partenaire introuvable !"
 }

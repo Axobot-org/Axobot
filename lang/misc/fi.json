@@ -7,36 +7,56 @@
         "watch": "katsoo"
     },
     "added_at": "Lisätty klo",
-    "aucune": "ei yhtään",
     "beginning": "alkaa",
     "bot": "botti",
+    "btn": {
+        "cancel": {
+            "answer": "",
+            "label": ""
+        },
+        "confirm": {
+            "answer": "",
+            "label": ""
+        },
+        "delete": {
+            "answer": "",
+            "label": ""
+        }
+    },
     "case": "Keissi",
     "category": "kategoria",
     "click_here": "Paina tästä",
-    "depuis": "",
     "dnd": "älä häiritse",
     "doc": "Dokumentaatio",
+    "done!": "",
     "duration": "kesto",
     "end": "loppuu",
-    "example": "esimerkki",
+    "example": {
+        "one": "",
+        "many": ""
+    },
     "extreme": "äärimmäinen",
     "ghost": "Haamu",
     "high": "ylhäinen",
+    "highest": "",
     "idle": "toimeton",
     "low": "alhainen",
     "medium": "keskikokoinen",
     "member": "jäsen",
     "membres": "jäsenet",
-    "nom": "nimi",
-    "non": "ei",
+    "name": "",
+    "no": "",
     "none": "ei yhtään",
     "offline": "offline tilassa",
     "online": "paikalla",
-    "oui": "kyllä",
+    "quit": "",
     "reason": "syy",
     "request_by": "Komenon käyttäjä %{user}",
     "server": "palvelin",
     "servers": "palvelimet",
+    "since": "",
     "unknown": "Tuntematon",
-    "version": "versio"
+    "verified": "",
+    "version": "versio",
+    "yes": ""
 }

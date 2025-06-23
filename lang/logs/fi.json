@@ -1,19 +1,20 @@
 {
     "ban": "Käyttäjälle %{user} (%{userid}) on annettu porttikielto",
-    "case-del": "The case #%{id} has been deleted (concerning %{user})",
+    "case-del": "",
     "case-reason": "Tapaus #%{id} on muokattu:\\n`Vanha syy:` %{old}\\n`Uusi syy:` %{new}",
     "clear": "%{number} viestiä poistettu kanavalla %{channel}",
     "kick": "%{user} (%{userid}) on potkittu",
     "mute": "%{user} (%{userid}) on nyt mykistetty",
     "reason": {
+        "account_creation": "",
         "autounmute": "automaattinen mykistyksen poisto",
         "invite": "Automaattinen valvoja (Discord kutsu linkki)",
+        "invites": "",
         "memberchan": "Automaattinen tapahtuma (configuraatio käyttäjänlaskelma)",
         "mentions": "Automod (liian monta mainintaa)",
         "unban": "porttikiellon poistanut %{user}",
         "unmute": "mykistäjä %{user}",
-        "welcome_roles": "Automated action (config welcome_roles)",
-        "young": "Automaattinen valvoja (liian uusi käyttäjä)"
+        "welcome_roles": ""
     },
     "slowmode-disabled": "Hidastusmuoto on kytketty pois kanavalla %{channel}",
     "slowmode-enabled": "Hidastusmuoto on kytketty päälle kanavalla %{channel} (%{seconds}s)",

@@ -31,7 +31,7 @@
     "nothing-desc": "There'r no events rn. Follow my bot news 2 know teh date of the next one!",
     "nothing-prices": "There's no thing 2 gain 4 this event :confused:",
     "no-objectives": "Dis event has no goal, no life meaning, nothing. At this point I wonder who am I, really.\nBut maybe %{cmd} would be more useful.",
-    "objectives": "Objectives",
+    "objectives": "",
     "ocean-cooldown": "Hooman, da ocean has bestowed its gifts upon you. Return in %{time} for anudder dose of sea treasures.",
     "points": "pts",
     "points-total": "Total pts",
@@ -51,6 +51,10 @@
     },
     "soon": "Hey hey hey! ur too soon, try checking on %{date}! :hype:  ",
     "tictactoe": {
+        "lost": {
+            "title": "",
+            "desc": ""
+        },
         "won": {
             "title": "WOW, u won against the most supremely smartest tic-tac-toe AI ever!",
             "desc": "So uh, as a reward, I've gave u **%{points} event points**, check 'em with `/event profile`!"
@@ -58,5 +62,5 @@
     },
     "tip-title": "Cool tip",
     "unclassed": "unclassd",
-    "xp-howto": "You can earn event points by winning tic-tac-toe games, using event commands when available, or by performing various other secret tasks. Don't hesitate to come to the support server to ask for information!"
+    "xp-howto": ""
 }

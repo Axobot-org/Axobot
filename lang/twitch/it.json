@@ -1,0 +1,26 @@
+{
+    "check-stream": {
+        "category": "",
+        "no-nsfw": "",
+        "offline": "",
+        "title": ""
+    },
+    "invalid-streamer-name": "",
+    "on-live-indication": "",
+    "stream-alerts": "",
+    "subscribe": {
+        "success": "",
+        "limit-reached": "",
+        "already-subscribed": ""
+    },
+    "subs-list": {
+        "title": "",
+        "empty": "",
+        "empty-tip": ""
+    },
+    "unknown-streamer": "",
+    "unsubscribe": {
+        "success": "",
+        "not-subscribed": ""
+    }
+}

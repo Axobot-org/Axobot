@@ -12,7 +12,6 @@
     "invalid-invite": "Pätemätön kutsu",
     "invalid-partner": "Yhteistyökumppania ei löytynyt",
     "missing-manage-guild": "Mahdotonta löytää palvelimen kutsu linkit (\"Hallinnoi palvelinta\" käyttöoikeus puuttuu)",
-    "missing-reactions": "Käyttöoikeus \"Lisää hymiöitä puuttuu 😕",
     "no-channel": "Et asettanut yhteistyökumppani kanavaa",
     "no-partner": "Sinulla ei ole yhteistyökumppaneita",
     "no-partner-2": "Ei milläkään palvelimella ole yhteistyötä sinun kanssa",
@@ -26,6 +25,7 @@
         "one": "1 yhteistyökumppani päivitetty",
         "zero": "Sinulla ei ole yhteistyökumppaneita"
     },
+    "reset-desc": "",
     "unknown-error": "Tuntematon virhe tapahtui. Lisätietoja saat ottamalla yhteyttä tukeen",
     "unknown-server": "Palvelin yhteistyökumppani ei löytynyt"
 }

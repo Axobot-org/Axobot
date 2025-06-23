@@ -1,18 +1,20 @@
 {
     "ban": "%{user} (%{userid}) wurde gebannt",
-    "case-del": "The case #%{id} has been deleted (concerning %{user})",
-    "case-reason": "The case #%{id} has been edited:\n`Old reason:` %{old}\n`New reason:` %{new}",
+    "case-del": "",
+    "case-reason": "",
     "clear": "%{number} Nachrichten wurden in %{channel} gelöscht",
     "kick": "%{user} (%{userid}) wurde gekickt",
     "mute": "%{user} (%{userid}) wurde gemuted",
     "reason": {
+        "account_creation": "",
         "autounmute": "autisch entmuted",
         "invite": "Automod (Discord Einladung)",
+        "invites": "",
         "memberchan": "Automatische Aktion (config membercount)",
+        "mentions": "",
         "unban": "Entbannt von %{user}",
         "unmute": "Entmuted von %{user}",
-        "welcome_roles": "Automated Aktion (config welcome_roles)",
-        "young": "Automod (zu junger Account)"
+        "welcome_roles": "Automated Aktion (config welcome_roles)"
     },
     "slowmode-disabled": "Slowmode deaktiviert in %{channel}",
     "slowmode-enabled": "Slowmode aktiviert in %{channel} (%{seconds}s)",

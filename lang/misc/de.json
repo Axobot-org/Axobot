@@ -9,13 +9,36 @@
     "added_at": "Hinzugefügt am",
     "beginning": "Anfang",
     "bot": "Bot",
+    "btn": {
+        "cancel": {
+            "answer": "",
+            "label": ""
+        },
+        "confirm": {
+            "answer": "",
+            "label": ""
+        },
+        "delete": {
+            "answer": "",
+            "label": ""
+        }
+    },
+    "case": "",
     "category": "Kategorie",
     "click_here": "Klick hier",
     "dnd": "nicht stören",
+    "doc": "",
+    "done!": "",
+    "duration": "",
     "end": "Ende",
+    "example": {
+        "one": "",
+        "many": ""
+    },
     "extreme": "Extrem",
     "ghost": "Geist",
     "high": "hoch",
+    "highest": "",
     "idle": "Abwesend",
     "low": "niedrig",
     "medium": "mittel",
@@ -26,10 +49,14 @@
     "none": "keine",
     "offline": "Offline",
     "online": "Online",
+    "quit": "",
+    "reason": "",
+    "request_by": "",
     "server": "Server",
     "servers": "Server",
     "since": "seit",
     "unknown": "Unbekannt",
+    "verified": "",
     "version": "Version",
     "yes": "Ja"
 }

@@ -4,6 +4,9 @@
         "many": "Enter wat roles shuld be mentionned for dis feeds (like uh, dunno, names or number or watever)."
     },
     "ask-roles-hint-example": "Smol example:\n> Members \"Super VIP\" @Ping roles",
+    "bluesky": "",
+    "bluesky-default-flow": "",
+    "bluesky-form-last": "",
     "change-txt": {
         "title": "Edit teh RSS feed txt",
         "label": "TXT template",
@@ -21,7 +24,6 @@
                 "timestamp": "`{timestamp}`: Unix time in seconds, for some nerdy users",
                 "link": "`{link}` or `{url}`: a link 2 the post",
                 "logo": "`{logo}`: a emoji representing teh type of feed (newspaper, orange alien, RedTriangle...)",
-                "mentions": "`{mentions}`: teh list of roles 2 mention",
                 "title": "`{title}`: I sure hope this one is obvious enouf",
                 "full_text": "`{full_text}`: the very full post text, if available ofc",
                 "description": "`{description}`: a short summary of the post, when provided"
@@ -46,7 +48,7 @@
         "many": "%{count} feeds had correctly been enabled, cap'!",
         "one": "Dis feed had correctly been enabled, cap'!"
     },
-    "deviant": "DeviantArt",
+    "deviant": "",
     "deviant-default-flow": "{logo}  | New draw by {author} : **{title}**\nDated on {date}\nURL: {link}\n{mentions}",
     "deviant-form-last": "{logo}  | Here is da brand new thing of {author}:\n{title}\nDarwn on {date}\nZelda: {url}",
     "embed-json-changed": "The embed ov feed have been modifed",
@@ -71,7 +73,7 @@
     "list-disabled": "(disabld)",
     "list-result": "{emoji} {link}\nDisc chan: {channel}\nPings: {roles} | {filter}\nId: {id}\nLast thing: {last_post}",
     "list-result-filter": {
-        "none": "No filter",
+        "none": "",
         "blacklist": "Black filter",
         "whitelist": "White filter"
     },
