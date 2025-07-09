@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from discord import Locale, app_commands
 from discord.app_commands import locale_str
@@ -20,7 +20,7 @@ LOCALES_MAP = {
 
 IGNORED_COMMANDS = {"admin", "find"}
 
-async def is_ignored_command(cmd: app_commands.Command | app_commands.Group | app_commands.ContextMenu):
+async def is_ignored_command(cmd: app_commands.Command[Any, Any, Any] | app_commands.Group | app_commands.ContextMenu):
     "Check if the given command should be ignored by the translator"
     if isinstance(cmd, app_commands.ContextMenu):
         root = cmd

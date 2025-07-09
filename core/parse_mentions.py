@@ -18,14 +18,14 @@ def parse_allowed_mentions(text: str, *, base: discord.AllowedMentions | None = 
             role_id = role_match.group(1)
             if not allowed_mentions.roles:
                 allowed_mentions.roles = []
-            allowed_mentions.roles.append(discord.Object(id=int(role_id)))
+            allowed_mentions.roles.append(discord.Object(id=int(role_id))) # type: ignore
     # Parse user mentions from text
     if allowed_mentions.users is not True:
         for user_match in re.finditer(r"<@!?(\d+)>", text):
             user_id = user_match.group(1)
             if not allowed_mentions.users:
                 allowed_mentions.users = []
-            allowed_mentions.users.append(discord.Object(id=int(user_id)))
+            allowed_mentions.users.append(discord.Object(id=int(user_id))) # type: ignore
     # Remove duplicates from roles and users
     if isinstance(allowed_mentions.roles, Sequence):
         allowed_mentions.roles = list(set(allowed_mentions.roles))

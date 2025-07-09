@@ -5,6 +5,7 @@ from enum import auto as enum_auto
 from typing import TYPE_CHECKING, TypedDict
 
 import discord
+from discord.utils import MISSING
 from cachetools import TTLCache
 
 if TYPE_CHECKING:
@@ -77,7 +78,8 @@ class TipsManager:
         if value := self.user_cache.get(user_id):
             return value
         query = "SELECT tip_id, shown_at FROM tips WHERE user_id = %s"
-        async with self.bot.db_main.read(query, (user_id,)) as query_result:
+        async with self.bot.db_main.read(query, (user_id,)) as query_result: # type: ignore
+            query_result: list["TipsManager.UserTipsFetchResult"]
             self.user_cache[user_id] = query_result
             return query_result
 
@@ -90,7 +92,8 @@ class TipsManager:
         if value := self.guild_cache.get(guild_id):
             return value
         query = "SELECT tip_id, shown_at FROM tips WHERE guild_id = %s"
-        async with self.bot.db_main.read(query, (guild_id,)) as query_result:
+        async with self.bot.db_main.read(query, (guild_id,)) as query_result: # type: ignore
+            query_result: list["TipsManager.GuildTipsFetchResult"]
             self.guild_cache[guild_id] = query_result
             return query_result
 
@@ -98,7 +101,7 @@ class TipsManager:
         "Register a tip as shown to a user"
         query = "INSERT INTO tips (user_id, tip_id) VALUES (%s, %s)"
         async with self.bot.db_main.write(query, (user_id, tip.value)):
-            new_record = {"tip_id": tip, "shown_at": self.bot.utcnow()}
+            new_record: TipsManager.UserTipsFetchResult = {"tip_id": tip, "shown_at": self.bot.utcnow()}
             if tips_list := self.user_cache.get(user_id):
                 tips_list.append(new_record)
             else:
@@ -153,8 +156,14 @@ class TipsManager:
 
     async def send_guild_tip(self, interaction: discord.Interaction, tip: GuildTip, **variables: dict[str, str]):
         "Send a tip into a guild"
+        if interaction.guild is None:
+            raise ValueError("Cannot send a guild tip without a guild")
         await self._send_tip(interaction, tip, ephemeral=None, **variables)
         await self.db_register_guild_tip(interaction.guild.id, tip)
+
+    class _SendMessageArgs(TypedDict):
+        embed: discord.Embed
+        ephemeral: bool
 
     async def _send_tip(self, interaction: discord.Interaction, tip: UserTip | GuildTip, ephemeral: bool | None,
                          **variables: dict[str, str]):
@@ -165,15 +174,16 @@ class TipsManager:
             description=text,
             color=discord.Color.blurple(),
         )
-        args = {"embed": embed}
-        if ephemeral is not None:
-            args["ephemeral"] = ephemeral
+        args: TipsManager._SendMessageArgs = {
+            "embed": embed,
+            "ephemeral": ephemeral if ephemeral is not None else MISSING
+        }
         if interaction.response.is_done():
             await interaction.followup.send(**args)
         else:
             await interaction.response.send_message(**args)
 
-    async def generate_random_tip(self, translation_context) -> str:
+    async def generate_random_tip(self, translation_context: discord.Interaction) -> str:
         "Pick a random tip from the translations list, and format it"
         params = await self.get_random_tips_params()
         return random.choice(await self.bot._(translation_context, "fun.tip-list", **params))

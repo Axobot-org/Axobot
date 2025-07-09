@@ -225,9 +225,12 @@ class Errors(commands.Cog):
             await interaction.response.send_message(error.args[0], ephemeral=True)
             return
         if interaction.guild:
-            guild = f"{interaction.guild.name} | {interaction.channel.name}"
+            if isinstance(interaction.channel, (discord.DMChannel, type(None))):
+                guild = f"DM with {interaction.user}"
+            else:
+                guild = f"{interaction.guild.name} | {interaction.channel.name}"
         elif interaction.guild_id:
-            guild = f"guild {interaction.guild_id}"
+            guild = f"Guild {interaction.guild_id}"
         else:
             guild = f"DM with {interaction.user}"
         if interaction.type == discord.InteractionType.application_command:
@@ -269,15 +272,22 @@ class Errors(commands.Cog):
             elif isinstance(ctx, str):
                 context = ctx
             elif ctx.guild is None:
+                assert isinstance(ctx.channel, discord.DMChannel)
                 recipient = await self.bot.get_recipient(ctx.channel)
                 context = f"DM | {recipient}"
             elif isinstance(ctx, discord.Interaction):
                 cmd_name = ctx.command.qualified_name if ctx.command else None
-                context = f"Slash command `{cmd_name}` | {ctx.guild.name} | {ctx.channel.name}"
+                if isinstance(ctx.channel, (discord.DMChannel, type(None))):
+                    context = f"Slash command `{cmd_name}` | DM with {ctx.user}"
+                else:
+                    context = f"Slash command `{cmd_name}` | {ctx.guild.name} | {ctx.channel.name}"
             else:
-                context = f"{ctx.guild.name} | {ctx.channel.name}"
+                context = f"{ctx.guild.name} | {ctx.channel.name}" # type: ignore
             # if channel is the private beta channel, send it there
-            if isinstance(ctx, MyContext | discord.Interaction) and ctx.channel.id == 625319425465384960:
+            if (
+                isinstance(ctx, MyContext | discord.Interaction)
+                and isinstance(ctx.channel, discord.abc.Messageable)
+                and ctx.channel.id == 625319425465384960):
                 await ctx.channel.send(f"{context}\n```py\n{trace[:1920]}\n```")
             else:
                 await self.send_error_msg_autoformat(context, trace)
@@ -298,7 +308,7 @@ class Errors(commands.Cog):
 
     async def senf_err_msg(self, msg: str):
         """Envoie un message dans le salon d'erreur"""
-        errors_channel = self.bot.get_channel(626039503714254858)
+        errors_channel: discord.TextChannel | None = self.bot.get_channel(626039503714254858) # type: ignore
         if errors_channel is None:
             return False
         if len(msg) > 2000:

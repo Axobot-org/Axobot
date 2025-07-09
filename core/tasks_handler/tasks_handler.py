@@ -3,13 +3,14 @@ from __future__ import annotations
 import json
 import logging
 import re
-from datetime import datetime, timedelta, timezone
+from datetime import timedelta, timezone
 from typing import TYPE_CHECKING
 
 import discord
 
 from core.enums import ServerWarningType
 from core.formatutils import FormatUtils
+from core.type_utils import AnyDict
 
 from .types import DbTask
 from .views import RecreateReminderView
@@ -28,14 +29,15 @@ class TaskHandler:
         """Renvoie une liste de tous les events qui doivent être exécutés"""
         try:
             query = "SELECT * FROM `timed` WHERE beta=%s"
-            events: list[dict] = []
+            events: list[DbTask] = []
             async with self.bot.db_main.read(query, (self.bot.beta,)) as query_results:
-                for row in query_results:
+                for row in query_results: # type: ignore
+                    row: DbTask
                     row["begin"] = row["begin"].replace(tzinfo=timezone.utc)
                     if get_all:
                         events.append(row)
                     else:
-                        now = self.bot.utcnow() if row["begin"].tzinfo else datetime.utcnow()
+                        now = self.bot.utcnow()
                         if row["begin"] + timedelta(seconds=row["duration"]) < now:
                             events.append(row)
             return events
@@ -53,7 +55,7 @@ class TaskHandler:
             return
         self.log.debug("Iterating (%s tasks found)", len(tasks_list))
         for task in tasks_list:
-            if task["action"] == "mute":
+            if task["action"] == "mute" and task["guild"]:
                 try:
                     guild = self.bot.get_guild(task["guild"])
                     if guild is None:
@@ -70,7 +72,7 @@ class TaskHandler:
                 except Exception as err:  # pylint: disable=broad-except
                     self.bot.dispatch("error", err)
                     self.log.error("Unmute: Unable to auto unmute %s", err)
-            if task["action"] == "ban":
+            if task["action"] == "ban" and task["guild"]:
                 try:
                     guild = self.bot.get_guild(task["guild"])
                     if guild is None:
@@ -102,7 +104,7 @@ class TaskHandler:
                 else:
                     if sent:
                         await self.remove_task(task["ID"])
-            if task["action"] == "role-grant":
+            if task["action"] == "role-grant" and task["guild"] and task["data"]:
                 try:
                     guild = self.bot.get_guild(task["guild"])
                     if guild is None:
@@ -141,42 +143,54 @@ class TaskHandler:
             pass
         return None
 
-    async def task_timer(self, task: dict) -> bool:
+    async def task_timer(self, task: DbTask) -> bool:
         """Send a reminder
         Returns True if the reminder has been sent"""
-        if task["user"] is None:
+        if task["message"] is None:
             return True
-        if task["guild"] is not None:
+        if task["guild"] is not None and task["channel"] is not None:
             guild = self.bot.get_guild(task["guild"])
             if guild is None:
                 return False
             channel = guild.get_channel_or_thread(task["channel"])
-            member = await guild.fetch_member(task["user"])
+            if not isinstance(channel, discord.abc.Messageable):
+                channel = None
+            try:
+                member = await guild.fetch_member(task["user"])
+            except discord.NotFound:
+                member = None
             # if channel has been deleted, or if member left the guild, we send it in DM
             if channel is None or member is None or not channel.permissions_for(guild.me).send_messages:
                 channel = await self._get_or_fetch_user(task["user"])
                 if channel is None:
                     return False
         else:
+            guild = None
             channel = await self._get_or_fetch_user(task["user"])
             if not channel:
                 return False
         user = channel if isinstance(channel, discord.User) else self.bot.get_user(task["user"])
         if user is None:
-            raise discord.errors.NotFound
+            raise discord.errors.NotFound(None, None) # type: ignore
         try:
             if self.bot.zombie_mode:
                 return False
-            f_duration = await FormatUtils.time_delta(task["duration"],
-                                                      lang=await self.bot._(channel, "_used_locale"),
-                                                      form="developed")
+            f_duration = await FormatUtils.time_delta(
+                task["duration"],
+                lang=await self.bot._(channel, "_used_locale"),
+                form="developed"
+            )
 
             if task["data"] is not None:
                 task["data"] = json.loads(task["data"])
             text = await self.bot._(channel, "timers.rmd.embed-asked", user=user.mention, duration=f_duration)
-            view = RecreateReminderView(self.bot, task)
+            view = RecreateReminderView(self.bot, task) # type: ignore
             await view.init()
-            if isinstance(channel, discord.User | discord.DMChannel) or channel.permissions_for(guild.me).embed_links:
+            if (
+                guild is None
+                or isinstance(channel, discord.User | discord.DMChannel)
+                or channel.permissions_for(guild.me).embed_links
+            ):
                 if task["data"] is not None and "msg_url" in task["data"]:
                     click_here = await self.bot._(channel, "timers.rmd.embed-link")
                     task["message"] += f'\n\n[{click_here}]({task["data"]["msg_url"]})'
@@ -198,7 +212,7 @@ class TaskHandler:
         return True
 
     async def add_task(self, action: str, duration: int, userid: int, guildid: int | None = None,
-                       channelid: int | None = None, message: str | None = None, data: dict | None = None):
+                       channelid: int | None = None, message: str | None = None, data: AnyDict | None = None):
         """Add a task to the list"""
         tasks_list = await self.get_events_from_db(get_all=True)
         for task in tasks_list:
@@ -208,7 +222,6 @@ class TaskHandler:
                     and task["channel"] == channelid
                     and task["action"] != "timer"):
                 return await self.update_duration(task["ID"], duration)
-        data = None if data is None else json.dumps(data)
         query = "INSERT INTO `timed` (`guild`,`channel`,`user`,`action`,`duration`,`message`, `data`, `beta`) VALUES (%(guild)s,%(channel)s,%(user)s,%(action)s,%(duration)s,%(message)s,%(data)s,%(beta)s)"
         query_args = {
             "guild": guildid,
@@ -217,7 +230,7 @@ class TaskHandler:
             "action": action,
             "duration": duration,
             "message": message,
-            "data": data,
+            "data": None if data is None else json.dumps(data),
             "beta": self.bot.beta
         }
         async with self.bot.db_main.write(query, query_args):

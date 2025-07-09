@@ -4,14 +4,14 @@ from typing import NamedTuple
 
 from mysql.connector import connect as sql_connect
 from mysql.connector import errors as mysql_errors
-from mysql.connector.connection import MySQLConnection
+from mysql.connector.abstracts import MySQLConnectionAbstract
 
 from core.boot_utils.conf_loader import get_secrets_dict
 
 
 class ConnectionDetails(NamedTuple):
     "Store info about a database connection."
-    cnx: MySQLConnection
+    cnx: MySQLConnectionAbstract
     creation: int
 
 
@@ -64,14 +64,13 @@ class DatabaseConnectionManager:
         "Close all database connections."
         connection: ConnectionDetails | None
         for connection in self.__connections.values():
-            if connection is not None:
-                connection.cnx.close()
+            connection.cnx.close()
         self.__connections.clear()
 
-    def __create_connection(self, database: str) -> MySQLConnection:
+    def __create_connection(self, database: str) -> MySQLConnectionAbstract:
         "Create a new connection to the database."
         self.__log.info("Opening new connection to database '%s'", database)
-        cnx = sql_connect(
+        cnx: MySQLConnectionAbstract = sql_connect(
             host=self.__database_keys["host"],
             user=self.__database_keys["user"],
             password=self.__database_keys["password"],
@@ -80,6 +79,6 @@ class DatabaseConnectionManager:
             charset="utf8mb4",
             collation="utf8mb4_unicode_ci",
             connection_timeout=5
-        )
+        ) # type: ignore
         self.__connections[database] = ConnectionDetails(cnx, int(time.time()))
         return cnx
