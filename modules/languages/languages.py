@@ -1,3 +1,5 @@
+from typing import Any
+
 import discord
 import i18n
 from asyncache import cached
@@ -18,11 +20,11 @@ SourceType = (
     | discord.DMChannel
     | discord.Interaction
     | discord.PartialMessageable
-    | commands.Context
+    | commands.Context[Any]
 )
 
 
-class Languages(discord.ext.commands.Cog):
+class Languages(commands.Cog):
     "Translations module"
 
     def __init__(self, bot: Axobot):
@@ -51,13 +53,13 @@ class Languages(discord.ext.commands.Cog):
     async def get_default_language(self) -> str:
         return (await self.bot.get_options_list())["language"]["default"]
 
-    async def tr(self, source: SourceType, string_id: str, **kwargs):
+    async def tr(self, source: SourceType, string_id: str, **kwargs: Any):
         """Renvoie le texte en fonction de la langue"""
         if isinstance(source, discord.PartialMessageable):
             if source.guild_id:
                 source = source.guild_id
             else:
-                source = await self.bot.fetch_channel(source.id)
+                source = await self.bot.fetch_channel(source.id) # type: ignore
         if isinstance(source, discord.Guild):
             # get ID from guild
             source = source.id
@@ -85,12 +87,12 @@ class Languages(discord.ext.commands.Cog):
             lang_opt = used_langs[0][0] if len(used_langs) > 0 else self.get_default_language()
         elif not self.bot.database_online or source is None:
             # get default lang
-            lang_opt = self.get_default_language()
+            lang_opt = await self.get_default_language()
         elif isinstance(source, discord.DMChannel):
             # get lang from DM channel
             recipient = await self.bot.get_recipient(source)
             if recipient is None:
-                lang_opt = self.get_default_language()
+                lang_opt = await self.get_default_language()
             else:
                 used_langs = await self.bot.get_cog("Utilities").get_user_languages(recipient, limit=1)
                 lang_opt = used_langs[0][0] if len(used_langs) > 0 else self.get_default_language()
@@ -103,10 +105,10 @@ class Languages(discord.ext.commands.Cog):
             raise TypeError(f"Unknown type for translation source: {type(source)}")
         if lang_opt not in await self.get_available_languages():
             # if lang not known: fallback to default
-            lang_opt = self.get_default_language()
+            lang_opt = await self.get_default_language()
         return await self._recursive_get_translation(lang_opt, string_id, **kwargs)
 
-    async def _recursive_get_translation(self, locale: str, string_id: str, **kwargs):
+    async def _recursive_get_translation(self, locale: str, string_id: str, **kwargs: Any) -> str:
         "Find the translation in the given locale, or fallback to another locale"
         try:
             return await self.get_translation(locale, string_id, **kwargs)
@@ -117,7 +119,7 @@ class Languages(discord.ext.commands.Cog):
             fallback = "fr" if locale == "fr2" else "en"
             return await self._recursive_get_translation(fallback, string_id, **kwargs)
 
-    async def get_translation(self, locale: str, string_id: str, **kwargs) -> str | list:
+    async def get_translation(self, locale: str, string_id: str, **kwargs: Any) -> str:
         "Get a translation from the i18n files directly"
         if string_id == "_used_locale":
             return locale
@@ -127,11 +129,12 @@ class Languages(discord.ext.commands.Cog):
         "Signal to the dev that a translation is missing"
         try:
             err = f"Message `{string_id}` not found in JSON files (language {lang})"
-            await self.bot.get_cog("Errors").senf_err_msg(err)
+            if error_cog := self.bot.get_cog("Errors"):
+                await error_cog.senf_err_msg(err)
             self.bot.log.warning(err)
         except Exception: # pylint: disable=broad-except
             self.bot.log.error("Something went wrong while reporting a translation as missing", exc_info=True)
 
 
-async def setup(bot):
+async def setup(bot: Axobot):
     await bot.add_cog(Languages(bot))

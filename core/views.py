@@ -1,6 +1,7 @@
 from typing import Callable
 
 import discord
+from discord import ui
 
 from core.bot_classes import Axobot
 
@@ -23,16 +24,11 @@ class ConfirmView(discord.ui.View):
 
     async def init(self):
         "Initialize buttons with translations"
-        confirm_label = await self.bot._(self.ctx, "misc.btn.confirm.label")
-        confirm_btn = discord.ui.Button(label=confirm_label, style=discord.ButtonStyle.green)
-        confirm_btn.callback = self.confirm
-        self.add_item(confirm_btn)
-        cancel_label = await self.bot._(self.ctx, "misc.btn.cancel.label")
-        cancel_btn = discord.ui.Button(label=cancel_label, style=discord.ButtonStyle.grey)
-        cancel_btn.callback = self.cancel
-        self.add_item(cancel_btn)
+        self._confirm_btn.label = await self.bot._(self.ctx, "misc.btn.confirm.label")
+        self._cancel_btn.label = await self.bot._(self.ctx, "misc.btn.cancel.label")
 
-    async def confirm(self, interaction: discord.Interaction):
+    @ui.button(label="...", style=discord.ButtonStyle.green)
+    async def _confirm_btn(self, interaction: discord.Interaction, _):
         "Confirm the action when clicking"
         if not self.validation(interaction):
             return
@@ -43,7 +39,8 @@ class ConfirmView(discord.ui.View):
         self.response_interaction = interaction
         self.stop()
 
-    async def cancel(self, interaction: discord.Interaction):
+    @ui.button(label="...", style=discord.ButtonStyle.grey)
+    async def _cancel_btn(self, interaction: discord.Interaction, _):
         "Cancel the action when clicking"
         if not self.validation(interaction):
             return
@@ -56,8 +53,8 @@ class ConfirmView(discord.ui.View):
         "Called when the timeout has expired"
         if isinstance(interaction, discord.Interaction) and not interaction.response.is_done():
             await interaction.response.defer()
-        for child in self.children:
-            child.disabled = True
+        self._confirm_btn.disabled = True
+        self._cancel_btn.disabled = True
         if isinstance(interaction, discord.Interaction):
             await interaction.edit_original_response(
                 view=self
@@ -82,8 +79,8 @@ class DeleteView(discord.ui.View):
         "Delete the message when clicking"
         if not self.validation(interaction):
             return
-        await interaction.message.delete(delay=0)
         self.stop()
+        await interaction.delete_original_response()
 
 
 class TextInputModal(discord.ui.Modal):

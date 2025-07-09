@@ -1,7 +1,7 @@
 import re
 import time
 from datetime import UTC, datetime, timedelta
-from typing import Literal
+from typing import Literal, TypedDict
 
 from babel import dates, numbers
 from dateutil.relativedelta import relativedelta
@@ -13,7 +13,7 @@ def get_locale(lang: str):
         return "en_US"
     if lang == "fr2":
         return "fr_FR"
-    return lang+"_"+lang.capitalize()
+    return lang + "_" + lang.capitalize()
 
 # pylint: disable=too-few-public-methods, invalid-name
 class TIMEDELTA_UNITS:
@@ -32,19 +32,32 @@ class FormatUtils:
 
 
     @staticmethod
-    async def time_delta(date1: datetime | int, date2: datetime = None,
+    async def time_delta(date1: datetime | int, date2: datetime | None = None,
                          lang: str = "en", year: bool = False, hour: bool = True, seconds: bool = True,
-                         form: Literal["short", "developed"]="developed"):
+                         form: Literal["short", "developed"] = "developed"):
         """Translates a two time interval datetime into a readable character string
 
         form can be 'short' (3d 6h) or 'developed' (3 jours 6 heures)
         """
         if date2 is None:
+            if not isinstance(date1, int):
+                raise TypeError("date2 must be a datetime object or an integer")
             delta = relativedelta(seconds=date1)
         else:
+            if not isinstance(date1, datetime):
+                raise TypeError("date1 must be a datetime object")
             delta = relativedelta(date2, date1)
+        return await FormatUtils._time_delta(delta, lang, year=year, hour=hour, seconds=seconds, form=form)
 
-        kwargs = {
+    class _FormatTimeDeltaArgs(TypedDict):
+        threshold: int
+        locale: str
+        format: Literal["narrow", "long"]
+
+    @staticmethod
+    async def _time_delta(
+            delta: relativedelta, lang: str, year: bool, hour: bool, seconds: bool, form: Literal["short", "developed"]):
+        kwargs: FormatUtils._FormatTimeDeltaArgs = {
             "threshold": 100000,
             "locale": get_locale(lang),
             "format": "narrow" if form=="short" else "long"
@@ -166,13 +179,13 @@ class _Duration(float):
         if r is not None:
             now = then = datetime.now(UTC)
             then += relativedelta(months=int(r.group(1)))
-            duration += (then - now).total_seconds()
+            duration += round((then - now).total_seconds())
             found = True
         r = re.search(r"^(\d+) ?y(?:ears?)?$", argument)
         if r is not None:
             now = then = datetime.now(UTC)
             then += relativedelta(years=int(r.group(1)))
-            duration += (then - now).total_seconds()
+            duration += round((then - now).total_seconds())
             found = True
         if not found:
             raise ValueError("Invalid duration")

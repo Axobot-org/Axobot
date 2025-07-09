@@ -1,17 +1,18 @@
+# pyright: reportMissingParameterType=false
+
 import inspect
 import re
-from typing import TYPE_CHECKING, Type
+from typing import Never, Type
 
 import discord
 from discord.ext import commands
 
 from core.arguments import errors as arguments_errors
+from core.bot_classes import Axobot, MyContext
 from core.formatutils import FormatUtils
 
-if TYPE_CHECKING:
-    from core.bot_classes import Axobot, MyContext
 
-def UnionTransformer(*types) -> Type[discord.app_commands.Transformer]: # pylint: disable=invalid-name
+def UnionTransformer(*types: type | str | None) -> Type[discord.app_commands.Transformer]: # pylint: disable=invalid-name
     "Convert arguments to one of the provided types"
 
     for type_ in types:
@@ -33,7 +34,7 @@ def UnionTransformer(*types) -> Type[discord.app_commands.Transformer]: # pylint
                     return None
                 if inspect.isclass(type_) and issubclass(type_, discord.app_commands.Transformer):
                     try:
-                        return await type_().transform(interaction, value)
+                        return await type_().transform(interaction, value) # pyright: ignore[reportUnknownMemberType]
                     except commands.errors.BadArgument:
                         continue
             raise commands.errors.BadArgument(value)
@@ -43,13 +44,15 @@ def UnionTransformer(*types) -> Type[discord.app_commands.Transformer]: # pylint
 class CardStyleTransformer(discord.app_commands.Transformer):
     "Converts a string to a valid XP card style"
 
-    async def transform(self, interaction: discord.Interaction["Axobot"], value, /):
+    async def transform(self, interaction, value, /):
         "Do the conversion"
-        if value in await interaction.client.get_cog("Utilities").allowed_card_styles(interaction.user):
+        assert isinstance(interaction.client, Axobot)
+        if value in await interaction.client.get_cog("Utilities")\
+            .allowed_card_styles(interaction.user): # pyright: ignore[reportOptionalMemberAccess]
             return value
         raise arguments_errors.InvalidCardStyleError(value)
 
-    async def autocomplete(self, interaction, value, /):
+    async def autocomplete(self, interaction, value, /) -> Never:
         raise NotImplementedError()
 
 CardStyleArgument = discord.app_commands.Transform[str, CardStyleTransformer]
@@ -58,8 +61,9 @@ CardStyleArgument = discord.app_commands.Transform[str, CardStyleTransformer]
 class BotOrGuildInviteTransformer(discord.app_commands.Transformer): # pylint: disable=abstract-method
     """Converts a string to a bot invite or a guild invite"""
 
-    async def transform(self, interaction: discord.Interaction["Axobot"], value, /):
+    async def transform(self, interaction, value, /):
         "Do the conversion"
+        assert isinstance(interaction.client, Axobot)
         answer = None
         r_invite = re.search(
             r"^https://discord(?:app)?\.com/(?:api/)?oauth2/authorize\?(?:client_id=(\d{17,19})|scope=([a-z\.\+]+?)|(?:permissions|guild_id|disable_guild_select|redirect_uri)=[^&\s]+)(?:&(?:client_id=(\d{17,19})|scope=([a-z\.\+]+?)|(?:permissions|guild_id|disable_guild_select|redirect_uri)=[^&\s]+))*$",
@@ -99,7 +103,7 @@ class GuildInviteTransformer(discord.app_commands.Transformer):
             raise arguments_errors.InvalidGuildInviteError(value)
         return invite
 
-    async def autocomplete(self, interaction, value, /):
+    async def autocomplete(self, interaction, value: str, /) -> list[discord.app_commands.Choice[str]]: # type: ignore[override]
         if interaction.guild is None or not interaction.guild.me.guild_permissions.manage_guild:
             return []
         value = value.lower()
@@ -117,7 +121,7 @@ GuildInviteArgument = discord.app_commands.Transform[discord.Invite, GuildInvite
 
 class URL(str):
     "Represents a decomposed URL"
-    def __init__(self, regex_exp: re.Match):
+    def __init__(self, regex_exp: re.Match[str]):
         self.domain: str = regex_exp.group("domain")
         self.path: str = regex_exp.group("path")
         self.is_https: bool = regex_exp.group("https") == "https"
@@ -129,7 +133,7 @@ class URL(str):
 class URLTransformer(discord.app_commands.Transformer): # pylint: disable=abstract-method
     "Convert argument to a valid URL"
 
-    async def transform(self, _interaction, value, /) -> URL:
+    async def transform(self, _interaction: discord.Interaction, value: str, /) -> URL:
         "Convert a string to a proper URL instance, else raise BadArgument"
         r = re.search(
             r"(?P<https>https?)://(?:www\.)?(?P<domain>[^/\s]+)(?:/(?P<path>[\S]+))?", value)
@@ -171,7 +175,7 @@ class GreedyUsersOrRolesTransformer(discord.app_commands.Transformer): # pylint:
     async def transform(self, interaction, value: str, /):
         "Convert a string to a list of users or roles, else raise BadArgument"
         ctx = await commands.Context.from_interaction(interaction)
-        result = []
+        result: list[discord.User | discord.Role] = []
         for word in value.split(" "):
             try:
                 result.append(await commands.UserConverter().convert(ctx, word))
@@ -184,7 +188,7 @@ GreedyUsersOrRolesArgument = discord.app_commands.Transform[list[discord.User | 
 class GreedyDurationTransformer(discord.app_commands.Transformer): # pylint: disable=abstract-method
     "Convert argument to a duration in seconds"
 
-    async def transform(self, _interaction, value: str, /):
+    async def transform(self, _interaction: discord.Interaction, value: str, /):
         "Convert a string to a duration in seconds, else raise BadArgument"
         return await FormatUtils.parse_duration(value)
 
@@ -198,8 +202,8 @@ class EmojiTransformer(discord.app_commands.Transformer):
         ctx = await commands.Context.from_interaction(interaction)
         return await commands.EmojiConverter().convert(ctx, value)
 
-    async def autocomplete(self, interaction, value, /):
-        if interaction.guild_id is None:
+    async def autocomplete(self, interaction, value: str, /) -> list[discord.app_commands.Choice[str]]: # type: ignore[override]
+        if interaction.guild is None:
             return []
         value = value.lower()
         options: list[tuple[bool, str, str]] = []
@@ -219,8 +223,9 @@ EmojiArgument = discord.app_commands.Transform[discord.Emoji, EmojiTransformer]
 class UnicodeEmojiTransformer(discord.app_commands.Transformer): # pylint: disable=abstract-method
     "Represents any Unicode emoji"
 
-    async def transform(self, interaction: discord.Interaction["Axobot"], value, /):
+    async def transform(self, interaction: discord.Interaction, value, /):
         "Check if a string is a unicod emoji, else raise BadArgument"
+        assert isinstance(interaction.client, Axobot)
         if value in interaction.client.emojis_manager.unicode_set:
             return value
         raise arguments_errors.InvalidUnicodeEmojiError(value)
@@ -228,7 +233,7 @@ class UnicodeEmojiTransformer(discord.app_commands.Transformer): # pylint: disab
 class PartialOrUnicodeEmojiTransformer(discord.app_commands.Transformer): # pylint: disable=abstract-method
     "Represents any unicode or Discord emoji"
 
-    async def transform(self, interaction, value, /):
+    async def transform(self, interaction: discord.Interaction, value, /):
         "Convert an argument into a PartialEmoji or Unicode emoji"
         ctx = await commands.Context.from_interaction(interaction)
         try:
@@ -241,7 +246,7 @@ PartialorUnicodeEmojiArgument = discord.app_commands.Transform[discord.PartialEm
 class DiscordOrUnicodeEmojiTransformer(discord.app_commands.Transformer): # pylint: disable=abstract-method
     "Represents any unicode or Discord emoji"
 
-    async def transform(self, interaction, value, /):
+    async def transform(self, interaction: discord.Interaction, value, /):
         "Convert an argument into a PartialEmoji or Unicode emoji"
         ctx = await commands.Context.from_interaction(interaction)
         try:
@@ -254,7 +259,7 @@ DiscordOrUnicodeEmojiArgument = discord.app_commands.Transform[discord.Emoji | s
 class GreedyDiscordOrUnicodeEmojiTransformer(discord.app_commands.Transformer): # pylint: disable=abstract-method
     "Convert argument to a list of discord or unicode emojis"
 
-    async def transform(self, interaction, value: str, /):
+    async def transform(self, interaction: discord.Interaction, value: str, /):
         "Convert a string to a list of discord or unicode emojis, else raise BadArgument"
         return [
             await DiscordOrUnicodeEmojiTransformer().transform(interaction, word)
@@ -288,7 +293,7 @@ class GuildTransformer(discord.app_commands.Transformer):
 
     async def transform(self, interaction, value, /) -> discord.Guild:
         "Do the conversion"
-        match = commands.IDConverter._get_id_match(value) # pylint: disable=protected-access
+        match = commands.IDConverter._get_id_match(value) # pylint: disable=protected-access # pyright: ignore[reportPrivateUsage]
         result = None
 
         if match is not None:
@@ -302,7 +307,7 @@ class GuildTransformer(discord.app_commands.Transformer):
                 raise commands.GuildNotFound(value)
         return result
 
-    async def autocomplete(self, interaction, value, /):
+    async def autocomplete(self, interaction, value, /) -> Never:
         raise NotImplementedError()
 
 GuildArgument = discord.app_commands.Transform[discord.Guild, GuildTransformer]

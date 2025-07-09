@@ -1,11 +1,11 @@
 import re
-from typing import TYPE_CHECKING, Callable
+from typing import TYPE_CHECKING, Any, Callable, Coroutine, Self
 
 import discord
 
 from core.formatutils import FormatUtils
 
-from .types import DbTask
+from .types import ReminderTask
 
 if TYPE_CHECKING:
     from core.bot_classes import Axobot
@@ -13,7 +13,9 @@ if TYPE_CHECKING:
 class RecreateReminderView(discord.ui.View):
     "A simple view allowing users to recreate a sent reminder"
 
-    def __init__(self, bot: "Axobot", task: DbTask):
+    children: list[discord.ui.Button[Self]]  # type: ignore[assignment]
+
+    def __init__(self, bot: "Axobot", task: ReminderTask):
         self.bot = bot
         self.task = task
         self.message: discord.Message | None = None
@@ -52,7 +54,7 @@ class RecreateReminderView(discord.ui.View):
     def _get_translator_context(self):
         return self.task["guild"] or self.bot.get_user(self.task["user"])
 
-    async def on_pressed(self, interaction: discord.Interaction, duration):
+    async def on_pressed(self, interaction: discord.Interaction, duration: int):
         "Called when the button is pressed"
         if not interaction.response.is_done():
             await interaction.response.defer(ephemeral=True)
@@ -90,18 +92,17 @@ class RecreateReminderView(discord.ui.View):
     async def interaction_check(self, interaction: discord.Interaction, /):
         return interaction.user.id == self.task["user"]
 
-    async def disable(self, interaction: discord.Interaction | discord.Message):
+    async def disable(self, interaction: discord.Interaction):
         "Called when the timeout has expired"
         for child in self.children:
             child.disabled = True
-        if isinstance(interaction, discord.Interaction):
-            await interaction.followup.edit_message(
-                interaction.message.id,
-                content=interaction.message.content,
-                view=self
-            )
-        else:
-            await interaction.edit(content=interaction.content, view=self)
+        if interaction.message is None:
+            raise ValueError("Interaction message is None, cannot edit it.")
+        await interaction.followup.edit_message(
+            interaction.message.id,
+            content=interaction.message.content,
+            view=self
+        )
         self.stop()
 
     async def on_timeout(self):
@@ -115,7 +116,7 @@ class AskDurationModal(discord.ui.Modal):
     "Ask a user to enter a duration for a reminder snooze"
     raw_duration = discord.ui.TextInput(label="", placeholder="1h 30m", style=discord.TextStyle.short, max_length=20)
 
-    def __init__(self, title: str, input_label: str, callback: Callable[[discord.Interaction, int], None]):
+    def __init__(self, title: str, input_label: str, callback: Callable[[discord.Interaction, int], Coroutine[Any, Any, None]]):
         super().__init__(title=title)
         self.callback = callback
         self.raw_duration.label = input_label

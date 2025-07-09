@@ -1,29 +1,32 @@
 import datetime
 import sys
 import time
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Generic, Sequence, TypeVar
 
 from mysql.connector import errors
 from mysql.connector.connection import MySQLConnection
 from mysql.connector.connection_cext import CMySQLConnection
 
 from core.database.query.db_abstract_query import DatabaseAbstractQuery
+from core.type_utils import AnyDict, AnyList, AnyStrDict, AnyTuple
 
 if TYPE_CHECKING:
     from core.bot_classes.axobot import Axobot
 
-RowType = tuple | dict[str, Any]
+RowType = AnyTuple | AnyStrDict
 
-class DatabaseReadQuery(DatabaseAbstractQuery):
+T = TypeVar('T')
+
+class DatabaseReadQuery(DatabaseAbstractQuery, Generic[T]):
     "Represents a context manager to execute a SELECT or SHOW query to a database"
 
-    def __init__(self, bot: "Axobot", cnx: MySQLConnection | CMySQLConnection, query: str, args: tuple | dict | None = None,
+    def __init__(self, bot: "Axobot", cnx: MySQLConnection | CMySQLConnection, query: str, args: AnyTuple | AnyDict | None = None,
                  fetchone: bool = False, astuple: bool = False):
         super().__init__(bot, cnx, query, args)
         self.fetchone = fetchone
         self.astuple = astuple
 
-    async def __aenter__(self) -> list[RowType] | RowType | None:
+    async def __aenter__(self) -> T:
         self.cursor = self.cnx.cursor(
             dictionary=(not self.astuple)
         )
@@ -34,26 +37,26 @@ class DatabaseReadQuery(DatabaseAbstractQuery):
         start_time = time.time()
 
         try:
-            self.cursor.execute(self.query, self.args)
+            self.cursor.execute(self.query, self.args) # type: ignore
         except errors.ProgrammingError as err:
-            self.log.error("%s", self.cursor._executed, exc_info=True)
+            self.log.error("%s", self.cursor._executed, exc_info=True) # type: ignore
             await self.__aexit__(*sys.exc_info())
             raise err
 
         return_type = tuple if self.astuple else dict
         if self.fetchone:
             one_row = self.cursor.fetchone()
-            result = return_type() if one_row is None else return_type(one_row)
+            result = return_type() if one_row is None else return_type(one_row) # type: ignore
         else:
-            result = list(map(return_type, self.cursor.fetchall()))
+            result = list(map(return_type, self.cursor.fetchall())) # type: ignore
             # convert datetime objects to UTC
             result = await convert_tzinfo(result)
 
         await self._save_execution_time(start_time)
-        return result
+        return result # type: ignore
 
 
-async def convert_tzinfo(result: list[dict | tuple]):
+async def convert_tzinfo(result: Sequence[AnyDict | AnyTuple]) -> AnyList:
     """Converts datetime objects in a list of dictionaries or tuples to UTC timezone"""
     updated_result = []
     for row in result:

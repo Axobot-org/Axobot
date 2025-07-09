@@ -1,0 +1,14 @@
+{
+  "typeCheckingMode": "strict",
+  "reportMissingImports": true,
+  "pythonVersion": "3.11",
+  "include": ["core", "docs", "modules"],
+  "exclude": ["**/__pycache__"],
+  "reportUnknownMemberType": "none",
+  "reportMissingParameterType": "information",
+  "reportUnknownParameterType": "information",
+  "reportUnknownArgumentType": "none",
+  "reportUnknownVariableType": "none",
+  "reportOptionalMemberAccess": "warning",
+  "reportIncompatibleMethodOverride": "information"
+}

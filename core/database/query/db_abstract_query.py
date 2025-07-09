@@ -1,9 +1,13 @@
 import logging
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
-from mysql.connector.connection import MySQLConnection, MySQLCursor
-from mysql.connector.connection_cext import CMySQLConnection, CMySQLCursor
+from mysql.connector.connection import MySQLConnection
+from mysql.connector.connection_cext import CMySQLConnection
+from mysql.connector.cursor import MySQLCursor
+from mysql.connector.cursor_cext import CMySQLCursor
+
+from core.type_utils import AnyDict, AnyTuple
 
 from .utils import format_query, save_execution_time
 
@@ -14,22 +18,23 @@ if TYPE_CHECKING:
 class DatabaseAbstractQuery(ABC):
     "Abstract base class for any database query."
 
-    def __init__(self, bot: "Axobot", cnx: MySQLConnection | CMySQLConnection, query: str, args: tuple | dict | None = None):
+    cursor: MySQLCursor | CMySQLCursor
+
+    def __init__(self,
+                 bot: "Axobot", cnx: MySQLConnection | CMySQLConnection, query: str, args: AnyTuple | AnyDict | None = None):
         self.bot = bot
         self.cnx = cnx
         self.query = query
         self.args = args
-        self.cursor: MySQLCursor | CMySQLCursor = None
         self.log = logging.getLogger("bot.sql")
 
     @abstractmethod
-    async def __aenter__(self):
+    async def __aenter__(self) -> Any:
         "Enter the context manager and execute the query."
 
     async def __aexit__(self, exc_type, value, traceback):
         "Exit the context manager and close the cursor."
-        if self.cursor is not None:
-            self.cursor.close()
+        self.cursor.close()
 
     async def _format_query(self):
         "Create a formatted query string from the query and its arguments."

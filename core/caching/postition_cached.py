@@ -1,8 +1,10 @@
+from typing import Any
+
 from asyncache import cached
 from cachetools import TTLCache
 
 
-def position_cached(cache: TTLCache, *, key: int):
+def position_cached(cache: TTLCache[Any, Any], *, key: int):
     """
     Decorator to cache the position of a given key in a TTLCache.
 

@@ -11,6 +11,7 @@ from core.arguments import args
 from core.bot_classes import Axobot
 from core.checks import checks
 from core.enums import RankCardsFlag, UserFlag
+from core.type_utils import UserOrMember
 
 importlib.reload(args)
 importlib.reload(checks)
@@ -94,7 +95,7 @@ class Users(commands.Cog):
         async with self.bot.db_main.write(query, (user_id,)):
             pass
 
-    async def get_userflags(self, user: discord.User) -> list[str]:
+    async def get_userflags(self, user: UserOrMember) -> list[str]:
         """Check what user flags has a user"""
         if not self.bot.database_online:
             return []
@@ -102,13 +103,13 @@ class Users(commands.Cog):
             return UserFlag().int_to_flags(userinfo["user_flags"])
         return []
 
-    async def has_userflag(self, user: discord.User, flag: str) -> bool:
+    async def has_userflag(self, user: UserOrMember, flag: str) -> bool:
         """Check if a user has a specific user flag"""
         if flag not in UserFlag.FLAGS.values():
             return False
         return flag in await self.get_userflags(user)
 
-    async def get_rankcards(self, user: discord.User) -> list[str]:
+    async def get_rankcards(self, user: UserOrMember) -> list[str]:
         """Check what rank cards got unlocked by a user"""
         if not self.bot.database_online:
             return []
@@ -116,13 +117,13 @@ class Users(commands.Cog):
             return RankCardsFlag().int_to_flags(userinfo["rankcards_unlocked"])
         return []
 
-    async def has_rankcard(self, user: discord.User, rankcard: str) -> bool:
+    async def has_rankcard(self, user: UserOrMember, rankcard: str) -> bool:
         """Check if a user has unlocked a specific rank card"""
         if rankcard not in RankCardsFlag.FLAGS.values():
             return False
         return rankcard in await self.get_rankcards(user)
 
-    async def set_rankcard(self, user: discord.User, style: str, add: bool=True):
+    async def set_rankcard(self, user: UserOrMember, style: str, add: bool=True):
         """Add or remove a rank card style for a user"""
         if style not in RankCardsFlag.FLAGS.values():
             raise ValueError(f"Unknown card style: {style}")
@@ -152,7 +153,7 @@ class Users(commands.Cog):
             result["default"] = result.pop('')
         return result
 
-    async def card_style_autocomplete(self, user: discord.User, current: str):
+    async def card_style_autocomplete(self, user: UserOrMember, current: str):
         "Autocompletion for a card style name"
         styles_list: list[str] = await self.bot.get_cog("Utilities").allowed_card_styles(user)
         filtered = sorted(

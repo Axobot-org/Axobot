@@ -10,15 +10,11 @@ admins_id = {279568324260528128,281404141841022976,552273019020771358}
 async def is_bot_admin(ctx: MyContext | discord.Interaction | discord.User):
     "Check if the user is one of the bot administrators"
     if isinstance(ctx, commands.Context):
-        user = ctx.author
+        user = ctx.author.id
     elif isinstance(ctx, discord.Interaction):
-        user = ctx.user
+        user = ctx.user.id
     else:
-        user = ctx
-    if isinstance(user, str) and user.isnumeric():
-        user = int(user)
-    elif isinstance(user, discord.User | discord.Member):
-        user = user.id
+        user = ctx.id
     return user in admins_id
 
 async def is_support_staff(interaction: discord.Interaction[Axobot]) -> bool:
@@ -43,9 +39,9 @@ async def database_connected(interaction: discord.Interaction[Axobot]) -> bool:
 
 async def is_voice_message(interaction: discord.Interaction):
     "Check if the message is a voice message"
-    if "resolved" not in interaction.data or "messages" not in interaction.data["resolved"]:
+    if interaction.data is None or "resolved" not in interaction.data or "messages" not in interaction.data["resolved"]:
         raise NotAVoiceMessageError()
-    messages: dict[str, dict] = interaction.data["resolved"]["messages"]
+    messages = interaction.data["resolved"]["messages"]
     if len(messages) != 1:
         raise NotAVoiceMessageError()
     message = list(messages.values())[0]

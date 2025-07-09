@@ -37,10 +37,7 @@ def _generate_version_note(note: VersionNote):
     # cleanup spaces
     content = _strip_lines(note["content"])
     # extract the version number
-    try:
-        version = re.search(r"Update (\d+\.\d+\.\d+[a-z]?)", content).group(1)
-    except AttributeError:
-        return _convert_to_rst(content)
+    version = _extract_version(content)
     # format the release date
     date = _format_date(note["release_date"])
     # extract the section titles and contents
@@ -64,6 +61,14 @@ def _generate_version_note(note: VersionNote):
     for title, content in sections:
         text += f"**{title}**\n\n{content}\n\n"
     return text.rstrip()
+
+def _extract_version(content: str) -> str:
+    if (match := re.search(r"Update (\d+\.\d+\.\d+[a-z]?)", content)) is not None:
+        try:
+            return match.group(1)
+        except AttributeError:
+            pass
+    return _convert_to_rst(content)
 
 def _strip_lines(text: str):
     "Strip leading and trailing whitespace from every line in a string"

@@ -1,13 +1,14 @@
 from math import ceil
-from typing import Any
+from typing import Any, Self
 
 from discord import (ButtonStyle, Interaction, Message, NotFound, SelectOption,
                      User, ui)
+from discord.utils import MISSING
 
 from core.bot_classes import Axobot, MyContext
 
 
-def cut_text(lines: list[str], max_length: int = 1024, max_size=100) -> list[str]:
+def cut_text(lines: list[str], max_length: int = 1024, max_size: int = 100) -> list[str]:
     "Cut some text into multiple paragraphs"
     result: list[str] = []
     paragraph: list[str] = []
@@ -30,7 +31,7 @@ class Paginator(ui.View):
         self.client = client
         self.user = user
         self.page = 1
-        self.children[2].label = stop_label
+        self._stop.label = stop_label
 
     async def send_init(self, ctx: MyContext | Interaction):
         "Build the first page, before anyone actually click"
@@ -42,10 +43,12 @@ class Paginator(ui.View):
         if isinstance(ctx, MyContext):
             return await ctx.send(**contents, view=self)
         if ctx.response.is_done():
-            return await ctx.followup.send(**contents, view=self)
-        return await ctx.response.send_message(**contents, view=self)
+            return await ctx.followup.send(**contents, view=self, wait=True)
+        callback_response = await ctx.response.send_message(**contents, view=self)
+        if callback_response.resource is not None and isinstance(callback_response.resource, Message):
+            return callback_response.resource
 
-    async def get_page_content(self, interaction: Interaction, page: int) -> dict[str, Any]:
+    async def get_page_content(self, interaction: Interaction | None, page: int) -> dict[str, Any]:
         "Build the page content given the page number and source interaction"
         raise NotImplementedError("get_page_content must be implemented!")
 
@@ -64,8 +67,8 @@ class Paginator(ui.View):
             await interaction.response.send_message(err, ephemeral=True)
         return result
 
-    async def on_error(self, interaction, error, item, /):
-        await self.client.dispatch("error", error, interaction)
+    async def on_error(self, interaction: Interaction, error: Exception, item, /):
+        self.client.dispatch("error", error, interaction)
 
     async def disable(self, interaction: Message | Interaction):
         "Called when the timeout has expired"
@@ -94,7 +97,7 @@ class Paginator(ui.View):
         else:
             await interaction.edit(view=self)
 
-    async def _update_buttons(self, stopped: bool=None):
+    async def _update_buttons(self, stopped: bool | None = None):
         "Mark buttons as enabled/disabled according to current page and view status"
         stopped = self.is_finished() if stopped is None else stopped
         count = await self.get_page_count()
@@ -103,38 +106,38 @@ class Paginator(ui.View):
             for child in self.children:
                 self.remove_item(child)
             return
-        self.children[0].disabled = (self.page == 1) or stopped
-        self.children[1].disabled = (self.page == 1) or stopped
-        self.children[2].disabled = stopped
-        self.children[3].disabled = (self.page == count) or stopped
-        self.children[4].disabled = (self.page == count) or stopped
+        self._first_element.disabled = (self.page == 1) or stopped
+        self._previous_element.disabled = (self.page == 1) or stopped
+        self._stop.disabled = stopped
+        self._next_element.disabled = (self.page == count) or stopped
+        self._last_element.disabled = (self.page == count) or stopped
 
     @ui.button(label="\U000025c0 \U000025c0", style=ButtonStyle.secondary)
-    async def _first_element(self, interaction: Interaction, _: ui.Button):
+    async def _first_element(self, interaction: Interaction, _: ui.Button[Self]):
         "Jump to the 1st page"
         await self._set_page(interaction, 1)
         await self._update_contents(interaction)
 
     @ui.button(label="\U000025c0", style=ButtonStyle.blurple)
-    async def _previous_element(self, interaction: Interaction, _: ui.Button):
+    async def _previous_element(self, interaction: Interaction, _: ui.Button[Self]):
         "Go to the previous page"
         await self._set_page(interaction, self.page-1)
         await self._update_contents(interaction)
 
     @ui.button(label="...", style=ButtonStyle.red)
-    async def _stop(self, interaction: Interaction, _: ui.Button):
+    async def _stop(self, interaction: Interaction, _: ui.Button[Self]):
         "Stop the view"
         self.stop()
         await self._update_contents(interaction)
 
     @ui.button(label="\U000025b6", style=ButtonStyle.blurple)
-    async def _next_element(self, interaction: Interaction, _: ui.Button):
+    async def _next_element(self, interaction: Interaction, _: ui.Button[Self]):
         "Go to the next page"
         await self._set_page(interaction, self.page+1)
         await self._update_contents(interaction)
 
     @ui.button(label="\U000025b6 \U000025b6", style=ButtonStyle.secondary)
-    async def _last_element(self, interaction: Interaction, _: ui.Button):
+    async def _last_element(self, interaction: Interaction, _: ui.Button[Self]):
         "Jump to the last page"
         await self._set_page(interaction, await self.get_page_count())
         await self._update_contents(interaction)
@@ -146,8 +149,6 @@ class PaginatedSelectView(ui.View):
     def __init__(self, client: Axobot, message: str | None, options: list[SelectOption], user: User, placeholder: str,
                  stop_label: str = "Quit", min_values: int = 1, max_values: int = 25, timeout: int = 180):
         super().__init__(timeout=timeout)
-        if any(not isinstance(opt.value, str) for opt in options):
-            raise ValueError("All options must have a string value")
         self.client = client
         self.message = message
         self.options = options
@@ -185,11 +186,11 @@ class PaginatedSelectView(ui.View):
         await self._update_buttons()
         if isinstance(ctx, Interaction):
             if ctx.response.is_done():
-                return await ctx.followup.send(content=self.message, view=self)
+                return await ctx.followup.send(content=self.message or MISSING, view=self)
             return await ctx.response.send_message(content=self.message, view=self)
         return await ctx.send(view=self)
 
-    async def interaction_check(self, interaction, /) -> bool:
+    async def interaction_check(self, interaction: Interaction, /) -> bool:
         result = True
         if user := interaction.user:
             result = user == self.user
@@ -198,8 +199,8 @@ class PaginatedSelectView(ui.View):
             await interaction.response.send_message(err, ephemeral=True)
         return result
 
-    async def on_error(self, interaction, error, item, /):
-        await self.client.dispatch("error", error, interaction)
+    async def on_error(self, interaction: Interaction, error: Exception, item, /):
+        self.client.dispatch("error", error, interaction)
 
     async def on_timeout(self):
         self._values.clear()
@@ -225,22 +226,21 @@ class PaginatedSelectView(ui.View):
         pages_count = ceil(len(self.options) / 25)
         self.page = min(max(page, 1), pages_count)
 
-    async def _update_contents(self, interaction: Message | Interaction, stopped: bool=None):
+    async def _update_contents(self, interaction: Message | Interaction, stopped: bool | None = None):
         "Update the page content"
         if isinstance(interaction, Interaction):
             await interaction.response.defer()
         await self._update_buttons(stopped=stopped)
         await self._update_selector()
         if isinstance(interaction, Interaction):
-            await interaction.followup.edit_message(
-                interaction.message.id,
+            await interaction.edit_original_response(
                 content=self.message,
                 view=self
             )
         else:
             await interaction.edit(content=self.message, view=self)
 
-    async def _update_buttons(self, stopped: bool=None):
+    async def _update_buttons(self, stopped: bool | None = None):
         "Mark buttons as enabled/disabled according to current page and view status"
         stopped = self.is_finished() if stopped is None else stopped
         pages_count = ceil(len(self.options) / 25)
@@ -252,7 +252,7 @@ class PaginatedSelectView(ui.View):
         self._last_element.disabled = (self.page == pages_count) or pages_count == 1 or stopped
 
     @ui.select(placeholder="...", row=0)
-    async def _selector(self, interaction: Interaction, selector: ui.Select):
+    async def _selector(self, interaction: Interaction, selector: ui.Select[Self]):
         "The actual selector"
         # remove values that have been unselected
         selector_all_values = {opt.value for opt in selector.options}
@@ -269,30 +269,30 @@ class PaginatedSelectView(ui.View):
             await self._update_contents(interaction)
 
     @ui.button(label="\U000025c0 \U000025c0", style=ButtonStyle.secondary, row=1)
-    async def _first_element(self, interaction: Interaction, _: ui.Button):
+    async def _first_element(self, interaction: Interaction, _: ui.Button[Self]):
         "Jump to the 1st page"
         await self._set_page(1)
         await self._update_contents(interaction)
 
     @ui.button(label="\U000025c0", style=ButtonStyle.blurple, row=1)
-    async def _previous_element(self, interaction: Interaction, _: ui.Button):
+    async def _previous_element(self, interaction: Interaction, _: ui.Button[Self]):
         "Go to the previous page"
         await self._set_page(self.page-1)
         await self._update_contents(interaction)
 
     @ui.button(label="...", style=ButtonStyle.red, row=1)
-    async def _stop(self, interaction: Interaction, _: ui.Button):
+    async def _stop(self, interaction: Interaction, _: ui.Button[Self]):
         "Stop the view"
         await self.disable(interaction)
 
     @ui.button(label="\U000025b6", style=ButtonStyle.blurple, row=1)
-    async def _next_element(self, interaction: Interaction, _: ui.Button):
+    async def _next_element(self, interaction: Interaction, _: ui.Button[Self]):
         "Go to the next page"
         await self._set_page(self.page+1)
         await self._update_contents(interaction)
 
     @ui.button(label="\U000025b6 \U000025b6", style=ButtonStyle.secondary, row=1)
-    async def _last_element(self, interaction: Interaction, _: ui.Button):
+    async def _last_element(self, interaction: Interaction, _: ui.Button[Self]):
         "Jump to the last page"
         await self._set_page(ceil(len(self.options) / 25))
         await self._update_contents(interaction)

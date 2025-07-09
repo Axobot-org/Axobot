@@ -1,4 +1,6 @@
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING, Any, Literal, overload
+
+from core.type_utils import AnyDict, AnyTuple
 
 from .db_multi_query import DatabaseMutliQueries
 from .db_read_query import DatabaseReadQuery
@@ -15,18 +17,72 @@ class DatabaseQueryHandler:
         self.bot = bot
         self.database = database
 
-    def read(self, query: str, args: tuple | dict | None = None, fetchone: bool = False, astuple: bool = False):
+    @overload
+    def read(
+        self,
+            query: str,
+            args: AnyTuple | AnyDict | None,
+            *,
+            fetchone: Literal[True],
+            astuple: Literal[True]
+    ) -> DatabaseReadQuery[AnyTuple] : ...
+
+    @overload
+    def read(
+        self,
+            query: str,
+            args: AnyTuple | AnyDict | None,
+            *,
+            fetchone: Literal[True],
+            astuple: Literal[False] = False
+    ) -> DatabaseReadQuery[AnyDict] : ...
+
+    @overload
+    def read(
+        self,
+            query: str,
+            args: AnyTuple | AnyDict | None,
+            *,
+            fetchone: Literal[False] = False,
+            astuple: Literal[True],
+    ) -> DatabaseReadQuery[list[AnyTuple]] : ...
+
+    @overload
+    def read(
+        self,
+            query: str,
+            args: AnyTuple | AnyDict | None = None,
+            *,
+            fetchone: Literal[False] = False,
+            astuple: Literal[False] = False
+    ) -> DatabaseReadQuery[list[AnyDict]] : ...
+
+    def read(
+        self,
+            query: str,
+            args: AnyTuple | AnyDict | None = None,
+            fetchone: bool = False,
+            astuple: bool = False
+    ):
         "Perform a read query to the database"
         cnx = self.bot.db.get_connection(self.database)
         if query_type(query) != "read":
-            raise ValueError(f"Expected read query, but received {truncate_query(query)}")
-        return DatabaseReadQuery(self.bot, cnx, query, args, fetchone, astuple)
+            raise ValueError(
+                f"Expected read query, but received {truncate_query(query)}")
+        return DatabaseReadQuery[Any](self.bot, cnx, query, args, fetchone, astuple)
 
-    def write(self, query: str, args: tuple | dict | None = None, multi: bool = False, returnrowcount: bool = False):
+    def write(
+        self,
+            query: str,
+            args: AnyTuple | AnyDict | None = None,
+            multi: bool = False,
+            returnrowcount: bool = False
+    ):
         "Perform a write query to the database"
         cnx = self.bot.db.get_connection(self.database)
         if query_type(query) != "write":
-            raise ValueError(f"Expected write query, but received {truncate_query(query)}")
+            raise ValueError(
+                f"Expected write query, but received {truncate_query(query)}")
         return DatabaseWriteQuery(self.bot, cnx, query, args, multi, returnrowcount)
 
     def multi(self):

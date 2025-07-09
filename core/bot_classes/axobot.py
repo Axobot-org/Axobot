@@ -2,7 +2,7 @@ import asyncio
 import datetime
 import logging
 import sys
-from typing import (TYPE_CHECKING, Awaitable, Callable, Literal, Optional,
+from typing import (TYPE_CHECKING, Any, Awaitable, Callable, Literal, Optional,
                     overload)
 
 import discord
@@ -26,6 +26,7 @@ if TYPE_CHECKING:
     from modules.cases.cases import Cases
     from modules.errors.errors import Errors
     from modules.help_cmd.help_cmd import Help
+    from modules.languages.languages import Languages
     from modules.minecraft.minecraft import Minecraft
     from modules.moderation.moderation import Moderation
     from modules.partners.partners import Partners
@@ -36,7 +37,7 @@ if TYPE_CHECKING:
     from modules.users.users import Users
     from modules.xp.xp import Xp
 
-async def get_prefix(bot: "Axobot", msg: discord.Message) -> list:
+async def get_prefix(bot: "Axobot", msg: discord.Message) -> list[str]:
     """Get the correct bot prefix from a message
     Prefix can change based on guild, but the bot mention will always be an option"""
     if msg.guild is None:
@@ -47,7 +48,7 @@ async def get_prefix(bot: "Axobot", msg: discord.Message) -> list:
 class Axobot(commands.bot.AutoShardedBot):
     """Bot class, with everything needed to run it"""
 
-    def __init__(self, case_insensitive: bool = None, status: discord.Status = None, database_online: bool = True, \
+    def __init__(self, case_insensitive: bool = False, status: discord.Status | None = None, database_online: bool = True, \
             beta: bool = False, zombie_mode: bool = False):
         # pylint: disable=assigning-non-slot
         # defining allowed default mentions
@@ -84,7 +85,7 @@ class Axobot(commands.bot.AutoShardedBot):
         self.tree.on_error = self.on_app_cmd_error
         self.app_commands_list: Optional[list[discord.app_commands.AppCommand]] = None
 
-    async def on_error(self, event_method: Exception | str, *_args, **_kwargs):
+    async def on_error(self, event_method: Exception | str, *_args, **_kwargs): # type: ignore
         "Called when an event raises an uncaught exception"
         if isinstance(event_method, str) and event_method.startswith("on_") and event_method != "on_error":
             _, error, _ = sys.exc_info()
@@ -141,12 +142,13 @@ class Axobot(commands.bot.AutoShardedBot):
         return self._options_list
 
     # pylint: disable=arguments-differ
-    async def get_context(self, source: discord.Message, *, cls=MyContext) -> MyContext:
+    async def get_context(self, source: discord.Message | discord.Interaction, *,
+                          cls: type[commands.Context[Any]] = MyContext) -> MyContext:
         """Get a custom context class when creating one from a message"""
         # when you override this method, you pass your new Context
         # subclass to the super() method, which tells the bot to
         # use the new MyContext class
-        return await super().get_context(source, cls=cls)
+        return await super().get_context(source, cls=cls) # pyright: ignore[reportReturnType]
 
     @overload
     def get_cog(self, name: Literal["AntiRaid"]) -> Optional["AntiRaid"]:
@@ -170,6 +172,10 @@ class Axobot(commands.bot.AutoShardedBot):
 
     @overload
     def get_cog(self, name: Literal["Help"]) -> Optional["Help"]:
+        ...
+
+    @overload
+    def get_cog(self, name: Literal["Languages"]) -> Optional["Languages"]:
         ...
 
     @overload
@@ -246,30 +252,31 @@ class Axobot(commands.bot.AutoShardedBot):
         options_list = await self.get_options_list()
         return options_list.get(option, {"default": None})["default"]
 
-    async def get_guilds_with_value(self, option_name: str, option_value: str):
+    async def get_guilds_with_value(self, option_name: str, option_value: str) -> list[int]:
         """Get a list of guilds with a specific config option set to a specific value"""
         cog = self.get_cog("ServerConfig")
         if cog and self.database_online:
             return await cog.db_get_guilds_with_value(option_name, option_value)
         return []
 
-    async def db_get_guilds_with_option(self, option_name: str):
+    async def db_get_guilds_with_option(self, option_name: str) -> dict[int, Any]:
         """Get a list of guilds with a specific config option set to anything but None"""
         cog = self.get_cog("ServerConfig")
         if cog and self.database_online:
             return await cog.db_get_guilds_with_option(option_name)
         return {}
 
-    async def get_recipient(self, channel: discord.DMChannel) -> discord.User | None:
+    async def get_recipient(self, channel: discord.abc.MessageableChannel) -> discord.User | None:
         """Get the recipient of the given DM channel
 
         This method is required because most of the time Discord doesn't properly give that info"""
         if not isinstance(channel, discord.DMChannel):
             return None
-        if channel.recipient is None:
-            # recipient couldn't be loaded
-            channel = await self.fetch_channel(channel.id)
-        return channel.recipient
+        if channel.recipient is not None:
+            return channel.recipient
+        # recipient couldn't be loaded
+        fetched_channel: discord.DMChannel = await self.fetch_channel(channel.id) # pyright: ignore[reportAssignmentType]
+        return fetched_channel.recipient
 
     def utcnow(self) -> datetime.datetime:
         """Get the current date and time with UTC timezone"""
@@ -278,19 +285,16 @@ class Axobot(commands.bot.AutoShardedBot):
     @property
     def _(self) -> Callable[..., Awaitable[str]]:
         """Translate something"""
-        cog = self.get_cog("Languages")
-        if cog is None:
+        if (cog := self.get_cog("Languages")) is None:
             self.log.error("Unable to load Languages cog")
-            async def fake_tr(*args, **_kwargs):
+            async def fake_tr(*args, **_kwargs) -> str: # type: ignore
                 return "en" if args[1] == "_used_locale" else args[1]
             return fake_tr
         return cog.tr
 
-    async def send_embed(self, embeds: list[discord.Embed] | discord.Embed, url: str | None=None):
+    async def send_embed(self, embed: discord.Embed, url: str | None=None):
         """Send a list of embeds to a discord channel"""
-        if isinstance(embeds, discord.Embed):
-            embeds = [embeds]
-        await send_log_embed(self, embeds, url)
+        await send_log_embed(self, [embed], url)
 
     async def fetch_app_commands(self):
         "Populate the app_commands_list attribute from the Discord API"
@@ -300,6 +304,7 @@ class Axobot(commands.bot.AutoShardedBot):
         "Get a specific app command from the Discord API"
         if self.app_commands_list is None:
             await self.fetch_app_commands()
+        assert self.app_commands_list is not None, "App commands list could not be populated"
         for command in self.app_commands_list:
             if command.name == name:
                 return command
@@ -325,4 +330,4 @@ class Axobot(commands.bot.AutoShardedBot):
         "Force add a message to the cache"
         if await self.get_message_from_cache(message.id) is None:
             # pylint: disable=protected-access
-            self._connection._messages.append(message)
+            self._connection._messages.append(message) # pyright: ignore[reportPrivateUsage, reportOptionalMemberAccess]
