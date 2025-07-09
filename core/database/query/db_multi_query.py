@@ -3,8 +3,12 @@ import sys
 from typing import TYPE_CHECKING, Self
 
 from mysql.connector import errors
-from mysql.connector.connection import MySQLConnection, MySQLCursor
-from mysql.connector.connection_cext import CMySQLConnection, CMySQLCursor
+from mysql.connector.connection import MySQLConnection
+from mysql.connector.connection_cext import CMySQLConnection
+from mysql.connector.cursor import MySQLCursor
+from mysql.connector.cursor_cext import CMySQLCursor
+
+from core.type_utils import AnyDict, AnyTuple
 
 from .utils import format_query
 
@@ -31,15 +35,17 @@ class DatabaseMutliQueries():
             self.cnx.commit()
             self.cursor.close()
 
-    async def write(self, query: str, args: tuple | dict | None = None):
+    async def write(self, query: str, args: AnyTuple | AnyDict | None = None):
         """Execute a write query, but delay the commit until the context manager exits"""
+        if self.cursor is None:
+            raise RuntimeError("DatabaseMutliQueries context manager not entered, use 'async with' to enter it")
         query_for_logs = await format_query(self.cursor, query, args)
         self.log.debug("%s", query_for_logs)
 
         try:
-            self.cursor.execute(query, args)
+            self.cursor.execute(query, args) # type: ignore
         except errors.ProgrammingError as err:
             # pylint: disable=protected-access
-            self.log.error("%s", self.cursor._executed, exc_info=True)
+            self.log.error("%s", self.cursor._executed, exc_info=True) # type: ignore
             await self.__aexit__(*sys.exc_info())
             raise err

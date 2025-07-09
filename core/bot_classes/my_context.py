@@ -9,34 +9,17 @@ if TYPE_CHECKING:
     from . import Axobot
 
 
-class MyContext(commands.Context):
+class MyContext(commands.Context["Axobot"]):
     """Replacement for the official commands.Context class
     It allows us to add more methods and properties in the whole bot code"""
-
-    bot: "Axobot"
-
-    @property
-    def bot_permissions(self) -> discord.Permissions:
-        """Permissions of the bot in the current context"""
-        if self.guild:
-            # message in a guild
-            return self.channel.permissions_for(self.guild.me)
-        else:
-            # message in DM
-            return self.channel.permissions_for(self.bot)
-
-    @property
-    def user_permissions(self) -> discord.Permissions:
-        """Permissions of the message author in the current context"""
-        return self.channel.permissions_for(self.author)
 
     @property
     def can_send_embed(self) -> bool:
         """If the bot has the right permissions to send an embed in the current context"""
         return self.interaction is not None or self.bot_permissions.embed_links
 
-    async def send(self, *args, json: dict | list | None = None, **kwargs) -> discord.Message | None:
-        if self.bot.zombie_mode and self.command.name not in self.bot.allowed_commands:
+    async def send(self, *args, json: dict | list | None = None, **kwargs) -> discord.Message | None: # type: ignore
+        if self.bot.zombie_mode and (self.command is None or self.command.name not in self.bot.allowed_commands):
             return
         if self.message.type == discord.MessageType.reply and self.message.reference:
             kwargs["allowed_mentions"] = kwargs.get("allowed_mentions", self.bot.allowed_mentions)
@@ -63,9 +46,10 @@ class MyContext(commands.Context):
             cmd_arg = args
         else:
             raise ValueError(args)
-        await self.bot.get_command("help")(self, args=cmd_arg)
+        if (help_cmd := self.bot.get_command("help")):
+            await help_cmd(self, args=cmd_arg)
 
-    async def send_super_help(self, entity: str | commands.Command | commands.Cog | None = None):
+    async def send_super_help(self, entity: str | commands.Command | commands.Cog | None = None): # type: ignore
         "Use the default help command"
         if entity:
             return await super().send_help(entity)

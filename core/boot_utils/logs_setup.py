@@ -1,6 +1,7 @@
 import logging
 import sys
 from logging.handlers import RotatingFileHandler
+from typing import Any
 
 from discord.utils import stream_supports_colour
 
@@ -37,7 +38,8 @@ def set_beta_logs():
 
 def _setup_log_handlers(logger: logging.Logger, filename: str):
     # DEBUG logs to a file
-    file_handler = RotatingFileHandler(filename, maxBytes=20e6, backupCount=5, delay=True)
+    size_50_mb = int(50e6)
+    file_handler = RotatingFileHandler(filename, maxBytes=size_50_mb, backupCount=5, delay=True)
     file_handler.setLevel(logging.DEBUG)
     _set_logging_formatter(file_handler)
     file_handler.set_name("file")
@@ -55,7 +57,7 @@ def _setup_log_handlers(logger: logging.Logger, filename: str):
     # set the logging level to DEBUG (so handlers can filter it)
     logger.setLevel(logging.DEBUG)
 
-def _set_logging_formatter(handler: logging.StreamHandler):
+def _set_logging_formatter(handler: logging.StreamHandler[Any]):
     "Return a logging formatter with or without colors"
     if not stream_supports_colour(handler.stream):
         formatter = logging.Formatter(

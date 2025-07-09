@@ -20,7 +20,7 @@ _MKD_FULL_REGEX = re.compile(
     flags=re.MULTILINE
 )
 
-def _replacement(match: re.Match) -> str:
+def _replacement(match: re.Match[str]) -> str:
     """Replace a markdown match with its content"""
     for text in match.groupdict().values():
         if text:

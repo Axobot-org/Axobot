@@ -1,7 +1,7 @@
 import asyncio
 import operator
 import re
-from typing import Any
+from typing import Any, TypedDict
 
 import aiohttp
 import discord
@@ -11,6 +11,14 @@ from discord.ext import commands
 
 from core.bot_classes import Axobot, MyContext
 
+class _ConfigDict(TypedDict):
+    """Dictionary to hold bot configuration"""
+    ID: int
+    entity_id: int
+    name: str
+    banned_guilds: str
+    banned_users: str
+
 
 class Utilities(commands.Cog):
     """This cog has various useful functions for the rest of the bot."""
@@ -18,7 +26,7 @@ class Utilities(commands.Cog):
     def __init__(self, bot: Axobot):
         self.bot = bot
         self.file = "utilities"
-        self.config = {}
+        self.config: _ConfigDict | None = None
         self.table = "users"
         self.new_pp = False
         bot.add_check(self.global_check)
@@ -30,23 +38,20 @@ class Utilities(commands.Cog):
     async def on_ready(self):
         await self.get_bot_infos()
 
-    async def get_bot_infos(self):
+    async def get_bot_infos(self) -> _ConfigDict | None:
         """Get the bot's infos from the database"""
-        if not self.bot.database_online:
-            return {}
+        if not self.bot.database_online or self.bot.user is None:
+            return None
         query = "SELECT * FROM `bot_infos` WHERE `ID` = %s"
-        async with self.bot.db_main.read(query, (self.bot.user.id,)) as query_results:
-            config_list: list[dict] = list(query_results)
-        if len(config_list) > 0:
-            self.config = config_list[0]
-            self.config.pop("token", None)
+        async with self.bot.db_main.read(query, (self.bot.user.id,), fetchone=True) as query_results:
+            query_results.pop("token", None)
+            self.config = query_results # type: ignore
             return self.config
-        return None
 
     async def edit_bot_infos(self, bot_id: int, values: list[tuple[str, Any]]):
         """Edit the bot's infos in the database"""
-        if not isinstance(values, list) or len(values) == 0:
-            raise ValueError
+        if len(values) == 0:
+            raise ValueError("Cannot edit bot infos with an empty values list")
         set_query = ", ".join(f"{val[0]}=%s" for val in values)
         query = f"UPDATE `bot_infos` SET {set_query} WHERE `ID`=%s"
         async with self.bot.db_main.write(query, tuple(val[1] for val in values) + (bot_id,)):
@@ -78,23 +83,19 @@ class Utilities(commands.Cog):
     async def global_check(self, ctx: MyContext):
         """Do a lot of checks before executing a command (banned guilds, system message etc)"""
         if self.bot.zombie_mode:
-            if isinstance(ctx, commands.Context) and ctx.command.name in self.bot.allowed_commands:
+            if ctx.command is not None and ctx.command.name in self.bot.allowed_commands:
                 return True
             return False
         if self.config is None:
             await self.get_bot_infos()
-        if not isinstance(ctx, commands.Context) or self.config is None:
+        if  self.config is None:
             return True
         if ctx.message.type not in {
             discord.MessageType.default, discord.MessageType.reply, discord.MessageType.chat_input_command
         }:
-            if not ctx.message.type.value == discord.MessageType.chat_input_command:
+            if not ctx.message.type == discord.MessageType.chat_input_command:
                 return False
-        if await self.bot.get_cog("Admin").check_if_admin(ctx):
-            return True
-        elif not self.config:
-            await self.get_bot_infos()
-        if len(self.config) == 0 or self.config is None:
+        if await self.bot.get_cog("Admin").check_if_admin(ctx): # type: ignore
             return True
         if ctx.guild is not None:
             if str(ctx.guild.id) in self.config["banned_guilds"].split(";"):
@@ -115,13 +116,12 @@ class Utilities(commands.Cog):
 
     async def get_xp_style(self, user: discord.User) -> str:
         "Return the chosen rank card style for a user"
-        if config := await self.bot.get_cog("Users").db_get_userinfo(user.id):
-            if config["xp_style"]:
-                return config["xp_style"]
+        if (user_cog := self.bot.get_cog("Users")) and (config := await user_cog.db_get_userinfo(user.id)) and config["xp_style"]:
+            return config["xp_style"]
         return self.bot.get_cog("Xp").default_xp_style
 
     @cached(TTLCache(maxsize=10_000, ttl=60))
-    async def allowed_card_styles(self, user: discord.User):
+    async def allowed_card_styles(self, user: discord.User | discord.Member) -> list[str]:
         """Retourne la liste des styles autorisées pour la carte d'xp de cet utilisateur"""
         base_styles = [
             "blue", "dark", "green", "grey", "orange",
@@ -130,28 +130,29 @@ class Utilities(commands.Cog):
         if not self.bot.database_online:
             return sorted(base_styles)
         rolebased_styles = []
-        if await self.bot.get_cog("Admin").check_if_admin(user):
+        if await self.bot.get_cog("Admin").check_if_admin(user): # type: ignore
             rolebased_styles.append("admin")
         if not self.bot.database_online:
             return sorted(rolebased_styles) + sorted(base_styles)
-        userflags = await self.bot.get_cog("Users").get_userflags(user)
-        for flag in ("support", "contributor", "partner", "premium"):
-            if flag in userflags:
-                rolebased_styles.append(flag)
-        for card in await self.bot.get_cog("Users").get_rankcards(user):
-            base_styles.append(card)
+        if user_cog := self.bot.get_cog("Users"):
+            userflags = await user_cog.get_userflags(user)
+            for flag in ("support", "contributor", "partner", "premium"):
+                if flag in userflags:
+                    rolebased_styles.append(flag)
+            for card in await user_cog.get_rankcards(user):
+                base_styles.append(card)
         return sorted(rolebased_styles) + sorted(base_styles)
 
-    async def get_user_languages(self, user: discord.User, limit: int=0):
+    async def get_user_languages(self, user: discord.User | discord.Member, limit: int=0):
         """Get the most used languages of an user
         If limit=0, return every languages"""
         if not self.bot.database_online:
             return [("en", 1.0)]
         languages = []
         disp_lang: list[tuple[str, float]] = []
-        available_langs: list[str] = (await self.bot.get_options_list())["language"]["values"]
+        available_langs: list[str] = (await self.bot.get_options_list())["language"]["values"] # type: ignore
         for guild in user.mutual_guilds:
-            lang: str = await self.bot.get_config(guild.id, "language")
+            lang: str = await self.bot.get_config(guild.id, "language") # type: ignore
             languages.append(lang)
         for lang in available_langs:
             if (count := languages.count(lang)) > 0:
@@ -166,6 +167,8 @@ class Utilities(commands.Cog):
 
     async def check_votes(self, userid: int) -> list[tuple[str, str]]:
         """check if a user voted on any bots list website"""
+        if self.bot.user is None:
+            raise ValueError("Bot user is not set, cannot check votes")
         votes = []
         async with aiohttp.ClientSession() as session:
             try:  # https://top.gg/bot/1048011651145797673

@@ -53,13 +53,13 @@ class BotInfo(commands.Cog):
             if "banned_guilds" not in self.bot.get_cog("Utilities").config.keys():
                 await self.bot.get_cog("Utilities").get_bot_infos()
             return [
-                int(x)
-                for x in self.bot.get_cog("Utilities").config["banned_guilds"].split(";")
-                if len(x) > 0
+                int(gid)
+                for gid in self.bot.get_cog("Utilities").config["banned_guilds"].split(";")
+                if len(gid) > 0
             ] + IGNORED_GUILDS
         return []
 
-    async def get_guilds_count(self, ignored_guilds:list=None) -> int:
+    async def get_guilds_count(self, ignored_guilds: list[int] | None = None) -> int:
         "Get the number of guilds where the bot is"
         if ignored_guilds is None:
             if self.bot.database_online:

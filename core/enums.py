@@ -4,7 +4,7 @@ from enum import IntEnum, unique
 class _BaseFlagClass:
     FLAGS: dict[int, str]
 
-    def flags_to_int(self, flags: list) -> int:
+    def flags_to_int(self, flags: list[str]) -> int:
         "Convert a list of flags to its integer value"
         result = 0
         for flag, value in self.FLAGS.items():
@@ -12,7 +12,7 @@ class _BaseFlagClass:
                 result |= flag
         return result
 
-    def int_to_flags(self, i: int) -> list:
+    def int_to_flags(self, i: int) -> list[str]:
         "Convert an integer value to its list of flags"
         return [v for k, v in self.FLAGS.items() if i & k == k]
 
