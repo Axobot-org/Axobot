@@ -62,6 +62,8 @@ class TwitchApiAgent:
         "Get the authentication headers for the API"
         if not self.is_token_valid:
             raise HttpTokenNotSet()
+        if not self.client_id:
+            raise ValueError("Client ID is not set, cannot get headers")
         return {
             "Client-ID": self.client_id,
             "Authorization": f"Bearer {self._token}"

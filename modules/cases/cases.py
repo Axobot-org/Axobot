@@ -31,10 +31,7 @@ class Case:
         self.reason = reason
         self.duration = duration
         self.id = case_id
-        if date is None:
-            self.date = "Unknown"
-        else:
-            self.date = date
+        self.date = date
 
     async def display(self, display_guild: bool=False):
         "Format a case to be human readable"
@@ -136,8 +133,6 @@ class Cases(commands.Cog):
         """delete a case from the db"""
         if not self.bot.database_online:
             return False
-        if not isinstance(case_id, int):
-            raise ValueError
         query = f"DELETE FROM `{self.table}` WHERE `ID` = %s"
         async with self.bot.db_main.write(query, (case_id,)):
             pass
@@ -147,8 +142,6 @@ class Cases(commands.Cog):
         """add a new case to the db"""
         if not self.bot.database_online:
             return False
-        if not isinstance(case, Case):
-            raise ValueError
         query = f"INSERT INTO `{self.table}` (`guild`, `user`, `type`, `mod`, `reason`,`duration`) \
 VALUES (%(g)s, %(u)s, %(t)s, %(m)s, %(r)s, %(d)s)"
         query_args = {
@@ -187,6 +180,8 @@ VALUES (%(g)s, %(u)s, %(t)s, %(m)s, %(r)s, %(d)s)"
         if not self.bot.database_online:
             await interaction.response.send_message(await self.bot._(interaction, "cases.no_database"))
             return
+        if not interaction.guild_id:
+            raise TypeError("This command can only be used in a guild")
         await self.see_case_main(interaction, interaction.guild_id, user)
 
     async def see_case_main(self, interaction: discord.Interaction, guild_id: int, user: discord.User):
@@ -260,6 +255,8 @@ VALUES (%(g)s, %(u)s, %(t)s, %(m)s, %(r)s, %(d)s)"
         if not self.bot.database_online:
             await interaction.response.send_message(await self.bot._(interaction, "cases.no_database"))
             return
+        if not interaction.guild_id:
+            raise TypeError("This command can only be used in a guild")
         await interaction.response.defer()
         old_case = await self.db_get_case_from_id(interaction.guild_id, case_id)
         if old_case is None or old_case.guild_id != interaction.guild_id:
@@ -279,6 +276,8 @@ VALUES (%(g)s, %(u)s, %(t)s, %(m)s, %(r)s, %(d)s)"
         ..Example cases search 69
 
         ..Doc moderator.html#search-for-a-case"""
+        if not interaction.guild_id:
+            raise TypeError("This command can only be used in a guild")
         await interaction.response.defer()
         case = await self.db_get_case_from_id(interaction.guild_id, case_id)
         if case is None:
@@ -326,9 +325,11 @@ VALUES (%(g)s, %(u)s, %(t)s, %(m)s, %(r)s, %(d)s)"
         ..Example cases remove 42
 
         ..Doc moderator.html#remove-case"""
+        if not interaction.guild_id:
+            raise TypeError("This command can only be used in a guild")
         await interaction.response.defer()
         case = await self.db_get_case_from_id(interaction.guild_id, case_id)
-        if case is None:
+        if case is None or case.id is None:
             await interaction.followup.send(await self.bot._(interaction, "cases.not-found"))
             return
         await self.db_delete_case(case.id)
@@ -336,5 +337,5 @@ VALUES (%(g)s, %(u)s, %(t)s, %(m)s, %(r)s, %(d)s)"
         self.bot.dispatch("case_delete", interaction.guild, case)
 
 
-async def setup(bot):
+async def setup(bot: Axobot):
     await bot.add_cog(Cases(bot))

@@ -5,6 +5,7 @@ import discord
 
 from core.bot_classes import Axobot
 from core.paginator import Paginator
+from core.type_utils import UserOrMember
 
 from .converters import to_display
 
@@ -14,7 +15,7 @@ if TYPE_CHECKING:
 class ServerConfigPaginator(Paginator):
     "Allow user to see a server config and navigate into its pages"
 
-    def __init__(self, client: Axobot, user: discord.User, stop_label: str, guild: discord.Guild, cog: "ServerConfig"):
+    def __init__(self, client: Axobot, user: UserOrMember, stop_label: str, guild: discord.Guild, cog: "ServerConfig"):
         super().__init__(client, user, stop_label, timeout=120)
         self.guild = guild
         self.cog = cog
@@ -26,7 +27,9 @@ class ServerConfigPaginator(Paginator):
         "Create and send 1st page"
         options_map = await self.client.get_options_list()
         self.options_list = sorted(option for option, value in options_map.items() if value["is_listed"])
-        full_config = await self.client.get_cog("ServerConfig").get_guild_config(self.guild.id, with_defaults=True)
+        if (config_cog := self.client.get_cog("ServerConfig")) is None:
+            raise RuntimeError("ServerConfig cog not found")
+        full_config = await config_cog.get_guild_config(self.guild.id, with_defaults=True)
         for option, value in full_config.items():
             if option in options_map and options_map[option]["is_listed"]:
                 self.server_config[option] = value

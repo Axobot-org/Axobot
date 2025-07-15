@@ -1002,8 +1002,12 @@ class EmojisManager:
             text = text.replace(unicode, name)
         return text
 
-    def get_emoji(self, name: str) -> discord.Emoji | None:
-        "Get a custom emoji object"
+    def get_emoji(self, name: str) -> discord.Emoji:
+        """
+        Get a custom emoji object
+
+        :raises: ValueError if the emoji is not found
+        """
         ids = {
             "youtube": 447459436982960143,
             "twitter": 958325391196585984,
@@ -1015,4 +1019,6 @@ class EmojisManager:
             "readthedocs": 484841075001786368,
             "bluesky": 1312561135794393232,
         }
-        return self.bot.get_emoji(ids[name])
+        if result := self.bot.get_emoji(ids[name]):
+            return result
+        raise ValueError(f"Emoji '{name}' not found in the bot's custom emojis.")

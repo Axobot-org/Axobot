@@ -37,6 +37,7 @@ with open(os.path.dirname(__file__) + "/data/discord_emoji_names.json", 'r', enc
 
 
 def normalize(message: str) -> str:
+    "Normalize the message by removing unwanted characters, normalizing unicode, emojis, and stopwords."
     message = normalize_unicode(message)
     message = normalize_emojis(message)
     message = normalize_words(message)
@@ -48,9 +49,11 @@ def normalize(message: str) -> str:
 
 
 def normalize_emojis(message: str) -> str:
+    "Normalize the emojis in the message by replacing them with a generic term."
     return RE_EMOJI.sub(" emoji ", message)
 
 def normalize_words(message: str) -> str:
+    "Normalize the words in the message by removing known patterns and replacing them with generic terms."
     message = RE_DISCORD_INVITE.sub(" discordinvite ", message)
 
     message = RE_EMAIL.sub(" emailaddress ", message)
@@ -68,6 +71,7 @@ def normalize_words(message: str) -> str:
     return message
 
 def normalize_chars(message: str, remove_dots: bool = True) -> str:
+    "Normalize the characters in the message, removing punctuation and extra spaces."
     if remove_dots:
         message = RE_PUNCTUATION.sub(' ', message)
     else:
@@ -80,21 +84,24 @@ def normalize_chars(message: str, remove_dots: bool = True) -> str:
 
 
 def normalize_stopwords(message: str) -> str:
+    "Remove stopwords from the message, keeping protected words."
     return ' '.join(term for term in message.split() if term in PROTECTED_WORDS or term not in STOP_WORDS)
 
 
 def normalize_affixes(message: str) -> str:
+    "Stem the words in the message, keeping protected words."
     return ' '.join(term if term in PROTECTED_WORDS else AFFIXES_STEM.stem(term) for term in message.split())
 
 def normalize_unicode(message: str) -> str:
+    "Normalize the unicode characters in the message, replacing confusable characters with their ASCII equivalent."
     new_msg = ''
     for c in message:
         if c.isascii() or c in {' ', '€'}:
             new_msg += c
         else:
             hex_repr = f"{ord(c):04x}".upper()
-            if ' ' not in UNICODE_MAP.get(hex_repr, ' '): # both check for existence and unicity
-                new_msg += chr(int(UNICODE_MAP.get(hex_repr), 16))
+            if (unicode_char := UNICODE_MAP.get(hex_repr)) and ' ' not in unicode_char: # both check for existence and unicity
+                new_msg += chr(int(unicode_char, 16))
             else:
                 new_msg += c
     return new_msg

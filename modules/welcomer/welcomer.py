@@ -10,6 +10,8 @@ from core.bot_classes import SUPPORT_GUILD_ID, Axobot
 from core.enums import ServerWarningType
 from core.parse_mentions import parse_allowed_mentions
 from core.safedict import SafeDict
+from core.text_cleanup import sync_check_any_link
+from modules.xp.xp import XpSystemType
 
 
 class Welcomer(commands.Cog):
@@ -24,13 +26,13 @@ class Welcomer(commands.Cog):
         self.no_message = {392766377078816789, 504269440872087564, 552273019020771358}
         self.join_cache = TTLCache[tuple[int, int], int](maxsize=50_000, ttl=90)
 
-
     @commands.Cog.listener()
     async def on_member_join(self, member:discord.Member):
         """Main function called when a member joins a server"""
         if not self.bot.database_online:
             return
-        await self.bot.get_cog("ServerConfig").update_memberchannel(member.guild)
+        if (serverconfig_cog := self.bot.get_cog("ServerConfig")):
+            await serverconfig_cog.update_memberchannel(member.guild)
         if "MEMBER_VERIFICATION_GATE_ENABLED" not in member.guild.features:
             await self.send_msg(member, "welcome")
             self.bot.loop.create_task(self.give_roles(member))
@@ -57,13 +59,14 @@ class Welcomer(commands.Cog):
         """Fonction principale appelée lorsqu'un membre quitte un serveur"""
         if not self.bot.database_online:
             return
-        await self.bot.get_cog("ServerConfig").update_memberchannel(member.guild)
+        if (serverconfig_cog := self.bot.get_cog("ServerConfig")):
+            await serverconfig_cog.update_memberchannel(member.guild)
         if "MEMBER_VERIFICATION_GATE_ENABLED" not in member.guild.features or not member.pending:
             await self.send_msg(member, "leave")
 
     async def _is_raider(self, member: discord.Member):
         "Use the AntiRaid cog to check if a member has just been detected as a potential raider"
-        if raid_cog := self.bot.get_cog("AntiRaid"):
+        if (raid_cog := self.bot.get_cog("AntiRaid")) and member.joined_at is not None:
             if (self.bot.utcnow() - member.joined_at).total_seconds() < 3:
                 # wait a few seconds to let the cog do its job
                 await asyncio.sleep(2)
@@ -74,14 +77,17 @@ class Welcomer(commands.Cog):
         """Envoie un message de bienvenue/départ dans le serveur"""
         if self.bot.zombie_mode:
             return
-        text: str | None = await self.bot.get_config(member.guild.id, event_type)
+        text: str | None = await self.bot.get_config(member.guild.id, event_type) # pyright: ignore[reportAssignmentType]
         if not text:
             return
         if member.id in self.no_message or (event_type == "welcome" and await self._is_raider(member)):
             return
-        if self.bot.get_cog("Utilities").sync_check_any_link(member.display_name) is not None:
+        if sync_check_any_link(member.display_name) is not None:
             return
-        channel: discord.TextChannel | None = await self.bot.get_config(member.guild.id, "welcome_channel")
+        channel: discord.TextChannel | None = await self.bot.get_config(
+            member.guild.id,
+            "welcome_channel"
+        ) # pyright: ignore[reportAssignmentType]
         if channel is None:
             return
         if event_type == "leave" and (msg_id := self.join_cache.get((member.guild.id, member.id))):
@@ -104,7 +110,7 @@ class Welcomer(commands.Cog):
             silent: bool = (
                 False if event_type == "leave"
                 else await self.bot.get_config(member.guild.id, "welcome_silent_mention")
-            )
+            ) # pyright: ignore[reportAssignmentType]
             msg = await channel.send(text, silent=silent, allowed_mentions=allowed_mentions)
             if event_type == "welcome":
                 self.join_cache[member.guild.id, member.id] = msg.id
@@ -138,8 +144,12 @@ class Welcomer(commands.Cog):
 
     async def check_owner_server(self, member: discord.Member):
         """Check if a newscommer of the support server is the owner of a server"""
-        servers = [x for x in self.bot.guilds if x.owner == member and x.member_count > 10]
-        if len(servers) > 0:
+        guilds = [
+            guild
+            for guild in self.bot.guilds
+            if guild.owner == member and guild.member_count is not None and guild.member_count > 10
+        ]
+        if len(guilds) > 0:
             role = member.guild.get_role(486905171738361876)
             if role is None:
                 self.log.warning("Owner role not found in support server")
@@ -149,7 +159,7 @@ class Welcomer(commands.Cog):
 
     async def check_support(self, member: discord.Member):
         """Check if a newscommer of the support server is part of the bot support team"""
-        if await self.bot.get_cog("Users").has_userflag(member, "support"):
+        if (users_cog := self.bot.get_cog("Users")) and await users_cog.has_userflag(member, "support"):
             role = member.guild.get_role(412340503229497361)
             if role is not None:
                 await member.add_roles(role)
@@ -158,7 +168,7 @@ class Welcomer(commands.Cog):
 
     async def check_contributor(self, member: discord.Member):
         """Check if a newscommer of the support server is a contributor"""
-        if await self.bot.get_cog("Users").has_userflag(member, "contributor"):
+        if (users_cog := self.bot.get_cog("Users")) and await users_cog.has_userflag(member, "contributor"):
             role = member.guild.get_role(552428810562437126)
             if role is not None:
                 await member.add_roles(role)
@@ -169,16 +179,19 @@ class Welcomer(commands.Cog):
         """Give roles rewards/muted role to new users"""
         if not self.bot.database_online:
             return
-        used_xp_type: str = await self.bot.get_config(member.guild.id, "xp_type")
+        if (xp_cog := self.bot.get_cog("Xp")) is None:
+            self.bot.dispatch("error", RuntimeError("Xp cog not loaded, cannot give roles back"))
+            return
+        used_xp_type: XpSystemType = await self.bot.get_config(member.guild.id, "xp_type") # pyright: ignore[reportAssignmentType]
         if used_xp_type == "global":
-            xp = await self.bot.get_cog("Xp").db_get_xp(member.id, None)
+            xp = await xp_cog.db_get_xp(member.id, None)
         else:
-            xp = await self.bot.get_cog("Xp").db_get_xp(member.id, member.guild.id)
+            xp = await xp_cog.db_get_xp(member.id, member.guild.id)
         if xp is not None:
-            await self.bot.get_cog("Xp").give_rr(
+            await xp_cog.give_rr(
                 member,
-                (await self.bot.get_cog("Xp").calc_level(xp, used_xp_type))[0],
-                await self.bot.get_cog("Xp").db_list_rr(member.guild.id)
+                (await xp_cog.calc_level(xp, used_xp_type))[0],
+                await xp_cog.db_list_rr(member.guild.id)
             )
 
     async def check_muted(self, member: discord.Member):
@@ -197,7 +210,10 @@ class Welcomer(commands.Cog):
     async def give_roles(self, member: discord.Member):
         """Give new roles to new users"""
         try:
-            roles: list[discord.Role] | None = await self.bot.get_config(member.guild.id, "welcome_roles")
+            roles: list[discord.Role] | None = await self.bot.get_config(
+                member.guild.id,
+                "welcome_roles"
+            ) # pyright: ignore[reportAssignmentType]
             if roles is None:
                 return
             for role in roles:
@@ -217,5 +233,5 @@ class Welcomer(commands.Cog):
             self.bot.dispatch("error", err)
 
 
-async def setup(bot):
+async def setup(bot: Axobot):
     await bot.add_cog(Welcomer(bot))

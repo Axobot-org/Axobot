@@ -9,17 +9,17 @@ from discord.ext import commands
 
 from core.bot_classes import MyContext
 
-from .utils import extract_info, get_discord_locale
+from .utils import AnyCtxCommand, AnyCtxGroup, extract_info, get_discord_locale
 
 
-async def get_command_inline_desc(ctx: MyContext, cmd: commands.Command):
+async def get_command_inline_desc(ctx: MyContext, cmd: AnyCtxCommand):
     "Generate a 1-line description with the command name and short desc"
     name = await get_command_name_translation(ctx, cmd)
     short = await get_command_desc_translation(ctx, cmd) or cmd.short_doc.strip()
     return f"• **{name}**" + (f"  *{short}*" if short else "")
 
 
-async def get_command_description(ctx: MyContext, command: commands.Command):
+async def get_command_description(ctx: MyContext, command: AnyCtxCommand):
     "Get the parsed description of a command"
     raw_desc = command.description.strip()
     if raw_desc == '' and command.help is not None:
@@ -28,7 +28,8 @@ async def get_command_description(ctx: MyContext, command: commands.Command):
     desc, examples, doc = await extract_info(raw_desc)
     # check for translated description
     if short_desc := await get_command_desc_translation(ctx, command):
-        if len(desc.split("\n")) > 1:
+        if desc and len(desc.split("\n")) > 1:
+            # add inspected (long) description to the translated short description
             long_desc = "\n".join(desc.split("\n")[1:]).strip()
             desc = f"{short_desc}\n\n{long_desc}"
         else:
@@ -37,7 +38,7 @@ async def get_command_description(ctx: MyContext, command: commands.Command):
         desc = await ctx.bot._(ctx.channel, "help.no-desc-cmd")
     return desc, examples, doc
 
-async def get_command_signature(ctx: MyContext, command: commands.Command):
+async def get_command_signature(ctx: MyContext, command: AnyCtxCommand):
     "Get the signature of a command"
     # prefix
     if isinstance(command, AppCommand | commands.HybridCommand | commands.HybridGroup):
@@ -50,7 +51,7 @@ async def get_command_signature(ctx: MyContext, command: commands.Command):
     signature = await _get_command_params_signature(ctx, command)
     return f"{prefix}{translated_name} {signature}".strip()
 
-async def get_command_full_name_translation(ctx: MyContext, command: commands.Command):
+async def get_command_full_name_translation(ctx: MyContext, command: AnyCtxCommand | AnyCtxGroup):
     "Get the translated command or group name (with parent name if exists)"
     locale = await get_discord_locale(ctx)
     full_name = await get_command_name_translation(ctx, command, locale)
@@ -59,10 +60,10 @@ async def get_command_full_name_translation(ctx: MyContext, command: commands.Co
         command = command.parent
     return full_name
 
-async def get_command_name_translation(ctx: MyContext, command: commands.Command, locale: Locale | None=None):
+async def get_command_name_translation(ctx: MyContext, command: AnyCtxCommand | AnyCtxGroup, locale: Locale | None=None):
     "Get the translated command or group name (without parent name)"
     locale = locale or await get_discord_locale(ctx)
-    if isinstance(command, commands.Group):
+    if isinstance(command, AnyCtxGroup):
         context = TranslationContext(
             TranslationContextLocation.group_name,
             command
@@ -74,10 +75,10 @@ async def get_command_name_translation(ctx: MyContext, command: commands.Command
         )
     return await ctx.bot.tree.translator.translate(locale_str(""), locale, context) or command.name
 
-async def get_command_desc_translation(ctx: MyContext, command: commands.Command):
+async def get_command_desc_translation(ctx: MyContext, command: AnyCtxCommand):
     "Get the translated command or group description"
     locale = await get_discord_locale(ctx)
-    if isinstance(command, commands.Group):
+    if isinstance(command, AnyCtxGroup):
         context = TranslationContext(
             TranslationContextLocation.group_description,
             command
@@ -101,7 +102,7 @@ async def _get_command_param_translation(ctx: MyContext, param: commands.Paramet
     )
     return await ctx.bot.tree.translator.translate(locale_str(param.name), locale, context) or param.name
 
-async def _get_command_params_signature(ctx: MyContext, command: commands.Command):
+async def _get_command_params_signature(ctx: MyContext, command: AnyCtxCommand):
     "Returns a POSIX-like signature useful for help command output."
     if command.usage is not None:
         return command.usage

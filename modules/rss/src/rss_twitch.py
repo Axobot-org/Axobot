@@ -35,17 +35,17 @@ class TwitchRSS:
         return matches.group(1)
 
     async def _get_feed(self, username: str, filter_config: FeedFilterConfig | None=None,
-                        session: aiohttp.ClientSession | None=None) -> FeedParserDict:
+                        session: aiohttp.ClientSession | None=None) -> FeedParserDict | None:
         "Get a list of feeds from a twitch username"
         url = "https://twitchrss.appspot.com/vod/" + username
         feed = await feed_parse(url, 5, session)
         if feed is None or "bozo_exception" in feed or not feed.entries:
             return None
         if filter_config is not None:
-            feed.entries = [entry for entry in feed.entries[:50] if await check_filter(entry, filter_config)]
+            feed['entries'] = [entry for entry in feed.entries[:50] if await check_filter(entry, filter_config)]
         return feed
 
-    async def _parse_entry(self, entry: FeedParserDict, feed: FeedParserDict, username: str, channel: discord.TextChannel):
+    async def _parse_entry(self, entry: FeedParserDict, feed: FeedParserDict, username: str, channel:"discord.abc.MessageableChannel"):
         "Parse a feed entry to get the relevant information and return a RssMessage object"
         url = "https://www.twitch.tv/" + username
         img_url = None
@@ -62,7 +62,7 @@ class TwitchRSS:
             channel=username
         )
 
-    async def get_last_post(self, channel: discord.TextChannel, username: str,
+    async def get_last_post(self, channel:"discord.abc.MessageableChannel", username: str,
                             filter_config: FeedFilterConfig | None,
                             session: aiohttp.ClientSession | None= None):
         "Get the last video of a Twitch user"
@@ -72,7 +72,7 @@ class TwitchRSS:
         entry = feed.entries[0]
         return await self._parse_entry(entry, feed, username, channel)
 
-    async def get_new_posts(self, channel: discord.TextChannel, username: str, date: dt.datetime,
+    async def get_new_posts(self, channel:"discord.abc.MessageableChannel", username: str, date: dt.datetime,
                             filter_config: FeedFilterConfig | None,
                             session: aiohttp.ClientSession | None=None) -> list[RssMessage]:
         "Get all new videos from a Twitch user"

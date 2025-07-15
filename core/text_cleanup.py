@@ -29,3 +29,13 @@ def _replacement(match: re.Match[str]) -> str:
 
 def remove_markdown(source: str):
     return _MKD_FULL_REGEX.sub(_replacement, source)
+
+_ANY_LINK_PATTERN = re.compile(r"(https?://?(?:[-\w.]|(?:%[\da-fA-F]{2}))+|discord.gg/[^\s]+)")
+def sync_check_any_link(text: str):
+    "Check if a text contains a http url"
+    return _ANY_LINK_PATTERN.search(text)
+
+_DISCORD_INVITE_PATTERN = re.compile(r"((?:discord\.gg|discord(?:app)?.com/invite|discord.me)/.+)")
+def sync_check_discord_invite(text: str):
+    "Check if a text contains a discord invite url"
+    return _DISCORD_INVITE_PATTERN.search(text)

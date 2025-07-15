@@ -50,11 +50,14 @@ class BotInfo(commands.Cog):
     async def get_ignored_guilds(self) -> list[int]:
         "Get the list of ignored guild IDs"
         if self.bot.database_online:
-            if "banned_guilds" not in self.bot.get_cog("Utilities").config.keys():
-                await self.bot.get_cog("Utilities").get_bot_infos()
+            if (utils_cog := self.bot.get_cog("Utilities")) is None:
+                raise RuntimeError("Utilities cog not loaded, cannot get ignored guilds")
+            config = await utils_cog.get_bot_infos()
+            if "banned_guilds" not in config.keys():
+                await utils_cog.get_bot_infos()
             return [
                 int(gid)
-                for gid in self.bot.get_cog("Utilities").config["banned_guilds"].split(";")
+                for gid in config["banned_guilds"].split(";")
                 if len(gid) > 0
             ] + IGNORED_GUILDS
         return []
@@ -92,15 +95,15 @@ class BotInfo(commands.Cog):
         latency = round(self.bot.latency*1000, 2)
         # RAM/CPU
         ram_usage = round(self.process.memory_info()[0]/2.**30,3)
-        if cog := self.bot.get_cog("BotStats"):
-            cpu: float = await cog.get_list_usage(cog.bot_cpu_records)
-        else:
-            cpu = 0.0
+        stats_cog = self.bot.get_cog("BotStats")
+        cpu: float = await stats_cog.get_list_usage(stats_cog.bot_cpu_records) or 0.0 if stats_cog else 0
         # Guilds count
         ignored_guilds = await self.get_ignored_guilds()
         len_servers = await self.get_guilds_count(ignored_guilds)
         # Languages
-        langs_list = list((await self.bot.get_cog("ServerConfig").get_enum_usage_stats("language", ignored_guilds)).items())
+        if (config_cog := self.bot.get_cog("ServerConfig")) is None:
+            raise RuntimeError("ServerConfig cog not loaded, cannot get languages")
+        langs_list = list((await config_cog.get_enum_usage_stats("language", ignored_guilds)).items())
         langs_list.sort(reverse=True, key=lambda x: x[1])
         lang_total = sum(x[1] for x in langs_list)
         langs_list = " | ".join([f"{x[0]}: {x[1]/lang_total*100:.0f}%" for x in langs_list if x[1] > 0])
@@ -108,14 +111,22 @@ class BotInfo(commands.Cog):
         # Users/bots
         users, bots = self.get_users_nber(ignored_guilds)
         # Total XP
-        if self.bot.database_online:
-            total_xp = await self.bot.get_cog("Xp").db_get_total_xp()
+        if self.bot.database_online and (xp_cog := self.bot.get_cog("Xp")):
+            total_xp: int | None = await xp_cog.db_get_total_xp() or None
         else:
-            total_xp = ""
+            total_xp = None
         # Commands within 24h
-        cmds_24h = await self.bot.get_cog("BotStats").get_sum_stats("wsevent.CMD_USE", 60*24)
+        cmds_24h: int = (
+            await stats_cog.get_sum_stats("wsevent.CMD_USE", 60*24)
+            if stats_cog
+            else 0
+        ) # pyright: ignore[reportAssignmentType]
         # RSS messages within 24h
-        rss_msg_24h = await self.bot.get_cog("BotStats").get_sum_stats("rss.messages", 60*24)
+        rss_msg_24h: int = (
+            await stats_cog.get_sum_stats("rss.messages", 60*24)
+            if stats_cog
+            else 0
+        ) # pyright: ignore[reportAssignmentType]
         # number formatter
         lang = await self.bot._(interaction, "_used_locale")
         async def n_format(nbr: int | float | None):
@@ -135,13 +146,14 @@ class BotInfo(commands.Cog):
             ("api_ping", await n_format(latency)),
             ("cmds_24h", await n_format(cmds_24h)),
             ("rss_msg_24h", await n_format(rss_msg_24h)),
-            ("total_xp", await n_format(total_xp)+" ")]:
+            ("total_xp", await n_format(total_xp) + " ")]:
             str_args = {f"v{i}": var[i] for i in range(len(var))} if isinstance(var, tuple | list) else {'v': var}
             desc += await self.bot._(interaction, "info.stats."+key, **str_args) + "\n"
         title = await self.bot._(interaction,"info.stats.title")
         color = self.bot.get_cog("Help").help_color
         embed = discord.Embed(title=title, color=color, description=desc)
-        embed.set_thumbnail(url=self.bot.user.display_avatar.with_static_format("png"))
+        if self.bot.display_avatar:
+            embed.set_thumbnail(url=self.bot.display_avatar.with_static_format("png"))
         await interaction.followup.send(embed=embed)
 
     def get_users_nber(self, ignored_guilds: list[int]):
@@ -225,7 +237,8 @@ ORDER BY usages DESC LIMIT %(limit)s"""
             description=desc,
             color=self.bot.get_cog("Help").help_color,
         )
-        emb.set_thumbnail(url=self.bot.user.display_avatar.with_static_format("png"))
+        if self.bot.display_avatar:
+            emb.set_thumbnail(url=self.bot.display_avatar.with_static_format("png"))
         emb.add_field(name=title_total, value=text_total)
         emb.add_field(name=title_24h, value=text_24h)
         await interaction.followup.send(embed=emb)
@@ -267,6 +280,8 @@ ORDER BY usages DESC LIMIT %(limit)s"""
         """Information about the bot
 
 ..Doc infos.html#about"""
+        if self.bot.user is None:
+            raise RuntimeError("Bot user is not initialized, cannot display about information")
         urls = ""
         website = "https://axobeta.zrunner.me" if self.bot.beta else "https://axobot.xyz"
         links = {

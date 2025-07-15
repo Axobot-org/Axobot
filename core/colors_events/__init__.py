@@ -4,14 +4,13 @@ from .blurple import convert_image as convert_blurple
 from .halloween import HalloweenVariationFlagType
 from .halloween import check_image as check_halloween
 from .halloween import convert_image as convert_halloween
-from .utils import (ColorVariation, LinkConverter, TargetConverter,
+from .utils import (ColorVariationType, LinkConverter,
                     TargetConverterType, get_url_from_ctx)
 
 __all__ = [
     "get_url_from_ctx",
-    "ColorVariation",
+    "ColorVariationType",
     "LinkConverter",
-    "TargetConverter",
     "TargetConverterType",
     "BlurpleVariationFlagType",
     "HalloweenVariationFlagType",

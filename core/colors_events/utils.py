@@ -65,6 +65,8 @@ class ColorVariation(str):
             raise commands.errors.BadArgument("Not a valid flag!")
         return argument
 
+ColorVariationType = Annotated[str, ColorVariation]
+
 async def get_url_from_ctx(ctx: MyContext, who: TargetConverterType | None):
     "Get the resource URL from either the who argument or the context"
     if ctx.message.attachments:

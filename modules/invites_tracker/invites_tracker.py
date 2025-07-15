@@ -1,6 +1,7 @@
 import asyncio
 import logging
 from datetime import datetime
+from typing import Sequence
 
 import discord
 from discord import app_commands
@@ -27,11 +28,11 @@ class InvitesTracker(commands.Cog):
     async def cog_unload(self):
         self.sync_all_guilds_invites.cancel() # pylint: disable=no-member
 
-    async def db_get_invites(self, guild_id: int) -> list[TrackedInvite]:
+    async def db_get_invites(self, guild_id: int) -> Sequence[TrackedInvite]:
         "Get a list of tracked invites associated to a guild"
         query = "SELECT * FROM `invites_tracker` WHERE `guild_id` = %s AND `beta` = %s"
         async with self.bot.db_main.read(query, (guild_id, self.bot.beta)) as query_result:
-            return query_result
+            return query_result # pyright: ignore[reportReturnType]
 
     async def db_upsert_invite(self, guild_id: int, invite_id: str, user_id: int | None, creation_date: datetime | None,
                             usage_count: int):
@@ -81,6 +82,8 @@ class InvitesTracker(commands.Cog):
         # add/update existing invitations
         for invite in guild_invites:
             user_id = invite.inviter.id if invite.inviter else None
+            if invite.uses is None:
+                continue
             await self.db_upsert_invite(guild.id, invite.code, user_id, invite.created_at, invite.uses)
             count += 1
         # delete removed invitations
@@ -97,7 +100,7 @@ class InvitesTracker(commands.Cog):
         # first, check if an invite was used exactly once
         for tracked_invite in tracked_invites:
             invite = next((i for i in guild_invites if i.code == tracked_invite["invite_id"]), None)
-            if invite is None:
+            if invite is None or invite.uses is None:
                 continue
             if invite.uses == tracked_invite["last_count"] + 1:
                 await self.db_update_invite_count(guild.id, invite.code, invite.uses)
@@ -105,7 +108,7 @@ class InvitesTracker(commands.Cog):
         # if not, check if an invite was used more than once
         for tracked_invite in tracked_invites:
             invite = next((i for i in guild_invites if i.code == tracked_invite["invite_id"]), None)
-            if invite is None:
+            if invite is None or invite.uses is None:
                 continue
             if invite.uses > tracked_invite["last_count"]:
                 await self.db_update_invite_count(guild.id, invite.code, invite.uses)
@@ -113,7 +116,7 @@ class InvitesTracker(commands.Cog):
 
 
     async def is_tracker_enabled(self, guild_id: int) -> bool:
-        return await self.bot.get_config(guild_id, "enable_invites_tracking")
+        return await self.bot.get_config(guild_id, "enable_invites_tracking") # pyright: ignore[reportReturnType]
 
 
     @tasks.loop(hours=6)
@@ -134,7 +137,7 @@ class InvitesTracker(commands.Cog):
                 color=0x6699ff,
                 timestamp=self.bot.utcnow()
             )
-            emb.set_author(name=self.bot.user, icon_url=self.bot.user.display_avatar)
+            emb.set_author(name=self.bot.user, icon_url=self.bot.display_avatar)
             await self.bot.send_embed(emb, url="loop")
         except Exception as err:
             self.bot.dispatch("error", err)
@@ -167,9 +170,11 @@ class InvitesTracker(commands.Cog):
         await asyncio.sleep(1) # Wait for the invite to be updated
         if used_invite := await self.check_invites_usage(member.guild):
             discord_invite, tracked_invite = used_invite
+            if discord_invite.uses is None:
+                raise RuntimeError("Invite uses is None but was still detected as used invite, this should not happen")
             tracked_invite["last_count"] = discord_invite.uses
-            tracked_invite["max_uses"] = discord_invite.max_uses
-            tracked_invite["ephemeral"] = bool(discord_invite.max_age)
+            tracked_invite["max_uses"] = discord_invite.max_uses # pyright: ignore[reportGeneralTypeIssues]
+            tracked_invite["ephemeral"] = bool(discord_invite.max_age) # pyright: ignore[reportGeneralTypeIssues]
             self.bot.dispatch("invite_used", member, tracked_invite)
             await self.db_update_invite_count(member.guild.id, discord_invite.code, discord_invite.uses)
         else:
@@ -188,8 +193,12 @@ class InvitesTracker(commands.Cog):
     @app_commands.checks.cooldown(1, 60)
     async def enable_tracking(self, interaction: discord.Interaction):
         "Start tracking the invitations usage of your server"
+        if interaction.guild is None:
+            raise RuntimeError("This command can only be used in a guild")
         await interaction.response.defer()
-        await self.bot.get_cog("ServerConfig").config_set_cmd(interaction, "enable_invites_tracking", str(True))
+        if (config_cog := self.bot.get_cog("ServerConfig")) is None:
+            raise RuntimeError("ServerConfig cog not loaded, cannot edit invites tracking")
+        await config_cog.config_set_cmd(interaction, "enable_invites_tracking", str(True))
         if interaction.guild.me.guild_permissions.manage_guild:
             await self.sync_guild_invites(interaction.guild)
 
@@ -197,13 +206,19 @@ class InvitesTracker(commands.Cog):
     @app_commands.checks.cooldown(1, 60)
     async def disable_tracking(self, interaction: discord.Interaction):
         "Stop tracking the invitations usage of your server"
+        if interaction.guild is None:
+            raise RuntimeError("This command can only be used in a guild")
         await interaction.response.defer()
-        await self.bot.get_cog("ServerConfig").config_set_cmd(interaction, "enable_invites_tracking", str(False))
+        if (config_cog := self.bot.get_cog("ServerConfig")) is None:
+            raise RuntimeError("ServerConfig cog not loaded, cannot edit invites tracking")
+        await config_cog.config_set_cmd(interaction, "enable_invites_tracking", str(False))
 
     @invites_main.command(name="resync")
     @app_commands.checks.cooldown(1, 60)
     async def resync_invites(self, interaction: discord.Interaction):
         "Ensure the stored invites are up-to-date with the current invites of the server"
+        if interaction.guild_id is None or interaction.guild is None:
+            raise RuntimeError("This command can only be used in a guild")
         if not await self.is_tracker_enabled(interaction.guild_id):
             await interaction.response.send_message(
                 await self.bot._(interaction, "invites_tracker.tracking-disabled"),
@@ -228,6 +243,8 @@ class InvitesTracker(commands.Cog):
     async def name_invite(self, interaction: discord.Interaction, invite: GuildInviteArgument,
                           name: app_commands.Range[str, 1, 60]):
         "Specify a custom name to give to an invite URL"
+        if interaction.guild_id is None:
+            raise RuntimeError("This command can only be used in a guild")
         if not await self.is_tracker_enabled(interaction.guild_id):
             await interaction.response.send_message(
                 await self.bot._(interaction, "invites_tracker.tracking-disabled"),
@@ -250,6 +267,8 @@ class InvitesTracker(commands.Cog):
     @app_commands.checks.cooldown(4, 60)
     async def list_tracked_invites(self, interaction: discord.Interaction):
         "List the tracked invites and their usage"
+        if interaction.guild_id is None:
+            raise RuntimeError("This command can only be used in a guild")
         if not await self.is_tracker_enabled(interaction.guild_id):
             await interaction.response.send_message(
                 await self.bot._(interaction, "invites_tracker.tracking-disabled"),

@@ -5,8 +5,8 @@ from enum import auto as enum_auto
 from typing import TYPE_CHECKING, TypedDict
 
 import discord
-from discord.utils import MISSING
 from cachetools import TTLCache
+from discord.utils import MISSING
 
 if TYPE_CHECKING:
     from bot_classes import Axobot
@@ -149,12 +149,12 @@ class TipsManager:
         return self.bot.utcnow() - last_tip > minTimeBetweenTips[tip]
 
     async def send_user_tip(self, interaction: discord.Interaction, tip: UserTip, ephemeral: bool | None = None,
-                            **variables: dict[str, str]):
+                            **variables: str):
         "Send a tip to a user"
         await self._send_tip(interaction, tip, ephemeral, **variables)
         await self.db_register_user_tip(interaction.user.id, tip)
 
-    async def send_guild_tip(self, interaction: discord.Interaction, tip: GuildTip, **variables: dict[str, str]):
+    async def send_guild_tip(self, interaction: discord.Interaction, tip: GuildTip, **variables: str):
         "Send a tip into a guild"
         if interaction.guild is None:
             raise ValueError("Cannot send a guild tip without a guild")
@@ -166,7 +166,7 @@ class TipsManager:
         ephemeral: bool
 
     async def _send_tip(self, interaction: discord.Interaction, tip: UserTip | GuildTip, ephemeral: bool | None,
-                         **variables: dict[str, str]):
+                         **variables: str):
         possible_titles = await self.bot._(interaction, "tips.embed.title")
         text = await self.bot._(interaction, f"tips.{tip.value}", **variables)
         embed = discord.Embed(

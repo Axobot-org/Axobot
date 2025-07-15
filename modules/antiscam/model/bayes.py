@@ -6,6 +6,8 @@ import re
 import string
 from typing import Literal, TypedDict
 
+from sklearn.base import BaseEstimator
+
 from .classes import Message
 
 CLASS = Literal[0, 1]
@@ -19,6 +21,11 @@ class RoundValueType(TypedDict):
     caps_percentage: int
     avg_word_len: int
 
+class RandomForestParams(TypedDict):
+    "Parameters for the RandomForest model training"
+    ntree: int
+    test_percent: float
+    round_values: RoundValueType
 
 class SpamDetector:
     """Implementation of Naive Bayes for binary classification"""
@@ -126,7 +133,7 @@ class SpamDetector:
                 result.append(0)
         return result
 
-class RandomForest:
+class RandomForest(BaseEstimator):
     "Random forest using the Bayes classification algorithm to detect if a message is a scam"
 
     def __init__(self, ntree: int, test_percent: float, round_values: RoundValueType):
@@ -157,41 +164,50 @@ class RandomForest:
             self.tests.append([x for x in data if x not in learning])
         return self
 
-    def set_params(self, ntree: int, test_percent: float, round_values: RoundValueType):
+    def set_params( # pylint: disable=arguments-differ # pyright: ignore[reportIncompatibleMethodOverride]
+            self, ntree: int, test_percent: float, round_values: RoundValueType
+        ):
         "Edit the model parameters"
         self.ntree = ntree
         self.test_percent = test_percent
         self.round_values = round_values
         return self
 
-    def get_params(self, deep: bool = True): # pylint: disable=unused-argument
+    def get_params(self, deep: bool = True) -> RandomForestParams: # pyright: ignore[reportIncompatibleMethodOverride]
         "Get the current model parameters"
-        return {
-            "ntree": self.ntree,
-            "test_percent": self.test_percent,
-            "round_values": self.round_values,
-        }
+        return RandomForestParams(
+            ntree=self.ntree,
+            test_percent=self.test_percent,
+            round_values=self.round_values,
+        )
 
     def save(self):
-        pickle.dump(self, open(os.path.dirname(__file__)+"/data/bayes_model.pkl", "wb"))
+        with open(os.path.dirname(__file__)+"/data/bayes_model.pkl", "wb") as raw:
+            pickle.dump(self, raw)
 
     def predict(self, x_dataset: list[Message]) -> list[CLASS]:
         "Predict the class index for each given message"
-        result = [0 for _ in range(len(x_dataset))]
+        predictions: list[float] = [0 for _ in range(len(x_dataset))]
         for tree in self.trees:
             for i, msg_class in enumerate(tree.predict(x_dataset)):
-                result[i] += msg_class/len(self.trees)
-        return [round(prediction) for prediction in result]
+                predictions[i] += msg_class / len(self.trees)
+        result = [round(prediction) for prediction in predictions]
+        if any(prediction not in (0, 1) for prediction in result):
+            raise ValueError("Prediction contains values other than 0 or 1. This should not happen.")
+        return result # pyright: ignore[reportReturnType]
 
     def get_external_accuracy(self, data: list[Message]) -> float:
         "Get the model accuracy based on a given dataset"
         pred = self.predict(data)
         return sum(1 for i in range(len(pred)) if pred[i] == data[i].category) / float(len(pred))
 
-    def get_classes(self, record: Message) -> dict[str, float]:
+    def get_classes(self, record: Message) -> dict[int, float]:
         "Get the probability of each class for a given message"
-        result = [0, 0]
+        predictions: list[float] = [0, 0]
         for tree in self.trees:
             pred = tree.predict([record])[0]
-            result[pred] += 1/len(self.trees)
-        return {self.classes_[i]: round(x, 5) for i, x in enumerate(result)}
+            predictions[pred] += 1 / len(self.trees)
+        return {
+            self.classes_[i]: round(x, 5)
+            for i, x in enumerate(predictions)
+        }

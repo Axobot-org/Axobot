@@ -1,5 +1,5 @@
 from difflib import SequenceMatcher
-from re import finditer, sub, IGNORECASE
+from re import IGNORECASE, finditer, sub
 
 from .normalization import normalize_unicode
 

@@ -36,4 +36,4 @@ async def send_log_embed(bot: "Axobot", embeds: list[discord.Embed | JSONEmbed],
             if "error" in msg:
                 err_msg = f"`Webhook error {url}:` [{resp.status}] {msg}"
                 if (cog := bot.get_cog("Errors")):
-                    await cog.senf_err_msg(err_msg)
+                    await cog.send_err_msg(err_msg)

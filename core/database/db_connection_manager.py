@@ -4,14 +4,15 @@ from typing import NamedTuple
 
 from mysql.connector import connect as sql_connect
 from mysql.connector import errors as mysql_errors
-from mysql.connector.abstracts import MySQLConnectionAbstract
+from mysql.connector.connection import MySQLConnection
+from mysql.connector.connection_cext import CMySQLConnection
 
 from core.boot_utils.conf_loader import get_secrets_dict
 
 
 class ConnectionDetails(NamedTuple):
     "Store info about a database connection."
-    cnx: MySQLConnectionAbstract
+    cnx: MySQLConnection | CMySQLConnection
     creation: int
 
 
@@ -67,10 +68,10 @@ class DatabaseConnectionManager:
             connection.cnx.close()
         self.__connections.clear()
 
-    def __create_connection(self, database: str) -> MySQLConnectionAbstract:
+    def __create_connection(self, database: str) -> MySQLConnection | CMySQLConnection:
         "Create a new connection to the database."
         self.__log.info("Opening new connection to database '%s'", database)
-        cnx: MySQLConnectionAbstract = sql_connect(
+        cnx = sql_connect(
             host=self.__database_keys["host"],
             user=self.__database_keys["user"],
             password=self.__database_keys["password"],
@@ -79,6 +80,8 @@ class DatabaseConnectionManager:
             charset="utf8mb4",
             collation="utf8mb4_unicode_ci",
             connection_timeout=5
-        ) # type: ignore
+        )
+        if not isinstance(cnx, (MySQLConnection, CMySQLConnection)):
+            raise TypeError("Connection is not a MySQLConnection or CMySQLConnection")
         self.__connections[database] = ConnectionDetails(cnx, int(time.time()))
         return cnx

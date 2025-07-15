@@ -13,7 +13,13 @@ from discord.ext import commands
 
 from core.bot_classes import Axobot
 from core.formatutils import FormatUtils
+from core.type_utils import (channel_is_messageable,
+                             assert_interaction_channel_is_guild_messageable)
+from modules.languages.languages import SourceType as TranslationSourceType
 from modules.rss.src import FeedObject
+
+from .src.types import (McSrvStatResponse, MinetoolsApiResponse,
+                        MojangApiResponse)
 
 SERVER_ADDRESS_REGEX = re.compile(r"^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$|"
                                   r"^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)+([A-Za-z]|"
@@ -26,16 +32,13 @@ def _similar(input_1: str, input_2: str):
 
 class MCServer:
     "Class containing all the data about a Minecraft server info, and methods to create a Discord embed from it"
-    def __init__(self, ip: str, max_players: int, online_players: int, players: list[str], ping: float,
+    def __init__(self, ip: str, max_players: int, online_players: int, players: list[str], ping: float | None,
                     img: str | None, version: str, api: str, desc: str):
         self.ip = ip
         self.max_players = max_players
         self.online_players = online_players
         self.players = players
-        if str(ping).isnumeric():
-            self.ping = round(float(ping), 3)
-        else:
-            self.ping = ping
+        self.ping = round(ping, 3) if ping else None
         self.image = img
         self.version = version
         self.api = api
@@ -47,7 +50,7 @@ class MCServer:
         self.desc = re.sub(r"[ \t\r]{2,}", ' ', self.desc).strip()
         return self
 
-    async def create_msg(self, source: discord.Interaction | discord.Guild, translate: Callable[[Any, str], Awaitable[str]]):
+    async def create_msg(self, source: TranslationSourceType, translate: Callable[..., Awaitable[str]]):
         "Create a Discord embed from the saved data"
         if self.players == [] and self.online_players != 0:
             players = [await translate(source, "minecraft.no-player-list")]
@@ -69,7 +72,7 @@ class MCServer:
             embed.add_field(name=await translate(source, "minecraft.server.players-list-20"), value=", ".join(players[:20]))
         elif players:
             embed.add_field(name=await translate(source, "minecraft.server.players-list-all"), value=", ".join(players))
-        if self.ping is not None:
+        if self.ping:
             embed.add_field(name=await translate(source, "minecraft.server.latency"), value=f"{self.ping:.0f} ms")
         if self.desc:
             embed.add_field(
@@ -87,7 +90,7 @@ class Minecraft(commands.Cog):
         self.feeds = {}
         self.file = "minecraft"
         self.embed_color = 0x16BD06
-        self.uuid_cache: dict[str, str] = {}
+        self.uuid_cache: dict[str, str | None] = {}
         self._session: aiohttp.ClientSession | None = None
 
     @property
@@ -151,7 +154,7 @@ class Minecraft(commands.Cog):
             "sortOrder": "desc",
             "searchFilter": search_value
         }
-        async with self.session.get(url, params=params, headers=header, timeout=10) as resp:
+        async with self.session.get(url, params=params, headers=header, timeout=aiohttp.ClientTimeout(10)) as resp:
             if resp.status >= 400:
                 raise ValueError(f"CurseForge API returned {resp.status} for {search_value}")
             api_results: list[dict[str, Any]] = (await resp.json())["data"]
@@ -212,7 +215,7 @@ class Minecraft(commands.Cog):
             "query": search_value,
             "facets": "[[\"project_type:mod\"]]",
         }
-        async with self.session.get(url, params=params, timeout=10) as resp:
+        async with self.session.get(url, params=params, timeout=aiohttp.ClientTimeout(10)) as resp:
             if resp.status >= 400:
                 raise ValueError(f"Modrinth API returned {resp.status} for {search_value}")
             api_results: list[dict[str, Any]] = (await resp.json())["hits"]
@@ -308,6 +311,8 @@ class Minecraft(commands.Cog):
         ..Example minecraft follow-server mc.hypixel.net
 
         ..Doc minecraft.html#mc"""
+        if interaction.guild is None:
+            raise RuntimeError("This command can only be used in a guild")
         if not self.bot.database_online:
             await interaction.response.send_message(await self.bot._(interaction, "cases.no_database"), ephemeral=True)
             return
@@ -316,13 +321,19 @@ class Minecraft(commands.Cog):
             return
         ip, port = validation
         await interaction.response.defer()
-        is_over, flow_limit = await self.bot.get_cog("Rss").is_overflow(interaction.guild)
+        if (rss_cog := self.bot.get_cog("Rss")) is None:
+            raise RuntimeError("Rss cog not loaded, cannot check for feeds limit")
+        is_over, feeds_limit = await rss_cog.is_overflow(interaction.guild)
         if is_over:
-            await interaction.followup.send(await self.bot._(interaction, "rss.flow-limit", limit=flow_limit))
+            await interaction.followup.send(await self.bot._(interaction, "rss.flow-limit", limit=feeds_limit))
             return
         if channel is None:
-            channel = interaction.channel
-        bot_perms = channel.permissions_for(interaction.guild.me)
+            if not assert_interaction_channel_is_guild_messageable(interaction):
+                return
+            dest_channel = interaction.channel
+        else:
+            dest_channel = channel
+        bot_perms = dest_channel.permissions_for(interaction.guild.me)
         if not bot_perms.send_messages or not bot_perms.embed_links:
             await interaction.followup.send(await self.bot._(interaction, "minecraft.serv-follow.missing-perms"))
             return
@@ -330,9 +341,9 @@ class Minecraft(commands.Cog):
             display_ip = ip
         else:
             display_ip = f"{ip}:{port}"
-        await self.bot.get_cog("Rss").db_add_feed(interaction.guild.id, channel.id, "mc", f"{ip}:{port or ''}")
+        await rss_cog.db_add_feed(interaction.guild.id, dest_channel.id, "mc", f"{ip}:{port or ''}")
         await interaction.followup.send(
-            await self.bot._(interaction, "minecraft.serv-follow.success", ip=display_ip, channel=channel.mention)
+            await self.bot._(interaction, "minecraft.serv-follow.success", ip=display_ip, channel=dest_channel.mention)
         )
 
     async def validate_server_ip(self, ip: str, port: int | None = None):
@@ -359,8 +370,8 @@ class Minecraft(commands.Cog):
         else:
             url = "https://api.minetools.eu/ping/"+str(ip)+"/"+str(port)
         try:
-            async with self.session.get(url, timeout=5) as resp:
-                data: dict = await resp.json()
+            async with self.session.get(url, timeout=aiohttp.ClientTimeout(5)) as resp:
+                data: MinetoolsApiResponse = await resp.json()
         except Exception:
             return await self.create_server_2(source, ip, port)
         if "error" in data:
@@ -387,8 +398,15 @@ class Minecraft(commands.Cog):
         max_players = data["players"]["max"]
         latency = data["latency"]
         return await MCServer(
-            formated_ip, version=version, online_players=online_players, max_players=max_players, players=players, img=img_url,
-            ping=latency, desc=data["description"], api="api.minetools.eu"
+            formated_ip,
+            version=version,
+            online_players=online_players,
+            max_players=max_players,
+            players=players,
+            img=img_url,
+            ping=latency,
+            desc=data["description"],
+            api="api.minetools.eu"
         ).clear_desc()
 
     async def create_server_2(self, source: discord.Interaction | discord.Guild, ip: str, port: str | None):
@@ -398,8 +416,8 @@ class Minecraft(commands.Cog):
         else:
             url = "https://api.mcsrvstat.us/1/"+str(ip)+"/"+str(port)
         try:
-            async with self.session.get(url, timeout=5) as resp:
-                data: dict = await resp.json()
+            async with self.session.get(url, timeout=aiohttp.ClientTimeout(5)) as resp:
+                data: McSrvStatResponse = await resp.json()
         except (aiohttp.ClientConnectorError, aiohttp.ContentTypeError):
             return await self.bot._(source, "minecraft.no-api")
         except json.decoder.JSONDecodeError:
@@ -410,72 +428,74 @@ class Minecraft(commands.Cog):
             return await self.bot._(source, "minecraft.serv-error")
         if data["debug"]["ping"] is False:
             return await self.bot._(source, "minecraft.no-ping")
-        if "list" in data["players"]:
-            players = data["players"]["list"][:20]
+        if players_list := data["players"].get("list", None):
+            players = players_list[:20]
         else:
             players = []
-        if "software" in data:
-            version = data["software"]+" "+data["version"]
+        if software := data.get("software", None):
+            version = software + " " + data["version"]
         else:
             version = data["version"]
         formated_ip = f"{ip}:{port}" if port is not None else str(ip)
         desc = "\n".join(data["motd"]["clean"])
         online_players = data["players"]["online"]
         max_players = data["players"]["max"]
-        l = None
         return await MCServer(
-            formated_ip, version=version, online_players=online_players, max_players=max_players, players=players, img=None,
-            ping=l, desc=desc, api="api.mcsrvstat.us"
+            formated_ip,
+            version=version,
+            online_players=online_players,
+            max_players=max_players,
+            players=players,
+            img=None,
+            ping=None,
+            desc=desc,
+            api="api.mcsrvstat.us"
         ).clear_desc()
 
     @cached(TTLCache(maxsize=1_000, ttl=60*60*24*7)) # 1 week
-    async def username_to_uuid(self, username: str) -> str:
+    async def username_to_uuid(self, username: str) -> str | None:
         """Convert a minecraft username to its uuid"""
         if username in self.uuid_cache:
             return self.uuid_cache[username]
         url = "https://api.mojang.com/users/profiles/minecraft/"+username
-        async with self.session.get(url, timeout=10) as resp:
+        async with self.session.get(url, timeout=aiohttp.ClientTimeout(10)) as resp:
             try:
-                search: dict = await resp.json()
+                search: MojangApiResponse = await resp.json()
                 self.uuid_cache[username] = search.get("id")
             except aiohttp.ContentTypeError:
                 self.uuid_cache[username] = None
         return self.uuid_cache[username]
 
-    async def send_msg_server(self, obj: str | MCServer, channel: discord.abc.Messageable, ip: tuple[str, str | None]):
+    async def send_msg_server(self, obj: str | MCServer, channel:"discord.abc.MessageableChannel", ip: tuple[str, str | None]):
         "Send the message into a Discord channel"
         guild = None if isinstance(channel, discord.DMChannel) else channel.guild
         embed = await self.form_msg_server(obj, guild, ip)
         if self.bot.zombie_mode:
             return
-        if isinstance(channel, discord.DMChannel) or channel.permissions_for(channel.guild.me).embed_links:
-            msg = await channel.send(embed=embed)
-        else:
-            try:
-                await channel.send(await self.bot._(guild, "minecraft.cant-embed"))
-            except discord.errors.Forbidden:
-                pass
-            msg = None
-        return msg
+        if isinstance(channel, discord.DMChannel) or (channel.guild and channel.permissions_for(channel.guild.me).embed_links):
+            return await channel.send(embed=embed)
+        try:
+            await channel.send(await self.bot._(guild, "minecraft.cant-embed"))
+        except discord.errors.Forbidden:
+            pass
+        return None
 
-    async def form_msg_server(self, obj: str | MCServer, source: discord.Interaction | discord.Guild, ip: tuple[str, str | None]):
+    async def form_msg_server(self, obj: str | MCServer, source: TranslationSourceType, ip: tuple[str, str | None]):
         "Create the embed from the saved data"
         if isinstance(obj, str):
             if ip[1] is None:
-                ip = ip[0]
+                formated_ip = ip[0]
             else:
-                ip = f"{ip[0]}:{ip[1]}"
+                formated_ip = f"{ip[0]}:{ip[1]}"
             return discord.Embed(
-                title=await self.bot._(source, "minecraft.serv-title", ip=ip),
+                title=await self.bot._(source, "minecraft.serv-title", ip=formated_ip),
                 color=discord.Colour(0x417505),
                 description=obj,
             )
         return await obj.create_msg(source, self.bot._)
 
-    async def find_msg(self, channel: discord.TextChannel, _ip: list, feed_id: str):
+    async def find_msg(self, channel:"discord.abc.MessageableChannel", feed_id: str):
         "Find the minecraft server message posted from that feed"
-        if channel is None:
-            return None
         if feed_id.isnumeric():
             try:
                 return await channel.fetch_message(int(feed_id))
@@ -485,32 +505,33 @@ class Minecraft(commands.Cog):
 
     async def check_feed(self, feed: FeedObject, send_stats: bool):
         "Refresh a minecraft server feed"
-        i = feed.link.split(':')
-        if i[1] == '':
-            i[1] = None
+        ip, port = feed.link.split(':')
+        port = port or None
         guild = self.bot.get_guild(feed.guild_id)
         if guild is None:
-            self.bot.log.warn("[minecraft feed] Cannot find guild %s", feed.guild_id)
+            self.bot.log.warning("[minecraft feed] Cannot find guild %s", feed.guild_id)
             return False
         if feed.link in self.feeds:
             obj = self.feeds[feed.link]
         else:
             try:
-                obj = await self.create_server_1(guild, i[0], i[1])
+                obj = await self.create_server_1(guild, ip, port)
             except Exception as err:
                 self.bot.dispatch("error", err, f"Guild {feed.guild_id} - id {feed.feed_id}")
                 return False
             self.feeds[feed.link] = obj
         try:
             channel = guild.get_channel_or_thread(feed.channel_id)
-            if channel is None:
-                self.bot.log.warn("[minecraft feed] Cannot find channel %s in guild %s", feed.channel_id, feed.guild_id)
+            if not channel_is_messageable(channel):
+                self.bot.log.warning("[minecraft feed] Cannot find channel %s in guild %s", feed.channel_id, feed.guild_id)
                 return False
-            msg = await self.find_msg(channel, i, feed.structure)
+            msg = await self.find_msg(channel, feed.structure)
             if msg is None:
-                msg = await self.send_msg_server(obj, channel, i)
+                msg = await self.send_msg_server(obj, channel, (ip, port))
                 if msg is not None:
-                    await self.bot.get_cog("Rss").db_update_feed(
+                    if (rss_cog := self.bot.get_cog("Rss")) is None:
+                        raise RuntimeError("Rss cog not loaded, cannot update feed")
+                    await rss_cog.db_update_feed(
                         feed.feed_id,
                         [("structure", str(msg.id)), ("date", self.bot.utcnow())]
                     )
@@ -518,7 +539,7 @@ class Minecraft(commands.Cog):
                         if statscog := self.bot.get_cog("BotStats"):
                             statscog.rss_stats["messages"] += 1
                 return True
-            err = await self.form_msg_server(obj, guild, i)
+            err = await self.form_msg_server(obj, guild, (ip, port))
             await msg.edit(embed=err)
             if statscog := self.bot.get_cog("BotStats"):
                 statscog.rss_stats["messages"] += 1
@@ -528,5 +549,5 @@ class Minecraft(commands.Cog):
             return False
 
 
-async def setup(bot):
+async def setup(bot: Axobot):
     await bot.add_cog(Minecraft(bot))

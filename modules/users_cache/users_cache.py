@@ -28,7 +28,7 @@ class UsersCache(commands.Cog):
         "Register a user into our database"
         if (user.global_name is None and not user.bot) or time.time() - self.last_save[user.id] < 60*30:
             return
-        self.last_save[user.id] = time.time()
+        self.last_save[user.id] = int(time.time())
         avatar_hash = user.avatar.key if user.avatar else None
         global_name = user.global_name or user.name
         query = "INSERT INTO `users_cache` (`user_id`, `username`, `global_name`, `avatar_hash`, `is_bot`, `last_seen`) \

@@ -2,6 +2,7 @@ import csv
 import json
 import os
 import pickle
+from typing import Any
 
 import aiohttp
 
@@ -43,17 +44,18 @@ class AntiScamAgent:
                 spamwriter.writerow([key, value])
         self.websites_list = data
 
-    def get_category_id(self, name: str):
+    def get_category_id(self, name: str) -> int | None:
         "Get a category ID from its name (like a reversed map)"
         for key, value in self.categories.items():
             if value == name:
                 return key
+        return None
 
     def get_model(self) -> RandomForest:
         "Get back our trained bayes model"
         class CustomUnpickler(pickle.Unpickler):
             "Custom unpickler to make sure to find our classes"
-            def find_class(self, module, name):
+            def find_class(self, module: Any, name: str):
                 if name == "RandomForest":
                     return RandomForest
                 if name == "SpamDetector":
@@ -78,11 +80,11 @@ class AntiScamAgent:
     def predict_bot(self, message: Message | str):
         "Try to predict the dangerousity of a message"
         if isinstance(message, str):
+            if self.websites_list is None:
+                raise ValueError("Websites list is not loaded. Please load it before predicting.")
             dataset = Message.from_raw(message, 0, self.websites_list)
-        elif isinstance(message, Message):
-            dataset = message
         else:
-            raise TypeError("'message' should be either a string or a Message")
+            dataset = message
 
         prediction = self.model.get_classes(dataset)
 

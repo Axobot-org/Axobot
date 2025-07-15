@@ -8,6 +8,7 @@ from cachetools import TTLCache
 from discord.ext import commands, tasks
 
 from core.bot_classes import DISCORD_INVITE_REGEX, Axobot
+from core.text_cleanup import sync_check_discord_invite
 
 
 class AntiRaid(commands.Cog):
@@ -36,7 +37,7 @@ class AntiRaid(commands.Cog):
         "Check for capslock messages"
         if msg.guild is None or msg.author.bot or not self.bot.database_online or len(msg.content) < 8:
             return
-        if msg.channel.permissions_for(msg.author).administrator:
+        if msg.channel.permissions_for(msg.author).administrator: # type: ignore
             return
         if not await self.bot.get_config(msg.guild, "anti_caps_lock"):
             return
@@ -69,22 +70,22 @@ class AntiRaid(commands.Cog):
 
     async def _get_raid_level(self, guild: discord.Guild) -> int:
         "Get the raid protection level of a guild, between 0 and 5"
-        level_name: str = await self.bot.get_config(guild.id, "anti_raid")
-        return (await self.bot.get_options_list())["anti_raid"]["values"].index(level_name)
+        level_name: str = await self.bot.get_config(guild.id, "anti_raid") # type: ignore
+        return (await self.bot.get_options_list())["anti_raid"]["values"].index(level_name) # type: ignore
 
     async def on_join_raid_check(self, member: discord.Member):
         """Check if a member should trigger the raid protection, and if so, kick or ban them
 
         Returns True if the member was kicked or banned, False otherwise"""
         # if guild is unavailable, or Axobot left the guild, or member is a bot
-        if member.guild is None or member.guild.me is None or member.bot:
+        if member.bot:
             return False
         level = await self._get_raid_level(member.guild)
         # if antiraid is disabled or bot can't kick
         if level == 0 or not member.guild.me.guild_permissions.kick_members:
             return False
         can_ban = member.guild.me.guild_permissions.ban_members
-        account_created_since = (self.bot.utcnow() - member.created_at).total_seconds()
+        account_created_since = int((self.bot.utcnow() - member.created_at).total_seconds())
         # Level 4
         if level >= 4:
             # kick accounts created less than 1d before
@@ -101,7 +102,7 @@ class AntiRaid(commands.Cog):
         # Level 3 or more
         if level >= 3 and can_ban:
             # ban (1w) members with invitations in their nickname
-            if self.bot.get_cog("Utilities").sync_check_discord_invite(member.display_name) is not None:
+            if sync_check_discord_invite(member.display_name) is not None:
                 duration = timedelta(days=7)
                 if await self._ban(member, await self.bot._(member.guild.id,"logs.reason.invite"), duration):
                     self.bot.dispatch("antiraid_ban", member, {
@@ -123,7 +124,7 @@ class AntiRaid(commands.Cog):
                 return True
         # Level 1 or more
         if level >= 1: # kick members with invitations in their nickname
-            if self.bot.get_cog("Utilities").sync_check_discord_invite(member.display_name) is not None:
+            if sync_check_discord_invite(member.display_name) is not None:
                 if await self._kick(member, await self.bot._(member.guild.id,"logs.reason.invite")):
                     self.bot.dispatch("antiraid_kick", member, {"discord_invite": True})
                     return True
@@ -167,7 +168,7 @@ class AntiRaid(commands.Cog):
         except discord.HTTPException:
             return False
         if duration:
-            await self.bot.task_handler.add_task("ban", duration.total_seconds(), member.id, member.guild.id)
+            await self.bot.task_handler.add_task("ban", int(duration.total_seconds()), member.id, member.guild.id)
         return True
 
     async def _timeout(self, member: discord.Member, reason: str, duration: timedelta):
@@ -202,6 +203,8 @@ class AntiRaid(commands.Cog):
                            check_id: str, duration: timedelta | None = None):
         translation_key = f"logs.reason.{check_id}"
         if action == "timeout":
+            if duration is None:
+                raise ValueError("Duration must be provided for timeout action")
             await self._timeout(member, await self.bot._(member.guild.id, translation_key), duration)
         if action == "kick":
             await self._kick(member, await self.bot._(member.guild.id, translation_key))
@@ -211,7 +214,7 @@ class AntiRaid(commands.Cog):
             f"{check_id}_treshold": treshold
         }
         if duration:
-            dispatch_data["duration"] = duration.total_seconds()
+            dispatch_data["duration"] = int(duration.total_seconds())
         self.bot.dispatch(f"antiraid_{action}", member, dispatch_data)
         return True
 
@@ -220,7 +223,8 @@ class AntiRaid(commands.Cog):
         "Check whether this member should be verified (False) or is immune (True)"
         if member.bot:
             return True
-        immune_roles: list[discord.Role] | None = await self.bot.get_config(member.guild.id, "anti_raid_ignored_roles")
+        immune_roles: list[discord.Role] | None = await self.bot.get_config(
+            member.guild.id, "anti_raid_ignored_roles") # type: ignore
         if not immune_roles:
             return member.guild_permissions.moderate_members
         return any(
@@ -232,7 +236,7 @@ class AntiRaid(commands.Cog):
     async def on_message_antiraid(self, message: discord.Message):
         "Check mentions/invites count when a message is sent"
         # if the message is not in a guild or the bot can't see the guild
-        if not isinstance(message.author, discord.Member) or message.guild.me is None:
+        if message.guild is None or not isinstance(message.author, discord.Member) or message.guild.me is None: # type: ignore
             return
         # if the author is a bot or should be immune
         if await self._should_ignore_member(message.author):
@@ -364,9 +368,9 @@ class AntiRaid(commands.Cog):
             del self.invites_score[member_id]
 
     @decrease_users_scores.error
-    async def on_decrease_mentions_count_error(self, error: Exception):
+    async def on_decrease_mentions_count_error(self, error: BaseException):
         self.bot.dispatch("error", error, "When calling `decrease_mentions_count` (<@279568324260528128>)")
 
 
-async def setup(bot):
+async def setup(bot: Axobot):
     await bot.add_cog(AntiRaid(bot))

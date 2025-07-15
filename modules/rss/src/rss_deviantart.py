@@ -35,20 +35,22 @@ class DeviantartRSS:
         return matches.group(1)
 
     async def _get_feed(self, username: str, filter_config: FeedFilterConfig | None=None,
-                        session: aiohttp.ClientSession | None=None) -> FeedParserDict:
+                        session: aiohttp.ClientSession | None=None) -> FeedParserDict | None:
         "Get a list of feeds from a deviantart username"
         url = "https://backend.deviantart.com/rss.xml?q=gallery%3A" + username
         feed = await feed_parse(url, 9, session)
         if feed is None or "bozo_exception" in feed or not feed.entries:
             return None
         if filter_config is not None:
-            feed.entries = [entry for entry in feed.entries[:50] if await check_filter(entry, filter_config)]
+            feed['entries'] = [entry for entry in feed.entries[:50] if await check_filter(entry, filter_config)]
         return feed
 
-    async def _parse_entry(self, entry: FeedParserDict, feed: FeedParserDict, url: str, channel: discord.TextChannel):
+    async def _parse_entry(self, entry: FeedParserDict, feed: FeedParserDict, url: str, channel:"discord.abc.MessageableChannel"):
         "Parse a feed entry to get the relevant information and return a RssMessage object"
         img_url = entry["media_content"][0]["url"] if "media_content" in entry else None
-        title = re.search(r"DeviantArt: ([^ ]+)'s gallery", feed.feed["title"]).group(1)
+        if (title_match := re.search(r"DeviantArt: ([^ ]+)'s gallery", feed.feed["title"])) is None:
+            raise ValueError("Title not found in feed title, cannot create RssMessage")
+        title = title_match.group(1).strip()
         return RssMessage(
             bot=self.bot,
             feed=FeedObject.unrecorded("deviant", channel.guild.id if channel.guild else None, link=url),
@@ -59,7 +61,7 @@ class DeviantartRSS:
             image=img_url
         )
 
-    async def get_last_post(self, channel: discord.TextChannel, username: str,
+    async def get_last_post(self, channel:"discord.abc.MessageableChannel", username: str,
                             filter_config: FeedFilterConfig | None,
                             session: aiohttp.ClientSession | None =  None):
         "Get the last post from a DeviantArt user"
@@ -70,7 +72,7 @@ class DeviantartRSS:
         url = "https://www.deviantart.com/" + username
         return await self._parse_entry(entry, feed, url, channel)
 
-    async def get_new_posts(self, channel: discord.TextChannel, username: str, date: dt.datetime,
+    async def get_new_posts(self, channel:"discord.abc.MessageableChannel", username: str, date: dt.datetime,
                             filter_config: FeedFilterConfig | None,
                             session: aiohttp.ClientSession | None=None) -> list[RssMessage]:
         "Get all new posts from a DeviantArt user"

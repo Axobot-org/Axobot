@@ -1,5 +1,6 @@
 import json
 import os
+from typing import Literal
 
 from .card_types import (CardData, CardMetaData, ColorsData, TextData,
                          TextMetaData)
@@ -73,7 +74,7 @@ def get_card_data(
         translation_map: dict[str, str],
         username: str,
         level: int,
-        rank: int,
+        rank: int | Literal['?'],
         participants: int,
         xp_to_current_level: int,
         xp_to_next_level: int,
@@ -82,27 +83,34 @@ def get_card_data(
     "Return every required info to generate the card"
     meta = get_card_meta(card_name)
     colors = get_card_colors(card_name)
-    text_values = get_card_texts(translation_map,
-                                 username, level,
-                                 rank, participants,
-                                 xp_to_current_level, xp_to_next_level,
-                                 total_xp)
+    text_values = get_card_texts(
+        translation_map,
+        username,
+        level,
+        rank,
+        participants,
+        xp_to_current_level,
+        xp_to_next_level,
+        total_xp
+    )
     texts: dict[str, TextData] = {}
-    for text_key, text_meta in meta["texts"].items():  # type: ignore
+    for text_key, text_meta in meta["texts"].items(): # pyright: ignore[reportAssignmentType]
         text_meta: TextMetaData
         label = text_values[text_key]
-        texts[text_key] = {
+        if len(colors["texts"][text_key]) != 3:
+            raise ValueError(f"Invalid color for text '{text_key}' in card '{card_name}'")
+        texts[text_key] = TextData(
             **text_meta,
-            "label": label,
-            "color": tuple(colors["texts"][text_key])
-        }
+            label=label,
+            color=tuple(colors["texts"][text_key]) # pyright: ignore[reportArgumentType]
+        )
     xp_from_last_level = total_xp - xp_to_current_level
     xp_between_last_next_level = xp_to_next_level - xp_to_current_level
     return {
         "type": card_name,
         "avatar_size": (meta["avatar_size"], meta["avatar_size"]),
         "avatar_position": meta["avatar_position"],
-        "xp_bar_color": tuple(colors["xp_bar"]),
+        "xp_bar_color": tuple(colors["xp_bar"]), # pyright: ignore[reportReturnType]
         "xp_bar_position": meta["xp_bar_position"],
         "card_version": 1 if card_name in V1_CARDS else 2,
         "xp_percent": xp_from_last_level / xp_between_last_next_level,
@@ -114,7 +122,7 @@ def get_card_texts(
         translation_map: dict[str, str],
         username: str,
         level: int,
-        rank: int,
+        rank: int | Literal['?'],
         participants: int,
         xp_to_current_level: int,
         xp_to_next_level: int,

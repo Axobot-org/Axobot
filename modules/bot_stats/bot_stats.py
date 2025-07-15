@@ -4,17 +4,17 @@ import re
 import subprocess
 from collections import defaultdict
 from datetime import datetime
-from typing import Any, TypedDict
+from typing import Any, Sequence, TypedDict
 
 import aiohttp
 import discord
-import mysql
+from mysql.connector.errors import IntegrityError as MysqlIntegrityError
 import psutil
 from discord.ext import commands, tasks
 
 from core.bot_classes import Axobot, MyContext
 from core.enums import ServerWarningType
-from modules.tickets.src.types import TicketCreationEvent
+from core.type_utils import AnyStrDict
 
 try:
     import orjson  # type: ignore
@@ -62,7 +62,7 @@ class BotStats(commands.Cog):
         self.ticket_events = {"creation": 0}
         self.emitted_serverlogs: dict[str, int] = {}
         self.emojis_usage: dict[int, int] = defaultdict(int)
-        self.last_backup_size: int | None = None
+        self.last_backup_size: float | None = None
         self.open_files: dict[str, int] = defaultdict(int)
         self.role_reactions = {"added": 0, "removed": 0}
         self.serverlogs_audit_search: tuple[int, int] | None = None
@@ -108,24 +108,24 @@ class BotStats(commands.Cog):
             self.total_cpu_records = self.total_cpu_records[-6:]
 
     @record_cpu_usage.error
-    async def on_record_cpu_error(self, error: Exception):
+    async def on_record_cpu_error(self, error: BaseException):
         self.bot.dispatch("error", error, "When collecting CPU usage")
 
     @tasks.loop(seconds=20)
     async def record_ws_latency(self):
         "Record the websocket latency for later use"
-        if self.bot.latency is None or math.isnan(self.bot.latency):
+        if math.isnan(self.bot.latency):
             return
         try:
             self.latency_records.append(round(self.bot.latency*1000))
         except OverflowError: # Usually because latency is infinite
-            self.latency_records.append(10e6)
+            self.latency_records.append(int(10e6))
         if len(self.latency_records) > 3:
             # if the list becomes too long (over 1min), cut it
             self.latency_records = self.latency_records[-3:]
 
     @record_ws_latency.error
-    async def on_record_latency_error(self, error: Exception):
+    async def on_record_latency_error(self, error: BaseException):
         self.bot.dispatch("error", error, "When collecting WS latency")
 
     @tasks.loop(minutes=2)
@@ -152,29 +152,30 @@ class BotStats(commands.Cog):
                 self.open_files[file_type] += 1
 
     @record_open_files.error
-    async def record_open_files_error(self, error: Exception):
+    async def record_open_files_error(self, error: BaseException):
         self.bot.dispatch("error", error, "When checking process open files")
 
-    async def get_list_usage(self, origin: list[float]):
+    async def get_list_usage(self, origin: Sequence[int | float]) -> float | None:
         "Calculate the average list value"
         if len(origin) > 0:
-            avg = round(sum(origin)/len(origin), 1)
+            avg = round(sum(origin) / len(origin), 1)
             return avg
+        return None
 
     @commands.Cog.listener()
-    async def on_antiscam_warn(self, *_args):
+    async def on_antiscam_warn(self):
         self.antiscam["warning"] += 1
 
     @commands.Cog.listener()
-    async def on_antiscam_delete(self, *_args):
+    async def on_antiscam_delete(self):
         self.antiscam["deletion"] += 1
 
     @commands.Cog.listener()
-    async def on_ticket_creation(self, _event: TicketCreationEvent):
+    async def on_ticket_creation(self):
         self.ticket_events["creation"] += 1
 
     @commands.Cog.listener()
-    async def on_server_warning(self, warning_type: ServerWarningType, _guild: discord.Guild, **_kwargs):
+    async def on_server_warning(self, warning_type: ServerWarningType):
         "Called when a server warning is triggered"
         if warning_type in {
             ServerWarningType.RSS_UNKNOWN_CHANNEL,
@@ -185,13 +186,15 @@ class BotStats(commands.Cog):
             self.rss_stats["warnings"] += 1
 
     @commands.Cog.listener()
-    async def on_socket_raw_receive(self, msg: str):
+    async def on_socket_raw_receive(self, raw: str):
         """Count when a websocket event is received"""
-        msg: dict = json_loads(msg)
+        msg: AnyStrDict = json_loads(raw)
         if msg['t'] is None:
             return
         nbr = self.received_events.get(msg['t'], 0)
         self.received_events[msg['t']] = nbr + 1
+        if self.bot.user is None:
+            raise RuntimeError("Bot user is not initialized, cannot track events")
         if msg['t'] == "MESSAGE_CREATE" and msg["d"]["author"]["id"] == str(self.bot.user.id):
             nbr2 = self.received_events.get("message_sent", 0)
             self.received_events["message_sent"] = nbr2 + 1
@@ -199,7 +202,7 @@ class BotStats(commands.Cog):
     @commands.Cog.listener()
     async def on_command_completion(self, ctx: MyContext):
         """Called when a command is correctly used by someone"""
-        if ctx.interaction:
+        if ctx.interaction or ctx.command is None:
             return # will be handled in on_app_command_completion
         name = ctx.command.qualified_name
         self.commands_uses[name] = self.commands_uses.get(name, 0) + 1
@@ -207,7 +210,7 @@ class BotStats(commands.Cog):
 
     @commands.Cog.listener()
     async def on_app_command_completion(self, _interaction: discord.Interaction,
-                                        command: discord.app_commands.Command | discord.app_commands.ContextMenu):
+                                        command: discord.app_commands.Command[Any, ..., Any] | discord.app_commands.ContextMenu):
         "Called when an app command is correctly used by someone"
         name = command.qualified_name.lower()
         self.commands_uses[name] = self.commands_uses.get(name, 0) + 1
@@ -231,12 +234,12 @@ class BotStats(commands.Cog):
         self.voice_transcript_events[(message_duration, generation_duration)] += 1
 
     @commands.Cog.listener()
-    async def on_stream_starts(self, *_args):
+    async def on_stream_starts(self):
         "Called when a stream starts"
         self.stream_events["starts"] += 1
 
     @commands.Cog.listener()
-    async def on_stream_ends(self, *_args):
+    async def on_stream_ends(self):
         "Called when a stream ends"
         self.stream_events["ends"] += 1
 
@@ -253,13 +256,15 @@ class BotStats(commands.Cog):
         if message.channel.id != 625319946271850537 or len(message.embeds) != 1:
             return
         embed = message.embeds[0]
+        if embed.description is None:
+            return
         if match := re.search(r"Database backup done! \((\d+(?:\.\d+)?)([GMK])\)", embed.description):
             unit = match.group(2)
-            self.last_backup_size = float(match.group(1))
+            last_backup_size = float(match.group(1)) # in Gb
             if unit == "M":
-                self.last_backup_size /= 1024
+                self.last_backup_size = last_backup_size / 1024
             elif unit == "K":
-                self.last_backup_size /= 1024**2
+                self.last_backup_size = last_backup_size / 1024**2
             self.log.info("Last backup size detected: %sG", self.last_backup_size)
 
     async def _check_voice_msg(self, message: discord.Message):
@@ -588,7 +593,7 @@ class BotStats(commands.Cog):
             self.open_files.clear()
             # Push everything
             cnx.commit()
-        except mysql.connector.errors.IntegrityError as err: # usually duplicate primary key
+        except MysqlIntegrityError as err: # usually duplicate primary key
             self.bot.dispatch("error", err, "Stats loop iteration cancelled")
         # if something goes wrong, we still have to close the cursor
         cursor.close()
@@ -599,7 +604,7 @@ class BotStats(commands.Cog):
         await self.bot.wait_until_ready()
 
     @sql_loop.error
-    async def on_sql_loop_error(self, error: Exception):
+    async def on_sql_loop_error(self, error: BaseException):
         self.bot.dispatch("error", error, "SQL stats loop has stopped <@279568324260528128>")
 
     async def get_sum_stats(self, variable: str, minutes: int) -> int | float | str | None:
@@ -609,11 +614,11 @@ class BotStats(commands.Cog):
         cursor.execute('SELECT variable, SUM(value) as value, type FROM `statsbot`.`zbot` WHERE variable = %s \
                        AND date BETWEEN (DATE_SUB(UTC_TIMESTAMP(),INTERVAL %s MINUTE)) AND UTC_TIMESTAMP() AND `entity_id`=%s',
                        (variable, minutes, self.bot.entity_id))
-        result: list[dict] = list(cursor)
+        results: list[AnyStrDict] = list(cursor) # type: ignore
         cursor.close()
-        if len(result) == 0:
+        if len(results) == 0:
             return 0
-        result = result[0]
+        result = results[0]
         if result["type"] == 0:
             return int(result["value"])
         if result["type"] == 1:
@@ -641,7 +646,7 @@ class BotStats(commands.Cog):
         await self.bot.wait_until_ready()
 
     @status_loop.error
-    async def on_status_loop_error(self, error: Exception):
+    async def on_status_loop_error(self, error: BaseException):
         self.bot.dispatch("error", error, "When sending stats to statuspage.io (<@279568324260528128>)")
 
     @tasks.loop(minutes=2)
@@ -658,7 +663,7 @@ class BotStats(commands.Cog):
         await self.bot.wait_until_ready()
 
     @heartbeat_loop.error
-    async def on_heartbeat_loop_error(self, error: Exception):
+    async def on_heartbeat_loop_error(self, error: BaseException):
         self.bot.dispatch("error", error, "When sending heartbeat to statsbot (<@279568324260528128>)")
 
     @tasks.loop(seconds=30)
@@ -672,7 +677,7 @@ class BotStats(commands.Cog):
             query += " (%s, %s, UTC_TIMESTAMP()),"
             args.extend((emoji_id, count))
         query = query[:-1] + " ON DUPLICATE KEY UPDATE count = count + VALUES(count), last_update = UTC_TIMESTAMP();"
-        async with self.bot.db_main.write(query, args):
+        async with self.bot.db_main.write(query, tuple(args)):
             self.emojis_usage.clear()
 
     @emojis_loop.before_loop
@@ -680,9 +685,9 @@ class BotStats(commands.Cog):
         await self.bot.wait_until_ready()
 
     @emojis_loop.error
-    async def on_emojis_loop_error(self, error: Exception):
+    async def on_emojis_loop_error(self, error: BaseException):
         self.bot.dispatch("error", error, "When sending emojis usage to database")
 
 
-async def setup(bot):
+async def setup(bot: Axobot):
     await bot.add_cog(BotStats(bot))

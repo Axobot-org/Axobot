@@ -14,6 +14,7 @@ RANDOM_NAMES_URL = "https://randommer.io/api/Name?nameType=surname&quantity=20"
 MINECRAFT_ENTITIES_URL = "https://raw.githubusercontent.com/PixiGeko/Minecraft-generated-data/master/1.21/releases/1.21/"\
     "custom-generated/tags/universal_tags/entity_type.json"
 
+
 class VoiceChannels(commands.Cog):
     "Create automated voice channels and give roles to voice members"
 
@@ -63,22 +64,24 @@ class VoiceChannels(commands.Cog):
         except (KeyError, ValueError):
             return
 
-    async def give_roles(self, member: discord.Member, remove=False):
+    async def give_roles(self, member: discord.Member, remove: bool = False):
         "Give roles to a member joining/leaving a voice channel"
         if not self.bot.database_online:
             return
         if not member.guild.me.guild_permissions.manage_roles:
             self.log.info("Missing \"manage_roles\" permission on guild %s", member.guild.id)
             return
-        roles: list[discord.Role] | None = await self.bot.get_config(member.guild.id, "voice_roles")
+        roles: list[discord.Role] | None = await self.bot.get_config(
+            member.guild.id, "voice_roles"
+        ) # pyright: ignore[reportAssignmentType]
         if not roles:
             return
         pos = member.guild.me.top_role.position
-        roles = filter(lambda x: (x is not None) and (x.position < pos), roles)
+        filtered_roles = filter(lambda x: x.position < pos, roles)
         if remove:
-            await member.remove_roles(*roles, reason="Left the voice chat")
+            await member.remove_roles(*filtered_roles, reason="Left the voice chat")
         else:
-            await member.add_roles(*roles, reason="Joined a voice chat")
+            await member.add_roles(*filtered_roles, reason="Joined a voice chat")
 
     @commands.Cog.listener()
     async def on_guild_channel_delete(self, channel: discord.abc.GuildChannel):
@@ -95,7 +98,10 @@ class VoiceChannels(commands.Cog):
                 return
             if not self.bot.database_online:
                 return
-            voice_channel: discord.VoiceChannel | None = await self.bot.get_config(member.guild.id, "voice_channel")
+            voice_channel: discord.VoiceChannel | None = await self.bot.get_config(
+                member.guild.id,
+                "voice_channel"
+            ) # pyright: ignore[reportAssignmentType]
             if voice_channel is None:  # if nothing was setup
                 return
             if after.channel == voice_channel:
@@ -106,7 +112,7 @@ class VoiceChannels(commands.Cog):
                         return
                 await self.create_channel(member)
             if (
-                (before.channel is not None)
+                isinstance(before.channel, discord.VoiceChannel)
                 and (member.guild.id in self.channels)
                 and (before.channel.id in self.channels[member.guild.id])
             ):
@@ -121,7 +127,10 @@ class VoiceChannels(commands.Cog):
     async def create_channel(self, member: discord.Member):
         """Create a new voice channel
         The member will get "Manage channel" permissions automatically"""
-        category: discord.CategoryChannel | None = await self.bot.get_config(member.guild.id, "voice_category")
+        category: discord.CategoryChannel | None = await self.bot.get_config(
+            member.guild.id,
+            "voice_category"
+        ) # pyright: ignore[reportAssignmentType]
         if category is None:  # if nothing was setup
             return
         perms = category.permissions_for(member.guild.me)
@@ -129,6 +138,8 @@ class VoiceChannels(commands.Cog):
         if not (perms.manage_channels and perms.move_members):
             self.log.info("Missing \"manage_channels, move_members\" permission on guild %s", member.guild.id)
             return
+        if member.voice is None or member.voice.channel is None:
+            raise RuntimeError("Member is not in a voice channel")
         if not (member.voice.channel.permissions_for(member.guild.me)).move_members:
             self.log.info("Missing \"move_members\" permission on channel %s", member.voice.channel.id)
             return
@@ -143,7 +154,10 @@ class VoiceChannels(commands.Cog):
         over[member].manage_roles = None
         over[member.guild.me].manage_roles = None
         # build channel name from config and random
-        chan_name: str = await self.bot.get_config(member.guild.id, "voice_channel_format")
+        chan_name: str = await self.bot.get_config(
+            member.guild.id,
+            "voice_channel_format"
+        ) # pyright: ignore[reportAssignmentType]
         args = {
             "user": member.global_name or member.name,
             "number": random.randint(0, 1000)
@@ -214,12 +228,21 @@ class VoiceChannels(commands.Cog):
                 await self.bot._(interaction, "voice_channels.no-channel"), ephemeral=True
             )
             return
+        if interaction.guild is None:
+            raise RuntimeError("This command can only be used in a guild")
         await interaction.response.defer()
         i = 0
         temp = []
         for chan in self.channels[interaction.guild_id]:
             d_chan = interaction.guild.get_channel(chan)
-            if d_chan is not None and len(d_chan.members) == 0:
+            if d_chan is None:
+                continue
+            if not isinstance(d_chan, (discord.VoiceChannel, discord.StageChannel)):
+                self.bot.dispatch("error", TypeError(
+                    f"Channel {chan} is not a voice channel in guild {interaction.guild_id}"
+                ))
+                continue
+            if len(d_chan.members) == 0:
                 await d_chan.delete(reason="unusued")
                 temp.append(d_chan)
                 i += 1

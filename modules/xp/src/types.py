@@ -1,4 +1,6 @@
+from datetime import datetime
 from time import time
+from typing import TypedDict
 
 
 class UserVoiceConnection:
@@ -20,3 +22,18 @@ class UserVoiceConnection:
     def reset_xp_time(self):
         "Resets the last XP time to the current time"
         self.last_xp_time = time()
+
+
+class DbRoleReward(TypedDict):
+    "Database structure for role rewards"
+    ID: int
+    guild: int
+    role: int
+    level: int
+    added_at: datetime
+
+class DbUserRank(TypedDict):
+    "Database structure for user ranks"
+    userID: int
+    xp: int
+    rank: int

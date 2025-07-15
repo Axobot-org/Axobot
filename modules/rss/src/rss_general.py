@@ -9,7 +9,7 @@ from typing import TYPE_CHECKING, Any, Literal, TypedDict
 
 import discord
 import feedparser
-from aiohttp import ClientSession, client_exceptions
+from aiohttp import ClientSession, ClientTimeout, client_exceptions
 from cachetools import TTLCache
 from feedparser.util import FeedParserDict
 
@@ -17,6 +17,7 @@ from core.caching.postition_cached import position_cached
 from core.formatutils import FormatUtils
 from core.parse_mentions import parse_allowed_mentions
 from core.safedict import SafeDict
+from core.type_utils import AnyStrDict
 
 FeedType = Literal["tw", "yt", "twitch", "reddit", "mc", "deviant", "bluesky", "web"]
 
@@ -28,7 +29,7 @@ logger = logging.getLogger("bot.rss")
 
 @position_cached(TTLCache(maxsize=1_000, ttl=60 * 5), key=0)
 async def feed_parse(url: str, timeout: int, session: ClientSession | None = None
-                     ) -> feedparser.FeedParserDict | None:
+                     ) -> FeedParserDict | None:
     """Asynchronous parsing using cool methods"""
     # if session is provided, we have to not close it
     if session is None:
@@ -37,7 +38,7 @@ async def feed_parse(url: str, timeout: int, session: ClientSession | None = Non
         _session = session
     try:
         user_agent_header = {"User-Agent": "Axobot feedparser"}
-        async with _session.get(url, timeout=timeout, headers=user_agent_header) as response:
+        async with _session.get(url, timeout=ClientTimeout(total=timeout), headers=user_agent_header) as response:
             html = await response.text()
             headers = response.raw_headers
     except (UnicodeDecodeError, client_exceptions.ClientError):
@@ -60,7 +61,7 @@ async def feed_parse(url: str, timeout: int, session: ClientSession | None = Non
         logger.info("feed_parse got a %s error for URL %s", response.status, url)
         return FeedParserDict(entries=[], feed=FeedParserDict(), status=response.status)
     headers = {k.decode("utf-8").lower(): v.decode("utf-8") for k, v in headers}
-    result = feedparser.parse(html, response_headers=headers)
+    result = feedparser.api.parse(html, response_headers=headers)
     result["status"] = response.status
     return result
 
@@ -116,14 +117,13 @@ class RssMessage:
         if isinstance(date, datetime.datetime):
             self.date = date.replace(tzinfo=datetime.UTC)
         elif isinstance(date, time.struct_time):
-            struct_timezone = date.tm_zone
             self.date = datetime.datetime(*date[:6])
-            if struct_timezone is None:
+            if self.date.tzinfo is None:
                 self.date = self.date.replace(tzinfo=datetime.UTC)
             else:
                 timezone = datetime.timezone(datetime.timedelta(seconds=date.tm_gmtoff))
                 self.date = self.date.replace(tzinfo=timezone)
-        elif isinstance(date, str):
+        elif isinstance(date, str): # type: ignore
             try:
                 self.date = datetime.datetime.fromisoformat(date)
             except ValueError:
@@ -259,7 +259,7 @@ class RssMessage:
         if self.embed_data["title"] is None:
             if self.feed.type != "tw":
                 emb.title = self.title[:256]
-            else:
+            elif self.author:
                 emb.title = self.author[:256]
         else:
             emb.title = _format_text(self.embed_data["title"], safedict, 256)
@@ -336,7 +336,7 @@ class FeedFilterConfig(TypedDict):
 
 class FeedObject:
     "A feed record from the database"
-    def __init__(self, from_dict: dict):
+    def __init__(self, from_dict: AnyStrDict):
         self.feed_id: int = from_dict["ID"]
         self.added_at: datetime.datetime | None = (
             from_dict["added_at"]
@@ -413,15 +413,14 @@ class FeedObject:
             return cog.get_emoji("deviant")
         if self.type == "bluesky":
             return cog.get_emoji("bluesky")
-        if self.link is not None:
-            if self.link.startswith("https://github.com/"):
-                return cog.get_emoji("github")
-            if self.link.startswith("https://reddit.com/"):
-                return cog.get_emoji("reddit")
-            if self.link.startswith("https://youtube.com/"):
-                return cog.get_emoji("youtube")
-            if self.link.startswith("https://twitrss.me/"):
-                return cog.get_emoji("twitter")
-            if self.link.startswith("https://minecraft.net/"):
-                return cog.get_emoji("minecraft")
+        if self.link.startswith("https://github.com/"):
+            return cog.get_emoji("github")
+        if self.link.startswith("https://reddit.com/"):
+            return cog.get_emoji("reddit")
+        if self.link.startswith("https://youtube.com/"):
+            return cog.get_emoji("youtube")
+        if self.link.startswith("https://twitrss.me/"):
+            return cog.get_emoji("twitter")
+        if self.link.startswith("https://minecraft.net/"):
+            return cog.get_emoji("minecraft")
         return "📰"

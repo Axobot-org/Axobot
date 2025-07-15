@@ -26,7 +26,8 @@ import os
 import sys
 from argparse import ArgumentParser, HelpFormatter, Namespace
 from functools import wraps
-from typing import Callable, Iterable
+from typing import Any, Callable, Collection
+from unicodedata import normalize
 
 from google.auth.exceptions import GoogleAuthError
 from googleapiclient.discovery import Resource
@@ -36,22 +37,22 @@ program = os.path.basename(sys.argv[0])
 VER_DATE = "0.1 2020-07-25 11:23"  # $ date +"%F %R"
 
 
-def error(msg: str, *args):
+def error(message: str, *args: Any):
     "Print an error message in the console"
     if len(args) > 0:
-        msg = msg % args
-    print("%s: error: %s" % (program, msg), file=sys.stderr)
+        message = message % args
+    print(f"{program}: error: {message}", file=sys.stderr)
     sys.exit(1)
 
 
-def warn(msg: str, *args):
+def warn(msg: str, *args: Any):
     "Print a warning message in the console"
     if len(args) > 0:
         msg = msg % args
     print("%s: warning: %s", (program, msg), file=sys.stderr)
 
 
-def print_list(lst: Iterable, name: str = None, newline=False):
+def print_list(lst: Collection[Any], name: str | None = None, newline: bool = False):
     "Print a list of any object in the console"
     if len(lst) > 0:
         if newline:
@@ -65,13 +66,12 @@ class Text:
     "Static class used to normalize texts and compare them"
 
     # pylint: disable=import-outside-toplevel
-    from unicodedata import normalize
 
     # https://stackoverflow.com/a/29247821/8327971
 
     @staticmethod
     def normalize_casefold(text: str):
-        return Text.normalize("NFKD", text.casefold())
+        return normalize("NFKD", text.casefold())
 
     @staticmethod
     def casefold_equal(text1: str, text2: str):
@@ -86,11 +86,11 @@ class Service:
     # pylint: disable=import-outside-toplevel
     from googleapiclient.discovery import build
 
-    def __init__(self, max_results, app_key):
+    def __init__(self, max_results: int, app_key: str):
         self.youtube: Resource = Service.build("youtube", "v3", developerKey=app_key)
         self.max_results = max_results
 
-    def search_term(self, term, search_type=None) -> tuple[list[str], list[str], list[str]]:
+    def search_term(self, term: str, search_type: str | None = None) -> tuple[list[str], list[str], list[str]]:
         "Search for a specific term in the YouTube API"
         resp = self.youtube.search().list(  # pylint: disable=no-member
             q=term,

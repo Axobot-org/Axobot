@@ -1,5 +1,6 @@
 import logging
 import time
+from typing import Sequence
 
 import discord
 from discord import app_commands
@@ -10,8 +11,12 @@ from core.arguments import PartialorUnicodeEmojiArgument
 from core.bot_classes import Axobot
 from core.enums import ServerWarningType
 from core.safedict import SafeDict
+from core.type_utils import (GuildInteraction, UserOrMember,
+                             assert_interaction_channel_is_guild_messageable)
 
-from .src.types import DBTopicRow, TicketCreationEvent
+from .src.types import (DBTopicRow, DBTopicRowWithDefault, TicketCreationEvent,
+                        TopicAutocompletionData,
+                        interaction_is_ticket_creation)
 from .src.views import AskTitleModal, AskTopicSelect, SelectView, SendHintText
 
 
@@ -31,25 +36,17 @@ class Tickets(commands.Cog):
         self.bot = bot
         self.file = "tickets"
         self.log = logging.getLogger("bot.tickets")
-        self.cooldowns: dict[discord.User, float] = {}
+        self.cooldowns: dict[UserOrMember, float] = {}
         self.default_name_format = "{username}-{topic}"
 
     @commands.Cog.listener()
     async def on_interaction(self, interaction: discord.Interaction):
         """Called when *any* interaction from the bot is created
-        We use it to detect interactions with the tickets system"""
-        if not interaction.guild:
-            # DM : not interesting
-            return
-        if interaction.type != discord.InteractionType.component:
-            # Not button : not interesting
+        We use it to detect interactions with the ticket opening buttons"""
+        if not interaction_is_ticket_creation(interaction):
             return
         try:
-            custom_ids: list[str] = interaction.data["custom_id"].split('-')
-            if len(custom_ids) != 3 or custom_ids[0] != str(interaction.guild_id) or custom_ids[1] != "tickets":
-                # unknown custom id
-                return
-            topic_id: int = int(interaction.data["values"][0])
+            topic_id = int(interaction.data["values"][0])
             topic = await self.db_get_topic_with_defaults(interaction.guild_id, topic_id)
             if topic is None:
                 if topic_id == -1 and await self.db_get_guild_default_id(interaction.guild_id) is None:
@@ -91,6 +88,8 @@ class Tickets(commands.Cog):
             modal_title = await self.bot._(interaction.guild_id, "tickets.title-modal.title")
             modal_label = await self.bot._(interaction.guild_id, "tickets.title-modal.label")
             modal_placeholder = await self.bot._(interaction.guild_id, "tickets.title-modal.placeholder")
+            if interaction.guild is None:
+                raise RuntimeError("Interaction guild is None, this should not happen")
             await interaction.response.send_modal(
                 AskTitleModal(interaction.guild.id, topic, modal_title, modal_label, modal_placeholder, self.create_ticket)
             )
@@ -101,15 +100,15 @@ class Tickets(commands.Cog):
         "Fetch the topics associated to a guild"
         query = "SELECT * FROM `tickets` WHERE `guild_id` = %s AND `topic` IS NOT NULL AND `beta` = %s"
         async with self.bot.db_main.read(query, (guild_id, self.bot.beta)) as db_query:
-            return db_query
+            return db_query # pyright: ignore[reportReturnType]
 
-    async def db_get_defaults(self, guild_id: int) -> DBTopicRow | None:
+    async def db_get_defaults(self, guild_id: int) -> DBTopicRowWithDefault | None:
         "Get the default values for a guild"
         query = "SELECT * FROM `tickets` WHERE `guild_id` = %s AND `topic` IS NULL AND `beta` = %s"
         async with self.bot.db_main.read(query, (guild_id, self.bot.beta), fetchone=True) as db_query:
-            return db_query or None
+            return db_query or None # pyright: ignore[reportReturnType]
 
-    async def db_get_topic_with_defaults(self, guild_id: int, topic_id: int) -> DBTopicRow:
+    async def db_get_topic_with_defaults(self, guild_id: int, topic_id: int) -> DBTopicRowWithDefault | None:
         "Fetch a topicfrom its guild and ID"
         if topic_id == -1:
             query = "SELECT * FROM `tickets` WHERE `guild_id` = %s AND `topic` IS NULL AND `beta` = %s"
@@ -129,7 +128,7 @@ class Tickets(commands.Cog):
             WHERE t.id = %s AND t.guild_id = %s AND t.beta = %s"""
             args = (topic_id, guild_id, self.bot.beta)
         async with self.bot.db_main.read(query, args, fetchone=True) as db_query:
-            return db_query or None
+            return db_query or None # pyright: ignore[reportReturnType]
 
     async def db_get_guild_default_id(self, guild_id: int) -> int | None:
         "Return the row ID corresponding to the default guild setup, or None"
@@ -144,23 +143,23 @@ class Tickets(commands.Cog):
         # INSERT only if not exists
         query = "INSERT INTO `tickets` (guild_id, beta) SELECT %(g)s, %(b)s WHERE (SELECT 1 as `exists` FROM `tickets` WHERE guild_id = %(g)s AND topic IS NULL AND beta = %(b)s) IS NULL"
         async with self.bot.db_main.write(query, {'g': guild_id, 'b': self.bot.beta}) as db_query:
-            return db_query
+            return db_query or 0
 
     async def db_add_topic(self, guild_id: int, name: str, emoji: str | None) -> bool:
         "Add a topic to a guild"
         query = "INSERT INTO `tickets` (`guild_id`, `topic`, `topic_emoji`, `beta`) VALUES (%s, %s, %s, %s)"
         try:
             async with self.bot.db_main.write(query, (guild_id, name, emoji, self.bot.beta), returnrowcount=True) as db_query:
-                return db_query > 0
+                return db_query is not None and db_query > 0
         except IntegrityError:
             return False
 
     async def db_delete_topics(self, guild_id: int, topic_ids: list[int]) -> int:
         "Delete multiple topics from a guild"
-        topic_ids = ", ".join(map(str, topic_ids))
-        query = f"DELETE FROM `tickets` WHERE `guild_id` = %s AND id IN ({topic_ids}) AND `beta` = %s"
+        topic_ids_arg = ", ".join(map(str, topic_ids))
+        query = f"DELETE FROM `tickets` WHERE `guild_id` = %s AND id IN ({topic_ids_arg}) AND `beta` = %s"
         async with self.bot.db_main.write(query, (guild_id, self.bot.beta), returnrowcount=True) as db_query:
-            return db_query
+            return db_query or 0
 
     async def db_topic_exists(self, guild_id: int, topic_id: int):
         "Check if a topic exists for a guild"
@@ -172,37 +171,38 @@ class Tickets(commands.Cog):
         "Edit a topic name"
         query = "UPDATE `tickets` SET `topic` = %s WHERE `guild_id` = %s AND `id` = %s AND `beta` = %s"
         async with self.bot.db_main.write(query, (name, guild_id, topic_id, self.bot.beta), returnrowcount=True) as db_query:
-            return db_query > 0
+            return db_query is not None and db_query > 0
 
     async def db_edit_topic_emoji(self, guild_id: int, topic_id: int, emoji: str | None) -> bool:
         "Edit a topic emoji"
         query = "UPDATE `tickets` SET `topic_emoji` = %s WHERE `guild_id` = %s AND `id` = %s AND `beta` = %s"
         async with self.bot.db_main.write(query, (emoji, guild_id, topic_id, self.bot.beta), returnrowcount=True) as db_query:
-            return db_query > 0
+            return db_query is not None and db_query > 0
 
     async def db_edit_topic_hint(self, guild_id: int, topic_id: int, hint: str | None) -> bool:
         "Edit a topic emoji"
         query = "UPDATE `tickets` SET `hint` = %s WHERE `guild_id` = %s AND `id` = %s AND `beta` = %s"
         async with self.bot.db_main.write(query, (hint, guild_id, topic_id, self.bot.beta), returnrowcount=True) as db_query:
-            return db_query > 0
+            return db_query is not None and db_query > 0
 
     async def db_edit_topic_role(self, guild_id: int, topic_id: int, role_id: int | None) -> bool:
         "Edit a topic emoji"
         query = "UPDATE tickets SET role = %s WHERE guild_id = %s AND id = %s AND beta = %s"
         async with self.bot.db_main.write(query, (role_id, guild_id, topic_id, self.bot.beta), returnrowcount=True) as db_query:
-            return db_query > 0
+            return db_query is not None and db_query > 0
 
     async def db_edit_topic_category(self, guild_id: int, topic_id: int, category: int | None) -> bool:
         "Edit a topic category or channel in which tickets will be created"
         query = "UPDATE `tickets` SET `category` = %s WHERE `guild_id` = %s AND `id` = %s AND `beta` = %s"
         async with self.bot.db_main.write(query, (category, guild_id, topic_id, self.bot.beta), returnrowcount=True) as db_query:
-            return db_query > 0
+            return db_query is not None and db_query > 0
 
     async def db_edit_topic_format(self, guild_id: int, topic_id: int, name_format: str | None) -> bool:
         "Edit a topic channel/thread name format"
         query = "UPDATE `tickets` SET `name_format` = %s WHERE `guild_id` = %s AND `id` = %s AND `beta` = %s"
-        async with self.bot.db_main.write(query, (name_format, guild_id, topic_id, self.bot.beta), returnrowcount=True) as db_query:
-            return db_query > 0
+        async with self.bot.db_main.write(query, (name_format, guild_id, topic_id, self.bot.beta),
+                                          returnrowcount=True) as db_query:
+            return db_query is not None and db_query > 0
 
     async def db_edit_prompt(self, guild_id: int, message: str):
         "Edit the prompt displayed for a guild"
@@ -210,15 +210,21 @@ class Tickets(commands.Cog):
         async with self.bot.db_main.write(query, (message, guild_id, self.bot.beta)) as _:
             pass
 
-    async def ask_user_topic(self, interaction: discord.Interaction, multiple = False, message: str | None = None):
+    async def ask_user_topic(self, interaction: discord.Interaction, multiple: bool = False, message: str | None = None):
         "Ask a user which topic they want to edit"
+        if interaction.guild is None:
+            raise RuntimeError("This method should only be used in a guild context")
         placeholder = await self.bot._(interaction, "tickets.selection-placeholder")
-        topics = await self.db_get_topics(interaction.guild_id)
+        topics = await self.db_get_topics(interaction.guild.id)
         if not topics:
             await interaction.followup.send(await self.bot._(interaction, "tickets.topic.no-server-topic"), ephemeral=True)
             return None
         view = AskTopicSelect(interaction.user.id, topics, placeholder, max_values=25 if multiple else 1)
-        msg = await interaction.followup.send(message or await self.bot._(interaction, "tickets.choose-topic-edition"), view=view)
+        msg = await interaction.followup.send(
+            message or await self.bot._(interaction, "tickets.choose-topic-edition"),
+            view=view,
+            wait=True
+        )
         await view.wait()
         if view.topics is None:
             # timeout
@@ -231,7 +237,7 @@ class Tickets(commands.Cog):
         except (ValueError, IndexError):
             return None
 
-    async def create_channel_first_message(self, interaction: discord.Interaction, topic: dict, ticket_name: str):
+    async def create_channel_first_message(self, interaction: discord.Interaction, topic: DBTopicRowWithDefault, ticket_name: str):
         "Create the introduction message at the beginning of the ticket"
         title = await self.bot._(interaction.guild_id, "tickets.ticket-introduction.title")
         desc = await self.bot._(interaction.guild_id, "tickets.ticket-introduction.description",
@@ -240,7 +246,8 @@ class Tickets(commands.Cog):
                                 )
         return discord.Embed(title=title, description=desc, color=discord.Color.green())
 
-    async def get_ticket_channel_perms(self, channel: discord.TextChannel, topic: dict, user: discord.Member):
+    async def get_ticket_channel_perms(self, channel: discord.CategoryChannel, topic: DBTopicRowWithDefault, user: discord.Member
+                                       ) -> dict[discord.Role | discord.Member, discord.PermissionOverwrite]:
         "Setup the required permissions for a channel ticket"
         permissions = {}
         # set for everyone
@@ -258,7 +265,7 @@ class Tickets(commands.Cog):
             )
         return permissions
 
-    async def setup_ticket_thread(self, thread: discord.Thread, topic: dict, user: discord.Member):
+    async def setup_ticket_thread(self, thread: discord.Thread, topic: DBTopicRowWithDefault, user: discord.Member):
         "Add the required members to a Discord thread ticket"
         mentions = [thread.guild.me.mention, user.mention]
         if (role_id := topic.get("role")) and (role := thread.guild.get_role(role_id)):
@@ -271,20 +278,12 @@ class Tickets(commands.Cog):
         # then delete to cleanup things
         await msg.delete()
 
-    async def send_missing_permissions_err(self, interaction: discord.Interaction, category: str):
-        "Send an error when the bot couldn't set up the channel permissions"
-        if interaction.user.guild_permissions.manage_roles:
-            msg = await self.bot._(interaction.guild_id, "tickets.missing-perms-setup.to-staff", category=category)
-        else:
-            msg = await self.bot._(interaction.guild_id, "tickets.missing-perms-setup.to-member")
-        await interaction.edit_original_response(content=msg)
-
     async def get_channel_name(self, name_format: str | None, interaction: discord.Interaction,
-                               topic: dict, ticket_name: str) -> str:
+                               topic: DBTopicRowWithDefault, ticket_name: str) -> str:
         "Build the correct channel name for a new ticket"
         channel_name = name_format or self.default_name_format
         if isinstance(topic["topic_emoji"], str) and ':' in topic["topic_emoji"]:
-            emoji: str = topic["topic_emoji"].split(':')[0]
+            emoji: str | None = topic["topic_emoji"].split(':')[0]
         else:
             emoji = topic["topic_emoji"]
         if topic["topic"] is None:
@@ -299,11 +298,11 @@ class Tickets(commands.Cog):
             "ticket_name": ticket_name
         }))[:100]
 
-    async def create_ticket(self, interaction: discord.Interaction, topic: dict, ticket_name: str):
+    async def create_ticket(self, interaction: GuildInteraction, topic: DBTopicRowWithDefault, ticket_name: str):
         "Create the ticket once the user has provided every required info"
         # update cooldown
         self.cooldowns[interaction.user] = time.time()
-        category = interaction.guild.get_channel(topic["category"])
+        category = interaction.guild.get_channel(topic["category"]) if topic["category"] else None
         if category is None:
             self.bot.dispatch("server_warning", ServerWarningType.TICKET_CREATION_UNKNOWN_TARGET,
                 interaction.guild,
@@ -331,9 +330,7 @@ class Tickets(commands.Cog):
                 return
         elif isinstance(category, discord.TextChannel):
             try:
-                if (
-                    "PRIVATE_THREADS" in interaction.guild.features
-                        and category.permissions_for(interaction.guild.me).create_private_threads):
+                if category.permissions_for(interaction.guild.me).create_private_threads:
                     channel_type = discord.ChannelType.private_thread
                 else:
                     channel_type = discord.ChannelType.public_thread
@@ -368,8 +365,12 @@ class Tickets(commands.Cog):
 
     async def topic_id_autocompletion(self, interaction: discord.Interaction, current: str, allow_other: bool=True):
         "Autocompletion to select a topic in an app command"
+        if interaction.guild is None or interaction.guild_id is None:
+            raise RuntimeError("This method should only be used in a guild context")
         current = current.lower()
-        topics = await self.db_get_topics(interaction.guild_id)
+        topics: list[TopicAutocompletionData] = await self.db_get_topics(
+            interaction.guild_id
+        ) # pyright: ignore[reportAssignmentType]
         if allow_other:
             topics.append({
                 "id": -1,
@@ -379,7 +380,7 @@ class Tickets(commands.Cog):
         filtered = sorted([
             (not topic["topic"].lower().startswith(current), topic["topic"], topic["id"])
             for topic in topics
-            if current in topic["topic"].lower()
+            if topic["topic"] is not None and current in topic["topic"].lower()
         ])
         return [
             app_commands.Choice(name=name, value=topic_id)
@@ -411,6 +412,8 @@ class Tickets(commands.Cog):
         """Ask the bot to send a message allowing people to open tickets
 
         ..Doc tickets.html#as-staff-send-the-prompt-message"""
+        if not assert_interaction_channel_is_guild_messageable(interaction):
+            return
         destination_channel = channel or interaction.channel
         if not destination_channel.permissions_for(interaction.guild.me).send_messages:
             await interaction.response.send_message(
@@ -419,8 +422,8 @@ class Tickets(commands.Cog):
             )
             return
         await interaction.response.defer(ephemeral=True)
-        topics = await self.db_get_topics(interaction.guild_id)
-        other = {
+        topics: Sequence[TopicAutocompletionData] = await self.db_get_topics(interaction.guild_id)
+        other: TopicAutocompletionData = {
             "id": -1,
             "topic": (await self.bot._(interaction, "tickets.other")).capitalize(),
             "topic_emoji": None
@@ -441,13 +444,14 @@ class Tickets(commands.Cog):
         ..Example tickets set-hint Make sure to directly state your question when creating your tickets - Please do not use this form for raid-related issues
 
         ..Doc tickets.html#default-hint"""
-        if message.lower() == "none":
-            message = None
+        if interaction.guild_id is None:
+            raise RuntimeError("This command should only be used in a guild context")
+        parsed_message = None if message.lower() == "none" else message
         await interaction.response.defer()
         row_id = await self.db_get_guild_default_id(interaction.guild_id)
         if row_id is None:
             row_id = await self.db_set_guild_default_id(interaction.guild_id)
-        if await self.db_edit_topic_hint(interaction.guild_id, row_id, message):
+        if await self.db_edit_topic_hint(interaction.guild_id, row_id, parsed_message):
             await interaction.followup.send(await self.bot._(interaction, "tickets.hint-edited.default"))
         else:
             await self.send_error_message(interaction)
@@ -463,6 +467,8 @@ class Tickets(commands.Cog):
         ..Example tickets set-role Moderators
 
         ..Doc tickets.html#default-staff-role"""
+        if interaction.guild_id is None:
+            raise RuntimeError("This command should only be used in a guild context")
         await interaction.response.defer()
         row_id = await self.db_get_guild_default_id(interaction.guild_id)
         if row_id is None:
@@ -479,6 +485,8 @@ class Tickets(commands.Cog):
         ..Example tickets set-text Select a category below to start opening your ticket!
 
         ..Doc tickets.html#presentation-message"""
+        if interaction.guild_id is None:
+            raise RuntimeError("This command should only be used in a guild context")
         await interaction.response.defer()
         row_id = await self.db_get_guild_default_id(interaction.guild_id)
         if row_id is None:
@@ -499,6 +507,8 @@ class Tickets(commands.Cog):
         ..Example tickets set-channels #tickets
 
         ..Doc tickets.html#tickets-category-channel"""
+        if interaction.guild_id is None or interaction.guild is None:
+            raise RuntimeError("This command should only be used in a guild context")
         await interaction.response.defer()
         row_id = await self.db_get_guild_default_id(interaction.guild_id)
         if row_id is None:
@@ -517,14 +527,14 @@ class Tickets(commands.Cog):
             message = await self.bot._(interaction,
                                        "tickets.category-edited.default-channel",
                                        channel=category_or_channel.mention)
-            if (
-                "PRIVATE_THREADS" not in interaction.guild.features
-                or not category_or_channel.permissions_for(interaction.guild.me).create_private_threads
-            ):
+            if not category_or_channel.permissions_for(interaction.guild.me).create_private_threads:
                 embed = discord.Embed(description=await self.bot._(interaction,
                                                                    "tickets.category-edited.channel-privacy-warning"),
                                       colour=discord.Color.orange())
-        await interaction.followup.send(message, embed=embed)
+        if embed is None:
+            await interaction.followup.send(message)
+        else:
+            await interaction.followup.send(message, embed=embed)
 
     @tickets_portal.command(name="set-format")
     @app_commands.describe(name_format="The channel format for this topic - set 'none' to use the default one")
@@ -538,13 +548,14 @@ class Tickets(commands.Cog):
         ..Example tickets set-format {username}-tickets
 
         ..Example tickets set-format {username}-{topic}"""
+        if interaction.guild_id is None:
+            raise RuntimeError("This command should only be used in a guild context")
         await interaction.response.defer()
         row_id = await self.db_get_guild_default_id(interaction.guild_id)
         if row_id is None:
             row_id = await self.db_set_guild_default_id(interaction.guild_id)
-        if name_format.lower() == "none":
-            name_format = None
-        await self.db_edit_topic_format(interaction.guild_id, row_id, name_format)
+        parsed_name_format = None if name_format.lower() == "none" else name_format
+        await self.db_edit_topic_format(interaction.guild_id, row_id, parsed_name_format)
         await interaction.followup.send(await self.bot._(interaction, "tickets.format.edited.default"))
 
     tickets_topics = app_commands.Group(
@@ -566,6 +577,8 @@ class Tickets(commands.Cog):
         ..Example tickets topic add Request a magician
 
         ..Doc tickets.html#create-a-new-topic"""
+        if interaction.guild_id is None:
+            raise RuntimeError("This command should only be used in a guild context")
         await interaction.response.defer()
         if is_named_other(name, await self.bot._(interaction, "tickets.other")):
             await interaction.followup.send(
@@ -590,19 +603,21 @@ class Tickets(commands.Cog):
         """Permanently delete a topic by its name
 
         ..Doc tickets.html#delete-a-topic"""
+        if interaction.guild_id is None:
+            raise RuntimeError("This command should only be used in a guild context")
         await interaction.response.defer()
         if not topic_id or not await self.db_topic_exists(interaction.guild_id, topic_id):
-            topic_id = await self.ask_user_topic(
-                interaction, True,
+            res = await self.ask_user_topic(
+                interaction,
+                True,
                 await self.bot._(interaction, "tickets.choose-topics-deletion")
             )
-            if topic_id is None:
+            if res is None:
                 # timeout
                 return
-        topic_ids: list[int] | None = [topic_id]
-        if topic_ids is None:
-            # timeout
-            return
+            topic_ids = res if isinstance(res, list) else [res]
+        else:
+            topic_ids = [topic_id]
         if len(topic_ids) == 1:
             topic = await self.db_get_topic_with_defaults(interaction.guild_id, topic_ids[0])
             topic_name = topic["topic"] if topic else ""
@@ -629,12 +644,17 @@ class Tickets(commands.Cog):
         ..Example tickets topic set-name 5 "Minecraft issues"
 
         ..Doc tickets.html#edit-a-topic-name"""
+        if interaction.guild_id is None:
+            raise RuntimeError("This command should only be used in a guild context")
         await interaction.response.defer()
         if not topic_id or not await self.db_topic_exists(interaction.guild_id, topic_id):
-            topic_id = await self.ask_user_topic(interaction)
-            if topic_id is None:
+            res = await self.ask_user_topic(interaction)
+            if res is None:
                 # timeout
                 return
+            if isinstance(res, list):
+                raise TypeError("This command should only edit one topic at a time")
+            topic_id = res
         if await self.db_edit_topic_name(interaction.guild_id, topic_id, name):
             await interaction.followup.send(await self.bot._(interaction, "tickets.name-edited", name=name))
         else:
@@ -649,17 +669,26 @@ class Tickets(commands.Cog):
 
         ..Example tickets topic set-emote :money_with_wings:
 
+        if interaction.guild_id is None:
+            raise RuntimeError("This command should only be used in a guild context")
         ..Doc tickets.html#edit-a-topic-emoji"""
+        if interaction.guild_id is None:
+            raise RuntimeError("This command should only be used in a guild context")
         await interaction.response.defer()
         if not topic_id or not await self.db_topic_exists(interaction.guild_id, topic_id):
-            topic_id = await self.ask_user_topic(interaction)
-            if topic_id is None:
+            res = await self.ask_user_topic(interaction)
+            if res is None:
                 # timeout
                 return
+            if isinstance(res, list):
+                raise TypeError("This command should only edit one topic at a time")
+            topic_id = res
         elif isinstance(emote, discord.PartialEmoji):
             emote = f"{emote.name}:{emote.id}"
         if await self.db_edit_topic_emoji(interaction.guild_id, topic_id, emote):
             topic = await self.db_get_topic_with_defaults(interaction.guild_id, topic_id)
+            if topic is None:
+                raise RuntimeError(f"Topic {topic_id} not found in guild {interaction.guild_id}")
             await interaction.followup.send(await self.bot._(interaction, "tickets.emote-edited", topic=topic["topic"]))
         else:
             await interaction.followup.send(await self.bot._(interaction, "tickets.nothing-to-edit"), ephemeral=True)
@@ -680,16 +709,22 @@ class Tickets(commands.Cog):
 If that still doesn't work, please create your ticket
 
         ..Doc tickets.html#topic-specific-hint"""
+        if interaction.guild_id is None:
+            raise RuntimeError("This command should only be used in a guild context")
         await interaction.response.defer()
         if not topic_id or not await self.db_topic_exists(interaction.guild_id, topic_id):
-            topic_id = await self.ask_user_topic(interaction)
-            if topic_id is None:
+            res = await self.ask_user_topic(interaction)
+            if res is None:
                 # timeout
                 return
-        if message.lower() == "none":
-            message = None
-        await self.db_edit_topic_hint(interaction.guild_id, topic_id, message)
+            if isinstance(res, list):
+                raise TypeError("This command should only edit one topic at a time")
+            topic_id = res
+        parsed_msg = None if message.lower() == "none" else message
+        await self.db_edit_topic_hint(interaction.guild_id, topic_id, parsed_msg)
         topic = await self.db_get_topic_with_defaults(interaction.guild_id, topic_id)
+        if topic is None:
+            raise RuntimeError(f"Topic {topic_id} not found in guild {interaction.guild_id}")
         await interaction.followup.send(await self.bot._(interaction, "tickets.hint-edited.topic", topic=topic["topic"]))
 
     @topic_set_hint.autocomplete("topic_id")
@@ -709,14 +744,21 @@ If that still doesn't work, please create your ticket
         ..Example tickets topic set-role 347 \"Minecraft moderators\"
 
         ..Doc tickets.html#topic-specific-staff-role"""
+        if interaction.guild_id is None:
+            raise RuntimeError("This command should only be used in a guild context")
         await interaction.response.defer()
         if not topic_id or not await self.db_topic_exists(interaction.guild_id, topic_id):
-            topic_id = await self.ask_user_topic(interaction)
-            if topic_id is None:
+            res = await self.ask_user_topic(interaction)
+            if res is None:
                 # timeout
                 return
+            if isinstance(res, list):
+                raise TypeError("This command should only edit one topic at a time")
+            topic_id = res
         if await self.db_edit_topic_role(interaction.guild_id, topic_id, role.id if role else None):
             topic = await self.db_get_topic_with_defaults(interaction.guild_id, topic_id)
+            if topic is None:
+                raise RuntimeError(f"Topic {topic_id} not found in guild {interaction.guild_id}")
             key = "tickets.role-edited.topic-reset" if role is None else "tickets.role-edited.topic"
             await interaction.followup.send(await self.bot._(interaction, key, topic=topic["topic"]))
         else:
@@ -739,15 +781,21 @@ If that still doesn't work, please create your ticket
         ..Example tickets set-format {username}-special
 
         ..Example tickets set-format 347 {username}-{topic}"""
+        if interaction.guild_id is None:
+            raise RuntimeError("This command should only be used in a guild context")
         if not topic_id or not await self.db_topic_exists(interaction.guild_id, topic_id):
-            topic_id = await self.ask_user_topic(interaction)
-            if topic_id is None:
+            res = await self.ask_user_topic(interaction)
+            if res is None:
                 # timeout
                 return
-        if name_format.lower() == "none":
-            name_format = None
-        if await self.db_edit_topic_format(interaction.guild_id, topic_id, name_format):
+            if isinstance(res, list):
+                raise TypeError("This command should only edit one topic at a time")
+            topic_id = res
+        parsed_format = None if name_format.lower() == "none" else name_format
+        if await self.db_edit_topic_format(interaction.guild_id, topic_id, parsed_format):
             topic = await self.db_get_topic_with_defaults(interaction.guild_id, topic_id)
+            if topic is None:
+                raise RuntimeError(f"Topic {topic_id} not found in guild {interaction.guild_id}")
             await interaction.followup.send(await self.bot._(interaction, "tickets.format.edited.topic", topic=topic["topic"]))
         else:
             await interaction.followup.send(await self.bot._(interaction, "tickets.nothing-to-edit"), ephemeral=True)
@@ -760,6 +808,8 @@ If that still doesn't work, please create your ticket
     @app_commands.checks.cooldown(3, 20)
     async def topic_list(self, interaction: discord.Interaction):
         "List every ticket topic used in your server"
+        if interaction.guild_id is None:
+            raise RuntimeError("This command should only be used in a guild context")
         await interaction.response.defer()
         topics_repr: list[str] = []
         none_emoji: str = self.bot.emojis_manager.customs["nothing"]
@@ -767,7 +817,9 @@ If that still doesn't work, please create your ticket
         # make sure an "other" topic exists
         if await self.db_get_guild_default_id(interaction.guild_id) is None:
             await self.db_set_guild_default_id(interaction.guild_id)
-        topics.append(await self.db_get_defaults(interaction.guild_id))
+        if (default_topic := await self.db_get_defaults(interaction.guild_id)) is None:
+            raise RuntimeError(f"Default topic not found for guild {interaction.guild_id}")
+        topics.append(default_topic) # pyright: ignore[reportArgumentType]
         for topic in topics:
             name = topic["topic"] or await self.bot._(interaction, "tickets.other")
             if topic["topic_emoji"]:
@@ -793,6 +845,8 @@ If that still doesn't work, please create your ticket
         ..Example tickets review-config Economy issues
 
         ..Doc tickets.html#review-the-configuration"""
+        if not assert_interaction_channel_is_guild_messageable(interaction):
+            return
         await interaction.response.defer()
         if topic_id is None:
             await self.review_all(interaction)
@@ -804,11 +858,11 @@ If that still doesn't work, please create your ticket
     async def portal_review_autocomplete(self, interaction: discord.Interaction, current: str):
         return await self.topic_id_autocompletion(interaction, current, allow_other=False)
 
-    async def review_all(self, interaction: discord.Interaction):
+    async def review_all(self, interaction: GuildInteraction):
         "Send a global recap of a guild settings"
         topics = await self.db_get_topics(interaction.guild_id)
         if defaults := await self.db_get_defaults(interaction.guild_id):
-            topics.append(defaults)
+            topics.append(defaults) # pyright: ignore[reportArgumentType]
         emb = discord.Embed(
             title=await self.bot._(interaction, "tickets.review.embed.title-global"),
             description=await self.bot._(interaction, "tickets.review.embed.desc-global"),
@@ -865,10 +919,11 @@ If that still doesn't work, please create your ticket
                 inline=inline
             )
         if len(emb.fields) == 0:
-            emb.description += "\n\n**" + await self.bot._(interaction, "tickets.review.no-config") + "**"
+            emb.description = (emb.description or '') \
+                + "\n\n**" + await self.bot._(interaction, "tickets.review.no-config") + "**"
         await interaction.followup.send(embed=emb)
 
-    async def review_topic(self, interaction: discord.Interaction, topic_id: int):
+    async def review_topic(self, interaction: GuildInteraction, topic_id: int):
         "Send a global recap of a guild settings"
         topics = await self.db_get_topics(interaction.guild_id)
         topics_filtered = [t for t in topics if t["id"] == topic_id]
@@ -927,8 +982,10 @@ If that still doesn't work, please create your ticket
                 inline=len(topic["hint"]) < 60
             )
         if len(emb.fields) == 0:
-            emb.description += "\n\n**" + await self.bot._(interaction, "tickets.review.topic-no-config") + "**"
+            emb.description = (emb.description or '') \
+                + "\n\n**" + await self.bot._(interaction, "tickets.review.topic-no-config") + "**"
         await interaction.followup.send(embed=emb)
 
-async def setup(bot):
+
+async def setup(bot: Axobot):
     await bot.add_cog(Tickets(bot))
