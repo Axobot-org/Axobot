@@ -69,7 +69,7 @@ async def _autocomplete_float(_bot: Axobot, _interaction: Interaction, option: F
         return []
     if value < option["min"]:
         return [Choice(name=str(option["min"]), value=str(option["min"]))]
-    if value > option["max"]:
+    if option["max"] is not None and value > option["max"]:
         return [Choice(name=str(option["max"]), value=str(option["max"]))]
     return [Choice(name=str(value), value=str(value))]
 
@@ -150,7 +150,7 @@ async def _autocomplete_role(_bot: Axobot, interaction: Interaction, option: Rol
 
 async def _autocomplete_text_channel(_: Axobot, interaction: Interaction, option: TextChannelOptionRepresentation, current: str):
     "Autocompletion for text channel options"
-    all_channels: list[discord.TextChannel | discord.Thread] = interaction.guild.text_channels
+    all_channels: list[discord.TextChannel | discord.Thread] = list(interaction.guild.text_channels)
     if option["allow_threads"]:
         all_channels += list(interaction.guild.threads)
     filtered_channels = (
@@ -179,7 +179,7 @@ async def _autocomplete_text_channel(_: Axobot, interaction: Interaction, option
 
 async def _autocomplete_voice_channel(_: Axobot, interaction: Interaction, option: VoiceChannelOptionRepresentation, current:str):
     "Autocompletion for voice channel options"
-    all_channels: list[discord.VoiceChannel | discord.StageChannel] = interaction.guild.voice_channels
+    all_channels: list[discord.VoiceChannel | discord.StageChannel] = list(interaction.guild.voice_channels)
     if option["allow_stage_channels"]:
         all_channels = all_channels + interaction.guild.stage_channels
     filtered_channels = (

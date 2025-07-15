@@ -2,10 +2,11 @@ from math import ceil
 from typing import Any, Self
 
 from discord import (ButtonStyle, Interaction, Message, NotFound, SelectOption,
-                     User, ui)
+                     ui)
 from discord.utils import MISSING
 
 from core.bot_classes import Axobot, MyContext
+from core.type_utils import UserOrMember
 
 
 def cut_text(lines: list[str], max_length: int = 1024, max_size: int = 100) -> list[str]:
@@ -26,7 +27,7 @@ def cut_text(lines: list[str], max_length: int = 1024, max_size: int = 100) -> l
 class Paginator(ui.View):
     "Base class to paginate something"
 
-    def __init__(self, client: Axobot, user: User, stop_label: str="Quit", timeout: int=180):
+    def __init__(self, client: Axobot, user: UserOrMember, stop_label: str="Quit", timeout: int=180):
         super().__init__(timeout=timeout)
         self.client = client
         self.user = user
@@ -146,7 +147,7 @@ class Paginator(ui.View):
 class PaginatedSelectView(ui.View):
     "View used to represent a discord Select with potentially more than 25 options"
 
-    def __init__(self, client: Axobot, message: str | None, options: list[SelectOption], user: User, placeholder: str,
+    def __init__(self, client: Axobot, message: str | None, options: list[SelectOption], user: UserOrMember, placeholder: str,
                  stop_label: str = "Quit", min_values: int = 1, max_values: int = 25, timeout: int = 180):
         super().__init__(timeout=timeout)
         self.client = client
@@ -187,7 +188,10 @@ class PaginatedSelectView(ui.View):
         if isinstance(ctx, Interaction):
             if ctx.response.is_done():
                 return await ctx.followup.send(content=self.message or MISSING, view=self)
-            return await ctx.response.send_message(content=self.message, view=self)
+            callback_response = await ctx.response.send_message(content=self.message, view=self)
+            if callback_response.resource is not None and isinstance(callback_response.resource, Message):
+                return callback_response.resource
+            return None
         return await ctx.send(view=self)
 
     async def interaction_check(self, interaction: Interaction, /) -> bool:

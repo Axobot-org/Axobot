@@ -14,6 +14,8 @@ from core.formatutils import FormatUtils
 from core.paginator import PaginatedSelectView
 from core.views import ConfirmView
 
+from .src.types import ReminderData, TransformReminderData
+
 ReminderTextArgument = app_commands.Range[str, 1, 1000]
 
 class Timers(commands.Cog):
@@ -23,7 +25,7 @@ class Timers(commands.Cog):
         self.bot = bot
         self.file = "timers"
 
-    async def db_get_reminder(self, reminder_id: int, user: int | None = None) -> dict | None:
+    async def db_get_reminder(self, reminder_id: int, user: int | None = None) -> ReminderData | None:
         "Get a specific reminder for a user"
         if user is not None:
             query = "SELECT * FROM `timed` WHERE user=%s AND action='timer' AND ID=%s AND `beta`=%s"
@@ -32,13 +34,13 @@ class Timers(commands.Cog):
             query = "SELECT * FROM `timed` WHERE action='timer' AND ID=%s AND `beta`=%s"
             q_args = (reminder_id, self.bot.beta)
         async with self.bot.db_main.read(query, q_args, fetchone=True) as query_result:
-            return query_result
+            return query_result # pyright: ignore[reportReturnType]
 
-    async def db_get_user_reminders(self, user: int) -> list[dict]:
+    async def db_get_user_reminders(self, user: int) -> list[ReminderData]:
         "Get every active user reminder"
         query = "SELECT * FROM `timed` WHERE user=%s AND action='timer' AND `beta`=%s"
         async with self.bot.db_main.read(query, (user, self.bot.beta)) as query_results:
-            return query_results
+            return query_results # pyright: ignore[reportReturnType]
 
     async def db_get_user_reminders_count(self, user: int) -> int:
         "Get the number of active user reminder"
@@ -50,14 +52,14 @@ class Timers(commands.Cog):
         "Delete a reminder for a user"
         query = "DELETE FROM `timed` WHERE user=%s AND action='timer' AND ID=%s AND `beta`=%s"
         async with self.bot.db_main.write(query, (user, reminder_id, self.bot.beta), returnrowcount=True) as query_result:
-            return query_result > 0
+            return query_result is not None and query_result > 0
 
     async def db_delete_reminders(self, reminder_ids: list[int], user: int) -> bool:
         "Delete multiple reminders for a user"
         list_placeholder = ",".join(["%s"] * len(reminder_ids))
         query = f"DELETE FROM `timed` WHERE user=%s AND action='timer' AND ID IN ({list_placeholder})"
         async with self.bot.db_main.write(query, (user, *reminder_ids), returnrowcount=True) as query_result:
-            return query_result > 0
+            return query_result is not None and query_result > 0
 
     async def db_delete_all_user_reminders(self, user: int):
         "Delete every reminder for a user"
@@ -92,8 +94,8 @@ class Timers(commands.Cog):
 
     @cached(TTLCache(1_000, ttl=60))
     async def _format_reminder_choice(self, current: str, lang: str, reminder_id: int, begin_date: datetime.datetime,
-                                      duration: str, reminder_message: str
-                                      ) -> tuple[bool, float, app_commands.Choice[str]] | None:
+                                      duration: int, reminder_message: str
+                                      ) -> tuple[bool, int, app_commands.Choice[str]] | None:
         "Format a reminder for a discord Choice"
         end_date: datetime.datetime = begin_date + datetime.timedelta(seconds=duration)
         f_duration = await self.format_duration_left(end_date, lang)
@@ -104,7 +106,7 @@ class Timers(commands.Cog):
             label = label[:37] + "..."
         choice = app_commands.Choice(value=str(reminder_id), name=label)
         priority = not reminder_message.lower().startswith(current)
-        return (priority, -end_date.timestamp(), choice)
+        return (priority, int(-end_date.timestamp()), choice)
 
 
     @cached(TTLCache(1_000, ttl=30))
@@ -186,6 +188,8 @@ class Timers(commands.Cog):
                 await self.bot._(interaction, "timers.rmd.too-long"), ephemeral=True
             )
             return
+        if interaction.channel is None:
+            raise TypeError("Interaction channel is None, cannot create a reminder")
         await interaction.response.defer()
         lang = await self.bot._(interaction, "_used_locale")
         f_duration = await FormatUtils.time_delta(duration, lang=lang, year=True, form="developed")
@@ -223,7 +227,7 @@ class Timers(commands.Cog):
             return
         txt = await self.bot._(interaction, "timers.rmd.item")
         lang = await self.bot._(interaction, "_used_locale")
-        reminders_formated_list: list[int, str] = []
+        reminders_formated_list: list[tuple[int, str]] = []
         ctx = await commands.Context.from_interaction(interaction)
         for item in reminders:
             item["message"] = await commands.clean_content(fix_channel_mentions=True).convert(ctx, item["message"])
@@ -233,7 +237,7 @@ class Timers(commands.Cog):
             end: datetime.datetime = item["begin"] + datetime.timedelta(seconds=item["duration"])
             duration = await self.format_duration_left(end, lang)
             item = txt.format(id=item["ID"], duration=duration, channel=chan, msg=msg)
-            reminders_formated_list.append((-end.timestamp(), item))
+            reminders_formated_list.append((int(-end.timestamp()), item))
         reminders_formated_list.sort()
         labels = [item[1] for item in reminders_formated_list]
         emb = discord.Embed(title=await self.bot._(interaction, "timers.rmd.title"), color=16108042)
@@ -245,7 +249,7 @@ class Timers(commands.Cog):
             emb.description = "\n".join(labels)
         await interaction.followup.send(embed=emb)
 
-    async def transform_reminders_options(self, reminders: list[dict]):
+    async def transform_reminders_options(self, reminders: list[TransformReminderData]) -> list[discord.SelectOption]:
         "Transform reminders data into discord SelectOption"
         res = []
         for reminder in reminders:
@@ -270,34 +274,34 @@ class Timers(commands.Cog):
             if len(reminders) == 0:
                 await interaction.followup.send(await self.bot._(interaction, "timers.rmd.empty"))
                 return
-            reminders_data: list[dict] = []
+            reminders_data: list[TransformReminderData] = []
             lang = await self.bot._(interaction, "_used_locale")
             for reminder in reminders:
-                rmd_data = {
-                    "id": reminder["ID"],
-                    "message": reminder["message"]
-                }
                 # channel name
                 if channel := self.bot.get_channel(reminder["channel"]):
-                    rmd_data["tr_channel"] = "DM" if isinstance(channel, discord.abc.PrivateChannel) else ("#" + channel.name)
+                    tr_channel = "DM" if isinstance(channel, discord.abc.PrivateChannel) else ("#" + channel.name)
                 else:
-                    rmd_data["tr_channel"] = reminder["channel"]
+                    tr_channel = str(reminder["channel"])
                 # duration
                 end: datetime.datetime = reminder["begin"] + datetime.timedelta(seconds=reminder["duration"])
                 now = self.bot.utcnow()
                 if now > end:
-                    duration = "-" + await FormatUtils.time_delta(
+                    tr_duration = "-" + await FormatUtils.time_delta(
                         end, now,
                         lang=lang, year=True, form="short", seconds=False
                     )
                 else:
-                    duration = await FormatUtils.time_delta(
+                    tr_duration = await FormatUtils.time_delta(
                         now, end,
                         lang=lang, year=True, form="short", seconds=False
                     )
-                rmd_data["tr_duration"] = duration
                 # append to the list
-                reminders_data.append(rmd_data)
+                reminders_data.append({
+                    "id": reminder["ID"],
+                    "message": reminder["message"],
+                    "tr_channel": tr_channel,
+                    "tr_duration": tr_duration
+                })
             form_placeholder = await self.bot._(interaction, "timers.rmd.select-placeholder")
             view = PaginatedSelectView(self.bot,
                 message=title,
@@ -310,7 +314,8 @@ class Timers(commands.Cog):
             await view.wait()
             if view.values is None:
                 # timeout
-                await view.disable(msg)
+                if msg:
+                    await view.disable(msg)
                 return
             try:
                 if isinstance(view.values, str):
@@ -362,12 +367,14 @@ class Timers(commands.Cog):
                 self.bot.dispatch("error", err, interaction)
 
     @remind_del.autocomplete("reminder_id")
-    async def remind_del_autocomplete(self, interaction: discord.Interaction, current: str):
+    async def remind_del_autocomplete(self, interaction: discord.Interaction, current: str
+                                      ) -> list[discord.app_commands.Choice[str]]:
         "Autocomplete for the reminder ID"
         try:
             return await self.get_reminders_choice(interaction.user.id, "en", current.lower())
         except Exception as err:
             self.bot.dispatch("interaction_error", interaction, err)
+            return []
 
     @remind_main.command(name="clear")
     @app_commands.checks.cooldown(3, 60)
@@ -409,5 +416,5 @@ class Timers(commands.Cog):
         await self.db_register_reminder_snooze(initial_duration, snooze_duration)
 
 
-async def setup(bot):
+async def setup(bot: Axobot):
     await bot.add_cog(Timers(bot))

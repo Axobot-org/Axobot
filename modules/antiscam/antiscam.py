@@ -7,6 +7,7 @@ from discord.ext import commands, tasks
 
 from core.arguments.args import MessageTransformer
 from core.bot_classes import Axobot
+from core.type_utils import UserOrMember
 
 from .model import AntiScamAgent, Message
 from .model.classes import (EMBED_COLORS, MsgReportView, PredictionResult,
@@ -47,7 +48,7 @@ class AntiScam(commands.Cog):
         )
         self.bot.tree.add_command(self.report_ctx_menu)
         self.messages_scanned_in_last_minute = 0
-        self.recent_scans: dict[str, PredictionResult] = {}
+        self.recent_scans: dict[str, PredictionResult[int]] = {}
 
     async def cog_load(self):
         "Load websites list from database"
@@ -69,7 +70,13 @@ class AntiScam(commands.Cog):
                 return
             except Exception as err:
                 self.bot.dispatch("error", err, "While loading antiscam domains list")
+        if self.agent is None:
+            self.bot.dispatch("error", "No antiscam agent found, cannot load websites list")
+            return
         self.agent.fetch_websites_locally()
+        if self.agent.websites_list is None:
+            self.bot.dispatch("error", "No antiscam websites list found, cannot load websites list")
+            return
         self.log.info("Loaded %s domain names from local file", len(self.agent.websites_list))
         self.cleanup_recent_scans_loop.start() # pylint: disable=no-member
 
@@ -87,7 +94,11 @@ class AntiScam(commands.Cog):
 
     @property
     def report_channel(self) -> discord.TextChannel:
-        return self.bot.get_channel(913821367500148776)
+        "Get the internal reports channel where scam messages are sent"
+        channel = self.bot.get_channel(913821367500148776)
+        if not isinstance(channel, discord.TextChannel):
+            raise TypeError("Report channel is not a TextChannel")
+        return channel
 
     async def send_bot_log(self, msg: discord.Message, deleted: bool):
         "Send a log to the bot internal log channel"
@@ -117,28 +128,33 @@ class AntiScam(commands.Cog):
             msg.avg_word_len,
             msg.category
         )) as query_result:
-            return query_result
+            return query_result or 0
 
     async def db_delete_msg(self, msg_id: int) -> bool:
         "Delete a report message from the database"
         await self.bot.wait_until_ready()
         query = f"DELETE FROM `spam-detection`.`{self.table}` WHERE id = %s"
         async with self.bot.db_main.write(query, (msg_id, ), returnrowcount=True) as query_result:
-            return query_result > 0
+            return bool(query_result)
 
     async def db_update_msg(self, msg_id: int, new_category: str) -> bool:
         "Update a message category in the database"
         await self.bot.wait_until_ready()
+        if self.agent is None:
+            raise ValueError("Agent is not loaded, cannot update database")
         query = f"UPDATE `spam-detection`.`{self.table}` SET category = %s WHERE id = %s"
         if category_id := self.agent.get_category_id(new_category):
             async with self.bot.db_main.write(query, (category_id, msg_id), returnrowcount=True) as query_result:
-                return query_result > 0
+                return bool(query_result)
         return False
 
     async def db_update_messages(self, table: str):
         "Update the messages table with any new info (updated unicode, websites list, etc.)"
         async with self.bot.db_main.read(f"SELECT * FROM `spam-detection`.`{table}`") as query_result:
             messages: list[dict[str, typing.Any]] = query_result
+
+        if self.agent is None or self.agent.websites_list is None:
+            raise ValueError("Agent or websites list is not loaded, cannot update messages")
 
         counter = 0
         async with self.bot.db_main.multi() as db:
@@ -160,12 +176,16 @@ class AntiScam(commands.Cog):
                 edits = {k: v for k, v in edits.items() if v != msg[k]}
                 counter += 1
                 query = f"UPDATE `spam-detection`.`{table}` SET {', '.join(f'{k}=%s' for k in edits)} WHERE id=%s"
-                params = list(edits.values()) + [msg["id"]]
+                params = tuple(edits.values()) + (msg["id"],)
                 await db.write(query, params)
         return counter
 
-    async def create_embed(self, msg: Message, author: discord.User, row_id: int, status: str, predicted: PredictionResult):
+    async def create_embed(self, msg: Message, author: UserOrMember, row_id: int, status: str, predicted: PredictionResult[int]):
         "Create an Embed object for a given message report"
+        if self.agent is None or self.bot.user is None:
+            raise ValueError("Agent or bot user is not loaded, cannot create embed")
+        if predicted.result is None:
+            raise ValueError("No prediction result found, cannot send message")
         emb = discord.Embed(title="New report",
                             description=msg.message,
                             color=int(EMBED_COLORS[status][1:], 16)
@@ -182,13 +202,15 @@ class AntiScam(commands.Cog):
                           value=f"{pred_title} ({pred_value}%)")
         return emb
 
-    async def send_report(self, message_author: discord.User, row_id: int, msg: Message):
+    async def send_report(self, message_author: UserOrMember, row_id: int, msg: Message):
         "Send a message report into the internal reports channel"
+        if self.agent is None:
+            raise ValueError("Agent is not loaded, cannot send report")
         prediction = self.agent.predict_bot(msg)
         emb = await self.create_embed(msg, message_author, row_id, "pending", prediction)
         await self.report_channel.send(embed=emb, view=MsgReportView(row_id))
 
-    async def edit_report_message(self, message: discord.InteractionMessage, new_status: str):
+    async def edit_report_message(self, message: discord.Message, new_status: str):
         "Edit a given report message to include its new status"
         emb = message.embeds[0]
         emb.set_field_at(0, name=emb.fields[0].name, value=new_status.title())
@@ -232,9 +254,13 @@ class AntiScam(commands.Cog):
         """Test the antiscam feature with a given message
 
         ..Example antiscam test free nitro for everyone at bit.ly/tomato"""
+        if self.agent is None or self.agent.websites_list is None:
+            raise ValueError("Agent or websites list is not loaded, cannot test message")
         await interaction.response.defer()
         data = Message.from_raw(text, 0, self.agent.websites_list)
         pred = self.agent.predict_bot(data)
+        if pred.result is None:
+            raise ValueError("No prediction result found, cannot send message")
         url_score = await self.bot._(interaction, "antiscam.url-score", score=data.url_score)
         probabilities_ = await self.bot._(interaction, "antiscam.probabilities")
         answer = probabilities_
@@ -242,8 +268,8 @@ class AntiScam(commands.Cog):
             answer += f"\n- {self.agent.categories[category]}: {round(proba*100, 1)}%"
         answer += f"\n\n{url_score}"
         embed = discord.Embed(
-            title = await self.bot._(interaction, "antiscam.result") + " " + self.agent.categories[pred.result],
-            description = answer,
+            title=await self.bot._(interaction, "antiscam.result") + " " + self.agent.categories[pred.result],
+            description=answer,
             color=discord.Color.red() if pred.result >= 2 else discord.Color.green()
         )
         await interaction.followup.send(embed=embed)
@@ -257,8 +283,14 @@ class AntiScam(commands.Cog):
             )
             return
         await interaction.response.defer(ephemeral=True)
-        await self._report_message(message.author, message.content, len(message.mentions), message.guild.id,
-                                   report_author=interaction.user, source_msg=message)
+        await self._report_message(
+            message.author,
+            message.content,
+            len(message.mentions),
+            message.guild.id if message.guild else None,
+            report_author=interaction.user,
+            source_msg=message
+        )
         await interaction.followup.send(
             await self.bot._(interaction.user, "antiscam.report-successful"),
             ephemeral=True
@@ -296,9 +328,14 @@ class AntiScam(commands.Cog):
             allowed_mentions=discord.AllowedMentions.none()
         )
 
-    async def _report_message(self, message_author: discord.User, content: str, mentions_count: int,
+    async def _report_message(self, message_author: UserOrMember, content: str, mentions_count: int,
                               guild_id: int | None,
-                              report_author: discord.Member | None, source_msg: discord.Message | None):
+                              report_author: UserOrMember | None, source_msg: discord.Message | None):
+        """
+        Report a message to the bot team
+        """
+        if self.agent is None or self.agent.websites_list is None:
+            raise ValueError("Agent or websites list is not loaded, cannot report message")
         msg = Message.from_raw(content, mentions_count, self.agent.websites_list)
         if guild_id:
             msg.contains_everyone = f"<@&{guild_id}>" in content or "@everyone" in content
@@ -328,13 +365,15 @@ class AntiScam(commands.Cog):
                 return
             harmless_probability = result.probabilities[1]
         else:
+            if self.agent is None or self.agent.websites_list is None:
+                raise ValueError("Agent or websites list is not loaded, cannot report message")
             # if content is new, analyze it
             message: Message = Message.from_raw(msg.content, len(msg.mentions), self.agent.websites_list)
             if len(message.normd_message.split()) < 3:
                 return
             self.messages_scanned_in_last_minute += 1
             result = self.agent.predict_bot(message)
-            if result.result > 1:
+            if result.result is not None and result.result > 1:
                 message.category = 0
                 self.log.info("Detected (%s): %s", result.probabilities[2], message.message)
             harmless_probability = result.probabilities[1]
@@ -360,9 +399,9 @@ class AntiScam(commands.Cog):
     @commands.Cog.listener()
     async def on_interaction(self, interaction: discord.Interaction):
         "Receive interactions from an antiscam report embed and take actions based on it"
-        if interaction.type != discord.InteractionType.component or not self.bot.database_online:
+        if interaction.type != discord.InteractionType.component or not self.bot.database_online or interaction.data is None:
             return
-        btn_id: str = interaction.data.get("custom_id", None)
+        btn_id: str | None = interaction.data.get("custom_id", None)
         if btn_id is None or '-' not in btn_id:
             return
         try:
@@ -372,6 +411,8 @@ class AntiScam(commands.Cog):
         msg_id = int(msg_id)
         if not interaction.response.is_done():
             await interaction.response.defer()
+        if interaction.message is None:
+            raise ValueError("Interaction message is not found, cannot edit it")
         if action == "delete":
             if await self.db_delete_msg(msg_id):
                 await interaction.followup.send("This record has successfully been deleted", ephemeral=True)
@@ -389,5 +430,5 @@ class AntiScam(commands.Cog):
         await interaction.followup.send("Nothing to do", ephemeral=True)
 
 
-async def setup(bot):
+async def setup(bot: Axobot):
     await bot.add_cog(AntiScam(bot))

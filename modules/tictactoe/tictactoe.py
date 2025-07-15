@@ -1,12 +1,16 @@
 import random
 import time
-from typing import Literal
+from typing import Literal, TypeGuard, TYPE_CHECKING
 
 import discord
 from discord import app_commands
 from discord.ext import commands
+from git import Optional
 
 from core.bot_classes import Axobot
+
+if TYPE_CHECKING:
+    from discord.types.interactions import InteractionData, ButtonMessageComponentInteractionData
 
 GridType = list[int | Literal['X', 'O']]
 
@@ -70,7 +74,9 @@ class TicTacToe(commands.Cog):
             elif self.bot.current_event == "fish":
                 self.emojis = ("🐟", "🐠")
             elif self.interaction.guild:
-                self.emojis = await self.bot.get_config(self.interaction.guild_id, "ttt_emojis")
+                self.emojis = await self.bot.get_config(
+                    self.interaction.guild.id, "ttt_emojis"
+                ) # pyright: ignore[reportAttributeAccessIssue]
             if len(self.emojis) < 2:
                 self.emojis = ("🔴", "🔵")
             # if the bot should start, play its turn
@@ -104,7 +110,7 @@ class TicTacToe(commands.Cog):
             """Check if the cell is empty"""
             return self.grid[case_id] not in {'X', 'O'}
 
-        async def replace_cell(self, is_user_turn: bool, case_id: int):
+        async def replace_cell(self, is_user_turn: bool, case_id: int) -> GridType:
             "Replace the cell value in the grid with the player's symbol, and return a copy of the grid"
             if is_user_turn:
                 return ['X' if x == case_id else x for x in self.grid]
@@ -130,6 +136,8 @@ class TicTacToe(commands.Cog):
             if interaction.user.id != self.interaction.user.id or not self.is_user_turn:
                 return
             await interaction.response.defer()
+            if not interaction_is_tictactoe(interaction.data):
+                raise ValueError("Interaction is not a tictactoe button click")
             case_id = int(interaction.data["custom_id"].split("_")[1])
             if not await self.test_valid_cell(case_id):
                 self.bot.dispatch("error", ValueError(f"Invalid cell: {case_id}"), "During a tictactoe game")
@@ -191,8 +199,17 @@ class TicTacToe(commands.Cog):
             return True
 
         async def on_error(self, interaction, error, item, /):
-            await self.bot.dispatch("error", error, interaction)
+            self.bot.dispatch("error", error, interaction)
 
 
-async def setup(bot):
+def interaction_is_tictactoe(interaction_data: Optional["InteractionData"]) -> TypeGuard["ButtonMessageComponentInteractionData"]:
+    "Check if an interaction is a click on a button"
+    if interaction_data is None:
+        return False
+    if interaction_data.get("component_type") != discord.ComponentType.button:
+        return False
+    return True
+
+
+async def setup(bot: Axobot):
     await bot.add_cog(TicTacToe(bot))

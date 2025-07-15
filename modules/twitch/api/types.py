@@ -1,5 +1,6 @@
 from typing import Literal, TypedDict
 
+
 class HttpTokenNotSet(Exception):
     pass
 

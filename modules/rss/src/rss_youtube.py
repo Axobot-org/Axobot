@@ -59,7 +59,7 @@ class YoutubeRSS:
         if len(channels) == 0:
             # it may be an unreferenced channel ID
             async with aiohttp.ClientSession(cookies=self.cookies) as session:
-                if self._is_valid_channel_id(session, name):
+                if await self._is_valid_channel_id(session, name):
                     return name
             return None
         identifier, _ = channels[0].split(": ", 1)
@@ -89,7 +89,7 @@ class YoutubeRSS:
             return [entry for entry in feed.entries[:50] if await check_filter(entry, filter_config)]
         return feed.entries
 
-    async def _parse_entry(self, entry: FeedParserDict, channel: discord.TextChannel):
+    async def _parse_entry(self, entry: FeedParserDict, channel:"discord.abc.MessageableChannel"):
         "Parse a feed entry to get the relevant information and return a RssMessage object"
         img_url = None
         if "media_thumbnail" in entry and len(entry["media_thumbnail"]) > 0:
@@ -107,7 +107,7 @@ class YoutubeRSS:
             post_text=post_text
         )
 
-    async def get_last_post(self, channel: discord.TextChannel, yt_channel_id: str,
+    async def get_last_post(self, channel:"discord.abc.MessageableChannel", yt_channel_id: str,
                             filter_config: FeedFilterConfig | None,
                             session: aiohttp.ClientSession | None=None):
         "Get the last post from a youtube channel"
@@ -117,7 +117,7 @@ class YoutubeRSS:
         entry = entries[0]
         return await self._parse_entry(entry, channel)
 
-    async def get_new_posts(self, channel: discord.TextChannel, identifiant: str, date: dt.datetime,
+    async def get_new_posts(self, channel:"discord.abc.MessageableChannel", identifiant: str, date: dt.datetime,
                             filter_config: FeedFilterConfig | None,
                             session: aiohttp.ClientSession | None=None) -> list[RssMessage]:
         "Get new posts from a youtube channels"

@@ -4,11 +4,10 @@ import typing
 import aiohttp
 import discord
 from discord.ext import commands
-from discord.ext.commands import Cog
 
 from core.bot_classes import Axobot, MyContext
 from core.checks.errors import NotDuringEventError
-from core.colors_events import (ColorVariation, HalloweenVariationFlagType,
+from core.colors_events import (ColorVariationType, HalloweenVariationFlagType,
                                 TargetConverterType, check_halloween,
                                 convert_halloween, get_url_from_ctx)
 
@@ -20,7 +19,7 @@ async def is_halloween(ctx: MyContext):
     raise NotDuringEventError()
 
 
-class Halloween(Cog):
+class Halloween(commands.Cog):
     "Class used for halloween events, mainly to hallowin-ify images"
 
     def __init__(self, bot: Axobot):
@@ -34,6 +33,13 @@ class Halloween(Cog):
             with open("halloween-cache.json", "w", encoding="utf-8") as file:
                 file.write("[]")
             self.cache = []
+
+    @property
+    def event_cog(self):
+        """Get the BotEvents cog to access event points system"""
+        if cog := self.bot.get_cog("BotEvents"):
+            return cog
+        raise RuntimeError("BotEvents cog not found, cannot access event points system")
 
     @commands.hybrid_group(name="halloween", brief="Happy Halloween!")
     @commands.check(is_halloween)
@@ -98,7 +104,7 @@ A BIG thanks to the Project Blurple and their original code for the colorization
 
     async def color_command(self, fmodifier: typing.Literal["light", "dark"], ctx: MyContext,
                             method: HalloweenVariationFlagType = "hallowify",
-                            variations: commands.Greedy[ColorVariation] = None,
+                            variations: commands.Greedy[ColorVariationType] | None = None,
                             replace_background: bool = False,
                             who: TargetConverterType | None = None):
         "Method called under the hood of each modifier command"
@@ -119,17 +125,17 @@ A BIG thanks to the Project Blurple and their original code for the colorization
             await ctx.send(await self.bot._(ctx.channel, "color-event.unknown-err", err=str(err)))
             return
         await ctx.reply(await self.bot._(ctx.channel, "color-event.colorify.success", user=ctx.author.mention), file=result)
-        if not isinstance(old_msg, discord.InteractionMessage):
+        if old_msg and not isinstance(old_msg, discord.InteractionMessage):
             await old_msg.delete()
         if self.bot.database_online:
-            await ctx.bot.get_cog("BotEvents").db_add_user_points(ctx.author.id, 1)
+            await self.event_cog.db_add_user_points(ctx.author.id, 1)
 
     @hallow_main.command("lightfy")
     @commands.cooldown(6, 120, commands.BucketType.member)
     @commands.cooldown(20, 60, commands.BucketType.guild)
     @commands.check(is_halloween)
     async def lightfy(self, ctx: MyContext, method: HalloweenVariationFlagType = "hallowify",
-                      variations: commands.Greedy[ColorVariation] = None,
+                      variations: commands.Greedy[ColorVariationType] | None = None,
                       replace_background: bool = False,
                       who: TargetConverterType | None = None):
         "Lightfy an image"
@@ -140,7 +146,7 @@ A BIG thanks to the Project Blurple and their original code for the colorization
     @commands.cooldown(20, 60, commands.BucketType.guild)
     @commands.check(is_halloween)
     async def darkfy(self, ctx: MyContext, method: HalloweenVariationFlagType = "hallowify",
-                      variations: commands.Greedy[ColorVariation] = None,
+                      variations: commands.Greedy[ColorVariationType] | None = None,
                       replace_background: bool = False,
                       who: TargetConverterType | None = None):
         "Darkfy an image"
@@ -164,17 +170,21 @@ A BIG thanks to the Project Blurple and their original code for the colorization
             async with session.get(str(url)) as image:
                 result = await check_halloween(await image.read())
         answer = "\n".join(f"> {color['name']}: {color['ratio']}%" for color in result['colors'])
-        await ctx.reply(await self.bot._(ctx.channel, "color-event.halloween.check.result", user=ctx.author.mention, results=answer))
+        await ctx.reply(
+            await self.bot._(ctx.channel, "color-event.halloween.check.result", user=ctx.author.mention, results=answer)
+        )
         if result["passed"] and self.bot.database_online and ctx.author.id not in self.cache:
             reward_points = 40
-            await ctx.bot.get_cog("BotEvents").db_add_user_points(ctx.author.id, reward_points)
+            await self.event_cog.db_add_user_points(ctx.author.id, reward_points)
             self.cache.append(ctx.author.id)
             with open("halloween-cache.json", "w", encoding="utf-8") as file:
                 json.dump(self.cache, file)
-            await ctx.send(await self.bot._(ctx.channel, "color-event.halloween.check.reward", user=ctx.author.mention, amount=reward_points))
-        if not isinstance(old_msg, discord.InteractionMessage):
+            await ctx.send(
+                await self.bot._(ctx.channel, "color-event.halloween.check.reward", user=ctx.author.mention, amount=reward_points)
+            )
+        if old_msg and not isinstance(old_msg, discord.InteractionMessage):
             await old_msg.delete()
 
 
-async def setup(bot):
+async def setup(bot: Axobot):
     await bot.add_cog(Halloween(bot))

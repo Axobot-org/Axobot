@@ -12,7 +12,7 @@ from core.getch_methods import getch_channel_or_thread
 
 log = logging.getLogger("bot")
 UnicodeEmoji = str
-EmojisManagerInstance = EmojisManager(None)
+EmojisManagerInstance = EmojisManager(None) # type: ignore
 
 GuildMessageableChannel = discord.TextChannel | discord.Thread | discord.VoiceChannel | discord.StageChannel
 
@@ -20,7 +20,7 @@ class IntOptionRepresentation(TypedDict):
     "Configuration for an integer option"
     type: Literal["int"]
     min: int
-    max: int
+    max: int | None
     default: int | None
     is_listed: bool
 
@@ -197,8 +197,6 @@ def get_converter(option_name: str, options_map: dict[str, AllRepresentation]):
 
 async def from_raw(option_name: str, raw: str, guild: discord.Guild, bot: Axobot):
     "Convert an option value to a usable object"
-    if raw is None:
-        return None
     options_map = await bot.get_options_list()
     converter = get_converter(option_name, options_map)
     return await converter.from_raw(raw, options_map[option_name], guild)
@@ -226,8 +224,6 @@ async def to_display(option_name: str, value, guild: discord.Guild, bot: Axobot)
 
 async def from_input(option_name: str, raw: str, guild: discord.Guild, interaction: discord.Interaction[Axobot]):
     "Convert a user input to a config object"
-    if raw is None:
-        return None
     options_map = await interaction.client.get_options_list()
     converter = get_converter(option_name, options_map)
     return await converter.from_input(raw, options_map[option_name], guild, interaction)
@@ -263,7 +259,7 @@ class IntOption(OptionConverter):
             raise ValueError("Invalid int value", "INT_INVALID", representation) from None
         if value < representation["min"]:
             raise ValueError("Value is too low", "INT_TOO_LOW", representation)
-        if representation["max"] is not None and value > representation["max"]:
+        if value > representation["max"]:
             raise ValueError("Value is too high", "INT_TOO_HIGH", representation)
         return value
 
@@ -427,8 +423,7 @@ class RolesListOption(OptionConverter):
         roles = [guild.get_role(id) for id in role_ids]
         if None in roles:
             log.warning("[RolesListConverter] Some roles not found: %s", role_ids)
-            roles = [role for role in roles if role is not None]
-        return roles
+        return [role for role in roles if role is not None]
 
     @staticmethod
     def to_raw(value: list[discord.Role]):
@@ -728,14 +723,20 @@ class ColorOption(OptionConverter):
 class LevelupChannelOption(OptionConverter):
     "Option converter for levelup channel values"
     @staticmethod
-    async def from_raw(raw: str, representation: LevelupChannelOptionRepresentation, guild: discord.guild):
+    async def from_raw(raw: str, representation: LevelupChannelOptionRepresentation, guild: discord.Guild):
         if raw in {"any", "none", "dm"}:
             return raw
-        channel_repr: TextChannelOptionRepresentation = representation | {
-            "allow_threads": True,
-            "allow_announcement_channels": True,
-            "allow_non_nsfw_channels": True,
-        }
+        channel_repr = TextChannelOptionRepresentation(
+            type="text_channel",
+            default=None,
+            is_listed=representation["is_listed"],
+            allow_threads=True,
+            allow_announcement_channels=True,
+            allow_non_nsfw_channels=True
+        )
+        channel_repr["allow_threads"] = True
+        channel_repr["allow_announcement_channels"] = True
+        channel_repr["allow_non_nsfw_channels"] = True
         return await TextChannelOption.from_raw(raw, channel_repr, guild)
 
     @staticmethod
@@ -755,11 +756,14 @@ class LevelupChannelOption(OptionConverter):
                          interaction: discord.Interaction):
         if raw.lower() in {"any", "none", "dm"}:
             return raw.lower()
-        channel_repr: TextChannelOptionRepresentation = representation | {
-            "allow_threads": True,
-            "allow_announcement_channels": True,
-            "allow_non_nsfw_channels": True,
-        }
+        channel_repr = TextChannelOptionRepresentation(
+            type="text_channel",
+            default=None,
+            is_listed=representation["is_listed"],
+            allow_threads=True,
+            allow_announcement_channels=True,
+            allow_non_nsfw_channels=True
+        )
         try:
             return await TextChannelOption.from_input(raw, channel_repr, guild, interaction)
         except ValueError:

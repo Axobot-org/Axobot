@@ -10,6 +10,7 @@ from discord.ext import commands, tasks
 from mysql.connector.errors import IntegrityError
 
 from core.bot_classes import SUPPORT_GUILD_ID, Axobot
+from core.type_utils import UserOrMember, channel_is_guild_messageable
 
 
 class Events(commands.Cog):
@@ -20,7 +21,8 @@ class Events(commands.Cog):
         self.file = "events"
         self.dbl_last_sending = datetime.datetime.fromtimestamp(0, tz=datetime.UTC)
         self.statslogs_last_push = datetime.datetime.fromtimestamp(0, tz=datetime.UTC)
-        self.loop_errors = [0, datetime.datetime.fromtimestamp(0, tz=datetime.UTC)]
+        self.loop_errors_count = 0
+        self.loop_errors_last_reset = self.bot.utcnow()
         self.embed_colors = {"welcome":5301186,
             "mute":4868682,
             "unmute":8311585,
@@ -67,7 +69,7 @@ class Events(commands.Cog):
     @commands.Cog.listener()
     async def on_guild_join(self, guild: discord.Guild):
         """Called when the bot joins a guild"""
-        await self.send_guild_log(guild,"join")
+        await self.send_guild_log(guild, "join")
         await self.send_guild_count_milestone()
         if guild.owner:
             await self.check_owner_server(guild.owner)
@@ -75,7 +77,7 @@ class Events(commands.Cog):
     @commands.Cog.listener()
     async def on_guild_remove(self, guild: discord.Guild):
         """Called when the bot left a guild"""
-        await self.send_guild_log(guild,"left")
+        await self.send_guild_log(guild, "left")
         if guild.owner:
             await self.check_owner_server(guild.owner)
 
@@ -88,14 +90,14 @@ class Events(commands.Cog):
                 desc = f"Bot **joined the server** {guild.name} ({guild.id}) - {len(guild.members)} users"
             else:
                 self.bot.log.info(f"Bot left the server {guild.id}")
-                if guild.name is None and guild.unavailable:
+                if not guild.name and guild.unavailable:
                     desc = f"Bot **may have left** the server {guild.id} (guild unavailable)"
                 else:
                     desc = f"Bot **left the server** {guild.name} ({guild.id}) - {len(guild.members)} users"
                     if guild.me and guild.me.joined_at:
                         desc += f"\nJoined at <t:{guild.me.joined_at.timestamp():.0f}>"
             emb = discord.Embed(description=desc, color=self.embed_colors["welcome"], timestamp=self.bot.utcnow())
-            emb.set_author(name=self.bot.user, icon_url=self.bot.user.display_avatar)
+            emb.set_author(name=self.bot.user, icon_url=self.bot.display_avatar)
             await self.bot.send_embed(emb)
             if self.bot.database_online:
                 await self.send_sql_statslogs()
@@ -108,6 +110,8 @@ class Events(commands.Cog):
         if guilds_count % 100 != 0:
             return
         if channel := self.bot.get_channel(625318973164093457):
+            if not channel_is_guild_messageable(channel):
+                raise TypeError("Channel is not a MessageableChannel")
             await channel.send(f"Nous venons d'atteindre les **{guilds_count} serveurs** ! :tada:")
 
     @commands.Cog.listener()
@@ -117,7 +121,7 @@ class Events(commands.Cog):
             return
         if msg.guild is None and not msg.flags.ephemeral:
             await self.send_mp(msg)
-        if msg.content.lower() == f"{self.bot.user.mention} send nudes":
+        if self.bot.user and msg.content.lower() == f"{self.bot.user.mention} send nudes":
             try:
                 nudes_reacts = [":eyes:",":innocent:",":rolling_eyes:",":confused:",":smirk:"]
                 if msg.guild is None or msg.channel.permissions_for(msg.guild.me).external_emojis:
@@ -139,22 +143,24 @@ class Events(commands.Cog):
         if recipient.id in {392766377078816789,279568324260528128,552273019020771358,281404141841022976}:
             return
         channel = self.bot.get_channel(625320165621497886)
-        if channel is None:
+        if channel is None or not isinstance(channel, discord.TextChannel):
             return self.bot.log.warning("[send_mp] Salon de MP introuvable")
-        emb = msg.embeds[0] if len(msg.embeds) > 0 else None
         arrow = ":inbox_tray:" if msg.author == recipient else ":outbox_tray:"
         date_ = f"<t:{msg.created_at.timestamp():.0f}>"
         msg_content = msg.content if len(msg.content) < 1900 else msg.content[:1900] + "…"
         text = f"{arrow} **{recipient}** ({recipient.id} - {date_})\n{msg_content}"
         if len(msg.attachments) > 0:
             text += "".join([f"\n{x.url}" for x in msg.attachments])
-        await channel.send(text, embed=emb)
+        if len(msg.embeds) > 0:
+            await channel.send(text, embed=msg.embeds[0])
+        else:
+            await channel.send(text)
 
     async def check_mp_adv(self, msg: discord.Message):
         """Teste s'il s'agit d'une pub MP"""
         if self.bot.zombie_mode:
             return
-        if msg.author.id == self.bot.user.id or "discord.gg/" not in msg.content:
+        if (self.bot.user and msg.author.id == self.bot.user.id) or "discord.gg/" not in msg.content:
             return
         try:
             await self.bot.fetch_invite(msg.content)
@@ -162,7 +168,7 @@ class Events(commands.Cog):
             return
         await msg.channel.send(await self.bot._(msg.channel,"events.mp-adv"))
 
-    async def check_owner_server(self, owner: discord.User):
+    async def check_owner_server(self, owner: UserOrMember):
         """Check if a server owner should get/loose the server owner role in support server"""
         guild = self.bot.get_guild(SUPPORT_GUILD_ID.id)
         if not guild:
@@ -174,7 +180,7 @@ class Events(commands.Cog):
         if not role:
             self.bot.log.warning("[check_owner_server] Owner role not found")
             return
-        guilds_owned = [x for x in self.bot.guilds if x.owner ==owner and x.member_count > 10]
+        guilds_owned = [x for x in self.bot.guilds if x.owner == owner and (x.member_count or 0) > 10]
         if len(guilds_owned) > 0 and role not in member.roles:
             await member.add_roles(role, reason="This user support me")
         elif len(guilds_owned) == 0 and role in member.roles:
@@ -182,13 +188,11 @@ class Events(commands.Cog):
 
 
     async def add_points(self, points: int):
-        """Ajoute ou enlève un certain nombre de points au score
-        La principale utilité de cette fonction est de pouvoir check le nombre de points à chaque changement"""
-        self.points += points
-        if self.points < 0:
-            self.points = 0
+        """Adds or remove security points"""
+        self.points = max(self.points + points, 0)
 
     async def add_event(self, event: str):
+        """Add points for a specific security event"""
         if event == "kick":
             await self.add_points(-self.table["kick"])
         elif event == "ban":
@@ -198,7 +202,7 @@ class Events(commands.Cog):
     @commands.Cog.listener(name="member_remove")
     async def check_user_left(self, member: discord.Member):
         "Check if someone has been kicked or banned by the bot"
-        if member.id == self.bot.user.id:
+        if self.bot.user and member.id == self.bot.user.id:
             return
         try:
             async for entry in member.guild.audit_logs(user=member.guild.me, limit=15):
@@ -230,22 +234,27 @@ class Events(commands.Cog):
             elif now.hour == 0 and now.day != self.dbl_last_sending.day:
                 await self.dbl_send_data()
             # Send stats logs - every 1h (start from 0:05 am)
-            elif now.minute > 5 and (now.day != self.statslogs_last_push.day or now.hour != self.statslogs_last_push.hour) and self.bot.database_online:
+            elif (
+                now.minute > 5
+                and (now.day != self.statslogs_last_push.day or now.hour != self.statslogs_last_push.hour)
+                and self.bot.database_online
+            ):
                 await self.send_sql_statslogs()
         except Exception as err:
             self.bot.dispatch("error", err)
-            self.loop_errors[0] += 1
-            if (now - self.loop_errors[1]).total_seconds() > 120:
-                self.loop_errors[0] = 0
-                self.loop_errors[1] = now
-            if self.loop_errors[0] > 10:
-                await self.bot.get_cog("Errors").senf_err_msg(
+            self.loop_errors_count += 1
+            if (now - self.loop_errors_last_reset).total_seconds() > 120:
+                self.loop_errors_count = 0
+                self.loop_errors_last_reset = now
+            if self.loop_errors_count > 10 and (errors_cog := self.bot.get_cog("Errors")):
+                await errors_cog.send_err_msg(
                     ":warning: **Too many errors: STOPPING THE MAIN LOOP** <@279568324260528128> :warning:"
                 )
                 self.loop.cancel() # pylint: disable=no-member
 
     @loop.before_loop
     async def before_loop(self):
+        "Wait a bit before starting the loop"
         await self.bot.wait_until_ready()
         await asyncio.sleep(2)
         self.bot.log.info("[tasks_loop] Starting one loop iteration")
@@ -254,11 +263,13 @@ class Events(commands.Cog):
         """Send guilds count to Discord Bots Lists"""
         if self.bot.entity_id != 2:
             return
+        if self.bot.user is None:
+            raise RuntimeError("Bot user is not set, cannot send data to bots lists")
         start_time = time.time()
         answers: list[str] = []
         self.bot.log.info("Sending server count to bots lists APIs...")
         try:
-            guild_count = await self.bot.get_cog("BotInfo").get_guilds_count()
+            guild_count = await self.bot.get_cog("BotInfo").get_guilds_count() # type: ignore
         except Exception as err:
             self.bot.dispatch("error", err, "Fetching guild count")
             guild_count = len(self.bot.guilds)
@@ -303,14 +314,13 @@ class Events(commands.Cog):
             answers.append("discordextremelist: 0")
             self.bot.dispatch("error", err, "Sending server count to discordextremelist")
         await session.close()
-        answers = " - ".join(answers)
         delta_time = round(time.time()-start_time, 3)
         emb = discord.Embed(
-            description=f"**Guilds count updated** in {delta_time}s\n{answers}",
+            description=f"**Guilds count updated** in {delta_time}s\n{' - '.join(answers)}",
             color=7229109,
             timestamp=self.bot.utcnow()
         )
-        emb.set_author(name=self.bot.user, icon_url=self.bot.user.display_avatar)
+        emb.set_author(name=self.bot.user, icon_url=self.bot.display_avatar)
         await self.bot.send_embed(emb, url="loop")
         self.dbl_last_sending = self.bot.utcnow()
 
@@ -323,7 +333,7 @@ class Events(commands.Cog):
         active_rss_feeds = await self.bot.get_cog("Rss").db_get_raws_count()
         if info_cog := self.bot.get_cog("BotInfo"):
             member_count, bot_count = info_cog.get_users_nber([])
-            codelines: int = info_cog.codelines
+            codelines: int = info_cog.codelines or 0
         else:
             member_count = len(self.bot.users)
             bot_count = len([1 for x in self.bot.users if x.bot])
@@ -354,10 +364,11 @@ class Events(commands.Cog):
         except IntegrityError: # Duplicate entry
             pass
         except Exception as err:
-            await self.bot.get_cog("Errors").senf_err_msg(query)
+            if errors_cog := self.bot.get_cog("Errors"):
+                await errors_cog.send_err_msg(query)
             raise err
         emb = discord.Embed(description="**Stats logs** updated", color=5293283, timestamp=self.bot.utcnow())
-        emb.set_author(name=self.bot.user, icon_url=self.bot.user.display_avatar)
+        emb.set_author(name=self.bot.user, icon_url=self.bot.display_avatar if self.bot.user else None)
         await self.bot.send_embed(emb, url="loop")
         self.statslogs_last_push = self.bot.utcnow()
 

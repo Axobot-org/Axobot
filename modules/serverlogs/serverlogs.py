@@ -13,6 +13,9 @@ from core.bot_classes import DISCORD_INVITE_REGEX, Axobot
 from core.enums import ServerWarningType
 from core.formatutils import FormatUtils
 from core.tips import GuildTip
+from core.type_utils import (GuildInteraction, UserOrMember,
+                             assert_interaction_channel_is_guild_messageable,
+                             channel_is_guild_messageable)
 from modules.antiscam.model.classes import PredictionResult
 from modules.tickets.src.types import TicketCreationEvent
 
@@ -44,7 +47,7 @@ class ServerLogs(commands.Cog):
     async def is_log_enabled(self, guild_id: int, log: str) -> list[int]:
         "Check if a log kind is enabled for a guild, and return the corresponding logs channel ID"
         if not self.bot.database_online:
-            return
+            return []
         guild_logs = await self.db_get_from_guild(guild_id)
         res: list[int] = []
         for channel, event in guild_logs.items():
@@ -87,12 +90,12 @@ class ServerLogs(commands.Cog):
         query = "INSERT INTO serverlogs (guild, channel, kind, beta) VALUES (%(g)s, %(c)s, %(k)s, %(b)s) "\
             "ON DUPLICATE KEY UPDATE guild=%(g)s"
         async with self.bot.db_main.write(query, {'g': guild_id, 'c': channel_id, 'k': kind, 'b': self.bot.beta}) as query_result:
-            if query_result > 0 and guild_id in self.cache:
+            if query_result and guild_id in self.cache:
                 if channel_id in self.cache[guild_id]:
                     self.cache[guild_id][channel_id].append(kind)
                 else:
                     self.cache[guild_id][channel_id] = await self.db_get_from_channel(guild_id, channel_id, False)
-            return query_result > 0
+            return bool(query_result)
 
     async def db_remove(self, guild_id: int, channel_id: int, kind: str) -> bool:
         "Remove logs from a channel"
@@ -100,12 +103,12 @@ class ServerLogs(commands.Cog):
         async with self.bot.db_main.write(
             query, (guild_id, channel_id, kind, self.bot.beta), returnrowcount=True
         ) as query_result:
-            if query_result > 0 and guild_id in self.cache:
+            if query_result and guild_id in self.cache:
                 if channel_id in self.cache[guild_id]:
                     self.cache[guild_id][channel_id] = [x for x in self.cache[guild_id][channel_id] if x != kind]
                 else:
                     self.cache[guild_id] = await self.db_get_from_guild(guild_id, use_cache=False)
-            return query_result > 0
+            return bool(query_result)
 
 
     @tasks.loop(seconds=15)
@@ -114,7 +117,7 @@ class ServerLogs(commands.Cog):
         try:
             for channel_id, embeds in dict(self.to_send).items():
                 channel = self.bot.get_channel(channel_id)
-                if not embeds or channel is None or channel.guild.me is None:
+                if not embeds or not channel_is_guild_messageable(channel):
                     self.to_send.pop(channel_id)
                     continue
                 perms = channel.permissions_for(channel.guild.me)
@@ -129,6 +132,7 @@ class ServerLogs(commands.Cog):
                     if not isinstance(err, discord.InvalidData):
                         # invalid data error is not recoverable, so we remove the logs
                         continue
+                    embeds_to_send = []
                 # remove sent embeds
                 if len(embeds) > len(embeds_to_send):
                     self.to_send[channel_id] = self.to_send[channel_id][len(embeds_to_send):]
@@ -168,6 +172,8 @@ class ServerLogs(commands.Cog):
         ..Example modlogs list
 
         ..Doc moderator.html#how-to-setup-logs"""
+        if not assert_interaction_channel_is_guild_messageable(interaction):
+            return
         await interaction.response.defer()
         if channel:  # display logs enabled for this channel only
             title = await self.bot._(interaction, "serverlogs.list.channel", channel='#'+channel.name)
@@ -213,6 +219,8 @@ class ServerLogs(commands.Cog):
         ..Example modlogs enable role_creation bot_warnings #mod-logs
 
         ..Doc moderator.html#how-to-setup-logs"""
+        if not assert_interaction_channel_is_guild_messageable(interaction):
+            return
         dest_channel = channel or interaction.channel
         currently_actived_logs = await self.db_get_from_channel(interaction.guild_id, dest_channel.id)
         actually_added: list[str] = []
@@ -255,7 +263,10 @@ class ServerLogs(commands.Cog):
                 return
 
     @modlogs_enable.autocomplete("logs")
-    async def _modlogs_enable_autocomplete(self, interaction: discord.Interaction, current: str):
+    async def _modlogs_enable_autocomplete(self, interaction: discord.Interaction, current: str
+                                           ) -> list[app_commands.Choice[str]]:
+        if interaction.channel_id is None or interaction.guild_id is None:
+            raise ValueError("Interaction must be in a guild channel")
         if channel := interaction.namespace.channel:
             channel_id: int = channel.id
         else:
@@ -265,7 +276,7 @@ class ServerLogs(commands.Cog):
         if len(available_logs) == 0:
             return []
         return await self.log_name_autocomplete(
-            current, available_logs,
+            current, list(available_logs),
             all_label=await self.bot._(interaction, "serverlogs.autocompletion-all")
         )
 
@@ -281,6 +292,8 @@ class ServerLogs(commands.Cog):
         ..Example modlogs disable ghost_ping #mod-logs
 
         ..Doc moderator.html#how-to-setup-logs"""
+        if not assert_interaction_channel_is_guild_messageable(interaction):
+            return
         dest_channel = channel or interaction.channel
         currently_actived_logs = await self.db_get_from_channel(interaction.guild_id, dest_channel.id)
         actually_removed: list[str] = []
@@ -299,22 +312,25 @@ class ServerLogs(commands.Cog):
         await interaction.followup.send(msg)
 
     @modlogs_disable.autocomplete("logs")
-    async def _modlogs_disable_autocomplete(self, interaction: discord.Interaction, current: str):
+    async def _modlogs_disable_autocomplete(self, interaction: discord.Interaction, current: str
+                                            ) -> list[app_commands.Choice[str]]:
+        if interaction.channel_id is None or interaction.guild_id is None:
+            raise ValueError("Interaction must be in a guild channel")
         if channel := interaction.namespace.channel:
             channel_id: int = channel.id
         else:
             channel_id = interaction.channel_id
-        actived_logs = await self.db_get_from_channel(interaction.guild_id, channel_id)
-        if len(actived_logs) == 0:
+        activated_logs = await self.db_get_from_channel(interaction.guild_id, channel_id)
+        if len(activated_logs) == 0:
             return []
         return await self.log_name_autocomplete(
-            current, actived_logs,
+            current, activated_logs,
             all_label=await self.bot._(interaction, "serverlogs.autocompletion-all")
         )
 
-    async def log_name_autocomplete(self, current: str, available_logs: list[str] | None=None, all_label: str="all"):
+    async def log_name_autocomplete(self, current: str, available_logs: list[str] | None = None, all_label: str="all"):
         "Autocompletion for log names"
-        all_logs = list(ALL_LOGS) if available_logs is None else  available_logs
+        all_logs = list(ALL_LOGS) if available_logs is None else available_logs
         filtered = sorted(
             (not option.startswith(current), option)
             for option in all_logs
@@ -327,9 +343,9 @@ class ServerLogs(commands.Cog):
         choices.insert(0, app_commands.Choice(name=all_label, value="all"))
         return choices
 
-    async def send_antiscam_tip(self, interaction: discord.Interaction):
+    async def send_antiscam_tip(self, interaction: GuildInteraction):
         "Send a tip if antiscam log is enabled but not the antiscam system"
-        antiscam_enabled: bool = await self.bot.get_config(interaction.guild_id, "anti_scam")
+        antiscam_enabled: bool = await self.bot.get_config(interaction.guild_id, "anti_scam") # type: ignore
         if antiscam_enabled:
             return False
         if await self.bot.tips_manager.should_show_guild_tip(interaction.guild_id, GuildTip.SERVERLOG_ENABLE_ANTISCAM):
@@ -342,9 +358,9 @@ class ServerLogs(commands.Cog):
             return True
         return False
 
-    async def send_antiraid_tip(self, interaction: discord.Interaction):
+    async def send_antiraid_tip(self, interaction: GuildInteraction):
         "Send a tip if antiraid log is enabled but not the antiscam system"
-        antiraid_level: str = await self.bot.get_config(interaction.guild_id, "anti_raid")
+        antiraid_level: str = await self.bot.get_config(interaction.guild_id, "anti_raid") # type: ignore
         if antiraid_level != "none":
             return False
         if await self.bot.tips_manager.should_show_guild_tip(interaction.guild_id, GuildTip.SERVERLOG_ENABLE_ANTIRAID):
@@ -357,9 +373,9 @@ class ServerLogs(commands.Cog):
             return True
         return False
 
-    async def send_botwarning_tip(self, interaction: discord.Interaction):
+    async def send_botwarning_tip(self, interaction: GuildInteraction):
         "Send a tip if bot_warnings log is not used in this guild"
-        if interaction.guild is None or await self.is_log_enabled(interaction.guild_id, "bot_warnings"):
+        if await self.is_log_enabled(interaction.guild_id, "bot_warnings"):
             return False
         if await self.bot.tips_manager.should_show_guild_tip(interaction.guild_id, GuildTip.SERVERLOG_ENABLE_BOTWARNING):
             log_add_cmd = await self.bot.get_command_mention("modlogs enable")
@@ -371,14 +387,14 @@ class ServerLogs(commands.Cog):
             return True
         return False
 
-    async def send_member_kick_warning(self, interaction: discord.Interaction):
+    async def send_member_kick_warning(self, interaction: GuildInteraction):
         "Warn the user if member kick log is enabled but bot has not access to guild audit logs"
         if interaction.guild.me.guild_permissions.view_audit_log:
             return
         await interaction.followup.send(await self.bot._(interaction.guild, "serverlogs.kick-warning"))
 
     async def search_audit_logs(self, guild: discord.Guild, action: discord.AuditLogAction,
-                                check: Callable[[discord.AuditLogEntry], bool]=None):
+                                check: Callable[[discord.AuditLogEntry], bool] | None = None):
         """Search for a specific audit log entry in a given guild"""
         if not guild.me.guild_permissions.view_audit_log:
             return None
@@ -404,7 +420,7 @@ class ServerLogs(commands.Cog):
             return
         if channel_ids := await self.is_log_enabled(msg.guild_id, "message_update"):
             old_content: str | None = None
-            author: discord.User | None = None
+            author: UserOrMember | None = None
             guild: discord.Guild
             link: str
             if msg.cached_message:
@@ -412,6 +428,8 @@ class ServerLogs(commands.Cog):
                     return
                 if "pinned" in msg.data and msg.cached_message.pinned != msg.data["pinned"]:
                     return
+                if msg.cached_message.guild is None:
+                    raise ValueError("Guild not found for message update")
                 old_content = msg.cached_message.content
                 author = msg.cached_message.author
                 guild = msg.cached_message.guild
@@ -419,10 +437,12 @@ class ServerLogs(commands.Cog):
             else:
                 if "author" in msg.data and (author_id := msg.data.get("author").get("id")):
                     author = self.bot.get_user(int(author_id))
-                guild = self.bot.get_guild(msg.guild_id)
+                if (g := self.bot.get_guild(msg.guild_id)) is None:
+                    raise ValueError("Guild not found for message update")
+                guild = g
                 link = f"https://discord.com/channels/{msg.guild_id}/{msg.channel_id}/{msg.message_id}"
             new_content = msg.data.get("content")
-            if new_content is None or old_content == new_content: # and msg.data.get("flags", 0) & 32:
+            if not new_content or old_content == new_content: # and msg.data.get("flags", 0) & 32:
                 return
             emb = discord.Embed(
                 description=f"**[Message]({link}) updated in <#{msg.channel_id}>**",
@@ -513,6 +533,8 @@ class ServerLogs(commands.Cog):
         Corresponding log: discord_invite"""
         if message.guild is None or message.author == self.bot.user:
             return
+        if not channel_is_guild_messageable(message.channel):
+            raise TypeError("Message channel is not a guild messageable channel")
         if (invites := DISCORD_INVITE_REGEX.findall(message.content)) and (
                 channel_ids := await self.is_log_enabled(message.guild.id, "discord_invite")):
             emb = discord.Embed(
@@ -610,7 +632,8 @@ class ServerLogs(commands.Cog):
         if any(not role.managed for role in added_roles+removed_roles):
             if entry := await self.search_audit_logs(before.guild, discord.AuditLogAction.member_role_update,
                                                      check=lambda entry: entry.target.id == before.id):
-                emb.add_field(name="Roles edited by", value=f"**{entry.user.mention}** ({entry.user.id})")
+                if entry.user:
+                    emb.add_field(name="Roles edited by", value=f"**{entry.user.mention}** ({entry.user.id})")
         await self.validate_logs(after.guild, channel_ids, emb, "member_roles")
 
     async def handle_member_nick(self, before: discord.Member, after: discord.Member, channel_ids: list[int]):
@@ -619,16 +642,18 @@ class ServerLogs(commands.Cog):
             description=f"**Member {before.mention} ({before.id}) updated**",
             color=discord.Color.blurple()
         )
-        if before.nick is None:
+        if before.nick is None and after.nick is not None:
             escaped = discord.utils.escape_markdown(after.nick)
             emb.add_field(name="Nickname set", value=f"Set to '{escaped}'")
-        elif after.nick is None:
+        elif after.nick is None and before.nick is not None:
             escaped = discord.utils.escape_markdown(before.nick)
             emb.add_field(name="Nickname removed", value=f"Previously '{escaped}'")
-        else:
+        elif before.nick is not None and after.nick is not None:
             escaped_before = discord.utils.escape_markdown(before.nick)
             escaped_after = discord.utils.escape_markdown(after.nick)
             emb.add_field(name="Nickname changed", value=f"From '{escaped_before}' to '{escaped_after}'")
+        else:
+            self.bot.dispatch("error", ValueError("Both icons are None, this should not happen"))
         emb.set_author(name=str(after), icon_url=after.display_avatar)
         after_nick = after.nick
         if entry := await self.search_audit_logs(before.guild, discord.AuditLogAction.member_update,
@@ -637,7 +662,8 @@ class ServerLogs(commands.Cog):
                                                      and hasattr(entry.after, "nick")
                                                      and entry.after.nick == after_nick
                                                  )):
-            emb.add_field(name="Edited by", value=f"**{entry.user.mention}** ({entry.user.id})")
+            if entry.user:
+                emb.add_field(name="Edited by", value=f"**{entry.user.mention}** ({entry.user.id})")
         await self.validate_logs(after.guild, channel_ids, emb, "member_nick")
 
     async def handle_member_avatar(self, before: discord.Member, after: discord.Member, channel_ids: list[int]):
@@ -671,7 +697,8 @@ class ServerLogs(commands.Cog):
             if entry.reason and entry.reason.endswith(self.bot.zws):
                 # muted from the /mute command, so we ignore this event
                 return
-            emb.add_field(name="Timeout by", value=f"**{entry.user.mention}** ({entry.user.id})")
+            if entry.user:
+                emb.add_field(name="Timeout by", value=f"**{entry.user.mention}** ({entry.user.id})")
             if entry.reason:
                 emb.add_field(name="With reason", value=entry.reason)
         await self.validate_logs(after.guild, channel_ids, emb, "member_timeout")
@@ -699,7 +726,8 @@ class ServerLogs(commands.Cog):
             if entry.reason and entry.reason.endswith(self.bot.zws):
                 # muted from the /mute command, so we ignore this event
                 return
-            emb.add_field(name="Revoked by", value=f"**{entry.user.mention}** ({entry.user.id})")
+            if entry.user:
+                emb.add_field(name="Revoked by", value=f"**{entry.user.mention}** ({entry.user.id})")
             if entry.reason:
                 emb.add_field(name="With reason", value=entry.reason)
         await self.validate_logs(after.guild, channel_ids, emb, "member_timeout")
@@ -854,7 +882,7 @@ class ServerLogs(commands.Cog):
         guild = self.bot.get_guild(payload.guild_id)
         if guild is None:
             return
-        if guild.me is None or not guild.me.guild_permissions.view_audit_log:
+        if not guild.me.guild_permissions.view_audit_log:
             return
         if entry := await self.search_audit_logs(guild, discord.AuditLogAction.kick,
                                                  check=lambda entry: entry.target.id == payload.user.id):
@@ -866,7 +894,8 @@ class ServerLogs(commands.Cog):
                 colour=discord.Color.red()
             )
             emb.set_author(name=str(payload.user), icon_url=payload.user.display_avatar)
-            emb.add_field(name="Kicked by", value=f"**{entry.user.mention}** ({entry.user.id})")
+            if entry.user:
+                emb.add_field(name="Kicked by", value=f"**{entry.user.mention}** ({entry.user.id})")
             if entry.reason:
                 emb.add_field(name="With reason", value=entry.reason)
             await self.validate_logs(guild, channel_ids, emb, "member_kick")
@@ -888,7 +917,8 @@ class ServerLogs(commands.Cog):
                 if entry.reason and entry.reason.endswith(self.bot.zws):
                     # banned from the /ban command, so we ignore this event
                     return
-                emb.add_field(name="Banned by", value=f"**{entry.user.mention}** ({entry.user.id})", inline=False)
+                if entry.user:
+                    emb.add_field(name="Banned by", value=f"**{entry.user.mention}** ({entry.user.id})", inline=False)
                 if entry.reason:
                     emb.add_field(name="With reason", value=entry.reason)
             await self.validate_logs(guild, channel_ids, emb, "member_ban")
@@ -909,7 +939,8 @@ class ServerLogs(commands.Cog):
                 if entry.reason and entry.reason.endswith(self.bot.zws):
                     # unbanned from the /unban command or after a tempban, so we ignore this event
                     return
-                emb.add_field(name="Unbanned by", value=f"**{entry.user.mention}** ({entry.user.id})", inline=False)
+                if entry.user:
+                    emb.add_field(name="Unbanned by", value=f"**{entry.user.mention}** ({entry.user.id})", inline=False)
                 if entry.reason:
                     emb.add_field(name="With reason", value=entry.reason)
             await self.validate_logs(guild, channel_ids, emb, "member_unban")
@@ -948,7 +979,8 @@ class ServerLogs(commands.Cog):
             # if we have access to audit logs, try to find who created the role
             if entry := await self.search_audit_logs(role.guild, discord.AuditLogAction.role_create,
                                                      check=lambda entry: entry.target.id == role.id):
-                emb.add_field(name="Created by", value=f"**{entry.user.mention}** ({entry.user.id})")
+                if entry.user:
+                    emb.add_field(name="Created by", value=f"**{entry.user.mention}** ({entry.user.id})")
                 if entry.reason:
                     emb.add_field(name="With reason", value=entry.reason)
             await self.validate_logs(role.guild, channel_ids, emb, "role_creation")
@@ -982,8 +1014,10 @@ class ServerLogs(commands.Cog):
             if before.icon != after.icon:
                 if after.icon:
                     emb.add_field(name="Icon", value=f"Set to {after.icon.url}")
-                else:
+                elif before.icon:
                     emb.add_field(name="Icon", value=f"Removed (previously {before.icon.url})")
+                else:
+                    self.bot.dispatch("error", ValueError("Both icons are None, this should not happen"))
             if before.unicode_emoji != after.unicode_emoji:
                 if before.unicode_emoji is None:
                     emb.add_field(name="Emoji", value=f"Set to {after.unicode_emoji}")
@@ -1016,7 +1050,8 @@ class ServerLogs(commands.Cog):
             # try to find who edited the role
             if entry := await self.search_audit_logs(before.guild, discord.AuditLogAction.role_update,
                                                      check=lambda entry: entry.target.id == after.id):
-                emb.add_field(name="Edited by", value=f"**{entry.user.mention}** ({entry.user.id})", inline=False)
+                if entry.user:
+                    emb.add_field(name="Edited by", value=f"**{entry.user.mention}** ({entry.user.id})", inline=False)
                 if entry.reason:
                     emb.add_field(name="With reason", value=entry.reason)
             await self.validate_logs(after.guild, channel_ids, emb, "role_update")
@@ -1039,16 +1074,19 @@ class ServerLogs(commands.Cog):
             # try to find who deleted the role
             if entry := await self.search_audit_logs(role.guild, discord.AuditLogAction.role_delete,
                                                      check=lambda entry: entry.target.id == role.id):
-                emb.add_field(name="Deleted by", value=f"**{entry.user.mention}** ({entry.user.id})")
+                if entry.user:
+                    emb.add_field(name="Deleted by", value=f"**{entry.user.mention}** ({entry.user.id})")
                 if entry.reason:
                     emb.add_field(name="With reason", value=entry.reason)
             await self.validate_logs(role.guild, channel_ids, emb, "role_deletion")
 
 
     @commands.Cog.listener()
-    async def on_antiscam_warn(self, message: discord.Message, prediction: PredictionResult):
+    async def on_antiscam_warn(self, message: discord.Message, prediction: PredictionResult[Any]):
         """Triggered when the antiscam system find a potentially dangerous message
         Corresponding log: antiscam"""
+        if message.guild is None:
+            return
         if channel_ids := await self.is_log_enabled(message.guild.id, "antiscam"):
             emb = discord.Embed(
                 description=f"**Potentially dangerous [message]({message.jump_url})**",
@@ -1058,9 +1096,11 @@ class ServerLogs(commands.Cog):
             await self.validate_logs(message.guild, channel_ids, emb, "antiscam")
 
     @commands.Cog.listener()
-    async def on_antiscam_delete(self, message: discord.Message, prediction: PredictionResult):
+    async def on_antiscam_delete(self, message: discord.Message, prediction: PredictionResult[Any]):
         """Triggered when the antiscam system delete a dangerous message
         Corresponding log: antiscam"""
+        if message.guild is None:
+            return
         if channel_ids := await self.is_log_enabled(message.guild.id, "antiscam"):
             emb = discord.Embed(
                 description=f"**Dangerous [message]({message.jump_url}) deleted**",
@@ -1070,9 +1110,11 @@ class ServerLogs(commands.Cog):
             await self.validate_logs(message.guild, channel_ids, emb, "antiscam")
 
     @commands.Cog.listener()
-    async def on_antiscam_report(self, message: discord.Message, prediction: PredictionResult, user: discord.Member):
+    async def on_antiscam_report(self, message: discord.Message, prediction: PredictionResult[Any], user: discord.Member):
         """Triggered when someone reports a potential scam message
         Corresponding log: antiscam"""
+        if message.guild is None:
+            return
         if channel_ids := await self.is_log_enabled(message.guild.id, "antiscam"):
             emb = discord.Embed(
                 description=f"**Scam [message]({message.jump_url}) reported** by one of your members",
@@ -1082,10 +1124,10 @@ class ServerLogs(commands.Cog):
             await self.prepare_antiscam_embed(message, prediction, emb)
             await self.validate_logs(message.guild, channel_ids, emb, "antiscam")
 
-    async def prepare_antiscam_embed(self, message: discord.Message, prediction: PredictionResult, emb: discord.Embed):
+    async def prepare_antiscam_embed(self, message: discord.Message, prediction: PredictionResult[Any], emb: discord.Embed):
         "Prepare the embed for an antiscam alert"
         # probabilities
-        categories: dict = self.bot.get_cog("AntiScam").agent.categories
+        categories = self.bot.get_cog("AntiScam").agent.categories # pyright: ignore[reportOptionalMemberAccess]
         emb.add_field(name="AI detection result", value=prediction.to_string(categories), inline=False)
         # message content
         content = message.content if len(message.content) < 1020 else message.content[:1020]+'…'
@@ -1345,7 +1387,7 @@ Minimum age required by anti-raid: {min_age}"
             await self.validate_logs(guild, channel_ids, emb, "member_ban")
 
     @commands.Cog.listener()
-    async def on_moderation_unban(self, guild: discord.Guild, author: discord.Member, user: discord.user,
+    async def on_moderation_unban(self, guild: discord.Guild, author: discord.Member, user: discord.User,
                                   case_id: int | None, reason: str | None):
         """Triggered when someone uses the unban command
         Corresponding log: member_unban"""
@@ -1578,7 +1620,7 @@ Minimum age required by anti-raid: {min_age}"
                 emb.add_field(name="Selected topic", value=kwargs.get("topic_name"))
                 emb.add_field(name="Reason", value="Unknown or deleted channel or category")
             elif warning_type == ServerWarningType.TICKET_CREATION_FAILED:
-                channel = kwargs.get("channel")
+                channel: "discord.abc.GuildChannel" = kwargs["channel"]
                 if isinstance(channel, discord.CategoryChannel):
                     emb.description = f"**Could not create ticket** in category {channel.name}"
                 else:
@@ -1589,7 +1631,7 @@ Minimum age required by anti-raid: {min_age}"
                     value=await self.bot._(guild.id, "permissions.list.manage_channels")
                 )
             elif warning_type == ServerWarningType.TICKET_INIT_FAILED:
-                channel = kwargs.get("channel")
+                channel: "discord.abc.GuildChannel" = kwargs["channel"]
                 if isinstance(channel, discord.CategoryChannel):
                     emb.description = f"**Could not setup ticket permissions** in category {channel.name}"
                 else:
@@ -1600,8 +1642,8 @@ Minimum age required by anti-raid: {min_age}"
                     value=await self.bot._(guild.id, "permissions.list.manage_permissions")
                 )
             elif warning_type == ServerWarningType.TEMP_ROLE_REMOVE_FORBIDDEN:
-                role = kwargs.get("role")
-                user = kwargs.get("user")
+                role: discord.Role = kwargs["role"]
+                user: discord.Member = kwargs["user"]
                 emb.description = f"**Could not remove temporary role** {role.mention} from user {user.mention}"
                 emb.add_field(name="Reason", value="Missing permission")
             elif warning_type == ServerWarningType.STREAM_NOTIFICATION_MISSING_PERMISSIONS:
@@ -1650,7 +1692,7 @@ Minimum age required by anti-raid: {min_age}"
                     emb.add_field(name="Time spent in the channel", value=duration)
                     del self.voice_join_timestamps[(member.id, before.channel.id)]
                 await self.validate_logs(member.guild, channel_ids, emb, "voice_leave")
-        else:
+        elif before.channel is not None and after.channel is not None:
             # voice_move
             self.voice_join_timestamps[(member.id, after.channel.id)] = time.time()
             if channel_ids := await self.is_log_enabled(member.guild.id, "voice_move"):
@@ -1665,6 +1707,8 @@ Minimum age required by anti-raid: {min_age}"
                     emb.add_field(name="Time spent in the channel", value=duration)
                     del self.voice_join_timestamps[(member.id, before.channel.id)]
                 await self.validate_logs(member.guild, channel_ids, emb, "voice_move")
+        else:
+            raise ValueError("Unexpected voice state update: both before and after channels are None")
 
     @commands.Cog.listener()
     async def on_say_usage(self, author: discord.Member, text: str, channel_id: int):
@@ -1698,5 +1742,5 @@ Minimum age required by anti-raid: {min_age}"
             await self.validate_logs(author.guild, channel_ids, emb, "react_usage")
 
 
-async def setup(bot):
+async def setup(bot: Axobot):
     await bot.add_cog(ServerLogs(bot))

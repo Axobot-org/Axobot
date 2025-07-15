@@ -9,7 +9,7 @@ import time
 import traceback
 from collections import defaultdict
 from contextlib import redirect_stdout
-from typing import TYPE_CHECKING, Literal
+from typing import Any, Literal
 
 import discord
 from asyncache import cached
@@ -30,12 +30,14 @@ from modules.antiscam.model import update_unicode_maps
 from modules.antiscam.model.training_bayes import train_model
 from modules.rss.src.rss_general import feed_parse
 
-if TYPE_CHECKING:
-    from modules.antiscam.antiscam import AntiScam
-
-
 AvailableGitBranches = Literal["main", "develop"]
 
+
+def get_cog_file(cog: commands.Cog) -> str:
+    """Get the file path of a cog."""
+    if hasattr(cog, "file"):
+        return cog.file # type: ignore
+    return cog.qualified_name
 
 def cleanup_code(content: str):
     """Automatically removes code blocks from the code."""
@@ -58,16 +60,19 @@ class Admin(commands.Cog):
         else:
             self.update = {"fr": None, "en": None}
         self._last_result = None
-        self._upvote_emojis = ()
+        self._upvote_emojis: tuple[discord.Emoji, discord.Emoji] | None = None
 
     @property
-    def upvote_emojis(self):
+    def upvote_emojis(self) -> tuple[discord.Emoji, discord.Emoji]:
         "Emojis used for the idea channel"
         if not self._upvote_emojis:
-            self._upvote_emojis = (
-                self.bot.get_emoji(938416027274993674),
-                self.bot.get_emoji(938416007549186049)
-            )
+            emoji_ids = (938416027274993674, 938416007549186049)
+            emojis = tuple(self.bot.get_emoji(emoji_id) for emoji_id in emoji_ids)
+            if None in emojis:
+                raise ValueError("One of the upvote emojis is not found")
+            self._upvote_emojis = emojis # type: ignore
+        if not self._upvote_emojis:
+            raise ValueError("Could not initialize upvote emojis")
         return self._upvote_emojis
 
     async def check_if_admin(self, interaction: discord.Interaction):
@@ -131,20 +136,28 @@ class Admin(commands.Cog):
         "Update the FAQ channels from the private preparation channels"
         await interaction.response.send_message("Suppression des salons...")
         guild = self.bot.get_guild(SUPPORT_GUILD_ID.id)
+        if guild is None:
+            raise ValueError("Support guild not found")
         destination_fr = guild.get_channel(508028818154323980)
         destination_en = guild.get_channel(541599345972346881)
-        chan_fr = guild.get_channel(541228784456695818)
-        chan_en = guild.get_channel(541599226623426590)
+        if not isinstance(destination_fr, discord.TextChannel) or not isinstance(destination_en, discord.TextChannel):
+            raise ValueError("Destination channels not found")
+        origin_fr = guild.get_channel(541228784456695818)
+        origin_en = guild.get_channel(541599226623426590)
+        if not isinstance(origin_fr, discord.TextChannel) or not isinstance(origin_en, discord.TextChannel):
+            raise ValueError("Origin channels not found")
         role_fr = guild.get_role(541224634087899146)
         role_en = guild.get_role(537597687801839617)
+        if role_fr is None or role_en is None:
+            raise ValueError("FAQ roles not found")
         await destination_fr.set_permissions(role_fr, read_messages=False)
         await destination_en.set_permissions(role_en, read_messages=False)
         await destination_fr.purge()
         await destination_en.purge()
         await interaction.edit_original_response(content="Envoi des messages...")
-        async for message in chan_fr.history(limit=200, oldest_first=True):
+        async for message in origin_fr.history(limit=200, oldest_first=True):
             await destination_fr.send(message.content)
-        async for message in chan_en.history(limit=200, oldest_first=True):
+        async for message in origin_en.history(limit=200, oldest_first=True):
             await destination_en.send(message.content)
         await destination_fr.set_permissions(role_fr, read_messages=True)
         await destination_en.set_permissions(role_en, read_messages=True)
@@ -183,6 +196,7 @@ class Admin(commands.Cog):
         if None in self.update.values():
             await interaction.response.send_message("Les textes ne sont pas complets !")
             return
+        updates: dict[Literal['fr', 'en'], str] = self.update # type: ignore
         text = "Vos messages contiennent"
         confirm_view = ConfirmView(
             self.bot, interaction.channel,
@@ -190,14 +204,14 @@ class Admin(commands.Cog):
             ephemeral=False
         )
         await confirm_view.init()
-        if max(len(x) for x in self.update.values()) > 1900//len(self.update.keys()):
+        if max(len(x) for x in updates.values()) > 1900//len(updates.keys()):
             await interaction.response.defer()
-            for i, lang in enumerate(self.update.keys()):
-                text += f"\n{lang}:```\n{self.update.get(lang)}\n```"
-                await interaction.followup.send(text, view=confirm_view if i == len(self.update)-1 else discord.utils.MISSING)
+            for i, lang in enumerate(updates.keys()):
+                text += f"\n{lang}:```\n{updates.get(lang)}\n```"
+                await interaction.followup.send(text, view=confirm_view if i == len(updates)-1 else discord.utils.MISSING)
                 text = ''
         else:
-            text += "\n"+"\n".join([f"{lang}:\n```\n{value}\n```" for lang, value in self.update.items()])
+            text += "\n"+"\n".join([f"{lang}:\n```\n{value}\n```" for lang, value in updates.items()])
             await interaction.response.send_message(text, view=confirm_view)
 
         await confirm_view.wait()
@@ -208,18 +222,18 @@ class Admin(commands.Cog):
             return
         count = 0
         for guild in self.bot.guilds:
-            channel: discord.TextChannel | None = await self.bot.get_config(guild.id, "bot_news")
+            channel: discord.TextChannel | None = await self.bot.get_config(guild.id, "bot_news") # type: ignore
             if channel is None:
                 # no channel configured
                 continue
-            lang: str | None = await self.bot.get_config(guild.id, "language")
-            if lang not in self.update:
+            lang: str | None = await self.bot.get_config(guild.id, "language") # type: ignore
+            if lang not in updates:
                 lang = "fr" if lang == "fr2" else "en"
-            mentions_roles: list[discord.Role] = await self.bot.get_config(guild.id, "update_mentions") or []
-            mentions = " ".join(x.mention for x in mentions_roles if x is not None)
+            mentions_roles: list[discord.Role] = await self.bot.get_config(guild.id, "update_mentions") or []  # type: ignore
+            mentions = " ".join(x.mention for x in mentions_roles)
             allowed_mentions = discord.AllowedMentions(everyone=False, roles=True)
             try:
-                await channel.send(self.update[lang]+"\n\n"+mentions, allowed_mentions=allowed_mentions)
+                await channel.send(updates[lang] + "\n\n"+mentions, allowed_mentions=allowed_mentions)
             except discord.Forbidden:
                 pass
             except Exception as err:
@@ -228,9 +242,12 @@ class Admin(commands.Cog):
                 count += 1
             if guild.id == SUPPORT_GUILD_ID.id:
                 fr_chan = guild.get_channel(494870602146906113)
+                if not isinstance(fr_chan, discord.TextChannel):
+                    self.bot.dispatch("error", ValueError("French channel not found in support server"), interaction)
+                    continue
                 if fr_chan != channel:
                     # special treatment for the French channel in the bot support server
-                    await fr_chan.send(self.update["fr"] + "\n\n<@&1092557246921179257>", allowed_mentions=allowed_mentions)
+                    await fr_chan.send(updates["fr"] + "\n\n<@&1092557246921179257>", allowed_mentions=allowed_mentions)
                     count += 1
 
         await interaction.followup.send(f"Message envoyé dans {count} salons !")
@@ -285,7 +302,7 @@ class Admin(commands.Cog):
         """Recharge un module"""
         await interaction.response.defer()
         if cog == "all":
-            cogs = sorted([x.file for x in self.bot.cogs.values()])
+            cogs: list[str] = sorted([get_cog_file(x) for x in self.bot.cogs.values()])
         else:
             cogs = cog.split(" ")
         answer: list[str] = []
@@ -310,8 +327,6 @@ class Admin(commands.Cog):
             else:
                 self.bot.log.info("Extension %s reloaded", cog_id)
                 reloaded_cogs.append(cog_id)
-            if cog_id == "utilities":
-                await self.bot.get_cog("Utilities").on_ready()
         if len(reloaded_cogs) > 0:
             answer.append(f"These cogs has successfully reloaded: {', '.join(reloaded_cogs)}")
             if info_cog := self.bot.get_cog("BotInfo"):
@@ -326,7 +341,7 @@ class Admin(commands.Cog):
         else:
             fixed = None
         data: list[tuple[str, str]] = [
-            (cog.qualified_name, cog.file if hasattr(cog, "file") else cog.qualified_name)
+            (cog.qualified_name, get_cog_file(cog) if hasattr(cog, "file") else cog.qualified_name)
             for cog in self.bot.cogs.values()
         ]
         filtered = [
@@ -351,7 +366,7 @@ class Admin(commands.Cog):
         """Liste les cogs actuellement chargés"""
         text = ""
         for cog_name, cog in self.bot.cogs.items():
-            text += f"- {cog.file} ({cog_name}) \n"
+            text += f"- {get_cog_file(cog)} ({cog_name}) \n"
         await interaction.response.send_message(text)
 
     @admin_main.command(name="shutdown")
@@ -415,9 +430,12 @@ class Admin(commands.Cog):
             await interaction.response.send_message("Impossible de faire ceci, la base de donnée est inaccessible")
             return
         await interaction.response.defer()
+        if (serverconfig := self.bot.get_cog("ServerConfig")) is None:
+            await interaction.followup.send("Impossible de trouver le cog ServerConfig")
+            return
         i = 0
         for guild in self.bot.guilds:
-            if await self.bot.get_cog("ServerConfig").update_memberchannel(guild):
+            if await serverconfig.update_memberchannel(guild):
                 i += 1
         await interaction.followup.send(f"{i} salons mis à jours !")
 
@@ -429,10 +447,13 @@ class Admin(commands.Cog):
                 "Impossible d'afficher cette commande, la base de donnée est hors ligne :confused:"
             )
             return
+        if (serverconfig := self.bot.get_cog("ServerConfig")) is None:
+            await interaction.followup.send("Impossible de trouver le cog ServerConfig")
+            return
         if option is None:
-            await self.bot.get_cog("ServerConfig").send_all_config(guild, interaction)
+            await serverconfig.send_all_config(guild, interaction)
         else:
-            await self.bot.get_cog("ServerConfig").send_specific_config(guild, interaction, option)
+            await serverconfig.send_specific_config(guild, interaction, option)
 
 
     db_group = app_commands.Group(
@@ -473,7 +494,7 @@ class Admin(commands.Cog):
     async def get_databases_names(self) -> list[str]:
         "Get every database names visible for the bot"
         query = "SHOW DATABASES"
-        async with self.bot.db_main.read(query, astuple=True) as query_results:
+        async with self.bot.db_main.read(query) as query_results:
             print(query_results)
             return [row[0] for row in query_results]
 
@@ -495,7 +516,7 @@ class Admin(commands.Cog):
         if msg := await self.emergency():
             await interaction.followup.send(msg)
 
-    async def emergency(self, level=100):
+    async def emergency(self, level: int = 100):
         "Trigger the emergency procedure: leave every servers and send a DM to every owner"
         if self.bot.zombie_mode:
             return
@@ -503,10 +524,13 @@ class Admin(commands.Cog):
         for user_id in checks.admins_id:
             try:
                 user = self.bot.get_user(user_id)
-                if user.dm_channel is None:
-                    await user.create_dm()
+                if user is None:
+                    self.bot.dispatch("error", ValueError(f"User {user_id} not found"), "Emergency command")
+                    continue
+                if (dm_channel := user.dm_channel) is None:
+                    dm_channel = await user.create_dm()
                 emoji = self.bot.emojis_manager.customs["red_warning"]
-                msg = await user.dm_channel.send(
+                msg = await dm_channel.send(
                     f"{emoji} La procédure d'urgence vient d'être activée. Si vous souhaitez l'annuler, veuillez \
                         cliquer sur la réaction ci-dessous dans les {timeout} secondes qui suivent l'envoi de ce message."
                 )
@@ -525,14 +549,16 @@ class Admin(commands.Cog):
                 if guild.id == 500648624204808193:
                     continue
                 try:
-                    if guild.owner not in owners:
+                    if guild.owner is not None and guild.owner not in owners:
                         await guild.owner.send(await self.bot._(guild,"admin.emergency"))
                         owners.add(guild.owner)
                     await guild.leave()
                     guilds_count +=1
                 except discord.HTTPException:
                     continue
-            chan: discord.TextChannel = await self.bot.get_channel(500674177548812306)
+            chan = self.bot.get_channel(500674177548812306)
+            if not isinstance(chan, discord.TextChannel):
+                raise ValueError("Emergency channel not found") from None
             emoji = self.bot.emojis_manager.customs["red_alert"]
             await chan.send(
                 f"{emoji} Prodédure d'urgence déclenchée : {guilds_count} serveurs quittés - {len(owners)} propriétaires prévenus"
@@ -540,8 +566,8 @@ class Admin(commands.Cog):
             return f"{emoji}  {len(owners)} propriétaires de serveurs ont été prévenu ({guilds_count} serveurs)"
         for user_id in checks.admins_id:
             try:
-                user = self.bot.get_user(user_id)
-                await user.send("La procédure a été annulée !")
+                if user := self.bot.get_user(user_id):
+                    await user.send("La procédure a été annulée !")
             except Exception as err:
                 self.bot.dispatch("error", err, None)
         return "Qui a appuyé sur le bouton rouge ? :thinking:"
@@ -555,9 +581,8 @@ class Admin(commands.Cog):
         if utils is None:
             await interaction.response.send_message("Unable to find Utilities cog")
             return
-        config = await utils.get_bot_infos()
-        if config is None:
-            await interaction.response.send_message("The config dictionnary has not been initialized")
+        if self.bot.user is None:
+            await interaction.response.send_message("The bot user is not initialized")
             return
         await interaction.response.defer()
         if not (target := self.bot.get_guild(int_target_id)):
@@ -565,27 +590,27 @@ class Admin(commands.Cog):
         if target is None:
             await interaction.followup.send("Unable to find any guild or user with this ID")
             return
+        config = await utils.get_bot_infos()
         if isinstance(target, discord.Guild):
             servs: list[str] = config["banned_guilds"].split(';')
             if str(target) in servs:
                 servs.remove(str(target))
-                await utils.edit_bot_infos(self.bot.user.id,[("banned_guilds",';'.join(servs))])
+                await utils.edit_bot_infos(self.bot.user.id, [("banned_guilds",';'.join(servs))])
                 await interaction.followup.send(f"Le serveur {target.name} n'est plus blacklisté")
             else:
                 servs.append(str(target.id))
-                await utils.edit_bot_infos(self.bot.user.id,[("banned_guilds",';'.join(servs))])
+                await utils.edit_bot_infos(self.bot.user.id, [("banned_guilds",';'.join(servs))])
                 await interaction.followup.send(f"Le serveur {target.name} a bien été blacklist")
         else:
             usrs: list[str] = config["banned_users"].split(';')
             if str(target.id) in usrs:
                 usrs.remove(str(target.id))
-                await utils.edit_bot_infos(self.bot.user.id,[("banned_users",';'.join(usrs))])
+                await utils.edit_bot_infos(self.bot.user.id, [("banned_users",';'.join(usrs))])
                 await interaction.followup.send(f"L'utilisateur {target} n'est plus blacklisté")
             else:
                 usrs.append(str(target.id))
-                await utils.edit_bot_infos(self.bot.user.id,[("banned_users",';'.join(usrs))])
+                await utils.edit_bot_infos(self.bot.user.id, [("banned_users",';'.join(usrs))])
                 await interaction.followup.send(f"L'utilisateur {target} a bien été blacklist")
-        utils.config.clear()
 
 
     @admin_main.command(name="module")
@@ -607,7 +632,7 @@ Cette option affecte tous les serveurs"""
                 await send("Les flux RSS sont mainenant activée")
             else:
                 await send("Les flux RSS sont mainenant désactivée")
-        elif module == "alerts":
+        elif module == "stats":
             self.bot.stats_enabled = enable
             if enable:
                 await send("Le système de log de statistiques est mainenant activé")
@@ -632,8 +657,11 @@ Cette option affecte tous les serveurs"""
     @flag_group.command(name="list")
     async def admin_flag_list(self, interaction: discord.Interaction, user: discord.User):
         "Liste les flags d'un utilisateur"
+        if (usercog := self.bot.get_cog("Users")) is None:
+            await interaction.response.send_message("Unable to find Users cog")
+            return
         await interaction.response.defer()
-        userflags: list[str] = sorted(await self.bot.get_cog("Users").get_userflags(user))
+        userflags: list[str] = sorted(await usercog.get_userflags(user))
         if userflags:
             await interaction.followup.send(f"Liste des flags de {user} : {', '.join(userflags)}")
         else:
@@ -648,13 +676,16 @@ Cette option affecte tous les serveurs"""
         """Ajoute un flag à un utilisateur
 
         Flags valides : support, contributor, premium, partner, translator, cookie"""
+        if (usercog := self.bot.get_cog("Users")) is None:
+            await interaction.response.send_message("Unable to find Users cog")
+            return
         await interaction.response.defer()
-        userflags: list[str] = await self.bot.get_cog("Users").get_userflags(user)
+        userflags: list[str] = await usercog.get_userflags(user)
         if flag in userflags:
             await interaction.followup.send(f"L'utilisateur {user} a déjà ce flag !")
             return
         userflags.append(flag)
-        await self.bot.get_cog("Users").db_edit_user_flags(user.id, UserFlag().flags_to_int(userflags))
+        await usercog.db_edit_user_flags(user.id, UserFlag().flags_to_int(userflags))
         await interaction.followup.send(f"L'utilisateur {user} a maintenant les flags {', '.join(userflags)}")
 
     @flag_group.command(name="remove")
@@ -666,13 +697,16 @@ Cette option affecte tous les serveurs"""
         """Retire un flag à un utilisateur
 
         Flags valides : support, contributor, premium, partner, translator, cookie"""
+        if (usercog := self.bot.get_cog("Users")) is None:
+            await interaction.response.send_message("Unable to find Users cog")
+            return
         await interaction.response.defer()
-        userflags: list[str] = await self.bot.get_cog("Users").get_userflags(user)
+        userflags: list[str] = await usercog.get_userflags(user)
         if flag not in userflags:
             await interaction.followup.send(f"L'utilisateur {user} n'a déjà pas ce flag")
             return
         userflags.remove(flag)
-        await self.bot.get_cog("Users").db_edit_user_flags(user.id, UserFlag().flags_to_int(userflags))
+        await usercog.db_edit_user_flags(user.id, UserFlag().flags_to_int(userflags))
         if userflags:
             await interaction.followup.send(f"L'utilisateur {user} a maintenant les flags {', '.join(userflags)}")
         else:
@@ -688,8 +722,11 @@ Cette option affecte tous les serveurs"""
     @rankcard_group.command(name="list")
     async def admin_card_list(self, interaction: discord.Interaction, user: discord.User):
         "Liste les cartes d'xp d'un utilisateur"
+        if (usercog := self.bot.get_cog("Users")) is None:
+            await interaction.response.send_message("Unable to find Users cog")
+            return
         await interaction.response.defer()
-        rankcards: list[str] = sorted(await self.bot.get_cog("Users").get_rankcards(user))
+        rankcards: list[str] = sorted(await usercog.get_rankcards(user))
         if rankcards:
             await interaction.followup.send(f"Liste des cartes d'xp de {user} : {', '.join(rankcards)}")
         else:
@@ -702,13 +739,16 @@ Cette option affecte tous les serveurs"""
     ])
     async def admin_card_add(self, interaction: discord.Interaction, user: discord.User, rankcard: str):
         """Autorise une carte d'xp à un utilisateur"""
+        if (usercog := self.bot.get_cog("Users")) is None:
+            await interaction.response.send_message("Unable to find Users cog")
+            return
         await interaction.response.defer()
-        rankcards: list[str] = await self.bot.get_cog("Users").get_rankcards(user)
+        rankcards: list[str] = await usercog.get_rankcards(user)
         if rankcard in rankcards:
             await interaction.followup.send(f"L'utilisateur {user} a déjà cette carte d'xp !")
             return
         rankcards.append(rankcard)
-        await self.bot.get_cog("Users").set_rankcard(user, rankcard, add=True)
+        await usercog.set_rankcard(user, rankcard, add=True)
         await interaction.followup.send(f"L'utilisateur {user} a maintenant les cartes d'xp {', '.join(rankcards)}")
 
     @rankcard_group.command(name="remove")
@@ -718,13 +758,16 @@ Cette option affecte tous les serveurs"""
     ])
     async def admin_card_remove(self, interaction: discord.Interaction, user: discord.User, rankcard: str):
         """Retire une carte d'xp à un utilisateur"""
+        if (usercog := self.bot.get_cog("Users")) is None:
+            await interaction.response.send_message("Unable to find Users cog")
+            return
         await interaction.response.defer()
-        rankcards: list[str] = await self.bot.get_cog("Users").get_rankcards(user)
+        rankcards: list[str] = await usercog.get_rankcards(user)
         if rankcard not in rankcards:
             await interaction.followup.send(f"L'utilisateur {user} n'a déjà pas cette carte d'xp")
             return
         rankcards.remove(rankcard)
-        await self.bot.get_cog("Users").set_rankcard(user, rankcard, add=False)
+        await usercog.set_rankcard(user, rankcard, add=False)
         if rankcards:
             await interaction.followup.send(f"L'utilisateur {user} a maintenant les cartes d'xp {', '.join(rankcards)}")
         else:
@@ -773,7 +816,7 @@ Cette option affecte tous les serveurs"""
     async def _get_ideas_list(self, channel: discord.TextChannel):
         "Get ideas from the ideas channel"
         now = self.bot.utcnow()
-        liste: list[tuple[int, datetime.timedelta, str, int, int]] = []
+        ideas_list: list[tuple[int, datetime.timedelta, str, int, int]] = []
         async for msg in channel.history(limit=500):
             if len(msg.reactions) > 0:
                 upvotes = 0
@@ -786,11 +829,12 @@ Cette option affecte tous les serveurs"""
                         downvotes = len(users)
                 duration = now-msg.created_at
                 if len(msg.embeds) > 0:
-                    liste.append((upvotes-downvotes, duration, msg.embeds[0].fields[0].value, upvotes, downvotes))
+                    content = str(msg.embeds[0].fields[0].value)
+                    ideas_list.append((upvotes-downvotes, duration, content, upvotes, downvotes))
                 else:
-                    liste.append((upvotes-downvotes, duration, msg.content, upvotes, downvotes))
-        liste.sort(reverse=True)
-        return liste
+                    ideas_list.append((upvotes-downvotes, duration, msg.content, upvotes, downvotes))
+        ideas_list.sort(reverse=True)
+        return ideas_list
 
     @server_group.command(name="best_ideas")
     async def best_ideas(self, interaction: discord.Interaction, number: int=10):
@@ -801,7 +845,7 @@ Cette option affecte tous les serveurs"""
             await interaction.followup.send("Serveur introuvable")
             return
         channel = server.get_channel(488769306524385301 if not self.bot.beta else 929864644678549534)
-        if channel is None:
+        if not isinstance(channel, discord.TextChannel):
             await interaction.followup.send("Salon introuvable")
             return
         ideas_list = await self._get_ideas_list(channel)
@@ -816,7 +860,7 @@ Cette option affecte tous les serveurs"""
         for (_, _, content, upvotes, downvotes) in ideas_list:
             text += f"\n**[{upvotes} - {downvotes}]**  {content}"
         if len(text) > 2000:
-            await interaction.edit_original_response("Le message est trop long pour être envoyé !")
+            await interaction.edit_original_response(content="Le message est trop long pour être envoyé !")
         emb = discord.Embed(title=title, description=text, color=color, timestamp=self.bot.utcnow())
         await interaction.edit_original_response(content=None, embed=emb)
 
@@ -879,10 +923,10 @@ Cette option affecte tous les serveurs"""
                 txt.append(f"{notok_} Status code: {feed.status}")
             if not url.startswith("https://"):
                 txt.append(f"{notok_} Not https")
-            youtube_rss = self.bot.get_cog("Rss").youtube_rss
             if "link" not in feed.feed:
                 txt.append(notok_+" No 'link' var")
-            elif yt_account := await youtube_rss.get_channel_by_any_url(feed.feed["link"]):
+            elif (rss_cog := self.bot.get_cog("Rss")) \
+                and (yt_account := await rss_cog.youtube_rss.get_channel_by_any_url(feed.feed["link"])):
                 txt.append("<:youtube:447459436982960143>  " + yt_account)
             elif "link" in feed.feed.keys():
                 txt.append(f":newspaper:  <{feed.feed['link']}>")
@@ -946,7 +990,6 @@ Cette option affecte tous les serveurs"""
         if (antiscam := self.bot.get_cog("AntiScam")) is None:
             await interaction.response.send_message("AntiScam cog not found!")
             return
-        antiscam: "AntiScam"
         await interaction.response.send_message("Hold on, I'm on it...")
         counter = await antiscam.db_update_messages(antiscam.table)
         await interaction.edit_original_response(content=f"{counter} messages updated!")
@@ -960,13 +1003,15 @@ Cette option affecte tous les serveurs"""
         if (antiscam := self.bot.get_cog("AntiScam")) is None:
             await interaction.response.send_message("AntiScam cog not found!")
             return
-        antiscam: "AntiScam"
+        if antiscam.agent is None:
+            await interaction.response.send_message("AntiScam agent not initialized!")
+            return
         await interaction.response.send_message("Hold on, this may take a while...")
         start = time.time()
         data = await antiscam.get_messages_list()
         model = await train_model(data)
         acc = model.get_external_accuracy(data)
-        elapsed_time = await FormatUtils.time_delta(time.time() - start, lang="en")
+        elapsed_time = await FormatUtils.time_delta(int(time.time() - start), lang="en")
         txt = f"New model has been generated in {elapsed_time}!\nAccuracy of {acc:.3f}"
         current_acc = antiscam.agent.model.get_external_accuracy(data)
         if acc > current_acc:
@@ -986,7 +1031,9 @@ Cette option affecte tous les serveurs"""
         if (antiscam := self.bot.get_cog("AntiScam")) is None:
             await interaction.response.send_message("AntiScam cog not found!")
             return
-        antiscam: "AntiScam"
+        if antiscam.agent is None:
+            await interaction.response.send_message("AntiScam agent not initialized!")
+            return
         await interaction.response.defer()
         attr_counts: dict[str, int] = defaultdict(int)
         for tree in antiscam.agent.model.trees:
@@ -1044,7 +1091,7 @@ Cette option affecte tous les serveurs"""
     async def bug_add(self, interaction: discord.Interaction, french: str, english: str):
         """Ajoute un bug à la liste"""
         channel = self.bot.get_channel(929864644678549534) if self.bot.beta else self.bot.get_channel(488769283673948175)
-        if channel is None:
+        if not isinstance(channel, discord.TextChannel):
             await interaction.response.send_message("Salon introuvable")
             return
         emb = discord.Embed(title="New bug", timestamp=self.bot.utcnow(), color=13632027)
@@ -1057,12 +1104,12 @@ Cette option affecte tous les serveurs"""
     async def bug_fix(self, interaction: discord.Interaction, msg_id: str, mark_as_fixed: bool = True):
         """Marque un bug comme étant fixé"""
         chan = self.bot.get_channel(929864644678549534) if self.bot.beta else self.bot.get_channel(488769283673948175)
-        if chan is None:
+        if not isinstance(chan, discord.TextChannel):
             await interaction.response.send_message("Salon introuvable")
             return
         await interaction.response.defer()
         try: # try to fetch message from the bugs channel
-            msg = await chan.fetch_message(msg_id)
+            msg = await chan.fetch_message(int(msg_id))
         except discord.DiscordException as err:
             await interaction.followup.send(f"`Error:` {err}")
             return
@@ -1089,7 +1136,7 @@ Cette option affecte tous les serveurs"""
     async def idea_add(self, interaction: discord.Interaction, french: str, english: str):
         """Ajoute une idée à la liste"""
         channel = self.bot.get_channel(929864644678549534) if self.bot.beta else self.bot.get_channel(488769306524385301)
-        if channel is None:
+        if not isinstance(channel, discord.TextChannel):
             await interaction.response.send_message("Salon introuvable")
             return
         emb = discord.Embed(color=16106019, timestamp=self.bot.utcnow())
@@ -1104,12 +1151,12 @@ Cette option affecte tous les serveurs"""
     async def idea_valid(self, interaction: discord.Interaction, msg_id: str, implemented: bool=True):
         """Marque une idée comme étant ajoutée à la prochaine MàJ"""
         chan = self.bot.get_channel(929864644678549534) if self.bot.beta else self.bot.get_channel(488769306524385301)
-        if chan is None:
+        if not isinstance(chan, discord.TextChannel):
             await interaction.response.send_message("Salon introuvable")
             return
         await interaction.response.defer()
         try: # try to fetch message from ideas channel
-            msg = await chan.fetch_message(msg_id)
+            msg = await chan.fetch_message(int(msg_id))
         except discord.DiscordException as err:
             # something went wrong (invalid message ID, or any other Discord API error)
             await interaction.followup.send(f"`Error:` {err}")
@@ -1130,7 +1177,7 @@ Cette option affecte tous les serveurs"""
     async def _eval(self, ctx: MyContext, *, body: str):
         """Evaluates a code
         Credits: Rapptz (https://github.com/Rapptz/RoboDanny/blob/rewrite/cogs/admin.py)"""
-        env = {
+        env: dict[str, Any] = {
             "bot": self.bot,
             "ctx": ctx,
             "channel": ctx.channel,
@@ -1173,5 +1220,5 @@ Cette option affecte tous les serveurs"""
                 await ctx.send(f"```py\n{value}{ret}\n```")
 
 
-async def setup(bot):
+async def setup(bot: Axobot):
     await bot.add_cog(Admin(bot))

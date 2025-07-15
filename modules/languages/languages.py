@@ -47,11 +47,11 @@ class Languages(commands.Cog):
 
     @cached(TTLCache(1, ttl=86_400))
     async def get_available_languages(self) -> tuple[str]:
-        return (await self.bot.get_options_list())["language"]["values"]
+        return (await self.bot.get_options_list())["language"]["values"] # pyright: ignore[reportGeneralTypeIssues]
 
     @cached(TTLCache(1, ttl=86_400))
     async def get_default_language(self) -> str:
-        return (await self.bot.get_options_list())["language"]["default"]
+        return (await self.bot.get_options_list())["language"]["default"] # pyright: ignore[reportReturnType]
 
     async def tr(self, source: SourceType, string_id: str, **kwargs: Any):
         """Renvoie le texte en fonction de la langue"""
@@ -83,8 +83,10 @@ class Languages(commands.Cog):
 
         if isinstance(source, discord.Member | discord.User):
             # get lang from user
-            used_langs = await self.bot.get_cog("Utilities").get_user_languages(source, limit=1)
-            lang_opt = used_langs[0][0] if len(used_langs) > 0 else self.get_default_language()
+            used_langs = await self.bot.get_cog("Utilities").get_user_languages( # pyright: ignore[reportOptionalMemberAccess]
+                source, limit=1
+            )
+            lang_opt = used_langs[0][0] if len(used_langs) > 0 else await self.get_default_language()
         elif not self.bot.database_online or source is None:
             # get default lang
             lang_opt = await self.get_default_language()
@@ -94,13 +96,15 @@ class Languages(commands.Cog):
             if recipient is None:
                 lang_opt = await self.get_default_language()
             else:
-                used_langs = await self.bot.get_cog("Utilities").get_user_languages(recipient, limit=1)
-                lang_opt = used_langs[0][0] if len(used_langs) > 0 else self.get_default_language()
+                used_langs = await self.bot.get_cog("Utilities").get_user_languages( # pyright: ignore[reportOptionalMemberAccess]
+                    recipient, limit=1
+                )
+                lang_opt = used_langs[0][0] if len(used_langs) > 0 else await self.get_default_language()
         elif isinstance(source, int):
             # get lang from server ID
-            lang_opt: str = await self.bot.get_config(source, "language")
+            lang_opt: str | None = await self.bot.get_config(source, "language") # pyright: ignore[reportAssignmentType]
             if lang_opt is None:
-                lang_opt = self.get_default_language()
+                lang_opt = await self.get_default_language()
         else:
             raise TypeError(f"Unknown type for translation source: {type(source)}")
         if lang_opt not in await self.get_available_languages():
@@ -130,7 +134,7 @@ class Languages(commands.Cog):
         try:
             err = f"Message `{string_id}` not found in JSON files (language {lang})"
             if error_cog := self.bot.get_cog("Errors"):
-                await error_cog.senf_err_msg(err)
+                await error_cog.send_err_msg(err)
             self.bot.log.warning(err)
         except Exception: # pylint: disable=broad-except
             self.bot.log.error("Something went wrong while reporting a translation as missing", exc_info=True)

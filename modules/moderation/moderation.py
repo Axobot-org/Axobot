@@ -2,6 +2,7 @@ import datetime
 import importlib
 import random
 from math import ceil
+from typing import Literal, overload
 
 import discord
 from discord import app_commands
@@ -12,6 +13,8 @@ from core.bot_classes import Axobot
 from core.checks import checks
 from core.formatutils import FormatUtils
 from core.paginator import Paginator
+from core.text_cleanup import sync_check_any_link, sync_check_discord_invite
+from core.type_utils import UserOrMember, assert_interaction_channel_is_guild_messageable
 from core.views import ConfirmView
 from modules.cases.cases import Case
 
@@ -49,6 +52,8 @@ Slowmode works up to one message every 6h (21600s)
 ..Example slowmode 0
 
 ..Doc moderator.html#slowmode"""
+        if not assert_interaction_channel_is_guild_messageable(interaction):
+            return
         if not interaction.channel.permissions_for(interaction.guild.me).manage_channels:
             await interaction.response.send_message(await self.bot._(interaction, "moderation.slowmode.no-perm"), ephemeral=True)
             return
@@ -105,6 +110,8 @@ Slowmode works up to one message every 6h (21600s)
 ..Example clear 50 False False True
 
 ..Doc moderator.html#clear"""
+        if not assert_interaction_channel_is_guild_messageable(interaction):
+            return
         if not interaction.channel.permissions_for(interaction.guild.me).manage_messages:
             await interaction.response.send_message(await self.bot._(interaction, "moderation.need-manage-messages"))
             return
@@ -132,13 +139,13 @@ Slowmode works up to one message every 6h (21600s)
                 return False
             if contains_file is not None and bool(msg.attachments) != contains_file:
                 return False
-            url_match = self.bot.get_cog("Utilities").sync_check_any_link(msg.content)
+            url_match = sync_check_any_link(msg.content)
             if contains_url is not None and (url_match is not None) != contains_url:
                 return False
-            invite_match = self.bot.get_cog("Utilities").sync_check_discord_invite(msg.content)
+            invite_match = sync_check_discord_invite(msg.content)
             if contains_invite is not None and (invite_match is not None) != contains_invite:
                 return False
-            if users and msg.author is not None:
+            if user_ids:
                 return msg.author.id in user_ids
             return True
 
@@ -151,10 +158,12 @@ Slowmode works up to one message every 6h (21600s)
         def check(msg: discord.Message):
             if msg.pinned or (interaction.message and msg.id == interaction.message.id):
                 return False
-            if interaction is None or msg.interaction_metadata is None:
+            if msg.interaction_metadata is None:
                 return True
             return interaction.id != msg.interaction_metadata.id
 
+        if not assert_interaction_channel_is_guild_messageable(interaction):
+            return
         try:
             deleted = await interaction.channel.purge(limit=number, check=check)
             await interaction.followup.send(
@@ -175,6 +184,8 @@ Slowmode works up to one message every 6h (21600s)
 ..Example kick @someone Not nice enough to stay here
 
 ..Doc moderator.html#kick"""
+        if not assert_interaction_channel_is_guild_messageable(interaction):
+            return
         if not interaction.channel.permissions_for(interaction.guild.me).kick_members:
             await interaction.response.send_message(await self.bot._(interaction.guild.id, "moderation.kick.no-perm"))
             return
@@ -205,7 +216,7 @@ Slowmode works up to one message every 6h (21600s)
         await self.send_chat_answer("kick", user, interaction, case_id)
         # send in modlogs
         self.bot.dispatch("moderation_kick", interaction.guild, interaction.user, user, case_id, reason)
-        await self.bot.get_cog("Events").add_event("kick")
+        await self.bot.get_cog("Events").add_event("kick") # type: ignore
 
 
     @app_commands.command(name="warn")
@@ -219,6 +230,8 @@ Slowmode works up to one message every 6h (21600s)
 ..Example warn @someone Please just stop, next one is a mute duh
 
 ..Doc moderator.html#warn"""
+        if not assert_interaction_channel_is_guild_messageable(interaction):
+            return
         await interaction.response.defer(ephemeral=True)
         if user == interaction.guild.me or await target_is_higher(user, interaction.user):
             await interaction.followup.send(await self.bot._(interaction, "moderation.warn.cant-staff"))
@@ -245,7 +258,7 @@ Slowmode works up to one message every 6h (21600s)
 
     async def get_muted_role(self, guild: discord.Guild) -> discord.Role | None:
         "Find the muted role from the guild config option"
-        return await self.bot.get_config(guild.id, "muted_role")
+        return await self.bot.get_config(guild.id, "muted_role") # pyright: ignore[reportReturnType]
 
     async def mute_member(self, member: discord.Member, reason: str | None, duration: datetime.timedelta | None=None):
         """Call when someone should be muted in a guild"""
@@ -264,8 +277,10 @@ Slowmode works up to one message every 6h (21600s)
         async with self.bot.db_main.write(query, (member.id, member.guild.id)):
             pass
 
-    async def check_mute_context(self, interaction: discord.Interaction, role: discord.Role, member: discord.Member):
+    async def check_mute_context(self, interaction: discord.Interaction, role: discord.Role | None, member: discord.Member):
         "Return True if the user can be muted in the given context"
+        if not assert_interaction_channel_is_guild_messageable(interaction):
+            return
         if await self.is_muted(interaction.guild, member, role):
             await interaction.followup.send(await self.bot._(interaction, "moderation.mute.already-mute"))
             return False
@@ -308,6 +323,8 @@ You can also mute this member for a defined duration, then use the following for
 ..Example mute @someone Plz respect me
 
 ..Doc articles/mute"""
+        if not assert_interaction_channel_is_guild_messageable(interaction):
+            return
         if duration <= 0:
             await interaction.response.send_message(await self.bot._(interaction, "timers.rmd.too-short"), ephemeral=True)
             return
@@ -332,7 +349,7 @@ You can also mute this member for a defined duration, then use the following for
         if not await self.check_mute_context(interaction, role, user):
             return
         case_id = None
-        if duration is not None:
+        if duration:
             await self.bot.task_handler.add_task("mute", duration, user.id, interaction.guild.id)
         if self.bot.database_online and (cases_cog := self.bot.get_cog("Cases")):
             f_reason = reason or "Unspecified"
@@ -383,6 +400,14 @@ You can also mute this member for a defined duration, then use the following for
             result: int = query_results[0]["count"]
         return result > 0
 
+    @overload
+    async def db_get_muted_list(self, guild_id: int, reasons: Literal[True]) -> dict[int, str]:
+        ...
+
+    @overload
+    async def db_get_muted_list(self, guild_id: int, reasons: Literal[False]) -> list[int]:
+        ...
+
     async def db_get_muted_list(self, guild_id: int, reasons: bool = False) -> dict[int, str] | list[int]:
         """List muted users for a specific guild
         Set 'reasons' to True if you want the attached reason"""
@@ -412,6 +437,8 @@ This will remove the role 'muted' for the targeted member
 ..Example unmute @someone
 
 ..Doc articles/mute"""
+        if not assert_interaction_channel_is_guild_messageable(interaction):
+            return
         role = await self.get_muted_role(interaction.guild)
         # if role not in user.roles:
         if not await self.is_muted(interaction.guild, user, role):
@@ -458,6 +485,8 @@ This will remove the role 'muted' for the targeted member
 
         ..Doc moderator.html#mute-unmute
         """
+        if not assert_interaction_channel_is_guild_messageable(interaction):
+            return
         await interaction.response.defer()
         confirm_view = ConfirmView(
             self.bot, interaction,
@@ -469,7 +498,7 @@ This will remove the role 'muted' for the targeted member
         confirm_txt += "\n\n"
         confirm_txt += await self.bot._(interaction, "moderation.mute-config.tip",
                                         mute=await self.bot.get_command_mention("mute"))
-        confirm_msg = await interaction.followup.send(confirm_txt, view=confirm_view)
+        confirm_msg = await interaction.followup.send(confirm_txt, view=confirm_view, wait=True)
 
         await confirm_view.wait()
         await confirm_view.disable(confirm_msg)
@@ -512,6 +541,8 @@ The 'days_to_delete' option represents the number of days worth of messages to d
 
 ..Doc moderator.html#ban-unban
         """
+        if not assert_interaction_channel_is_guild_messageable(interaction):
+            return
         if duration is not None:
             if duration <= 0:
                 await interaction.response.send_message(await self.bot._(interaction, "timers.rmd.too-short"), ephemeral=True)
@@ -540,7 +571,7 @@ The 'days_to_delete' option represents the number of days worth of messages to d
         except discord.errors.Forbidden:
             await interaction.followup.send(await self.bot._(interaction, "moderation.ban.too-high"))
             return
-        await self.bot.get_cog("Events").add_event("ban")
+        await self.bot.get_cog("Events").add_event("ban") # type: ignore
         if duration is not None:
             await self.bot.task_handler.add_task("ban", duration, user.id, interaction.guild_id)
         case_id = None
@@ -566,6 +597,8 @@ The 'days_to_delete' option represents the number of days worth of messages to d
 ..Example unban 1048011651145797673 Nice enough
 
 ..Doc moderator.html#ban-unban"""
+        if not assert_interaction_channel_is_guild_messageable(interaction):
+            return
         await interaction.response.defer(ephemeral=True)
         if not interaction.guild.me.guild_permissions.ban_members:
             await interaction.followup.send(await self.bot._(interaction, "moderation.ban.cant-ban"))
@@ -578,8 +611,7 @@ The 'days_to_delete' option represents the number of days worth of messages to d
         f_reason = reason or "Unspecified"
         await interaction.guild.unban(user, reason=f_reason[:512] + self.bot.zws)
         case_id = None
-        if self.bot.database_online:
-            cases_cog = self.bot.get_cog("Cases")
+        if self.bot.database_online and (cases_cog := self.bot.get_cog("Cases")):
             case = Case(bot=self.bot, guild_id=interaction.guild_id, user_id=user.id, case_type="unban",
                         mod_id=interaction.user.id, reason=f_reason, date=self.bot.utcnow())
             await cases_cog.db_add_case(case)
@@ -602,6 +634,8 @@ Permissions for using this command are the same as for the kick
 ..Example softban @someone No spam pls
 
 ..Doc moderator.html#softban"""
+        if not assert_interaction_channel_is_guild_messageable(interaction):
+            return
         if not interaction.guild.me.guild_permissions.ban_members:
             await interaction.response.send_message(await self.bot._(interaction, "moderation.ban.cant-ban"), ephemeral=True)
             return
@@ -639,16 +673,18 @@ Permissions for using this command are the same as for the kick
         self.bot.dispatch("moderation_softban", interaction.guild, interaction.user, user, case_id, reason)
         await interaction.followup.send(await self.bot._(interaction, "moderation.ban.softban-success"))
 
-    async def dm_user(self, user: discord.User, action: str, interaction: discord.Interaction,
-                      reason: str = None, duration: str = None):
+    async def dm_user(self, user: UserOrMember, action: str, interaction: discord.Interaction,
+                      reason: str | None = None, duration: str | None = None):
         "DM a user about a moderation action taken against them"
-        if user.id in self.bot.get_cog("Welcomer").no_message:
+        if interaction.guild is None:
+            raise RuntimeError("This method is supposed to be used in a guild context")
+        if user.id in self.bot.get_cog("Welcomer").no_message: # type: ignore
             return
         if action in ("warn", "mute", "kick", "ban"):
             message = await self.bot._(user, "moderation."+action+"-dm", guild=interaction.guild.name)
         else:
             return
-        color: int = None
+        color: int | None = None
         if help_cog := self.bot.get_cog("Help"):
             color = help_cog.help_color
         emb = discord.Embed(description=message, colour=color)
@@ -675,8 +711,10 @@ Permissions for using this command are the same as for the kick
         except Exception as err:
             self.bot.dispatch("error", err, interaction)
 
-    async def send_chat_answer(self, action: str, user: discord.User, interaction: discord.Interaction, case: int = None):
+    async def send_chat_answer(self, action: str, user: UserOrMember, interaction: discord.Interaction, case: int | None = None):
         "Send a message in the chat about a moderation action taken"
+        if not assert_interaction_channel_is_guild_messageable(interaction):
+            return
         if action not in ("warn", "mute", "unmute", "kick", "ban", "unban"):
             raise ValueError("Invalid action: "+action)
         if not interaction.channel.permissions_for(interaction.guild.me).embed_links:
@@ -704,9 +742,12 @@ The 'show_reasons' parameter is used to display the ban reasons.
 You must be an administrator of this server to use this command.
 
 ..Doc moderator.html#banlist-mutelist"""
+        if not assert_interaction_channel_is_guild_messageable(interaction):
+            return
         if not interaction.guild.me.guild_permissions.ban_members:
             await interaction.response.send_message(await self.bot._(interaction, "moderation.ban.cant-ban"), ephemeral=True)
             return
+        guild = interaction.guild
 
         class BansPaginator(Paginator):
             "Paginator used to display banned users"
@@ -726,20 +767,20 @@ You must be an administrator of this server to use this command.
                 if last_user := (None if len(self.saved_bans) == 0 else self.saved_bans[-1].user):
                     self.saved_bans += [
                         entry
-                        async for entry in interaction.guild.bans(limit=1000, after=last_user)
+                        async for entry in guild.bans(limit=1000, after=last_user)
                         if entry.user.id not in self.users
                     ]
                 else:
                     self.saved_bans += [
                         entry
-                        async for entry in interaction.guild.bans(limit=1000)
+                        async for entry in guild.bans(limit=1000)
                         if entry.user.id not in self.users
                     ]
                 self.users = {entry.user.id for entry in self.saved_bans}
 
                 _title = await self.client._(interaction, "moderation.ban.list-title-0")
                 emb = discord.Embed(
-                    title=_title.format(interaction.guild.name),
+                    title=_title.format(guild.name),
                     color=7506394
                 )
                 if len(self.saved_bans) == 0:
@@ -775,6 +816,8 @@ You must be an administrator of this server to use this command.
 The 'show_reasons' parameter is used to display the mute reasons.
 
 ..Doc moderator.html#banlist-mutelist"""
+        if not assert_interaction_channel_is_guild_messageable(interaction):
+            return
         await interaction.response.defer(ephemeral=True)
         try:
             muted_list = await self.db_get_muted_list(interaction.guild_id, reasons=show_reasons)
@@ -782,6 +825,7 @@ The 'show_reasons' parameter is used to display the mute reasons.
             await interaction.followup.send(await self.bot._(interaction, "moderation.error"))
             self.bot.dispatch("error", err, interaction)
             return
+        guild = interaction.guild
 
         class MutesPaginator(Paginator):
             "Paginator used to display muted users"
@@ -806,10 +850,14 @@ The 'show_reasons' parameter is used to display the mute reasons.
 
             async def get_page_content(self, interaction, page):
                 "Create one page"
-                title = await self.client._(interaction, "moderation.mute.list-title-0", guild=interaction.guild.name)
+                title = await self.client._(interaction, "moderation.mute.list-title-0", guild=guild.name)
+                if serverconfig_cog := self.client.get_cog("ServerConfig"):
+                    emb_color = serverconfig_cog.embed_color
+                else:
+                    emb_color = None
                 emb = discord.Embed(
                     title=title,
-                    color=self.client.get_cog("ServerConfig").embed_color
+                    color=emb_color
                 )
                 if len(muted_list) == 0:
                     emb.description = await self.client._(interaction, "moderation.mute.no-mutes")
@@ -818,7 +866,7 @@ The 'show_reasons' parameter is used to display the mute reasons.
                     for i in range(page_start, page_end, 10):
                         column_start, column_end = i+1, min(i+10, len(muted_list))
                         values: list[str] = []
-                        if show_reasons:
+                        if isinstance(muted_list, dict):
                             for user_id, reason in list(muted_list.items())[i:i+10]:
                                 user = await self._resolve_user(user_id)
                                 values.append(f"{user}  *({reason})*")
@@ -852,6 +900,8 @@ The 'show_reasons' parameter is used to display the mute reasons.
         ..Example unhoist 0AZ^_
 
         ..Doc moderator.html#unhoist-members"""
+        if not assert_interaction_channel_is_guild_messageable(interaction):
+            return
         count = 0
         if not interaction.guild.me.guild_permissions.manage_nicknames:
             await interaction.response.send_message(
@@ -903,16 +953,17 @@ The 'show_reasons' parameter is used to display the mute reasons.
         ..Example destop https://discordapp.com/channels/356067272730607628/488769306524385301/740249890201796688
 
         ..Doc moderator.html#clear"""
-        if start_message.guild != interaction.guild:
+        if not assert_interaction_channel_is_guild_messageable(interaction):
+            return
+        if start_message.guild != interaction.guild or start_message.guild is None:
             await interaction.response.send_message(
                 await self.bot._(interaction, "moderation.destop.no-guild"), ephemeral=True
             )
             return
         await interaction.response.defer(ephemeral=True)
-        if isinstance(start_message.channel, discord.PartialMessageable):
-            start_message.channel = await start_message.guild.fetch_channel(start_message.channel.id)
-            if start_message.channel is None:
-                return
+        channel = start_message.channel
+        if isinstance(channel, discord.PartialMessageable):
+            channel = await start_message.guild.fetch_channel(channel.id)
         bot_perms = start_message.channel.permissions_for(interaction.guild.me)
         if not bot_perms.manage_messages:
             await interaction.followup.send(await self.bot._(interaction, "moderation.need-manage-messages"))
@@ -924,7 +975,9 @@ The 'show_reasons' parameter is used to display the mute reasons.
             await interaction.followup.send(await self.bot._(interaction, "moderation.destop.too-old", days=21))
             return
         min_date = start_message.created_at - datetime.timedelta(seconds=1)
-        messages = await start_message.channel.purge(after=min_date, limit=CLEAR_MAX_MESSAGES, oldest_first=False)
+        messages = await channel.purge( # pyright: ignore[reportAttributeAccessIssue]
+            after=min_date, limit=CLEAR_MAX_MESSAGES, oldest_first=False
+        )
         await interaction.followup.send(await self.bot._(interaction, "moderation.clear.done", count=len(messages)))
         self.bot.dispatch("moderation_clear", interaction.channel, interaction.user, len(messages))
 
@@ -937,34 +990,33 @@ The 'show_reasons' parameter is used to display the mute reasons.
         if role is None:
             role = await guild.create_role(name="muted")
         errors_count = 0
+        if (serverconfig_cog := self.bot.get_cog("ServerConfig")) is None:
+            raise RuntimeError("ServerConfig cog not found, cannot get muted role color")
         try:
-            for x in guild.by_category():
-                category, channelslist = x[0], x[1]
+            for (category, channelslist) in guild.by_category():
                 for channel in channelslist:
-                    if channel is None:
+                    if len(channel.changed_roles) == 0 or channel.permissions_synced:
                         continue
-                    if len(channel.changed_roles) != 0 and not channel.permissions_synced:
-                        try:
-                            await channel.set_permissions(role, send_messages=False)
-                            for r in channel.changed_roles:
-                                if r.managed and len(r.members) == 1 and r.members[0].bot:
-                                    # if it's an integrated bot role
-                                    continue
-                                obj = channel.overwrites_for(r)
-                                if obj.send_messages:
-                                    obj.send_messages = None
-                                    await channel.set_permissions(r, overwrite=obj)
-                        except discord.errors.Forbidden:
-                            errors_count += 1
+                    try:
+                        await channel.set_permissions(role, send_messages=False)
+                        for r in channel.changed_roles:
+                            if r.managed and len(r.members) == 1 and r.members[0].bot:
+                                # if it's an integrated bot role
+                                continue
+                            obj = channel.overwrites_for(r)
+                            if obj.send_messages:
+                                obj.send_messages = None
+                                await channel.set_permissions(r, overwrite=obj)
+                    except discord.errors.Forbidden:
+                        errors_count += 1
                 if category is not None and category.permissions_for(guild.me).manage_roles:
                     await category.set_permissions(role, send_messages=False)
         except Exception as err:
             self.bot.dispatch("error", err)
             errors_count = len(guild.channels)
-        await self.bot.get_cog("ServerConfig").set_option(guild.id, "muted_role", role)
+        await serverconfig_cog.set_option(guild.id, "muted_role", role)
         return role, errors_count
 
 
-
-async def setup(bot):
+async def setup(bot: Axobot):
     await bot.add_cog(Moderation(bot))

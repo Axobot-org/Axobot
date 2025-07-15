@@ -3,12 +3,13 @@
 
 
 import json
-from typing import Any
 from urllib.parse import urlparse
 
 import requests
 from asyncache import cached
 from cachetools import TTLCache
+
+from core.type_utils import AnyStrDict
 
 BITLY_API_VERSION = "v4"
 BITLY_SERVICE_URL = f"https://api-ssl.bitly.com/{BITLY_API_VERSION}/"
@@ -24,7 +25,7 @@ class BaseShortener():
         self.api_key = api_key
         self.headers = {"Authorization": f"Bearer {api_key}"}
 
-    def _do_http_request(self, request_url: str, data: dict=None, headers: dict=None):
+    def _do_http_request(self, request_url: str, data: AnyStrDict | None = None, headers: AnyStrDict | None = None):
         if headers:
             headers = self.headers | headers
         else:
@@ -40,7 +41,7 @@ class BaseShortener():
         except requests.exceptions.HTTPError as err:
             raise ShortenerServiceError(err) from err
 
-    def request(self, action: str, data: dict) -> tuple[int, dict[str, Any]]:
+    def request(self, action: str, data: AnyStrDict) -> tuple[int, AnyStrDict]:
         "Make a request to the API"
         status, response = self._do_http_request(BITLY_SERVICE_URL+action, data)
         return status, json.loads(response)
@@ -55,13 +56,12 @@ class Bitly(BaseShortener):
     def __init__(self, api_key: str):
         BaseShortener.__init__(self, api_key)
 
-    # pylint: disable=no-self-use
-    def _get_error_from_response(self, response: dict[str, Any]) -> str | None:
+    def _get_error_from_response(self, response: AnyStrDict) -> str | None:
         """The exact nature of the error is obtained from the 'message' json attribute"""
         return response.get("message")
 
     @cached(TTLCache(10_000, ttl=86400))
-    def shorten_url(self, long_url: str, domain: str="bit.ly"):  # pylint: disable=arguments-differ
+    def shorten_url(self, long_url: str, domain: str="bit.ly") -> str:
         "Shorten a given URL to a bit.ly url"
         params = {
             "long_url": long_url,
@@ -74,16 +74,18 @@ class Bitly(BaseShortener):
             msg = self._get_error_from_response(response)
             raise BitlyError(f"Error occurred while shortening url {long_url}: {msg}")
 
-        short_url: str = response.get("link")
+        short_url: str | None = response.get("link")
         if not short_url:
             raise BitlyError(f"Error occurred while shortening url {long_url}")
         return short_url
 
     @cached(TTLCache(10_000, ttl=86400))
-    def expand_url(self, short_url: str):
+    def expand_url(self, short_url: str) -> str:
         "Extract a full URL from a given shortened url"
         # Extract info from short_url
         parsed_url = urlparse(short_url)
+        if parsed_url.hostname is None:
+            raise BitlyError(f"Invalid URL: {short_url}")
         params = {
             "bitlink_id": parsed_url.hostname + parsed_url.path
         }

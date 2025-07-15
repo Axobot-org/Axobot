@@ -1,6 +1,6 @@
 import importlib
 import locale
-from typing import Literal, get_args
+from typing import Literal, Sequence, get_args
 
 import aiohttp
 import discord
@@ -9,9 +9,9 @@ from discord.ext import commands
 
 from core.arguments import args
 from core.bot_classes import PRIVATE_GUILD_ID, Axobot
+from core.bot_classes.my_context import MyContext
 from core.checks import checks
 from core.formatutils import FormatUtils
-from modules.rss.src.rss_general import FeedObject
 
 default_color = discord.Color(0x50e3c2)
 
@@ -31,8 +31,8 @@ QueryTypesTyping = Literal[
     "invite",
     "id",
 ]
-QUERY_TYPES: tuple[str] = get_args(QueryTypesTyping)
-DM_QUERY_TYPES: tuple[str] = ["emoji", "user", "invite", "id"]
+QUERY_TYPES: tuple[QueryTypesTyping] = get_args(QueryTypesTyping)
+DM_QUERY_TYPES: list[QueryTypesTyping] = ["emoji", "user", "invite", "id"]
 
 
 class Info(commands.Cog):
@@ -42,7 +42,10 @@ class Info(commands.Cog):
         self.bot = bot
         self.file = "info"
 
-    async def display_critical(self, interaction: discord.Interaction):
+    async def display_critical(self, interaction: discord.Interaction) -> bool:
+        "Returns whether the user can see critical information (ie. has 'Manage guild' perm)"
+        if not isinstance(interaction.user, discord.Member):
+            raise TypeError("This function is not meant to be used outside of guilds")
         return interaction.user.guild_permissions.manage_guild
 
     @app_commands.command(name="info")
@@ -50,7 +53,7 @@ class Info(commands.Cog):
         query="A name, mention or ID",
         query_type="The type of the item to look for"
     )
-    async def info_main(self, interaction: discord.Interaction, *, query: app_commands.Range[str, 1, 100], \
+    async def info_main(self, interaction: discord.Interaction[Axobot], *, query: app_commands.Range[str, 1, 100], \
                         query_type: QueryTypesTyping | None = None):
         """Find informations about someone/something
 
@@ -70,7 +73,7 @@ class Info(commands.Cog):
                 return
             query_type, resolved_query = guess_result
         else:
-            ctx = await commands.Context.from_interaction(interaction)
+            ctx = await MyContext.from_interaction(interaction)
             try:
                 resolved_query = await self._convert_query(query, query_type, ctx)
             except (commands.BadArgument, ValueError):
@@ -104,11 +107,11 @@ class Info(commands.Cog):
         else:
             await interaction.followup.send(await self.bot._(interaction, "info.not-found", N=query))
 
-    async def _guess_query_type(self, query: str, interaction: discord.Interaction):
+    async def _guess_query_type(self, query: str, interaction: discord.Interaction[Axobot]):
         "Guess the query type from the given query"
         if query == "server" and interaction.guild:
             return "server", interaction.guild
-        ctx = await commands.Context.from_interaction(interaction)
+        ctx = await MyContext.from_interaction(interaction)
         is_bot_admin = await checks.is_bot_admin(interaction)
         for query_type in (QUERY_TYPES if interaction.guild else DM_QUERY_TYPES):
             if is_bot_admin and query_type == "id":
@@ -128,7 +131,7 @@ class Info(commands.Cog):
                 except commands.BadArgument:
                     pass
 
-    async def _convert_query(self, query: str, query_type: QueryTypesTyping, ctx: commands.Context):
+    async def _convert_query(self, query: str, query_type: QueryTypesTyping, ctx: MyContext):
         "Try to convert the query to the given type"
         if query_type == "member":
             return await commands.MemberConverter().convert(ctx, query)
@@ -159,6 +162,8 @@ class Info(commands.Cog):
 
     async def member_info(self, interaction: discord.Interaction, member: discord.Member):
         "Get info about a server member"
+        if interaction.guild is None:
+            raise TypeError("This function is not meant to be used outside of guilds")
         lang = await self.bot._(interaction, "_used_locale")
         critical_info = await self.display_critical(interaction)
         since = await self.bot._(interaction, "misc.since")
@@ -200,7 +205,7 @@ class Info(commands.Cog):
             )
             embed.add_field(name=await self.bot._(interaction, "info.info.member-2"),
                             value=f"{join_date} ({since} {since_date})", inline=False)
-        if member.guild.member_count < 1e4:
+        if member.guild.member_count is not None and member.guild.member_count < 1e4:
             # Join position
             if len([x for x in interaction.guild.members if not x.joined_at]) > 0 and interaction.guild.large:
                 await interaction.guild.chunk()
@@ -253,22 +258,22 @@ class Info(commands.Cog):
             botb = await self.bot._(interaction, "misc.no")
         embed.add_field(name="Bot", value=botb.capitalize())
         # Administrator
-        if interaction.channel.permissions_for(member).administrator:
+        if member.guild_permissions.administrator:
             admin = await self.bot._(interaction, "misc.yes")
         else:
             admin = await self.bot._(interaction, "misc.no")
         embed.add_field(name=await self.bot._(interaction, "info.info.member-6"), value=admin.capitalize(), inline=True)
         # Infractions count
-        if critical_info and not member.bot and self.bot.database_online:
+        if critical_info and not member.bot and self.bot.database_online and (cases_cog := self.bot.get_cog("Cases")):
             embed.add_field(
                 name=await self.bot._(interaction, "info.info.member-7"),
-                value=await self.bot.get_cog("Cases").db_get_user_cases_count_from_guild(member.id, interaction.guild.id),
+                value=await cases_cog.db_get_user_cases_count_from_guild(member.id, interaction.guild.id),
                 inline=True)
         # Guilds count
-        if member.bot:
+        if member.bot and (partners_cog := self.bot.get_cog("Partners")):
             async with aiohttp.ClientSession(loop=self.bot.loop) as session:
-                guilds_count = await self.bot.get_cog("Partners").get_bot_guilds(member.id, session)
-                bot_owners = await self.bot.get_cog("Partners").get_bot_owners(member.id, session)
+                guilds_count = await partners_cog.get_bot_guilds(member.id, session)
+                bot_owners = await partners_cog.get_bot_owners(member.id, session)
             if guilds_count is not None:
                 guilds_count = await FormatUtils.format_nbr(guilds_count, lang)
                 embed.add_field(name=str(await self.bot._(interaction,"misc.servers")).capitalize(), value=guilds_count)
@@ -292,6 +297,8 @@ class Info(commands.Cog):
 
     async def role_info(self, interaction: discord.Interaction, role: discord.Role):
         "Get info about a server role"
+        if interaction.guild is None:
+            raise TypeError("This function is not meant to be used outside of guilds")
         lang = await self.bot._(interaction, "_used_locale")
         embed = discord.Embed(colour=role.color)
         icon_url = role.guild.icon.with_static_format("png") if role.guild.icon else None
@@ -393,10 +400,10 @@ class Info(commands.Cog):
         # is in server
         if on_server:
             embed.add_field(name=await self.bot._(interaction, "info.info.user-0"), value=on_server.capitalize())
-        if user.bot:
+        if user.bot and (partners_cog := self.bot.get_cog("Partners")):
             async with aiohttp.ClientSession(loop=self.bot.loop) as session:
-                guilds_count = await self.bot.get_cog("Partners").get_bot_guilds(user.id, session)
-                bot_owners = await self.bot.get_cog("Partners").get_bot_owners(user.id, session)
+                guilds_count = await partners_cog.get_bot_guilds(user.id, session)
+                bot_owners = await partners_cog.get_bot_owners(user.id, session)
             if guilds_count is not None:
                 guilds_count = await FormatUtils.format_nbr(guilds_count, lang)
                 embed.add_field(
@@ -412,6 +419,8 @@ class Info(commands.Cog):
 
     async def emoji_info(self, interaction: discord.Interaction, emoji: discord.Emoji | discord.PartialEmoji):
         "Get info about any Discord emoji"
+        if interaction.guild is None:
+            raise TypeError("This function is not meant to be used outside of guilds")
         lang = await self.bot._(interaction, "_used_locale")
         since = await self.bot._(interaction, "misc.since")
         is_partial = isinstance(emoji, discord.PartialEmoji)
@@ -429,7 +438,7 @@ class Info(commands.Cog):
             animate = await self.bot._(interaction, "misc.no")
         embed.add_field(name=await self.bot._(interaction, "info.info.emoji-0"), value=animate.capitalize())
         # guild name
-        if not is_partial and emoji.guild != interaction.guild:
+        if not is_partial and emoji.guild is not None and emoji.guild != interaction.guild:
             embed.add_field(name=await self.bot._(interaction, "info.info.emoji-3"), value=emoji.guild.name)
         # string
         string = f"<a:{emoji.name}:{emoji.id}>" if emoji.animated else f"<:{emoji.name}:{emoji.id}>"
@@ -460,18 +469,21 @@ class Info(commands.Cog):
                 value=" ".join([x.mention for x in emoji.roles])
             )
         # uses
-        infos_uses = await self.bot.get_cog("BotStats").db_get_emojis_info(emoji.id)
-        if len(infos_uses) > 0:
-            infos_uses = infos_uses[0]
-            date = f"<t:{infos_uses['added_at'].timestamp():.0f}:D>"
-            embed.add_field(
-                name=await self.bot._(interaction, "info.info.emoji-5"),
-                value=await self.bot._(interaction, "info.info.emoji-5v", nbr=infos_uses["count"], date=date)
-            )
+        if emoji.id and (bot_stats_cog := self.bot.get_cog("BotStats")):
+            infos_uses = await bot_stats_cog.db_get_emojis_info(emoji.id)
+            if len(infos_uses) > 0:
+                infos_uses = infos_uses[0]
+                date = f"<t:{infos_uses['added_at'].timestamp():.0f}:D>"
+                embed.add_field(
+                    name=await self.bot._(interaction, "info.info.emoji-5"),
+                    value=await self.bot._(interaction, "info.info.emoji-5v", nbr=infos_uses["count"], date=date)
+                )
         await interaction.followup.send(embed=embed)
 
     async def textchannel_info(self, interaction: discord.Interaction, channel: discord.TextChannel):
         "Get informations about a text channel"
+        if interaction.guild is None or not isinstance(interaction.user, discord.Member):
+            raise TypeError("This function is not meant to be used outside of guilds")
         if not channel.permissions_for(interaction.user).view_channel:
             await interaction.followup.send(await self.bot._(interaction, "info.cant-see-channel"))
             return
@@ -526,6 +538,8 @@ class Info(commands.Cog):
 
     async def voicechannel_info(self, interaction: discord.Interaction, channel: discord.VoiceChannel):
         "Get informations about a voice channel"
+        if interaction.guild is None or not isinstance(interaction.user, discord.Member):
+            raise TypeError("This function is not meant to be used outside of guilds")
         if not channel.permissions_for(interaction.user).view_channel:
             await interaction.followup.send(await self.bot._(interaction, "info.cant-see-channel"))
             return
@@ -565,12 +579,14 @@ class Info(commands.Cog):
 
     async def guild_info(self, interaction: discord.Interaction, guild: discord.Guild):
         "Get informations about the server"
+        if interaction.guild is None or not isinstance(interaction.user, discord.Member):
+            raise TypeError("This function is not meant to be used outside of guilds")
         lang = await self.bot._(interaction, "_used_locale")
         critical_info = await self.display_critical(interaction)
         since = await self.bot._(interaction, "misc.since")
         _, bots, online, _ = await self.get_members_repartition(guild.members)
 
-        desc = await self.bot.get_config(guild.id, "description")
+        desc: str | None = await self.bot.get_config(guild.id, "description") # pyright: ignore[reportAssignmentType]
         if (desc is None or len(desc) == 0) and guild.description is not None:
             desc = guild.description
         embed = discord.Embed(colour=default_color, description=desc)
@@ -636,7 +652,7 @@ class Info(commands.Cog):
         except Exception as err:
             self.bot.dispatch("error", err, interaction)
         # Premium subscriptions count
-        if isinstance(guild.premium_subscription_count, int) and guild.premium_subscription_count > 0:
+        if guild.premium_subscription_count > 0:
             subs_count = await self.bot._(interaction, "info.info.guild-13v",
                                           b=guild.premium_subscription_count, p=guild.premium_tier)
             embed.add_field(name=await self.bot._(interaction, "info.info.guild-13"), value=subs_count)
@@ -648,7 +664,7 @@ class Info(commands.Cog):
                 roles = [x.name for x in guild.roles if len(x.members) > 1][1:]
         except Exception as err:
             self.bot.dispatch("error", err, interaction)
-            roles = guild.roles
+            roles = list(map(str, guild.roles))
         roles.reverse()
         if len(roles) == 0:
             temp = (await self.bot._(interaction, "misc.none")).capitalize()
@@ -697,10 +713,14 @@ class Info(commands.Cog):
         lang = await self.bot._(interaction, "_used_locale")
         since = await self.bot._(interaction, "misc.since")
         embed = discord.Embed(colour=default_color)
-        icon_url = invite.guild.icon.with_static_format("png") if invite.guild.icon else None
+        icon_url = (
+            invite.guild.icon.with_static_format("png")
+            if isinstance(invite.guild, (discord.Guild, discord.PartialInviteGuild)) and invite.guild.icon
+            else None
+        )
         embed.set_author(name=f"{await self.bot._(interaction, 'info.info.inv-4')} '{invite.code}'", icon_url=icon_url)
         # Try to get the complete invite
-        if invite.guild in self.bot.guilds:
+        if isinstance(invite.guild, discord.Guild):
             try:
                 temp = [x for x in await invite.guild.invites() if x.id == invite.id]
                 if len(temp) > 0:
@@ -727,26 +747,32 @@ class Info(commands.Cog):
             max_age = str(invite.max_age) if invite.max_age != 0 else "∞"
             embed.add_field(name=await self.bot._(interaction, "info.info.inv-3"), value=max_age)
         if isinstance(invite.channel, discord.PartialInviteChannel | discord.abc.GuildChannel):
-            # Guild name
-            embed.add_field(name=await self.bot._(interaction, "info.info.guild-0"), value=invite.guild.name)
+            if isinstance(invite.guild, (discord.Guild, discord.PartialInviteGuild)):
+                # Guild name
+                embed.add_field(name=await self.bot._(interaction, "info.info.guild-0"), value=invite.guild.name)
             # Channel name
             embed.add_field(name=await self.bot._(interaction, "info.info.textchan-5"), value="#"+invite.channel.name)
             # Guild icon
-            if invite.guild.icon:
+            if isinstance(invite.guild, (discord.Guild, discord.PartialInviteGuild)) and invite.guild.icon:
                 embed.set_thumbnail(url=icon_url)
             # Guild ID
-            embed.add_field(name=await self.bot._(interaction, "info.info.inv-6"), value=invite.guild.id)
+            if invite.guild:
+                embed.add_field(name=await self.bot._(interaction, "info.info.inv-6"), value=invite.guild.id)
             # Members count
             if invite.approximate_member_count:
                 embed.add_field(name=await self.bot._(interaction, "info.info.inv-7"), value=invite.approximate_member_count)
         # Guild banner
-        if invite.guild.banner is not None:
+        if isinstance(invite.guild, (discord.Guild, discord.PartialInviteGuild)) and invite.guild.banner is not None:
             embed.set_image(url=invite.guild.banner)
         # Guild description
-        if invite.guild.description is not None and len(invite.guild.description) > 0:
+        if (
+            isinstance(invite.guild, (discord.Guild, discord.PartialInviteGuild))
+            and invite.guild.description is not None
+            and len(invite.guild.description) > 0
+        ):
             embed.add_field(name=await self.bot._(interaction, "info.info.inv-8"), value=invite.guild.description)
         # Guild features
-        if len(invite.guild.features) > 0:
+        if isinstance(invite.guild, (discord.Guild, discord.PartialInviteGuild)) and len(invite.guild.features) > 0:
             async def tr(x: str):
                 return await self.bot._(interaction, "info.info.guild-features." + x)
             features: list[str] = [await tr(x) for x in invite.guild.features]
@@ -766,6 +792,8 @@ class Info(commands.Cog):
 
     async def category_info(self, interaction: discord.Interaction, category: discord.CategoryChannel):
         "Get informations about a category"
+        if not isinstance(interaction.user, discord.Member):
+            raise TypeError("This function is not meant to be used outside of guilds")
         if not category.permissions_for(interaction.user).view_channel:
             await interaction.followup.send(await self.bot._(interaction, "info.cant-see-channel"))
             return
@@ -808,6 +836,8 @@ class Info(commands.Cog):
 
     async def forum_info(self, interaction: discord.Interaction, forum: discord.ForumChannel):
         "Get informations about a forum channel"
+        if not isinstance(interaction.user, discord.Member):
+            raise TypeError("This function is not meant to be used outside of guilds")
         if not forum.permissions_for(interaction.user).view_channel:
             await interaction.followup.send(await self.bot._(interaction, "info.cant-see-channel"))
             return
@@ -888,6 +918,8 @@ class Info(commands.Cog):
 
     async def stagechannel_info(self, interaction: discord.Interaction, stage: discord.StageChannel):
         "Get information about a stage channel"
+        if not isinstance(interaction.user, discord.Member):
+            raise TypeError("This function is not meant to be used outside of guilds")
         if not stage.permissions_for(interaction.user).view_channel:
             await interaction.followup.send(await self.bot._(interaction, "info.cant-see-channel"))
             return
@@ -947,7 +979,7 @@ class Info(commands.Cog):
         await interaction.followup.send(embed=embed)
 
 
-    async def get_members_repartition(self, members: list[discord.Member]):
+    async def get_members_repartition(self, members: Sequence[discord.Member]):
         """Get number of total/online/bots members in a selection"""
         bots = online = total = unverified = 0
         for u in members:
@@ -966,7 +998,7 @@ class Info(commands.Cog):
         description="Help the bot staff to find things",
         guild_ids=[PRIVATE_GUILD_ID.id]
     )
-    find_main.interaction_check = checks.is_support_staff
+    find_main.interaction_check = checks.is_support_staff # pyright: ignore[reportAttributeAccessIssue]
 
     @find_main.command(name="user")
     async def find_user(self, interaction: discord.Interaction, user: discord.User):
@@ -987,28 +1019,33 @@ class Info(commands.Cog):
                 servers_in = [f"{owned} owned servers, member of {membered} others"]
         else:
             servers_in = []
+        if (utils_cog := self.bot.get_cog("Utilities")) is None:
+            raise RuntimeError("Utilities cog not found, cannot get user languages")
         # XP card
-        xp_card = await self.bot.get_cog("Utilities").get_xp_style(user)
+        xp_card = await utils_cog.get_xp_style(user)
         # Flags
-        userflags = await self.bot.get_cog("Users").get_userflags(user)
-        if await self.bot.get_cog("Admin").check_if_admin(user):
-            userflags.append("admin")
-        if len(userflags) == 0:
-            userflags = ["None"]
+        if (users_cog := self.bot.get_cog("Users")) is not None:
+            userflags = await users_cog.get_userflags(user)
+            if await self.bot.get_cog("Admin").check_if_admin(user): # type: ignore
+                userflags.append("admin")
+            if len(userflags) == 0:
+                userflags = ["None"]
+        else:
+            userflags = ["Unknown"]
         # Votes
-        votes = await self.bot.get_cog("Utilities").check_votes(user.id)
+        votes = await utils_cog.check_votes(user.id)
         votes = " - ".join([f"[{x[0]}]({x[1]})" for x in votes])
         if len(votes) == 0:
             votes = "Nowhere"
         # Languages
-        disp_lang = list()
+        disp_lang: list[str] = []
         if hasattr(user, "mutual_guilds"):
-            for lang in await self.bot.get_cog("Utilities").get_user_languages(user):
+            for lang in await utils_cog.get_user_languages(user):
                 disp_lang.append(f"{lang[0]} ({lang[1]*100:.0f}%)")
         if len(disp_lang) == 0:
             disp_lang = ["Unknown"]
         # User name
-        if user.bot and discord.PublicUserFlags.verified_bot in user.public_flags:
+        if user.bot and discord.PublicUserFlags.verified_bot in user.public_flags: # pyright: ignore[reportOperatorIssue]
             user_name = user.name + "<:botverified:1093225375963811920>"
         elif user.bot:
             user_name = user.name + "<:bot:1093225377377308692>"
@@ -1040,15 +1077,17 @@ class Info(commands.Cog):
         await interaction.followup.send(embed=embed)
 
     @find_main.command(name="guild")
-    @discord.app_commands.describe(guild="The server name or ID")
-    async def find_guild(self, interaction: discord.Interaction, guild: str):
+    @discord.app_commands.rename(guild_id_or_name="guild")
+    @discord.app_commands.describe(guild_id_or_name="The server name or ID")
+    async def find_guild(self, interaction: discord.Interaction, guild_id_or_name: str):
         "Find any guild where the bot is"
         await interaction.response.defer()
-        if guild.isnumeric():
-            guild: discord.Guild = self.bot.get_guild(int(guild))
+        guild: discord.Guild | None = None
+        if guild_id_or_name.isnumeric():
+            guild = self.bot.get_guild(int(guild_id_or_name))
         else:
             for x in self.bot.guilds:
-                if x.name == guild:
+                if x.name == guild_id_or_name:
                     guild = x
                     break
         if isinstance(guild, str) or guild is None:
@@ -1057,24 +1096,31 @@ class Info(commands.Cog):
         # Bots
         bots = len([x for x in guild.members if x.bot])
         # Lang
-        lang: str = await self.bot.get_config(guild.id, "language")
+        lang: str = await self.bot.get_config(guild.id, "language") # pyright: ignore[reportAssignmentType]
         # Roles rewards
-        rr_len: int = await self.bot.get_config(guild.id, "rr_max_number")
-        rr_len: str = "{}/{}".format(len(await self.bot.get_cog("Xp").db_list_rr(guild.id)), rr_len)
+        if xp_cog := self.bot.get_cog("Xp"):
+            max_rr: int = await self.bot.get_config(guild.id, "rr_max_number") # pyright: ignore[reportAssignmentType]
+            rr_count = len(await xp_cog.db_list_rr(guild.id))
+            rr_len = f"{rr_count}/{max_rr}"
+        else:
+            rr_len = "Not available"
         # Streamers
         if twitch_cog := self.bot.get_cog("Twitch"):
-            streamers_len: int =  await self.bot.get_config(guild.id, "streamers_max_number")
-            streamers_len: str = "{}/{}".format(await twitch_cog.db_get_guild_subscriptions_count(guild.id), streamers_len)
+            max_streamers: int =  await self.bot.get_config(
+                guild.id, "streamers_max_number") # pyright: ignore[reportAssignmentType]
+            streamers_count = await twitch_cog.db_get_guild_subscriptions_count(guild.id)
+            streamers_len = f"{streamers_count}/{max_streamers}"
         else:
             streamers_len = "Not available"
         # Rss
-        rss_len: int = await self.bot.get_config(guild.id, "rss_max_number")
         if rss_cog := self.bot.get_cog("Rss"):
-            rss_numb = "{}/{}".format(len(await rss_cog.db_get_guild_feeds(guild.id)), rss_len)
+            max_rss: int = await self.bot.get_config(guild.id, "rss_max_number") # pyright: ignore[reportAssignmentType]
+            rss_count = len(await rss_cog.db_get_guild_feeds(guild.id))
+            rss_numb = f"{rss_count}/{max_rss}"
         else:
             rss_numb = "Not available"
         # Join date
-        joined_at = f"<t:{guild.me.joined_at.timestamp():.0f}>"
+        joined_at = f"<t:{guild.me.joined_at.timestamp():.0f}>" if guild.me.joined_at else "Unknown"
         # ----
         if interaction.guild is None:
             color = None
@@ -1144,8 +1190,10 @@ class Info(commands.Cog):
     async def find_rss(self, interaction: discord.Interaction, feed_id: int):
         "Find any active or inactive RSS feed"
         await interaction.response.defer()
-        feed: FeedObject = await self.bot.get_cog("Rss").db_get_feed(feed_id)
-        if feed is None:
+        if (rss_cog := self.bot.get_cog("Rss")) is None:
+            await interaction.followup.send("RSS cog not loaded, cannot get feed info")
+            return
+        if (feed := await rss_cog.db_get_feed(feed_id)) is None:
             await interaction.followup.send("Unknown RSS feed")
             return
         guild = self.bot.get_guild(feed.guild_id)
@@ -1154,7 +1202,7 @@ class Info(commands.Cog):
         else:
             g = f"`{guild.name}`\n{guild.id}"
         channel = self.bot.get_channel(feed.channel_id)
-        if channel is None:
+        if channel is None or isinstance(channel, discord.abc.PrivateChannel):
             c = f"Unknown ({feed.channel_id})"
         else:
             c = f"`{channel.name}`\n{channel.id}"
@@ -1195,6 +1243,8 @@ class Info(commands.Cog):
         """Get some stats on the number of server members
 
         ..Doc infos.html#membercount"""
+        if interaction.guild is None:
+            raise TypeError("This command can only be used in a guild")
         await interaction.response.defer()
         total, bots_count, online_count, unverified = await self.get_members_repartition(interaction.guild.members)
         humans_count = total - bots_count
@@ -1223,6 +1273,6 @@ class Info(commands.Cog):
         await interaction.followup.send(embed=embed)
 
 
-async def setup(bot):
+async def setup(bot: Axobot):
     locale.setlocale(locale.LC_ALL, '')
     await bot.add_cog(Info(bot))

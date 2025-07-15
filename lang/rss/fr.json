@@ -84,6 +84,7 @@
     "list2": "*Entrez le numéro du flux à supprimer*\n\n**Lien - Type - Salon**\n",
     "loop-processing": "Une vérification de vos flux RSS est déjà en cours. Veuillez patienter quelques minutes",
     "mc": "Minecraft",
+    "move-invalid-channel": "Le salon que vous avez fourni n'est pas valide. Veuillez fournir un salon textuel ou un fil valide.",
     "move-success": {
         "many": "%{count} flux RSS ont été déplacés dans le salon %{channel} !",
         "one": "Votre flux RSS a bien été déplacé dans le salon %{channel} !"

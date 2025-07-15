@@ -21,7 +21,7 @@ class DatabaseQueryHandler:
     def read(
         self,
             query: str,
-            args: AnyTuple | AnyDict | None,
+            args: AnyTuple | AnyDict | None = None,
             *,
             fetchone: Literal[True],
             astuple: Literal[True]
@@ -31,7 +31,7 @@ class DatabaseQueryHandler:
     def read(
         self,
             query: str,
-            args: AnyTuple | AnyDict | None,
+            args: AnyTuple | AnyDict | None = None,
             *,
             fetchone: Literal[True],
             astuple: Literal[False] = False
@@ -41,7 +41,7 @@ class DatabaseQueryHandler:
     def read(
         self,
             query: str,
-            args: AnyTuple | AnyDict | None,
+            args: AnyTuple | AnyDict | None = None,
             *,
             fetchone: Literal[False] = False,
             astuple: Literal[True],

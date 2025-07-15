@@ -21,7 +21,9 @@ from .my_context import MyContext
 if TYPE_CHECKING:
     from core.utilities import Utilities
     from modules.antiraid.antiraid import AntiRaid
+    from modules.antiscam.antiscam import AntiScam
     from modules.bot_events.bot_events import BotEvents
+    from modules.bot_info.bot_info import BotInfo
     from modules.bot_stats.bot_stats import BotStats
     from modules.cases.cases import Cases
     from modules.errors.errors import Errors
@@ -155,11 +157,19 @@ class Axobot(commands.bot.AutoShardedBot):
         ...
 
     @overload
-    def get_cog(self, name: Literal["BotStats"]) -> Optional["BotStats"]:
+    def get_cog(self, name: Literal["AntiScam"]) -> Optional["AntiScam"]:
         ...
 
     @overload
     def get_cog(self, name: Literal["BotEvents"]) -> Optional["BotEvents"]:
+        ...
+
+    @overload
+    def get_cog(self, name: Literal["BotInfo"]) -> Optional["BotInfo"]:
+        ...
+
+    @overload
+    def get_cog(self, name: Literal["BotStats"]) -> Optional["BotStats"]:
         ...
 
     @overload
@@ -266,7 +276,7 @@ class Axobot(commands.bot.AutoShardedBot):
             return await cog.db_get_guilds_with_option(option_name)
         return {}
 
-    async def get_recipient(self, channel: discord.abc.MessageableChannel) -> discord.User | None:
+    async def get_recipient(self, channel: "discord.abc.MessageableChannel") -> discord.User | None:
         """Get the recipient of the given DM channel
 
         This method is required because most of the time Discord doesn't properly give that info"""
@@ -331,3 +341,10 @@ class Axobot(commands.bot.AutoShardedBot):
         if await self.get_message_from_cache(message.id) is None:
             # pylint: disable=protected-access
             self._connection._messages.append(message) # pyright: ignore[reportPrivateUsage, reportOptionalMemberAccess]
+
+    @property
+    def display_avatar(self) -> discord.Asset | None:
+        """Get the bot's display avatar"""
+        if self.user is None:
+            return None
+        return self.user.display_avatar

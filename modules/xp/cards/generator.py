@@ -1,3 +1,5 @@
+from typing import Literal
+
 from PIL import Image, ImageDraw, ImageFont, ImageSequence
 
 from .cards_metadata import get_card_data
@@ -13,7 +15,7 @@ class CardGeneration:
                  username: str,
                  avatar: Image.Image,
                  level: int,
-                 rank: int,
+                 rank: int | Literal['?'],
                  participants: int,
                  xp_to_current_level: int,
                  xp_to_next_level: int,

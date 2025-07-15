@@ -3,7 +3,7 @@ import importlib
 import random
 import urllib.parse
 from math import ceil
-from typing import Any, Literal
+from typing import Any, Literal, Sequence, TypeVar
 
 import aiohttp
 import discord
@@ -20,12 +20,16 @@ from core.bot_classes import SUPPORT_GUILD_ID, Axobot, MyContext
 from core.checks import checks
 from core.formatutils import FormatUtils
 from core.paginator import Paginator
+from core.type_utils import (UserOrMember, channel_is_guild_messageable,
+                             channel_is_messageable,
+                             assert_interaction_channel_is_guild_messageable)
 
 importlib.reload(checks)
 importlib.reload(args)
 
 
-def flatten_list(first_list: list) -> list:
+T = TypeVar('T')
+def flatten_list(first_list: Sequence[Sequence[T]]) -> list[T]:
     return [item for sublist in first_list for item in sublist]
 
 
@@ -48,7 +52,10 @@ class Fun(commands.Cog):
 
     @property
     def utilities(self):
-        return self.bot.get_cog("Utilities")
+        "Return the Utilities cog"
+        if cog := self.bot.get_cog("Utilities"):
+            return cog
+        raise RuntimeError("Utilities cog not loaded")
 
     async def is_in_guild(self, user_id: int, guild_id: int):
         "Check if a user is part of a guild"
@@ -119,31 +126,33 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         ..Example fun count-messages 300 someone
 
         ..Doc fun.html#count-messages"""
-        if channel is None:
-            channel = interaction.channel
-        if not channel.permissions_for(interaction.user).read_message_history:
+        if not channel_is_messageable(interaction.channel):
+            raise TypeError("This command can only be used in a text channel")
+        destination_channel: "discord.abc.MessageableChannel" = channel or interaction.channel
+        if (
+            isinstance(interaction.user, discord.Member)
+            and not destination_channel.permissions_for(interaction.user).read_message_history):
             await interaction.response.send_message(await self.bot._(interaction, "fun.count.forbidden"))
             return
-        if interaction.guild is not None and not channel.permissions_for(interaction.guild.me).read_message_history:
+        if interaction.guild is not None and not destination_channel.permissions_for(interaction.guild.me).read_message_history:
             await interaction.response.send_message(await self.bot._(interaction, "fun.count.missing-perms"))
             return
-        if user is None:
-            user = interaction.user
+        seeking_user: UserOrMember = user or interaction.user
         counter = 0
         await interaction.response.send_message(await self.bot._(interaction,"fun.count.counting"))
         total_count = 0
-        async for log in channel.history(limit=limit):
+        async for log in destination_channel.history(limit=limit):
             total_count += 1
-            if log.author == user:
+            if log.author == seeking_user:
                 counter += 1
         result = round(counter*100/total_count,2)
-        if user == interaction.user:
+        if seeking_user == interaction.user:
             await interaction.edit_original_response(
                 content=await self.bot._(interaction, "fun.count.result-you", limit=total_count, x=counter, p=result)
             )
         else:
             await interaction.edit_original_response(
-                content=await self.bot._(interaction, "fun.count.result-user", limit=total_count, user=user.display_name,
+                content=await self.bot._(interaction, "fun.count.result-user", limit=total_count, user=seeking_user.display_name,
                                          x=counter, p=result)
             )
 
@@ -161,11 +170,12 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         if name in available_names:
             await interaction.followup.send(file=await self.utilities.find_img(f"blame-{name}.png"))
             return
-        if name not in available_names:
-            txt = "- "+"\n- ".join(sorted(available_names))
-            title = await self.bot._(interaction, "fun.blame-0", user=interaction.user)
-            emb = discord.Embed(title=title, description=txt, color=self.bot.get_cog("Help").help_color)
-            await interaction.followup.send(embed=emb)
+        txt = "- "+"\n- ".join(sorted(available_names))
+        title = await self.bot._(interaction, "fun.blame-0", user=interaction.user)
+        if (help_cog := self.bot.get_cog("Help")) is None:
+            raise RuntimeError("Help cog not loaded")
+        emb = discord.Embed(title=title, description=txt, color=help_cog.help_color)
+        await interaction.followup.send(embed=emb)
 
     @cached(TTLCache(1_000, 3600))
     async def _get_blame_available_names(self, user_id: int):
@@ -311,25 +321,28 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         ..Example say Booh!
 
         ..Doc miscellaneous.html#say"""
-        if channel is None:
-            channel = interaction.channel
-        if not (
-            channel.permissions_for(interaction.user).read_messages and
-            channel.permissions_for(interaction.user).send_messages and
-            channel.guild == interaction.guild
-        ):
-            await interaction.response.send_message(await self.bot._(interaction, "fun.say-no-perm", channel=channel.mention))
+        if not assert_interaction_channel_is_guild_messageable(interaction):
             return
-        if not channel.permissions_for(interaction.guild.me).send_messages:
+        destination_channel: "discord.abc.MessageableChannel" = channel or interaction.channel
+        if not (
+            destination_channel.permissions_for(interaction.user).read_messages and
+            destination_channel.permissions_for(interaction.user).send_messages and
+            destination_channel.guild == interaction.guild
+        ):
+            await interaction.response.send_message(
+                await self.bot._(interaction, "fun.say-no-perm", channel=destination_channel.mention)
+            )
+            return
+        if not destination_channel.permissions_for(interaction.guild.me).send_messages: # pyright: ignore[reportOptionalMemberAccess]
             error = await self.bot._(interaction, "fun.no-say")
             error += random.choice([" :confused:", '', '', ''])
             await interaction.response.send_message(error)
             return
         if self.bot.zombie_mode:
             return
-        await channel.send(text)
+        await destination_channel.send(text)
         await interaction.response.send_message(await self.bot._(interaction, "fun.say-done"), ephemeral=True)
-        self.bot.dispatch("say_usage", interaction.user, text, channel.id)
+        self.bot.dispatch("say_usage", interaction.user, text, destination_channel.id)
 
     @app_commands.command(name="react")
     @app_commands.guild_only()
@@ -347,13 +360,17 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         ..Example react https://discord.com/channels/125723125685026816/375246790301057024/790177026232811531 :party: :money:
 
         ..Doc fun.html#react"""
+        if not isinstance(interaction.user, discord.Member):
+            raise RuntimeError("This command can only be used by a user")
         channel = message.channel
         if not (
             channel.permissions_for(interaction.user).read_messages
             and channel.permissions_for(interaction.user).add_reactions
             and (channel.guild is None or channel.guild==interaction.guild)
         ):
-            await interaction.response.send_message(await self.bot._(interaction, "fun.say-no-perm", channel=channel.mention))
+            await interaction.response.send_message(
+                await self.bot._(interaction, "fun.say-no-perm", channel=channel.mention) # pyright: ignore[reportAttributeAccessIssue]
+            )
             return
         await interaction.response.defer(ephemeral=True)
         count = 0
@@ -385,7 +402,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
 
         ..Doc miscellaneous.html#hour-weather"""
         await interaction.response.defer()
-        g = geocoder.arcgis(city)
+        g = geocoder.arcgis(city) # pyright: ignore[reportAttributeAccessIssue]
         if not g.ok:
             await interaction.followup.send(content=await self.bot._(interaction, "fun.invalid-city"))
             return
@@ -512,7 +529,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
             async def get_page_count(self) -> int:
                 return ceil(len(formatted_jobs)/30)
 
-            async def get_page_content(self, interaction: discord.Interaction, page: int):
+            async def get_page_content(self, interaction: discord.Interaction | None, page: int):
                 "Create one page"
                 emb = discord.Embed(
                     title=_title,
@@ -593,9 +610,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
     @app_commands.checks.cooldown(2, 10)
     async def avatar(self, interaction: discord.Interaction, user: discord.User | None):
         """Get the avatar URL of any user"""
-        if user is None:
-            user = interaction.user
-        await interaction.response.send_message(user.display_avatar.url)
+        await interaction.response.send_message((user or interaction.user).display_avatar.url)
 
 
     @app_commands.command(name="embed")
@@ -612,6 +627,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         color="The color of the embed bar"
     )
     async def send_embed(self, interaction: discord.Interaction,
+                         *,
                          channel: discord.TextChannel | None=None,
                          title: app_commands.Range[str, 1, 256] | None=None,
                          content: app_commands.Range[str, 1, 2048] | None=None,
@@ -637,9 +653,15 @@ If you want to use lines break in the texts, use the special character `\\n`
 ..Doc miscellaneous.html#embed
         """
         destination = channel or interaction.channel
-        if not (
-            destination.permissions_for(interaction.user).read_messages
-            and destination.permissions_for(interaction.user).send_messages
+        if not channel_is_guild_messageable(destination):
+            raise RuntimeError("interaction.channel is invalid, cannot send embed")
+        if not isinstance(interaction.user, discord.Member):
+            raise RuntimeError("interaction.user is not a member")
+        if interaction.guild is None:
+            raise RuntimeError("interaction.guild is None")
+        if (
+            not destination.permissions_for(interaction.user).read_messages
+            or not destination.permissions_for(interaction.user).send_messages
         ):
             await interaction.response.send_message(
                 await self.bot._(interaction, "fun.say-no-perm", channel=destination.mention),
@@ -659,7 +681,7 @@ If you want to use lines break in the texts, use the special character `\\n`
             )
             return
         await interaction.response.defer(ephemeral=True)
-        default_color = self.bot.get_cog("ServerConfig").embed_color
+        default_color = self.bot.get_cog("ServerConfig").embed_color # pyright: ignore[reportOptionalMemberAccess]
         if content:
             content = content.replace("\\n", "\n")
         emb = discord.Embed(
@@ -690,5 +712,5 @@ If you want to use lines break in the texts, use the special character `\\n`
         )
 
 
-async def setup(bot):
+async def setup(bot: Axobot):
     await bot.add_cog(Fun(bot))

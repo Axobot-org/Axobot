@@ -1,17 +1,15 @@
 import inspect
 
 from discord import Locale
-from discord.app_commands import Argument as AppArgument
-from discord.app_commands import Command, Group
+from discord.app_commands import Parameter as AppArgument
 from discord.app_commands.translator import (TranslationContext,
                                              TranslationContextLocation,
                                              locale_str)
 
 from core.bot_classes import MyContext
 
-from .utils import extract_info, get_discord_locale
-
-AppCommandOrGroup = Command | Group
+from .utils import (AppCommandOrGroup, AppCommandsGroup, extract_info,
+                    get_discord_locale)
 
 
 async def get_command_inline_desc(ctx: MyContext, cmd: AppCommandOrGroup):
@@ -23,15 +21,15 @@ async def get_command_inline_desc(ctx: MyContext, cmd: AppCommandOrGroup):
 
 async def get_command_description(ctx: MyContext, command: AppCommandOrGroup):
     "Get the parsed description of a command"
-    if isinstance(command, Group):
+    if isinstance(command, AppCommandsGroup):
         raw_desc = command.description.strip()
     else:
         raw_desc = inspect.cleandoc(command.callback.__doc__ or "")
-    desc = str | None
     desc, examples, doc = await extract_info(raw_desc)
     # check for translated description
     if short_desc := await get_command_desc_translation(ctx, command):
-        if len(desc.split("\n")) > 1:
+        if desc and len(desc.split("\n")) > 1:
+            # add inspected (long) description to the translated short description
             long_desc = "\n".join(desc.split("\n")[1:]).strip()
             desc = f"{short_desc}\n\n{long_desc}"
     if desc is None:
@@ -59,7 +57,7 @@ async def get_command_full_name_translation(ctx: MyContext, command: AppCommandO
 async def get_command_name_translation(ctx: MyContext, command: AppCommandOrGroup, locale: Locale | None=None):
     "Get the translated command or group name (without parent name)"
     locale = locale or await get_discord_locale(ctx)
-    if isinstance(command, Group):
+    if isinstance(command, AppCommandsGroup):
         context = TranslationContext(
             TranslationContextLocation.group_name,
             command
@@ -69,14 +67,16 @@ async def get_command_name_translation(ctx: MyContext, command: AppCommandOrGrou
             TranslationContextLocation.command_name,
             command
         )
-    if translation := await ctx.bot.tree.translator.translate(locale_str(""), locale, context):
+    if translation := await ctx.bot.tree.translator.translate( # pyright: ignore[reportOptionalMemberAccess]
+        locale_str(""), locale, context
+    ):
         return translation
     return command.qualified_name
 
 async def get_command_desc_translation(ctx: MyContext, command: AppCommandOrGroup):
     "Get the translated command or group description"
     locale = await get_discord_locale(ctx)
-    if isinstance(command, Group):
+    if isinstance(command, AppCommandsGroup):
         context = TranslationContext(
             TranslationContextLocation.group_description,
             command
@@ -86,7 +86,7 @@ async def get_command_desc_translation(ctx: MyContext, command: AppCommandOrGrou
             TranslationContextLocation.command_description,
             command
         )
-    return await ctx.bot.tree.translator.translate(locale_str(""), locale, context)
+    return await ctx.bot.tree.translator.translate(locale_str(""), locale, context) # pyright: ignore[reportOptionalMemberAccess]
 
 
 async def _get_command_param_translation(ctx: MyContext, param: AppArgument):
@@ -96,11 +96,16 @@ async def _get_command_param_translation(ctx: MyContext, param: AppArgument):
         TranslationContextLocation.parameter_name,
         param
     )
-    return await ctx.bot.tree.translator.translate(locale_str(param.name), locale, context) or param.name
+    return (
+        await ctx.bot.tree.translator.translate( # pyright: ignore[reportOptionalMemberAccess]
+            locale_str(param.name), locale, context
+        )
+        or param.name
+    )
 
 async def _get_command_params_signature(ctx: MyContext, command: AppCommandOrGroup):
     "Returns a POSIX-like signature useful for help command output."
-    if isinstance(command, Group) or not command.parameters:
+    if isinstance(command, AppCommandsGroup) or not command.parameters:
         return ''
     result = []
     for param in command.parameters:

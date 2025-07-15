@@ -8,6 +8,8 @@ from discord import app_commands
 from discord.ext import commands
 
 from core.bot_classes import Axobot
+from core.type_utils import (AnyStrDict, GuildInteraction,
+                             assert_interaction_channel_is_guild_messageable)
 
 
 class LoadArguments:
@@ -66,6 +68,8 @@ Arguments are:
 ..Example backup load delete_old_roles:True delete_old_emojis:True
 
 ..Doc server.html#server-backup"""
+        if not assert_interaction_channel_is_guild_messageable(interaction):
+            return
         if interaction.guild_id in self.backups_loading:
             await interaction.response.send_message(
                 await self.bot._(interaction, "s_backup.already_running"), ephemeral=True
@@ -96,12 +100,12 @@ Arguments are:
             if data["_backup_version"] == 1:
                 problems, logs = await self.BackupLoaderV1().load_backup(interaction, data, arguments)
             else:
-                await interaction.edit_original_response(await self.bot._(interaction, "s_backup.invalid_version"))
+                await interaction.edit_original_response(content=await self.bot._(interaction, "s_backup.invalid_version"))
                 self.backups_loading.remove(interaction.guild_id)
                 return
         except Exception as err:  # pylint: disable=broad-except
             self.bot.dispatch("error", err, interaction)
-            await interaction.edit_original_response(await self.bot._(interaction, "s_backup.err"))
+            await interaction.edit_original_response(content=await self.bot._(interaction, "s_backup.err"))
             self.backups_loading.remove(interaction.guild_id)
             return
         # Formatting and sending logs
@@ -134,6 +138,8 @@ Arguments are:
 ..Example backup create
 
 ..Doc server.html#server-backup"""
+        if not assert_interaction_channel_is_guild_messageable(interaction):
+            return
         await interaction.response.defer()
         data = await self.create_backup(interaction)
         file = discord.File(BytesIO(data.encode()),
@@ -142,10 +148,10 @@ Arguments are:
 
     # --------
 
-    async def create_backup(self, interaction: discord.Interaction) -> str:
+    async def create_backup(self, interaction: GuildInteraction) -> str:
         "Create a backup of the server and return it as a JSON string"
-        async def get_channel_json(chan: discord.abc.GuildChannel) -> dict:
-            chan_js = {"id": chan.id, "name": chan.name, "position": chan.position}
+        async def get_channel_json(chan: discord.abc.GuildChannel) -> AnyStrDict:
+            chan_js: AnyStrDict = {"id": chan.id, "name": chan.name, "position": chan.position}
             if isinstance(chan, discord.TextChannel):
                 chan_js["type"] = "TextChannel"
                 chan_js["description"] = chan.topic
@@ -157,7 +163,7 @@ Arguments are:
                 chan_js["type"] = str(type(chan))
             perms: list[dict[str, Any]] = []
             for iter_obj, iter_perm in chan.overwrites.items():
-                temp2 = {"id": iter_obj.id}
+                temp2: AnyStrDict = {"id": iter_obj.id}
                 if isinstance(iter_obj, discord.Member):
                     temp2["type"] = "member"
                 else:
@@ -171,11 +177,11 @@ Arguments are:
             return chan_js
         # ----
         g = interaction.guild
-        back = {
+        back: AnyStrDict = {
             "_backup_version": 1,
             "name": g.name,
             "id": g.id,
-            "owner": g.owner.id,
+            "owner": g.owner_id,
             "afk_timeout": g.afk_timeout,
             "icon": g.icon.url if g.icon else None,
             "verification_level": g.verification_level.value,
@@ -200,6 +206,7 @@ Arguments are:
         back["roles"] = roles
         categ: list[dict[str, Any]] = []
         for category, channels in g.by_category():
+            temp: AnyStrDict
             if category is None:
                 temp = {"id": None}
             else:
@@ -211,7 +218,7 @@ Arguments are:
                 }
                 perms: list[dict[str, Any]] = []
                 for iter_obj, iter_perm in category.overwrites.items():
-                    temp2 = {"id": iter_obj.id}
+                    temp2: AnyStrDict = {"id": iter_obj.id}
                     if isinstance(iter_obj, discord.Member):
                         temp2["type"] = "member"
                     else:
@@ -283,7 +290,7 @@ Arguments are:
                         res = None
             return res
 
-        async def load_roles(self, interaction: discord.Interaction, problems: list, logs: list, symb: list, data: dict,
+        async def load_roles(self, interaction: GuildInteraction, problems: list, logs: list, symb: list, data: dict,
                              args: LoadArguments, roles_list: dict[int, discord.Role]):
             "Create and update roles based on the backup map"
             if not interaction.guild.me.guild_permissions.manage_roles:
@@ -378,7 +385,7 @@ Arguments are:
                             logs.append(f"  {symb[0]} Unable to move role {role_data['name']} to position {new_pos}: {err}")
                             problems[1] += 1
 
-        async def load_categories(self, interaction: discord.Interaction, problems: list, logs: list, symb: list, data: dict,
+        async def load_categories(self, interaction: GuildInteraction, problems: list, logs: list, symb: list, data: dict,
                                   args: LoadArguments, channels_list: dict):
             "Create and update channel categories based on the backup map"
             if not interaction.guild.me.guild_permissions.manage_channels:
@@ -441,7 +448,7 @@ Arguments are:
                         else:
                             logs.append(f"  {symb[2]} Category {categ.name} deleted")
 
-        async def load_channels(self, interaction: discord.Interaction, problems: list, logs: list, symb: list, data: dict,
+        async def load_channels(self, interaction: GuildInteraction, problems: list, logs: list, symb: list, data: dict,
                                 args: LoadArguments, channels_list: dict):
             "Create and update channels based on the backup map"
             if not interaction.guild.me.guild_permissions.manage_channels:
@@ -538,7 +545,7 @@ Arguments are:
                 except discord.Forbidden:
                     pass
 
-        async def load_perms(self, interaction: discord.Interaction, problems: list, logs: list, symb: list, data: dict,
+        async def load_perms(self, interaction: GuildInteraction, problems: list, logs: list, symb: list, data: dict,
                              _args: LoadArguments, roles_list: dict, channels_list: dict):
             "Sync category and channel permissions based on the backup map"
             if not interaction.guild.me.guild_permissions.manage_roles:
@@ -572,7 +579,7 @@ Arguments are:
                     else:
                         logs.append(f"     {symb[2]} Permissions of channel {chan['name']} set")
 
-        async def load_members(self, interaction: discord.Interaction, problems: list, logs: list, symb: list, data: dict,
+        async def load_members(self, interaction: GuildInteraction, problems: list, logs: list, symb: list, data: dict,
                                _args: LoadArguments, roles_list: dict[int, discord.Role]):
             "Sync member nicknames and roles based on the backup map"
             if "members" not in data.keys():
@@ -624,7 +631,7 @@ Arguments are:
                     if len(edition) > 0:
                         logs.append(f"  {symb[2]} Updated {'and'.join(edition)} for user {member}")
 
-        async def load_emojis(self, interaction: discord.Interaction, problems: list, logs: list, symb: list, data: dict,
+        async def load_emojis(self, interaction: GuildInteraction, problems: list, logs: list, symb: list, data: dict,
                               args: LoadArguments, roles_list: dict):
             "Sync guild emojis based on the backup map"
             if not interaction.guild.me.guild_permissions.manage_expressions:
@@ -681,7 +688,7 @@ Arguments are:
                         else:
                             logs.append(f"  {symb[2]} Emoji {emoji.name} deleted")
 
-        async def load_webhooks(self, interaction: discord.Interaction, problems: list, logs: list, symb: list, data: dict,
+        async def load_webhooks(self, interaction: GuildInteraction, problems: list, logs: list, symb: list, data: dict,
                                 args: LoadArguments, channels_list: dict):
             "Sync webhooks based on the backup map"
             if not interaction.guild.me.guild_permissions.manage_webhooks:
@@ -732,7 +739,7 @@ Arguments are:
                         else:
                             logs.append(f"  {symb[2]} Webhook {web.name} deleted")
 
-        async def load_backup(self, interaction: discord.Interaction, data: dict, args: LoadArguments) -> tuple[list, list]:
+        async def load_backup(self, interaction: GuildInteraction, data: AnyStrDict, args: LoadArguments) -> tuple[list, list]:
             "Load a backup in a server, for backups version 1"
             if data.pop("_backup_version", None) != 1:
                 return ([0, 1], ["Unknown backup version"])
@@ -903,5 +910,5 @@ Arguments are:
             return problems, logs
 
 
-async def setup(bot):
+async def setup(bot: Axobot):
     await bot.add_cog(Backups(bot))

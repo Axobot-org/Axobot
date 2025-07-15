@@ -1,7 +1,6 @@
 from typing import TYPE_CHECKING
 
 import discord
-from discord.ext import commands
 
 from core.bot_classes import MyContext
 
@@ -11,8 +10,8 @@ from .utils import get_embed_color, get_embed_footer, get_send_callback
 if TYPE_CHECKING:
     from ..help_cmd import Help as HelpCog
 
-def sort_by_name(cmd: commands.Command):
-    return cmd.name
+# def sort_by_name(cmd: commands.Command[Any, ..., Any]) -> str:
+#     return cmd.name
 
 async def help_category_command(cog: "HelpCog", ctx: MyContext, category_id: str):
     "Generate embed fields to describe all commands of a specific category"
