@@ -1,12 +1,20 @@
 import inspect
-from typing import Callable, TypedDict, Union, get_type_hints
+from typing import Any, Callable, TypedDict, Union, get_type_hints
 
 import discord
 from discord import app_commands
 from discord.ext import commands
 
 from core.bot_classes import MyContext
+from core.bot_classes.axobot import Axobot
 from core.translator import LOCALES_MAP
+from core.type_utils import channel_is_messageable
+
+AnyAppCommand = discord.app_commands.Command[Any, ..., Any]
+AppCommandsGroup = discord.app_commands.Group
+AppCommandOrGroup = AnyAppCommand | AppCommandsGroup
+AnyCtxCommand = commands.Command[Any, ..., Any]
+AnyCtxGroup = commands.Group[Any, ..., Any]
 
 
 class FieldData(TypedDict):
@@ -31,9 +39,10 @@ async def get_embed_footer(ctx: MyContext):
     "Get the footer text to use for help embeds"
     return (await ctx.bot._(ctx.channel, "help.footer")).format('/')
 
-async def get_discord_locale(ctx: MyContext | discord.Interaction):
+async def get_discord_locale(ctx: MyContext | discord.Interaction[Axobot]):
     "Get the Discord locale to use for a given context"
-    bot_locale = await ctx.bot._(ctx.channel, "_used_locale")
+    bot = ctx.bot if isinstance(ctx, MyContext) else ctx.client
+    bot_locale = await bot._(ctx.channel, "_used_locale")
     for locale, lang in LOCALES_MAP.items():
         if lang == bot_locale:
             return locale
@@ -51,14 +60,14 @@ async def extract_info(raw_description: str) -> tuple[str | None, list[str], str
             doc = line.replace("..Doc ", "")
         else:
             description.append(line)
-    return (
+    return tuple(
         x if len(x) > 0 else None
         for x in ("\n\n".join(description), examples, doc)
-    )
+    ) # pyright: ignore[reportReturnType]
 
 async def generate_warnings_field(
         ctx: MyContext,
-        command: app_commands.Command | app_commands.Group | commands.Command | commands.Group
+        command: AnyAppCommand | AppCommandsGroup | AnyCtxCommand | AnyCtxGroup
     ) -> FieldData | None:
     "Generate an embed field to list warnings and checks about a command usage"
     if isinstance(command, app_commands.Group | commands.Group):
@@ -89,7 +98,7 @@ async def generate_warnings_field(
             "inline": False
         }
 
-async def _extract_check_name(check: Callable) -> str:
+async def _extract_check_name(check: Callable[..., Any]) -> str:
     "Get the name of a check"
     if "guild_only.<locals>.predicate" in str(check):
         return "guild_only"
@@ -101,7 +110,7 @@ async def _extract_check_name(check: Callable) -> str:
         return "has_permissions"
     return check.__qualname__.split('.')[0]
 
-async def _run_check_function(ctx: MyContext, check: Callable) -> bool:
+async def _run_check_function(ctx: MyContext, check: Callable[..., Any]) -> bool:
     # get type of expected argument
     sig = inspect.signature(check)
     first_param_name = list(sig.parameters.keys())[0]
@@ -135,9 +144,13 @@ async def _run_check_function(ctx: MyContext, check: Callable) -> bool:
 async def get_send_callback(ctx: MyContext):
     "Get a function to call to send the command result"
     async def _send_interaction(content: str | None=None, *, embed: discord.Embed | None = None):
+        if ctx.interaction is None:
+            raise ValueError("Cannot send interaction response: no interaction found in context")
         await ctx.interaction.followup.send(content, embed=embed)
 
     async def _send_default(content: str | None=None, *, embed: discord.Embed | None = None):
+        if not channel_is_messageable(destination):
+            raise ValueError("Cannot send message: no destination channel found")
         await destination.send(content, embed=embed)
 
     destination = None
@@ -175,4 +188,4 @@ async def _should_dm(ctx: MyContext) -> bool:
     "Check if the answer should be sent in DM or in current channel"
     if ctx.guild is None or not ctx.bot.database_online:
         return False
-    return await ctx.bot.get_config(ctx.guild.id, "help_in_private")
+    return await ctx.bot.get_config(ctx.guild.id, "help_in_private") # pyright: ignore[reportReturnType]

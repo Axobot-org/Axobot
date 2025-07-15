@@ -32,7 +32,7 @@ class FormatUtils:
 
 
     @staticmethod
-    async def time_delta(date1: datetime | int, date2: datetime | None = None,
+    async def time_delta(date1: datetime | int | float, date2: datetime | None = None,
                          lang: str = "en", year: bool = False, hour: bool = True, seconds: bool = True,
                          form: Literal["short", "developed"] = "developed"):
         """Translates a two time interval datetime into a readable character string
@@ -40,9 +40,9 @@ class FormatUtils:
         form can be 'short' (3d 6h) or 'developed' (3 jours 6 heures)
         """
         if date2 is None:
-            if not isinstance(date1, int):
+            if not isinstance(date1, (int, float)):
                 raise TypeError("date2 must be a datetime object or an integer")
-            delta = relativedelta(seconds=date1)
+            delta = relativedelta(seconds=int(date1))
         else:
             if not isinstance(date1, datetime):
                 raise TypeError("date1 must be a datetime object")

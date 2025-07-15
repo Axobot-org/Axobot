@@ -1,6 +1,5 @@
 import asyncio
 import datetime
-import importlib
 import time
 from typing import Literal
 
@@ -14,32 +13,42 @@ from discord.ext import commands, tasks
 from core.arguments import args
 from core.bot_classes import SUPPORT_GUILD_ID, Axobot
 from core.checks import checks
+from core.type_utils import (AnyStrDict, channel_is_guild_messageable,
+                             channel_is_messageable,
+                             assert_interaction_channel_is_guild_messageable)
 from core.views import ConfirmView
 
-importlib.reload(args)
-importlib.reload(checks)
+from .src.types import (DbPartner, EmbedField, PartnerType, TopGGBotResponse,
+                        TopGGStatsResponse)
 
 DescriptionType = app_commands.Range[str, 1, 1500]
 
 class PartnerIdTransformer(app_commands.Transformer):
     """Converts a string to a bot invite or a guild invite"""
 
-    type = AppCommandOptionType.integer
+    @property
+    def type(self):
+        return AppCommandOptionType.integer
 
-    min_value = 0
+    @property
+    def min_value(self):
+        return 0
 
     async def transform(self, interaction, value, /):
         return value
 
-    async def autocomplete(self, interaction, value, /):
-        self: "Partners"
-        if (self := interaction.client.get_cog("Partners")) is None:
+    async def autocomplete( # pyright: ignore[reportIncompatibleMethodOverride]
+            self, interaction: discord.Interaction, value, /
+        ) -> list[app_commands.Choice[str]]:
+        if not assert_interaction_channel_is_guild_messageable(interaction):
             return []
-        value = value.lower()
-        partners = await self._get_partners_for_choice(interaction.guild_id)
+        if (cog := interaction.client.get_cog("Partners")) is None:
+            return []
+        value = str(value).lower()
+        partners = await cog.get_partners_for_choice(interaction.guild_id)
         filtered: list[tuple[bool, str, str]] = []
         for partner in partners:
-            name = await self._fetch_name_from_partner(partner["type"], partner["target"])
+            name = await cog.fetch_name_from_partner(partner["type"], partner["target"])
             if value == str(partner["ID"]) or value in name.lower():
                 filtered.append((
                     not name.lower().startswith(value),
@@ -91,6 +100,8 @@ class Partners(commands.Cog):
         count = [0,0]
         for channel in channels:
             try:
+                if not channel_is_messageable(channel):
+                    raise TypeError(f"Partner channel {channel.id} of type {type(channel)} is not messageable")
                 count[0] += 1
                 count[1] += await self.update_partners(channel)
             except Exception as err:
@@ -100,41 +111,39 @@ class Partners(commands.Cog):
             description=f"**Partners channels updated** in {delta_time}s ({count[0]} channels - {count[1]} partners)",
             color=10949630,
             timestamp=self.bot.utcnow())
-        emb.set_author(name=self.bot.user, icon_url=self.bot.user.display_avatar)
+        emb.set_author(name=self.bot.user, icon_url=self.bot.display_avatar)
         await self.bot.send_embed(emb, url="loop")
 
     @refresh_loop.error
-    async def on_refresh_loop_error(self, error):
+    async def on_refresh_loop_error(self, error: BaseException):
         self.bot.dispatch("error", error, "When refreshing partners channels")
 
     async def generate_id(self):
         return round(time.time()/2)
 
-    async def db_get_partner(self, partner_id: int, guild_id: int) -> dict | None:
+    async def db_get_partner(self, partner_id: int, guild_id: int) -> DbPartner | None:
         """Return a partner based on its ID"""
         query = f"SELECT * FROM `{self.table}` WHERE `ID` = %s AND `guild` = %s"
         async with self.bot.db_main.read(query, (partner_id, guild_id), fetchone=True) as query_result:
-            return query_result
+            return query_result or None # pyright: ignore[reportReturnType]
 
-    async def db_get_partners_of_guild(self, guild_id: int):
+    async def db_get_partners_of_guild(self, guild_id: int) -> list[DbPartner]:
         """Return every partners of a guild"""
         query = f"SELECT * FROM `{self.table}` WHERE `guild` = %s"
         async with self.bot.db_main.read(query, (guild_id, )) as query_results:
-            results = list(query_results)
-        return results
+            return list(query_results) # pyright: ignore[reportReturnType]
 
-    async def db_get_partnered(self, invites: list):
+    async def db_get_partnered(self, invites: list[discord.Invite]) -> list[DbPartner]:
         """Return every guilds which has this one as partner"""
         if len(invites) == 0:
             return []
         condition = " OR ".join(["`target` = %s" for _ in invites])
-        params = [invite.code for invite in invites]
+        params = tuple(invite.code for invite in invites)
         query = f"SELECT * FROM `{self.table}` WHERE `type`='guild' AND ({condition})"
         async with self.bot.db_main.read(query, params) as query_results:
-            results = list(query_results)
-        return results
+            return list(query_results) # pyright: ignore[reportReturnType]
 
-    async def db_set_partner(self, guild_id: int, partner_id: int, partner_type: str, desc: str):
+    async def db_set_partner(self, guild_id: int, partner_id: int | str, partner_type: PartnerType, desc: str):
         """Add a partner into a server"""
         new_id = await self.generate_id()
         query = f"INSERT INTO `{self.table}` (`ID`, `guild`, `messageId`, `target`, `type`, `description`) \
@@ -148,7 +157,7 @@ class Partners(commands.Cog):
         """Modify a partner"""
         try:
             values: list[str] = []
-            params = { "id": partner_id }
+            params: AnyStrDict = { "id": partner_id }
             if target is not None:
                 values.append("`target` = %(target)s")
                 params["target"] = target
@@ -190,12 +199,13 @@ class Partners(commands.Cog):
         None if unknown bot/count not provided"""
         db_count = await self.db_get_bot_guilds(bot_id)
         try:
-            async with session.get(f"https://top.gg/api/bots/{bot_id}/stats", headers=self.dbl_headers, timeout=10) as resp:
-                ans: dict = await resp.json()
+            async with session.get(
+                f"https://top.gg/api/bots/{bot_id}/stats", headers=self.dbl_headers, timeout=aiohttp.ClientTimeout(10)
+            ) as resp:
+                response: TopGGStatsResponse = await resp.json()
         except asyncio.TimeoutError:
             return db_count
-        if "server_count" in ans:
-            api_count: int = ans["server_count"]
+        if api_count := response.get("server_count"):
             if db_count and api_count < db_count*0.95:
                 return db_count
             return api_count
@@ -205,13 +215,15 @@ class Partners(commands.Cog):
         """Get the owners list of a bot
         Empty list if unknown bot/owners not provided"""
         try:
-            async with session.get(f"https://top.gg/api/bots/{bot_id}", headers=self.dbl_headers, timeout=10) as resp:
-                ans: dict = await resp.json()
+            async with session.get(
+                f"https://top.gg/api/bots/{bot_id}", headers=self.dbl_headers, timeout=aiohttp.ClientTimeout(10)
+            ) as resp:
+                response: TopGGBotResponse = await resp.json()
         except asyncio.TimeoutError:
             return []
         owners = []
-        if "owners" in ans:
-            for owner_id in ans["owners"]:
+        if "owners" in response:
+            for owner_id in response["owners"]:
                 try:
                     owners.append(await self.bot.fetch_user(owner_id))
                 except discord.NotFound:
@@ -223,9 +235,9 @@ class Partners(commands.Cog):
         guilds_map: dict[int, discord.abc.GuildChannel] = await self.bot.db_get_guilds_with_option("partner_channel")
         return list(guilds_map.values())
 
-    async def update_partners(self, channel: discord.TextChannel, color: int | None = None) -> int:
+    async def update_partners(self, channel:"discord.abc.MessageableChannel", color: int | None = None) -> int:
         """Update every partners of a channel"""
-        if not channel.permissions_for(channel.guild.me).embed_links:
+        if channel.guild is None or not channel.permissions_for(channel.guild.me).embed_links:
             return 0
         partners = await self.db_get_partners_of_guild(channel.guild.id)
         if len(partners) == 0:
@@ -240,7 +252,7 @@ class Partners(commands.Cog):
         tr_owner = await self.bot._(channel.guild.id, "info.info.guild-1")
         count = 0
         if color is None:
-            color = await self.bot.get_config(channel.guild.id, "partner_color")
+            color = await self.bot.get_config(channel.guild.id, "partner_color") # type: ignore
         session = aiohttp.ClientSession(loop=self.bot.loop)
         for partner in partners:
             target_desc = partner["description"]
@@ -251,7 +263,7 @@ class Partners(commands.Cog):
             else:
                 try:
                     title, fields, image, target_desc = await self.update_partner_guild(
-                        tr_guild, tr_members, tr_unknown, tr_invite, tr_click, channel, partner, target_desc
+                        tr_guild, tr_members, tr_unknown, tr_invite, tr_click, channel.guild, partner, target_desc
                     )
                 except discord.NotFound:
                     continue
@@ -279,38 +291,39 @@ class Partners(commands.Cog):
         return count
 
     async def update_partner_bot(self, tr_bot: str, tr_guilds: str, tr_invite: str, tr_owner: str, tr_click: str,
-                                 session: aiohttp.ClientSession, partner: dict):
+                                 session: aiohttp.ClientSession, partner: DbPartner):
         """Update a bot partner embed"""
         image = ""
         title = "**" + tr_bot.capitalize() + "** "
-        fields = []
+        fields: list[EmbedField] = []
+        partner_bot_id = int(partner["target"])
         try:
-            title += str(await self.bot.fetch_user(int(partner["target"])))
+            title += str(await self.bot.fetch_user(partner_bot_id))
             # guild count field
-            guild_nbr = await self.get_bot_guilds(partner["target"], session)
+            guild_nbr = await self.get_bot_guilds(partner_bot_id, session)
             if guild_nbr is not None:
                 fields.append({
                     "name": tr_guilds.capitalize(),
                     "value": str(guild_nbr)
                 })
             # owners field
-            owners = await self.get_bot_owners(partner["target"], session)
+            owners = await self.get_bot_owners(partner_bot_id, session)
             if owners:
                 fields.append({
                     "name": tr_owner.capitalize(),
                     "value": ", ".join([str(u) for u in owners])
                 })
-            usr = await self.bot.fetch_user(int(partner["target"]))
+            usr = await self.bot.fetch_user(partner_bot_id)
             image = usr.display_avatar.with_static_format("png") if usr else ""
         except discord.NotFound:
             title += "ID: " + partner["target"]
         except Exception as err:
-            usr = await self.bot.fetch_user(int(partner["target"]))
+            usr = await self.bot.fetch_user(partner_bot_id)
             image = usr.display_avatar.url if usr else ""
             self.bot.dispatch("error", err)
         perm = discord.Permissions.all()
         perm.update(administrator=False)
-        oauth_url = discord.utils.oauth_url(partner["target"], permissions=perm)
+        oauth_url = discord.utils.oauth_url(partner_bot_id, permissions=perm)
         fields.append({
             "name": tr_invite.capitalize(),
             "value": f"[{tr_click.capitalize()}]({oauth_url})"
@@ -318,30 +331,31 @@ class Partners(commands.Cog):
         return title, fields, image
 
     async def update_partner_guild(self, tr_guild: str, tr_members: str, tr_unknown: str, tr_invite: str, tr_click: str,
-                                   channel: discord.TextChannel, partner: dict, target_desc: str):
+                                   guild: discord.Guild, partner: DbPartner, target_desc: str | None):
         """Update a guild partner embed"""
         title = "**" + tr_guild.capitalize() + "** "
         try:
             inv = await self.bot.fetch_invite(partner["target"])
         except discord.NotFound as err:
             raise err
-        image = str(inv.guild.icon) if inv.guild.icon else None
-        if isinstance(inv, discord.Invite) and not inv.revoked and inv.guild:
-            title += str(inv.guild.name)
-            field1 = {
+        image = str(inv.guild.icon) if isinstance(inv.guild, (discord.Guild, discord.PartialInviteGuild)) else None
+        if not inv.revoked and inv.guild:
+            if isinstance(inv.guild, (discord.Guild, discord.PartialInviteGuild)):
+                title += str(inv.guild.name)
+            field1: EmbedField | None = {
                 "name": tr_members.capitalize(),
                 "value": str(inv.approximate_member_count)
             }
-            await self.give_roles(inv, channel.guild)
+            await self.give_roles(inv, guild)
         else:
             title += tr_unknown
             field1 = None
-        field2 = {
+        field2: EmbedField = {
             "name": tr_invite.capitalize(),
             "value": f"[{tr_click.capitalize()}](https://discord.gg/{partner['target']})"
         }
-        if len(target_desc) == 0:
-            target_desc: str | None = await self.bot.get_config(inv.guild.id, "description")
+        if not target_desc:
+            target_desc = await self.bot.get_config(inv.guild.id, "description") # type: ignore
         return title, (field1, field2), image, target_desc
 
     async def give_roles(self, invite: discord.Invite, guild: discord.Guild):
@@ -350,14 +364,14 @@ class Partners(commands.Cog):
             return
         if guild.id == SUPPORT_GUILD_ID.id and self.bot.beta:
             return
-        role = await self.bot.get_config(guild.id, "partner_role")
+        role: discord.Role | None = await self.bot.get_config(guild.id, "partner_role") # type: ignore
         if role is None:
             return
         admins = [x for x in invite.guild.members if not x.bot and x.guild_permissions.administrator]
         for admin in admins:
             if admin in guild.members:
                 member = guild.get_member(admin.id)
-                if role not in member.roles:
+                if member and role not in member.roles:
                     try:
                         await member.add_roles(role)
                     except discord.HTTPException:
@@ -399,6 +413,8 @@ class Partners(commands.Cog):
         ..Example partners add discord.gg/N55zY88
 
         ..Doc server.html#add-a-partner"""
+        if not assert_interaction_channel_is_guild_messageable(interaction):
+            return
         await interaction.response.defer()
         partner_type, item = await self.fetch_user_or_invite_from_id(invite)
         if item is None:
@@ -420,7 +436,7 @@ class Partners(commands.Cog):
             timestamp=self.bot.utcnow()
         )
         emb.set_footer(text=interaction.guild.name)
-        emb.set_author(name=self.bot.user, icon_url=self.bot.user.display_avatar)
+        emb.set_author(name=self.bot.user, icon_url=self.bot.display_avatar)
         await self.bot.send_embed(emb)
 
     @partner_main.command(name="set-description")
@@ -433,6 +449,8 @@ class Partners(commands.Cog):
         ..Example partners set-description 779713982 Very cool bot with tons of features, costs a lot
 
         ..Doc server.html#add-a-partner"""
+        if not assert_interaction_channel_is_guild_messageable(interaction):
+            return
         await interaction.response.defer()
         partner = await self.db_get_partner(partner_id, interaction.guild_id)
         if not partner:
@@ -453,6 +471,8 @@ class Partners(commands.Cog):
         ..Example partners reset-description 779713982
 
         ..Doc server.html#reset-a-partner-description"""
+        if not assert_interaction_channel_is_guild_messageable(interaction):
+            return
         await interaction.response.defer()
         partner = await self.db_get_partner(partner_id, interaction.guild_id)
         if not partner:
@@ -474,6 +494,8 @@ class Partners(commands.Cog):
         ..Example partners set-invite 795897339 discord.gg/ruyvNYQ
 
         ..Doc server.html#change-a-server-invite"""
+        if not assert_interaction_channel_is_guild_messageable(interaction):
+            return
         await interaction.response.defer()
         partner = await self.db_get_partner(partner_id, interaction.guild_id)
         if not partner:
@@ -486,7 +508,7 @@ class Partners(commands.Cog):
             else:
                 await interaction.followup.send(await self.bot._(interaction, "partners.invalid-invite"))
             return
-        if await self.db_edit_partner(partner["ID"], target=item.id):
+        if await self.db_edit_partner(partner["ID"], target=str(item.id)):
             await interaction.followup.send(await self.bot._(interaction, "partners.changed-invite"))
         else:
             await interaction.followup.send(await self.bot._(interaction, "partners.unknown-error"))
@@ -501,22 +523,29 @@ class Partners(commands.Cog):
         ..Example partner remove 800697342
 
         ..Doc server.html#remove-a-partner"""
+        if not assert_interaction_channel_is_guild_messageable(interaction):
+            return
         await interaction.response.defer()
         partner = await self.db_get_partner(partner_id, interaction.guild_id)
         if not partner:
             await interaction.followup.send(await self.bot._(interaction, "partners.invalid-partner"))
             return
         if partner["type"] == "bot":
+            if not isinstance(partner["target"], int):
+                raise TypeError(f"Expected partner target to be an int for bot type, but got {type(partner['target'])}")
             try:
                 bot = await self.bot.fetch_user(partner["target"])
             except discord.NotFound:
                 bot = partner["target"]
             confirm_txt = await self.bot._(interaction, "partners.confirm-bot", bot=bot)
         elif partner["type"] == "guild":
+            server = partner["target"]
             try:
-                server = (await self.bot.fetch_invite(partner["target"])).guild.name
+                guild = await self.bot.fetch_invite(partner["target"])
+                if isinstance(guild, (discord.Guild, discord.PartialInviteGuild)):
+                    server = guild.name
             except discord.NotFound:
-                server = partner["target"]
+                pass
             confirm_txt = await self.bot._(interaction, "partners.confirm-server", server=server)
         else:
             return
@@ -541,7 +570,7 @@ class Partners(commands.Cog):
                 timestamp=self.bot.utcnow()
             )
             emb.set_footer(text=interaction.guild.name)
-            emb.set_author(name=self.bot.user, icon_url=self.bot.user.display_avatar)
+            emb.set_author(name=self.bot.user, icon_url=self.bot.display_avatar)
             await self.bot.send_embed(emb)
         else:
             await interaction.followup.send(await self.bot._(interaction, "partners.unknown-error"))
@@ -553,6 +582,8 @@ class Partners(commands.Cog):
         """Get the list of your server partners
 
         ..Doc server.html#list-every-partners"""
+        if not assert_interaction_channel_is_guild_messageable(interaction):
+            return
         await interaction.response.defer()
         lists = ['', '']
         tr_bot = await self.bot._(interaction, "misc.bot")
@@ -563,16 +594,21 @@ class Partners(commands.Cog):
         for partner in await self.db_get_partners_of_guild(interaction.guild_id):
             date = f"<t:{partner['added_at'].timestamp():.0f}:D>"
             if partner["type"]=="bot":
+                if not isinstance(partner["target"], int):
+                    raise TypeError(f"Expected partner target to be an int for bot type, but got {type(partner['target'])}")
                 try:
                     bot = await self.bot.fetch_user(partner["target"])
                 except discord.HTTPException:
                     bot = partner["target"]
                 lists[0] += f"[{partner['ID']}] **{tr_bot.capitalize()}** `{bot}` ({tr_added} {date})\n"
             elif partner["type"]=="guild":
+                server = "discord.gg/" + partner["target"]
                 try:
-                    server = (await self.bot.fetch_invite(partner["target"])).guild.name
+                    guild = await self.bot.fetch_invite(partner["target"])
+                    if isinstance(guild, (discord.Guild, discord.PartialInviteGuild)):
+                        server = guild.name
                 except discord.HTTPException:
-                    server = "discord.gg/"+partner["target"]
+                    pass
                 lists[0] += f"[{partner['ID']}] **{tr_guild.capitalize()}** `{server}` ({tr_added} {date})\n"
         if interaction.guild.me.guild_permissions.manage_guild:
             for partner in await self.db_get_partnered(await interaction.guild.invites()):
@@ -589,7 +625,7 @@ class Partners(commands.Cog):
         if len(lists[1]) == 0:
             lists[1] = await self.bot._(interaction, "partners.no-partner-2")
         fields_name = await self.bot._(interaction, "partners.partners-list")
-        color = await self.bot.get_config(interaction.guild_id, "partner_color")
+        color: int | None = await self.bot.get_config(interaction.guild_id, "partner_color") # type: ignore
         emb = discord.Embed(title=fields_name[0], color=color, timestamp=self.bot.utcnow())
         if interaction.guild.icon:
             emb.set_thumbnail(url=interaction.guild.icon)
@@ -610,7 +646,9 @@ class Partners(commands.Cog):
 
     ..Doc server.html#change-the-embed-color"""
         await interaction.response.defer()
-        await self.bot.get_cog("ServerConfig").config_set_cmd(interaction, "partner_color", color)
+        if (serverconfig_cog := self.bot.get_cog("ServerConfig")) is None:
+            raise RuntimeError("ServerConfig cog not loaded, cannot set partner color")
+        await serverconfig_cog.config_set_cmd(interaction, "partner_color", color)
 
     @partner_main.command(name="refresh")
     @app_commands.check(checks.database_connected)
@@ -619,11 +657,15 @@ class Partners(commands.Cog):
         """Refresh your partners information in the designated channel
 
         ..Doc server.html#refresh-your-list"""
+        if not assert_interaction_channel_is_guild_messageable(interaction):
+            return
         await interaction.response.send_message(
             await self.bot._(interaction, "rss.guild-loading", emoji=self.bot.emojis_manager.customs["loading"])
         )
-        channel: discord.abc.GuildChannel | None = await self.bot.get_config(interaction.guild_id, "partner_channel")
-        if channel is None:
+        channel: discord.abc.GuildChannel | None = await self.bot.get_config( # type: ignore
+            interaction.guild_id, "partner_channel"
+        )
+        if not channel_is_guild_messageable(channel):
             await interaction.edit_original_response(content=await self.bot._(interaction, "partners.no-channel"))
             return
         count = await self.update_partners(channel)
@@ -631,21 +673,25 @@ class Partners(commands.Cog):
 
 
     @cached(TTLCache(100, ttl=30))
-    async def _get_partners_for_choice(self, guild_id: int):
+    async def get_partners_for_choice(self, guild_id: int):
         return await self.db_get_partners_of_guild(guild_id)
 
     @cached(TTLCache(1_000, ttl=60*5))
-    async def _fetch_name_from_partner(self, partner_type: Literal["bot", "guild"], target: str) -> str:
+    async def fetch_name_from_partner(self, partner_type: Literal["bot", "guild"], target: str) -> str:
+        "Find the display name of a partner from its type and target (ie. bot name or guild name)"
         if partner_type == "bot":
             try:
-                return str(await self.bot.fetch_user(target))
+                return str(await self.bot.fetch_user(int(target)))
             except discord.NotFound:
                 return target
         try:
-            return (await self.bot.fetch_invite(target)).guild.name
+            guild = (await self.bot.fetch_invite(target)).guild
+            if not isinstance(guild, (discord.Guild, discord.PartialInviteGuild)):
+                return target
+            return guild.name
         except discord.NotFound:
             return target
 
 
-async def setup(bot):
+async def setup(bot: Axobot):
     await bot.add_cog(Partners(bot))

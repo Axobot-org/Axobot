@@ -28,6 +28,12 @@ class Users(commands.Cog):
         self.bot = bot
         self.file = "users"
 
+    @property
+    def utility_cog(self):
+        if cog := self.bot.get_cog("Utilities"):
+            return cog
+        raise RuntimeError("Utilities cog not loaded")
+
     async def db_get_userinfo(self, user_id: int) -> dict[str, Any] | None:
         """Get the user info from the database"""
         if not self.bot.database_online:
@@ -127,7 +133,7 @@ class Users(commands.Cog):
         """Add or remove a rank card style for a user"""
         if style not in RankCardsFlag.FLAGS.values():
             raise ValueError(f"Unknown card style: {style}")
-        rankcards: list = await self.get_rankcards(user)
+        rankcards = await self.get_rankcards(user)
         if style in rankcards and add:
             return
         if style not in rankcards and not add:
@@ -138,7 +144,7 @@ class Users(commands.Cog):
             rankcards.remove(style)
         await self.db_edit_user_rankcards(user.id, RankCardsFlag().flags_to_int(rankcards))
 
-    async def get_rankcards_stats(self) -> dict:
+    async def get_rankcards_stats(self) -> dict[str, int]:
         """Get how many users use any rank card"""
         if not self.bot.database_online:
             return {}
@@ -155,7 +161,7 @@ class Users(commands.Cog):
 
     async def card_style_autocomplete(self, user: UserOrMember, current: str):
         "Autocompletion for a card style name"
-        styles_list: list[str] = await self.bot.get_cog("Utilities").allowed_card_styles(user)
+        styles_list: list[str] = await self.utility_cog.allowed_card_styles(user)
         filtered = sorted(
             (not name.startswith(current), name) for name in styles_list
             if current in name
@@ -184,14 +190,22 @@ class Users(commands.Cog):
         ..Doc user.html#change-your-xp-card"""
         await interaction.response.defer(ephemeral=True)
         if style is None:
-            style = await self.bot.get_cog("Utilities").get_xp_style(interaction.user)
+            style = await self.utility_cog.get_xp_style(interaction.user)
         profile_card_cmd = await self.bot.get_command_mention("profile card")
         desc = await self.bot._(interaction, "users.card-desc", profile_cmd=profile_card_cmd)
-        xp_cog = self.bot.get_cog("Xp")
+        if (xp_cog := self.bot.get_cog("Xp")) is None:
+            raise RuntimeError("Xp cog not loaded")
         translations_map = await xp_cog.get_card_translations_map(interaction)
-        card = await xp_cog.create_card(translations_map, interaction.user, style, xp=30, rank=0, ranks_nb=1,
-                                                        levels_info=[1, 85, 0])
-                                                        # current level, xp for next level, xp for current level
+        card = await xp_cog.create_card(
+            translations_map,
+            interaction.user,
+            style,
+            xp=30,
+            rank=0,
+            ranks_nb=1,
+            levels_info=(1, 85, 0)
+            # current level, xp for next level, xp for current level
+        )
         await interaction.followup.send(desc, file=card)
 
     @profile_cardpreview.autocomplete("style")
@@ -221,7 +235,7 @@ class Users(commands.Cog):
     @app_commands.check(checks.database_connected)
     async def profile_card_list(self, interaction: discord.Interaction):
         "List the available card styles for you"
-        available_cards = "\n- " + "\n- ".join(await self.bot.get_cog("Utilities").allowed_card_styles(interaction.user))
+        available_cards = "\n- " + "\n- ".join(await self.utility_cog.allowed_card_styles(interaction.user))
         await interaction.response.send_message(
             await self.bot._(interaction, "users.list-cards", cards=available_cards),
             ephemeral=True
@@ -259,5 +273,5 @@ class Users(commands.Cog):
             await interaction.followup.send(await self.bot._(interaction, "users.config_success", opt=option))
 
 
-async def setup(bot):
+async def setup(bot: Axobot):
     await bot.add_cog(Users(bot))

@@ -1,6 +1,6 @@
 import re
 from collections import Counter
-from typing import TypeVar
+from typing import Generic, Iterable, Sequence, TypedDict, TypeVar
 
 import discord
 
@@ -106,12 +106,19 @@ class Message:
             "class": self.category
         }
 
-ClassType = TypeVar("ClassType")
-class PredictionResult:
+PredictionClass = TypeVar("PredictionClass")
+
+class PredictionResultDict(TypedDict, Generic[PredictionClass]):
+    "Represents the result of a prediction, as a dictionary"
+    probabilities: dict[PredictionClass, float]
+    result: PredictionClass | None
+    classes: Sequence[PredictionClass]
+
+class PredictionResult(Generic[PredictionClass]):
     "Represents the results of an AI prediction"
-    def __init__(self, probabilities: list[float], classes: list[ClassType]):
-        self.probabilities: dict[ClassType, float] = {}
-        self.result: ClassType = None
+    def __init__(self, probabilities: Iterable[float], classes: Iterable[PredictionClass]):
+        self.probabilities: dict[PredictionClass, float] = {}
+        self.result: PredictionClass | None = None
         max_prob = -1
         for prob, cls in zip(probabilities, classes, strict=True):
             self.probabilities[cls] = prob
@@ -120,15 +127,21 @@ class PredictionResult:
                 max_prob = prob
         self.classes = classes
 
-    def to_dict(self):
+    def to_dict(self) -> PredictionResultDict[PredictionClass]:
+        "Returns a dictionary representation of the prediction result"
         return {
             "probabilities": self.probabilities,
             "result": self.result,
-            "classes": self.classes
+            "classes": list(self.classes)
         }
 
-    def to_string(self, categories: dict):
-        text = f"Result: {categories[self.result]}\n\nProbabilities:\n"
+    def to_string(self, categories: dict[PredictionClass, str]) -> str:
+        "Returns a string representation of the prediction result"
+        if self.result:
+            text = f"Result: {categories[self.result]}"
+        else:
+            text = "Result: Unknown"
+        text += "\n\nProbabilities:\n"
         for category, proba in self.probabilities.items():
             text += f"- {categories[category]}: {round(proba*100, 1)}%\n"
         return text

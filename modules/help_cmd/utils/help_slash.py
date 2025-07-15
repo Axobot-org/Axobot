@@ -1,7 +1,6 @@
 from typing import TYPE_CHECKING
 
 import discord
-from discord.app_commands import Command, Group
 
 from core.bot_classes import MyContext
 
@@ -9,13 +8,14 @@ from .slash_cmd_utils import (get_command_desc_translation,
                               get_command_description,
                               get_command_name_translation,
                               get_command_signature)
-from .utils import (FieldData, generate_warnings_field, get_embed_color,
-                    get_embed_footer, get_send_callback)
+from .utils import (AppCommandOrGroup, AppCommandsGroup, FieldData,
+                    generate_warnings_field, get_embed_color, get_embed_footer,
+                    get_send_callback)
 
 if TYPE_CHECKING:
     from ..help_cmd import Help as HelpCog
 
-AppCommandOrGroup = Command | Group
+
 
 def sort_by_name(cmd: AppCommandOrGroup):
     return cmd.name
@@ -53,7 +53,7 @@ async def _generate_command_fields(cog: "HelpCog", ctx: MyContext, command: AppC
             "inline": False
         })
     # Subcommands
-    if isinstance(command, Group):
+    if isinstance(command, AppCommandsGroup):
         syntax += " ..."
         if subcommands_field := await _generate_subcommands_field(ctx, command):
             fields.append(subcommands_field)
@@ -72,7 +72,7 @@ async def _generate_command_fields(cog: "HelpCog", ctx: MyContext, command: AppC
     fields.append(await _generate_command_category_field(cog, ctx, command))
     return syntax, fields
 
-async def _generate_subcommands_field(ctx: MyContext, cmd: Group) -> FieldData | None:
+async def _generate_subcommands_field(ctx: MyContext, cmd: AppCommandsGroup) -> FieldData | None:
     "Generate an embed field to describe the subcommands of a commands group"
     subcmds = ""
     subs_cant_show = 0

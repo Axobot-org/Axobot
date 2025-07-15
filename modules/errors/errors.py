@@ -303,10 +303,10 @@ class Errors(commands.Cog):
                 msg = context + f"\n```py\n{python_message[i:i+1920]}\n```"
             else:
                 msg = f"```py\n{python_message[i:i+1920]}\n```"
-            success = success and await self.senf_err_msg(msg)
+            success = success and await self.send_err_msg(msg)
         return success
 
-    async def senf_err_msg(self, msg: str):
+    async def send_err_msg(self, msg: str):
         """Envoie un message dans le salon d'erreur"""
         errors_channel: discord.TextChannel | None = self.bot.get_channel(626039503714254858) # type: ignore
         if errors_channel is None:
@@ -320,5 +320,5 @@ class Errors(commands.Cog):
         return True
 
 
-async def setup(bot):
+async def setup(bot: Axobot):
     await bot.add_cog(Errors(bot))

@@ -84,6 +84,7 @@
     "list2": "*Type the number of the feeds to delete*\n\n**Link - Type - Channel**\n",
     "loop-processing": "A check of your RSS feeds is already in progress. Please wait a few minutes",
     "mc": "Minecraft",
+    "move-invalid-channel": "The channel you provided is not valid. Please provide a valid text channel or thread.",
     "move-success": {
         "many": "%{count} RSS feeds have been moved to the channel %{channel}!",
         "one": "One RSS feed has been moved in the channel %{channel}!"

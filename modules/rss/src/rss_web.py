@@ -31,7 +31,7 @@ class WebRSS:
         return bool(matches)
 
     async def _get_feed(self, url: str, filter_config: FeedFilterConfig | None=None,
-                        session: aiohttp.ClientSession | None=None) -> FeedParserDict:
+                        session: aiohttp.ClientSession | None=None) -> FeedParserDict | None:
         "Get a list of feeds from a web URL"
         feed = await feed_parse(url, 9, session)
         if feed is None or not feed.entries:
@@ -53,8 +53,8 @@ class WebRSS:
                 pass
         if filter_config is not None:
             # Remove entries that don't match the filter
-            feed.entries = [entry for entry in feed.entries[:50] if await check_filter(entry, filter_config)]
-            if not feed.entries:
+            feed["entries"] = [entry for entry in feed.entries[:50] if await check_filter(entry, filter_config)]
+            if not feed["entries"]:
                 return None
         return feed
 
@@ -63,13 +63,13 @@ class WebRSS:
         "Compute which key to use to get the date from a feed"
         for i in ["published_parsed", "published", "updated_parsed"]:
             if entry.get(i) is not None:
-                return i
+                return i # type: ignore
 
     async def _get_entry_datetime(self, entry: FeedParserDict) -> dt.datetime | None:
         "Try to find the entry publication date and return it as a datetime object"
         entry_date = entry.get(await self._get_feed_date_key(entry))
         if isinstance(entry_date, time.struct_time):
-            if entry_date.tm_zone is None:
+            if entry_date.tm_zone is None: # type: ignore
                 timezone = dt.UTC
             else:
                 timezone = dt.timezone(dt.timedelta(seconds=entry_date.tm_gmtoff))
@@ -87,7 +87,7 @@ class WebRSS:
             if value := entry.get(i):
                 return value
 
-    async def _parse_entry(self, entry: FeedParserDict, feed: FeedParserDict, url: str, date: Any, channel: discord.TextChannel):
+    async def _parse_entry(self, entry: FeedParserDict, feed: FeedParserDict, url: str, date: Any, channel:"discord.abc.MessageableChannel"):
         "Parse a feed entry to get the relevant information and return a RssMessage object"
         if "link" in entry:
             link = entry["link"]
@@ -130,7 +130,7 @@ class WebRSS:
             post_description=post_description
         )
 
-    async def get_last_post(self, channel: discord.TextChannel, url: str,
+    async def get_last_post(self, channel:"discord.abc.MessageableChannel", url: str,
                             filter_config: FeedFilterConfig | None,
                             session: aiohttp.ClientSession | None=None):
         "Get the last post from a web feed"
@@ -141,7 +141,7 @@ class WebRSS:
         entry_date = await self._get_entry_datetime(entry) or "Unknown"
         return await self._parse_entry(entry, feed, url, entry_date, channel)
 
-    async def get_new_posts(self, channel: discord.TextChannel, url: str, date: dt.datetime,
+    async def get_new_posts(self, channel:"discord.abc.MessageableChannel", url: str, date: dt.datetime,
                             filter_config: FeedFilterConfig | None,
                             last_entry_id: str | None=None,
                             session: aiohttp.ClientSession | None=None) -> list[RssMessage]:

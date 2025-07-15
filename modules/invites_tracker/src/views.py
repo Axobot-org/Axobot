@@ -1,10 +1,12 @@
 from math import ceil
+from typing import Sequence
 
-from discord import Color, Embed, User
+from discord import Color, Embed
 
 from core.bot_classes.axobot import Axobot
 from core.formatutils import FormatUtils
 from core.paginator import Paginator
+from core.type_utils import UserOrMember
 
 from .types import TrackedInvite
 
@@ -13,7 +15,7 @@ INVITES_PER_PAGE = 20
 class TrackedInvitesPaginator(Paginator):
     "Paginator to list tracked invites for a guild"
 
-    def __init__(self, client: Axobot, user: User, invites: list[TrackedInvite], stop_label: str):
+    def __init__(self, client: Axobot, user: UserOrMember, invites: Sequence[TrackedInvite], stop_label: str):
         super().__init__(client, user, stop_label)
         self.invites = sorted(invites, key=lambda invite: invite["last_count"], reverse=True)
 

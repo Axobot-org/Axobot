@@ -4,11 +4,10 @@ import typing
 import aiohttp
 import discord
 from discord.ext import commands
-from discord.ext.commands import Cog
 
 from core.bot_classes import Axobot, MyContext
 from core.checks.errors import NotDuringEventError
-from core.colors_events import (BlurpleVariationFlagType, ColorVariation,
+from core.colors_events import (BlurpleVariationFlagType, ColorVariationType,
                                 TargetConverterType, check_blurple,
                                 convert_blurple, get_url_from_ctx)
 
@@ -19,7 +18,7 @@ async def is_blurple(ctx: MyContext):
         return True
     raise NotDuringEventError()
 
-class Blurplefy(Cog):
+class Blurplefy(commands.Cog):
     "Class used to make things blurple, for the Discord birthday event"
 
     def __init__(self, bot: Axobot):
@@ -33,6 +32,13 @@ class Blurplefy(Cog):
             with open("blurple-cache.json", "w", encoding="utf-8") as jsonfile:
                 jsonfile.write("[]")
             self.cache = []
+
+    @property
+    def event_cog(self):
+        """Get the BotEvents cog to access event points system"""
+        if cog := self.bot.get_cog("BotEvents"):
+            return cog
+        raise RuntimeError("BotEvents cog not found, cannot access event points system")
 
     @commands.hybrid_group(name="blurple", aliases=["b"], brief="Happy Discord Birthday!")
     @commands.check(is_blurple)
@@ -100,7 +106,7 @@ Online editor: https://projectblurple.com/paint
 
     async def color_command(self, fmodifier: typing.Literal["light", "dark"], ctx: MyContext,
                             method: BlurpleVariationFlagType = "blurplefy",
-                            variations: commands.Greedy[ColorVariation] = None,
+                            variations: commands.Greedy[ColorVariationType] | None = None,
                             replace_background: bool = False,
                             who: TargetConverterType | None = None):
         "Change a given image with the given modifier, method and variations"
@@ -121,17 +127,17 @@ Online editor: https://projectblurple.com/paint
             await ctx.send(await self.bot._(ctx.channel, "color-event.unknown-err", err=str(err)))
             return
         await ctx.reply(await self.bot._(ctx.channel, "color-event.colorify.success", user=ctx.author.mention), file=result)
-        if not isinstance(old_msg, discord.InteractionMessage):
+        if old_msg and not isinstance(old_msg, discord.InteractionMessage):
             await old_msg.delete()
         if self.bot.database_online:
-            await self.bot.get_cog("BotEvents").db_add_user_points(ctx.author.id, 3)
+            await self.event_cog.db_add_user_points(ctx.author.id, 3)
 
     @blurple_main.command("lightfy")
     @commands.cooldown(6, 120, commands.BucketType.member)
     @commands.cooldown(20, 60, commands.BucketType.guild)
     @commands.check(is_blurple)
     async def lightfy(self, ctx: MyContext, method: BlurpleVariationFlagType = "blurplefy",
-                      variations: commands.Greedy[ColorVariation] = None,
+                      variations: commands.Greedy[ColorVariationType] | None = None,
                       replace_background: bool = False,
                       who: TargetConverterType | None = None):
         "Lightfy an image"
@@ -142,7 +148,7 @@ Online editor: https://projectblurple.com/paint
     @commands.cooldown(20, 60, commands.BucketType.guild)
     @commands.check(is_blurple)
     async def darkfy(self, ctx: MyContext, method: BlurpleVariationFlagType = "blurplefy",
-                      variations: commands.Greedy[ColorVariation] = None,
+                      variations: commands.Greedy[ColorVariationType] | None = None,
                       replace_background: bool = False,
                       who: TargetConverterType | None = None):
         "Darkfy an image"
@@ -166,16 +172,21 @@ Online editor: https://projectblurple.com/paint
             async with session.get(str(url)) as image:
                 result = await check_blurple(await image.read())
         answer = "\n".join(f"> {color['name']}: {color['ratio']}%" for color in result["colors"])
-        await ctx.reply(await self.bot._(ctx.channel, "color-event.blurple.check.result", user=ctx.author.mention, results=answer))
+        await ctx.reply(
+            await self.bot._(ctx.channel, "color-event.blurple.check.result", user=ctx.author.mention, results=answer)
+        )
         if result["passed"] and self.bot.database_online and ctx.author.id not in self.cache:
             reward_points = 40
-            await self.bot.get_cog("BotEvents").db_add_user_points(ctx.author.id, reward_points)
+            await self.event_cog.db_add_user_points(ctx.author.id, reward_points)
             self.cache.append(ctx.author.id)
             with open("blurple-cache.json", "w", encoding="utf-8") as jsonfile:
                 json.dump(self.cache, jsonfile)
-            await ctx.send(await self.bot._(ctx.channel, "color-event.blurple.check.reward", user=ctx.author.mention, amount=reward_points))
-        if not isinstance(old_msg, discord.InteractionMessage):
+            await ctx.send(
+                await self.bot._(ctx.channel, "color-event.blurple.check.reward", user=ctx.author.mention, amount=reward_points)
+            )
+        if old_msg and not isinstance(old_msg, discord.InteractionMessage):
             await old_msg.delete()
 
-async def setup(bot):
+
+async def setup(bot: Axobot):
     await bot.add_cog(Blurplefy(bot))

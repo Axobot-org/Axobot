@@ -12,6 +12,7 @@ from mysql.connector.errors import IntegrityError
 
 from core.bot_classes import Axobot
 from core.enums import ServerWarningType
+from core.type_utils import assert_interaction_channel_is_guild_messageable, channel_is_guild_messageable
 
 from .api.api_agent import TwitchApiAgent
 from .api.types import (GroupedStreamerDBObject, PlatformId, StreamersDBObject,
@@ -56,7 +57,7 @@ class Twitch(commands.Cog):
             async with self.bot.db_main.write(
                 query, (guild_id, platform, user_id, user_name, self.bot.beta), returnrowcount=True
             ) as query_result:
-                return query_result > 0
+                return query_result is not None and query_result > 0
         except IntegrityError:
             return False
 
@@ -69,12 +70,12 @@ class Twitch(commands.Cog):
     async def db_get_guild_streamers(self, guild_id: int, platform: PlatformId | None=None) -> list[StreamersDBObject]:
         "Get the streamers for a guild"
         query = "SELECT * FROM `streamers` WHERE `guild_id` = %s AND `beta` = %s"
-        args = [guild_id, self.bot.beta]
+        args: tuple[int | bool | str, ...] = (guild_id, self.bot.beta)
         if platform is not None:
             query += " AND `platform` = %s"
-            args.append(platform)
+            args += (platform,)
         async with self.bot.db_main.read(query, args) as query_result:
-            return query_result
+            return query_result # pyright: ignore[reportReturnType]
 
     async def db_get_guilds_per_streamers(self, platform: PlatformId | None=None) -> list[GroupedStreamerDBObject]:
         "Get all streamers objects"
@@ -85,14 +86,14 @@ class Twitch(commands.Cog):
             return [
                 data | {"guild_ids": json.loads(data["guild_ids"])}
                 for data in query_result
-            ]
+            ] # pyright: ignore[reportReturnType]
 
-    async def db_remove_streamer(self, guild_id: int, platform: PlatformId, user_id: str):
+    async def db_remove_streamer(self, guild_id: int, platform: PlatformId, user_id: str) -> bool:
         "Remove a streamer from the database"
         query = "DELETE FROM `streamers` WHERE `guild_id` = %s AND `platform` = %s AND `user_id` = %s AND `beta` = %s"
         async with self.bot.db_main.write(
             query, (guild_id, platform, user_id, self.bot.beta), returnrowcount=True) as query_result:
-            return query_result > 0
+            return query_result is not None and query_result > 0
 
     async def db_set_streamer_status(self, platform: PlatformId, user_id: str, is_streaming: bool):
         "Set the streaming status of a streamer"
@@ -100,7 +101,7 @@ class Twitch(commands.Cog):
         async with self.bot.db_main.write(
             query, (is_streaming, platform, user_id, self.bot.beta), returnrowcount=True
         ) as query_result:
-            return query_result > 0
+            return query_result is not None and query_result > 0
 
     async def db_get_streamer_status(self, platform: PlatformId, user_id: str) -> bool | None:
         "Get the streaming status of a streamer"
@@ -130,6 +131,8 @@ class Twitch(commands.Cog):
 ..Example twitch subscribe Zerator
 
 ..Doc streamers.html#subscribe-or-unsubscribe-to-a-streamer"""
+        if not assert_interaction_channel_is_guild_messageable(interaction):
+            return
         await interaction.response.defer()
         if match := re.findall(r"^https://(?:www\.)?twitch\.tv/(\w+)", streamer):
             streamer = match[0]
@@ -142,7 +145,12 @@ class Twitch(commands.Cog):
             await interaction.followup.send(await self.bot._(interaction, "twitch.unknown-streamer"), ephemeral=True)
             return
         streamers_count = await self.db_get_guild_subscriptions_count(interaction.guild_id)
-        max_count: int = await self.bot.get_config(interaction.guild_id, "streamers_max_number")
+        if streamers_count is None:
+            raise RuntimeError(f"Cannot get the number of subscriptions for the guild {interaction.guild_id}")
+        max_count: int = await self.bot.get_config(
+            interaction.guild_id,
+            "streamers_max_number"
+        ) # pyright: ignore[reportAssignmentType]
         if streamers_count >= max_count:
             await interaction.followup.send(
                 await self.bot._(interaction, "twitch.subscribe.limit-reached", max_count), ephemeral=True
@@ -165,6 +173,8 @@ class Twitch(commands.Cog):
 ..Example twitch unsubscribe monstercat
 
 ..Doc streamers.html#subscribe-or-unsubscribe-to-a-streamer"""
+        if not assert_interaction_channel_is_guild_messageable(interaction):
+            return
         await interaction.response.defer()
         if streamer.isnumeric():
             user_id = streamer
@@ -186,6 +196,8 @@ class Twitch(commands.Cog):
     @twitch_unsub.autocomplete("streamer")
     async def twitch_unsub_autocomplete(self, interaction: discord.Interaction, current: str):
         "Autocomplete for twitch_unsub"
+        if interaction.guild_id is None:
+            raise TypeError("This command can only be used in a guild")
         current = current.lower()
         streamers = await self.db_get_guild_streamers(interaction.guild_id, "twitch")
         filtered = [
@@ -206,9 +218,14 @@ class Twitch(commands.Cog):
 ..Example twitch list-subscriptions
 
 ..Doc streamers.html#list-your-subscriptions"""
+        if interaction.guild_id is None:
+            raise TypeError("This command can only be used in a guild")
         await interaction.response.defer()
         streamers = await self.db_get_guild_streamers(interaction.guild_id, "twitch")
-        max_count: int = await self.bot.get_config(interaction.guild_id, "streamers_max_number")
+        max_count: int = await self.bot.get_config(
+            interaction.guild_id,
+            "streamers_max_number"
+        ) # pyright: ignore[reportAssignmentType]
         if streamers:
             title = await self.bot._(interaction, "twitch.subs-list.title", current=len(streamers), max=max_count)
             on_live = await self.bot._(interaction, "twitch.on-live-indication")
@@ -232,7 +249,9 @@ class Twitch(commands.Cog):
 ..Example twitch check-stream monstercat
 
 ..Doc streamers.html#check-a-streamer-status"""
-        await interaction.response.defer(ephemeral=interaction.guild is not None)
+        if not assert_interaction_channel_is_guild_messageable(interaction):
+            return
+        await interaction.response.defer(ephemeral=True)
         if streamer.isnumeric():
             user_id = streamer
             avatar = None
@@ -250,7 +269,7 @@ class Twitch(commands.Cog):
         resp = await self.agent.get_user_stream_by_id(user_id)
         if len(resp) > 0:
             stream = resp[0]
-            if stream["is_mature"] and not (interaction.guild is None or interaction.channel.is_nsfw()):
+            if stream["is_mature"] and not interaction.channel.is_nsfw():
                 await interaction.followup.send(await self.bot._(interaction, "twitch.check-stream.no-nsfw"), ephemeral=True)
                 return
             await interaction.followup.send(embed=await self.create_stream_embed(stream, interaction, avatar))
@@ -279,7 +298,7 @@ class Twitch(commands.Cog):
             if member.bot or not member.activities:
                 continue
             for activity in member.activities:
-                if activity.type != discord.ActivityType.streaming:
+                if not isinstance(activity, discord.Streaming):
                     continue
                 if activity.twitch_name and activity.twitch_name.lower() == streamer_name:
                     return member
@@ -293,11 +312,13 @@ class Twitch(commands.Cog):
             ):
                 yield member
 
-    async def send_stream_alert(self, stream: StreamObject, channel: discord.abc.GuildChannel):
+    async def send_stream_alert(self, stream: StreamObject, channel: "discord.abc.MessageableChannel"):
         "Send a stream alert to a guild when a streamer is live"
+        if not channel_is_guild_messageable(channel):
+            raise RuntimeError("Cannot send stream alert to a non-messageable channel")
         msg = await self.bot._(channel.guild, "twitch.stream-alerts", streamer=stream["user_name"])
         allowed_mentions = discord.AllowedMentions.none()
-        if role := await self.bot.get_config(channel.guild.id, "stream_mention"):
+        if role := await self.bot.get_config(channel.guild.id, "stream_mention"): # pyright: ignore[reportAssignmentType]
             role: discord.Role
             msg = role.mention + " " + msg
             allowed_mentions = discord.AllowedMentions(roles=[role])
@@ -307,21 +328,24 @@ class Twitch(commands.Cog):
             else:
                 avatar = None
             embed = await self.create_stream_embed(stream, channel.guild.id, avatar)
+            await channel.send(
+                msg,
+                embed=embed,
+                allowed_mentions=allowed_mentions
+            )
         else:
-            embed = None
             msg += f"\nhttps://twitch.tv/{stream['user_name']}"
-        await channel.send(
-            msg,
-            embed=embed,
-            allowed_mentions=allowed_mentions
-        )
+            await channel.send(
+                msg,
+                allowed_mentions=allowed_mentions
+            )
 
 
     @commands.Cog.listener()
     async def on_stream_starts(self, stream: StreamObject, guild: discord.Guild):
         "When a stream starts, send a notification to the subscribed guild"
         # Send notification
-        if channel := await self.bot.get_config(guild.id, "streaming_channel"):
+        if (channel := await self.bot.get_config(guild.id, "streaming_channel")) and channel_is_guild_messageable(channel):
             try:
                 await self.send_stream_alert(stream, channel)
             except discord.Forbidden:
@@ -329,7 +353,7 @@ class Twitch(commands.Cog):
                 self.bot.dispatch("server_warning", ServerWarningType.STREAM_NOTIFICATION_MISSING_PERMISSIONS,
                                   guild, channel_id=channel.id, username=stream["user_name"])
         # Grant role
-        if role := await self.bot.get_config(guild.id, "streaming_role"):
+        if (role := await self.bot.get_config(guild.id, "streaming_role")) and isinstance(role, discord.Role):
             if member := await self.find_streamer_in_guild(stream["user_name"], guild):
                 try:
                     await member.add_roles(role, reason="Twitch streamer is live")
@@ -341,7 +365,7 @@ class Twitch(commands.Cog):
     @commands.Cog.listener()
     async def on_stream_ends(self, _streamer_name: str, guild: discord.Guild):
         "When a stream ends, remove the role from the streamer"
-        if role := await self.bot.get_config(guild.id, "streaming_role"):
+        if (role := await self.bot.get_config(guild.id, "streaming_role")) and isinstance(role, discord.Role):
             async for member in self.find_streamer_offline_in_guild(guild, role):
                 try:
                     await member.remove_roles(role, reason="Twitch streamer is offline")
@@ -368,7 +392,7 @@ class Twitch(commands.Cog):
             ]
             if not guilds: # if not guild has been found, skip
                 continue
-            streamer_ids[streamer["user_id"]] = streamer | {"guilds": guilds}
+            streamer_ids[streamer["user_id"]] = streamer | {"guilds": guilds} # pyright: ignore[reportArgumentType]
             count += 1
             # make one request every 30 streamers
             if len(streamer_ids) > 30:
@@ -379,7 +403,7 @@ class Twitch(commands.Cog):
         self.log.debug("%s streamers checked", count)
 
     @stream_check_task.error
-    async def on_stream_check_error(self, error: Exception):
+    async def on_stream_check_error(self, error: BaseException):
         self.bot.dispatch("error", error, "<@279568324260528128> Twitch streams loop has crashed")
 
     async def _update_streams(self, streamer_ids: dict[str, _StreamersReadyForNotification]):

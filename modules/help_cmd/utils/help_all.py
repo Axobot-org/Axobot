@@ -4,23 +4,29 @@ import discord
 
 from core.bot_classes import MyContext
 
-from .slash_cmd_utils import get_command_inline_desc
-from .utils import (FieldData, get_embed_color, get_embed_footer,
-                    get_send_callback)
+from .slash_cmd_utils import \
+    get_command_inline_desc as get_slash_command_inline_desc
+from .txt_cmd_utils import \
+    get_command_inline_desc as get_txt_command_inline_desc
+from .utils import (AnyAppCommand, AnyCtxCommand, AppCommandsGroup, FieldData,
+                    get_embed_color, get_embed_footer, get_send_callback)
 
 if TYPE_CHECKING:
     from ..help_cmd import Help as HelpCog
 
-
-def sort_by_name(cmd: discord.app_commands.Command):
+def sort_by_name(cmd: AnyAppCommand | AnyCtxCommand | AppCommandsGroup) -> str:
     return cmd.name
 
 async def help_all_command(cog: "HelpCog", ctx: MyContext):
     "Show all commands and groups"
     send = await get_send_callback(ctx)
-    compress: bool = await cog.bot.get_config(ctx.guild.id, "compress_help") if ctx.guild else False
-    commands = cog.bot.tree.get_commands(guild=None, type=discord.AppCommandType.chat_input)
-    fields = await all_commands(cog, ctx, commands, compress=compress)
+    compress: bool = (
+        await cog.bot.get_config(ctx.guild.id, "compress_help") # pyright: ignore[reportAssignmentType]
+        if ctx.guild
+        else False
+    )
+    app_cmds = cog.bot.tree.get_commands(guild=None, type=discord.AppCommandType.chat_input)
+    fields = await all_commands(cog, ctx, app_cmds, compress=compress)
     if ctx.guild is None:
         title = await cog.bot._(ctx.channel, "help.embed_title_dm")
     else:
@@ -33,7 +39,7 @@ async def help_all_command(cog: "HelpCog", ctx: MyContext):
     await send(embed=embed)
 
 
-async def all_commands(cog: "HelpCog", ctx: MyContext, commands_list: Iterable[discord.app_commands.Command],
+async def all_commands(cog: "HelpCog", ctx: MyContext, commands_list: Iterable[AnyAppCommand | AnyCtxCommand | AppCommandsGroup],
                         compress: bool) -> list[FieldData]:
     "Generate embed fields to describe all commands, grouped by category"
     categories: dict[str, list[str]] = { x: [] for x in cog.commands_data.keys() }
@@ -42,8 +48,10 @@ async def all_commands(cog: "HelpCog", ctx: MyContext, commands_list: Iterable[d
     for command in commands_list:
         if compress:
             cmd_desc = ""
+        elif isinstance(command, (discord.app_commands.Command, discord.app_commands.Group)):
+            cmd_desc = await get_slash_command_inline_desc(ctx, command)
         else:
-            cmd_desc = await get_command_inline_desc(ctx, command)
+            cmd_desc = await get_txt_command_inline_desc(ctx, command)
         for category_id, category in cog.commands_data.items():
             if command.name in category["commands"]:
                 categories[category_id].append(cmd_desc)

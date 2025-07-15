@@ -9,7 +9,9 @@ from discord.ext import commands, tasks
 
 from core.bot_classes import Axobot
 from core.tips import UserTip
+from core.type_utils import AnyStrDict, GuildInteraction, assert_interaction_channel_is_guild_messageable
 from core.views import ConfirmView
+from modules.serverconfig.src.types import is_enum_option_representation, is_number_option_representation
 
 from .src.autocomplete import autocomplete_main
 from .src.checks import check_config
@@ -54,33 +56,34 @@ class ServerConfig(commands.Cog):
             value = await to_raw(option_name, (await self.get_options_list())[option_name]["default"], self.bot)
         return value
 
-    async def get_option(self, guild_id: discord.Guild | int, option_name: str):
+    async def get_option(self, guild: int | discord.Guild, option_name: str):
         "Return the formated value of a server config option"
+        guild_id = guild if isinstance(guild, int) else guild.id
         if self.enable_caching:
             try:
                 return self.cache[(guild_id, option_name)]
             except KeyError:
                 pass
-        guild = guild_id if isinstance(guild_id, discord.Guild) else self.bot.get_guild(guild_id)
-        if guild is None:
+        resolved_guild = guild if isinstance(guild, discord.Guild) else self.bot.get_guild(guild_id)
+        if resolved_guild is None:
             value = (await self.get_options_list())[option_name]["default"]
         else:
-            guild_id = guild.id
-            raw_value = await self.get_raw_option(guild_id, option_name)
-            value = await from_raw(option_name, raw_value, guild, self.bot)
+            if (raw_value := await self.get_raw_option(guild_id, option_name)) is None:
+                return None
+            value = await from_raw(option_name, raw_value, resolved_guild, self.bot)
         if self.enable_caching:
             self.cache[(guild_id, option_name)] = value
         return value
 
     async def set_option(self, guild_id: int, option_name: str, value: Any):
         "Set the value of a server config option"
-        if not isinstance(guild_id, int):
-            raise ValueError(f"Guild ID must be an integer, not {type(guild_id)}")
         if option_name not in (await self.get_options_list()):
             raise ValueError(f"Option {option_name} does not exist")
         if not self.bot.database_online:
             return False
-        if await self.db_set_value(guild_id, option_name, await to_raw(option_name, value, self.bot)):
+        if (raw := await to_raw(option_name, value, self.bot)) is None:
+            raise ValueError(f"Invalid value for option {option_name}: {value}")
+        if await self.db_set_value(guild_id, option_name, raw):
             if self.enable_caching:
                 self.cache[(guild_id, option_name)] = value
             return True
@@ -88,8 +91,6 @@ class ServerConfig(commands.Cog):
 
     async def reset_option(self, guild_id: int, option_name: str):
         "Reset the value of a server config option"
-        if not isinstance(guild_id, int):
-            raise ValueError(f"Guild ID must be an integer, not {type(guild_id)}")
         if option_name not in (await self.get_options_list()):
             raise ValueError(f"Option {option_name} does not exist")
         if not self.bot.database_online:
@@ -110,13 +111,13 @@ class ServerConfig(commands.Cog):
                 self.cache.pop((guild_id, option_name))
         return True
 
-    async def get_guild_config(self, guild_id: int, with_defaults: bool) -> dict[str, Any]:
+    async def get_guild_config(self, guild_id: int, with_defaults: bool) -> AnyStrDict:
         "Return the config of a guild"
         if not self.bot.database_online or (guild := self.bot.get_guild(guild_id)) is None:
             if with_defaults:
                 return {option_name: option["default"] for option_name, option in (await self.get_options_list()).items()}
             return {}
-        config = await self.db_get_guild(guild_id)
+        config: AnyStrDict | None = await self.db_get_guild(guild_id)
         if config is None:
             if with_defaults:
                 return {option_name: option["default"] for option_name, option in (await self.get_options_list()).items()}
@@ -129,9 +130,9 @@ class ServerConfig(commands.Cog):
                     config[option_name] = await from_raw(option_name, config[option_name], guild, self.bot)
         return config
 
-    async def get_enum_usage_stats(self, option_id: str, ignored_guilds: list[int]):
+    async def get_enum_usage_stats(self, option_id: str, ignored_guilds: list[int]) -> AnyStrDict:
         "Return stats on used languages"
-        if not self.bot.database_online or "Languages" not in self.bot.cogs:
+        if not self.bot.database_online:
             return {}
         query = "SELECT `guild_id`, `value` FROM `serverconfig` WHERE `option_name` = 'language' AND `beta` = %s"
         values_list: list[str] = []
@@ -141,10 +142,16 @@ class ServerConfig(commands.Cog):
                 if row["guild_id"] in guilds:
                     values_list.append(row["value"])
         options_list = await self.get_options_list()
+        option = options_list[option_id]
+        if not is_enum_option_representation(option):
+            raise ValueError(f"Option {option_id} is not an enum")
+        default = option["default"]
+        if not isinstance(default, str):
+            raise TypeError(f"Default value for option {option_id} is not a string")
         for _ in range(len(guilds) - len(values_list)):
-            values_list.append(options_list[option_id]["default"])
+            values_list.append(default)
         langs: dict[str, int] = {}
-        for lang in options_list[option_id]["values"]:
+        for lang in option["values"]:
             langs[lang] = values_list.count(lang)
         return langs
 
@@ -154,7 +161,7 @@ class ServerConfig(commands.Cog):
             raise ValueError(f"Option {option_name} does not exist")
         if (await self.get_options_list())[option_name]["type"] != "roles_list":
             raise ValueError(f"Option {option_name} is not a roles list")
-        if not self.bot.database_online or not isinstance(member, discord.Member):
+        if not self.bot.database_online:
             return False
         raw_roles = await self.get_raw_option(member.guild.id, option_name)
         if raw_roles is None:
@@ -182,12 +189,12 @@ class ServerConfig(commands.Cog):
         if i > 0:
             log_text = f"[MEMBERCOUNTER] {i} channels refreshed"
             emb = discord.Embed(description=log_text, color=5011628, timestamp=self.bot.utcnow())
-            emb.set_author(name=self.bot.user, icon_url=self.bot.user.display_avatar)
+            emb.set_author(name=self.bot.user, icon_url=self.bot.display_avatar)
             self.bot.log.info(log_text)
             await self.bot.send_embed(emb, url="loop")
 
     @update_every_membercounter.error
-    async def update_every_membercounter_error(self, error: Exception):
+    async def update_every_membercounter_error(self, error: BaseException):
         "Error handler for the update_every_membercounter loop"
         self.bot.dispatch("error", error, "Membercounter update loop")
 
@@ -200,6 +207,8 @@ class ServerConfig(commands.Cog):
         channel = await self.get_option(guild.id, "membercounter")
         if channel is None:
             return False
+        if not isinstance(channel, (discord.VoiceChannel, discord.StageChannel)):
+            raise TypeError(f"Membercounter channel {channel} in guild {guild.id} is not a voice or stage channel")
         lang = await self.bot._(guild.id, "_used_locale")
         text = (await self.bot._(guild.id, "misc.membres")).capitalize()
         if lang == "fr":
@@ -284,7 +293,7 @@ class ServerConfig(commands.Cog):
             "ON DUPLICATE KEY UPDATE `value` = %s"
         async with self.bot.db_main.write(query, (guild_id, option_name, new_value, self.bot.beta, new_value), returnrowcount=True
                                      ) as query_results:
-            return query_results > 0
+            return query_results is not None and query_results > 0
 
     async def db_delete_option(self, guild_id: int, option_name: str) -> bool:
         "Delete a value from the database"
@@ -294,7 +303,7 @@ class ServerConfig(commands.Cog):
             raise RuntimeError("Database is offline")
         query = "DELETE FROM `serverconfig` WHERE `guild_id` = %s AND `option_name` = %s AND `beta` = %s"
         async with self.bot.db_main.write(query, (guild_id, option_name, self.bot.beta), returnrowcount=True) as query_results:
-            return query_results > 0
+            return query_results is not None and query_results > 0
 
     async def db_delete_guild(self, guild_id: int) -> bool:
         "Delete a guild from the database"
@@ -302,7 +311,7 @@ class ServerConfig(commands.Cog):
             raise RuntimeError("Database is offline")
         query = "DELETE FROM `serverconfig` WHERE `guild_id` = %s AND `beta` = %s"
         async with self.bot.db_main.write(query, (guild_id, self.bot.beta), returnrowcount=True) as query_results:
-            return query_results > 0
+            return query_results is not None and query_results > 0
 
     async def db_get_guilds_with_membercounter(self) -> list[int]:
         "Get a list of guilds with a membercounter"
@@ -360,6 +369,8 @@ class ServerConfig(commands.Cog):
                 await self.bot._(interaction, "cases.no_database"), ephemeral=True
             )
             return
+        if not assert_interaction_channel_is_guild_messageable(interaction):
+            return
         if (opt_data := (await self.get_options_list()).get(option)) is None:
             await interaction.response.send_message(
                 await self.bot._(interaction, "server.option-notfound"), ephemeral=True
@@ -378,7 +389,8 @@ class ServerConfig(commands.Cog):
         return await self.option_name_autocomplete(option)
 
     @config_set.autocomplete("value")
-    async def sconfig_change_autocomplete_val(self, interaction: discord.Interaction, value: str):
+    async def sconfig_change_autocomplete_val(self, interaction: discord.Interaction, value: str
+                                              ) -> list[discord.app_commands.Choice[str]]:
         "Autocomplete the value of a config option"
         if option_name := interaction.namespace.option:
             try:
@@ -393,6 +405,8 @@ class ServerConfig(commands.Cog):
     @app_commands.checks.cooldown(3, 20)
     async def config_reset(self, interaction: discord.Interaction, option: str):
         "Reset an option to its initial value"
+        if interaction.guild is None:
+            raise RuntimeError("This command can only be used in a guild")
         if not self.bot.database_online:
             await interaction.response.send_message(
                 await self.bot._(interaction, "cases.no_database"), ephemeral=True
@@ -409,14 +423,14 @@ class ServerConfig(commands.Cog):
             )
             return
         await interaction.response.defer()
-        await self.reset_option(interaction.guild_id, option)
-        await self.on_config_edit(interaction.guild_id, interaction.user.id, "sconfig_option_reset", {"option": option})
+        await self.reset_option(interaction.guild.id, option)
+        await self.on_config_edit(interaction.guild.id, interaction.user.id, "sconfig_option_reset", {"option": option})
         await interaction.followup.send(await self.bot._(interaction, "server.value-deleted", option=option))
         # send internal log
-        msg = f"Reset option in server {interaction.guild_id}: {option}"
+        msg = f"Reset option in server {interaction.guild.id}: {option}"
         emb = discord.Embed(description=msg, color=self.log_color, timestamp=self.bot.utcnow())
         emb.set_footer(text=interaction.guild.name)
-        emb.set_author(name=self.bot.user, icon_url=self.bot.user.display_avatar)
+        emb.set_author(name=self.bot.user, icon_url=self.bot.display_avatar)
         await self.bot.send_embed(emb)
         self.bot.log.debug(msg)
 
@@ -450,14 +464,16 @@ class ServerConfig(commands.Cog):
         await confirm_view.disable(interaction)
         if not confirm_view.value:
             return
-        if await self.reset_guild_config(interaction.guild_id):
+        if interaction.guild is None:
+            raise RuntimeError("This command can only be used in a guild")
+        if await self.reset_guild_config(interaction.guild.id):
             await interaction.followup.send(await self.bot._(interaction, "server.reset-all.success"))
             # Send internal log
-            await self.on_config_edit(interaction.guild_id, interaction.user.id, "sconfig_reset_all", None)
-            msg = f"Reset all options in server {interaction.guild_id}"
+            await self.on_config_edit(interaction.guild.id, interaction.user.id, "sconfig_reset_all", None)
+            msg = f"Reset all options in server {interaction.guild.id}"
             emb = discord.Embed(description=msg, color=self.log_color, timestamp=self.bot.utcnow())
             emb.set_footer(text=interaction.guild.name)
-            emb.set_author(name=self.bot.user, icon_url=self.bot.user.display_avatar)
+            emb.set_author(name=self.bot.user, icon_url=self.bot.display_avatar)
             await self.bot.send_embed(emb)
             self.bot.log.info(msg)
         else:
@@ -484,6 +500,8 @@ class ServerConfig(commands.Cog):
                 await self.bot._(interaction, "cases.no_database"), ephemeral=True
             )
             return
+        if interaction.guild is None:
+            raise RuntimeError("This command can only be used in a guild")
         await interaction.response.defer()
         await self.send_online_user_tip(interaction)
         if option is None:
@@ -497,7 +515,10 @@ class ServerConfig(commands.Cog):
 
     async def send_online_user_tip(self, interaction: discord.Interaction):
         "Send a tip about viewing the dashboard online"
-        if not await self.bot.get_cog("Users").db_get_user_config(interaction.user.id, "show_tips"):
+        if (
+            (users_cog := self.bot.get_cog("Users")) is None
+            or not await users_cog.db_get_user_config(interaction.user.id, "show_tips")
+        ):
             # tips are disabled
             return
         if await self.bot.tips_manager.should_show_user_tip(interaction.user.id, UserTip.ONLINE_DASHBOARD_ACCESS):
@@ -555,17 +576,19 @@ class ServerConfig(commands.Cog):
                 return await self.bot._(interaction,
                                         "server.set_success.levelup_channel.channel",
                                         opt=option_name, val=value.mention)
+        if interaction.guild is None:
+            raise RuntimeError("This command can only be used in a guild")
         str_value = await to_display(option_name, value, interaction.guild, self.bot)
         return await self.bot._(interaction, f"server.set_success.{option_type}", opt=option_name, val=str_value)
 
     async def _get_set_error_message(self, interaction: discord.Interaction, option_name: str, error: ValueError, _value: Any):
         "Generate a proper error message for an invalid value"
         option_data: AllRepresentation = error.args[2]
-        if option_data["type"] in {"int", "float"}:
+        if is_number_option_representation(option_data):
             return await self.bot._(interaction,
                                     f"server.set_error.{option_data['type']}_err",
                                     min=option_data["min"], max=option_data["max"])
-        if option_data["type"] == "enum":
+        if is_enum_option_representation(option_data):
             translated_values = [
                 await self.bot._(interaction, f"server.enum.{option_name}.{value}")
                 for value in option_data["values"]
@@ -579,21 +602,21 @@ class ServerConfig(commands.Cog):
         if error_name in {"ROLES_TOO_FEW", "ROLES_TOO_MANY"}:
             return await self.bot._(interaction,
                                     "server.set_error.roles_list",
-                                    min=option_data["min_count"], max=option_data["max_count"])
+                                    min=option_data.get("min_count"), max=option_data.get("max_count"))
         if error_name in {"CHANNELS_TOO_FEW", "CHANNELS_TOO_MANY"}:
             return await self.bot._(interaction,
                                     "server.set_error.channels_list",
-                                    min=option_data["min_count"], max=option_data["max_count"])
+                                    min=option_data.get("min_count"), max=option_data.get("max_count"))
         if error_name in {"EMOJIS_TOO_FEW", "EMOJIS_TOO_MANY"}:
-            if option_data["min_count"] == option_data["max_count"]:
-                return await self.bot._(interaction, "server.set_error.emojis_list_exact", count=option_data["min_count"])
+            if option_data.get("min_count") == option_data.get("max_count"):
+                return await self.bot._(interaction, "server.set_error.emojis_list_exact", count=option_data.get("min_count"))
             return await self.bot._(interaction,
                                     "server.set_error.emojis_list",
-                                    min=option_data["min_count"], max=option_data["max_count"])
+                                    min=option_data.get("min_count"), max=option_data.get("max_count"))
         user_input = error.args[3] if len(error.args) > 3 else None
         return await self.bot._(interaction, "server.set_error." + error_name, input=user_input)
 
-    async def config_set_cmd(self, interaction: discord.Interaction, option_name: str, raw_input: str):
+    async def config_set_cmd(self, interaction: GuildInteraction, option_name: str, raw_input: str):
         "Process the config_set command"
         if option_name not in (await self.get_options_list()):
             await interaction.followup.send(await self.bot._(interaction, "server.option-notfound"), ephemeral=True)
@@ -617,7 +640,7 @@ class ServerConfig(commands.Cog):
         check_embed = await check_config(self.bot, interaction.guild, option_name, value)
         await interaction.followup.send(
             await self._get_set_success_message(interaction, option_name, value),
-            embed=check_embed
+            embed=check_embed or discord.utils.MISSING
         )
         # send bot_warning tip
         if option_name in {"welcome_channel", "welcome_roles", "welcome"} and (serverlogs_cog := self.bot.get_cog("ServerLogs")):
@@ -626,7 +649,7 @@ class ServerConfig(commands.Cog):
         msg = f"Changed option in server {interaction.guild_id}: {option_name} = `{await to_raw(option_name, value, self.bot)}`"
         emb = discord.Embed(description=msg, color=self.log_color, timestamp=self.bot.utcnow())
         emb.set_footer(text=interaction.guild.name)
-        emb.set_author(name=self.bot.user, icon_url=self.bot.user.display_avatar)
+        emb.set_author(name=self.bot.user, icon_url=self.bot.display_avatar)
         await self.bot.send_embed(emb)
         self.bot.log.debug(msg.replace('`', ''))
 

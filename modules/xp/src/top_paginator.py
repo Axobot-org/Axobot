@@ -1,6 +1,6 @@
 
 from math import ceil
-from typing import Literal, TypedDict
+from typing import TYPE_CHECKING, Literal, Optional, TypedDict
 
 import discord
 from asyncache import cached
@@ -8,13 +8,23 @@ from cachetools import Cache
 
 from core.bot_classes import Axobot
 from core.paginator import Paginator
+from core.type_utils import UserOrMember
+
+if TYPE_CHECKING:
+    from modules.xp.xp import XpSystemType
+
+
+class FieldData(TypedDict):
+    "Represents an embed field"
+    name: str
+    value: str
 
 LeaderboardScope = Literal["global", "server"]
 
 class TopPaginator(Paginator):
     "Paginator used to display the leaderboard"
 
-    def __init__(self, client: Axobot, user: discord.User, guild: discord.Guild, scope: LeaderboardScope,
+    def __init__(self, client: Axobot, user: UserOrMember, guild: discord.Guild | None, scope: LeaderboardScope,
                     start_page: int, stop_label: str = "Quit", timeout: int = 180):
         super().__init__(client, user, stop_label, timeout)
         class Position(TypedDict):
@@ -32,14 +42,26 @@ class TopPaginator(Paginator):
         self.guild = guild
         self.scope = scope
         self.page = start_page
-        self.raw_data: list[RawData | None] = []
-        self.positions: list[Position] = []
-        self.cog = client.get_cog("Xp")
-        self.used_system: str = None
+        self.raw_data: list[RawData] = []
+        self.positions: list[Position | None] = []
+        if (xp_cog := client.get_cog("Xp")) is None:
+            raise ValueError("Xp cog not found, cannot create TopPaginator")
+        self.cog = xp_cog
+        self._used_system: Optional[XpSystemType] = None
         self.max_page: int = 1
 
         domain = "axobeta.zrunner.me" if self.client.beta else "axobot.xyz"
-        self.url = f"https://{domain}/leaderboard/{self.guild.id}"
+        if self.guild:
+            self.url = f"https://{domain}/leaderboard/{self.guild.id}"
+        else:
+            self.url = f"https://{domain}/leaderboard/global"
+
+    @property
+    def used_system(self) -> "XpSystemType":
+        "Get the used XP system for this guild leaderboard"
+        if self._used_system is None:
+            raise ValueError("Used system not set yet")
+        return self._used_system
 
     def convert_average(self, nbr: int) -> str:
         "Convert a large number to its short version (ex: 1000000 -> 1M)"
@@ -54,13 +76,13 @@ class TopPaginator(Paginator):
         return self.max_page
 
     @cached(Cache(maxsize=1)) # cache as long as possible, as it should never change for one same Paginator
-    async def get_user_rank(self):
+    async def get_user_rank(self) -> FieldData:
         "Get the embed field content corresponding to the user's rank"
         pos = [(i+1, pos) for i, pos in enumerate(self.positions) if pos is not None and pos["user_id"] == self.user.id]
         field_name = "__" + await self.client._(self.guild, "xp.top-your") + "__"
         if len(pos) == 0:
             # fetch from raw data
-            pos = [(i+1, pos) for i, pos in enumerate(self.raw_data) if pos is not None and pos["user_id"] == self.user.id]
+            pos = [(i+1, pos) for i, pos in enumerate(self.raw_data) if pos["user_id"] == self.user.id]
             if len(pos) == 0:
                 value = await self.client._(self.guild, "xp.1-no-xp")
             else:
@@ -78,8 +100,14 @@ class TopPaginator(Paginator):
 
     async def fetch_data(self):
         "Fetch the required data to display the leaderboard"
-        self.used_system = await self.client.get_config(self.guild.id, "xp_type")
-        if self.used_system == "global":
+        if self.guild is None:
+            self._used_system = "global"
+        else:
+            self._used_system = await self.client.get_config(
+                self.guild.id,
+                "xp_type"
+            ) # pyright: ignore[reportAttributeAccessIssue]
+        if self.guild is None or self.used_system == "global":
             if self.scope == "global":
                 if len(self.cog.leaderboard_cache["global"]) == 0:
                     await self.cog.db_load_cache(None)
@@ -92,6 +120,8 @@ class TopPaginator(Paginator):
                     {"user_id": int(row["userID"]), "xp": row["xp"]}
                     for row in await self.cog.db_get_top(10000, guild=self.guild)
                 ]
+                if len(self.raw_data) == 0:
+                    raise ValueError("No data found for the global leaderboard")
         else:
             if not self.guild.id in self.cog.leaderboard_cache.keys():
                 await self.cog.db_load_cache(self.guild.id)
@@ -135,7 +165,7 @@ class TopPaginator(Paginator):
             }
             i += 1
 
-    async def get_page_content(self, _interaction, page: int):
+    async def get_page_content(self, interaction: discord.Interaction | None, page: int):
         "Get the content of a page"
         if page > self.max_page:
             page = self.page = self.max_page
@@ -143,6 +173,8 @@ class TopPaginator(Paginator):
         txt = []
         i = (page-1)*20
         for row in self.positions[(page-1)*20:page*20]:
+            if row is None:
+                raise ValueError("Row data is None, this should not happen")
             i += 1
             username = row["username"]
             lvl = row["level"]

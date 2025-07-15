@@ -1,6 +1,5 @@
 import asyncio
 import operator
-import re
 from typing import Any, TypedDict
 
 import aiohttp
@@ -10,6 +9,8 @@ from cachetools import TTLCache
 from discord.ext import commands
 
 from core.bot_classes import Axobot, MyContext
+from core.type_utils import UserOrMember
+
 
 class _ConfigDict(TypedDict):
     """Dictionary to hold bot configuration"""
@@ -26,7 +27,7 @@ class Utilities(commands.Cog):
     def __init__(self, bot: Axobot):
         self.bot = bot
         self.file = "utilities"
-        self.config: _ConfigDict | None = None
+        self._config: _ConfigDict | None = None
         self.table = "users"
         self.new_pp = False
         bot.add_check(self.global_check)
@@ -38,24 +39,33 @@ class Utilities(commands.Cog):
     async def on_ready(self):
         await self.get_bot_infos()
 
-    async def get_bot_infos(self) -> _ConfigDict | None:
-        """Get the bot's infos from the database"""
+    async def get_bot_infos(self) -> _ConfigDict:
+        """Get the bot's configuration info"""
+        if self._config is None:
+            await self._fetch_bot_infos()
+        if self._config is None:
+            raise RuntimeError("Bot infos not found in the database")
+        return self._config
+
+    async def _fetch_bot_infos(self) -> _ConfigDict | None:
+        """Get the bot's info from the database"""
         if not self.bot.database_online or self.bot.user is None:
             return None
         query = "SELECT * FROM `bot_infos` WHERE `ID` = %s"
         async with self.bot.db_main.read(query, (self.bot.user.id,), fetchone=True) as query_results:
             query_results.pop("token", None)
-            self.config = query_results # type: ignore
-            return self.config
+            self._config = query_results # type: ignore
+            return self._config
 
     async def edit_bot_infos(self, bot_id: int, values: list[tuple[str, Any]]):
-        """Edit the bot's infos in the database"""
+        """Edit the bot's info in the database"""
         if len(values) == 0:
             raise ValueError("Cannot edit bot infos with an empty values list")
         set_query = ", ".join(f"{val[0]}=%s" for val in values)
         query = f"UPDATE `bot_infos` SET {set_query} WHERE `ID`=%s"
         async with self.bot.db_main.write(query, tuple(val[1] for val in values) + (bot_id,)):
             pass
+        self._config = None  # Reset the cached config
         return True
 
     async def find_img(self, name: str):
@@ -86,9 +96,9 @@ class Utilities(commands.Cog):
             if ctx.command is not None and ctx.command.name in self.bot.allowed_commands:
                 return True
             return False
-        if self.config is None:
+        if self._config is None:
             await self.get_bot_infos()
-        if  self.config is None:
+        if  self._config is None:
             return True
         if ctx.message.type not in {
             discord.MessageType.default, discord.MessageType.reply, discord.MessageType.chat_input_command
@@ -98,30 +108,22 @@ class Utilities(commands.Cog):
         if await self.bot.get_cog("Admin").check_if_admin(ctx): # type: ignore
             return True
         if ctx.guild is not None:
-            if str(ctx.guild.id) in self.config["banned_guilds"].split(";"):
+            if str(ctx.guild.id) in self._config["banned_guilds"].split(";"):
                 return False
-        if str(ctx.author.id) in self.config["banned_users"].split(";"):
+        if str(ctx.author.id) in self._config["banned_users"].split(";"):
             return False
         return True
 
-    def sync_check_any_link(self, text: str):
-        "Check if a text contains a http url"
-        pattern = r"(https?://?(?:[-\w.]|(?:%[\da-fA-F]{2}))+|discord.gg/[^\s]+)"
-        return re.search(pattern, text)
-
-    def sync_check_discord_invite(self, text: str):
-        "Check if a text contains a discord invite url"
-        pattern = r"((?:discord\.gg|discord(?:app)?.com/invite|discord.me)/.+)"
-        return re.search(pattern, text)
-
-    async def get_xp_style(self, user: discord.User) -> str:
+    async def get_xp_style(self, user: UserOrMember) -> str:
         "Return the chosen rank card style for a user"
         if (user_cog := self.bot.get_cog("Users")) and (config := await user_cog.db_get_userinfo(user.id)) and config["xp_style"]:
             return config["xp_style"]
-        return self.bot.get_cog("Xp").default_xp_style
+        if (xp_cog := self.bot.get_cog("Xp")) is None:
+            raise RuntimeError("Xp cog not loaded, cannot get default xp style")
+        return xp_cog.default_xp_style
 
     @cached(TTLCache(maxsize=10_000, ttl=60))
-    async def allowed_card_styles(self, user: discord.User | discord.Member) -> list[str]:
+    async def allowed_card_styles(self, user: UserOrMember) -> list[str]:
         """Retourne la liste des styles autorisées pour la carte d'xp de cet utilisateur"""
         base_styles = [
             "blue", "dark", "green", "grey", "orange",
@@ -143,7 +145,7 @@ class Utilities(commands.Cog):
                 base_styles.append(card)
         return sorted(rolebased_styles) + sorted(base_styles)
 
-    async def get_user_languages(self, user: discord.User | discord.Member, limit: int=0):
+    async def get_user_languages(self, user: UserOrMember, limit: int=0):
         """Get the most used languages of an user
         If limit=0, return every languages"""
         if not self.bot.database_online:

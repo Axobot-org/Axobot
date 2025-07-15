@@ -45,6 +45,8 @@ class VoiceMessages(commands.Cog):
         "Create a transcript of the voice message"
         attachment = message.attachments[0]
         await interaction.response.defer(ephemeral=True)
+        if attachment.duration is None:
+            raise ValueError("Attachment duration is None")
         # if voice message is too long, abort
         if attachment.duration > self.max_duration:
             lang = await self.bot._(interaction, "_used_locale")

@@ -3,13 +3,14 @@ import os
 from typing import Any, Callable, Coroutine, TypedDict
 
 import discord
-from discord.app_commands import Command, Group
+from discord.app_commands import Group
 from discord.ext import commands
 
 from core.bot_classes import Axobot, MyContext
 
-from .utils import (get_send_callback, help_all_command, help_category_command,
-                    help_slash_cmd_command, help_text_cmd_command)
+from .utils import (AppCommandOrGroup, get_send_callback, help_all_command,
+                    help_category_command, help_slash_cmd_command,
+                    help_text_cmd_command)
 
 
 class CommandsCategoryData(TypedDict):
@@ -22,7 +23,9 @@ class Help(commands.Cog):
     def __init__(self, bot: Axobot):
         self.bot = bot
         self.file = "help_cmd"
-        self.old_cmd = bot.remove_command("help")
+        if (old_cmd := bot.remove_command("help")) is None:
+            raise RuntimeError("The 'help' command is already removed, cannot load the help cog.")
+        self.old_cmd = old_cmd
         self.help_color = 0x7ED321
         self.help_color_dm = 0xD6FFA9
         json_path = os.path.dirname(__file__) + "/help.json"
@@ -111,7 +114,8 @@ If the bot can't send the new command format, it will try to send the old one.""
             return
         await self._send_error_unknown_command(ctx, send, parent)
 
-    async def _find_command_from_name(self, args: list[str], parent_command: Command | None) -> Command | Group | None:
+    async def _find_command_from_name(
+            self, args: list[str], parent_command: AppCommandOrGroup | None) -> AppCommandOrGroup | None:
         if parent_command and not args:
             return parent_command
         if not args:
@@ -126,5 +130,5 @@ If the bot can't send the new command format, it will try to send the old one.""
                     return await self._find_command_from_name(args, subcommand)
 
 
-async def setup(bot):
+async def setup(bot: Axobot):
     await bot.add_cog(Help(bot))

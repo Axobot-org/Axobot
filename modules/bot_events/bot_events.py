@@ -111,7 +111,7 @@ class BotEvents(commands.Cog):
             description=f"**Bot event** updated (current event is {event})",
             color=1406147, timestamp=self.bot.utcnow()
         )
-        emb.set_author(name=self.bot.user, icon_url=self.bot.user.display_avatar)
+        emb.set_author(name=self.bot.user, icon_url=self.bot.display_avatar)
         await self.bot.send_embed(emb, url="loop")
 
     @commands.Cog.listener()
