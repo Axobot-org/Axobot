@@ -1,11 +1,13 @@
 from typing import Literal
 
 from PIL import Image, ImageDraw, ImageFont, ImageSequence
+from PIL.GifImagePlugin import GifImageFile
 
 from .cards_metadata import get_card_data
 
 CARD_SIZE = (1021, 340)
 
+Rect = tuple[tuple[int, int], tuple[int, int]]
 
 class CardGeneration:
     "Generate a card from a card type and a user avatar"
@@ -13,7 +15,7 @@ class CardGeneration:
     def __init__(self, card_name: str,
                  translation_map: dict[str, str],
                  username: str,
-                 avatar: Image.Image,
+                 avatar: Image.Image | GifImageFile,
                  level: int,
                  rank: int | Literal['?'],
                  participants: int,
@@ -25,7 +27,7 @@ class CardGeneration:
         self.data = get_card_data(card_name, translation_map, username,
                                   level, rank, participants, xp_to_current_level, xp_to_next_level, total_xp)
         self.fonts_cache: dict[tuple[str, int], ImageFont.FreeTypeFont] = {}
-        if self.avatar.format == "GIF":
+        if isinstance(self.avatar, GifImageFile):
             self.skip_second_frames = self.avatar.n_frames > 60 and self.avatar.info["duration"] < 30
             self.result = [
                 Image.new("RGBA", CARD_SIZE, (255, 255, 255, 0))
@@ -49,12 +51,14 @@ class CardGeneration:
                 if should_resize:
                     avatar_frame = avatar_frame.resize(self.data["avatar_size"], resample=Image.Resampling.LANCZOS)
                 result_frame.paste(avatar_frame, self.data["avatar_position"])
+                result_frame.info["duration"] = self.avatar.info.get("duration")
+            avatar_iterator.im.seek(0) # Reset the iterator for the next use
         else:
             if should_resize:
                 self.avatar = self.avatar.resize(self.data["avatar_size"], resample=Image.Resampling.LANCZOS)
             self.result.paste(self.avatar, self.data["avatar_position"])
 
-    def _find_max_text_size(self, text: str, rect: tuple[tuple[int, int], tuple[int, int]], font_name: str, font_size: str):
+    def _find_max_text_size(self, text: str, rect: Rect, font_name: str, font_size: int):
         while True:
             if (font_name, font_size) in self.fonts_cache:
                 font = self.fonts_cache[(font_name, font_size)]
@@ -80,7 +84,7 @@ class CardGeneration:
         for data in self.data["texts"].values():
             text = data["label"]
             alignment = data["alignment"]
-            rect = tuple(tuple(x) for x in data["position"])
+            rect: Rect = tuple(tuple(x) for x in data["position"]) # pyright: ignore[reportAssignmentType]
             font_name = "./assets/fonts/" + data["font"]
             font_size = data["font_size"]
             color = data["color"]
@@ -157,6 +161,13 @@ class CardGeneration:
 
         return self.result
 
+    def get_durations(self) -> list[int]:
+        "Get the durations of each frame in the card"
+        if not isinstance(self.result, list):
+            raise ValueError("This method is only applicable for animated cards")
+        default_duration = self.avatar.info["duration"]
+        multiplier = 2 if self.skip_second_frames else 1
+        return [frame.info.get("duration", default_duration) * multiplier for frame in self.result]
 
 def main():
     "Try it and see"

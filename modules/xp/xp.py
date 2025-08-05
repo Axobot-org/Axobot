@@ -21,6 +21,7 @@ from PIL import Image, ImageFont
 from core.bot_classes import Axobot
 from core.safedict import SafeDict
 from core.tips import UserTip
+from core.type_utils import UserOrMember
 from modules.serverconfig.src.converters import GuildMessageableChannel
 
 from .cards import CardGeneration
@@ -746,7 +747,7 @@ class Xp(commands.Cog):
         await self.bot.wait_until_ready()
 
     @voice_xp_loop.error
-    async def on_voice_xp_loop_error(self, error: Exception):
+    async def on_voice_xp_loop_error(self, error: BaseException):
         self.bot.dispatch("error", error, "Voice XP loop has stopped  <@279568324260528128>")
 
     @tasks.loop(time=datetime.time(hour=0, tzinfo=datetime.UTC))
@@ -787,7 +788,7 @@ class Xp(commands.Cog):
         await self.bot.wait_until_ready()
 
     @xp_decay_loop.error
-    async def on_xp_decay_loop_error(self, error: Exception):
+    async def on_xp_decay_loop_error(self, error: BaseException):
         self.bot.dispatch("error", error, "XP decay loop has stopped  <@279568324260528128>")
 
     @tasks.loop(hours=1)
@@ -810,7 +811,7 @@ class Xp(commands.Cog):
         await self.bot.wait_until_ready()
 
     @clear_cards_loop.error
-    async def on_clear_cards_loop_error(self, error: Exception):
+    async def on_clear_cards_loop_error(self, error: BaseException):
         self.bot.dispatch("error", error, "XP decay loop has stopped  <@279568324260528128>")
 
 
@@ -890,7 +891,7 @@ class Xp(commands.Cog):
         # if we can send embeds
         await self.send_embed(interaction, target_user, xp, rank, ranks_nb, levels_info)
 
-    async def create_card(self, translation_map: dict[str, str], user: discord.User, style: str, xp: int, rank: int,
+    async def create_card(self, translation_map: dict[str, str], user: UserOrMember, style: str, xp: int, rank: int,
                           ranks_nb: int, levels_info: tuple[int, int, int]):
         "Find the user rank card, or generate a new one, based on given data"
         static = True
@@ -922,12 +923,9 @@ class Xp(commands.Cog):
         )
         generated_card = card_generator.draw_card()
         if isinstance(generated_card, list):
-            duration = user_avatar.info["duration"]
-            if card_generator.skip_second_frames:
-                duration *= 2
             generated_card[0].save(
                 filepath,
-                save_all=True, append_images=generated_card[1:], duration=duration, loop=0, disposal=2
+                save_all=True, append_images=generated_card[1:], duration=card_generator.get_durations(), loop=0, disposal=2
             )
         else:
             generated_card.save(filepath)
