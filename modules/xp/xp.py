@@ -8,7 +8,7 @@ import string
 import time
 from collections import defaultdict
 from io import BytesIO
-from typing import Any, Literal
+from typing import Any, Literal, Optional
 
 import aiohttp
 import discord
@@ -21,7 +21,11 @@ from PIL import Image, ImageFont
 from core.bot_classes import Axobot
 from core.safedict import SafeDict
 from core.tips import UserTip
-from core.type_utils import UserOrMember
+from core.type_utils import (AnyStrDict, GuildMessage, UserOrMember,
+                             assert_interaction_channel_is_guild_messageable,
+                             assert_message_channel_is_guild_messageable,
+                             channel_is_guild_messageable)
+from modules.languages.languages import SourceType as TranslationSourceType
 from modules.serverconfig.src.converters import GuildMessageableChannel
 
 from .cards import CardGeneration
@@ -107,8 +111,8 @@ class Xp(commands.Cog):
             raise RuntimeError("Suspicious users set could not be initialized")
         return user_id in self._suspicious_users
 
-    async def get_lvlup_channel(self, member: discord.Member, fallback: discord.abc.MessageableChannel | None
-                                ) -> discord.abc.MessageableChannel | None:
+    async def get_lvlup_channel(self, member: discord.Member, fallback: Optional["discord.abc.MessageableChannel"]
+                                ) -> Optional["discord.abc.MessageableChannel"]:
         "Find the channel where to send the levelup message"
         value: discord.TextChannel | discord.Thread | Literal["dm", "any", "none"] = await self.bot.get_config(
             member.guild.id,
@@ -891,8 +895,8 @@ class Xp(commands.Cog):
         # if we can send embeds
         await self.send_embed(interaction, target_user, xp, rank, ranks_nb, levels_info)
 
-    async def create_card(self, translation_map: dict[str, str], user: UserOrMember, style: str, xp: int, rank: int,
-                          ranks_nb: int, levels_info: tuple[int, int, int]):
+    async def create_card(self, translation_map: dict[str, str], user: UserOrMember, style: str, xp: int,
+                          rank: int | Literal['?'], ranks_nb: int, levels_info: tuple[int, int, int]):
         "Find the user rank card, or generate a new one, based on given data"
         static = True
         if (
