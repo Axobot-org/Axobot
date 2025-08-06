@@ -1,7 +1,6 @@
 from typing import TYPE_CHECKING, TypedDict, TypeGuard
 
 import discord
-from discord.types.interactions import SelectMessageComponentInteractionData
 
 from core.type_utils import GuildInteraction
 
