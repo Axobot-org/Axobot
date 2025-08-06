@@ -234,12 +234,12 @@ class BotStats(commands.Cog):
         self.voice_transcript_events[(message_duration, generation_duration)] += 1
 
     @commands.Cog.listener()
-    async def on_stream_starts(self):
+    async def on_stream_starts(self, *_args, **_kwargs):
         "Called when a stream starts"
         self.stream_events["starts"] += 1
 
     @commands.Cog.listener()
-    async def on_stream_ends(self):
+    async def on_stream_ends(self, *_args, **_kwargs):
         "Called when a stream ends"
         self.stream_events["ends"] += 1
 

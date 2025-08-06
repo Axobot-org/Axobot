@@ -54,5 +54,5 @@ class Bitly(commands.Cog):
         await interaction.followup.send(await self.bot._(interaction, "info.bitly_long", url=expanded_url))
 
 
-async def setup(bot):
+async def setup(bot: Axobot):
     await bot.add_cog(Bitly(bot))
