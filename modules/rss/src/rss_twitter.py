@@ -10,7 +10,7 @@ import twitter
 from asyncache import cached
 from cachetools import TTLCache
 
-from .rss_general import FeedObject, RssMessage
+from .general import FeedObject, RssMessage
 
 if TYPE_CHECKING:
     from core.bot_classes import Axobot

@@ -82,6 +82,7 @@ If the rss feed ID is not given, the bot will open a menu to select it. And for 
     - :code:`{title}`: the title of the post
     - :code:`{full_text}`: the full text of the post
     - :code:`{description}`: the description/summary of the post
+    - :code:`{image_alt}`: the alt text of the first image in the post, if any
 
 .. warning:: Hey guess what? For this command, the bot needs "`Embed Links <perms.html#embed-links>`__" permission!
 

@@ -11,8 +11,8 @@ from feedparser import CharacterEncodingOverride
 from feedparser.util import FeedParserDict
 
 from .convert_post_to_text import get_summary_from_entry, get_text_from_entry
-from .rss_general import (FeedFilterConfig, FeedObject, RssMessage,
-                          check_filter, feed_parse)
+from .general import (FeedFilterConfig, FeedObject, RssMessage, check_filter,
+                      feed_parse)
 
 if TYPE_CHECKING:
     from core.bot_classes import Axobot
@@ -112,10 +112,13 @@ class WebRSS:
         post_text = await get_text_from_entry({"link": link} | entry)
         post_description = await get_summary_from_entry({"link": link} | entry)
         img: str | None = None
+        img_alt: str | None = None
         if "media_thumbnail" in entry and len(entry["media_thumbnail"]) > 0 and "url" in entry["media_thumbnail"][0]:
             img = entry["media_thumbnail"][0]["url"]
         elif img_match := re.search(r"(http(s?):)([/|.\w\s-])*\.(?:jpe?g|gif|png|webp)", str(entry)):
             img = img_match.group(0)
+            if img_alt_match := re.search(r"<img\b[^>]*?(?:title=\"([^\"]+)\"|alt=\"([^\"]+)\")[^>]*?>", str(entry)):
+                img_alt = img_alt_match.group(1) or img_alt_match.group(2)
         return RssMessage(
             bot=self.bot,
             feed=FeedObject.unrecorded("web", channel.guild.id if channel.guild else None, channel.id, url),
@@ -126,6 +129,7 @@ class WebRSS:
             author=author,
             channel=feed.feed["title"] if "title" in feed.feed else '?',
             image=img,
+            image_alt=img_alt,
             post_text=post_text,
             post_description=post_description
         )

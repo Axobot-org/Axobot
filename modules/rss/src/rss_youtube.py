@@ -13,7 +13,7 @@ from feedparser.util import FeedParserDict
 from core.caching.postition_cached import position_cached
 
 from . import FeedObject, RssMessage, feed_parse, get_text_from_entry
-from .rss_general import FeedFilterConfig, check_filter
+from .general import FeedFilterConfig, check_filter
 from .youtube_search import Service
 
 if TYPE_CHECKING:

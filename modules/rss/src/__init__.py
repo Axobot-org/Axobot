@@ -1,5 +1,5 @@
 from .convert_post_to_text import get_text_from_entry
-from .rss_general import (FeedEmbedData, FeedObject, FeedType, RssMessage,
+from .general import (FeedEmbedData, FeedObject, FeedType, RssMessage,
                           feed_parse)
 from .rss_youtube import YoutubeRSS
 
