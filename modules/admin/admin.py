@@ -28,7 +28,7 @@ from core.views import ConfirmView
 from docs import conf
 from modules.antiscam.model import update_unicode_maps
 from modules.antiscam.model.training_bayes import train_model
-from modules.rss.src.rss_general import feed_parse
+from modules.rss.src.general import feed_parse
 
 AvailableGitBranches = Literal["main", "develop"]
 

@@ -93,25 +93,28 @@ async def check_filter(entry: FeedParserDict, filter_config: FeedFilterConfig) -
 class RssMessage:
     "Represents a message ready to be sent"
 
-    def __init__(self,
-                 bot: Axobot,
-                 feed: "FeedObject",
-                 url: str,
-                 title: str,
-                 date: datetime.datetime | time.struct_time | str = datetime.datetime.now(),
-                 entry_id: str | None = None,
-                 author: str | None = None,
-                 channel: str | None = None,
-                 retweeted_from: str | None = None,
-                 image: str | None = None,
-                 post_text: str | None = None,
-                 post_description: str | None = None,
-                 ):
+    def __init__(
+        self,
+            bot: Axobot,
+            feed: "FeedObject",
+            url: str,
+            title: str,
+            date: datetime.datetime | time.struct_time | str = datetime.datetime.now(),
+            entry_id: str | None = None,
+            author: str | None = None,
+            channel: str | None = None,
+            retweeted_from: str | None = None,
+            image: str | None = None,
+            image_alt: str | None = None,
+            post_text: str | None = None,
+            post_description: str | None = None,
+    ):
         self.bot = bot
         self.feed = feed
         self.url = url
         self.title = title if len(title) < 300 else title[:299]+'…'
         self.image = image
+        self.image_alt = image_alt
         self.post_text = post_text
         self.post_description = post_description
         if isinstance(date, datetime.datetime):
@@ -219,6 +222,7 @@ class RssMessage:
             mentions=", ".join(self.mentions),
             logo=self.logo,
             author=_author,
+            image_alt=self.image_alt or "",
             full_text=post_text,
             description=description
         )

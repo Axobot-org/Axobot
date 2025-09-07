@@ -9,7 +9,7 @@ import discord
 from feedparser.util import FeedParserDict
 
 from .convert_post_to_text import get_text_from_entry
-from .rss_general import (FeedFilterConfig, FeedObject, RssMessage,
+from .general import (FeedFilterConfig, FeedObject, RssMessage,
                           check_filter, feed_parse)
 
 if TYPE_CHECKING:

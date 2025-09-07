@@ -29,7 +29,7 @@ from modules.rss.src.rss_bluesky import BlueskyRSS
 
 from .src import FeedObject, RssMessage, YoutubeRSS, feed_parse
 from .src.rss_deviantart import DeviantartRSS
-from .src.rss_general import InvalidFormatError
+from .src.general import InvalidFormatError
 from .src.rss_twitch import TwitchRSS
 from .src.rss_web import WebRSS
 
