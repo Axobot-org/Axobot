@@ -1,5 +1,6 @@
 {
     "attachment-too-long": "Due to technical limitations, I cannot handle attachments longer than %{duration}",
+    "api-error": "An error occurred while trying to contact the transcription service. Please try again later.",
     "no-transcript": "I couldn't detect a single word in this voice message :confused:",
     "openai-credits": "Powered by local [OpenAI's Whisper model](%{url})",
     "title": "Transcript generation"
