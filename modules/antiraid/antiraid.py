@@ -221,7 +221,7 @@ class AntiRaid(commands.Cog):
 
     async def _should_ignore_member(self, member: discord.Member):
         "Check whether this member should be verified (False) or is immune (True)"
-        if member.bot:
+        if member.bot or member.guild_permissions.administrator:
             return True
         immune_roles: list[discord.Role] | None = await self.bot.get_config(
             member.guild.id, "anti_raid_ignored_roles") # type: ignore
