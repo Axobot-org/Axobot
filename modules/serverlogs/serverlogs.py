@@ -673,7 +673,7 @@ class ServerLogs(commands.Cog):
             color=discord.Color.blurple()
         )
         before_txt = "None" if before.guild_avatar is None else f"[Before]({before.guild_avatar})"
-        after_txt = "None" if after.guild_avatar is None else f"[After]{after.guild_avatar}"
+        after_txt = "None" if after.guild_avatar is None else f"[After]({after.guild_avatar})"
         emb.add_field(name="Server avatar edited", value=f"{before_txt} -> {after_txt}")
         emb.set_author(name=str(after), icon_url=after.display_avatar)
         await self.validate_logs(after.guild, channel_ids, emb, "member_avatar")
