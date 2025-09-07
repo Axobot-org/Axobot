@@ -57,6 +57,7 @@
         "guild-8": "Authentification à deux facteurs",
         "guild-9": "Niveau de sécurité",
         "guild-features": {
+            "AGE_VERIFICATION_LARGE_GUILD": "Vérification d'âge pour les grands serveurs",
             "ANIMATED_BANNER": "Bannière animée",
             "ANIMATED_ICON": "Icône de serveur animée",
             "AUDIO_BITRATE_128_KBPS": "Bitrate audio de 128kbps",
@@ -90,7 +91,8 @@
             "MORE_STICKERS": "Limite de stickers augmentée",
             "NEWS": "Salons de news",
             "PARTNERED": "Serveur partenaire",
-            "PREVIEW_ENABLED": "Preview activées",
+            "PIN_PERMISSION_MIGRATION_COMPLETE": "Permission d'épingler séparée de celle de gérer les messages",
+            "PREVIEW_ENABLED": "Aperçu activé",
             "PRIVATE_THREADS": "Fils privés",
             "PUBLIC": "Serveur public",
             "RAID_ALERTS_DISABLED": "Alertes de raid désactivées",

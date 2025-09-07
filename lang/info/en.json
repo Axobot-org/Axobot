@@ -57,6 +57,7 @@
         "guild-8": "Two-factor authentification",
         "guild-9": "Security level",
         "guild-features": {
+            "AGE_VERIFICATION_LARGE_GUILD": "Age verification for large servers",
             "ANIMATED_BANNER": "Animated banner",
             "ANIMATED_ICON": "Animated server icon",
             "AUDIO_BITRATE_128_KBPS": "128 kbps audio bitrate",
@@ -90,6 +91,7 @@
             "MORE_STICKERS": "Stickers limit increased",
             "NEWS": "News channel",
             "PARTNERED": "Partnered server",
+            "PIN_PERMISSION_MIGRATION_COMPLETE": "Pin permission separated from manage messages",
             "PREVIEW_ENABLED": "Preview enabled",
             "PRIVATE_THREADS": "Private threads",
             "PUBLIC": "Public server",
