@@ -132,10 +132,13 @@ async def _run_check_function(ctx: MyContext, check: Callable[..., Any]) -> bool
         param_types = [original_param_type]
     # check against each possible type
     for param_type in param_types:
-        if ctx.interaction and issubclass(param_type, discord.Interaction):
-            return await discord.utils.maybe_coroutine(check, ctx.interaction)
-        if issubclass(param_type, commands.Context):
-            return await discord.utils.maybe_coroutine(check, ctx)
+        try:
+            if ctx.interaction and issubclass(param_type, discord.Interaction):
+                return await discord.utils.maybe_coroutine(check, ctx.interaction)
+            if issubclass(param_type, commands.Context):
+                return await discord.utils.maybe_coroutine(check, ctx)
+        except TypeError as err:
+            ctx.bot.dispatch("error", err, f"Type error when checking {check} ({param_types})")
     # if no type matched, dispatch an error
     ctx.bot.dispatch("error", ValueError(f"Unknown type for check {check} ({param_types})"))
     return False
