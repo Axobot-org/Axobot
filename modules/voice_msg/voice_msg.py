@@ -1,6 +1,7 @@
 import logging
 import time
 
+import aiohttp
 import discord
 from aiohttp import ClientSession
 from discord import app_commands
@@ -63,7 +64,15 @@ class VoiceMessages(commands.Cog):
         else:
             # else generate it
             start = time.time()
-            result = await self._get_transcript(attachment)
+            try:
+                result = await self._get_transcript(attachment)
+            except aiohttp.ClientResponseError as err:
+                self.bot.dispatch("error", err, interaction)
+                await interaction.followup.send(
+                    await self.bot._(interaction.user, "voice_msg.api-error"),
+                    ephemeral=True
+                )
+                return
             duration = time.time() - start
             self.log.info(
                 "Transcript done in %ss (original duration: %ss)",
@@ -97,13 +106,12 @@ class VoiceMessages(commands.Cog):
         headers = {"Authorization": self.bot.secrets["awhikax_api"]}
         data = {"model": "small", "audio_url": attachment.url}
         async with self.session.post("https://api.awhikax.com/stt", headers=headers, data=data) as resp:
-            if resp.status != 200:
-                return ""
+            resp.raise_for_status()
             response = await resp.json()
         if response["success"]:
             return response["message"]
         return ""
 
 
-async def setup(bot):
+async def setup(bot: Axobot):
     await bot.add_cog(VoiceMessages(bot))
