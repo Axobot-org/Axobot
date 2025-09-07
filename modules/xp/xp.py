@@ -687,7 +687,8 @@ class Xp(commands.Cog):
                     i += 1
                 if row["userID"]== user_id:
                     userdata = DbUserRank(
-                        **row,
+                        userID=row["userID"],
+                        xp=row["xp"],
                         rank=round(row["rank"])
                     )
                     break
