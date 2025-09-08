@@ -175,7 +175,7 @@ class BotStats(commands.Cog):
         self.ticket_events["creation"] += 1
 
     @commands.Cog.listener()
-    async def on_server_warning(self, warning_type: ServerWarningType):
+    async def on_server_warning(self, warning_type: ServerWarningType, **kwargs):
         "Called when a server warning is triggered"
         if warning_type in {
             ServerWarningType.RSS_UNKNOWN_CHANNEL,
