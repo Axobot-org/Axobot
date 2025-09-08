@@ -906,7 +906,7 @@ class Xp(commands.Cog):
             and await users_cog.db_get_user_config(user.id, "animated_card")
         ):
             # if the user has animated cards enabled, we generate a gif card
-            static = True
+            static = False
         file_ext = "png" if static else "gif"
         filepath = f"./assets/cards/{user.id}-{xp}-{style}.{file_ext}"
         # check if the card has already been generated, and return it if it is the case
