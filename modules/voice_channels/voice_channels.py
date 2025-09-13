@@ -170,7 +170,12 @@ class VoiceChannels(commands.Cog):
         # actually create the channel
         new_channel = await category.create_voice_channel(name=chan_name, position=p, overwrites=over)
         # move user
-        await member.move_to(new_channel)
+        try:
+            await member.move_to(new_channel)
+        except discord.HTTPException as err:
+            self.bot.dispatch("error", err, f"Moving member {member} to channel {new_channel}")
+            await self.delete_channel(new_channel)
+            return
         # add to database
         await self.db_add_channel(new_channel)
 
