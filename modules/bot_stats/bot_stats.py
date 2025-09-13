@@ -260,11 +260,16 @@ class BotStats(commands.Cog):
             return
         if match := re.search(r"Database backup done! \((\d+(?:\.\d+)?)([GMK])\)", embed.description):
             unit = match.group(2)
-            last_backup_size = float(match.group(1)) # in Gb
+            last_backup_size = float(match.group(1))
             if unit == "M":
                 self.last_backup_size = last_backup_size / 1024
             elif unit == "K":
                 self.last_backup_size = last_backup_size / 1024**2
+            elif unit == "G":
+                self.last_backup_size = last_backup_size
+            else:
+                self.bot.dispatch("error", ValueError(f"Unknown backup size unit: {unit}"), "When checking last backup size")
+                return
             self.log.info("Last backup size detected: %sG", self.last_backup_size)
 
     async def _check_voice_msg(self, message: discord.Message):
