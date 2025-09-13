@@ -1,81 +1,134 @@
 {
-    "config-help": "Cette commande sert principalement à configurer votre serveur. En faisant `%{p}config see [option]`, tu obtiendrez l'aperçu des configurations actuelles, et les administrateurs du serveur peuvent entrer `%{p}config set <option> valeur1, valeur2...` pour modifier une configuration, ou `%{p}config del <option>` pour réinitialiser l'option (`%{p}config set <option> del` fonctionne de même).\nLa liste des options disponible est accessible à l'adresse <https://axobot.rtfd.io/en/latest/server.html#list-of-every-option>",
-    "config-list": "Liste des options disponibles :%{text}Plus d'information : %{link}",
-    "edit-error": {
-        "anti_raid": "Ce niveau n'existe pas :eyes:. Voici la liste des niveaux actuellement disponibles : %{list}",
-        "boolean": "L'option '%{name}' attend un paramètre de type booléen (True/False) comme valeur :innocent: !",
-        "category": "J'ai pas trouvé la catégorie %{name}, désolé.",
-        "channel": "Je suis paumé :whut: ! Je suis incapable de trouver le salon '%{channel}' :confused: !\n*(Entre la mention, le nom exact ou l'identifiant du ou des salon(s))*",
-        "color": "Euuuuuh... Cette couleur est invalide !",
-        "emoji": "Je trouve pas l'émoji %{emoji} ! :eyes:",
-        "lang": "Cette langue n'est pas disponible. Voici la liste des langues actuellement supportées est là *(Encore merci aux traducteurs !)* :\n%{list}",
-        "numeric": "L'option '%{name}' attend un nombre comme paramètre :stuck_out_tongue_winking_eye:",
-        "prefix": {
-            "invalid": "Oooups, il semble que ce préfixe est invalide :thinking: Si le problème persiste, choisis-en un autre",
-            "long": "Ce préfixe est *BEAUCOUP* trop long pour être utilisé !"
-        },
-        "role": "Meh ? Je trouve pas le rôle '%{role}' :blobconfused: (Tu peux vérifier les majuscules et les caractères spéciaux ?)",
-        "tttdisplay": "Ce mode n'existe pas.\nPar contre, ceux-là existent : %{list}",
-        "xp": "Ce système d'xp n'existe pas. Pas la peine d'essayer. Et si tu la connais pas, voici la liste des systèmes disponibles :grin: ! %{list}",
-        "xp_rate": "Le modificateur d'xp doit être compris entre %{min} et %{max}. Sinon c'est trop nerfé ou overcheat !"
+    "bool": {
+        "true": "",
+        "false": ""
     },
-    "edit-success": {
-        "boolean": "L'option '%{opt}' a bien été modifiée ! Maintenant, elle vaut \"*%{val}*\"",
-        "category": "L'option '%{opt}' a été modifié avec la catégorie %{val}",
-        "channel": "L'option '%{opt}' a bien été modifiée avec les salons %{val}",
-        "color": "La couleur utilisée pour cette option (%{opt}) est maintenant `%{val}`",
-        "emojis": "Les émojis pour l'option '%{opt}' sont maintenant %{val}",
-        "lang": "Le bot parle maintenant %{val}. こんにちは！",
+    "enum": {
+        "anti_raid": {
+            "none": "",
+            "smooth": "",
+            "careful": "",
+            "high": "",
+            "extreme": ""
+        },
+        "language": {
+            "fr": "",
+            "en": "",
+            "lolcat": "",
+            "fi": "",
+            "de": "",
+            "fr2": "",
+            "cs": ""
+        },
         "levelup_channel": {
-            "any": "Les messages de levelup seront postés directement dans le tchat ;) !",
-            "chan": "Les messages de levelup seront maintenant envoyés sur %{val} !",
-            "none": "Y'aura plus de messages de levelup, maintenant !"
+            "none": "",
+            "any": "",
+            "dm": ""
         },
-        "prefix": "Le préfixe a bien été remplacé par `%{val}`",
-        "raid": "Le niveau de sécurité anti-raid est maintenant défini à **%{name}** (%{index}) :wink:",
-        "role": "L'option '%{opt}' a bien été modifiée. Elle s'applique maintenant à ces rôles :\n%{val}",
-        "text": "L'option '%{opt}' a bien été remplacée par le texte suivant : \n```\n%{val}\n```",
-        "tttdisplay": "L'utilisation du morpion est mise à %{val}",
-        "xp": "Le type d'xp utilisé est maintenant un classement %{val}. J'espère qu'ils préfèreront :grin: !",
-        "xp_rate": "Le modificateur d'xp est maintenant à %{val}. À vous le niveau 100 !"
+        "xp_type": {
+            "global": "",
+            "mee6-like": "",
+            "local": ""
+        }
     },
+    "config-list": "Liste des options disponibles :%{text}Plus d'information : %{link}",
+    "deleted-channel": "",
+    "deleted-role": "",
     "internal-error": "Aw ! Une erreur interne est survenue... Réessaie ?\nSi ça marche pas, signale-le dans mon Discord. *(Tip : Tape `!about` pour en avoir le lien)*",
     "need-manage-server": "T'as besoin de la perm \"Gérer le serveur\" pour exécuter cette commande.",
     "not-found": "Le serveur %{guild} n'a pas encore été enregistré dans la base de données.",
     "opt_title": "Option '%{opt}' du serveur %{guild}",
     "option-notfound": "Hey ! Cette option n'existe pas ! Tu as peut-être fait une fôtt d'Ortograff ? :wink:",
+    "reset-all": {
+        "confirmation": "",
+        "success": "",
+        "error": ""
+    },
     "see-0": "Tape `!config help` pour plus de détails. Tout simplement :stuck_out_tongue_winking_eye: !",
     "see-title": "Voici ici la configuration actuelle du serv %{guild}",
+    "set_error": {
+        "BOOLEAN_INVALID": "",
+        "CATEGORY_INVALID": "",
+        "channels_list": "",
+        "CHANNEL_ANNOUNCEMENT": "",
+        "CHANNEL_INVALID": "",
+        "CHANNEL_NON_NSFW": "",
+        "CHANNEL_NOT_TEXT": "",
+        "CHANNEL_NOT_VOICE": "",
+        "CHANNEL_STAGE": "",
+        "CHANNEL_THREAD": "",
+        "COLOR_INVALID": "",
+        "emojis_list": "",
+        "emojis_list_exact": "",
+        "EMOJI_INVALID": "",
+        "ENUM_INVALID": "",
+        "float_err": "",
+        "int_err": "",
+        "LEVELUP_CHANNEL_INVALID": "",
+        "roles_list": "",
+        "ROLE_EVERYONE": "",
+        "ROLE_INTEGRATED": "",
+        "ROLE_INVALID": "",
+        "text_err": ""
+    },
+    "set_success": {
+        "int": "",
+        "float": "",
+        "boolean": {
+            "true": "",
+            "false": ""
+        },
+        "enum": "",
+        "text": "",
+        "role": "",
+        "roles_list": "",
+        "text_channel": "",
+        "text_channels_list": "",
+        "voice_channel": "",
+        "category": "",
+        "emojis_list": "",
+        "color": "",
+        "levelup_channel": {
+            "any": "",
+            "channel": "",
+            "none": "",
+            "dm": ""
+        }
+    },
     "server_desc": {
         "anti_caps_lock": "Faut que j'envoie un message lorsqu'un membre envoie trop de majuscules :thinking: ? %{value}",
         "anti_raid": "Voici le niveau de la protection anti-raid : %{value} \n*([Documentation](https://axobot.rtfd.io/en/latest/moderator.html#anti-raid))*",
+        "anti_raid_ignored_roles": "",
+        "anti_scam": "",
         "autoremove_xp": "Le bot enlèvera {xp} points d'xp par jour aux membres inactifs. Quelle punition !",
-        "ban_allowed_roles": "Voici tous ceux qui peuvent ban quelqu'un : %{value}. Faites attention !",
         "bot_news": "Voici la liste des salons dans lesquels envoyer les news du bot : %{value}",
-        "clear_allowed_roles": "Tout ce beau monde peut nettoyer un salon avec `!`clear : %{value}",
+        "compress_help": "",
+        "delete_welcome_on_quick_leave": "",
         "description": "Description du serveur :\n %{value}",
-        "enable_fun": "Les commandes répertoriées dans la commande `!fun` sont-elles activées ? %{value}",
+        "enable_events": "",
+        "enable_invites_tracking": "",
         "enable_xp": "Le système d'xp doit-il être activé ? %{value}",
         "help_in_private": "Faut que j'envoie le message d'aide en MP ? %{value}",
         "hunter": "Liste des salons dans lesquels le jeu *Hunter* est actif : %{value}",
-        "kick_allowed_roles": "Tout ce beau monde peut kick : %{value}",
         "language": "Langue actuelle du bot pour ce serveur : **%{value}**",
         "leave": "Message envoyé lorsqu'un membre repart : %{value}",
         "levelup_channel": "Salon où j'envoie les messages de levelup : %{value}",
         "levelup_msg": "Message envoyé lorsqu'un membre gagne un niveau d'xp : %{value}",
+        "levelup_silent_mention": "",
         "membercounter": "Salon affichant dans son nom le nombre de membres : %{value}",
-        "mute_allowed_roles": "Liste des rôles qui peuvent utiliser la commande 'mute' : %{value}",
         "muted_role": "Rôle utilisé pour rendre les gens muets : %{value}",
         "noxp_channels": "Salons où il est impossible d'obtenir de l'xp : %{value}",
+        "noxp_roles": "",
         "partner_channel": "Salon dans lequel envoyer les partenaires : %{value}",
         "partner_color": "Couleur de l'embed des partenaires : %{value}",
         "partner_role": "Rôle donné aux partenaires : %{value}",
         "poll_channels": "Liste des salons dans lesquels les réactions :thumbsup: et :thumbsdown: seront automatiquement ajoutées à chaque message : %{value}",
-        "prefix": "Préfixe actuel du bot : %{value}",
+        "private_leaderboard": "",
+        "rank_in_private": "",
         "save_roles": "Les rôles doivent-ils être sauvegardés lorsqu'un membre part, au cas où il revienne ? %{value}",
-        "say_allowed_roles": "Liste des rôles qui peuvent utiliser la commande 'say' : %{value}",
-        "slowmode_allowed_roles": "Liste des rôles qui peuvent utiliser les commandes 'slowmode' et 'freeze' : %{value}",
-        "ttt_display": "Utilisation du morpion : %{value}",
+        "streaming_channel": "",
+        "stream_mention": "",
+        "streaming_role": "",
         "ttt_emojis": "Émojis utilisés pour le morpion : %{value}",
         "update_mentions": "Rôles mentionnés lors d'une mise à jour du bot : %{value}",
         "verification_role": "Rôles enlevés lorsqu'un joueur s'authentifie avec la commande `verify` : %{value}",
@@ -83,13 +136,32 @@
         "voice_channel": "Salons à partir duquel les chats vocaux vont être créés : %{value}",
         "voice_channel_format": "Format du nom automatic des salons vocaux : %{value}",
         "voice_roles": "Rôles donnés aux membres d'un salon vocal : %{value}",
+        "voice_xp_per_min": "",
         "vote_emojis": "Emojis utilisés pour les réactions de vote : %{value}",
-        "warn_allowed_roles": "Liste des rôles pouvant utiliser les commandes 'warn' et 'case' : %{value}",
         "welcome": "Message envoyé lorsqu'un membre arrive : %{value}",
         "welcome_channel": "Liste des salons dans lesquels envoyer les messages de bienvenue/quit : %{value}",
         "welcome_roles": "Liste des rôles donnés automatiquement aux nouveaux membres : %{value}",
+        "welcome_silent_mention": "",
+        "xp_decay": "",
         "xp_rate": "Modficateur de gains d'xp : %{value}",
         "xp_type": "Type de système d'xp : %{value}"
     },
-    "value-deleted": "La valeur de l'option ('%{option}') a bien été reset."
+    "tips": {
+        "antiscam_enable_logs": "",
+        "title": ""
+    },
+    "value-deleted": "La valeur de l'option ('%{option}') a bien été reset.",
+    "warnings": {
+        "afk_channel": "",
+        "antiraid_perms_missing": {
+            "one": "",
+            "many": ""
+        },
+        "channel_write_permissions": "",
+        "manage_guild_permissions": "",
+        "moderation_command": "",
+        "title": "",
+        "xp_should_be_enabled": "",
+        "xp_should_be_local": ""
+    }
 }

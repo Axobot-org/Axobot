@@ -1,10 +1,10 @@
 {
     "about": {
         "server": "Můj Discord server:",
-        "invite": "Odkaz na pozvání na jiný server:",
         "docs": "Dokumentace bota:",
         "privacy": "Zásady ochrany osobních údajů:",
-        "sponsor": "Přispět:"
+        "sponsor": "Přispět:",
+        "website": "Moje webová stránka:"
     },
     "about-main": "Ahoj! Jsem %{mention}!\nJsem bot, který vám umožní spoustu věcí: moderování, systém xp, statistiky, řízení partnerů a mnoho dalších super užitečných příkazů (a úplně zbytečných)!\nMůžete začít zadáním `!help` v tomto chatu, abyste viděli seznam dostupných příkazů, pak `!config see` vám umožní vidět možnosti konfigurace.\n\nMůj majitel (Z_runner) a já bychom chtěli poděkovat Awhikaxovi za jeho podporu během různých krizí, Aragorn1202 za všechny jeho nápady a věty plné zdravého rozumu, Adri za všechna ta krásná loga, emodži a profilové fotky a celému týmu překladatelů za jejich dlouholetou práci!\n\n:globe_with_meridians: Některé odkazy mohou být užitečné: %{links}\n\nPřeji hezký den!",
     "bitly_already_shortened": "Tato adresa url je již zkrácena!",
@@ -26,6 +26,7 @@
         "emoji-5v": "%{nbr} (První registrované použití: %{date})",
         "forum": {
             "title": "Fórum '%{name}'",
+            "media-title": "\"Mediální fórum '%{name}'\"",
             "tags": "Štítky příspěvku",
             "default-emoji": "Výchozí reakční emoji",
             "guidelines": "Pokyny",
@@ -58,6 +59,9 @@
         "guild-features": {
             "ANIMATED_BANNER": "Animovaný banner",
             "ANIMATED_ICON": "Animovaná ikona serveru",
+            "AUDIO_BITRATE_128_KBPS": "",
+            "AUDIO_BITRATE_256_KBPS": "",
+            "AUDIO_BITRATE_384_KBPS": "",
             "AUTO_MODERATION": "Automatická moderování",
             "BANNER": "Vlastní banner serveru",
             "CHANNEL_BANNER": "Banner kanálu",
@@ -79,6 +83,7 @@
             "INVITES_DISABLED": "Pozvánky zakázány",
             "INVITE_SPLASH": "Vložit vlastní screen",
             "LINKED_TO_HUB": "Seznam v uzlu studenta",
+            "MAX_FILE_SIZE_100_MB": "",
             "MEMBER_VERIFICATION_GATE_ENABLED": "Verifikace k ověření uživatelů povolena",
             "MONETIZATION_ENABLED": "Monetizace povolena",
             "MORE_EMOJI": "Limit emoji zvýšen",
@@ -93,11 +98,17 @@
             "ROLE_ICONS": "Ikony rolí",
             "ROLE_SUBSCRIPTIONS_AVAILABLE_FOR_PURCHASE": "Předplatné rolí je k dispozici ke koupi",
             "ROLE_SUBSCRIPTIONS_ENABLED": "Role předplatitele",
+            "STAGE_CHANNEL_VIEWERS_50": "",
+            "STAGE_CHANNEL_VIEWERS_150": "",
+            "STAGE_CHANNEL_VIEWERS_300": "",
             "TEXT_IN_VOICE_ENABLED": "Text v hlasových chatech",
-            "THREE_DAY_THREAD_ARCHIVE": "3 denní archiv vláken",
             "TICKETED_EVENTS_ENABLED": "Vstupenkové akce",
+            "TIERLESS_BOOSTING": "",
             "VANITY_URL": "Vlastní url pozvánka",
             "VERIFIED": "Ověřený server",
+            "VIDEO_BITRATE_ENHANCED": "",
+            "VIDEO_QUALITY_720_60FPS": "",
+            "VIDEO_QUALITY_1080_60FPS": "",
             "VIP_REGIONS": "VIP hlasové regiony",
             "WELCOME_SCREEN_ENABLED": "Uvítací obrazovka povolena"
         },
@@ -164,8 +175,8 @@
     "membercount-4": "Počet neověřených uživatelů",
     "not-found": "Nelze najít %{N}",
     "ping": {
-        "normal": ":ping_pong:  Pong!\nBot ping: %{bot}ms\nDiscord ping: %{api}ms",
-        "pig": ":pig:  Groink!\nBot ping: %{bot}ms\nDiscord ping: %{api}ms"
+        "normal": ":ping_pong: Pong!\nPing bota: %{bot}ms\nPing Discordu: %{api}ms",
+        "pig": ":pig: Groink!\nPing bota: %{bot}ms\nPing Discordu: %{api}ms"
     },
     "stats": {
         "api_ping": "**API latence:** %{v} ms",

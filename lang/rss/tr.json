@@ -1,0 +1,150 @@
+{
+    "ask-roles-hint": {
+        "one": "",
+        "many": ""
+    },
+    "ask-roles-hint-example": "",
+    "bluesky": "",
+    "bluesky-default-flow": "",
+    "bluesky-form-last": "",
+    "change-txt": {
+        "title": "",
+        "label": "",
+        "modal-success": "",
+        "placeholder": "",
+        "confirmation": {
+            "current-structure": "",
+            "variables-title": "",
+            "variables-explanation": "",
+            "variables": {
+                "author": "",
+                "channel": "",
+                "date": "",
+                "long_date": "",
+                "timestamp": "",
+                "link": "",
+                "logo": "",
+                "title": "",
+                "full_text": "",
+                "description": ""
+            }
+        }
+    },
+    "choose-delete": "",
+    "choose-disable": "",
+    "choose-enable": "",
+    "choose-mentions-1": "",
+    "choose-roles": "",
+    "choose-test": "",
+    "delete-success": {
+        "many": "",
+        "one": ""
+    },
+    "disable-success": {
+        "many": "",
+        "one": ""
+    },
+    "enable-success": {
+        "many": "",
+        "one": ""
+    },
+    "deviant": "",
+    "deviant-default-flow": "",
+    "deviant-form-last": "",
+    "embed-json-changed": "",
+    "filter": {
+        "same": "",
+        "success": {
+            "blacklist": "",
+            "reset": "",
+            "whitelist": ""
+        }
+    },
+    "flow-limit": "",
+    "guild-complete": {
+        "one": "",
+        "many": ""
+    },
+    "guild-error": "",
+    "guild-loading": "",
+    "invalid-flow": "",
+    "invalid-link": "",
+    "list": "",
+    "list-disabled": "",
+    "list-result": "",
+    "list-result-filter": {
+        "none": "",
+        "blacklist": "",
+        "whitelist": ""
+    },
+    "list-title": {
+        "one": "",
+        "many": ""
+    },
+    "list2": "",
+    "loop-processing": "",
+    "mc": "",
+    "move-success": {
+        "many": "",
+        "one": ""
+    },
+    "no-feed": "",
+    "no-feed2": "",
+    "no-feed-enabled": "",
+    "no-feed-filter": "",
+    "no-roles": "",
+    "not-a-role": "",
+    "nothing": "",
+    "picker-placeholder": {
+        "single": "",
+        "multi": ""
+    },
+    "research-timeout": "",
+    "roles": {
+        "edit-silent-false": {
+            "one": "",
+            "many": ""
+        },
+        "edit-silent-true": {
+            "one": "",
+            "many": ""
+        },
+        "edit-success": {
+            "many": "",
+            "one": "",
+            "zero": ""
+        },
+        "list": "",
+        "no-change": ""
+    },
+    "success-add": "",
+    "test": {
+        "empty-result": "",
+        "invalid-format": ""
+    },
+    "text-success": {
+        "single": "",
+        "multiple": ""
+    },
+    "too-long": "",
+    "tw": "",
+    "tw-default-flow": "",
+    "tw-form-last": "",
+    "tw-no-tweet": "",
+    "twitch": "",
+    "twitch-default-flow": "",
+    "twitch-form-last": "",
+    "twitch-invalid": "",
+    "use_embed-same": "",
+    "use_embed-success": "",
+    "use_embed_false": "",
+    "use_embed_true": "",
+    "web": "",
+    "web-default-flow": "",
+    "web-form-last": "",
+    "web-invalid": "",
+    "yt": "",
+    "yt-default-flow": "",
+    "yt-form-last": "",
+    "yt-invalid": ""
+}

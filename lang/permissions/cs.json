@@ -45,14 +45,16 @@
         "send_tts_messages": "Odeslat TTS zprávy",
         "send_voice_messages": "Odeslat hlasové zprávy",
         "speak": "Mluvit",
-        "stream": "Go live",
+        "stream": "Začít živý přenos",
         "use_application_commands": "Použít příkazy aplikace",
         "use_embedded_activities": "Spustit aktivity v hlasových kanálech",
+        "use_external_apps": "Použít externí aplikace",
         "use_external_sounds": "Použít externí zvuky",
         "use_slash_commands": "Použít lomítkové příkazy",
         "use_soundboard": "Použít zvukovou desku",
         "use_voice_activation": "Použít hlasovou aktivitu",
         "view_audit_log": "Zobrazit auditorské protokoly",
+        "view_creator_monetization_analytics": "Zobrazit analytiku monetizace tvůrce",
         "view_guild_insights": "Zobrazit pohled na klanu"
     },
     "target": {

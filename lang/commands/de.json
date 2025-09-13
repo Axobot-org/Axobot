@@ -1,0 +1,590 @@
+{
+    "command_name": {
+        "Quote": "",
+        "Report a scam": "",
+        "Voice to text": "",
+        "about": "",
+        "antiscam report": "",
+        "antiscam test": "",
+        "ban": "",
+        "banlist": "",
+        "bitly create": "",
+        "bitly find": "",
+        "blurple check": "",
+        "blurple darkfy": "",
+        "blurple help": "",
+        "blurple lightfy": "",
+        "cases edit-reason": "",
+        "cases list": "",
+        "cases remove": "",
+        "cases search": "",
+        "clear": "",
+        "config list": "",
+        "config reset": "",
+        "config reset-all": "",
+        "config see": "",
+        "config set": "",
+        "destop": "",
+        "documentation": "",
+        "emoji clear": "",
+        "emoji list": "",
+        "emoji rename": "",
+        "emoji restrict": "",
+        "event collect": "",
+        "event info": "",
+        "event profile": "",
+        "help": "",
+        "info": "",
+        "invites-tracker disable": "",
+        "invites-tracker enable": "",
+        "invites-tracker list-invites": "",
+        "invites-tracker resync": "",
+        "invites-tracker set-name": "",
+        "kick": "",
+        "last-post": "",
+        "membercount": "",
+        "minecraft follow-server": "",
+        "minecraft mod": "",
+        "minecraft server": "",
+        "minecraft skin": "",
+        "modlogs disable": "",
+        "modlogs enable": "",
+        "modlogs list": "",
+        "mute": "",
+        "mute-config": "",
+        "mutelist": "",
+        "partners add": "",
+        "partners list": "",
+        "partners refresh": "",
+        "partners remove": "",
+        "partners reset-description": "",
+        "partners set-color": "",
+        "partners set-description": "",
+        "partners set-invite": "",
+        "permissions": "",
+        "ping": "",
+        "poll": "",
+        "profile card": "",
+        "profile card-preview": "",
+        "profile config": "",
+        "profile list-card-styles": "",
+        "quote": "",
+        "random-tip": "",
+        "rank": "",
+        "reminders cancel": "",
+        "reminders clear": "",
+        "reminders create": "",
+        "reminders list": "",
+        "remindme": "",
+        "role grant": "",
+        "role members-list": "",
+        "role revoke": "",
+        "role set-color": "",
+        "role temporary-grant": "",
+        "roles-react add": "",
+        "roles-react list": "",
+        "roles-react remove": "",
+        "roles-react send": "",
+        "roles-react set-description": "",
+        "roles-react update": "",
+        "roles-rewards add": "",
+        "roles-rewards list": "",
+        "roles-rewards reload": "",
+        "roles-rewards remove": "",
+        "rss add": "",
+        "rss disable": "",
+        "rss enable": "",
+        "rss list": "",
+        "rss move": "",
+        "rss refresh": "",
+        "rss remove": "",
+        "rss set-embed": "",
+        "rss set-filter": "",
+        "rss set-mentions": "",
+        "rss set-text": "",
+        "rss test": "",
+        "set-xp": "",
+        "slowmode": "",
+        "softban": "",
+        "stats": "",
+        "tic-tac-toe": "",
+        "tickets portal set-category": "",
+        "tickets portal set-format": "",
+        "tickets portal set-hint": "",
+        "tickets portal set-role": "",
+        "tickets portal set-text": "",
+        "tickets portal summon": "",
+        "tickets review-config": "",
+        "tickets topic add": "",
+        "tickets topic list": "",
+        "tickets topic remove": "",
+        "tickets topic set-emote": "",
+        "tickets topic set-format": "",
+        "tickets topic set-hint": "",
+        "tickets topic set-name": "",
+        "tickets topic set-role": "",
+        "top": "",
+        "twitch check-stream": "",
+        "twitch list-subscriptions": "",
+        "twitch subscribe": "",
+        "twitch unsubscribe": "",
+        "unban": "",
+        "unhoist": "",
+        "unmute": "",
+        "warn": ""
+    },
+    "command_short_description": {
+        "cases edit-reason": "",
+        "cases list": "",
+        "cases remove": "",
+        "cases search": "",
+        "clear": "",
+        "invites-tracker disable": "",
+        "invites-tracker enable": "",
+        "invites-tracker list-invites": "",
+        "invites-tracker resync": "",
+        "invites-tracker set-name": "",
+        "membercount": "",
+        "minecraft follow-server": "",
+        "minecraft mod": "",
+        "minecraft server": "",
+        "minecraft skin": "",
+        "partners add": "",
+        "partners list": "",
+        "partners refresh": "",
+        "partners remove": "",
+        "partners reset-description": "",
+        "partners set-color": "",
+        "partners set-description": "",
+        "partners set-invite": "",
+        "quote": "",
+        "random-tip": "",
+        "rank": "",
+        "set-xp": "",
+        "tic-tac-toe": "",
+        "top": ""
+    },
+    "group_description": {
+        "antiscam": "",
+        "bitly": "",
+        "cases": "",
+        "config": "",
+        "emoji": "",
+        "event": "",
+        "invites-tracker": "",
+        "minecraft": "",
+        "modlogs": "",
+        "partners": "",
+        "profile": "",
+        "reminders": "",
+        "role": "",
+        "roles-react": "",
+        "roles-rewards": "",
+        "rss": "",
+        "tickets": "",
+        "tickets portal": "",
+        "tickets topic": "",
+        "twitch": ""
+    },
+    "group_name": {
+        "antiscam": "",
+        "bitly": "",
+        "blurple": "",
+        "cases": "",
+        "config": "",
+        "emoji": "",
+        "event": "",
+        "invites-tracker": "",
+        "minecraft": "",
+        "modlogs": "",
+        "partners": "",
+        "profile": "",
+        "reminders": "",
+        "role": "",
+        "roles-react": "",
+        "roles-rewards": "",
+        "rss": "",
+        "tickets": "",
+        "tickets portal": "",
+        "tickets topic": "",
+        "twitch": ""
+    },
+    "param_name": {
+        "antiscam report": {
+            "message": ""
+        },
+        "antiscam test": {
+            "text": ""
+        },
+        "ban": {
+            "days_to_delete": "",
+            "reason": "",
+            "time": "",
+            "user": ""
+        },
+        "banlist": {
+            "show_reasons": ""
+        },
+        "bitly create": {
+            "url": ""
+        },
+        "bitly find": {
+            "url": ""
+        },
+        "blurple check": {
+            "who": ""
+        },
+        "blurple darkfy": {
+            "method": "",
+            "variations": "",
+            "who": ""
+        },
+        "blurple lightfy": {
+            "method": "",
+            "variations": "",
+            "who": ""
+        },
+        "cases edit-reason": {
+            "case_id": "",
+            "new_reason": ""
+        },
+        "cases list": {
+            "user": ""
+        },
+        "cases remove": {
+            "case_id": ""
+        },
+        "cases search": {
+            "case_id": ""
+        },
+        "clear": {
+            "contains_file": "",
+            "contains_invite": "",
+            "contains_url": "",
+            "is_pinned": "",
+            "number": "",
+            "users": ""
+        },
+        "config reset": {
+            "option": ""
+        },
+        "config see": {
+            "option": ""
+        },
+        "config set": {
+            "option": "",
+            "value": ""
+        },
+        "destop": {
+            "start_message": ""
+        },
+        "emoji clear": {
+            "emoji": "",
+            "message": ""
+        },
+        "emoji rename": {
+            "emoji": "",
+            "name": ""
+        },
+        "emoji restrict": {
+            "emoji": "",
+            "roles": ""
+        },
+        "event profile": {
+            "user": ""
+        },
+        "help": {
+            "args": ""
+        },
+        "info": {
+            "query": "",
+            "query_type": ""
+        },
+        "invites-tracker set-name": {
+            "invite": "",
+            "name": ""
+        },
+        "kick": {
+            "reason": "",
+            "user": ""
+        },
+        "last-post": {
+            "type": "",
+            "url": ""
+        },
+        "minecraft follow-server": {
+            "channel": "",
+            "ip": "",
+            "port": ""
+        },
+        "minecraft mod": {
+            "mod_name": ""
+        },
+        "minecraft server": {
+            "ip": "",
+            "port": ""
+        },
+        "minecraft skin": {
+            "username": ""
+        },
+        "modlogs disable": {
+            "channel": "",
+            "logs": ""
+        },
+        "modlogs enable": {
+            "channel": "",
+            "logs": ""
+        },
+        "modlogs list": {
+            "channel": ""
+        },
+        "mute": {
+            "reason": "",
+            "time": "",
+            "user": ""
+        },
+        "mutelist": {
+            "show_reasons": ""
+        },
+        "partners add": {
+            "description": "",
+            "invite": ""
+        },
+        "partners remove": {
+            "partner": ""
+        },
+        "partners reset-description": {
+            "partner": ""
+        },
+        "partners set-color": {
+            "color": ""
+        },
+        "partners set-description": {
+            "description": "",
+            "partner": ""
+        },
+        "partners set-invite": {
+            "new_invite": "",
+            "partner": ""
+        },
+        "permissions": {
+            "channel": "",
+            "target": ""
+        },
+        "poll": {
+            "channel": "",
+            "options_count": "",
+            "text": ""
+        },
+        "profile card": {
+            "style": ""
+        },
+        "profile card-preview": {
+            "style": ""
+        },
+        "profile config": {
+            "enable": "",
+            "option": ""
+        },
+        "quote": {
+            "message": "",
+            "style": ""
+        },
+        "rank": {
+            "user": ""
+        },
+        "reminders cancel": {
+            "reminder_id": ""
+        },
+        "reminders create": {
+            "duration": "",
+            "message": ""
+        },
+        "remindme": {
+            "duration": "",
+            "message": ""
+        },
+        "role grant": {
+            "role": "",
+            "users": ""
+        },
+        "role members-list": {
+            "role": ""
+        },
+        "role revoke": {
+            "role": "",
+            "users": ""
+        },
+        "role set-color": {
+            "color": "",
+            "role": ""
+        },
+        "role temporary-grant": {
+            "role": "",
+            "time": "",
+            "user": ""
+        },
+        "roles-react add": {
+            "description": "",
+            "emoji": "",
+            "role": ""
+        },
+        "roles-react remove": {
+            "emoji": ""
+        },
+        "roles-react send": {
+            "channel": ""
+        },
+        "roles-react set-description": {
+            "description": "",
+            "emoji": ""
+        },
+        "roles-react update": {
+            "change_description": "",
+            "embed": "",
+            "emojis": ""
+        },
+        "roles-rewards add": {
+            "level": "",
+            "role": ""
+        },
+        "roles-rewards remove": {
+            "level": ""
+        },
+        "rss add": {
+            "link": "",
+            "channel": ""
+        },
+        "rss disable": {
+            "feed": ""
+        },
+        "rss enable": {
+            "feed": ""
+        },
+        "rss move": {
+            "channel": "",
+            "feed": ""
+        },
+        "rss remove": {
+            "feed": ""
+        },
+        "rss set-embed": {
+            "author_text": "",
+            "color": "",
+            "enable_link_in_title": "",
+            "feed": "",
+            "footer_text": "",
+            "image_location": "",
+            "should_use_embed": "",
+            "show_date_in_footer": "",
+            "title": ""
+        },
+        "rss set-filter": {
+            "feed": "",
+            "filter_type": "",
+            "words": ""
+        },
+        "rss set-mentions": {
+            "feed": "",
+            "mentions": "",
+            "silent": ""
+        },
+        "rss set-text": {
+            "feed": "",
+            "text": ""
+        },
+        "rss test": {
+            "feed": "",
+            "with_mentions": ""
+        },
+        "set-xp": {
+            "user": "",
+            "xp": ""
+        },
+        "slowmode": {
+            "seconds": ""
+        },
+        "softban": {
+            "reason": "",
+            "user": ""
+        },
+        "stats": {
+            "category": ""
+        },
+        "tickets portal set-category": {
+            "category_or_channel": ""
+        },
+        "tickets portal set-format": {
+            "name_format": ""
+        },
+        "tickets portal set-hint": {
+            "message": ""
+        },
+        "tickets portal set-role": {
+            "role": ""
+        },
+        "tickets portal set-text": {
+            "message": ""
+        },
+        "tickets portal summon": {
+            "channel": ""
+        },
+        "tickets review-config": {
+            "topic_id": ""
+        },
+        "tickets topic add": {
+            "emote": "",
+            "name": ""
+        },
+        "tickets topic remove": {
+            "topic_id": ""
+        },
+        "tickets topic set-emote": {
+            "emote": "",
+            "topic_id": ""
+        },
+        "tickets topic set-format": {
+            "name_format": "",
+            "topic_id": ""
+        },
+        "tickets topic set-hint": {
+            "message": "",
+            "topic_id": ""
+        },
+        "tickets topic set-name": {
+            "name": "",
+            "topic_id": ""
+        },
+        "tickets topic set-role": {
+            "role": "",
+            "topic_id": ""
+        },
+        "top": {
+            "page": "",
+            "scope": ""
+        },
+        "twitch check-stream": {
+            "streamer": ""
+        },
+        "twitch subscribe": {
+            "streamer": ""
+        },
+        "twitch unsubscribe": {
+            "streamer": ""
+        },
+        "unban": {
+            "reason": "",
+            "user": ""
+        },
+        "unhoist": {
+            "characters": ""
+        },
+        "unmute": {
+            "user": ""
+        },
+        "warn": {
+            "message": "",
+            "user": ""
+        }
+    }
+}

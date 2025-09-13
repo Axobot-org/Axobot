@@ -1,80 +1,134 @@
 {
-    "config-help": "Tätä komentoa yleensä käytetään palvelimen konfigurointiin. Viestittämällä `%{p}config see [option]` sinä aiot saada näyn tämänaikaisesta konfiguraatiosta, ja palvelimen järjestelmänvalvojat voivat viestittää `%{p}config set <option> ominaisuus1, ominaisuus2...` jolla voi muuttaa konfigurointia, tai `%{p}config del <option>` jolla voi asettaa uudelleen vaitoehdon (`%{p}config set <option>` toimii samallain). Lista mahdollisista vaihtoehdoista löytyy täältä: <https://axobot.rtfd.io/en/latest/server.html#list-of-every-option>",
-    "config-list": "Lista saatavilla olevista vaihtoehdoista: %{text}Lisätietoja täältä %{link}",
-    "edit-error": {
-        "anti_raid": "Tämä taso ei ole olemassa. Tässä on lista kaikista mahdollisista tasoista: %{list}",
-        "boolean": "Vaihtoehto \"%{name}\" haluaa boolean (True/False) paramittarin arvosta :innocent:",
-        "category": "Kategoriaa %{name} ei löytynyt",
-        "channel": "Kanava \"%{channel}\" ei löytynyt :confused: (Laita tasan sama mainitseminen tai nimi)",
-        "emoji": "Emoji %{emoji} ei löytynyt",
-        "lang": "Tämä kieli ei ole vielä botissa. Tässä on lista kaikista mahdollisista kielistä: %{list}",
-        "numeric": "Vaihtoehto \"%{name}\" haluaa numeron paramittarista:innocent:",
-        "prefix": {
-            "invalid": "Ups, näyttää siltä että tämä ei ole etuliite :thinking: Jos tämä jatkuu, valitse joku toinen",
-            "long": "Tätä etuliite on liian pitkä!"
-        },
-        "role": "Rooli \"%{role}\" ei löytynyt :confused: (Katso isot kirjaimet ja ulkomaalaiset kirjaimet)",
-        "tttdisplay": "Tätä käyttötapaa ei ole olemassa. Tässä on luettelo käytettävissä olevista käyttötavoista: %{list}",
-        "xp": "Tämä XP systeemi ei ole olemassa. Tässä on lista kaikista mahdollisista systeemeistä: %{list}",
-        "xp_rate": "Xp korko voi vain olla %{min} ja %{max} välillä"
+    "bool": {
+        "true": "",
+        "false": ""
     },
-    "edit-success": {
-        "boolean": "Vaihtoehto \"%{opt}\" on nyt aktivioitu hinnalle *%{val}*",
-        "category": "Vaihtoehto \"%{opt}\" on vaihdettu %{val} kategorian kanssa",
-        "channel": "Vaihtoehto \"%{opt}\" on nyt aktivoitu kanaville %{val}",
-        "emojis": "Tunteet vaihdoehdolle \"%{opt}\" on nyt %{val}",
-        "lang": "Botin kieli on nyt %{val}",
+    "enum": {
+        "anti_raid": {
+            "none": "",
+            "smooth": "",
+            "careful": "",
+            "high": "",
+            "extreme": ""
+        },
+        "language": {
+            "fr": "",
+            "en": "",
+            "lolcat": "",
+            "fi": "",
+            "de": "",
+            "fr2": "",
+            "cs": ""
+        },
         "levelup_channel": {
-            "any": "Tason ylennykset nyt lähetetään suoraan kanavaan",
-            "chan": "Tason ylennykset nyt lähetetään kanavalle %{val}",
-            "none": "Tason ylennyksiä ei enää lähetetä minnekkään"
+            "none": "",
+            "any": "",
+            "dm": ""
         },
-        "prefix": "Etuliite on nyt vaihdettu oikein, nyt etuliite on `%{val}`",
-        "raid": "Anti-raid suojaus taso on nyt aktivoitu tasolle **%{name}** (%{index})",
-        "role": "Vaihtoehto \"%{opt}\" on nyt aktivoitu rooleille: %{val}",
-        "text": "Vaihtoehto \"%{opt}\" on nyt korjattu seuraavalla tekstillä: \n```\n%{val}\n```",
-        "tttdisplay": "Ristinollan pelaaminen on nyt asetettu %{val}",
-        "xp": "XP systeemiä on nyt käytössä %{val}",
-        "xp_rate": "Xp korko on nyt %{val}"
+        "xp_type": {
+            "global": "",
+            "mee6-like": "",
+            "local": ""
+        }
     },
+    "config-list": "Lista saatavilla olevista vaihtoehdoista: %{text}Lisätietoja täältä %{link}",
+    "deleted-channel": "",
+    "deleted-role": "",
     "internal-error": "Ups, sisäinen virhe tapahtui...",
     "need-manage-server": "Tarvitset \"Hallitse palvelinta\" käyttöoikeudet, jotta voit käyttää tätä komentoa.",
     "not-found": "Palvelin %{guild} ei ole vielä rekisteröity databaseen",
     "opt_title": "Vaihtoehto \"%{opt}\" palvelimesta %{guild}",
     "option-notfound": "Tämä vaihtoehto ei ole olemassa :confused:",
+    "reset-all": {
+        "confirmation": "",
+        "success": "",
+        "error": ""
+    },
     "see-0": "Viestitä `!config help` saadakseen lisätietoja",
     "see-title": "%{guild} palvelin konfigurointi",
+    "set_error": {
+        "BOOLEAN_INVALID": "",
+        "CATEGORY_INVALID": "",
+        "channels_list": "",
+        "CHANNEL_ANNOUNCEMENT": "",
+        "CHANNEL_INVALID": "",
+        "CHANNEL_NON_NSFW": "",
+        "CHANNEL_NOT_TEXT": "",
+        "CHANNEL_NOT_VOICE": "",
+        "CHANNEL_STAGE": "",
+        "CHANNEL_THREAD": "",
+        "COLOR_INVALID": "",
+        "emojis_list": "",
+        "emojis_list_exact": "",
+        "EMOJI_INVALID": "",
+        "ENUM_INVALID": "",
+        "float_err": "",
+        "int_err": "",
+        "LEVELUP_CHANNEL_INVALID": "",
+        "roles_list": "",
+        "ROLE_EVERYONE": "",
+        "ROLE_INTEGRATED": "",
+        "ROLE_INVALID": "",
+        "text_err": ""
+    },
+    "set_success": {
+        "int": "",
+        "float": "",
+        "boolean": {
+            "true": "",
+            "false": ""
+        },
+        "enum": "",
+        "text": "",
+        "role": "",
+        "roles_list": "",
+        "text_channel": "",
+        "text_channels_list": "",
+        "voice_channel": "",
+        "category": "",
+        "emojis_list": "",
+        "color": "",
+        "levelup_channel": {
+            "any": "",
+            "channel": "",
+            "none": "",
+            "dm": ""
+        }
+    },
     "server_desc": {
         "anti_caps_lock": "Pitäisikö botin lähettää viesti kun jäsen lähettää liikaa isoja kirjaimia? %{value}",
         "anti_raid": "Taso anti-raid suojeluksesta: %{value} \n*([Dokumentaatio](https://axobot.rtfd.io/en/latest/moderator.html#anti-raid))*",
+        "anti_raid_ignored_roles": "",
+        "anti_scam": "",
         "autoremove_xp": "Kokemuspisteet jotka poistetaan päivittäin epäaktiivisilta jäseniltä: %{value}",
-        "ban_allowed_roles": "Lista rookeista jotka voivat käyttää komentoa 'ban': %{value}",
         "bot_news": "Lista kanavista johon lähetetään botin uutiset: %{value}",
-        "clear_allowed_roles": "Lista rooleista jotka voivat käyttää komentoa 'clear': %{value}",
         "compress_help": "Pitäisikö `help` komennon näkymä olla yksinkertaistettu? %{value}",
-        "description": "Server description:\n %{value}",
-        "enable_fun": "Onko komennot jotka ovat listassa `!fun` komennossa kytketty päälle? %{value}",
+        "delete_welcome_on_quick_leave": "",
+        "description": "",
+        "enable_events": "",
+        "enable_invites_tracking": "",
         "enable_xp": "Pitäisiko XP systeemi olla kytketty päälle? %{value}",
         "help_in_private": "Lähetetäänkö help viesti yksityis viestillä? %{value}",
         "hunter": "Lista kanavista jossa peli *Metsästäjä* on aktiivinen: %{value}",
-        "kick_allowed_roles": "Lista rooleista jotka voivat käyttää komentoa 'kick': %{value}",
         "language": "Tämän hetkinen kieli tälle palvelimelle: **%{value}**",
         "leave": "Viesti joka lähetetään kun jäsen lähtee: %{value}",
         "levelup_channel": "Kanava, johon tason ylennykset lähetetään: %{value}",
         "levelup_msg": "Viesti joka lähetetään kun jäsen saa uuden tason XP systeemissä: %{value}",
+        "levelup_silent_mention": "",
         "membercounter": "Kanava joka näyttää numeron jäsenistä sen nimessä on: %{value}",
-        "mute_allowed_roles": "Lista rooleista jotka voivat käyttää komentoa 'mute': %{value}",
         "muted_role": "Käytetty mykistys rooli : %{value}",
         "noxp_channels": "Kanavat joilla et voi saada XP:tä: %{value}",
+        "noxp_roles": "",
         "partner_channel": "Kanava johon yhteistyökumppanit lähetetään: %{value}",
         "partner_color": "Väri yhteistyökumppanien upotetusta linkistä: %{value}",
         "partner_role": "Rooli joka annetaan yhteistyökumppaneille: %{value}",
         "poll_channels": "Tässä on lista kanavista joissa kaikkiin viesteihin lisätään reaktiot :thumbsup: ja :thumbsdown: automaattisesti: %{value}",
-        "prefix": "Tämän hetkinen botin etuliite: %{value}",
+        "private_leaderboard": "",
+        "rank_in_private": "",
         "save_roles": "Pitäisikö roolit tallentua kun jäsen lähtee, jos hän palaa takaisin? %{value}",
-        "say_allowed_roles": "Lista rooleista jotka voivat käyttää komentoa 'say' : %{value}",
-        "slowmode_allowed_roles": "Lista rooleista jotka voivat käyttää komentoja 'slowmode' ja 'freeze': %{value}",
-        "ttt_display": "Ristinollan pelaaminen: %{value}",
+        "streaming_channel": "",
+        "stream_mention": "",
+        "streaming_role": "",
         "ttt_emojis": "Emojit joita käytetään risti-nollassa: %{value}",
         "update_mentions": "Roolit jotka mainitaan botin muutoslokissa: %{value}",
         "verification_role": "Roolit jotka otetaan pois kun jäsen käyttää `verify` komennon: %{value}",
@@ -82,12 +136,32 @@
         "voice_channel": "Kanava, josta tehdään uusia automaattisia puhekanavia: %{value}",
         "voice_channel_format": "Formaatti automaattisen puhekanavan nimestä: %{value}",
         "voice_roles": "Roolit jotka annetaan, kun joku liittyy puhekanavalle: %{value}",
+        "voice_xp_per_min": "",
         "vote_emojis": "Emojit joita käytetään äänestyksissä reaktioina: %{value}",
-        "warn_allowed_roles": "Lista rooleista jotka voivat käyttää komentoja 'warn' ja 'cases': %{value}",
         "welcome": "Viesti joka lähetetään kun jäsen liittyy: %{value}",
         "welcome_channel": "Lista kanavista johon Tervetuloa ja Heippa viestit lähetetään: %{value}",
         "welcome_roles": "Lista rooleista jotka annetaan uusille jäsenille: %{value}",
+        "welcome_silent_mention": "",
+        "xp_decay": "",
         "xp_rate": "XP tulonmuuttaja: %{value}",
         "xp_type": "XP systeemiä: %{value} käytetään nyt"
+    },
+    "tips": {
+        "antiscam_enable_logs": "",
+        "title": ""
+    },
+    "value-deleted": "",
+    "warnings": {
+        "afk_channel": "",
+        "antiraid_perms_missing": {
+            "one": "",
+            "many": ""
+        },
+        "channel_write_permissions": "",
+        "manage_guild_permissions": "",
+        "moderation_command": "",
+        "title": "",
+        "xp_should_be_enabled": "",
+        "xp_should_be_local": ""
     }
 }

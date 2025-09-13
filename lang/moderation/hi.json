@@ -1,0 +1,144 @@
+{
+    "ban": {
+        "ban-success": "",
+        "cant-ban": "",
+        "list-error": "",
+        "list-title-0": "",
+        "list-title-1": "",
+        "list-title-2": "",
+        "no-bans": "",
+        "softban-succes": "",
+        "staff-ban": "",
+        "too-high": "",
+        "unban-success": "",
+        "user-not-banned": ""
+    },
+    "ban-chat": "",
+    "ban-dm": "",
+    "cant-find-user": "",
+    "cant-pin": "",
+    "caps-lock": "",
+    "clear": {
+        "done": {
+            "many": "",
+            "one": ""
+        },
+        "not-found": "",
+        "too-few": ""
+    },
+    "destop": {
+        "no-guild": "",
+        "too-old": ""
+    },
+    "emoji": {
+        "cant-emoji": "",
+        "cleared": "",
+        "emoji-valid": {
+            "one": "",
+            "many": ""
+        },
+        "list": "",
+        "list-title": "",
+        "private": "",
+        "renamed": "",
+        "unrestricted": "",
+        "wrong-guild": ""
+    },
+    "error": "",
+    "kick": {
+        "cant-staff": "",
+        "no-perm": "",
+        "success": "",
+        "too-high": ""
+    },
+    "kick-chat": "",
+    "kick-dm": "",
+    "missing-manage-nick": "",
+    "missing-user-perms": "",
+    "mute-config": {
+        "confirm": "",
+        "err": "",
+        "success": {
+            "many": "",
+            "zero": ""
+        },
+        "success2": {
+            "many": "",
+            "zero": ""
+        },
+        "tip": ""
+    },
+    "mute": {
+        "already-mute": "",
+        "already-unmute": "",
+        "cant-mute": "",
+        "cant-timeout": "",
+        "list-title-0": "",
+        "list-title-1": "",
+        "list-title-2": "",
+        "mute-high": "",
+        "mute-success": "",
+        "no-mute": "",
+        "no-mutes": "",
+        "staff-mute": "",
+        "too-high": "",
+        "unmute-success": ""
+    },
+    "mute-chat": "",
+    "mute-dm": "",
+    "need-manage-messages": "",
+    "need-read-history": "",
+    "pin": {
+        "error-notfound": "",
+        "error-toomuch": ""
+    },
+    "raid-banned": "",
+    "raid-kicked": "",
+    "react-clear": "",
+    "role": {
+        "color-success": "",
+        "give-pending": "",
+        "give-roles-higher": "",
+        "give-success": {
+            "many": "",
+            "one": "",
+            "zero": ""
+        },
+        "give-too-high": "",
+        "limit-hit": "",
+        "list": "",
+        "remove-pending": "",
+        "remove-success": {
+            "many": "",
+            "one": "",
+            "zero": ""
+        },
+        "temp-grant-success": "",
+        "too-high": ""
+    },
+    "slowmode": {
+        "cant-slowmode": "",
+        "disabled": "",
+        "enabled": "",
+        "info": "",
+        "invalid": "",
+        "no-perm": "",
+        "too-long": ""
+    },
+    "unban-chat": "",
+    "unhoist-too-many-members": "",
+    "unhoisted": {
+        "many": "",
+        "one": "",
+        "zero": ""
+    },
+    "unmute-chat": "",
+    "warn": {
+        "cant-bot": "",
+        "cant-staff": "",
+        "success": "",
+        "warn-but-db": ""
+    },
+    "warn-chat": "",
+    "warn-dm": ""
+}

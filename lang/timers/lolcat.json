@@ -19,7 +19,7 @@
         "embed-asked": "%{user}, u asked me %{duration} ago 2 remind you this:",
         "embed-date": "Ask date",
         "embed-link": "First msg",
-        "embed-title": "Reminder",
+        "embed-title": "",
         "empty": "Oops, U don't have any pending reminder lol",
         "item": "ID: `{id}` | In: {duration} | Chan: {channel} | Msg: {msg}",
         "recreated": "Roger that, new reminder created",

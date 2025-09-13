@@ -1,0 +1,167 @@
+{
+    "bool": {
+        "true": "",
+        "false": ""
+    },
+    "enum": {
+        "anti_raid": {
+            "none": "",
+            "smooth": "",
+            "careful": "",
+            "high": "",
+            "extreme": ""
+        },
+        "language": {
+            "fr": "",
+            "en": "",
+            "lolcat": "",
+            "fi": "",
+            "de": "",
+            "fr2": "",
+            "cs": ""
+        },
+        "levelup_channel": {
+            "none": "",
+            "any": "",
+            "dm": ""
+        },
+        "xp_type": {
+            "global": "",
+            "mee6-like": "",
+            "local": ""
+        }
+    },
+    "config-list": "",
+    "deleted-channel": "",
+    "deleted-role": "",
+    "internal-error": "",
+    "need-manage-server": "",
+    "not-found": "",
+    "opt_title": "",
+    "option-notfound": "",
+    "reset-all": {
+        "confirmation": "",
+        "success": "",
+        "error": ""
+    },
+    "see-0": "",
+    "see-title": "",
+    "set_error": {
+        "BOOLEAN_INVALID": "",
+        "CATEGORY_INVALID": "",
+        "channels_list": "",
+        "CHANNEL_ANNOUNCEMENT": "",
+        "CHANNEL_INVALID": "",
+        "CHANNEL_NON_NSFW": "",
+        "CHANNEL_NOT_TEXT": "",
+        "CHANNEL_NOT_VOICE": "",
+        "CHANNEL_STAGE": "",
+        "CHANNEL_THREAD": "",
+        "COLOR_INVALID": "",
+        "emojis_list": "",
+        "emojis_list_exact": "",
+        "EMOJI_INVALID": "",
+        "ENUM_INVALID": "",
+        "float_err": "",
+        "int_err": "",
+        "LEVELUP_CHANNEL_INVALID": "",
+        "roles_list": "",
+        "ROLE_EVERYONE": "",
+        "ROLE_INTEGRATED": "",
+        "ROLE_INVALID": "",
+        "text_err": ""
+    },
+    "set_success": {
+        "int": "",
+        "float": "",
+        "boolean": {
+            "true": "",
+            "false": ""
+        },
+        "enum": "",
+        "text": "",
+        "role": "",
+        "roles_list": "",
+        "text_channel": "",
+        "text_channels_list": "",
+        "voice_channel": "",
+        "category": "",
+        "emojis_list": "",
+        "color": "",
+        "levelup_channel": {
+            "any": "",
+            "channel": "",
+            "none": "",
+            "dm": ""
+        }
+    },
+    "server_desc": {
+        "anti_caps_lock": "",
+        "anti_raid": "",
+        "anti_raid_ignored_roles": "",
+        "anti_scam": "",
+        "autoremove_xp": "",
+        "bot_news": "",
+        "compress_help": "",
+        "delete_welcome_on_quick_leave": "",
+        "description": "",
+        "enable_events": "",
+        "enable_invites_tracking": "",
+        "enable_xp": "",
+        "help_in_private": "",
+        "hunter": "",
+        "language": "",
+        "leave": "",
+        "levelup_channel": "",
+        "levelup_msg": "",
+        "levelup_silent_mention": "",
+        "membercounter": "",
+        "muted_role": "",
+        "noxp_channels": "",
+        "noxp_roles": "",
+        "partner_channel": "",
+        "partner_color": "",
+        "partner_role": "",
+        "poll_channels": "",
+        "private_leaderboard": "",
+        "rank_in_private": "",
+        "save_roles": "",
+        "streaming_channel": "",
+        "stream_mention": "",
+        "streaming_role": "",
+        "ttt_emojis": "",
+        "update_mentions": "",
+        "verification_role": "",
+        "voice_category": "",
+        "voice_channel": "",
+        "voice_channel_format": "",
+        "voice_roles": "",
+        "voice_xp_per_min": "",
+        "vote_emojis": "",
+        "welcome": "",
+        "welcome_channel": "",
+        "welcome_roles": "",
+        "welcome_silent_mention": "",
+        "xp_decay": "",
+        "xp_rate": "",
+        "xp_type": ""
+    },
+    "tips": {
+        "antiscam_enable_logs": "",
+        "title": ""
+    },
+    "value-deleted": "",
+    "warnings": {
+        "afk_channel": "",
+        "antiraid_perms_missing": {
+            "one": "",
+            "many": ""
+        },
+        "channel_write_permissions": "",
+        "manage_guild_permissions": "",
+        "moderation_command": "",
+        "title": "",
+        "xp_should_be_enabled": "",
+        "xp_should_be_local": ""
+    }
+}

@@ -122,6 +122,7 @@
         "enabled": "Kanál %{channel} je nyní v pomalém režimu. Počkejte %{s} sekund před odesláním zprávy.",
         "info": "Pomalý režim tohoto kanálu je aktuálně {} sekund",
         "invalid": "Tato hodnota je neplatná",
+        "no-perm": "Potřeba oprávnění \"Spravovat kanál\" :confused:",
         "too-long": "Není možné nastavit frekvenci vyšší než 6 hodin"
     },
     "unban-chat": "Člen %{user} (%{userid}) již není na tomto serveru zabanován",
