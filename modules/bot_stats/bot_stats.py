@@ -163,19 +163,19 @@ class BotStats(commands.Cog):
         return None
 
     @commands.Cog.listener()
-    async def on_antiscam_warn(self):
+    async def on_antiscam_warn(self, *_args, **_kwargs):
         self.antiscam["warning"] += 1
 
     @commands.Cog.listener()
-    async def on_antiscam_delete(self):
+    async def on_antiscam_delete(self, *_args, **_kwargs):
         self.antiscam["deletion"] += 1
 
     @commands.Cog.listener()
-    async def on_ticket_creation(self):
+    async def on_ticket_creation(self, *_args, **_kwargs):
         self.ticket_events["creation"] += 1
 
     @commands.Cog.listener()
-    async def on_server_warning(self, warning_type: ServerWarningType, **kwargs):
+    async def on_server_warning(self, warning_type: ServerWarningType, *_args, **_kwargs):
         "Called when a server warning is triggered"
         if warning_type in {
             ServerWarningType.RSS_UNKNOWN_CHANNEL,
