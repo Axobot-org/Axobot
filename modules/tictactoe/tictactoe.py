@@ -206,7 +206,7 @@ def interaction_is_tictactoe(interaction_data: Optional["InteractionData"]) -> T
     "Check if an interaction is a click on a button"
     if interaction_data is None:
         return False
-    if interaction_data.get("component_type") != discord.ComponentType.button:
+    if interaction_data.get("component_type") != discord.ComponentType.button.value:
         return False
     return True
 
