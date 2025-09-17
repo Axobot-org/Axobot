@@ -62,7 +62,7 @@ def interaction_is_ticket_creation(interaction: discord.Interaction) -> TypeGuar
         return False
     if interaction.type != discord.InteractionType.component or interaction.data is None:
         return False
-    if interaction.data.get("component_type") != discord.ComponentType.select:
+    if interaction.data.get("component_type") != discord.ComponentType.select.value:
         return False
     if not (custom_id := interaction.data.get("custom_id")):
         return False
