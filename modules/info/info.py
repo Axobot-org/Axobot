@@ -1054,8 +1054,7 @@ class Info(commands.Cog):
         # XP sus
         xp_sus = "Unknown"
         if xp_cog := self.bot.get_cog("Xp"):
-            if xp_cog.sus is not None:
-                xp_sus = str(user.id in xp_cog.sus)
+            xp_sus = await xp_cog.is_suspicious_user(user.id)
         # ----
         if interaction.guild is None:
             color = None

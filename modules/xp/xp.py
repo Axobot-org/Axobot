@@ -104,7 +104,7 @@ class Xp(commands.Cog):
         if self.clear_cards_loop.is_running():
             self.clear_cards_loop.stop()
 
-    async def _is_suspicious_user(self, user_id: int) -> bool:
+    async def is_suspicious_user(self, user_id: int) -> bool:
         if self._suspicious_users is None:
             await self.reload_sus()
         if self._suspicious_users is None:
@@ -257,7 +257,7 @@ class Xp(commands.Cog):
         prev_points = await self.get_member_xp(msg.author, "global")
         await self.db_set_xp(msg.author.id, giv_points, "add")
         # check for sus people
-        if await self._is_suspicious_user(msg.author.id):
+        if await self.is_suspicious_user(msg.author.id):
             await self.send_sus_msg(msg, giv_points)
         await self.update_cache_and_execute_actions(msg.author, msg.channel, "global", prev_points, giv_points)
 
@@ -272,7 +272,7 @@ class Xp(commands.Cog):
         prev_points = await self.get_member_xp(msg.author, msg.guild.id)
         await self.db_set_xp(msg.author.id, giv_points, "add", msg.guild.id)
         # check for sus people
-        if await self._is_suspicious_user(msg.author.id):
+        if await self.is_suspicious_user(msg.author.id):
             await self.send_sus_msg(msg, giv_points)
         await self.update_cache_and_execute_actions(msg.author, msg.channel, "mee6-like", prev_points, giv_points)
 
@@ -292,7 +292,7 @@ class Xp(commands.Cog):
         prev_points = await self.get_member_xp(msg.author, msg.guild.id)
         await self.db_set_xp(msg.author.id, giv_points, "add", msg.guild.id)
         # check for sus people
-        if await self._is_suspicious_user(msg.author.id):
+        if await self.is_suspicious_user(msg.author.id):
             await self.send_sus_msg(msg, giv_points)
         await self.update_cache_and_execute_actions(msg.author, msg.channel, "local", prev_points, giv_points)
 
