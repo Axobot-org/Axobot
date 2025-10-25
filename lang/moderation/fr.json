@@ -7,7 +7,7 @@
         "list-title-1": "Liste des 45 premiers membres bannis du serveur '{}'",
         "list-title-2": "Liste des 60 premiers membres bannis du serveur '{}'",
         "no-bans": "Aucun membre ne semble être banni de ce serveur",
-        "softban-succes": "Le membre a bien été softban",
+        "softban-success": "Le membre a bien été softban",
         "staff-ban": "Vous ne pouvez pas bannir un autre membre du staff !",
         "too-high": "Il semble que ce membre soit trop haut pour que je puisse le bannir :thinking:",
         "unban-success": "Le membre a bien été débanni",

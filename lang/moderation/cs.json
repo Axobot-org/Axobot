@@ -7,7 +7,7 @@
         "list-title-1": "Seznam 45 zabanovaných členů serveru \"{}\"",
         "list-title-2": "Seznam 60 zabanovaných členů serveru \"{}\"",
         "no-bans": "Žádnému členovi zde zřejmě není zabanován vstup",
-        "softban-succes": "Člen byl softbannován",
+        "softban-success": "Člen byl softbannován",
         "staff-ban": "Nemůžeš zabanovat jiné členy týmu!",
         "too-high": "Zdá se, že tento člen má vyšší funkcni, nemohu ho tedy zabanovat. :thinking:",
         "unban-success": "Člen byl odbanován",

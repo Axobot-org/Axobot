@@ -7,7 +7,7 @@
         "list-title-1": "List of 45 banned members of the server \"{}\"",
         "list-title-2": "List of 60 banned members of the server \"{}\"",
         "no-bans": "No member seems to be banned from here",
-        "softban-succes": "The member has been softbanned",
+        "softban-success": "The member has been softbanned",
         "staff-ban": "You can't ban another staff!",
         "too-high": "It seems that this member is too high for me to ban them. :thinking:",
         "unban-success": "The member has been unbanned",
