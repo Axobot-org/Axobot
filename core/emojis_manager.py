@@ -1,5 +1,5 @@
 import re
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 
 import discord
 import requests
@@ -953,7 +953,7 @@ def convert_unicode_name(name: str) -> str:
 class EmojisManager:
     """Class for managing emojis. No more, no less."""
 
-    def __init__(self, bot: "Axobot"):
+    def __init__(self, bot: Optional["Axobot"]):
         self.bot = bot
         self.emoji_map = emojiMap
         self.numbers = numbers
@@ -993,8 +993,9 @@ class EmojisManager:
                     self.unicode_set.add(match.group("emoji"))
                     emoji_name = convert_unicode_name(match.group("name"))
                     self.emoji_map[':' + emoji_name + ':'] = match.group("emoji")
-        except requests.exceptions.ConnectionError:
-            pass
+        except requests.exceptions.ConnectionError as err:
+            if self.bot:
+                self.bot.dispatch("error", err)
 
     async def anti_code(self, text: str) -> str:
         "Convert unicode emojis to their columns-string representation"
@@ -1008,6 +1009,8 @@ class EmojisManager:
 
         :raises: ValueError if the emoji is not found
         """
+        if self.bot is None:
+            raise ValueError("Bot instance is not available to fetch custom emojis.")
         ids = {
             "youtube": 447459436982960143,
             "twitter": 958325391196585984,
