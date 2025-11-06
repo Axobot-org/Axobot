@@ -35,7 +35,13 @@ class AntiRaid(commands.Cog):
     @commands.Cog.listener(name="on_message")
     async def on_message_anticaps(self, msg: discord.Message):
         "Check for capslock messages"
-        if msg.guild is None or msg.author.bot or not self.bot.database_online or len(msg.content) < 8:
+        if (
+            msg.guild is None
+            or msg.author.bot
+            or not isinstance(msg.author, discord.Member)
+            or not self.bot.database_online
+            or len(msg.content) < 8
+        ):
             return
         if msg.channel.permissions_for(msg.author).administrator: # type: ignore
             return
