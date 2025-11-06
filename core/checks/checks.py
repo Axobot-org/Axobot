@@ -1,9 +1,15 @@
+from typing import TYPE_CHECKING, TypedDict
+
 import discord
 from discord.ext import commands
 
 from core.bot_classes import SUPPORT_GUILD_ID, MyContext
 from core.bot_classes.axobot import Axobot
 from core.checks.errors import NotAVoiceMessageError
+
+if TYPE_CHECKING:
+    from discord.types.message import Message as MessageDict
+    from discord.types.message import MessageSnapshot
 
 admins_id = {279568324260528128,281404141841022976,552273019020771358}
 
@@ -47,6 +53,21 @@ async def is_voice_message(interaction: discord.Interaction):
     message = list(messages.values())[0]
     flags = discord.MessageFlags()
     flags.value = message.get("flags", 0)
+    if not flags.voice:
+        if flags.forwarded: # pylint: disable=using-constant-test
+            return await _forwards_voice_message(message)
+        raise NotAVoiceMessageError()
+    return True
+
+SnapshotRef = TypedDict("SnapshotRef", message="MessageSnapshot")
+async def _forwards_voice_message(message: "MessageDict"):
+    "Check if the interaction message forwards a voice message"
+    snapshots: list[SnapshotRef] = message.get("message_snapshots", [])
+    if len(snapshots) != 1:
+        raise NotAVoiceMessageError()
+    snapshot = snapshots[0]["message"]
+    flags = discord.MessageFlags()
+    flags.value = snapshot.get("flags", 0)
     if not flags.voice:
         raise NotAVoiceMessageError()
     return True
