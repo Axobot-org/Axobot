@@ -44,7 +44,7 @@ async def main():
             status_list = json.load(status_file)
         if not client.database_online:
             status = choice(status_list["no-db"])
-        if client.beta:
+        elif client.beta:
             status = choice(status_list["beta"])
         else:
             status = choice(status_list["axobot"])
