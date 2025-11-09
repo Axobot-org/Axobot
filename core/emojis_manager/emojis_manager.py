@@ -1,8 +1,12 @@
+import asyncio
+import json
+import logging
+import os
 import re
 from typing import TYPE_CHECKING, Optional
 
+import aiohttp
 import discord
-import requests
 
 if TYPE_CHECKING:
     from core.bot_classes import Axobot
@@ -941,6 +945,7 @@ def convert_unicode_name(name: str) -> str:
     return (
         name
         .replace(' ', '_')
+        .replace('-', '_')
         .replace(': ', '_')
         .replace(', ', '_')
         .replace('light skin tone', 'tone1')
@@ -956,9 +961,9 @@ class EmojisManager:
     def __init__(self, bot: Optional["Axobot"]):
         self.bot = bot
         self.emoji_map = emojiMap
-        self.numbers = numbers
-        self.alphabet = alphabet
-        self.chars = characteres
+        self.log = logging.getLogger("bot.emojis")
+        self.unicode_set: set[str] = set()
+        self.unicode_set_file_path = os.path.dirname(__file__) + "/unicode_emojis.json"
 
         self.numbers_names = [f"{str(i).ljust(2, '_')}:{emoji}" for i, emoji in enumerate(numbers)]
 
@@ -986,22 +991,37 @@ class EmojisManager:
         }
 
         try:
-            resp = requests.get("https://www.unicode.org/Public/emoji/15.1/emoji-test.txt", timeout=5)
-            self.unicode_set: set[str] = set()
-            for line in resp.text.split("\n"):
-                if match := UNICODE_FILE_LINE_PATTERN.match(line):
-                    self.unicode_set.add(match.group("emoji"))
-                    emoji_name = convert_unicode_name(match.group("name"))
-                    self.emoji_map[':' + emoji_name + ':'] = match.group("emoji")
-        except requests.exceptions.ConnectionError as err:
-            if self.bot:
-                self.bot.dispatch("error", err)
+            with open(self.unicode_set_file_path, 'r', encoding="utf8") as json_file:
+                self.unicode_set = set(json.load(json_file))
+        except (FileNotFoundError, json.decoder.JSONDecodeError):
+            self.log.warning("Unicode emojis file not found, fetching from Unicode website...")
+            asyncio.create_task(self.update_unicode_emojis_list())
 
-    async def anti_code(self, text: str) -> str:
-        "Convert unicode emojis to their columns-string representation"
-        for name, unicode in emojiMap.items():
-            text = text.replace(unicode, name)
-        return text
+    async def update_unicode_emojis_list(self):
+        "Update the Unicode emojis list from the Unicode website."
+        try:
+            async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(10)) as session:
+                async with session.get("https://www.unicode.org/Public/emoji/15.1/emoji-test.txt") as resp:
+                    resp.raise_for_status()
+                    text = await resp.text()
+                    self.unicode_set = set()
+                    for line in text.split("\n"):
+                        if match := UNICODE_FILE_LINE_PATTERN.match(line):
+                            self.unicode_set.add(match.group("emoji"))
+        except Exception as err:
+            if self.bot:
+                self.bot.dispatch("error", err, "While fetching Unicode emojis list.")
+            else:
+                self.log.exception("While fetching Unicode emojis list.")
+            return
+        if not self.unicode_set:
+            if self.bot:
+                self.bot.dispatch("error", RuntimeError("Failed to fetch Unicode emojis list."))
+            else:
+                self.log.error("Failed to fetch Unicode emojis list.")
+            return
+        with open(self.unicode_set_file_path, 'w', encoding="utf8") as json_file:
+            json.dump(list(self.unicode_set), json_file)
 
     def get_emoji(self, name: str) -> discord.Emoji:
         """
