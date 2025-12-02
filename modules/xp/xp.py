@@ -771,17 +771,23 @@ class Xp(commands.Cog):
             if await self.bot.get_config(guild_id, "xp_type") == "global":
                 continue
             # apply decay
-            async with self.bot.db_xp.write(decay_query.format(table=guild_id), (value,), returnrowcount=True) as row_count:
-                if row_count is None:
-                    raise ValueError(f"XP decay query returned 'None' row count for guild {guild_id}")
-                users_count += row_count
-                # if xp has been edited, invalidate cache
-                if row_count > 0 and guild_id in self.leaderboard_cache:
-                    del self.leaderboard_cache[guild_id]
-            # remove members with 0xp or less
-            async with self.bot.db_xp.write(cleanup_query.format(table=guild_id), returnrowcount=True) as row_count:
-                self.log.info("xp decay: removed %s members from guild %s", row_count, guild_id)
-            guilds_count += 1
+            try:
+                async with self.bot.db_xp.write(decay_query.format(table=guild_id), (value,), returnrowcount=True) as row_count:
+                    if row_count is None:
+                        raise ValueError(f"XP decay query returned 'None' row count for guild {guild_id}")
+                    users_count += row_count
+                    # if xp has been edited, invalidate cache
+                    if row_count > 0 and guild_id in self.leaderboard_cache:
+                        del self.leaderboard_cache[guild_id]
+                # remove members with 0xp or less
+                async with self.bot.db_xp.write(cleanup_query.format(table=guild_id), returnrowcount=True) as row_count:
+                    self.log.info("xp decay: removed %s members from guild %s", row_count, guild_id)
+                guilds_count += 1
+            except MySQLProgrammingError as err:
+                if err.errno == 1146:  # table does not exist
+                    self.log.warning("XP decay: table %s does not exist, skipping", guild_id)
+                    continue
+                raise err
         log_text = f"XP decay: removed xp of {users_count} users from {guilds_count} guilds"
         emb = discord.Embed(description=log_text, color=0x66ffcc, timestamp=self.bot.utcnow())
         emb.set_author(name=self.bot.user, icon_url=self.bot.display_avatar)
