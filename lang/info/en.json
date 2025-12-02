@@ -84,6 +84,7 @@
             "INVITES_DISABLED": "Invites disabled",
             "INVITE_SPLASH": "Invite custom screen",
             "LINKED_TO_HUB": "Linked to a student hub",
+            "MAX_FILE_SIZE_50_MB": "50MB max file size",
             "MAX_FILE_SIZE_100_MB": "100MB max file size",
             "MEMBER_VERIFICATION_GATE_ENABLED": "Member verification gate enabled",
             "MONETIZATION_ENABLED": "Monetization enabled",
