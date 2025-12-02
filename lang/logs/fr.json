@@ -7,6 +7,7 @@
     "mute": "%{user} (%{userid}) est maintenant muet",
     "reason": {
         "account_creation": "Automod (compte trop récent)",
+        "attachments": "Automod (spam de fichiers)",
         "autounmute": "unmute automatique",
         "invite": "Automod (invitation Discord dans son pseudo)",
         "invites": "Automod (spam d'invitations Discord)",

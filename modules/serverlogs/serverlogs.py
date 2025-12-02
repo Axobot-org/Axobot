@@ -1152,6 +1152,9 @@ class ServerLogs(commands.Cog):
             # invites theshold
             if invites_treshold := data.get("invites_treshold"):
                 emb.add_field(name="Invites treshold", value=invites_treshold)
+            # attachments theshold
+            if attachments_treshold := data.get("attachments_treshold"):
+                emb.add_field(name="Attachments treshold", value=attachments_treshold)
             # duration
             if duration := data.get("duration"):
                 lang = await self.bot._(member.guild.id, "_used_locale")
@@ -1186,6 +1189,9 @@ Minimum age required by anti-raid: {min_age}"
             # invites theshold
             if invites_treshold := data.get("invites_treshold"):
                 emb.add_field(name="Invites treshold", value=invites_treshold)
+            # attachments theshold
+            if attachments_treshold := data.get("attachments_treshold"):
+                emb.add_field(name="Attachments treshold", value=attachments_treshold)
             # discord invite
             if "discord_invite" in data:
                 emb.add_field(name="Contains a Discord invite in their username", value=self.bot.zws, inline=False)
@@ -1216,6 +1222,9 @@ Minimum age required by anti-raid: {min_age}"
             # invites theshold
             if invites_treshold := data.get("invites_treshold"):
                 emb.add_field(name="Invites treshold", value=invites_treshold)
+            # attachments theshold
+            if attachments_treshold := data.get("attachments_treshold"):
+                emb.add_field(name="Attachments treshold", value=attachments_treshold)
             # discord invite
             if "discord_invite" in data:
                 emb.add_field(name="Contains a Discord invite in their username", value=self.bot.zws, inline=False)
