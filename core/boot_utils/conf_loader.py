@@ -36,6 +36,7 @@ class SecretKeys(TypedDict):
     webhooks: WebhooksKeys
     dbl: str
     bitly: str
+    topgg_stats: str
     discordbotlist: str
     discordextremelist: str
     statuspage: str

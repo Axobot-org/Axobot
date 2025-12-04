@@ -13,16 +13,13 @@ class DbPartner(TypedDict):
     type: PartnerType
     description: str
 
-class TopGGStatsResponse(TypedDict):
-    "Response from the Top.gg API for bot stats."
-    server_count: int
-    shards: list[int]
-    shard_count: int | None
-
 class TopGGBotResponse(TypedDict):
     "Response from the Top.gg API for bot information."
-    owners: list[int]
+    id: str
+    name: str
+    owners: list[str]
     tags: list[str]
+    server_count: int
 
 class EmbedField(TypedDict):
     "A field in an embed."

@@ -13,13 +13,13 @@ from discord.ext import commands, tasks
 from core.arguments import args
 from core.bot_classes import SUPPORT_GUILD_ID, Axobot
 from core.checks import checks
-from core.type_utils import (AnyStrDict, channel_is_guild_messageable,
-                             channel_is_messageable,
-                             assert_interaction_channel_is_guild_messageable)
+from core.type_utils import (AnyStrDict,
+                             assert_interaction_channel_is_guild_messageable,
+                             channel_is_guild_messageable,
+                             channel_is_messageable)
 from core.views import ConfirmView
 
-from .src.types import (DbPartner, EmbedField, PartnerType, TopGGBotResponse,
-                        TopGGStatsResponse)
+from .src.types import DbPartner, EmbedField, PartnerType, TopGGBotResponse
 
 DescriptionType = app_commands.Range[str, 1, 1500]
 
@@ -83,8 +83,8 @@ class Partners(commands.Cog):
         self.refresh_loop.cancel() # pylint: disable=no-member
 
     @property
-    def dbl_headers(self):
-        return {"Authorization": self.bot.secrets["dbl"]}
+    def topgg_stats_headers(self):
+        return {"Authorization": self.bot.secrets["topgg_stats"]}
 
     @tasks.loop(time=[
         datetime.time(hour=7, tzinfo=datetime.UTC),
@@ -194,41 +194,30 @@ class Partners(commands.Cog):
                 return query_results["server_count"]
         return None
 
-    async def get_bot_guilds(self, bot_id: int, session: aiohttp.ClientSession) -> int | None:
-        """Get the guilds count of a bot
-        None if unknown bot/count not provided"""
+    async def get_bot_stats(self, bot_id: int, session: aiohttp.ClientSession) -> tuple[int | None, list[discord.User | int]]:
+        """Get the guilds count and the owners list of a bot
+        None if unknown bot/data not provided"""
         db_count = await self.db_get_bot_guilds(bot_id)
+        owners: list[discord.User | int] = []
         try:
             async with session.get(
-                f"https://top.gg/api/bots/{bot_id}/stats", headers=self.dbl_headers, timeout=aiohttp.ClientTimeout(10)
-            ) as resp:
-                response: TopGGStatsResponse = await resp.json()
-        except asyncio.TimeoutError:
-            return db_count
-        if api_count := response.get("server_count"):
-            if db_count and api_count < db_count*0.95:
-                return db_count
-            return api_count
-        return db_count
-
-    async def get_bot_owners(self, bot_id: int, session: aiohttp.ClientSession) -> list[discord.User | int]:
-        """Get the owners list of a bot
-        Empty list if unknown bot/owners not provided"""
-        try:
-            async with session.get(
-                f"https://top.gg/api/bots/{bot_id}", headers=self.dbl_headers, timeout=aiohttp.ClientTimeout(10)
+                f"https://api.topstats.gg/discord/bots/{bot_id}",
+                headers=self.topgg_stats_headers,
+                timeout=aiohttp.ClientTimeout(10)
             ) as resp:
                 response: TopGGBotResponse = await resp.json()
         except asyncio.TimeoutError:
-            return []
-        owners = []
+            return db_count, owners
         if "owners" in response:
             for owner_id in response["owners"]:
                 try:
-                    owners.append(await self.bot.fetch_user(owner_id))
+                    owners.append(await self.bot.fetch_user(int(owner_id)))
                 except discord.NotFound:
-                    owners.append(owner_id)
-        return owners
+                    owners.append(int(owner_id))
+        if api_count := response.get("server_count"):
+            if not db_count or api_count > db_count*0.95:
+                return api_count, owners
+        return db_count, owners
 
     async def get_partners_channels(self) -> list[discord.abc.GuildChannel]:
         """Return every partners channels"""
@@ -300,14 +289,13 @@ class Partners(commands.Cog):
         try:
             title += str(await self.bot.fetch_user(partner_bot_id))
             # guild count field
-            guild_nbr = await self.get_bot_guilds(partner_bot_id, session)
+            guild_nbr, owners = await self.get_bot_stats(partner_bot_id, session)
             if guild_nbr is not None:
                 fields.append({
                     "name": tr_guilds.capitalize(),
                     "value": str(guild_nbr)
                 })
             # owners field
-            owners = await self.get_bot_owners(partner_bot_id, session)
             if owners:
                 fields.append({
                     "name": tr_owner.capitalize(),

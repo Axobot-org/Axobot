@@ -272,8 +272,7 @@ class Info(commands.Cog):
         # Guilds count
         if member.bot and (partners_cog := self.bot.get_cog("Partners")):
             async with aiohttp.ClientSession(loop=self.bot.loop) as session:
-                guilds_count = await partners_cog.get_bot_guilds(member.id, session)
-                bot_owners = await partners_cog.get_bot_owners(member.id, session)
+                guilds_count, bot_owners = await partners_cog.get_bot_stats(member.id, session)
             if guilds_count is not None:
                 guilds_count = await FormatUtils.format_nbr(guilds_count, lang)
                 embed.add_field(name=str(await self.bot._(interaction,"misc.servers")).capitalize(), value=guilds_count)
@@ -402,8 +401,7 @@ class Info(commands.Cog):
             embed.add_field(name=await self.bot._(interaction, "info.info.user-0"), value=on_server.capitalize())
         if user.bot and (partners_cog := self.bot.get_cog("Partners")):
             async with aiohttp.ClientSession(loop=self.bot.loop) as session:
-                guilds_count = await partners_cog.get_bot_guilds(user.id, session)
-                bot_owners = await partners_cog.get_bot_owners(user.id, session)
+                guilds_count, bot_owners = await partners_cog.get_bot_stats(user.id, session)
             if guilds_count is not None:
                 guilds_count = await FormatUtils.format_nbr(guilds_count, lang)
                 embed.add_field(
