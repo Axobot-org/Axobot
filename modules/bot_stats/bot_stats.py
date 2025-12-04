@@ -52,7 +52,7 @@ class BotStats(commands.Cog):
         self.rss_stats: RssStats = {"checked": 0, "messages": 0, "errors": 0, "warnings": 0, "time": 0}
         self.rss_loop_finished = False
         self.xp_cards = {"generated": 0, "sent": 0}
-        self.process = psutil.Process()
+        self.process: psutil.Process = psutil.Process()
         self.bot_cpu_records: list[float] = []
         self.total_cpu_records: list[float] = []
         self.latency_records: list[int] = []
@@ -102,7 +102,7 @@ class BotStats(commands.Cog):
         if len(self.bot_cpu_records) > 6:
             # if the list becomes too long (over 1min), cut it
             self.bot_cpu_records = self.bot_cpu_records[-6:]
-        self.total_cpu_records.append(psutil.cpu_percent())
+        self.total_cpu_records.append(sum(psutil.cpu_percent(percpu=True)))
         if len(self.total_cpu_records) > 6:
             # if the list becomes too long (over 1min), cut it
             self.total_cpu_records = self.total_cpu_records[-6:]

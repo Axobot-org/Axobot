@@ -10,6 +10,18 @@ from discord.ext import commands, tasks
 from core.bot_classes import DISCORD_INVITE_REGEX, Axobot
 from core.text_cleanup import sync_check_discord_invite
 
+AutoActionType = Literal["timeout", "kick", "ban"]
+CheckType = Literal["mentions", "invites", "attachments", "account_creation"]
+
+
+RE_ATTACHMENT_URL = re.compile(r"https?://\S+\.(?:png|jpg|jpeg|gif|webp|mp4|mov|wmv|flv|avi|mkv)")
+def _count_attachments(message: discord.Message) -> int:
+    "Count the number of attachments in a message"
+    files_count = len(message.attachments)
+    if message.content:
+        files_count += len(re.findall(RE_ATTACHMENT_URL, message.content))
+    return files_count
+
 
 class AntiRaid(commands.Cog):
     "Handle raid protection in guilds"
@@ -19,10 +31,12 @@ class AntiRaid(commands.Cog):
         self.file = "antiraid"
         # Cache of raider status for (guild_id, user_id) - True if raider detected
         self.check_cache = TTLCache[tuple[int, int], bool](maxsize=10_000, ttl=60)
-        # Cache of mentions sent by users - count of recent mentions, decreased every minute
+        # Cache of mentions sent by users - decreased every minute
         self.mentions_score: defaultdict[int, int] = defaultdict(int)
-        # Cache of discord invites sent by users - count of recent mentions, decreased every minute
+        # Cache of discord invites sent by users - decreased every minute
         self.invites_score: defaultdict[int, int] = defaultdict(int)
+        # Cache of attachments sent by users - decreased every minute
+        self.attachments_score: defaultdict[int, int] = defaultdict(int)
 
     async def cog_load(self):
         # pylint: disable=no-member
@@ -35,7 +49,13 @@ class AntiRaid(commands.Cog):
     @commands.Cog.listener(name="on_message")
     async def on_message_anticaps(self, msg: discord.Message):
         "Check for capslock messages"
-        if msg.guild is None or msg.author.bot or not self.bot.database_online or len(msg.content) < 8:
+        if (
+            msg.guild is None
+            or msg.author.bot
+            or not isinstance(msg.author, discord.Member)
+            or not self.bot.database_online
+            or len(msg.content) < 8
+        ):
             return
         if msg.channel.permissions_for(msg.author).administrator: # type: ignore
             return
@@ -185,22 +205,22 @@ class AntiRaid(commands.Cog):
             return False
         return True
 
-    async def _check_min_score(self, member: discord.Member, score: int, treshold: int, action: Literal["timeout", "kick", "ban"],
-                           check_id: str, duration: timedelta | None = None):
+    async def _check_min_score(self, member: discord.Member, score: int, treshold: int, action: AutoActionType,
+                           check_id: CheckType, duration: timedelta | None = None):
         "Check if a score is higher than a treshold, and take actions"
         if score < treshold:
             return False
         return await self._check_score_action(member, treshold, action, check_id, duration)
 
-    async def _check_max_score(self, member: discord.Member, score: int, treshold: int, action: Literal["timeout", "kick", "ban"],
-                            check_id: str, duration: timedelta | None = None):
+    async def _check_max_score(self, member: discord.Member, score: int, treshold: int, action: AutoActionType,
+                            check_id: CheckType, duration: timedelta | None = None):
         "Check if a score is lower than a treshold, and take actions"
         if score > treshold:
             return False
         return await self._check_score_action(member, treshold, action, check_id, duration)
 
-    async def _check_score_action(self, member: discord.Member, treshold: int, action: Literal["timeout", "kick", "ban"],
-                           check_id: str, duration: timedelta | None = None):
+    async def _check_score_action(self, member: discord.Member, treshold: int, action: AutoActionType,
+                           check_id: CheckType, duration: timedelta | None = None):
         translation_key = f"logs.reason.{check_id}"
         if action == "timeout":
             if duration is None:
@@ -258,6 +278,12 @@ class AntiRaid(commands.Cog):
         # if invites score is higher than 0, apply sanctions
         if invites_count != 0 and self.invites_score[message.author.id] > 0:
             await self.check_invites_score(message.author)
+        # 3. Check attachments
+        if attachments_count := _count_attachments(message):
+            self.attachments_score[message.author.id] += attachments_count
+        # if attachments score is higher than 0, apply sanctions
+        if attachments_count != 0 and self.attachments_score[message.author.id] > 0:
+            await self.check_attachments_score(message.author)
 
     async def check_mentions_score(self, member: discord.Member):
         "Check if a member has a mentions score higher than the treshold set by the antiraid config, and take actions"
@@ -346,6 +372,38 @@ class AntiRaid(commands.Cog):
                 return True
         return False
 
+    async def check_attachments_score(self, member: discord.Member):
+        "Check if a member has a attachments score higher than the treshold set by the antiraid config, and take actions"
+        score = self.attachments_score[member.id]
+        if score == 0:
+            return
+        level = await self._get_raid_level(member.guild)
+        # if antiraid is disabled, or bot can't moderate members
+        if level == 0 or not member.guild.me.guild_permissions.moderate_members:
+            return False
+        # Level 4
+        if level >= 4:
+            # ban (1w) members with more than 6 attachments
+            if await self._check_min_score(member, score, 6, "ban", "attachments", timedelta(weeks=1)):
+                return True
+        # Level 3 or more
+        if level >= 3:
+            # kick members with more than 6 attachments
+            if await self._check_min_score(member, score, 6, "kick", "attachments"):
+                return True
+        # Level 2 or more
+        if level >= 2:
+            # timeout (1h) members with more than 4 attachments
+            if await self._check_min_score(member, score, 4, "timeout", "attachments", timedelta(hours=1)):
+                return True
+            # timeout (10min) members with more than 3 attachments
+            if await self._check_min_score(member, score, 3, "timeout", "attachments", timedelta(minutes=10)):
+                return True
+        # Level 1 or more
+        if level >= 1:
+            # timeout (30min) members with more than 6 attachments
+            if await self._check_min_score(member, score, 6, "timeout", "attachments", timedelta(minutes=30)):
+                return True
 
     @tasks.loop(seconds=30)
     async def decrease_users_scores(self):
@@ -366,6 +424,14 @@ class AntiRaid(commands.Cog):
                 invites_users_to_remove.append(member_id)
         for member_id in invites_users_to_remove:
             del self.invites_score[member_id]
+        # Decrease attachments count by 2
+        attachments_users_to_remove: list[int] = []
+        for member_id in self.attachments_score:
+            self.attachments_score[member_id] -= 2
+            if self.attachments_score[member_id] <= 0:
+                attachments_users_to_remove.append(member_id)
+        for member_id in attachments_users_to_remove:
+            del self.attachments_score[member_id]
 
     @decrease_users_scores.error
     async def on_decrease_mentions_count_error(self, error: BaseException):

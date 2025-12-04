@@ -1274,7 +1274,7 @@ class Rss(commands.Cog):
     async def db_enable_feeds(self, feed_ids: list[int], *, enable: bool) -> bool:
         "Enable or disable feeds in the database"
         args_placeholder = ",".join(["%s"] * len(feed_ids))
-        query = f"UPDATE `{self.table}` SET `enabled`=%s WHERE ID IN ({args_placeholder})"
+        query = f"UPDATE `{self.table}` SET `enabled`=%s, `recent_errors`=0 WHERE ID IN ({args_placeholder})"
         async with self.bot.db_main.write(query, (enable, *feed_ids), returnrowcount=True) as query_result:
             return query_result is not None and query_result > 0
 

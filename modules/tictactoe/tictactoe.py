@@ -1,6 +1,6 @@
 import random
 import time
-from typing import Literal, TypeGuard, TYPE_CHECKING
+from typing import TYPE_CHECKING, Literal, TypeGuard
 
 import discord
 from discord import app_commands
@@ -10,7 +10,7 @@ from git import Optional
 from core.bot_classes import Axobot
 
 if TYPE_CHECKING:
-    from discord.types.interactions import InteractionData, ButtonMessageComponentInteractionData
+    from discord.types.interactions import ButtonMessageComponentInteractionData, InteractionData
 
 GridType = list[int | Literal['X', 'O']]
 
@@ -21,7 +21,7 @@ class TicTacToe(commands.Cog):
     def __init__(self, bot: Axobot):
         self.bot = bot
         self.file = "tictactoe"
-        self.in_game = {}
+        self.in_game: dict[int, float] = {}
 
     @app_commands.command(name="tic-tac-toe")
     async def main(self, interaction: discord.Interaction):
@@ -34,10 +34,10 @@ class TicTacToe(commands.Cog):
             await interaction.response.send_message(await self.bot._(interaction, "tictactoe.already-playing"))
             return
         await interaction.response.defer()
-        self.in_game[interaction.user.id] = time.time()
         game = self.Game(interaction, self)
         u_begin = await self.bot._(interaction, "tictactoe.user-begin" if game.is_user_turn else "tictactoe.bot-begin")
         await game.init_game()
+        self.in_game[interaction.user.id] = time.time()
         tip = await self.bot._(interaction, "tictactoe.tip", symb1=game.emojis[0], symb2=game.emojis[1])
         await interaction.edit_original_response(content=u_begin.format(interaction.user.mention) + tip, view=game)
         await game.wait()

@@ -104,7 +104,7 @@ class Xp(commands.Cog):
         if self.clear_cards_loop.is_running():
             self.clear_cards_loop.stop()
 
-    async def _is_suspicious_user(self, user_id: int) -> bool:
+    async def is_suspicious_user(self, user_id: int) -> bool:
         if self._suspicious_users is None:
             await self.reload_sus()
         if self._suspicious_users is None:
@@ -257,7 +257,7 @@ class Xp(commands.Cog):
         prev_points = await self.get_member_xp(msg.author, "global")
         await self.db_set_xp(msg.author.id, giv_points, "add")
         # check for sus people
-        if await self._is_suspicious_user(msg.author.id):
+        if await self.is_suspicious_user(msg.author.id):
             await self.send_sus_msg(msg, giv_points)
         await self.update_cache_and_execute_actions(msg.author, msg.channel, "global", prev_points, giv_points)
 
@@ -272,7 +272,7 @@ class Xp(commands.Cog):
         prev_points = await self.get_member_xp(msg.author, msg.guild.id)
         await self.db_set_xp(msg.author.id, giv_points, "add", msg.guild.id)
         # check for sus people
-        if await self._is_suspicious_user(msg.author.id):
+        if await self.is_suspicious_user(msg.author.id):
             await self.send_sus_msg(msg, giv_points)
         await self.update_cache_and_execute_actions(msg.author, msg.channel, "mee6-like", prev_points, giv_points)
 
@@ -292,7 +292,7 @@ class Xp(commands.Cog):
         prev_points = await self.get_member_xp(msg.author, msg.guild.id)
         await self.db_set_xp(msg.author.id, giv_points, "add", msg.guild.id)
         # check for sus people
-        if await self._is_suspicious_user(msg.author.id):
+        if await self.is_suspicious_user(msg.author.id):
             await self.send_sus_msg(msg, giv_points)
         await self.update_cache_and_execute_actions(msg.author, msg.channel, "local", prev_points, giv_points)
 
@@ -771,17 +771,23 @@ class Xp(commands.Cog):
             if await self.bot.get_config(guild_id, "xp_type") == "global":
                 continue
             # apply decay
-            async with self.bot.db_xp.write(decay_query.format(table=guild_id), (value,), returnrowcount=True) as row_count:
-                if row_count is None:
-                    raise ValueError(f"XP decay query returned 'None' row count for guild {guild_id}")
-                users_count += row_count
-                # if xp has been edited, invalidate cache
-                if row_count > 0 and guild_id in self.leaderboard_cache:
-                    del self.leaderboard_cache[guild_id]
-            # remove members with 0xp or less
-            async with self.bot.db_xp.write(cleanup_query.format(table=guild_id), returnrowcount=True) as row_count:
-                self.log.info("xp decay: removed %s members from guild %s", row_count, guild_id)
-            guilds_count += 1
+            try:
+                async with self.bot.db_xp.write(decay_query.format(table=guild_id), (value,), returnrowcount=True) as row_count:
+                    if row_count is None:
+                        raise ValueError(f"XP decay query returned 'None' row count for guild {guild_id}")
+                    users_count += row_count
+                    # if xp has been edited, invalidate cache
+                    if row_count > 0 and guild_id in self.leaderboard_cache:
+                        del self.leaderboard_cache[guild_id]
+                # remove members with 0xp or less
+                async with self.bot.db_xp.write(cleanup_query.format(table=guild_id), returnrowcount=True) as row_count:
+                    self.log.info("xp decay: removed %s members from guild %s", row_count, guild_id)
+                guilds_count += 1
+            except MySQLProgrammingError as err:
+                if err.errno == 1146:  # table does not exist
+                    self.log.warning("XP decay: table %s does not exist, skipping", guild_id)
+                    continue
+                raise err
         log_text = f"XP decay: removed xp of {users_count} users from {guilds_count} guilds"
         emb = discord.Embed(description=log_text, color=0x66ffcc, timestamp=self.bot.utcnow())
         emb.set_author(name=self.bot.user, icon_url=self.bot.display_avatar)

@@ -49,9 +49,17 @@ async def _convert_post_to_text(post: str, post_type: str) -> str | None:
 async def _convert_html_to_text(html: str) -> str:
     "Convert an HTML string into a plain text string"
     soup = BeautifulSoup(html, "html.parser")
-    return md_converter.convert_soup(soup)
+    try:
+        return md_converter.convert_soup(soup)
+    except RecursionError:
+        log.exception("RecursionError while converting HTML to text")
+        return html
 
 async def _convert_xhtml_to_text(html: str) -> str:
     "Convert an XML string into a plain text string"
     soup = BeautifulSoup(html, "lxml")
-    return md_converter.convert_soup(soup)
+    try:
+        return md_converter.convert_soup(soup)
+    except RecursionError:
+        log.exception("RecursionError while converting XHTML to text")
+        return html

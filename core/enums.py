@@ -38,6 +38,7 @@ class RankCardsFlag(_BaseFlagClass):
         1 << 16: "halloween24",
         1 << 17: "christmas24",
         1 << 18: "april25",
+        1 << 19: "christmas25"
     }
 
 class UserFlag(_BaseFlagClass):

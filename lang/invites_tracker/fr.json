@@ -6,7 +6,8 @@
             "user-and-date": "Créée par %{user} le %{date}",
             "user": "Créée par %{user}",
             "date": "Créée le %{date}",
-            "none": "Pas d'autres informations disponibles"
+            "none": "Pas d'autres informations disponibles",
+            "last-tracking": "Dernière utilisation %{last_tracking}"
         }
     },
     "missing-permission": "J'ai besoin de la permission `Gérer le serveur` pour lire les invitations.",

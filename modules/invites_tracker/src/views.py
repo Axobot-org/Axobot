@@ -54,6 +54,11 @@ class TrackedInvitesPaginator(Paginator):
                 value = await self.client._(
                     interaction, "invites_tracker.list.field-value.none"
                 )
+            if last_tracking := invite.get("last_tracking"):
+                last_tracking_str = f"<t:{last_tracking.timestamp():.0f}:R>"
+                value += "\n" + await self.client._(
+                    interaction, "invites_tracker.list.field-value.last-tracking", last_tracking=last_tracking_str
+                )
             invites_count = await FormatUtils.format_nbr(invite["last_count"], lang)
             embed.add_field(
                 name=await self.client._(interaction, "invites_tracker.list.field-title", name=name, count=invites_count),

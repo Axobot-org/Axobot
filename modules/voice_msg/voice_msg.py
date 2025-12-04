@@ -9,6 +9,7 @@ from discord.ext import commands
 
 from core.bot_classes import Axobot
 from core.checks import checks
+from core.checks.errors import NotAVoiceMessageError
 from core.formatutils import FormatUtils
 
 
@@ -44,7 +45,7 @@ class VoiceMessages(commands.Cog):
     @app_commands.check(checks.is_voice_message)
     async def handle_message_command(self, interaction: discord.Interaction, message: discord.Message):
         "Create a transcript of the voice message"
-        attachment = message.attachments[0]
+        attachment = await self._extract_attachment(message)
         await interaction.response.defer(ephemeral=True)
         if attachment.duration is None:
             raise ValueError("Attachment duration is None")
@@ -100,6 +101,16 @@ class VoiceMessages(commands.Cog):
             color=discord.Color.blurple()
         )
         await interaction.followup.send(embed=emb, ephemeral=True)
+
+    async def _extract_attachment(self, message: discord.Message) -> discord.Attachment:
+        "Extract the voice message attachment from a message"
+        if message.attachments:
+            return message.attachments[0]
+        if message.flags.forwarded and (snapshots := message.message_snapshots):
+            snapshot = snapshots[0]
+            if snapshot.flags.voice and snapshot.attachments:
+                return snapshot.attachments[0]
+        raise NotAVoiceMessageError()
 
     async def _get_transcript(self, attachment: discord.Attachment) -> str:
         "Call the external API to get the audio transcript"

@@ -311,7 +311,7 @@ You can specify a verification limit by adding a number in argument (up to 1.000
         text="The text to send",
         channel="The channel where the bot must send the message"
     )
-    async def say(self, interaction: discord.Interaction, text: str,
+    async def say(self, interaction: discord.Interaction, text: app_commands.Range[str, 1, 2000],
                   channel: discord.TextChannel | discord.Thread | None = None):
         """Let the bot say something for you
         You can specify a channel where the bot must send this message. If channel is None, the current channel will be used
