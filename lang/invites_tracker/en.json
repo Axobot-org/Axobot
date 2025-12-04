@@ -6,7 +6,8 @@
             "user-and-date": "Created by %{user} on %{date}",
             "user": "Created by %{user}",
             "date": "Created on %{date}",
-            "none": "No further information available"
+            "none": "No further information available",
+            "last-tracking": "Last used %{last_tracking}"
         }
     },
     "missing-permission": "I need the `Manage Server` permission to read the invites.",

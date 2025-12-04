@@ -9,6 +9,7 @@ from discord.ext import commands, tasks
 
 from core.arguments.args import GuildInviteArgument
 from core.bot_classes import Axobot
+from core.type_utils import assert_interaction_channel_is_guild_messageable
 
 from .src.types import TrackedInvite
 from .src.views import TrackedInvitesPaginator
@@ -193,7 +194,7 @@ class InvitesTracker(commands.Cog):
     @app_commands.checks.cooldown(1, 60)
     async def enable_tracking(self, interaction: discord.Interaction):
         "Start tracking the invitations usage of your server"
-        if interaction.guild is None:
+        if not assert_interaction_channel_is_guild_messageable(interaction):
             raise RuntimeError("This command can only be used in a guild")
         await interaction.response.defer()
         if (config_cog := self.bot.get_cog("ServerConfig")) is None:
@@ -206,7 +207,7 @@ class InvitesTracker(commands.Cog):
     @app_commands.checks.cooldown(1, 60)
     async def disable_tracking(self, interaction: discord.Interaction):
         "Stop tracking the invitations usage of your server"
-        if interaction.guild is None:
+        if not assert_interaction_channel_is_guild_messageable(interaction):
             raise RuntimeError("This command can only be used in a guild")
         await interaction.response.defer()
         if (config_cog := self.bot.get_cog("ServerConfig")) is None:
