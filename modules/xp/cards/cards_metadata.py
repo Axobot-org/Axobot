@@ -42,6 +42,7 @@ V3_CARDS = {
     "halloween24",
     "christmas24",
     "april25",
+    "christmas25",
 }
 
 JSON_DATA_FILE = os.path.dirname(__file__) + "/cards_data.json"

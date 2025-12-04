@@ -49,8 +49,9 @@ class ChristmasSubcog(AbstractSubcog):
                  current_event: EventType | None, current_event_data: EventData, current_event_id: str | None):
         super().__init__(bot, current_event, current_event_data, current_event_id)
         self.pending_reactions: dict[int, EventItem] = {} # map of MessageID => EventItem
+        self.max_missed_days = 4
 
-    async def on_message(self, msg):
+    async def on_message(self, msg: discord.Message):
         "Add random reaction to some messages"
         if self.current_event and (data := self.current_event_data.get("emojis")):
             if msg.guild is not None and not msg.channel.permissions_for(msg.guild.me).add_reactions:
@@ -68,7 +69,7 @@ class ChristmasSubcog(AbstractSubcog):
                         return
                     self.pending_reactions[msg.id] = item
 
-    async def on_raw_reaction_add(self, payload):
+    async def on_raw_reaction_add(self, payload: discord.RawReactionActionEvent):
         if payload.message_id not in self.pending_reactions:
             return
         item = self.pending_reactions[payload.message_id]
@@ -129,9 +130,9 @@ class ChristmasSubcog(AbstractSubcog):
         emb.set_author(name=user.global_name, icon_url=user.display_avatar.replace(static_format="png", size=32))
         for field in await self.generate_user_profile_rank_fields(interaction, lang, user):
             emb.add_field(**field)
-        if user == interaction.user:
-            if field := await self._generate_user_profile_top_rank_field(user):
-                emb.add_field(**field)
+        # if user == interaction.user:
+        #     if field := await self._generate_user_profile_top_rank_field(user):
+        #         emb.add_field(**field)
         emb.add_field(**await self.generate_user_profile_collection_field(interaction, user))
         await interaction.followup.send(embed=emb)
 
@@ -186,8 +187,8 @@ class ChristmasSubcog(AbstractSubcog):
         if today.day >= 25:
             today = dt.date(today.year, 12, 24)
         gifts_ids = []
-        # make sure user can't get more than 3 gifts in the past
-        min_past_day = max(today.day - 3, last_collect_day.day if last_collect_day.month == 12 else 0)
+        # make sure user can't get more than 4 days in the past
+        min_past_day = max(today.day - self.max_missed_days, last_collect_day.day if last_collect_day.month == 12 else 0)
         for day in range(min_past_day, today.day):
             gifts_ids += ADVENT_CALENDAR[day + 1]
         if not gifts_ids:
@@ -234,7 +235,7 @@ the end of the event? Don't forget to join our [support server](https://discord.
         if today.day - last_collect_day.day == 1 or last_collect_day.month != 12:
             text += await self.bot._(interaction, "bot_events.calendar.today-gifts", points=total_points)
         else:
-            missed_days = min(today.day - last_collect_day.day - 1, 3)
+            missed_days = min(today.day - last_collect_day.day - 1, self.max_missed_days)
             text = await self.bot._(interaction, "bot_events.calendar.today-gifts-late", days=missed_days, points=total_points)
         items_group: dict[int, int] = defaultdict(int)
         for item in items:

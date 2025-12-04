@@ -422,6 +422,17 @@
                 "total_xp_with_text": [127, 255, 255]
             }
         },
+        "christmas25": {
+            "xp_bar": [0, 142, 0],
+            "texts": {
+                "username": [111, 215, 70],
+                "level": [255, 67, 70],
+                "rank": [255, 255, 255],
+                "participants": [255, 255, 255],
+                "xp_to_next_level_with_text": [255, 255, 255],
+                "total_xp_with_text": [234, 234, 234]
+            }
+        },
         "premium": {
             "xp_bar": [255, 255, 102],
             "texts": {
