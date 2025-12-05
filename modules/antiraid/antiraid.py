@@ -383,26 +383,26 @@ class AntiRaid(commands.Cog):
             return False
         # Level 4
         if level >= 4:
-            # ban (1w) members with more than 6 attachments
-            if await self._check_min_score(member, score, 6, "ban", "attachments", timedelta(weeks=1)):
+            # ban (1w) members with more than 8 attachments
+            if await self._check_min_score(member, score, 8, "ban", "attachments", timedelta(weeks=1)):
                 return True
         # Level 3 or more
         if level >= 3:
-            # kick members with more than 6 attachments
-            if await self._check_min_score(member, score, 6, "kick", "attachments"):
+            # kick members with more than 8 attachments
+            if await self._check_min_score(member, score, 8, "kick", "attachments"):
                 return True
         # Level 2 or more
         if level >= 2:
-            # timeout (1h) members with more than 4 attachments
-            if await self._check_min_score(member, score, 4, "timeout", "attachments", timedelta(hours=1)):
+            # timeout (1h) members with more than 8 attachments
+            if await self._check_min_score(member, score, 8, "timeout", "attachments", timedelta(hours=1)):
                 return True
-            # timeout (10min) members with more than 3 attachments
-            if await self._check_min_score(member, score, 3, "timeout", "attachments", timedelta(minutes=10)):
+            # timeout (10min) members with more than 6 attachments
+            if await self._check_min_score(member, score, 6, "timeout", "attachments", timedelta(minutes=10)):
                 return True
         # Level 1 or more
         if level >= 1:
-            # timeout (30min) members with more than 6 attachments
-            if await self._check_min_score(member, score, 6, "timeout", "attachments", timedelta(minutes=30)):
+            # timeout (30min) members with more than 10 attachments
+            if await self._check_min_score(member, score, 10, "timeout", "attachments", timedelta(minutes=30)):
                 return True
 
     @tasks.loop(seconds=30)
