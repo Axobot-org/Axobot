@@ -20,6 +20,7 @@ def _count_attachments(message: discord.Message) -> int:
     files_count = len(message.attachments)
     if message.content:
         files_count += len(re.findall(RE_ATTACHMENT_URL, message.content))
+        files_count += message.content.count("://imgur.com/")
     return files_count
 
 
