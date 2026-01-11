@@ -166,7 +166,7 @@ class Events(commands.Cog):
             await self.bot.fetch_invite(msg.content)
         except discord.NotFound:
             return
-        await msg.channel.send(await self.bot._(msg.channel,"events.mp-adv"))
+        await msg.channel.send(await self.bot._(msg.channel, "events.mp-adv", link="https://axobot.xyz"))
 
     async def check_owner_server(self, owner: UserOrMember):
         """Check if a server owner should get/loose the server owner role in support server"""

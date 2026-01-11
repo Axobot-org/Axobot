@@ -1,3 +1,3 @@
 {
-    "mp-adv": "You are probably trying to invite me to this server? If that is the case, I can't join it with a simple invitation. An administrator must use my own invitation link, here: <https://zrunner.me/invitezbot> :wink:"
+    "mp-adv": "You are probably trying to invite me to this server? If that is the case, I can't join it with a simple invitation. An administrator must use my own invitation link, here: %{link} :wink:"
 }

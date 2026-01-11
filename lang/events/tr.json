@@ -1,3 +1,3 @@
 {
-    "mp-adv": "Sunucuna beni mi davet etmeye çalışıyorsun? Eğer yapmak istediğin buysa, sunucuna basit bir davet linkiyle katılamam. Bir adminin beni kendi davet linkimle davet etmesi gerek, buyurun: <https://zrunner.me/invitezbot> 😉"
+    "mp-adv": "Sunucuna beni mi davet etmeye çalışıyorsun? Eğer yapmak istediğin buysa, sunucuna basit bir davet linkiyle katılamam. Bir adminin beni kendi davet linkimle davet etmesi gerek, buyurun: %{link} 😉"
 }
