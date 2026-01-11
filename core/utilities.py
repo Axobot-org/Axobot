@@ -100,11 +100,6 @@ class Utilities(commands.Cog):
             await self.get_bot_infos()
         if  self._config is None:
             return True
-        if ctx.message.type not in {
-            discord.MessageType.default, discord.MessageType.reply, discord.MessageType.chat_input_command
-        }:
-            if not ctx.message.type == discord.MessageType.chat_input_command:
-                return False
         if await self.bot.get_cog("Admin").check_if_admin(ctx): # type: ignore
             return True
         if ctx.guild is not None:

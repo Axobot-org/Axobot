@@ -1,7 +1,7 @@
 from typing import Any, Literal, Union
 
 from discord import Attachment, Locale
-from discord.app_commands import Command as AppCommand
+from discord.app_commands import Command as AppCommand, Parameter
 from discord.app_commands.translator import (TranslationContext,
                                              TranslationContextLocation,
                                              locale_str)
@@ -10,6 +10,8 @@ from discord.ext import commands
 from core.bot_classes import MyContext
 
 from .utils import AnyCtxCommand, AnyCtxGroup, extract_info, get_discord_locale
+
+AnyHybridCommand = commands.HybridCommand[Any, ..., Any]
 
 
 async def get_command_inline_desc(ctx: MyContext, cmd: AnyCtxCommand):
@@ -90,15 +92,12 @@ async def get_command_desc_translation(ctx: MyContext, command: AnyCtxCommand):
         )
     return await ctx.bot.tree.translator.translate(locale_str(""), locale, context)
 
-async def _get_command_param_translation(ctx: MyContext, param: commands.Parameter, command: commands.HybridCommand):
+async def _get_command_param_translation(ctx: MyContext, param: commands.Parameter, command: AnyHybridCommand):
     "Get the translated command parameter name"
     locale = await get_discord_locale(ctx)
-    class FakeParameter:
-        def __init__(self, command: AppCommand | commands.HybridCommand):
-            self.command = command
     context = TranslationContext(
         TranslationContextLocation.parameter_name,
-        FakeParameter(command)
+        Parameter(None, command) # pyright: ignore[reportArgumentType]
     )
     return await ctx.bot.tree.translator.translate(locale_str(param.name), locale, context) or param.name
 

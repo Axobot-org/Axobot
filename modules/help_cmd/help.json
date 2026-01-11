@@ -9,6 +9,7 @@
             "documentation",
             "help",
             "info",
+            "invites-tracker",
             "last-post",
             "markdown",
             "membercount",
@@ -22,7 +23,7 @@
         "emoji": "🔨",
         "commands": [
             "antiscam",
-            "backup",
+            "server-backup",
             "ban",
             "banlist",
             "cases",
@@ -46,7 +47,7 @@
         "emoji": "⚙️",
         "commands": [
             "config",
-            "emoji",
+            "emojis",
             "mute-config",
             "partners",
             "pin",
