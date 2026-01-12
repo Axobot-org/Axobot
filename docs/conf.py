@@ -29,13 +29,13 @@ else:
 # -- Project information -----------------------------------------------------
 
 project = "Axobot"
-copyright = "2019 - 2025"
+copyright = "2019 - 2026"
 author = "ZRunner"
 
 # The short X.Y version
 version = "5.1"
 # The full version, including alpha/beta/rc tags
-release = "5.1.2"
+release = "5.1.3"
 
 _documentation_name = "Axobot Documentation"
 
