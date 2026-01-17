@@ -363,6 +363,7 @@ class Admin(commands.Cog):
         repo = Repo(os.getcwd())
         assert not repo.bare
         msg = await interaction.original_response()
+        old_hash = repo.head.commit.hexsha
         if branch:
             try:
                 repo.git.checkout(branch)
@@ -372,11 +373,18 @@ class Admin(commands.Cog):
             msg = await msg.edit(content=msg.content + f"\nBranche {branch} correctement sélectionnée")
         origin = repo.remotes.origin
         origin.pull()
-        msg = await msg.edit(content=msg.content + f"\nPull effectué avec succès sur la branche {repo.active_branch.name}")
+        new_hash = repo.head.commit.hexsha
+        if old_hash == new_hash:
+            await msg.edit(content=msg.content + f"\nLe dépôt est déjà à jour sur la branche {repo.active_branch.name}")
+        else:
+            msg = await msg.edit(content=(
+                msg.content
+                + f"\nPull effectué avec succès sur la branche {repo.active_branch.name} ({old_hash[:7]}... -> {new_hash[:7]}...)"
+            ))
         if install_requirements:
-            await msg.edit(content=msg.content+"\nInstallation des dépendances...")
+            msg = await msg.edit(content=msg.content + "\nInstallation des dépendances...")
             os.system("pip install -qr requirements.txt")
-            await msg.edit(content=msg.content+"\nDépendances installées")
+            await msg.edit(content=msg.content + "\nDépendances installées")
 
     @admin_main.command(name="membercounter")
     async def membercounter(self, interaction: discord.Interaction):
