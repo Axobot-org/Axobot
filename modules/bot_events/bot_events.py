@@ -83,7 +83,7 @@ class BotEvents(commands.Cog):
                 self.current_event_id = ev_id
                 self.log.info("Current bot event: %s", ev_id)
                 break
-            if ev_data["begin"] - datetime.timedelta(days=5) <= now < ev_data["begin"]:
+            if ev_data["begin"] - datetime.timedelta(days=6) <= now < ev_data["begin"]:
                 self.coming_event = ev_data["type"]
                 self.coming_event_data = ev_data
                 self.coming_event_id = ev_id
@@ -268,19 +268,26 @@ class BotEvents(commands.Cog):
     @events_main.command(name="profile")
     @app_commands.checks.cooldown(4, 10)
     @app_commands.check(database_connected)
-    async def event_profile(self, interaction: discord.Interaction, user: discord.User = None):
+    async def event_profile(self, interaction: discord.Interaction, user: discord.User | None = None):
         """Take a look at your progress in the event and your global ranking
         Event points are reset after each event"""
-        if user is None:
-            user = interaction.user
+        if self.current_event is None and self.coming_event_data:
+            date = f"<t:{self.coming_event_data['begin'].timestamp():.0f}>"
+            await interaction.followup.send(await self.bot._(interaction, "bot_events.soon", date=date))
+            return
+        resolved_user = user or interaction.user
         await interaction.response.defer()
-        await self.subcog.profile_cmd(interaction, user)
+        await self.subcog.profile_cmd(interaction, resolved_user)
 
     @events_main.command(name="collect")
     @app_commands.checks.cooldown(2, 60)
     @app_commands.check(database_connected)
     async def event_collect(self, interaction: discord.Interaction):
         "Get some event points every hour"
+        if self.current_event is None and self.coming_event_data:
+            date = f"<t:{self.coming_event_data['begin'].timestamp():.0f}>"
+            await interaction.followup.send(await self.bot._(interaction, "bot_events.soon", date=date))
+            return
         await interaction.response.defer()
         await self.subcog.collect_cmd(interaction)
 

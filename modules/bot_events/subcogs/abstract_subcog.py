@@ -6,6 +6,7 @@ import discord
 
 from core.bot_classes import Axobot
 from core.formatutils import FormatUtils
+from core.type_utils import UserOrMember
 
 from ..data.dict_types import (EventData, EventItem, EventItemWithCount,
                                EventType)
@@ -39,7 +40,7 @@ class AbstractSubcog(ABC):
         "Called when a reaction is added"
 
     @abstractmethod
-    async def profile_cmd(self, interaction: discord.Interaction, user: discord.User):
+    async def profile_cmd(self, interaction: discord.Interaction, user: UserOrMember):
         "Displays the profile of the user"
 
     @abstractmethod
@@ -54,7 +55,7 @@ class AbstractSubcog(ABC):
         return "en"
 
     async def generate_user_profile_rank_fields(self, interaction: discord.Interaction, lang: Literal["fr", "en"],
-                                                user: discord.User):
+                                                user: UserOrMember):
         "Compute the texts to display in the /event profile command"
         user_rank_query = await self.db_get_event_rank(user.id)
         if user_rank_query is None:
@@ -253,7 +254,7 @@ class AbstractSubcog(ABC):
         async with self.bot.db_main.read(query, (user_id, self.bot.beta, event_type)) as query_results:
             return query_results
 
-    async def db_get_last_user_collect(self, user_id: int) -> datetime.datetime:
+    async def db_get_last_user_collect(self, user_id: int) -> datetime.datetime | None:
         "Get the last collect datetime from a user"
         if not self.bot.database_online:
             return None
