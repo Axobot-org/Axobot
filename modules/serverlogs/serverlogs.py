@@ -175,10 +175,10 @@ class ServerLogs(commands.Cog):
         for embed in embeds[:10]:
             if embed.view:
                 break
-            if current + len(embed) > 6000:
+            if current + len(embed.embed) > 6000:
                 break
             batch.append(embed)
-            current += len(embed)
+            current += len(embed.embed)
         return batch
 
     modlogs_main = app_commands.Group(
@@ -923,7 +923,7 @@ class ServerLogs(commands.Cog):
                 emb.add_field(name="Kicked by", value=f"**{entry.user.mention}** ({entry.user.id})")
             if entry.reason:
                 emb.add_field(name="With reason", value=entry.reason)
-            # View with an action to add this ban into user cases
+            # View with an action to add this kick into user cases
             view = AddCaseView(log_entry=entry, bot=self.bot)
             await self.validate_logs(guild, channel_ids, LogToSend(emb, view), "member_kick")
 
@@ -979,7 +979,7 @@ class ServerLogs(commands.Cog):
                 if entry.reason:
                     emb.add_field(name="With reason", value=entry.reason)
 
-                # View with an action to add this ban into user cases
+                # View with an action to add this un^ban into user cases
                 view = AddCaseView(log_entry=entry, bot=self.bot)
             await self.validate_logs(guild, channel_ids, LogToSend(emb, view), "member_unban")
 

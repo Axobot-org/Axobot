@@ -99,7 +99,7 @@ class ChangelogView(ui.LayoutView):
         """Refresh the send button's disabled state."""
         self.edit_french_text.disabled = self.is_finished()
         self.edit_english_text.disabled = self.is_finished()
-        self.send_to_servers.disabled = self.is_finished() or not (self.french_text or self.english_text)
+        self.send_to_servers.disabled = self.is_finished() or not (self.french_text and self.english_text)
         await interaction.response.edit_message(view=self)
 
 

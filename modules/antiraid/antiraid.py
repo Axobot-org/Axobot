@@ -15,12 +15,13 @@ CheckType = Literal["mentions", "invites", "attachments", "account_creation"]
 
 
 RE_ATTACHMENT_URL = re.compile(r"https?://\S+\.(?:png|jpg|jpeg|gif|webp|mp4|mov|wmv|flv|avi|mkv)")
+RE_IMGUR_URL = re.compile(r"https?://(?:i\.)?imgur\.com/\S+")
 def _count_attachments(message: discord.Message) -> int:
     "Count the number of attachments in a message"
     files_count = len(message.attachments)
     if message.content:
         files_count += len(re.findall(RE_ATTACHMENT_URL, message.content))
-        files_count += message.content.count("://imgur.com/")
+        files_count += len(re.findall(RE_IMGUR_URL, message.content))
     return files_count
 
 

@@ -273,7 +273,7 @@ class BotEvents(commands.Cog):
         Event points are reset after each event"""
         if self.current_event is None and self.coming_event_data:
             date = f"<t:{self.coming_event_data['begin'].timestamp():.0f}>"
-            await interaction.followup.send(await self.bot._(interaction, "bot_events.soon", date=date))
+            await interaction.response.send_message(await self.bot._(interaction, "bot_events.soon", date=date))
             return
         resolved_user = user or interaction.user
         await interaction.response.defer()
@@ -286,7 +286,7 @@ class BotEvents(commands.Cog):
         "Get some event points every hour"
         if self.current_event is None and self.coming_event_data:
             date = f"<t:{self.coming_event_data['begin'].timestamp():.0f}>"
-            await interaction.followup.send(await self.bot._(interaction, "bot_events.soon", date=date))
+            await interaction.response.send_message(await self.bot._(interaction, "bot_events.soon", date=date))
             return
         await interaction.response.defer()
         await self.subcog.collect_cmd(interaction)
