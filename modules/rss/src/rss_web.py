@@ -113,11 +113,12 @@ class WebRSS:
         post_description = await get_summary_from_entry({"link": link} | entry)
         img: str | None = None
         img_alt: str | None = None
+        img_search_text = str(entry.get("summary", "") + entry.get("content", [{}])[0].get("value", ""))
         if "media_thumbnail" in entry and len(entry["media_thumbnail"]) > 0 and "url" in entry["media_thumbnail"][0]:
             img = entry["media_thumbnail"][0]["url"]
-        elif img_match := re.search(r"(http(s?):)([/|.\w\s-])*\.(?:jpe?g|gif|png|webp)", str(entry)):
+        elif img_match := re.search(r"(http(s?):)([/|.\w\s-])*\.(?:jpe?g|gif|png|webp)", img_search_text):
             img = img_match.group(0)
-            if img_alt_match := re.search(r"<img\b[^>]*?(?:title=\"([^\"]+)\"|alt=\"([^\"]+)\")[^>]*?>", str(entry)):
+            if img_alt_match := re.search(r"<img\b[^>]*?(?:title=\"([^\"]+)\"|alt=\"([^\"]+)\")[^>]*?>", img_search_text):
                 img_alt = img_alt_match.group(1) or img_alt_match.group(2)
         return RssMessage(
             bot=self.bot,

@@ -10,11 +10,11 @@ from core.bot_classes.axobot import Axobot
 from core.translator import LOCALES_MAP
 from core.type_utils import channel_is_messageable
 
-AnyAppCommand = discord.app_commands.Command[Any, ..., Any]
+AnyAppCommand = discord.app_commands.Command
 AppCommandsGroup = discord.app_commands.Group
 AppCommandOrGroup = AnyAppCommand | AppCommandsGroup
-AnyCtxCommand = commands.Command[Any, ..., Any]
-AnyCtxGroup = commands.Group[Any, ..., Any]
+AnyCtxCommand = commands.Command
+AnyCtxGroup = commands.Group
 
 
 class FieldData(TypedDict):

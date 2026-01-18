@@ -24,11 +24,12 @@ from core.bot_classes import (PRIVATE_GUILD_ID, SUPPORT_GUILD_ID, Axobot,
 from core.checks import checks
 from core.enums import RankCardsFlag, UserFlag
 from core.formatutils import FormatUtils
-from core.views import ConfirmView
 from docs import conf
 from modules.antiscam.model import update_unicode_maps
 from modules.antiscam.model.training_bayes import train_model
 from modules.rss.src.general import feed_parse
+
+from .views.changelog_view import ChangelogView
 
 AvailableGitBranches = Literal["main", "develop"]
 
@@ -54,11 +55,6 @@ class Admin(commands.Cog):
         self.bot = bot
         self.file = "admin"
         self.emergency_time = 15.0
-        self.update: dict[Literal["fr", "en"], str | None]
-        if self.bot.beta:
-            self.update = {"fr": "Foo", "en": "Bar"}
-        else:
-            self.update = {"fr": None, "en": None}
         self._last_result = None
         self._upvote_emojis: tuple[discord.Emoji, discord.Emoji] | None = None
 
@@ -165,61 +161,22 @@ class Admin(commands.Cog):
 
 
     @admin_main.command(name="update")
-    async def update_config(self, interaction: discord.Interaction, send: bool=False):
-        """Préparer/lancer un message de mise à jour
-        Ajouter "send" en argument déclenche la procédure pour l'envoyer à tous les serveurs"""
-        if send:
-            await self.send_updates(interaction)
-            return
-        def check(message: discord.Message):
-            return message.author == interaction.user and message.channel == interaction.channel
-        await interaction.response.send_message("C'est parti !")
-        msg = None
-        for language in self.update:
-            await interaction.followup.send(f"Message en {language} ?")
-            try:
-                msg = await self.bot.wait_for("message", check=check, timeout=60)
-            except asyncio.TimeoutError:
-                await interaction.followup.send("Trop tard !")
-                return
-            if msg.content.lower() in ["none", "annuler", "stop", "oups"]:
-                await interaction.followup.send("Annulé !")
-                return
-            self.update[language] = msg.content
-        if msg:
-            await self.add_success_reaction(msg)
+    async def update_config(self, interaction: discord.Interaction):
+        """Write and send a changelog message to all subscribed servers"""
+        view = ChangelogView(self.bot, interaction.user.id, conf.release, self.send_updates)
+        await interaction.response.send_message(view=view)
 
-    async def send_updates(self, interaction: discord.Interaction):
-        """Lance un message de mise à jour"""
+    async def send_updates(self, interaction: discord.Interaction, view: ChangelogView):
+        """Send the changelog once it has been written by the admin"""
         if self.bot.zombie_mode:
             return
-        if None in self.update.values():
+        if view.french_text is None or view.english_text is None:
             await interaction.response.send_message("Les textes ne sont pas complets !")
             return
-        updates: dict[Literal['fr', 'en'], str] = self.update # type: ignore
-        text = "Vos messages contiennent"
-        confirm_view = ConfirmView(
-            self.bot, interaction.channel,
-            validation=lambda inter: inter.user == interaction.user,
-            ephemeral=False
-        )
-        await confirm_view.init()
-        if max(len(x) for x in updates.values()) > 1900//len(updates.keys()):
-            await interaction.response.defer()
-            for i, lang in enumerate(updates.keys()):
-                text += f"\n{lang}:```\n{updates.get(lang)}\n```"
-                await interaction.followup.send(text, view=confirm_view if i == len(updates)-1 else discord.utils.MISSING)
-                text = ''
-        else:
-            text += "\n"+"\n".join([f"{lang}:\n```\n{value}\n```" for lang, value in updates.items()])
-            await interaction.response.send_message(text, view=confirm_view)
-
-        await confirm_view.wait()
-        if confirm_view.value is None:
-            await interaction.followup.send("Trop long !")
-            return
-        if not confirm_view.value:
-            return
+        updates: dict[Literal['fr', 'en'], str] = {
+            'fr': view.french_text,
+            'en': view.english_text
+        }
         count = 0
         for guild in self.bot.guilds:
             channel: discord.TextChannel | None = await self.bot.get_config(guild.id, "bot_news") # type: ignore
@@ -258,13 +215,11 @@ class Admin(commands.Cog):
             "v": conf.release,
             "r": interaction.created_at,
             "b": self.bot.beta,
-            "fr": self.update["fr"],
-            "en": self.update["en"]
+            "fr": updates["fr"],
+            "en": updates["en"]
         }
         async with self.bot.db_main.write(query, args):
             pass
-        for language in self.update:
-            self.update[language] = None
 
 
     cog_group = app_commands.Group(
@@ -408,6 +363,7 @@ class Admin(commands.Cog):
         repo = Repo(os.getcwd())
         assert not repo.bare
         msg = await interaction.original_response()
+        old_hash = repo.head.commit.hexsha
         if branch:
             try:
                 repo.git.checkout(branch)
@@ -417,11 +373,18 @@ class Admin(commands.Cog):
             msg = await msg.edit(content=msg.content + f"\nBranche {branch} correctement sélectionnée")
         origin = repo.remotes.origin
         origin.pull()
-        msg = await msg.edit(content=msg.content + f"\nPull effectué avec succès sur la branche {repo.active_branch.name}")
+        new_hash = repo.head.commit.hexsha
+        if old_hash == new_hash:
+            await msg.edit(content=msg.content + f"\nLe dépôt est déjà à jour sur la branche {repo.active_branch.name}")
+        else:
+            msg = await msg.edit(content=(
+                msg.content
+                + f"\nPull effectué avec succès sur la branche {repo.active_branch.name} ({old_hash[:7]}... -> {new_hash[:7]}...)"
+            ))
         if install_requirements:
-            await msg.edit(content=msg.content+"\nInstallation des dépendances...")
+            msg = await msg.edit(content=msg.content + "\nInstallation des dépendances...")
             os.system("pip install -qr requirements.txt")
-            await msg.edit(content=msg.content+"\nDépendances installées")
+            await msg.edit(content=msg.content + "\nDépendances installées")
 
     @admin_main.command(name="membercounter")
     async def membercounter(self, interaction: discord.Interaction):

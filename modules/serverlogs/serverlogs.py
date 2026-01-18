@@ -2,7 +2,7 @@ import asyncio
 import datetime
 import time
 from random import random
-from typing import TYPE_CHECKING, Any, Callable
+from typing import TYPE_CHECKING, Any, Callable, NamedTuple
 
 import discord
 from cachetools import TTLCache
@@ -21,10 +21,16 @@ from modules.tickets.src.types import TicketCreationEvent
 
 from .arguments.serverlog_argument import (ALL_LOGS, LOGS_CATEGORIES,
                                            ServerLogArgument)
+from .views.add_case_view import AddCaseView
 
 if TYPE_CHECKING:
     from modules.cases.cases import Case
 
+
+class LogToSend(NamedTuple):
+    "A log to send"
+    embed: discord.Embed
+    view: discord.ui.View | None = None
 
 class ServerLogs(commands.Cog):
     """Handle any kind of server log"""
@@ -33,7 +39,7 @@ class ServerLogs(commands.Cog):
         self.bot = bot
         self.file = "serverlogs"
         self.cache = TTLCache[int, dict[int, list[str]]](maxsize=10_000, ttl=3600*4)
-        self.to_send: dict[int, list[discord.Embed]] = {}
+        self.to_send: dict[int, list[LogToSend]] = {}
         self.auditlogs_timeout = 3 # seconds
         self.voice_join_timestamps: dict[tuple[int, int], float] = {}
 
@@ -55,13 +61,18 @@ class ServerLogs(commands.Cog):
                 res.append(channel)
         return res
 
-    async def validate_logs(self, guild_id: discord.Guild, channel_ids: list[int], embed: discord.Embed, log_type: str):
+    async def validate_logs(self,
+                            guild_id: discord.Guild,
+                            channel_ids: list[int],
+                            embed: discord.Embed | LogToSend,
+                            log_type: str):
         "Send a log embed to the corresponding modlogs channels"
+        log_to_send = embed if isinstance(embed, LogToSend) else LogToSend(embed=embed)
         for channel_id in channel_ids:
             if channel_id in self.to_send:
-                self.to_send[channel_id].append(embed)
+                self.to_send[channel_id].append(log_to_send)
             else:
-                self.to_send[channel_id] = [embed]
+                self.to_send[channel_id] = [log_to_send]
             self.bot.dispatch("serverlog", guild_id.id, channel_id, log_type)
 
     async def db_get_from_channel(self, guild_id: int, channel_id: int, use_cache: bool=True) -> list[str]:
@@ -111,31 +122,43 @@ class ServerLogs(commands.Cog):
             return bool(query_result)
 
 
-    @tasks.loop(seconds=15)
+    @tasks.loop(seconds=10)
     async def send_logs_task(self):
-        "Send ready logs every 15s to avoid rate limits"
+        "Send ready logs every few seconds to avoid rate limits"
         try:
-            for channel_id, embeds in dict(self.to_send).items():
+            for channel_id, logs in dict(self.to_send).items():
                 channel = self.bot.get_channel(channel_id)
-                if not embeds or not channel_is_guild_messageable(channel):
+                if not logs or not channel_is_guild_messageable(channel):
                     self.to_send.pop(channel_id)
                     continue
                 perms = channel.permissions_for(channel.guild.me)
                 if not (perms.send_messages and perms.embed_links):
                     continue
                 # send logs
-                try:
-                    embeds_to_send = await self._get_embeds_batch(embeds)
-                    await channel.send(embeds=embeds_to_send)
-                except discord.HTTPException as err:
-                    self.bot.dispatch("error", err, f"Sending logs to guild {channel.guild.id} | Channel {channel.id}")
-                    if not isinstance(err, discord.InvalidData):
-                        # invalid data error is not recoverable, so we remove the logs
-                        continue
-                    embeds_to_send = []
+                if logs[0].view:
+                    logs_to_send = logs[:1]
+                    try:
+                        msg = await channel.send(embed=logs[0].embed, view=logs[0].view)
+                        if hasattr(logs[0].view, "message"):
+                            setattr(logs[0].view, "message", msg)
+                    except discord.HTTPException as err:
+                        self.bot.dispatch("error", err, f"Sending logs to guild {channel.guild.id} | Channel {channel.id}")
+                        if not isinstance(err, discord.InvalidData):
+                            # invalid data error is not recoverable, so we remove the logs
+                            continue
+                else:
+                    try:
+                        logs_to_send = await self._get_embeds_batch(logs)
+                        await channel.send(embeds=[log.embed for log in logs_to_send])
+                    except discord.HTTPException as err:
+                        self.bot.dispatch("error", err, f"Sending logs to guild {channel.guild.id} | Channel {channel.id}")
+                        if not isinstance(err, discord.InvalidData):
+                            # invalid data error is not recoverable, so we remove the logs
+                            continue
+                        logs_to_send = []
                 # remove sent embeds
-                if len(embeds) > len(embeds_to_send):
-                    self.to_send[channel_id] = self.to_send[channel_id][len(embeds_to_send):]
+                if len(logs) > len(logs_to_send):
+                    self.to_send[channel_id] = self.to_send[channel_id][len(logs_to_send):]
                 else:
                     self.to_send.pop(channel_id)
         except Exception as err: # pylint: disable=broad-except
@@ -145,15 +168,17 @@ class ServerLogs(commands.Cog):
     async def before_logs_task(self):
         await self.bot.wait_until_ready()
 
-    async def _get_embeds_batch(self, embeds: list[discord.Embed]):
+    async def _get_embeds_batch(self, embeds: list[LogToSend]):
         "Return a list of max. 10 embeds, such that the list do not exceed 6000 characters"
-        batch: list[discord.Embed] = []
+        batch: list[LogToSend] = []
         current = 0
         for embed in embeds[:10]:
-            if current + len(embed) > 6000:
+            if embed.view:
+                break
+            if current + len(embed.embed) > 6000:
                 break
             batch.append(embed)
-            current += len(embed)
+            current += len(embed.embed)
         return batch
 
     modlogs_main = app_commands.Group(
@@ -898,7 +923,9 @@ class ServerLogs(commands.Cog):
                 emb.add_field(name="Kicked by", value=f"**{entry.user.mention}** ({entry.user.id})")
             if entry.reason:
                 emb.add_field(name="With reason", value=entry.reason)
-            await self.validate_logs(guild, channel_ids, emb, "member_kick")
+            # View with an action to add this kick into user cases
+            view = AddCaseView(log_entry=entry, bot=self.bot)
+            await self.validate_logs(guild, channel_ids, LogToSend(emb, view), "member_kick")
 
 
     @commands.Cog.listener()
@@ -911,9 +938,13 @@ class ServerLogs(commands.Cog):
                 colour=discord.Color.red()
             )
             emb.set_author(name=str(user), icon_url=user.display_avatar)
+            view = None
             # try to get more info from audit logs
-            if entry := await self.search_audit_logs(guild, discord.AuditLogAction.ban,
-                                                     check=lambda entry: entry.target.id == user.id):
+            if entry := await self.search_audit_logs(
+                guild,
+                discord.AuditLogAction.ban,
+                check=lambda entry: entry.target.id == user.id,
+            ):
                 if entry.reason and entry.reason.endswith(self.bot.zws):
                     # banned from the /ban command, so we ignore this event
                     return
@@ -921,7 +952,10 @@ class ServerLogs(commands.Cog):
                     emb.add_field(name="Banned by", value=f"**{entry.user.mention}** ({entry.user.id})", inline=False)
                 if entry.reason:
                     emb.add_field(name="With reason", value=entry.reason)
-            await self.validate_logs(guild, channel_ids, emb, "member_ban")
+
+                # View with an action to add this ban into user cases
+                view = AddCaseView(log_entry=entry, bot=self.bot)
+            await self.validate_logs(guild, channel_ids, LogToSend(emb, view), "member_ban")
 
     @commands.Cog.listener()
     async def on_member_unban(self, guild: discord.Guild, user: discord.User):
@@ -933,6 +967,7 @@ class ServerLogs(commands.Cog):
                 colour=discord.Color.green()
             )
             emb.set_author(name=str(user), icon_url=user.display_avatar)
+            view = None
             # try to get more info from audit logs
             if entry := await self.search_audit_logs(guild, discord.AuditLogAction.unban,
                                                      check=lambda entry: entry.target.id == user.id):
@@ -943,7 +978,10 @@ class ServerLogs(commands.Cog):
                     emb.add_field(name="Unbanned by", value=f"**{entry.user.mention}** ({entry.user.id})", inline=False)
                 if entry.reason:
                     emb.add_field(name="With reason", value=entry.reason)
-            await self.validate_logs(guild, channel_ids, emb, "member_unban")
+
+                # View with an action to add this un^ban into user cases
+                view = AddCaseView(log_entry=entry, bot=self.bot)
+            await self.validate_logs(guild, channel_ids, LogToSend(emb, view), "member_unban")
 
 
     async def get_role_specs(self, role: discord.Role) -> list[str]:

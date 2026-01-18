@@ -520,33 +520,29 @@ class Minecraft(commands.Cog):
                 self.bot.dispatch("error", err, f"Guild {feed.guild_id} - id {feed.feed_id}")
                 return False
             self.feeds[feed.link] = obj
-        try:
-            channel = guild.get_channel_or_thread(feed.channel_id)
-            if not channel_is_messageable(channel):
-                self.bot.log.warning("[minecraft feed] Cannot find channel %s in guild %s", feed.channel_id, feed.guild_id)
-                return False
-            msg = await self.find_msg(channel, feed.structure)
-            if msg is None:
-                msg = await self.send_msg_server(obj, channel, (ip, port))
-                if msg is not None:
-                    if (rss_cog := self.bot.get_cog("Rss")) is None:
-                        raise RuntimeError("Rss cog not loaded, cannot update feed")
-                    await rss_cog.db_update_feed(
-                        feed.feed_id,
-                        [("structure", str(msg.id)), ("date", self.bot.utcnow())]
-                    )
-                    if send_stats:
-                        if statscog := self.bot.get_cog("BotStats"):
-                            statscog.rss_stats["messages"] += 1
-                return True
-            err = await self.form_msg_server(obj, guild, (ip, port))
-            await msg.edit(embed=err)
-            if statscog := self.bot.get_cog("BotStats"):
-                statscog.rss_stats["messages"] += 1
-            return True
-        except Exception as err:
-            self.bot.dispatch("error", err)
+        channel = guild.get_channel_or_thread(feed.channel_id)
+        if not channel_is_messageable(channel):
+            self.bot.log.warning("[minecraft feed] Cannot find channel %s in guild %s", feed.channel_id, feed.guild_id)
             return False
+        msg = await self.find_msg(channel, feed.structure)
+        if msg is None:
+            msg = await self.send_msg_server(obj, channel, (ip, port))
+            if msg is not None:
+                if (rss_cog := self.bot.get_cog("Rss")) is None:
+                    raise RuntimeError("Rss cog not loaded, cannot update feed")
+                await rss_cog.db_update_feed(
+                    feed.feed_id,
+                    [("structure", str(msg.id)), ("date", self.bot.utcnow())]
+                )
+                if send_stats:
+                    if statscog := self.bot.get_cog("BotStats"):
+                        statscog.rss_stats["messages"] += 1
+            return True
+        err = await self.form_msg_server(obj, guild, (ip, port))
+        await msg.edit(embed=err)
+        if statscog := self.bot.get_cog("BotStats"):
+            statscog.rss_stats["messages"] += 1
+        return True
 
 
 async def setup(bot: Axobot):
