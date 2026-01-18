@@ -1379,95 +1379,90 @@ class Rss(commands.Cog):
     async def check_feed(self, feed: FeedObject, session: ClientSession | None = None, should_send_stats: bool = False):
         """Check one rss feed and send messages if required
         Return True if the operation was a success"""
-        try:
-            guild = self.bot.get_guild(feed.guild_id)
-            if guild is None:
-                self.log.info("Cannot send message on server %s (unknown guild)", feed.guild_id)
-                return False
-            chan = await self._get_channel_or_thread(guild, feed.channel_id)
-            if chan is None:
-                self.log.info("Cannot send message on channel %s (unknown channel)", feed.channel_id)
-                self.bot.dispatch("server_warning", ServerWarningType.RSS_UNKNOWN_CHANNEL, guild,
-                                  channel_id=feed.channel_id, feed_id=feed.feed_id)
-                return False
-            if feed.type == "yt":
-                if feed.date is None:
-                    objs = await self.youtube_rss.get_last_post(chan, feed.link, feed.filter_config, session)
-                else:
-                    objs = await self.youtube_rss.get_new_posts(chan, feed.link, feed.date, feed.filter_config, session)
-            elif feed.type == "tw":
-                self.bot.dispatch("server_warning", ServerWarningType.RSS_TWITTER_DISABLED, guild,
-                                    channel_id=feed.channel_id, feed_id=feed.feed_id)
-                return False
-            elif feed.type == "web":
-                if feed.date is None:
-                    objs = await self.web_rss.get_last_post(chan, feed.link, feed.filter_config, session)
-                else:
-                    objs = await self.web_rss.get_new_posts(chan, feed.link, feed.date, feed.filter_config,
-                                                            feed.last_entry_id, session)
-            elif feed.type == "deviant":
-                if feed.date is None:
-                    objs = await self.deviant_rss.get_last_post(chan, feed.link, feed.filter_config, session)
-                else:
-                    objs = await self.deviant_rss.get_new_posts(chan, feed.link, feed.date, feed.filter_config, session)
-            elif feed.type == "twitch":
-                if feed.date is None:
-                    objs = await self.twitch_rss.get_last_post(chan, feed.link, feed.filter_config, session)
-                else:
-                    objs = await self.twitch_rss.get_new_posts(chan, feed.link, feed.date, feed.filter_config, session)
-            elif feed.type == "bluesky":
-                if feed.date is None:
-                    objs = await self.bluesky_rss.get_last_post(chan, feed.link, feed.filter_config, session)
-                else:
-                    objs = await self.bluesky_rss.get_new_posts(chan, feed.link, feed.date, feed.filter_config, session)
-            else:
-                self.bot.dispatch("error", RuntimeError(f"Unknown feed type {feed.type}"))
-                return False
-            # transform single object into list
-            if isinstance(objs, RssMessage):
-                objs = [objs]
-            if isinstance(objs, str | int | None) or len(objs) == 0:
-                return True
-            if len(objs) == 0:
-                return True
-            latest_post_date = None
-            latest_entry_id = None
-            sent_messages = 0
-            for obj in objs[:self.max_messages]:
-                # if the guild was marked as inactive (ie. the bot wasn't there in the previous loop),
-                #  mark the feeds as completed but do not send any message, to avoid spamming channels
-                if feed.has_recently_been_refreshed():
-                    # if we can't post messages: abort
-                    if not chan.permissions_for(guild.me).send_messages:
-                        self.bot.dispatch("server_warning", ServerWarningType.RSS_MISSING_TXT_PERMISSION, guild,
-                                            channel=chan, feed_id=feed.feed_id)
-                        return False
-                    # same if we need to be able to send embeds
-                    if feed.use_embed and not chan.permissions_for(guild.me).embed_links:
-                        self.bot.dispatch("server_warning", ServerWarningType.RSS_MISSING_EMBED_PERMISSION, guild,
-                                            channel=chan, feed_id=feed.feed_id)
-                        return False
-                    obj.feed = feed
-                    obj.fill_embed_data()
-                    await obj.fill_mention(guild)
-                    try:
-                        if await self.send_rss_msg(obj, chan):
-                            sent_messages += 1
-                    except InvalidFormatError:
-                        self.bot.dispatch("server_warning", ServerWarningType.RSS_INVALID_FORMAT, guild,
-                                            channel=chan, feed_id=feed.feed_id)
-                        break
-                latest_post_date = obj.date
-                latest_entry_id = obj.entry_id
-            if sent_messages > 0 and isinstance(latest_post_date, datetime.datetime):
-                await self._update_feed_last_entry(feed.feed_id, latest_post_date, latest_entry_id)
-            if should_send_stats and sent_messages and (statscog := self.bot.get_cog("BotStats")):
-                statscog.rss_stats["messages"] += sent_messages
-            return sent_messages > 0
-        except Exception as err:
-            error_msg = f"RSS error on feed {feed.feed_id} (type {feed.type} - channel {feed.channel_id} )"
-            self.bot.dispatch("error", err, error_msg)
+        guild = self.bot.get_guild(feed.guild_id)
+        if guild is None:
+            self.log.info("Cannot send message on server %s (unknown guild)", feed.guild_id)
             return False
+        chan = await self._get_channel_or_thread(guild, feed.channel_id)
+        if chan is None:
+            self.log.info("Cannot send message on channel %s (unknown channel)", feed.channel_id)
+            self.bot.dispatch("server_warning", ServerWarningType.RSS_UNKNOWN_CHANNEL, guild,
+                                channel_id=feed.channel_id, feed_id=feed.feed_id)
+            return False
+        if feed.type == "yt":
+            if feed.date is None:
+                objs = await self.youtube_rss.get_last_post(chan, feed.link, feed.filter_config, session)
+            else:
+                objs = await self.youtube_rss.get_new_posts(chan, feed.link, feed.date, feed.filter_config, session)
+        elif feed.type == "tw":
+            self.bot.dispatch("server_warning", ServerWarningType.RSS_TWITTER_DISABLED, guild,
+                                channel_id=feed.channel_id, feed_id=feed.feed_id)
+            return False
+        elif feed.type == "web":
+            if feed.date is None:
+                objs = await self.web_rss.get_last_post(chan, feed.link, feed.filter_config, session)
+            else:
+                objs = await self.web_rss.get_new_posts(chan, feed.link, feed.date, feed.filter_config,
+                                                        feed.last_entry_id, session)
+        elif feed.type == "deviant":
+            if feed.date is None:
+                objs = await self.deviant_rss.get_last_post(chan, feed.link, feed.filter_config, session)
+            else:
+                objs = await self.deviant_rss.get_new_posts(chan, feed.link, feed.date, feed.filter_config, session)
+        elif feed.type == "twitch":
+            if feed.date is None:
+                objs = await self.twitch_rss.get_last_post(chan, feed.link, feed.filter_config, session)
+            else:
+                objs = await self.twitch_rss.get_new_posts(chan, feed.link, feed.date, feed.filter_config, session)
+        elif feed.type == "bluesky":
+            if feed.date is None:
+                objs = await self.bluesky_rss.get_last_post(chan, feed.link, feed.filter_config, session)
+            else:
+                objs = await self.bluesky_rss.get_new_posts(chan, feed.link, feed.date, feed.filter_config, session)
+        else:
+            self.bot.dispatch("error", RuntimeError(f"Unknown feed type {feed.type}"))
+            return False
+        # transform single object into list
+        if isinstance(objs, RssMessage):
+            objs = [objs]
+        if isinstance(objs, str | int | None) or len(objs) == 0:
+            return True
+        if len(objs) == 0:
+            return True
+        latest_post_date = None
+        latest_entry_id = None
+        sent_messages = 0
+        for obj in objs[:self.max_messages]:
+            # if the guild was marked as inactive (ie. the bot wasn't there in the previous loop),
+            #  mark the feeds as completed but do not send any message, to avoid spamming channels
+            if feed.has_recently_been_refreshed():
+                # if we can't post messages: abort
+                if not chan.permissions_for(guild.me).send_messages:
+                    self.bot.dispatch("server_warning", ServerWarningType.RSS_MISSING_TXT_PERMISSION, guild,
+                                        channel=chan, feed_id=feed.feed_id)
+                    return False
+                # same if we need to be able to send embeds
+                if feed.use_embed and not chan.permissions_for(guild.me).embed_links:
+                    self.bot.dispatch("server_warning", ServerWarningType.RSS_MISSING_EMBED_PERMISSION, guild,
+                                        channel=chan, feed_id=feed.feed_id)
+                    return False
+                obj.feed = feed
+                obj.fill_embed_data()
+                await obj.fill_mention(guild)
+                try:
+                    if await self.send_rss_msg(obj, chan):
+                        sent_messages += 1
+                except InvalidFormatError:
+                    self.bot.dispatch("server_warning", ServerWarningType.RSS_INVALID_FORMAT, guild,
+                                        channel=chan, feed_id=feed.feed_id)
+                    break
+            latest_post_date = obj.date
+            latest_entry_id = obj.entry_id
+        if sent_messages > 0 and isinstance(latest_post_date, datetime.datetime):
+            await self._update_feed_last_entry(feed.feed_id, latest_post_date, latest_entry_id)
+        if should_send_stats and sent_messages and (statscog := self.bot.get_cog("BotStats")):
+            statscog.rss_stats["messages"] += sent_messages
+        return sent_messages > 0
 
     async def disabled_feeds_check(self, feeds: list[FeedObject]):
         "Check each passed feed and disable it if it has too many recent errors"
@@ -1498,7 +1493,8 @@ class Rss(commands.Cog):
             else:
                 result = await self.check_feed(feed, session, should_send_stats=guild_id is None)
         except Exception as err:
-            self.bot.dispatch("error", err, f"RSS feed {feed.feed_id}")
+            error_msg = f"RSS error on feed {feed.feed_id} (type {feed.type} - channel {feed.channel_id} )"
+            self.bot.dispatch("error", err, error_msg)
             return False
         return result
 
