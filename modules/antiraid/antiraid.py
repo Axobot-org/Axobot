@@ -186,7 +186,7 @@ class AntiRaid(commands.Cog):
         except discord.HTTPException:
             pass
         try:
-            await member.ban(reason=reason)
+            await member.ban(reason=reason, delete_message_seconds=60*30)
         except discord.HTTPException:
             return False
         if duration:
