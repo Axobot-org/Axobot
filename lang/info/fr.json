@@ -65,6 +65,7 @@
             "AUDIO_BITRATE_384_KBPS": "Bitrate audio de 384kbps",
             "AUTO_MODERATION": "Modération automatique",
             "BANNER": "Bannière de serveur custom",
+            "BYPASS_SLOWMODE_PERMISSION_MIGRATION_COMPLETE": "Permission de contourner le mode lent séparée de celle de gérer les messages",
             "CHANNEL_BANNER": "Bannières de salon",
             "CHANNEL_ICON_EMOJIS_GENERATED": "Icônes de salons générées",
             "COMMERCE": "Fonctionnalités de commerce",
