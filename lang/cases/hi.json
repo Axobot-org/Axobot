@@ -1,5 +1,5 @@
 {
-    "cases-0": "%{nbr} मामले पाए गए: (%{start}-%{end})",
+    "records_number": "",
     "deleted": "मामला #%{ID} हटा दिया गया है!",
     "display": {
         "date": "**तारीख:** %{data}",
@@ -7,6 +7,7 @@
         "guild": "**सर्वर:** %{data}",
         "moderator": "**मॉडरेटर:** %{data}",
         "reason": "**कारण:** %{data}",
+        "title": "",
         "type": "**प्रकार:** %{data}",
         "user": "**उपयोगकर्ता:** %{data}"
     },

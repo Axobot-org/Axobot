@@ -1,6 +1,16 @@
 {
-    "cases-0": "%{nbr} casiers trouvés : (%{start}-%{end})",
+    "records_number": "",
     "deleted": "Le casier n°%{ID} a bien été supprimé !",
+    "display": {
+        "date": "",
+        "duration": "",
+        "guild": "",
+        "moderator": "",
+        "reason": "",
+        "title": "",
+        "type": "",
+        "user": ""
+    },
     "list-0": "**Type:** {T}\n**Moderateur:** {M}\n**Date:** {D}\n**Raison:** *{R}*",
     "list-1": "**Serveur:** {G}\n**Type:** {T}\n**Moderateur:** {M}\n**Date:** {D}\n**Raison:** *{R}*",
     "no-case": "Cet utilisateur n'a pas de casier :D",

@@ -1,3 +1,6 @@
+base_path: ./lang
+preserve_hierarchy: true
+
 files:
-  - source: /lang/*/en.json
+  - source: /*/en.json
     translation: /%original_path%/%two_letters_code%.json

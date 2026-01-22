@@ -1,25 +1,41 @@
 {
-    "afk": {
-        "afk-done": "Du bist jetzt AFK",
-        "afk-user-noreason": "Dieser Nutzer ist AFK!",
-        "afk-user-reason": "Dieses Mitglied ist AFK, da %{reason}",
-        "no-perm": "Ups... Ich kann keine Namen ändern 😕 Ich werde versuchen mich zu erinnern aber ich könnte vergessen, dass du afk bist",
-        "unafk-cant": "Du bist nicht AFK!",
-        "unafk-done": "Du bist nicht mehr AFK"
-    },
     "bbw-too-many": "Ups, der Text ist zu groß für Discord 😕",
     "blame-0": "Liste möglicher Namen für **%{user}**",
-    "cant-react": "Ich hab keine Berechtigung für das Hinzufügen von Berechtigungen!",
     "cookie": "{user} hat <@375598088850505728> eine Packung Kekse geschenkt! %{emoji}",
     "count": {
         "counting": "Zählt...",
+        "forbidden": "",
         "missing-perms": "Ooops, ich besitze nicht die Berechtigung diesen Chatverlauf zu lesen",
         "result-user": "Von den letzen %{limit} Nachrichten hat %{user} %{x} Nachrichten gesendet (%{p}%)",
         "result-you": "Von den letzen %{limit} Nachrichten sind %{x} von dir (%{p}%)",
         "too-much": "Du willst wohl Discord zerstören! %{e} Aus offentsichtlichen Gründen begrenze ich auf %{l} Nachrichten"
     },
-    "discordjobs-count": "%{c} Angebote gefunden",
-    "discordjobs-title": "verfügbare Jobs bei Discord",
+    "discordjobs": {
+        "all-count": {
+            "zero": "",
+            "one": "",
+            "many": ""
+        },
+        "filtered-count": {
+            "zero": "",
+            "one": "",
+            "many": ""
+        },
+        "title": ""
+    },
+    "discordlinks": {
+        "title": "",
+        "server-status": "",
+        "tos": "",
+        "bug-report": "",
+        "feedback": "",
+        "selfbot": "",
+        "dev-tos": "",
+        "how-id": "",
+        "age-requirement": "",
+        "betterdiscord": "",
+        "downloads": ""
+    },
     "discordstatus-exists": "Es gibt gerade ein %{impact} Problem bei Discord: %{title}",
     "discordstatus-impacts": {
         "major": "größer",
@@ -29,8 +45,14 @@
     "discordstatus-nothing": "Es wurde nichts gefunden!\nDas letzte bekannte Problem war am %{date}",
     "embed-invalid-channel": "Kann keine Nachricht in diesen Kanal senden",
     "embed-invalid-image": "Die Url stellte sich als ungültig heraus",
+    "embed-sent": "",
     "error": "Ein Fehler: `%{err}`",
-    "fun-list": "Hier ist einer Liste aller Spaß Befehle:",
+    "flip": {
+        "tails": "",
+        "heads": "",
+        "edge": ""
+    },
+    "hour-result": "",
     "invalid-city": "Ungultige Stadt :confused:",
     "kills-list": [
         "Oh oh, du wirst sterben!",
@@ -56,18 +78,39 @@
         "{1}, Lavabäder sind heiß aber Lava brennt...",
         "{1} hat einen Raketensprung versucht",
         "Du solltest die schöne Melodie des Schlafliedes nicht hören, {1} 🎵",
-        "{2}.exe *has stopped working*"
+        "{2}.exe *has stopped working*",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
     ],
-    "markdown": "__**Markdown Regeln** für *Discord*__\n\n`*italics*` = *italics*\n`__underline__` = __underline__\n`**bold**` = **bold**\n`***bold italics***` = ***bold italics***\n`~~strikeout~~` = ~~strikeout~~\n`__*underline italics*__` = __*underline italics*__\n`__**underline bold**__` = __**underline bold**__\n`__***underline bold italics***__` = __***underline bold italics***__\n`||spoiler||` = ||spoiler||\n> quote = `> quote`\n\\`code\\` = `code`\n \\ to ignore\n\nFür Codeblock cf: <https://discord.gg/DGahTNn>",
     "nasa-none": "Ups, Ich kann keine Informationen von der Nasa bekommen. Versuche es nochmal in ein paar Minuten 😕",
-    "no-database": "As our database is offline, access to fun commands is restricted to people with permission \"Manage Server\"",
     "no-embed-perm": "Ich hab keine Rechte für \"Embed links\" :confused:",
     "no-emoji": "Dieser Emoji wurde nicht gefunden!",
-    "no-fun": "Spaß Befehle wurden auf diesem Server Deaktiviert. Um denn eine Liste von ihnen zu sehen klicke Hier https://axobot.rtfd.io/en/latest/fun.html",
-    "no-reaction": "Fehler beim Hinzufügen der Reaktion, bitte check meine Berechtigungen...",
     "no-roll": "Keine Wahl gefunden",
     "no-say": "Es ist mir nicht möglich hier Nachrichten zu versenden",
-    "no-voicechan": "Du musst in einem Sprachkanal sein um diesen Befehl zu benutzen.",
     "not-enough-roll": "Es müssen mindestens zwei verschiedene Sachen sein",
     "osekour": [
         "Warte, Ich schaue eben den Film zuende.",
@@ -82,24 +125,13 @@
         "Entschuldigung, da sind mehr als nur drei Schneeflocken: Wir stecken in der Garage fest",
         "Wir müssen noch bis zum ende unserer Wartungspause warten... Wusstest du das nicht? Es ist schon zwei Monate her als wir angefangen haben!"
     ],
-    "piece-0": [
-        "Zahl!",
-        "Kopf!"
-    ],
-    "piece-1": "Oh nein, die Münze ist auf der Kante gelandet!",
     "react-0": "Gesuchte Nachricht konnte nicht gefunden werden. Du musst als erstes die ID und dann den Emoji angeben :upside_down:\n Bitte beachte auch, dass den Nachrichtenverlauf lesen können muss!",
-    "reminds-asked": "%{user}, du hast mich vor %{duration} gefragt, dass ich dich daran erinnern soll:",
-    "reminds-date": "gefragt um",
-    "reminds-link": "Originale Nachricht",
-    "reminds-saved": "Habs! Ich werde dich in %{duration} erinnern",
-    "reminds-title": "Erinnerung",
-    "reminds-too-long": "Es ist nicht möglich es auf eine so lange Zeit zu setzen",
-    "reminds-too-short": "Du hast eine ungültige Zeit eingegeben",
+    "react-done": {
+        "one": "",
+        "many": ""
+    },
+    "say-done": "",
     "say-no-perm": "Du hast keine Berechtigungen in diesem Channel %{channel} Nachrichten zu senden",
-    "thanos": [
-        "{0} wurde von Thanos verschont",
-        "Thanos hat {0} pulverisiert! Für die Allgemeinheit...."
-    ],
     "tip-list": [
         "Hast du schon gewusst, dass es mehrere Sprachen für diesen Bot gibt? Es gibt sogar aus Spaß lolcat",
         "Pro-Tipp: Um die Sprache für Zbot zu ändern, benutze den %{config_cmd} Befehl!",
@@ -116,8 +148,20 @@
         "Hast du schon gewusst, dass du eine Beschreibung von deinem Server machen kannst, die in anderen Servern genutzt werden können. `description` ist die Option von dem %{config_cmd} Befehl",
         "Hast du schon gewusst, dass bei manchen Events es möglich ist, limitierte xp cards zu bekommen. Vergiss es nicht, die Zbot News auf deinem Server zu aktivieren!",
         "Hast du schon gewusst, dass Zbot seinen Namen von... seinem Creator Z_runner hat?",
-        "Pro-Tipp: Der `prefix` Befehl erlaubt dir eine Liste mit allen aktuell nutzbaren Prefixen in diesem Server"
+        "Pro-Tipp: Der `prefix` Befehl erlaubt dir eine Liste mit allen aktuell nutzbaren Prefixen in diesem Server",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
     ],
-    "uninhabited-city": "Unbewohnte Stadt 😕",
-    "vote-0": "Du kannst nicht mehr, als 20 Möglichkeiten oder eine negative Zahl angeben!"
+    "uninhabited-city": "Unbewohnte Stadt 😕"
 }

@@ -1,0 +1,40 @@
+{
+    "cant-embed": "",
+    "invalid-ip": "",
+    "mod-fields": {
+        "author": "",
+        "authors": "",
+        "categories": "",
+        "downloads": "",
+        "id-curseforge": "",
+        "id-modrinth": "",
+        "name": "",
+        "release": "",
+        "summary": "",
+        "versions": ""
+    },
+    "mod-title": "",
+    "no-api": "",
+    "no-embed": "",
+    "no-mod": "",
+    "no-ping": "",
+    "no-player-list": "",
+    "player-not-found": "",
+    "player-skin-download": "",
+    "player-skin-title": "",
+    "server": {
+        "description": "",
+        "from-provider": "",
+        "latency": "",
+        "players-count": "",
+        "players-list-20": "",
+        "players-list-all": "",
+        "version": ""
+    },
+    "serv-follow": {
+        "missing-perms": "",
+        "success": ""
+    },
+    "serv-error": "",
+    "serv-title": ""
+}

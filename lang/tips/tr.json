@@ -1,0 +1,19 @@
+{
+    "embed": {
+        "title": [
+            "",
+            "",
+            "",
+            "",
+            ""
+        ]
+    },
+    "online_dashboard_access": "",
+    "online_leaderboard_access": "",
+    "rank_card_personalisation": "",
+    "rss_delete_disabled_feeds": "",
+    "rss_difference_disable_delete": "",
+    "serverlog_enable_antiraid": "",
+    "serverlog_enable_antiscam": "",
+    "serverlog_enable_botwarning": ""
+}

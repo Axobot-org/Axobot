@@ -1,0 +1,84 @@
+{
+    "aliases": "",
+    "categories": {
+        "data": "",
+        "moderation": "",
+        "other": "",
+        "server-settings": "",
+        "staff": "",
+        "unclassed": "",
+        "users-info": ""
+    },
+    "check-desc": {
+        "bot_has_permissions": [
+            "",
+            ""
+        ],
+        "can_use_cookie": [
+            "",
+            ""
+        ],
+        "can_use_rss": [
+            "",
+            ""
+        ],
+        "database_connected": [
+            "",
+            ""
+        ],
+        "guild_only": [
+            "",
+            ""
+        ],
+        "has_permissions": [
+            "",
+            ""
+        ],
+        "in_support_server": [
+            "",
+            ""
+        ],
+        "is_blurple": [
+            "",
+            ""
+        ],
+        "is_bot_admin": [
+            "",
+            ""
+        ],
+        "is_halloween": [
+            "",
+            ""
+        ],
+        "is_owner": [
+            "",
+            ""
+        ],
+        "is_support_staff": [
+            "",
+            ""
+        ]
+    },
+    "cmd-count": {
+        "zero": "",
+        "one": "",
+        "many": ""
+    },
+    "cmd-not-found": "",
+    "cog-empty-dm": "",
+    "description": "",
+    "embed_title": "",
+    "embed_title_dm": "",
+    "footer": "",
+    "more-subcmds": {
+        "one": "",
+        "many": ""
+    },
+    "no-desc-cmd": "",
+    "no-desc-cog": "",
+    "no-subcmd": "",
+    "not-enabled": "",
+    "subcmd-not-found": "",
+    "subcmds": "",
+    "warning": ""
+}

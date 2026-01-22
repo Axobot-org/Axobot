@@ -20,5 +20,5 @@
     "reason-edited": "Teh ryson for case #%{ID} has been changd!",
     "search-0": "**Uzr:** {U}\n**Type:** {T}\n**Mod:** {M}\n**Date:** {D}\n**Reazon:** *{R}*",
     "search-1": "**Uzr:** {U}\n**Servr:** {G}\n**Type:** {T}\n**Modz:** {M}\n**Date:** {D}\n**Reazon:** *{R}*",
-    "title-search": "Case #%{ID}"
+    "title-search": ""
 }

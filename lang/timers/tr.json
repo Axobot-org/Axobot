@@ -1,9 +1,31 @@
 {
     "rmd": {
+        "cancelled": "",
+        "cleared": "",
+        "confirm": "",
+        "custom-duration": {
+            "button": "",
+            "title": "",
+            "input": ""
+        },
+        "delete": {
+            "error": "",
+            "success": {
+                "one": "",
+                "many": ""
+            },
+            "title": ""
+        },
         "embed-asked": "%{user}, %{duration} önce size şunu hatırlatmamı istediniz:",
         "embed-date": "İstek tarihi",
+        "embed-link": "",
         "embed-title": "Hatırlatıcı",
+        "empty": "",
+        "item": "",
+        "recreated": "",
         "saved": "Anladım! %{duration} sonra size hatırlatacağım",
+        "select-placeholder": "",
+        "title": "",
         "too-long": "Böyle uzun bir süre ayarlamak imkansız",
         "too-short": "Geçersiz bir süre girdiniz"
     }

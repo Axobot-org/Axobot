@@ -1,14 +1,20 @@
 {
     "ban": {
+        "ban-success": "",
         "cant-ban": "Berechtigung \"Ban members\" fehlt :confused:",
         "list-error": "Oops, es scheint als wenn das zu viele zum anzeige sind :confused:",
         "list-title-0": "Liste aller gebannter Mitglieder \"{}\"",
         "list-title-1": "Liste der ersten 45 gebannten Mitlgider \"{}\"",
         "list-title-2": "Liste der ersten 60 gebannten Mitlgider \"{}\"",
         "no-bans": "Es gibt keine gebannte Mitglieder",
+        "softban-succes": "",
         "staff-ban": "Du kannst kein Teammitglied bannen!",
+        "too-high": "",
+        "unban-success": "",
         "user-not-banned": "Diese Person ist nicht gebannt :upside_down:"
     },
+    "ban-chat": "",
+    "ban-dm": "",
     "cant-find-user": "Oops, der Nutzer **%{user}** konnte nicht gefunden werden",
     "cant-pin": "Oops, mir fehlt die Brechtigung Nachrichten anzupinnen",
     "caps-lock": "Hey %{user}, bitte schreibe nicht in capslock!",
@@ -20,47 +26,98 @@
         "not-found": "Hmm... ich kann diese Nachrichten irgendwie nicht löschen. Discord sagt mir sie würden nicht existieren :thinking:",
         "too-few": "Ich kann nicht so wenige Nachrichten löschen"
     },
+    "destop": {
+        "no-guild": "",
+        "too-old": ""
+    },
     "emoji": {
         "cant-emoji": "Mir fehlt die `Manage expressions` Berechtigung :confused:",
-        "emoji-valid": "Der Emoji %{name} wurde modifiziert, sodass ihn nur noch die Rolle `%{roles}` benutzen kann",
+        "cleared": "",
+        "emoji-valid": {
+            "one": "",
+            "many": ""
+        },
         "list": "{} (`:{}:`) hinzugefüg am {} {}",
         "list-title": "Emojis auf diesem Server %{guild}",
-        "private": "[Restricted]",
+        "private": "",
         "renamed": "Der Emoji %{name} wurde umbenannt!",
+        "unrestricted": "",
         "wrong-guild": "Oops, es scheint als wenn dieser Emoji nicht zu diesem Server gehört :thinking:"
     },
     "error": "Oops, da ist wohl ein Fehler passiert. Versuch es am Besten später nochmal ober kontaktiere den Support",
     "kick": {
         "cant-staff": "Du kannst keine Teammitglieder kicken!",
         "no-perm": "Berechtigung \"Kick members\" benötigt :confused:",
+        "success": "",
         "too-high": "Es scheint so, als wenn diese Person mehr rechte hat als ich :thinking:"
     },
+    "kick-chat": "",
+    "kick-dm": "",
     "missing-manage-nick": "Oops, mir fehlt die \"Manage nicknames\" Berecht!",
+    "missing-user-perms": "",
+    "mute-config": {
+        "confirm": "",
+        "err": "",
+        "success": {
+            "many": "",
+            "zero": ""
+        },
+        "success2": {
+            "many": "",
+            "zero": ""
+        },
+        "tip": ""
+    },
     "mute": {
         "already-mute": "Dieses Mitglied ist schon gemuted!",
         "already-unmute": "Dieses Mitglied ist nicht gemuted!",
         "cant-mute": "Oops, es scheint als wenn ich nicht genug Berechtigungen habe.... Ich benötige die `Manage roles` Berechtigung.",
+        "cant-timeout": "",
+        "list-title-0": "",
+        "list-title-1": "",
+        "list-title-2": "",
         "mute-high": "Oops, die `muted` ist zu hoch positioniert für mich... Bitte plaziere eine meiner Rollen über der `muted` Rolle.",
+        "mute-success": "",
         "no-mute": "Oops, es scheint so als ob keine `muted` Rolle existert :confused: Bitte erstelle eine und füge die benötigten Berechtigungen hinzu.",
-        "staff-mute": "Du kannst keine Teammitgleider muten"
+        "no-mutes": "",
+        "staff-mute": "Du kannst keine Teammitgleider muten",
+        "too-high": "",
+        "unmute-success": ""
     },
+    "mute-chat": "",
+    "mute-dm": "",
     "need-manage-messages": "Berechtigung \"Manage Messages\" fehlt :confused:",
     "need-read-history": "Oops, mir fehlt die \"Read Message History\" Berechtigung :confused: ",
     "pin": {
         "error-notfound": "Oops, ich kann diese Nachricht nicht finden (Error : `%{err}`)",
         "error-toomuch": "Oops, nicht möglich diese Nachricht anzupinnen (hast du mehr als 50 angepinnte Nachrichten?). Fehler: `%{err}`"
     },
+    "raid-banned": "",
+    "raid-kicked": "",
     "react-clear": "Ich konnte die Nachricht leider nicht finden :confused:",
     "role": {
         "color-success": "Die Farbe der Rolle %{role} wurde geändert!",
+        "give-pending": "",
+        "give-roles-higher": "",
         "give-success": {
             "many": "-> %{count} Rollen wurden von %{m} Rollen gegeben!",
             "one": "-> 1 Rolle wurde von den %{m} Rollen vergeben!",
             "zero": "-> Es konnten keine Rollen auf %{m} zugewiesen werden"
         },
-        "give-too-high": "Oops, diese Rolle ist zu hoch, als dass ich sie bearbeiten kann. Bitte plaziere eine meiner Rollen über der `%{r}` Rolle bevor du es noch einmal probierst :confused:"
+        "give-too-high": "Oops, diese Rolle ist zu hoch, als dass ich sie bearbeiten kann. Bitte plaziere eine meiner Rollen über der `%{r}` Rolle bevor du es noch einmal probierst :confused:",
+        "limit-hit": "",
+        "list": "",
+        "remove-pending": "",
+        "remove-success": {
+            "many": "",
+            "one": "",
+            "zero": ""
+        },
+        "temp-grant-success": "",
+        "too-high": ""
     },
     "slowmode": {
+        "cant-slowmode": "",
         "disabled": "Slowmode wurde in diesem Kanal deaktiviert.",
         "enabled": "Der %{channel} Kanal ist jetzt im slowmode. Warte noch %{s} Sekunden um wieder Nachrichten zu versenden.",
         "info": "Der slowmode von diesem Kanal liegt momentan bei %{s} Sekunden",
@@ -68,69 +125,20 @@
         "no-perm": "Oops, mir fehlt die `Manage this channel` Berechtigung :confused:",
         "too-long": "Slowmode lässt sich nicht höher als sechs Stunden stellen"
     },
+    "unban-chat": "",
+    "unhoist-too-many-members": "",
     "unhoisted": {
         "many": "%{count} Nicknamen geändert!",
         "one": "1 Nickname geändert!",
         "zero": "Es wurden keine Nicknamen geändert"
     },
-    "verify-role-high": "Oops, es scheint als wenn die Rolle `%{r}` zu hoch für mich ist. Bitte plaziere sie unter einer meiner Rollen oder eine meiner Rolle über sie.",
-    "verify_questions": [
-        [
-            "Was ergibt 2+7?",
-            "9"
-        ],
-        [
-            "Was ergibt das Produkt von 2 mal 3?",
-            "6"
-        ],
-        [
-            "Was repräsentiert das Emoji 🐷? Ein `Fisch`, eine `Pflanze` oder ein `Schwein`?",
-            "denken"
-        ],
-        [
-            "Schwein",
-            "3"
-        ],
-        [
-            "Welche geometrische Form hat drei Seiten?",
-            "5"
-        ],
-        [
-            "Dreieck",
-            "z"
-        ],
-        [
-            "Wie viele Sekunden hat eine Minute?",
-            "_special_servername"
-        ],
-        [
-            "60",
-            "Baguette"
-        ],
-        [
-            "Was ist die gegenteilige Farbe von schwarz?",
-            "weiß"
-        ],
-        [
-            "Was ist der vierte Himmelsrichtung? Noden, Süden, Westen, ...",
-            "Osten"
-        ],
-        [
-            "Was stellt das Emoji 🐷 dar? Ein `Fisch`, eine `Pflanze` oder ein `Schwein`?",
-            "Schwein"
-        ],
-        [
-            "Welche geometrische Form hat 3 Seiten?",
-            "Dreieck"
-        ],
-        [
-            "Wie viele Sekunden hat eine Minute?",
-            "60"
-        ]
-    ],
+    "unmute-chat": "",
     "warn": {
         "cant-bot": "Du kannst keine Bots verwarnen ^^",
         "cant-staff": "Du kannst keine Teammitglieder verwarnen!",
+        "success": "",
         "warn-but-db": "Da unsere Database momentan offline ist konnte diese Warnung nicht gespeichert werden. Sie wurde aber dennoch abgesendet"
-    }
+    },
+    "warn-chat": "",
+    "warn-dm": ""
 }

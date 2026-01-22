@@ -1,0 +1,66 @@
+{
+    "available-starting": "",
+    "calendar": {
+        "collected-all": "",
+        "collected-day": "",
+        "today-gifts": "",
+        "today-gifts-late": ""
+    },
+    "collect": {
+        "got-points": "",
+        "lost-points": "",
+        "nothing": "",
+        "got-items": {
+            "one": "",
+            "many": ""
+        },
+        "too-quick": "",
+        "strike-bonus": ""
+    },
+    "collection-empty": {
+        "user": "",
+        "other": ""
+    },
+    "collection-more": "",
+    "collection-title": {
+        "user": "",
+        "other": ""
+    },
+    "events-price-title": "",
+    "leaderboard-global": "",
+    "nothing-desc": "",
+    "nothing-prices": "",
+    "no-objectives": "",
+    "objectives": "",
+    "ocean-cooldown": "",
+    "points": "",
+    "points-total": "",
+    "position-global": "",
+    "rank-title": "",
+    "rankcard-unlocked": {
+        "title": "",
+        "desc": {
+            "one": "",
+            "many": ""
+        }
+    },
+    "reaction": {
+        "positive": "",
+        "negative": "",
+        "neutral": ""
+    },
+    "soon": "",
+    "tictactoe": {
+        "lost": {
+            "title": "",
+            "desc": ""
+        },
+        "won": {
+            "title": "",
+            "desc": ""
+        }
+    },
+    "tip-title": "",
+    "unclassed": "",
+    "xp-howto": ""
+}

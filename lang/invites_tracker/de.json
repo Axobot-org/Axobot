@@ -1,0 +1,18 @@
+{
+    "list": {
+        "title": "",
+        "field-title": "",
+        "field-value": {
+            "user-and-date": "",
+            "user": "",
+            "date": "",
+            "none": ""
+        }
+    },
+    "missing-permission": "",
+    "rename": {
+        "set-success": "",
+        "reset-success": ""
+    },
+    "tracking-disabled": ""
+}

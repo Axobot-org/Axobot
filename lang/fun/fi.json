@@ -1,15 +1,6 @@
 {
-    "afk": {
-        "afk-done": "Sinä olet nyt AFK:illa",
-        "afk-user-noreason": "Tämä jäsen on AFK:illa!",
-        "afk-user-reason": "Tämä jäsen on AFK:illa koska, %{reason}",
-        "no-perm": "Ups, en voi muokata nimimerkkiäsi 😕 yritän muistaa, mutta saatan unohtaa että olet afk tilassa",
-        "unafk-cant": "Et ole AFK tilassa!",
-        "unafk-done": "Et ole enää AFK:illa"
-    },
     "bbw-too-many": "Ups, määrä on likan iso Discordille 😕",
     "blame-0": "Lista kaikista käytettävistä nimistä **%{reason}**:lle",
-    "cant-react": "Minulla ei ole tarpeeksi käyttöoikeuksia lisätä reaktioita!",
     "cookie": "%{user} antoi paketin keksejä käyttäjälle <@375598088850505728>! %{emoji}",
     "count": {
         "counting": "Laskeminen on kesken...",
@@ -19,8 +10,32 @@
         "result-you": "Viimeiset %{limit} lähetystä, olet lähettänyt %{x} viestiä (%{p}%)",
         "too-much": "Sinä haluat räjäyttää Discordin! %{e} Selvien suorituskykyjen syyksi, Minä laitan rajotuksen %{l} viestille."
     },
-    "discordjobs-count": "%{c} tarjousta löytyi",
-    "discordjobs-title": "Avoimia työpaikkoja Discordilla",
+    "discordjobs": {
+        "all-count": {
+            "zero": "",
+            "one": "",
+            "many": ""
+        },
+        "filtered-count": {
+            "zero": "",
+            "one": "",
+            "many": ""
+        },
+        "title": ""
+    },
+    "discordlinks": {
+        "title": "",
+        "server-status": "",
+        "tos": "",
+        "bug-report": "",
+        "feedback": "",
+        "selfbot": "",
+        "dev-tos": "",
+        "how-id": "",
+        "age-requirement": "",
+        "betterdiscord": "",
+        "downloads": ""
+    },
     "discordstatus-exists": "Tällä hetkellä on yksi %{impact} virhe Discordilla: %{title}",
     "discordstatus-impacts": {
         "major": "suuri",
@@ -30,8 +45,14 @@
     "discordstatus-nothing": "Ei yhtään virhettä tällä hetkellä!\nViimeinen tiedetty virhe oli %{date}",
     "embed-invalid-channel": "En pysty lähettää viestejä tuolle kanavalle",
     "embed-invalid-image": "Url linkki joka pitäisi olla kuva linkki, on pätemätön",
+    "embed-sent": "",
     "error": "Virhe havaittu: `%{err}`",
-    "fun-list": "Tässä on lista kaikista käytettävistä hauska komentoista:",
+    "flip": {
+        "tails": "",
+        "heads": "",
+        "edge": ""
+    },
+    "hour-result": "",
     "invalid-city": "Pätemätön kaupunki :confused:",
     "kills-list": [
         "Jaahas, olet kuolemassa!",
@@ -56,18 +77,40 @@
         "Sinun ei kannattaisi kuunnella söpöä melodiaa keholaulusta, {victim} :musical_note:",
         "{ex}.exe *On lakannut toimimasta*",
         "{victim} yritti raketti hyppyä",
-        "{ex}.exe *on lopettanut toiminnan*"
+        "{ex}.exe *on lopettanut toiminnan*",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
     ],
-    "markdown": "__**Markdown Rules** on *Discord*__\n\n`*italics*` = *italics*\n`__underline__` = __underline__\n`**bold**` = **bold**\n`***bold italics***` = ***bold italics***\n`~~strikeout~~` = ~~strikeout~~\n`__*underline italics*__` = __*underline italics*__\n`__**underline bold**__` = __**underline bold**__\n`__***underline bold italics***__` = __***underline bold italics***__\n`||spoiler||` = ||spoiler||\n> quote = `> quote`\n\\`code\\` = `code`\n\\ to ignore\n\nFor code blocks, cf <https://discord.gg/DGahTNn>",
     "nasa-none": "Ups, en pysty saamaan tietoja NASAsta tällä hetkellä. Yritä uudelleen muutaman minuutin kuluttua 😕",
-    "no-database": "Kun tietokantamme on offline tilassa, mahollisuus hauska komentoihin on vain käyttäjille joilla on käyttöoikeudet \"Hallinnoi palvelinta\"",
     "no-embed-perm": "Minulla ei ole käyttöoikeuksia \"Embed links\" :confused:",
     "no-emoji": "Mahdotonta löytää tämä emoji!",
-    "no-fun": "Hauska komennot ovat kytketty pois käytöstä tällä serverillä. Näet listan niistä täältä: https://axobot.rtfd.io/en/latest/fun.html",
-    "no-reaction": "Mahdotonta lisätä reaktioita. Katso minun käyttöoikeudet...",
     "no-roll": "Ei vaihtoehtoa löydetty",
     "no-say": "En voi lähettää viestiä tälle kanavalle",
-    "no-voicechan": "Sinun täytyy olla äänikanavalla jotta tämä komento toimisi.",
     "not-enough-roll": "Täytyy olla vähintään kaksi vaihtoehtoa",
     "osekour": [
         "Odota, minä olen kohta katsonut elokuvani.",
@@ -82,17 +125,13 @@
         "Anteeksi, täällä on enemmän kuin 3 lumihiutaletta: me olemme jumissa autotallissa",
         "Meidän täytyy odottaa meidän jäähyn loppuun asti... Oletko sanomassa että et tiedä?! On ollut kaksi kuukautta kun aloitimme!"
     ],
-    "piece-0": [
-        "Kruuna!",
-        "Klaava!"
-    ],
-    "piece-1": "Epäonnistui, se tippu reunaan!",
     "react-0": "En voinut löytää corresponding viestiä. Sinun täytyy lisätä viesti ID ensimmäiseen argumenttiin, ja emoji toiseen:upside_down:\n Katso myös että voin lukea kanavan viesti historiaa!",
+    "react-done": {
+        "one": "",
+        "many": ""
+    },
+    "say-done": "",
     "say-no-perm": "Sinulla ei ole käyttöoikeuksia lähettämään viestejä kanavalle %{channel}",
-    "thanos": [
-        "{0} oli jaettu Thanoksen kanssa",
-        "Thanos päätti muuttaa {0} tuhkiin. Ihmiskunnan hyväksi ...."
-    ],
     "tip-list": [
         "Tiesitkö että, **Jees1#5825** käänsi tämän botin suomeksi?",
         "Pro-vinkki: vaihtaaksesi botin kieltä, käytä komentoa %{config_cmd}!",
@@ -110,8 +149,19 @@
         "Pro-vinkki: Botilla on Discord palvelin, jossa voit nähdä tunnetut bugit ja äänestää seuraavia päivityksiä varten! Käytä %{about_cmd} komentoa saadaksesi kutsun",
         "Pro-tip: The bot has a Discord, where you can see the current bugs and vote for the next updates! Use the `about` command to get the invite",
         "Tiesitkö, että voit antaa kuvauksen palvelimestasi, jota voidaan käyttää muissa palvelimissa komennon %{config_cmd} `kuvaus` vaihtoehdon avulla",
-        "Tiesitkö, että joissakin erikoistapahtumissa on mahdollista saada keräilijä xp kortteja. Älä unohda seurata uutisia virallisella palvelimellamme tai komennolla %{event_cmd}!"
+        "Tiesitkö, että joissakin erikoistapahtumissa on mahdollista saada keräilijä xp kortteja. Älä unohda seurata uutisia virallisella palvelimellamme tai komennolla %{event_cmd}!",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
     ],
-    "uninhabited-city": "Asumaton kaupunki :confused:",
-    "vote-0": "Sinä voit laittaa enemmän kuin 20 vaihtoehtoa, ja myös vähemmän negatiivisia!"
+    "uninhabited-city": "Asumaton kaupunki :confused:"
 }

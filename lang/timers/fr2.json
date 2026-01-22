@@ -12,7 +12,7 @@
             "error": "Oups, quelque chose a cassé pendant que j'essayais de supprimer tes rappels. Essaie encore ou contacte notre support technique !",
             "success": {
                 "one": "Ton rappel a bien été supprimé 😁",
-                "other": "%{count} de tes rappels ont bien été supprimés !"
+                "many": ""
             },
             "title": "Choisis quel(s) rappel(s) tu veux supprimer"
         },

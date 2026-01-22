@@ -48,8 +48,8 @@
             "title-global": "Global config blink",
             "title-topic": "\"%{topic}\" config review"
         },
-        "emoji": "Emoji",
-        "format": "Name format",
+        "emoji": "",
+        "format": "",
         "hint": "Hint msg",
         "no-config": "Dis server dont use teh cool ticket systm :sadcat:",
         "prompt": "Select prompt",
