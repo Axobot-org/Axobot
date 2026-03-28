@@ -30,8 +30,8 @@ class RandomCollectSubcog(AbstractSubcog):
             if msg.guild is not None and not msg.channel.permissions_for(msg.guild.me).add_reactions:
                 # don't react if we can't add reactions
                 return
-            if not await self.is_fun_enabled(msg):
-                # don't react if fun is disabled for this guild
+            if not await self.are_events_enabled(msg):
+                # don't react if events are disabled for this guild
                 return
             if random() < data["probability"] and any(trigger in msg.content for trigger in data["triggers"]):
                 react = choice(data["reactions_list"])
