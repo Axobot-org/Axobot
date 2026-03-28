@@ -137,15 +137,30 @@ class BotEvents(commands.Cog):
     @commands.Cog.listener()
     async def on_tictactoe_win(self, interaction: discord.Interaction):
         "Grant points to the user if they won a game of tictactoe"
-        if not self.current_event:
+        if not self.current_event or not self.current_event_data["objectives"]:
             return
         now = time.time()
         # limit to 1 win per X seconds
         if self.last_ttt_win[interaction.user.id] + self.min_delay_between_ttt_wins > now:
             return
         self.last_ttt_win[interaction.user.id] = int(now)
-        points = 3
         user = interaction.user
+        # check if user points is high enough to add some difficulty (ie. grant less points on win)
+        user_points = await self.db_get_user_points(user.id)
+        first_cap = self.current_event_data["objectives"][0]["points"]
+        last_cap = self.current_event_data["objectives"][-1]["points"]
+        if user_points is None or user_points < first_cap * 0.9:
+            # grant 5 points if user has less than 90% of the first objective
+            points = 5
+        elif user_points < last_cap * 0.9:
+            # grant 3 points if user has less than 90% of the last objective
+            points = 3
+        elif user_points < last_cap * 2:
+            # grant 1 point if user has between 90% and 200% of the last objective
+            points = 1
+        else:
+            # grant 0 points if user has more than 200% of the last objective (to avoid farming)
+            return
         # send win reward embed
         emb = discord.Embed(
             title=await self.bot._(interaction, "bot_events.tictactoe.won.title"),
@@ -162,12 +177,10 @@ class BotEvents(commands.Cog):
     @commands.Cog.listener()
     async def on_tictactoe_lose(self, interaction: discord.Interaction):
         "Grant points to the user if they lost a game of tictactoe"
-        if not self.current_event:
+        if not self.current_event or not self.current_event_data["objectives"]:
             return
         user = interaction.user
         # check if user points is high enough to add some difficulty (ie. remove points on loss)
-        if not self.current_event_data["objectives"]:
-            return
         user_points = await self.db_get_user_points(user.id)
         first_cap = self.current_event_data["objectives"][0]["points"]
         last_cap = self.current_event_data["objectives"][-1]["points"]
