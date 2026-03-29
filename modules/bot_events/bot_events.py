@@ -147,15 +147,18 @@ class BotEvents(commands.Cog):
         user = interaction.user
         # check if user points is high enough to add some difficulty (ie. grant less points on win)
         user_points = await self.db_get_user_points(user.id)
-        first_cap = self.current_event_data["objectives"][0]["points"]
-        last_cap = self.current_event_data["objectives"][-1]["points"]
-        if user_points is None or user_points < first_cap * 0.9:
-            # grant 5 points if user has less than 90% of the first objective
+        first_objective = self.current_event_data["objectives"][0]["points"]
+        last_objective = self.current_event_data["objectives"][-1]["points"]
+        first_cap = first_objective * 0.9 if first_objective > 50 else 0
+        second_cap = max(50, last_objective * 0.9)
+        last_cap = max(200, last_objective * 2)
+        if user_points is None or user_points < first_cap:
+            # grant 5 points if user has less than 90% of the first meaningful objective
             points = 5
-        elif user_points < last_cap * 0.9:
-            # grant 3 points if user has less than 90% of the last objective
+        elif user_points < second_cap:
+            # grant 3 points if user has less than 90% of the last objective or if the first objective is too low
             points = 3
-        elif user_points < last_cap * 2:
+        elif user_points < last_cap:
             # grant 1 point if user has between 90% and 200% of the last objective
             points = 1
         else:

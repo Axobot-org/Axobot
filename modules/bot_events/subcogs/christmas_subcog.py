@@ -1,6 +1,7 @@
 import datetime as dt
 from collections import defaultdict
 from random import choices, random
+import time
 
 import discord
 import emoji
@@ -51,7 +52,9 @@ class ChristmasSubcog(AbstractSubcog):
         super().__init__(bot, current_event, current_event_data, current_event_id)
         self.pending_reactions: dict[int, EventItem] = {} # map of MessageID => EventItem
         self.max_missed_days = 4
-        self.collect_cooldown = 60*30 # (30min) time in seconds between 2 collects
+        self.collect_cooldown = 60 * 15 # (15min) time in seconds between 2 collects
+        self.reaction_channel_cooldown = 60 * 3 # (3min) min seconds between bot reactions per channel
+        self.last_channel_reaction: dict[int, float] = {} # map of ChannelID => timestamp
 
     async def on_message(self, msg: discord.Message):
         "Add random reaction to some messages"
@@ -62,6 +65,9 @@ class ChristmasSubcog(AbstractSubcog):
             if not await self.are_events_enabled(msg):
                 # don't react if events are disabled for this guild
                 return
+            now = time.time()
+            if now - self.last_channel_reaction.get(msg.channel.id, 0.0) < self.reaction_channel_cooldown:
+                return
             if random() < data["probability"] and await self.check_trigger_words(msg.content):
                 if item := await self.get_random_item_for_reaction():
                     try:
@@ -70,6 +76,7 @@ class ChristmasSubcog(AbstractSubcog):
                         self.bot.dispatch("error", err, f"When trying to add event reaction {item['emoji']}")
                         return
                     self.pending_reactions[msg.id] = item
+                    self.last_channel_reaction[msg.channel.id] = now
 
     async def on_raw_reaction_add(self, payload: discord.RawReactionActionEvent):
         if payload.message_id not in self.pending_reactions:
