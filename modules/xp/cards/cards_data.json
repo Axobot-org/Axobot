@@ -443,6 +443,17 @@
                 "xp_to_next_level_with_text": [255, 204, 102],
                 "total_xp_with_text": [255, 204, 102]
             }
+        },
+        "april26": {
+            "xp_bar": [251, 220, 4],
+            "texts": {
+                "username": [254, 255, 255],
+                "level": [251, 220, 4],
+                "rank": [255, 255, 255],
+                "participants": [255, 255, 255],
+                "xp_to_next_level_with_text": [255, 255, 255],
+                "total_xp_with_text": [255, 255, 255]
+            }
         }
     }
 }
