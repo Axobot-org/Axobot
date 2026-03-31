@@ -160,8 +160,8 @@ class AbstractSubcog(ABC):
             top_5_f.append(f"{i+1}. {username} ({row['points']} points)")
         return "\n".join(top_5_f)
 
-    async def is_fun_enabled(self, message: discord.Message):
-        "Check if fun is enabled in a given context"
+    async def are_events_enabled(self, message: discord.Message):
+        "Check if events are enabled in a given context"
         if message.guild is None:
             return True
         if not self.bot.database_online and not message.author.guild_permissions.manage_guild:
@@ -181,6 +181,19 @@ class AbstractSubcog(ABC):
         if last_collect is None:
             return 1e9
         return (self.bot.utcnow() - last_collect).total_seconds()
+
+    async def get_reaction_destination_channel(self, payload: discord.RawReactionActionEvent):
+        "Find the correct channel to use when responding to a collect reaction"
+        # get the destination channel
+        if (
+            (channel := self.bot.get_channel(payload.channel_id))
+            and channel.permissions_for(channel.guild.me).send_messages
+            and channel.permissions_for(channel.guild.me).embed_links
+        ):
+            return channel
+        if (user := self.bot.get_user(payload.user_id)) and user.dm_channel is not None:
+            return user.dm_channel
+        return None
 
     async def add_collect(self, user_id: int, points: int, /,
                           ignore_last_collect: bool = False,

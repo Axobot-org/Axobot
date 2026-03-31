@@ -65,6 +65,7 @@
             "AUDIO_BITRATE_384_KBPS": "384 kbps audio bitrate",
             "AUTO_MODERATION": "Auto moderation",
             "BANNER": "Custom server banner",
+            "BYPASS_SLOWMODE_PERMISSION_MIGRATION_COMPLETE": "Bypass slowmode permission separated from manage messages",
             "CHANNEL_BANNER": "Channel banner",
             "CHANNEL_ICON_EMOJIS_GENERATED": "Channel icon generated",
             "COMMERCE": "Commerce features",

@@ -1,3 +1,5 @@
+import time
+from asyncio import sleep
 from random import choices, random
 
 import discord
@@ -21,7 +23,9 @@ class SingleReactionSubcog(AbstractSubcog):
         super().__init__(bot, current_event, current_event_data, current_event_id)
         self.pending_reactions: dict[int, EventItem] = {} # map of MessageID => EventItem
 
-        self.collect_cooldown = 60*30 # (30min) time in seconds between 2 collects
+        self.collect_cooldown = 60 * 10 # (10min) time in seconds between 2 collects
+        self.reaction_channel_cooldown = 60 * 2 # (2min) min seconds between bot reactions per channel
+        self.last_channel_reaction: dict[int, float] = {} # map of ChannelID => timestamp
 
     async def on_message(self, msg):
         "Add random reaction to some message"
@@ -29,8 +33,11 @@ class SingleReactionSubcog(AbstractSubcog):
             if msg.guild is not None and not msg.channel.permissions_for(msg.guild.me).add_reactions:
                 # don't react if we can't add reactions
                 return
-            if not await self.is_fun_enabled(msg):
-                # don't react if fun is disabled for this guild
+            if not await self.are_events_enabled(msg):
+                # don't react if events are disabled for this guild
+                return
+            now = time.time()
+            if now - self.last_channel_reaction.get(msg.channel.id, 0.0) < self.reaction_channel_cooldown:
                 return
             if random() < data["probability"] and await self.check_trigger_words(msg.content):
                 if item := await self.get_random_item_for_reaction():
@@ -39,6 +46,8 @@ class SingleReactionSubcog(AbstractSubcog):
                     except discord.HTTPException as err:
                         self.bot.dispatch("error", err, f"When trying to add event reaction {item['emoji']}")
                         return
+                    self.last_channel_reaction[msg.channel.id] = now
+                    await sleep(0.5) # wait a bit before registering, to avoid self-bots
                     self.pending_reactions[msg.id] = item
 
     async def on_raw_reaction_add(self, payload):
@@ -131,26 +140,13 @@ class SingleReactionSubcog(AbstractSubcog):
 
     async def check_trigger_words(self, message: str):
         "Check if a word in the message triggers the event"
-        if self.current_event and (data := self.current_event_data.get("emojis")):
+        if len(message) > 10 and self.current_event and (data := self.current_event_data.get("emojis")):
             message = message.lower()
             return any(trigger in message for trigger in data["triggers"])
         return False
 
-    async def get_reaction_destination_channel(self, payload: discord.RawReactionActionEvent):
-        "Find the correct channel to use when responding to a collect reaction"
-        # get the destination channel
-        if (
-            (channel := self.bot.get_channel(payload.channel_id))
-            and channel.permissions_for(channel.guild.me).send_messages
-            and channel.permissions_for(channel.guild.me).embed_links
-        ):
-            return channel
-        if (user := self.bot.get_user(payload.user_id)) and user.dm_channel is not None:
-            return user.dm_channel
-        return None
-
     @cached(TTLCache(maxsize=1, ttl=60*60*24))
-    async def _get_suitable_reaction_items(self):
+    async def _get_suitable_reaction_items(self) -> list[EventItem]:
         "Get the list of items usable in reactions"
         if self.current_event is None:
             return []
