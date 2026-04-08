@@ -225,7 +225,7 @@ class Partners(commands.Cog):
         return list(guilds_map.values())
 
     async def update_partners(self, channel:"discord.abc.MessageableChannel", color: int | None = None) -> int:
-        """Update every partners of a channel"""
+        """Update every partners of a channel. Returns the number of partners updated"""
         if channel.guild is None or not channel.permissions_for(channel.guild.me).embed_links:
             return 0
         partners = await self.db_get_partners_of_guild(channel.guild.id)
@@ -271,6 +271,8 @@ class Partners(commands.Cog):
             except (discord.errors.NotFound, discord.errors.Forbidden):
                 msg = await channel.send(embed=emb)
                 await self.db_edit_partner(partner_id=partner["ID"], msg=msg.id)
+            except discord.errors.DiscordServerError as err:
+                self.bot.dispatch("error", err)
             except Exception as err:
                 msg = await channel.send(embed=emb)
                 await self.db_edit_partner(partner_id=partner["ID"], msg=msg.id)
