@@ -38,7 +38,9 @@ class ServerLogs(commands.Cog):
     def __init__(self, bot: Axobot):
         self.bot = bot
         self.file = "serverlogs"
-        self.cache = TTLCache[int, dict[int, list[str]]](maxsize=10_000, ttl=3600*4)
+        # 10min cache of guild_id -> [channel_id, logs]
+        self.cache = TTLCache[int, dict[int, list[str]]](maxsize=10_000, ttl=60 * 10)
+        # guild_id -> list of logs to send in the next log batch
         self.to_send: dict[int, list[LogToSend]] = {}
         self.auditlogs_timeout = 3 # seconds
         self.voice_join_timestamps: dict[tuple[int, int], float] = {}
@@ -77,7 +79,7 @@ class ServerLogs(commands.Cog):
 
     async def db_get_from_channel(self, guild_id: int, channel_id: int, use_cache: bool=True) -> list[str]:
         "Get enabled logs for a channel"
-        if use_cache and (cached := self.cache.get(guild_id)) and channel_id in cached:
+        if use_cache and (cached := self.cache.get(guild_id)) is not None and channel_id in cached:
             return cached[channel_id]
         query = "SELECT kind FROM serverlogs WHERE guild = %s AND channel = %s AND beta = %s"
         async with self.bot.db_main.read(query, (guild_id, channel_id, self.bot.beta)) as query_results:
@@ -86,7 +88,7 @@ class ServerLogs(commands.Cog):
     async def db_get_from_guild(self, guild_id: int, use_cache: bool=True) -> dict[int, list[str]]:
         """Get enabled logs for a guild
         Returns a map of ChannelID -> list of enabled logs"""
-        if use_cache and (cached := self.cache.get(guild_id)):
+        if use_cache and (cached := self.cache.get(guild_id)) is not None:
             return cached
         query = "SELECT channel, kind FROM serverlogs WHERE guild = %s AND beta = %s"
         async with self.bot.db_main.read(query, (guild_id, self.bot.beta)) as query_results:
