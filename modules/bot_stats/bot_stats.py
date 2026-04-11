@@ -4,7 +4,7 @@ import re
 import subprocess
 from collections import defaultdict
 from datetime import datetime
-from typing import Any, Literal
+from typing import Any, Literal, NamedTuple
 
 import aiohttp
 import discord
@@ -33,10 +33,11 @@ RssStats = dict[Literal["checked", "messages", "errors", "warnings", "time"], in
 XpCardsStats = dict[Literal["generated", "sent"], int]
 TicketEventsStats = dict[Literal["creation"], int]
 
-
-async def get_ram_data() -> tuple[float, int]:
-    data = psutil.virtual_memory()
-    return data.percent, (data.total - data.available)
+class RamStats(NamedTuple):
+    """RAM usage data point"""
+    bot_used: float
+    total_percent: float
+    total_used: float
 
 
 class BotStats(commands.Cog):
@@ -161,6 +162,17 @@ class BotStats(commands.Cog):
     async def record_open_files_error(self, error: BaseException):
         self.bot.dispatch("error", error, "When checking process open files")
 
+    async def get_ram_data(self) -> RamStats:
+        """Get the RAM usage data for later use. Units are in GigaBytes (decimal)."""
+        data = psutil.virtual_memory()
+        bot_ram = round(self.process.memory_info().rss / 1e9, 3)
+        total_ram = round((data.total - data.available) / 1e9, 3)
+        return RamStats(
+            bot_used=bot_ram,
+            total_percent=data.percent,
+            total_used=total_ram
+        )
+
     # ---- Event listeners ----
 
     @commands.Cog.listener()
@@ -270,7 +282,7 @@ class BotStats(commands.Cog):
             await self.emoji_analysis(message)
 
     async def _check_backup_msg(self, message: discord.Message):
-        "Collect the last backup size from the logs channel"
+        "Collect the last backup size from the logs channel, in GB (decimal)"
         if message.channel.id != _LOGS_CHANNEL_ID or len(message.embeds) != 1:
             return
         embed = message.embeds[0]
@@ -282,15 +294,17 @@ class BotStats(commands.Cog):
             if unit == "G":
                 self.last_backup_size = size
             elif unit == "M":
-                self.last_backup_size = size / 1024
+                self.last_backup_size = size / 1e3
             elif unit == "K":
-                self.last_backup_size = size / 1024 ** 2
+                self.last_backup_size = size / 1e6
+            elif unit == "B":
+                self.last_backup_size = size / 1e9
             else:
                 self.bot.dispatch(
                     "error", ValueError(f"Unknown backup size unit: {unit}"), "When checking last backup size"
                 )
                 return
-            self.log.info("Last backup size detected: %sG", self.last_backup_size)
+            self.log.info("Last backup size detected: %sGB", self.last_backup_size)
 
     async def _check_voice_msg(self, message: discord.Message):
         "Collect the amount of sent voice messages"
@@ -500,7 +514,7 @@ class BotStats(commands.Cog):
 
         # Backup size
         if self.last_backup_size is not None:
-            rows.append(StatRow("backup.size", self.last_backup_size, 1, "Gb", False))
+            rows.append(StatRow("backup.size", self.last_backup_size, 1, "GB", False))
             self.last_backup_size = None
 
         # Role reactions
@@ -547,11 +561,10 @@ class BotStats(commands.Cog):
         rows.append(StatRow("rss.disabled", await self.db_get_disabled_rss(), 0, "disabled", False))
 
         # RAM usage
-        bot_ram = round(self.process.memory_info()[0] / 2.0 ** 30, 3)
-        rows.append(StatRow("perf.bot_ram", bot_ram, 1, "Gb", False))
-        percent_ram, total_ram = await get_ram_data()
-        rows.append(StatRow("perf.total_ram", round(total_ram / 1e9, 3), 1, "Gb", False))
-        rows.append(StatRow("perf.percent_total_ram", percent_ram, 1, "%", False))
+        ram_usage = await self.get_ram_data()
+        rows.append(StatRow("perf.bot_ram", ram_usage.bot_used, 1, "GB", False))
+        rows.append(StatRow("perf.total_ram", ram_usage.total_used, 1, "GB", False))
+        rows.append(StatRow("perf.percent_total_ram", ram_usage.total_percent, 1, "%", False))
 
         # Guild availability
         guilds = self.bot.guilds
