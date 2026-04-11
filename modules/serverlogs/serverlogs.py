@@ -1576,7 +1576,7 @@ Minimum age required by anti-raid: {min_age}"
         Corresponding log: moderation_case"""
         if channel_ids := await self.is_log_enabled(guild.id, "moderation_case"):
             emb = discord.Embed(
-                description=f"**Case #{after.id} edited**",
+                description=f"**Case #{after.id} ({after.type}) edited**",
                 colour=discord.Color.orange()
             )
             if moderator := self.bot.get_user(after.mod_id):
@@ -1595,7 +1595,7 @@ Minimum age required by anti-raid: {min_age}"
         Corresponding log: moderation_case"""
         if channel_ids := await self.is_log_enabled(guild.id, "moderation_case"):
             emb = discord.Embed(
-                description=f"**Case #{case.id} deleted**",
+                description=f"**Case #{case.id} ({case.type}) deleted**",
                 colour=discord.Color.red()
             )
             if moderator := self.bot.get_user(case.mod_id):
