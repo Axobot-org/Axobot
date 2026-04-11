@@ -288,7 +288,7 @@ class BotStats(commands.Cog):
         embed = message.embeds[0]
         if embed.description is None:
             return
-        if match := re.search(r"Database backup done! \((\d+(?:\.\d+)?)([GMK])\)", embed.description):
+        if match := re.search(r"Database backup done! \((\d+(?:\.\d+)?)([GMKB])\)", embed.description):
             unit = match.group(2)
             size = float(match.group(1))
             if unit == "G":
@@ -514,7 +514,7 @@ class BotStats(commands.Cog):
 
         # Backup size
         if self.last_backup_size is not None:
-            rows.append(StatRow("backup.size", self.last_backup_size, 1, "GB", False))
+            rows.append(StatRow("backup.size", round(self.last_backup_size, 6), 1, "GB", False))
             self.last_backup_size = None
 
         # Role reactions
