@@ -68,6 +68,7 @@ class Axobot(commands.bot.AutoShardedBot):
         self.entity_id: int = 0 # ID of the bot for the statistics database
         self.db = DatabaseConnectionManager()
         self.db_main = DatabaseQueryHandler(self, "axobot")
+        self.db_stats = DatabaseQueryHandler(self, "statsbot")
         self.db_xp = DatabaseQueryHandler(self, "axobot-xp")
         self.log = logging.getLogger("bot") # logs module
         self.xp_enabled: bool = True # if xp is enabled
