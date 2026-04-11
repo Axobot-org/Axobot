@@ -6,6 +6,7 @@
         "today-gifts": "Voici les cadeaux d'aujourd'hui (**%{points} points**) :",
         "today-gifts-late": "Voici les cadeaux du jour, ainsi que des %{days} jours manqués (**%{points} points**) :"
     },
+    "christmas-cooldown": "La magie de Noël a déjà répondu à ton appel, %{user}. Reviens dans %{time} pour en recevoir davantage.",
     "collect": {
         "got-points": "Tu n'as pas trouvé d'objet intéressant cette fois-ci, mais tu as tout de même réussi à **gagner %{points} points d'événement** !",
         "lost-points": "Il semble que tu n'ai pas trouvé d'objet à collectionner sur ton chemin, et que tu ai inexplicablement **perdu %{points} points d'événement**...",
@@ -32,7 +33,7 @@
     "nothing-prices": "Il n'y a rien à gagner pour cet événement :confused:",
     "no-objectives": "Cet événement n’a aucun objectif de points, pas besoin de farm pour une fois !\nConsultez la commande %{cmd} pour plus d’informations.",
     "objectives": "Objectifs",
-    "ocean-cooldown": "L'océan a été assez généreux envers toi pour l'instant. Reviens dans %{time} pour tenter de recevoir sa bénédiction.",
+    "ocean-cooldown": "L'océan a été assez généreux envers toi pour l'instant, %{user}. Reviens dans %{time} pour tenter de recevoir sa bénédiction.",
     "points": "points",
     "points-total": "Total des points",
     "position-global": "Position mondiale",
@@ -47,7 +48,7 @@
     "reaction": {
         "positive": "Félicitations %{user}, tu as trouvé 1 %{item} ! Il a été ajouté à ta collection et t'a fait remporter **%{points} points d'événement** !",
         "negative": "Oh non, %{user} tu as trouvé 1 %{item} ! Il a été ajouté à ta collection, mais t'a fait perdre **%{points} points d'événement**...",
-        "neutral": "Tu as trouvé 1 %{item} ! Il a été ajouté à ta collection."
+        "neutral": "Hey %{user}, tu as trouvé 1 %{item} ! Il a été ajouté à ta collection."
     },
     "soon": "Un événement arrive bientôt ! Surveillez les informations, car il débutera le %{date}",
     "tictactoe": {

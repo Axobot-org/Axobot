@@ -66,6 +66,7 @@ class SingleReactionSubcog(AbstractSubcog):
         delete_after = 12 if isinstance(channel, discord.abc.PrivateChannel) else None
         translation_source = payload.guild_id or payload.user_id
         lang = await self.get_event_language(translation_source)
+        user_mention = f"<@{payload.user_id}>"
         # check last collect from this user
         seconds_since_last_collect = await self.get_seconds_since_last_collect(payload.user_id)
         if seconds_since_last_collect < self.collect_cooldown:
@@ -73,7 +74,7 @@ class SingleReactionSubcog(AbstractSubcog):
             time_remaining = self.collect_cooldown - seconds_since_last_collect
             remaining = await FormatUtils.time_delta(time_remaining, lang=lang, seconds=time_remaining < 60)
             await channel.send(
-                await self.bot._(translation_source, "bot_events.ocean-cooldown", time=remaining),
+                await self.bot._(translation_source, "bot_events.ocean-cooldown", user=user_mention, time=remaining),
                 delete_after=delete_after
             )
             return
@@ -85,7 +86,6 @@ class SingleReactionSubcog(AbstractSubcog):
         desc_key = "bot_events.reaction.neutral"
         name_key = "french_name" if lang in ("fr", "fr2") else "english_name"
         item_name = item["emoji"] + " " + item[name_key]
-        user_mention = f"<@{payload.user_id}>"
         desc = await self.bot._(translation_source, desc_key, user=user_mention, item=item_name)
         embed = discord.Embed(title=title, description=desc, color=self.current_event_data["color"])
         if self.current_event_data["icon"]:
