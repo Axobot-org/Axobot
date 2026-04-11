@@ -21,7 +21,7 @@ class InvitesTracker(commands.Cog):
     def __init__(self, bot: Axobot):
         self.bot = bot
         self.file = "invites_tracker"
-        self.log = logging.getLogger("bot.rss")
+        self.log = logging.getLogger("bot.invites_tracker")
 
     async def cog_load(self):
         self.sync_all_guilds_invites.start() # pylint: disable=no-member
