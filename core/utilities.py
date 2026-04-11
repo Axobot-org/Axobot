@@ -1,6 +1,6 @@
 import asyncio
 import operator
-from typing import Any, TypedDict
+from typing import Any, Sequence, TypedDict
 
 import aiohttp
 import discord
@@ -10,6 +10,13 @@ from discord.ext import commands
 
 from core.bot_classes import Axobot, MyContext
 from core.type_utils import UserOrMember
+
+
+def avg(records: Sequence[int | float]) -> float | None:
+    "Return the rounded mean of a sequence, or None if empty."
+    if records:
+        return round(sum(records) / len(records), 1)
+    return None
 
 
 class _ConfigDict(TypedDict):

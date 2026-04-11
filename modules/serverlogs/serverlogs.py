@@ -38,7 +38,9 @@ class ServerLogs(commands.Cog):
     def __init__(self, bot: Axobot):
         self.bot = bot
         self.file = "serverlogs"
-        self.cache = TTLCache[int, dict[int, list[str]]](maxsize=10_000, ttl=3600*4)
+        # 10min cache of guild_id -> [channel_id, logs]
+        self.cache = TTLCache[int, dict[int, list[str]]](maxsize=10_000, ttl=60 * 10)
+        # guild_id -> list of logs to send in the next log batch
         self.to_send: dict[int, list[LogToSend]] = {}
         self.auditlogs_timeout = 3 # seconds
         self.voice_join_timestamps: dict[tuple[int, int], float] = {}
@@ -77,7 +79,7 @@ class ServerLogs(commands.Cog):
 
     async def db_get_from_channel(self, guild_id: int, channel_id: int, use_cache: bool=True) -> list[str]:
         "Get enabled logs for a channel"
-        if use_cache and (cached := self.cache.get(guild_id)) and channel_id in cached:
+        if use_cache and (cached := self.cache.get(guild_id)) is not None and channel_id in cached:
             return cached[channel_id]
         query = "SELECT kind FROM serverlogs WHERE guild = %s AND channel = %s AND beta = %s"
         async with self.bot.db_main.read(query, (guild_id, channel_id, self.bot.beta)) as query_results:
@@ -86,7 +88,7 @@ class ServerLogs(commands.Cog):
     async def db_get_from_guild(self, guild_id: int, use_cache: bool=True) -> dict[int, list[str]]:
         """Get enabled logs for a guild
         Returns a map of ChannelID -> list of enabled logs"""
-        if use_cache and (cached := self.cache.get(guild_id)):
+        if use_cache and (cached := self.cache.get(guild_id)) is not None:
             return cached
         query = "SELECT channel, kind FROM serverlogs WHERE guild = %s AND beta = %s"
         async with self.bot.db_main.read(query, (guild_id, self.bot.beta)) as query_results:
@@ -424,17 +426,16 @@ class ServerLogs(commands.Cog):
         if not guild.me.guild_permissions.view_audit_log:
             return None
         now = self.bot.utcnow()
-        stats_cog = self.bot.get_cog("BotStats")
         await asyncio.sleep(self.auditlogs_timeout)
         async for entry in guild.audit_logs(action=action, limit=5, oldest_first=False):
             if (now - entry.created_at).total_seconds() > 5:
                 continue
             if check is None or check(entry):
-                if stats_cog and action != discord.AuditLogAction.kick:
-                    await stats_cog.on_serverlogs_audit_search(True)
+                if action != discord.AuditLogAction.kick:
+                    self.bot.dispatch("serverlogs_audit_search", True)
                 return entry
-        if stats_cog and action != discord.AuditLogAction.kick:
-            await stats_cog.on_serverlogs_audit_search(False)
+        if action != discord.AuditLogAction.kick:
+            self.bot.dispatch("serverlogs_audit_search", False)
 
 
     @commands.Cog.listener()
@@ -1574,7 +1575,7 @@ Minimum age required by anti-raid: {min_age}"
         Corresponding log: moderation_case"""
         if channel_ids := await self.is_log_enabled(guild.id, "moderation_case"):
             emb = discord.Embed(
-                description=f"**Case #{after.id} edited**",
+                description=f"**Case #{after.id} ({after.type}) edited**",
                 colour=discord.Color.orange()
             )
             if moderator := self.bot.get_user(after.mod_id):
@@ -1593,7 +1594,7 @@ Minimum age required by anti-raid: {min_age}"
         Corresponding log: moderation_case"""
         if channel_ids := await self.is_log_enabled(guild.id, "moderation_case"):
             emb = discord.Embed(
-                description=f"**Case #{case.id} deleted**",
+                description=f"**Case #{case.id} ({case.type}) deleted**",
                 colour=discord.Color.red()
             )
             if moderator := self.bot.get_user(case.mod_id):

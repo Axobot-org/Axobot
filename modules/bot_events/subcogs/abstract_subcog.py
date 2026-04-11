@@ -187,8 +187,12 @@ class AbstractSubcog(ABC):
         # get the destination channel
         if (
             (channel := self.bot.get_channel(payload.channel_id))
-            and channel.permissions_for(channel.guild.me).send_messages
-            and channel.permissions_for(channel.guild.me).embed_links
+            and (
+                isinstance(channel, discord.abc.PrivateChannel)
+                or (
+                channel.permissions_for(channel.guild.me).send_messages
+                and channel.permissions_for(channel.guild.me).embed_links
+            ))
         ):
             return channel
         if (user := self.bot.get_user(payload.user_id)) and user.dm_channel is not None:

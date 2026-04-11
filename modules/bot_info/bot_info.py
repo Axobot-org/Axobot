@@ -12,6 +12,7 @@ from core.bot_classes import Axobot
 from core.bot_classes.consts import IGNORED_GUILDS
 from core.checks import checks
 from core.formatutils import FormatUtils
+from core.utilities import avg
 from docs import conf
 
 
@@ -96,7 +97,7 @@ class BotInfo(commands.Cog):
         # RAM/CPU
         ram_usage = round(self.process.memory_info()[0]/2.**30,3)
         stats_cog = self.bot.get_cog("BotStats")
-        cpu: float = await stats_cog.get_list_usage(stats_cog.bot_cpu_records) or 0.0 if stats_cog else 0
+        cpu: float = avg(stats_cog.bot_cpu_records) or 0.0 if stats_cog else 0
         # Guilds count
         ignored_guilds = await self.get_ignored_guilds()
         len_servers = await self.get_guilds_count(ignored_guilds)
