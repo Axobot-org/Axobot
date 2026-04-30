@@ -93,8 +93,8 @@ class VoiceMessages(commands.Cog):
         # if transcript is too long, truncate it
         if len(result) > 1900:
             result = result[:1900] + "…"
-        result += "\n\n*" + await self.bot._(interaction.user, "voice_msg.openai-credits",
-                                            url="https://github.com/openai/whisper") + '*'
+        result += "\n\n*" + await self.bot._(interaction.user, "voice_msg.parakeet-credits",
+                                            url="https://huggingface.co/nvidia/parakeet-tdt-0.6b-v3") + '*'
         emb = discord.Embed(
             title=await self.bot._(interaction.user, "voice_msg.title"),
             description=result,
