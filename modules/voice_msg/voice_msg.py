@@ -114,13 +114,13 @@ class VoiceMessages(commands.Cog):
 
     async def _get_transcript(self, attachment: discord.Attachment) -> str:
         "Call the external API to get the audio transcript"
-        headers = {"Authorization": self.bot.secrets["awhikax_api"]}
+        headers = {"Authorization": "Bearer " + self.bot.secrets["awhikax_api"]}
         data = {"model": "small", "audio_url": attachment.url}
         async with self.session.post("https://api.awhikax.com/stt", headers=headers, data=data) as resp:
             resp.raise_for_status()
             response = await resp.json()
         if response["success"]:
-            return response["message"]
+            return response["text"]
         return ""
 
 
