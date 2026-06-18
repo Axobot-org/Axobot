@@ -2,7 +2,9 @@
     "channel": {
         "channel": "4 channel %{mention}",
         "category": "4 teh category %{name}",
-        "general": "Global perms or smth"
+        "general": "Global perms or smth",
+        "text_channels": "Texty channels",
+        "voice_channels": "Voicey channels"
     },
     "list": {
         "add_reactions": "Add reactions",

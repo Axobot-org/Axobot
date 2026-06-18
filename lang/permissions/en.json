@@ -2,7 +2,9 @@
     "channel": {
         "channel": "In channel %{mention}",
         "category": "In category %{name}",
-        "general": "General permissions"
+        "general": "General permissions",
+        "text_channels": "Text channels",
+        "voice_channels": "Voice channels"
     },
     "list": {
         "add_reactions": "Add reactions",

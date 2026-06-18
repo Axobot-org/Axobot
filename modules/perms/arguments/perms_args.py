@@ -44,13 +44,13 @@ VoiceChannelTypes = (
 
 TextChannelTypes = (
     discord.TextChannel
-    | discord.CategoryChannel
     | discord.ForumChannel
     | discord.Thread
 )
 
 AcceptableChannelTypes = (
     None
+    | discord.CategoryChannel
     | VoiceChannelTypes
     | TextChannelTypes
 )
