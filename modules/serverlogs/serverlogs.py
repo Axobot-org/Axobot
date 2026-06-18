@@ -560,7 +560,7 @@ class ServerLogs(commands.Cog):
         if message.guild is None or message.author == self.bot.user:
             return
         if not channel_is_guild_messageable(message.channel):
-            raise TypeError("Message channel is not a guild messageable channel")
+            raise TypeError(f"Message channel of type {type(message.channel)} is not a guild messageable channel")
         if (invites := DISCORD_INVITE_REGEX.findall(message.content)) and (
                 channel_ids := await self.is_log_enabled(message.guild.id, "discord_invite")):
             emb = discord.Embed(
@@ -736,12 +736,15 @@ class ServerLogs(commands.Cog):
             description=f"**Member {before.mention} ({before.id}) no longer in timeout**",
             color=discord.Color.green()
         )
-        duration = await FormatUtils.time_delta(now, before.timed_out_until, lang="en")
-        emb.add_field(
-            name="Planned timeout end",
-            value=f"<t:{before.timed_out_until.timestamp():.0f}> (in {duration})",
-            inline=False
-        )
+        if before.timed_out_until:
+            duration = await FormatUtils.time_delta(now, before.timed_out_until, lang="en")
+            emb.add_field(
+                name="Planned timeout end",
+                value=f"<t:{before.timed_out_until.timestamp():.0f}> (in {duration})",
+                inline=False
+            )
+        else:
+            self.bot.dispatch("error", ValueError(f"Member {before} ({before.id}) was not in timeout but got un-timeout event"))
         emb.set_author(name=str(after), icon_url=after.display_avatar)
         # try to get who timeouted that member
         if entry := await self.search_audit_logs(before.guild, discord.AuditLogAction.member_update,
