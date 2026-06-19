@@ -2,6 +2,6 @@
     "attachment-too-long": "En raison de limitations techniques, je ne peux pas traiter les messages vocaux de plus de %{duration}",
     "api-error": "Une erreur est survenue pendant la transcription du message. Veuillez réessayer plus tard.",
     "no-transcript": "Je n'ai pas pu détecter un seul mot dans ce message vocal :confused:",
-    "openai-credits": "Réalisé localement par le [modèle Whisper d'OpenAI](%{url})",
+    "parakeet-credits": "Réalisé localement par le [modèle NVIDIA Parakeet](%{url})",
     "title": "Génération de transcription"
 }

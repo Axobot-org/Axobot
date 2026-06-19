@@ -3,6 +3,7 @@ from collections import defaultdict
 
 import discord
 from discord.ext import commands, tasks
+from mysql.connector import DatabaseError
 
 from core.bot_classes import Axobot
 
@@ -35,8 +36,12 @@ class UsersCache(commands.Cog):
 VALUES (%s, %s, %s, %s, %s, CURRENT_TIMESTAMP()) ON DUPLICATE KEY UPDATE `username` = VALUES(`username`), \
 `global_name` = VALUES(`global_name`), `avatar_hash` = VALUES(`avatar_hash`), `is_bot` = VALUES(`is_bot`), \
 `last_seen` = VALUES(`last_seen`);"
-        async with self.bot.db_main.write(query, (user.id, user.name, global_name, avatar_hash, user.bot)):
-            pass
+        try:
+            async with self.bot.db_main.write(query, (user.id, user.name, global_name, avatar_hash, user.bot)):
+                pass
+        except DatabaseError as err:
+            if err.errno != 1020:
+                raise err
 
 
     @tasks.loop(hours=24)

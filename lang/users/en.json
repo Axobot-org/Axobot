@@ -6,7 +6,7 @@
     "config_success": "The %{opt} option has been edited!",
     "invalid-card": "This style is invalid. Here is the list of styles you can use: %{cards}",
     "list-cards": "Here is the list of available rank cards for you: %{cards}",
-    "missing-attach-files": "Oops, I\"m missing the permission to Attach Files :confused:",
+    "missing-attach-files": "Oops, I'm missing the permission to Attach Files :confused:",
     "set_config": {
         "animated_card": {
             "false": "Your xp card won't be animated even if you use an animated avatar (faster rendering)",

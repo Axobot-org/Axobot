@@ -2,7 +2,9 @@
     "channel": {
         "channel": "In channel %{mention}",
         "category": "In category %{name}",
-        "general": "General permissions"
+        "general": "General permissions",
+        "text_channels": "Text channels",
+        "voice_channels": "Voice channels"
     },
     "list": {
         "add_reactions": "Add reactions",
@@ -26,7 +28,7 @@
         "manage_events": "Manage events",
         "manage_guild": "Manage server",
         "manage_messages": "Manage messages",
-        "manage_nicknames": "Manage nickames",
+        "manage_nicknames": "Manage nicknames",
         "manage_permissions": "Manage permissions",
         "manage_roles": "Manage roles",
         "manage_threads": "Manage threads",

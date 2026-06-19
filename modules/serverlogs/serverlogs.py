@@ -1,4 +1,5 @@
 import asyncio
+from collections import defaultdict
 import datetime
 import time
 from random import random
@@ -560,7 +561,7 @@ class ServerLogs(commands.Cog):
         if message.guild is None or message.author == self.bot.user:
             return
         if not channel_is_guild_messageable(message.channel):
-            raise TypeError("Message channel is not a guild messageable channel")
+            raise TypeError(f"Message channel of type {type(message.channel)} is not a guild messageable channel")
         if (invites := DISCORD_INVITE_REGEX.findall(message.content)) and (
                 channel_ids := await self.is_log_enabled(message.guild.id, "discord_invite")):
             emb = discord.Embed(
@@ -736,12 +737,15 @@ class ServerLogs(commands.Cog):
             description=f"**Member {before.mention} ({before.id}) no longer in timeout**",
             color=discord.Color.green()
         )
-        duration = await FormatUtils.time_delta(now, before.timed_out_until, lang="en")
-        emb.add_field(
-            name="Planned timeout end",
-            value=f"<t:{before.timed_out_until.timestamp():.0f}> (in {duration})",
-            inline=False
-        )
+        if before.timed_out_until:
+            duration = await FormatUtils.time_delta(now, before.timed_out_until, lang="en")
+            emb.add_field(
+                name="Planned timeout end",
+                value=f"<t:{before.timed_out_until.timestamp():.0f}> (in {duration})",
+                inline=False
+            )
+        else:
+            self.bot.dispatch("error", ValueError(f"Member {before} ({before.id}) was not in timeout but got un-timeout event"))
         emb.set_author(name=str(after), icon_url=after.display_avatar)
         # try to get who timeouted that member
         if entry := await self.search_audit_logs(before.guild, discord.AuditLogAction.member_update,
@@ -841,6 +845,23 @@ class ServerLogs(commands.Cog):
             emb.add_field(name="Account created at", value=f"<t:{member.created_at.timestamp():.0f}>", inline=False)
             if specs := await self.get_member_specs(member):
                 emb.add_field(name="Specificities", value=", ".join(specs), inline=False)
+            if (
+                cases_cog := self.bot.get_cog("Cases")
+                ) and (
+                cases := await cases_cog.db_get_user_cases_in_guild(member.guild.id, member.id)
+            ):
+                cases_count = defaultdict[str, int](int)
+                total_cases_count = 0
+                for case in cases:
+                    if case.type == "unban":
+                        continue
+                    cases_count[case.type] += 1
+                    total_cases_count += 1
+                cases_txt = f"{total_cases_count} case{'s' if total_cases_count > 1 else ''} on this user"
+                for case_type, count in sorted(cases_count.items()):
+                    cases_txt += f"\n- {count} {case_type}{'s' if count > 1 else ''}"
+                emb.add_field(name="Cases", value=cases_txt)
+
             await self.validate_logs(member.guild, channel_ids, emb, "member_join")
 
     async def _create_invite_field(self, invite: dict[str, int | str | None]):

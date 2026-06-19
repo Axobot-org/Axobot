@@ -9,7 +9,7 @@
     "christmas-cooldown": "The magic of Christmas has already answered your call, %{user}. Return in %{time} for another blessing.",
     "collect": {
         "got-points": "You didn't find any exciting item this time, but still managed to **earn %{points} event points**!",
-        "lost-points": "It seems like you didn't come accross any collectible item on your way, and you somehow **lost %{points} event points**...",
+        "lost-points": "It seems like you didn't come across any collectible item on your way, and you somehow **lost %{points} event points**...",
         "nothing": "You didn't find anything interesting on your way, let's hope you'll have more luck next time!",
         "got-items": {
             "one": "You found **one %{item}** on your trip! (%{points} event points)",

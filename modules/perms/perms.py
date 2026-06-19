@@ -1,14 +1,26 @@
 import typing
+from dataclasses import dataclass
 
 import discord
 from discord import app_commands
 from discord.ext import commands
 
 from core.bot_classes import Axobot
-from core.paginator import cut_text
+from core.type_utils import assert_interaction_channel_is_guild_messageable
 
 from .arguments.perms_args import (AcceptableChannelTypes, TargetArgument,
                                    TextChannelTypes, VoiceChannelTypes)
+
+
+@dataclass(frozen=True, kw_only=True)
+class PermissionRow:
+    name: str
+    emoji: str
+
+@dataclass(frozen=True, kw_only=True)
+class PermissionSection:
+    title: str
+    perms: list[PermissionRow]
 
 
 class Perms(commands.Cog):
@@ -17,46 +29,69 @@ class Perms(commands.Cog):
     def __init__(self, bot: Axobot):
         self.bot = bot
         self.file = "perms"
-        chan_perms = [key for key, value in discord.Permissions().all_channel() if value]
-        self.perms_name = {
-            "general": [key for key, value in discord.Permissions().general() if value],
-            "text": [key for key, value in discord.Permissions().text() if value],
-            "voice": [key for key, value in discord.Permissions().voice() if value]
-        }
-        self.perms_name["common_channel"] = [x for x in chan_perms if x in self.perms_name["general"]]
+        self.general_permissions = [key for key, value in discord.Permissions().general() if value]
+        self.text_permissions = [key for key, value in discord.Permissions().text() if value]
+        self.voice_permissions = [key for key, value in (discord.Permissions().voice()) if value]
 
-    async def collect_permissions(self, interaction: discord.Interaction, permissions: discord.Permissions, channel
-                                  ) -> list[tuple[str, str]]:
-        "Iterate over the given permissions and return the needed ones, formatted"
-        result = []
-        emojis_cog = self.bot.emojis_manager
+    async def _get_permissions_sections(
+            self,
+            interaction: discord.Interaction,
+            permissions: discord.Permissions,
+            channel: AcceptableChannelTypes
+        ) -> list[PermissionSection]:
+        """Get the sections of permissions for display."""
+        emoji = {
+            True: self.bot.emojis_manager.customs["green_check"],
+            False: self.bot.emojis_manager.customs["red_cross"]
+        }
+
         # if target is admin, only display that
         if permissions.administrator:
-            perm_tr = await self.bot._(interaction, "permissions.list.administrator")
-            if "permissions.list." in perm_tr: # unsuccessful translation
-                perm_tr = "Administrator"
-            return [(emojis_cog.customs["green_check"], perm_tr)]
-        # else
-        common_perms = self.perms_name["common_channel"]
-        text_perms = self.perms_name["text"] + common_perms
-        voice_perms = self.perms_name["voice"] + common_perms
-        for perm_id, value in permissions:
-            if not (
-                channel is None
-                or
-                (perm_id in text_perms and isinstance(channel, typing.get_args(TextChannelTypes)))
-                or
-                (perm_id in voice_perms and isinstance(channel, typing.get_args(VoiceChannelTypes)))
-            ):
-                continue
-            perm_tr = await self.bot._(interaction, "permissions.list."+perm_id)
-            if "permissions.list." in perm_tr:  # unsuccessful translation
-                perm_tr = perm_id.replace('_', ' ').title()
-            if value:
-                result.append((emojis_cog.customs["green_check"], perm_tr))
-            else:
-                result.append((emojis_cog.customs["red_cross"], perm_tr))
+            return [PermissionSection(
+                title=self.bot.zws,
+                perms=[PermissionRow(
+                    name=await self._build_permission_translation(interaction, "administrator"),
+                    emoji=emoji[True]
+                )]
+            )]
+
+        result: list[PermissionSection] = []
+
+        result.append(PermissionSection(
+            title=await self.bot._(interaction, "permissions.channel.general"),
+            perms=[PermissionRow(
+                name=await self._build_permission_translation(interaction, perm_id),
+                emoji=emoji[getattr(permissions, perm_id)]
+            ) for perm_id in self.general_permissions]
+        ))
+
+        is_category_or_none = channel is None or isinstance(channel, discord.CategoryChannel)
+
+        if is_category_or_none or isinstance(channel, typing.get_args(TextChannelTypes)):
+            result.append(PermissionSection(
+                title=await self.bot._(interaction, "permissions.channel.text_channels"),
+                perms=[PermissionRow(
+                    name=await self._build_permission_translation(interaction, perm_id),
+                    emoji=emoji[getattr(permissions, perm_id)]
+                ) for perm_id in self.text_permissions]
+            ))
+
+        if is_category_or_none or isinstance(channel, typing.get_args(VoiceChannelTypes)):
+            result.append(PermissionSection(
+                title=await self.bot._(interaction, "permissions.channel.voice_channels"),
+                perms=[PermissionRow(
+                    name=await self._build_permission_translation(interaction, perm_id),
+                    emoji=emoji[getattr(permissions, perm_id)]
+                ) for perm_id in self.voice_permissions]
+            ))
+
         return result
+
+    async def _build_permission_translation(self, interaction: discord.Interaction, perm_id: str) -> str:
+        perm_tr = await self.bot._(interaction, "permissions.list."+perm_id)
+        if "permissions.list." in perm_tr:  # unsuccessful translation
+            perm_tr = perm_id.replace('_', ' ').title()
+        return perm_tr
 
     @app_commands.command(name="permissions")
     @app_commands.guild_only()
@@ -78,9 +113,12 @@ class Perms(commands.Cog):
         ..Example permissions 0b1001
 
         ..Doc infos.html#permissions"""
+        if not assert_interaction_channel_is_guild_messageable(interaction):
+            return
         if target is None:
             target = interaction.user
         await interaction.response.defer()
+
         if isinstance(target, discord.Member):
             if channel is None:
                 perms = target.guild_permissions
@@ -97,31 +135,26 @@ class Perms(commands.Cog):
             col = target.color
             avatar = interaction.guild.icon.replace(format="png", size=256) if interaction.guild.icon else None
             name = await self.bot._(interaction, "permissions.target.role", name=str(target))
-        elif isinstance(target, int):
+        else:
             perms = discord.Permissions(target)
             col = discord.Color.blurple()
             avatar = None
             name = await self.bot._(interaction, "permissions.target.value", value=f"{target} | {bin(target)}")
-        else:
-            self.bot.dispatch("error", TypeError(f"Unknown target type: {type(target)}"), interaction)
-            return
 
-        perms_list = await self.collect_permissions(interaction, perms, channel)
-        perms_list.sort(key=lambda x: x[1])
-        perms_list = [''.join(perm) for perm in perms_list]
-        if isinstance(target, int):
+        if isinstance(target, int) or channel is None:
             desc = None
-        elif channel is None:
-            desc = await self.bot._(interaction, "permissions.channel.general")
         elif isinstance(channel, discord.CategoryChannel):
             desc = await self.bot._(interaction, "permissions.channel.category", name=channel.name)
         else:
             desc = await self.bot._(interaction, "permissions.channel.channel", mention=channel.mention)
 
         embed = discord.Embed(color=col, description=desc)
-        paragraphs = cut_text(perms_list, max_size=21)
-        for paragraph in paragraphs:
-            embed.add_field(name=self.bot.zws, value=paragraph)
+        for perm_section in await self._get_permissions_sections(interaction, perms, channel):
+            paragraph = "\n".join([
+                f"{perm.emoji}{perm.name}"
+                for perm in sorted(perm_section.perms, key=lambda x: x.name)
+            ])
+            embed.add_field(name=perm_section.title, value=paragraph)
 
         _whatisthat = await self.bot._(interaction, "permissions.whatisthat")
         embed.add_field(name=self.bot.zws, value=f"[{_whatisthat}]({self.bot.doc_url}perms.html)",

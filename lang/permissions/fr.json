@@ -2,7 +2,9 @@
     "channel": {
         "channel": "Dans le salon %{mention}",
         "category": "Dans la catégorie %{name}",
-        "general": "Permissions générales"
+        "general": "Permissions générales",
+        "text_channels": "Salons textuels",
+        "voice_channels": "Salons vocaux"
     },
     "list": {
         "add_reactions": "Ajouter des réactions",

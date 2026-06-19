@@ -63,9 +63,8 @@ class ChangelogView(ui.LayoutView):
     async def interaction_check(self, interaction: Interaction, /):
         return interaction.user.id == self.user_id
 
-    async def on_error(self, interaction: Interaction, error: Exception, item: ui.Item[Any], /):
+    async def on_error(self, interaction: Interaction, error: Exception, _item: ui.Item[Any], /):
         self.bot.dispatch("interaction_error", interaction, error)
-        return await super().on_error(interaction, error, item)
 
     async def edit_french_text_callback(self, interaction: Interaction):
         """Button to edit the French changelog text."""

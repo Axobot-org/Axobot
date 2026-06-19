@@ -14,7 +14,7 @@
         "versions": "Game versions"
     },
     "mod-title": "Mod",
-    "no-api": "Error: Unable to connect to API",
+    "no-api": "Error: Unable to connect to the API",
     "no-embed": "Unable to send the result! Please give me 'Embed links' permission to send it",
     "no-mod": "Unable to find this mod",
     "no-ping": "Error: Unable to ping this server",

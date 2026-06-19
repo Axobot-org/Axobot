@@ -31,7 +31,7 @@
             "Can only be used in a server"
         ],
         "has_permissions": [
-            "You have the sufficient Discord permissions",
+            "You have sufficient Discord permissions",
             "You do not have the right Discord permissions"
         ],
         "in_support_server": [
@@ -40,7 +40,7 @@
         ],
         "is_blurple": [
             "The Discord Birthday event is underway, enjoy it!",
-            "There are no Blurple event at the moment"
+            "There is no Blurple event at the moment"
         ],
         "is_bot_admin": [
             "You need to be one of the bot Admins",
@@ -48,7 +48,7 @@
         ],
         "is_halloween": [
             "The Halloween event is underway, enjoy it!",
-            "There are no Halloween event at the moment"
+            "There is no Halloween event at the moment"
         ],
         "is_owner": [
             "You must be the owner of the bot",
@@ -65,7 +65,7 @@
         "many": "%{count} commands\n`/help %{cog}` to get the list"
     },
     "cmd-not-found": "There is no command named \"%{cmd}\"",
-    "cog-empty-dm": "No command of this category is available in DM!",
+    "cog-empty-dm": "No command in this category is available in DMs!",
     "description": "Description",
     "embed_title": "Available commands",
     "embed_title_dm": "Commands available in DM",
