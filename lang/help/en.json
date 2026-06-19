@@ -30,26 +30,26 @@
             "Can only be used in a server",
             "Can only be used in a server"
         ],
-            "has_permissions": [
-                "You have sufficient Discord permissions",
-                "You do not have the right Discord permissions"
-            ],
+        "has_permissions": [
+            "You have sufficient Discord permissions",
+            "You do not have the right Discord permissions"
+        ],
         "in_support_server": [
             "You are in the bot support server",
             "You can only use this command in the support server"
         ],
-            "is_blurple": [
-                "The Discord Birthday event is underway, enjoy it!",
-                "There is no Blurple event at the moment"
-            ],
+        "is_blurple": [
+            "The Discord Birthday event is underway, enjoy it!",
+            "There is no Blurple event at the moment"
+        ],
         "is_bot_admin": [
             "You need to be one of the bot Admins",
             "You are not a bot Admin"
         ],
-            "is_halloween": [
-                "The Halloween event is underway, enjoy it!",
-                "There is no Halloween event at the moment"
-            ],
+        "is_halloween": [
+            "The Halloween event is underway, enjoy it!",
+            "There is no Halloween event at the moment"
+        ],
         "is_owner": [
             "You must be the owner of the bot",
             "You are not the owner of the bot"
