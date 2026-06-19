@@ -20,7 +20,7 @@
     "slowmode-disabled": "Slowmode disabled in %{channel}",
     "slowmode-enabled": "Slowmode enabled in %{channel} (%{seconds}s)",
     "softban": "%{user} (%{userid}) has been \"softbanned\"",
-    "unban": "%{user} (%{userid}) is no more banned",
-    "unmute": "%{user} (%{userid}) is no more muted",
+    "unban": "%{user} (%{userid}) is no longer banned",
+    "unmute": "%{user} (%{userid}) is no longer muted",
     "warn": "%{user} (%{userid}) has been warned"
 }

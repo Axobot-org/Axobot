@@ -6,7 +6,7 @@
         "list-title-0": "List of banned members of the server \"{}\"",
         "list-title-1": "List of 45 banned members of the server \"{}\"",
         "list-title-2": "List of 60 banned members of the server \"{}\"",
-        "no-bans": "No member seems to be banned from here",
+        "no-bans": "No member seems to be banned here",
         "softban-success": "The member has been softbanned",
         "staff-ban": "You can't ban another staff!",
         "too-high": "It seems that this member is too high for me to ban them. :thinking:",
@@ -79,9 +79,9 @@
         "mute-high": "Oops, it seems that the `muted` role is too high for me to give it... Please fix this problem by placing my role higher than the `muted` role.",
         "mute-success": "The member has been muted",
         "no-mute": "Oops, it seems that the role `muted` does not exist :confused: Please create it and assign permissions manually.",
-        "no-mutes": "No member seems to be muted from here",
+        "no-mutes": "No member seems to be muted here",
         "staff-mute": "You can't prevent another staff member from speaking",
-        "too-high": "It seems that this member is too high for me to time out them out :thinking:",
+        "too-high": "It seems that this member is too high for me to time them out :thinking:",
         "unmute-success": "The member has been unmuted"
     },
     "mute-chat": "Member %{user} (%{userid}) has been muted",
@@ -107,7 +107,7 @@
         "give-too-high": "Oops, it seems that this role is too high for me to give or remove to anyone. Please place my role above the `%{r}` role",
         "limit-hit": "To avoid spamming Discord, I could only affect %{limit} members. Re-run this command in a few seconds if you want to affect more",
         "list": "List of server roles",
-        "remove-pending": "Revoking the role to %{n} members, it may take a few minutes...",
+        "remove-pending": "Revoking the role from %{n} members, it may take a few minutes...",
         "remove-success": {
             "many": "-> %{count} roles revoked out of %{m}!",
             "one": "-> 1 role revoked out of %{m}",
@@ -130,7 +130,7 @@
     "unhoisted": {
         "many": "%{count} edited nicknames!",
         "one": "1 nickname has been edited",
-        "zero": "No nickname have been edited"
+        "zero": "No nicknames have been edited"
     },
     "unmute-chat": "The member %{user} (%{userid}) has been unmuted",
     "warn": {

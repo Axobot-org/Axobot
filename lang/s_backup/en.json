@@ -1,7 +1,7 @@
 {
     "already_running": "A backup is already running, please wait for it to finish",
     "backup-done": "Backup done!",
-    "err": "Oops, an internal error occured... wait a few moments or contact support (command `about`) if it happens again",
+    "err": "Oops, an internal error occurred... wait a few moments or contact support (command `about`) if it happens again",
     "finished": "Backup applied! Here are the logs",
     "invalid_file": "Please send the backup file in the same message as the command",
     "invalid_version": "The backup version is invalid. The file is probably corrupted",

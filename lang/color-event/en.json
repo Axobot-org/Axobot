@@ -12,8 +12,8 @@
     },
     "halloween": {
         "check": {
-            "intro": "%{user}, starting halloween image analysis (Please note that this may take a while)",
-            "result": "%{user}, here are your halloween analysis results:\n%{results}",
+            "intro": "%{user}, starting Halloween image analysis (please note that this may take a while)",
+            "result": "%{user}, here are your Halloween analysis results:\n%{results}",
             "reward": "%{user}, you just won %{amount} event XP thanks to your hallow-iful image!"
         }
     },

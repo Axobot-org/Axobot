@@ -3,5 +3,5 @@
         "many": "%{count} deleted channels",
         "one": "1 deleted channel"
     },
-    "no-channel": "There are no voice channel generated in this server"
+    "no-channel": "There are no voice channels generated in this server"
 }
