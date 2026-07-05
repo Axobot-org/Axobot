@@ -105,6 +105,7 @@ class Xp(commands.Cog):
             self.clear_cards_loop.stop()
 
     async def is_suspicious_user(self, user_id: int) -> bool:
+        "Check if a user is suspected of cheating xp"
         if self._suspicious_users is None:
             await self.reload_sus()
         if self._suspicious_users is None:
@@ -345,7 +346,7 @@ class Xp(commands.Cog):
         """Envoie le message de levelup"""
         if self.bot.zombie_mode:
             return
-        if not channel_is_guild_messageable(channel):
+        if channel is not None and not channel_is_guild_messageable(channel):
             raise TypeError(f"Channel is not messageable but is {type(channel)} with id {getattr(channel, 'id', None)}")
         destination = await self.get_lvlup_channel(member, channel)
         # if no destination could be found, or destination is in guild and bot can't send messages: abort
