@@ -72,8 +72,8 @@ class WebRSS:
         if not is_reddit_feed:
             return url
         query_params = parse_qs(parsed_url.query)
-        query_params["user"] = query_params["user"] or [self.bot.secrets["reddit"]["user"]]
-        query_params["feed"] = query_params["feed"] or [self.bot.secrets["reddit"]["feed"]]
+        query_params["user"] = query_params.get("user", [self.bot.secrets["reddit"]["user"]])
+        query_params["feed"] = query_params.get("feed", [self.bot.secrets["reddit"]["feed"]])
         parsed_url = parsed_url._replace(query=urlencode(query_params, doseq=True))
         return parsed_url.geturl()
 
