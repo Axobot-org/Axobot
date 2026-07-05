@@ -34,7 +34,7 @@ class WebRSS:
     async def _get_feed(self, url: str, filter_config: FeedFilterConfig | None=None,
                         session: aiohttp.ClientSession | None=None) -> FeedParserDict | None:
         "Get a list of feeds from a web URL"
-        url = await self._add_params_to_reddit_url(url)
+        url = await self.add_params_to_reddit_url(url)
         feed = await feed_parse(url, 9, session)
         if feed is None or not feed.entries:
             return None
@@ -60,7 +60,7 @@ class WebRSS:
                 return None
         return feed
 
-    async def _add_params_to_reddit_url(self, url: str) -> str:
+    async def add_params_to_reddit_url(self, url: str) -> str:
         "Add authentication params to a reddit URL if needed"
         parsed_url = urlsplit(url)
         reddit_domains = {"reddit.com", "www.reddit.com", "old.reddit.com"}

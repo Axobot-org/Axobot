@@ -1209,6 +1209,7 @@ class Rss(commands.Cog):
         if self.bluesky_rss.is_bluesky_url(url):
             return True
         # check web feed
+        url = await self.web_rss.add_params_to_reddit_url(url)
         feed = await feed_parse(url, 8)
         if feed is None:
             return False
