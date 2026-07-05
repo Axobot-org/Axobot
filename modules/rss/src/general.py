@@ -1,11 +1,12 @@
 from __future__ import annotations
 
 import asyncio
+from dataclasses import dataclass
 import datetime
 import json
 import logging
 import time
-from typing import TYPE_CHECKING, Any, Literal, TypedDict
+from typing import TYPE_CHECKING, Literal, TypedDict
 
 import discord
 import feedparser
@@ -90,6 +91,17 @@ async def check_filter(entry: FeedParserDict, filter_config: FeedFilterConfig) -
         return False
     return True
 
+@dataclass(slots=True)
+class EmbedInfo:
+    "Information about an embed to send"
+    color: discord.Colour | int
+    show_date_in_footer: bool
+    enable_link_in_title: bool
+    image_location: Literal["thumbnail", "banner", "none"]
+    author_text: str | None = None
+    footer_text: str | None = None
+    title: str | None = None
+
 class RssMessage:
     "Represents a message ready to be sent"
 
@@ -144,33 +156,29 @@ class RssMessage:
             self.author = channel
         # lazy loading
         self.mentions: list[str] = []
-        self.embed_data: dict[str, Any] = {}
+        self.embed_data = EmbedInfo(
+            color=discord.Colour.light_grey(),
+            show_date_in_footer=True,
+            enable_link_in_title=False,
+            image_location="thumbnail",
+        )
 
     def fill_embed_data(self):
         "Fill any interesting value to send in an embed"
-        self.embed_data = {
-            "color": discord.Colour.light_grey(),
-            "author_text": None,
-            "footer_text": None,
-            "title": None,
-            "show_date_in_footer": True,
-            "enable_link_in_title": False,
-            "image_location": "thumbnail",
-        }
         if author_text := self.feed.embed_data.get("author_text"):
-            self.embed_data["author_text"] = author_text
+            self.embed_data.author_text = author_text
         if title := self.feed.embed_data.get("title"):
-            self.embed_data["title"] = title
+            self.embed_data.title = title
         if footer := self.feed.embed_data.get("footer_text"):
-            self.embed_data["footer_text"] = footer
+            self.embed_data.footer_text = footer
         if color := self.feed.embed_data.get("color"):
-            self.embed_data["color"] = color
+            self.embed_data.color = color
         if (show_date_in_footer := self.feed.embed_data.get("show_date_in_footer")) is not None:
-            self.embed_data["show_date_in_footer"] = show_date_in_footer
+            self.embed_data.show_date_in_footer = show_date_in_footer
         if (enable_link_in_title := self.feed.embed_data.get("enable_link_in_title")) is not None:
-            self.embed_data["enable_link_in_title"] = enable_link_in_title
+            self.embed_data.enable_link_in_title = enable_link_in_title
         if image_location := self.feed.embed_data.get("image_location"):
-            self.embed_data["image_location"] = image_location
+            self.embed_data.image_location = image_location
 
     async def fill_mention(self, guild: discord.Guild):
         "Fill the mentions attribute with required roles mentions"
@@ -255,28 +263,28 @@ class RssMessage:
         if not self.feed.use_embed:
             return text[:2000]
 
-        emb = discord.Embed(description=text[:4096], color=self.embed_data["color"])
-        if self.embed_data["author_text"]:
-            emb.set_author(name=_format_text(self.embed_data["author_text"], safedict, 256))
-        if self.embed_data["footer_text"]:
-            emb.set_footer(text=_format_text(self.embed_data["footer_text"], safedict, 2048))
-        if self.embed_data["title"] is None:
+        emb = discord.Embed(description=text[:4096], color=self.embed_data.color)
+        if self.embed_data.author_text:
+            emb.set_author(name=_format_text(self.embed_data.author_text, safedict, 256))
+        if self.embed_data.footer_text:
+            emb.set_footer(text=_format_text(self.embed_data.footer_text, safedict, 2048))
+        if self.embed_data.title is None:
             if self.feed.type != "tw":
                 emb.title = self.title[:256]
             elif self.author:
                 emb.title = self.author[:256]
         else:
-            emb.title = _format_text(self.embed_data["title"], safedict, 256)
-        if "{url}" not in msg_format and "{link}" not in msg_format:
+            emb.title = _format_text(self.embed_data.title, safedict, 256)
+        if "{url}" not in msg_format and "{link}" not in msg_format and not self.embed_data.enable_link_in_title:
             emb.add_field(name="URL", value=self.url[:1024])
         if self.image is not None:
-            if self.embed_data["image_location"] == "thumbnail":
+            if self.embed_data.image_location == "thumbnail":
                 emb.set_thumbnail(url=self.image)
-            elif self.embed_data["image_location"] == "banner":
+            elif self.embed_data.image_location == "banner":
                 emb.set_image(url=self.image)
-        if self.embed_data["show_date_in_footer"] and isinstance(self.date, datetime.datetime):
+        if self.embed_data.show_date_in_footer and isinstance(self.date, datetime.datetime):
             emb.timestamp = self.date
-        if self.embed_data["enable_link_in_title"]:
+        if self.embed_data.enable_link_in_title:
             emb.url = self.url
         return emb
 

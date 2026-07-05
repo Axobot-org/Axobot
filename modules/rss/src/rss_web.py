@@ -4,6 +4,7 @@ import datetime as dt
 import re
 import time
 from typing import TYPE_CHECKING, Any, Literal
+from urllib.parse import parse_qs, urlencode, urlsplit
 
 import aiohttp
 import discord
@@ -33,6 +34,7 @@ class WebRSS:
     async def _get_feed(self, url: str, filter_config: FeedFilterConfig | None=None,
                         session: aiohttp.ClientSession | None=None) -> FeedParserDict | None:
         "Get a list of feeds from a web URL"
+        url = await self.add_params_to_reddit_url(url)
         feed = await feed_parse(url, 9, session)
         if feed is None or not feed.entries:
             return None
@@ -57,6 +59,23 @@ class WebRSS:
             if not feed["entries"]:
                 return None
         return feed
+
+    async def add_params_to_reddit_url(self, url: str) -> str:
+        "Add authentication params to a reddit URL if needed"
+        parsed_url = urlsplit(url)
+        reddit_domains = {"reddit.com", "www.reddit.com", "old.reddit.com"}
+        is_reddit_feed = (
+            parsed_url.netloc in reddit_domains
+            and parsed_url.path.startswith("/r/")
+            and parsed_url.path.endswith(".rss")
+        )
+        if not is_reddit_feed:
+            return url
+        query_params = parse_qs(parsed_url.query)
+        query_params["user"] = query_params.get("user", [self.bot.secrets["reddit"]["user"]])
+        query_params["feed"] = query_params.get("feed", [self.bot.secrets["reddit"]["feed"]])
+        parsed_url = parsed_url._replace(query=urlencode(query_params, doseq=True))
+        return parsed_url.geturl()
 
     async def _get_feed_date_key(self, entry: FeedParserDict
                                  ) -> Literal["published_parsed", "published", "updated_parsed"] | None:
