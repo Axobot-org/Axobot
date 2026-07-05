@@ -29,6 +29,11 @@ class TwitchKeys(TypedDict):
     client_id: str
     client_secret: str
 
+class RedditKeys(TypedDict):
+    "Store the username and feed ID for the Reddit RSS feeds"
+    user: str
+    feed: str
+
 class SecretKeys(TypedDict):
     "Map containing all the secret keys used by the bot"
     fernet_key: str
@@ -45,6 +50,7 @@ class SecretKeys(TypedDict):
     google_api: str
     curseforge: str
     twitch: TwitchKeys
+    reddit: RedditKeys
     awhikax_api: str
 
 async def load_token(bot: "Axobot", bot_id: int) -> BotInfo:
