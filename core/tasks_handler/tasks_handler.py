@@ -8,8 +8,8 @@ from typing import TYPE_CHECKING
 
 import discord
 
-from core.enums import ServerWarningType
 from core.formatutils import FormatUtils
+from core.server_warnings import TempRoleRemoveForbidden
 from core.type_utils import AnyDict
 
 from .types import DbTask
@@ -121,13 +121,9 @@ class TaskHandler:
                         try:
                             await user.remove_roles(role, reason="Temp role expired")
                         except discord.Forbidden:
-                            self.bot.dispatch(
-                                "server_warning",
-                                ServerWarningType.TEMP_ROLE_REMOVE_FORBIDDEN,
-                                guild,
-                                role=role,
-                                user=user
-                            )
+                            self.bot.dispatch("server_warning", TempRoleRemoveForbidden(
+                                guild=guild, role=role, user=user
+                            ))
                             self.log.warning("RoleGrant: Unable to remove temporary role: Forbidden")
                     await self.remove_task(task["ID"])
                 except Exception as err:  # pylint: disable=broad-except

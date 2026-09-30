@@ -1,6 +1,3 @@
-from enum import IntEnum, unique
-
-
 class _BaseFlagClass:
     FLAGS: dict[int, str]
 
@@ -52,38 +49,3 @@ class UserFlag(_BaseFlagClass):
         1 << 4: "translator",
         1 << 5: "cookie"
     }
-
-
-@unique
-class ServerWarningType(IntEnum):
-    "Type of emitted server warning, mainly used for logs"
-    # channel, is_join
-    WELCOME_MISSING_TXT_PERMISSIONS = 1
-    # channel, feed_id
-    RSS_MISSING_TXT_PERMISSION = 2
-    # channel, feed_id
-    RSS_MISSING_EMBED_PERMISSION = 3
-    # channel_id, feed_id
-    RSS_UNKNOWN_CHANNEL = 4
-    # channel_id, feed_id
-    RSS_DISABLED_FEED = 5
-    # channel_id, topic_name
-    TICKET_CREATION_UNKNOWN_TARGET = 6
-    # channel, topic_name
-    TICKET_CREATION_FAILED = 7
-    # channel, topic_name
-    TICKET_INIT_FAILED = 8
-    # role, user
-    WELCOME_ROLE_MISSING_PERMISSIONS = 9
-    # channel, feed_id
-    RSS_TWITTER_DISABLED = 10
-    # role, user
-    TEMP_ROLE_REMOVE_FORBIDDEN = 11
-    # channel, feed_id
-    RSS_INVALID_FORMAT = 12
-    # channel_id, username
-    STREAM_NOTIFICATION_MISSING_PERMISSIONS = 13
-    # role_id, member, username
-    STREAM_ROLE_MISSING_PERMISSIONS = 14
-    # channel
-    MEMBERCOUNTER_MISSING_PERMISSIONS = 15

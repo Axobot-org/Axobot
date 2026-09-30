@@ -9,8 +9,8 @@ from mysql.connector.errors import IntegrityError
 
 from core.arguments import PartialorUnicodeEmojiArgument
 from core.bot_classes import Axobot
-from core.enums import ServerWarningType
 from core.safedict import SafeDict
+from core.server_warnings import TicketCreationFailed, TicketCreationUnknownTarget
 from core.type_utils import (GuildInteraction, UserOrMember,
                              assert_interaction_channel_is_guild_messageable)
 
@@ -304,11 +304,11 @@ class Tickets(commands.Cog):
         self.cooldowns[interaction.user] = time.time()
         category = interaction.guild.get_channel(topic["category"]) if topic["category"] else None
         if category is None:
-            self.bot.dispatch("server_warning", ServerWarningType.TICKET_CREATION_UNKNOWN_TARGET,
-                interaction.guild,
+            self.bot.dispatch("server_warning", TicketCreationUnknownTarget(
+                guild=interaction.guild,
                 channel_id=topic["category"],
                 topic_name=topic["topic"]
-            )
+            ))
             raise RuntimeError(f"No category configured for guild {interaction.guild_id} and topic {topic['topic']}")
         sent_error = False
         channel_name = await self.get_channel_name(topic["name_format"], interaction, topic, ticket_name)
@@ -322,11 +322,11 @@ class Tickets(commands.Cog):
                     content=await self.bot._(interaction.guild_id, "tickets.missing-perms-creation.channel",
                                              category=category.name)
                 )
-                self.bot.dispatch("server_warning", ServerWarningType.TICKET_CREATION_FAILED,
-                    interaction.guild,
+                self.bot.dispatch("server_warning", TicketCreationFailed(
+                    guild=interaction.guild,
                     channel=category,
                     topic_name=topic["topic"]
-                )
+                ))
                 return
         elif isinstance(category, discord.TextChannel):
             try:
@@ -341,11 +341,11 @@ class Tickets(commands.Cog):
                     content=await self.bot._(interaction.guild_id, "tickets.missing-perms-creation.thread",
                                              channel=category.mention)
                 )
-                self.bot.dispatch("server_warning", ServerWarningType.TICKET_CREATION_FAILED,
-                    interaction.guild,
+                self.bot.dispatch("server_warning", TicketCreationFailed(
+                    guild=interaction.guild,
                     channel=category,
                     topic_name=topic["topic"]
-                )
+                ))
                 return
             await self.setup_ticket_thread(channel, topic, interaction.user)
         else:

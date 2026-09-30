@@ -13,7 +13,9 @@ from discord.ext import commands, tasks
 from mysql.connector.errors import IntegrityError as MysqlIntegrityError
 
 from core.bot_classes import Axobot, MyContext
-from core.enums import ServerWarningType
+from core.server_warnings import (RssMissingEmbedPermission,
+                                  RssMissingTxtPermission, RssTwitterDisabled,
+                                  RssUnknownChannel, ServerWarning)
 from core.type_utils import AnyStrDict
 from core.utilities import avg
 
@@ -188,14 +190,14 @@ class BotStats(commands.Cog):
         self.ticket_events["creation"] += 1
 
     @commands.Cog.listener()
-    async def on_server_warning(self, warning_type: ServerWarningType, *_args: Any, **_kwargs: Any):
+    async def on_server_warning(self, warning: ServerWarning):
         "Called when a server warning is triggered"
-        if warning_type in {
-            ServerWarningType.RSS_UNKNOWN_CHANNEL,
-            ServerWarningType.RSS_MISSING_TXT_PERMISSION,
-            ServerWarningType.RSS_MISSING_EMBED_PERMISSION,
-            ServerWarningType.RSS_TWITTER_DISABLED,
-        }:
+        if isinstance(warning, (
+            RssUnknownChannel,
+            RssMissingTxtPermission,
+            RssMissingEmbedPermission,
+            RssTwitterDisabled,
+        )):
             self.rss_stats["warnings"] += 1
 
     @commands.Cog.listener()

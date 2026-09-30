@@ -19,9 +19,12 @@ from discord.ext import commands, tasks
 from core.arguments import args
 from core.bot_classes import Axobot
 from core.checks import checks
-from core.enums import ServerWarningType
 from core.formatutils import FormatUtils
 from core.paginator import PaginatedSelectView, Paginator
+from core.server_warnings import (RssDisabledFeed, RssInvalidFormat,
+                                  RssMissingEmbedPermission,
+                                  RssMissingTxtPermission, RssTwitterDisabled,
+                                  RssUnknownChannel)
 from core.tips import GuildTip
 from core.type_utils import AnyStrDict, channel_is_messageable
 from core.views import ConfirmView, TextInputModal
@@ -1387,8 +1390,9 @@ class Rss(commands.Cog):
         chan = await self._get_channel_or_thread(guild, feed.channel_id)
         if chan is None:
             self.log.info("Cannot send message on channel %s (unknown channel)", feed.channel_id)
-            self.bot.dispatch("server_warning", ServerWarningType.RSS_UNKNOWN_CHANNEL, guild,
-                                channel_id=feed.channel_id, feed_id=feed.feed_id)
+            self.bot.dispatch("server_warning", RssUnknownChannel(
+                guild=guild, channel_id=feed.channel_id, feed_id=feed.feed_id
+            ))
             return False
         if feed.type == "yt":
             if feed.date is None:
@@ -1396,8 +1400,9 @@ class Rss(commands.Cog):
             else:
                 objs = await self.youtube_rss.get_new_posts(chan, feed.link, feed.date, feed.filter_config, session)
         elif feed.type == "tw":
-            self.bot.dispatch("server_warning", ServerWarningType.RSS_TWITTER_DISABLED, guild,
-                                channel_id=feed.channel_id, feed_id=feed.feed_id)
+            self.bot.dispatch("server_warning", RssTwitterDisabled(
+                guild=guild, channel_id=feed.channel_id, feed_id=feed.feed_id
+            ))
             return False
         elif feed.type == "web":
             if feed.date is None:
@@ -1441,13 +1446,15 @@ class Rss(commands.Cog):
             if feed.has_recently_been_refreshed():
                 # if we can't post messages: abort
                 if not chan.permissions_for(guild.me).send_messages:
-                    self.bot.dispatch("server_warning", ServerWarningType.RSS_MISSING_TXT_PERMISSION, guild,
-                                        channel=chan, feed_id=feed.feed_id)
+                    self.bot.dispatch("server_warning", RssMissingTxtPermission(
+                        guild=guild, channel=chan, feed_id=feed.feed_id
+                    ))
                     return False
                 # same if we need to be able to send embeds
                 if feed.use_embed and not chan.permissions_for(guild.me).embed_links:
-                    self.bot.dispatch("server_warning", ServerWarningType.RSS_MISSING_EMBED_PERMISSION, guild,
-                                        channel=chan, feed_id=feed.feed_id)
+                    self.bot.dispatch("server_warning", RssMissingEmbedPermission(
+                        guild=guild, channel=chan, feed_id=feed.feed_id
+                    ))
                     return False
                 obj.feed = feed
                 obj.fill_embed_data()
@@ -1456,8 +1463,9 @@ class Rss(commands.Cog):
                     if await self.send_rss_msg(obj, chan):
                         sent_messages += 1
                 except InvalidFormatError:
-                    self.bot.dispatch("server_warning", ServerWarningType.RSS_INVALID_FORMAT, guild,
-                                        channel=chan, feed_id=feed.feed_id)
+                    self.bot.dispatch("server_warning", RssInvalidFormat(
+                        guild=guild, channel=chan, feed_id=feed.feed_id
+                    ))
                     break
             latest_post_date = obj.date
             latest_entry_id = obj.entry_id
@@ -1474,11 +1482,9 @@ class Rss(commands.Cog):
                 await self.db_update_feed(feed.feed_id, [("enabled", False)])
                 self.log.info("Disabled feed %s (too many errors)", feed.feed_id)
                 if guild := self.bot.get_guild(feed.guild_id):
-                    self.bot.dispatch("server_warning", ServerWarningType.RSS_DISABLED_FEED,
-                                      guild,
-                                      channel_id=feed.channel_id,
-                                      feed_id=feed.feed_id
-                                      )
+                    self.bot.dispatch("server_warning", RssDisabledFeed(
+                        guild=guild, channel_id=feed.channel_id, feed_id=feed.feed_id
+                    ))
 
     async def _loop_refresh_one_feed(self, feed: FeedObject, session: ClientSession, guild_id: int | None) -> bool | None:
         """Refresh one feed (called by the refresh_feeds method loop)

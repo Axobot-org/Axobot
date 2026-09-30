@@ -11,8 +11,8 @@ from discord import app_commands
 from discord.ext import commands, tasks
 
 from core.bot_classes import DISCORD_INVITE_REGEX, Axobot
-from core.enums import ServerWarningType
 from core.formatutils import FormatUtils
+from core.server_warnings import ServerWarning
 from core.tips import GuildTip
 from core.type_utils import (GuildInteraction, UserOrMember,
                              assert_interaction_channel_is_guild_messageable,
@@ -22,6 +22,7 @@ from modules.tickets.src.types import TicketCreationEvent
 
 from .arguments.serverlog_argument import (ALL_LOGS, LOGS_CATEGORIES,
                                            ServerLogArgument)
+from .src.server_warning_embeds import build_server_warning_embed
 from .views.add_case_view import AddCaseView
 
 if TYPE_CHECKING:
@@ -1632,113 +1633,14 @@ Minimum age required by anti-raid: {min_age}"
             await self.validate_logs(guild, channel_ids, emb, "case_delete")
 
     @commands.Cog.listener()
-    async def on_server_warning(self, warning_type: ServerWarningType, guild: discord.Guild, **kwargs):
+    async def on_server_warning(self, warning: ServerWarning):
         """Triggered when the bot fails to do its job in a guild
         Corresponding log: bot_warnings"""
-        if channel_ids := await self.is_log_enabled(guild.id, "bot_warnings"):
-            emb = discord.Embed(colour=discord.Color.red())
-            if warning_type == ServerWarningType.WELCOME_MISSING_TXT_PERMISSIONS:
-                if kwargs.get("is_join"):
-                    emb.description = f"**Could not send welcome message** in channel {kwargs.get('channel').mention}"
-                else:
-                    emb.description = f"**Could not send leaving message** in channel {kwargs.get('channel').mention}"
-                emb.add_field(
-                    name="Missing permission",
-                    value=await self.bot._(guild.id, "permissions.list.send_messages")
-                )
-            elif warning_type == ServerWarningType.WELCOME_ROLE_MISSING_PERMISSIONS:
-                emb.description = f"**Could not give welcome role** to user {kwargs.get('user').mention}"
-                emb.add_field(
-                    name="Role to give",
-                    value=kwargs.get("role").mention
-                )
-            elif warning_type == ServerWarningType.MEMBERCOUNTER_MISSING_PERMISSIONS:
-                membercounter_channel: discord.VoiceChannel | discord.StageChannel = kwargs["channel"]
-                emb.description = f"**Could not update membercount channel** {membercounter_channel.mention}"
-                permissions = [
-                    await self.bot._(guild.id, f"permissions.list.{permission}")
-                    for permission in ("read_messages", "connect", "manage_channels")
-                ]
-                emb.add_field(name="Required permissions", value="\n".join(permissions))
-            elif warning_type in {ServerWarningType.RSS_MISSING_TXT_PERMISSION, ServerWarningType.RSS_MISSING_EMBED_PERMISSION}:
-                emb.description = f"**Could not send RSS message** in channel {kwargs.get('channel').mention}"
-                emb.add_field(name="Feed ID", value=kwargs.get("feed_id"))
-                if warning_type == ServerWarningType.RSS_MISSING_TXT_PERMISSION:
-                    emb.add_field(
-                        name="Missing permission",
-                        value=await self.bot._(guild.id, "permissions.list.send_messages")
-                    )
-                else:
-                    emb.add_field(
-                        name="Missing permission",
-                        value=await self.bot._(guild.id, "permissions.list.embed_links")
-                    )
-            elif warning_type == ServerWarningType.RSS_UNKNOWN_CHANNEL:
-                emb.description = f"**Could not send RSS message** in channel {kwargs.get('channel_id')}"
-                emb.add_field(name="Feed ID", value=kwargs.get("feed_id"))
-                emb.add_field(name="Reason", value="Unknown or deleted channel")
-            elif warning_type == ServerWarningType.RSS_DISABLED_FEED:
-                emb.description = f"**Feed has been disabled** in channel <#{kwargs.get('channel_id')}>"
-                emb.add_field(name="Feed ID", value=kwargs.get("feed_id"))
-                emb.add_field(name="Reason", value="Too many recent errors")
-            elif warning_type == ServerWarningType.RSS_TWITTER_DISABLED:
-                emb.description = "Due to a recent Twitter API change, **Twitter feeds are not supported** anymore.\n"\
-                    "You should consider deleting this RSS feed."
-                emb.add_field(name="Feed ID", value=kwargs.get("feed_id"))
-                emb.add_field(name="Reason", value="Withdrawal of the free Twitter API")
-            elif warning_type == ServerWarningType.RSS_INVALID_FORMAT:
-                emb.description = f"**Could not send RSS message** in channel {kwargs.get('channel').mention}"
-                emb.add_field(name="Feed ID", value=kwargs.get("feed_id"))
-                rss_text_cmd = await self.bot.get_command_mention("rss set-text")
-                emb.add_field(name="Reason",
-                              value=f"Invalid template format. Use the {rss_text_cmd} command to fix your template.")
-            elif warning_type == ServerWarningType.TICKET_CREATION_UNKNOWN_TARGET:
-                emb.description = f"**Could not create ticket** in channel or category {kwargs.get('channel_id')}"
-                emb.add_field(name="Selected topic", value=kwargs.get("topic_name"))
-                emb.add_field(name="Reason", value="Unknown or deleted channel or category")
-            elif warning_type == ServerWarningType.TICKET_CREATION_FAILED:
-                channel: "discord.abc.GuildChannel" = kwargs["channel"]
-                if isinstance(channel, discord.CategoryChannel):
-                    emb.description = f"**Could not create ticket** in category {channel.name}"
-                else:
-                    emb.description = f"**Could not create ticket** in channel {channel.mention}"
-                emb.add_field(name="Selected topic", value=kwargs.get("topic_name"))
-                emb.add_field(
-                    name="Missing permission",
-                    value=await self.bot._(guild.id, "permissions.list.manage_channels")
-                )
-            elif warning_type == ServerWarningType.TICKET_INIT_FAILED:
-                channel: "discord.abc.GuildChannel" = kwargs["channel"]
-                if isinstance(channel, discord.CategoryChannel):
-                    emb.description = f"**Could not setup ticket permissions** in category {channel.name}"
-                else:
-                    emb.description = f"**Could not setup ticket permissions** in channel {channel.mention}"
-                emb.add_field(name="Selected topic", value=kwargs.get("topic_name"))
-                emb.add_field(
-                    name="Missing permission",
-                    value=await self.bot._(guild.id, "permissions.list.manage_permissions")
-                )
-            elif warning_type == ServerWarningType.TEMP_ROLE_REMOVE_FORBIDDEN:
-                role: discord.Role = kwargs["role"]
-                user: discord.Member = kwargs["user"]
-                emb.description = f"**Could not remove temporary role** {role.mention} from user {user.mention}"
-                emb.add_field(name="Reason", value="Missing permission")
-            elif warning_type == ServerWarningType.STREAM_NOTIFICATION_MISSING_PERMISSIONS:
-                channel_mention = f"<#{kwargs.get('channel_id')}>"
-                username = kwargs.get("username")
-                emb.description = f"**Could not send stream notification** in channel {channel_mention}"
-                emb.add_field(name="Streamer username", value=username)
-            elif warning_type == ServerWarningType.STREAM_ROLE_MISSING_PERMISSIONS:
-                role_mention = f"<@&{kwargs.get('role_id')}>"
-                member_mention = kwargs.get("member").mention
-                username = kwargs.get("username")
-                emb.description = f"**Could not give stream role** to user {member_mention}"
-                emb.add_field(name="Streamer username", value=username)
-                emb.add_field(name="Role to give", value=role_mention)
-            else:
-                self.bot.dispatch("error", f"Unknown warning type: {warning_type}")
+        if channel_ids := await self.is_log_enabled(warning.guild.id, "bot_warnings"):
+            if (emb := await build_server_warning_embed(self.bot, warning)) is None:
+                self.bot.dispatch("error", f"Unknown warning type: {type(warning).__name__}")
                 return
-            await self.validate_logs(guild, channel_ids, emb, "bot_warnings")
+            await self.validate_logs(warning.guild, channel_ids, emb, "bot_warnings")
 
     @commands.Cog.listener()
     async def on_voice_state_update(self, member: discord.Member, before: discord.VoiceState, after: discord.VoiceState):
