@@ -247,9 +247,9 @@ class Tickets(commands.Cog):
         return discord.Embed(title=title, description=desc, color=discord.Color.green())
 
     async def get_ticket_channel_perms(self, channel: discord.CategoryChannel, topic: DBTopicRowWithDefault, user: discord.Member
-                                       ) -> dict[discord.Role | discord.Member, discord.PermissionOverwrite]:
+                                       ) -> dict[discord.Role | discord.Member | discord.Object, discord.PermissionOverwrite]:
         "Setup the required permissions for a channel ticket"
-        permissions = {}
+        permissions: dict[discord.Role | discord.Member | discord.Object, discord.PermissionOverwrite] = {}
         # set for everyone
         permissions[channel.guild.default_role] = discord.PermissionOverwrite(read_messages=False)
         # set for the user and the bot
@@ -380,7 +380,7 @@ class Tickets(commands.Cog):
         filtered = sorted([
             (not topic["topic"].lower().startswith(current), topic["topic"], topic["id"])
             for topic in topics
-            if topic["topic"] is not None and current in topic["topic"].lower()
+            if current in topic["topic"].lower()
         ])
         return [
             app_commands.Choice(name=name, value=topic_id)
@@ -683,7 +683,7 @@ class Tickets(commands.Cog):
             if isinstance(res, list):
                 raise TypeError("This command should only edit one topic at a time")
             topic_id = res
-        elif isinstance(emote, discord.PartialEmoji):
+        if isinstance(emote, discord.PartialEmoji):
             emote = f"{emote.name}:{emote.id}"
         if await self.db_edit_topic_emoji(interaction.guild_id, topic_id, emote):
             topic = await self.db_get_topic_with_defaults(interaction.guild_id, topic_id)

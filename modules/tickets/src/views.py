@@ -6,7 +6,7 @@ from discord import ui
 
 from core.type_utils import (GuildInteraction,
                              assert_interaction_channel_is_guild_messageable)
-from modules.tickets.src.types import DBTopicRow, TopicAutocompletionData
+from modules.tickets.src.types import DBTopicRow, DBTopicRowWithDefault, TopicAutocompletionData
 
 
 class SelectView(ui.View):
@@ -70,8 +70,8 @@ class AskTitleModal(ui.Modal):
     "Ask a user the name of their ticket"
     name = ui.TextInput(label="", placeholder=None, style=discord.TextStyle.short, max_length=100)
 
-    def __init__(self, guild_id: int, topic: DBTopicRow, title: str, input_label: str, input_placeholder: str,
-                 callback: Callable[[GuildInteraction, DBTopicRow, str], Any]):
+    def __init__(self, guild_id: int, topic: DBTopicRowWithDefault, title: str, input_label: str,
+                 input_placeholder: str, callback: Callable[[GuildInteraction, DBTopicRowWithDefault, str], Any]):
         super().__init__(title=title, timeout=600)
         self.guild_id = guild_id
         self.topic = topic
