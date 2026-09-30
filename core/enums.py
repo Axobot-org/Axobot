@@ -85,3 +85,5 @@ class ServerWarningType(IntEnum):
     STREAM_NOTIFICATION_MISSING_PERMISSIONS = 13
     # role_id, member, username
     STREAM_ROLE_MISSING_PERMISSIONS = 14
+    # channel
+    MEMBERCOUNTER_MISSING_PERMISSIONS = 15

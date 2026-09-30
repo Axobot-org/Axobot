@@ -1652,6 +1652,14 @@ Minimum age required by anti-raid: {min_age}"
                     name="Role to give",
                     value=kwargs.get("role").mention
                 )
+            elif warning_type == ServerWarningType.MEMBERCOUNTER_MISSING_PERMISSIONS:
+                membercounter_channel: discord.VoiceChannel | discord.StageChannel = kwargs["channel"]
+                emb.description = f"**Could not update membercount channel** {membercounter_channel.mention}"
+                permissions = [
+                    await self.bot._(guild.id, f"permissions.list.{permission}")
+                    for permission in ("read_messages", "connect", "manage_channels")
+                ]
+                emb.add_field(name="Required permissions", value="\n".join(permissions))
             elif warning_type in {ServerWarningType.RSS_MISSING_TXT_PERMISSION, ServerWarningType.RSS_MISSING_EMBED_PERMISSION}:
                 emb.description = f"**Could not send RSS message** in channel {kwargs.get('channel').mention}"
                 emb.add_field(name="Feed ID", value=kwargs.get("feed_id"))
