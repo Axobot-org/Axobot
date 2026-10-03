@@ -318,6 +318,9 @@ class Rss(commands.Cog):
         destination_channel = channel or interaction.channel
         if destination_channel is None:
             raise RuntimeError("No channel provided for the RSS feed")
+        if channel is None and not isinstance(interaction.channel, (discord.TextChannel, discord.Thread)):
+            await interaction.followup.send(await self.bot._(interaction, "rss.move-invalid-channel"), ephemeral=True)
+            return
         try:
             feed_id = await self.db_add_feed(interaction.guild_id, destination_channel.id, feed_type, identifiant)
             await interaction.followup.send(
