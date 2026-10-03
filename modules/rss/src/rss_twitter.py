@@ -112,7 +112,7 @@ class TwitterRSS:
             feed=FeedObject.unrecorded("tw", channel.guild.id if channel.guild else None, channel.id, url),
             url=url,
             title=text,
-            date=dt.datetime.fromtimestamp(lastpost.created_at_in_seconds),
+            date=dt.datetime.fromtimestamp(lastpost.created_at_in_seconds, tz=dt.UTC),
             author=lastpost.user.screen_name,
             retweeted_from=is_rt,
             channel=lastpost.user.name,
@@ -132,7 +132,8 @@ class TwitterRSS:
             if len(posts_list) > 10:
                 break
             # don't return posts older than the date
-            if (dt.datetime.fromtimestamp(post.created_at_in_seconds) - date).total_seconds() < self.min_time_between_posts:
+            post_date = dt.datetime.fromtimestamp(post.created_at_in_seconds, tz=dt.UTC)
+            if (post_date - date).total_seconds() < self.min_time_between_posts:
                 break
             # detect if retweet
             is_rt = None
@@ -152,7 +153,7 @@ class TwitterRSS:
                 feed=FeedObject.unrecorded("tw", channel.guild.id if channel.guild else None, channel.id, url),
                 url=url,
                 title=text,
-                date=dt.datetime.fromtimestamp(post.created_at_in_seconds),
+                date=post_date,
                 author=post.user.screen_name,
                 retweeted_from=is_rt,
                 channel=post.user.name,

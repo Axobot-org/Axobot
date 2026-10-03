@@ -28,6 +28,32 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger("bot.rss")
 
+def normalize_datetime_utc(
+    date: datetime.datetime | time.struct_time | str | None,
+) -> datetime.datetime | None:
+    "Interpret naive dates as UTC and convert timezone-aware dates to UTC"
+    if isinstance(date, datetime.datetime):
+        if date.utcoffset() is None:
+            return date.replace(tzinfo=datetime.UTC)
+        return date.astimezone(datetime.UTC)
+    if isinstance(date, time.struct_time):
+        offset = date.tm_gmtoff or 0
+        try:
+            timezone = datetime.timezone(datetime.timedelta(seconds=offset))
+            parsed_date = datetime.datetime(*date[:6], tzinfo=timezone)
+            return parsed_date.astimezone(datetime.UTC)
+        except (OverflowError, ValueError):
+            return None
+    if isinstance(date, str):
+        try:
+            parsed_date = datetime.datetime.fromisoformat(date)
+        except ValueError:
+            return None
+        if parsed_date.utcoffset() is None:
+            return parsed_date.replace(tzinfo=datetime.UTC)
+        return parsed_date.astimezone(datetime.UTC)
+    return None
+
 @position_cached(TTLCache(maxsize=1_000, ttl=60 * 5), key=0)
 async def feed_parse(url: str, timeout: int, session: ClientSession | None = None
                      ) -> FeedParserDict | None:
@@ -135,22 +161,7 @@ class RssMessage:
         self.image_alt = image_alt
         self.post_text = post_text
         self.post_description = post_description
-        if isinstance(date, datetime.datetime):
-            self.date = date.replace(tzinfo=datetime.UTC)
-        elif isinstance(date, time.struct_time):
-            self.date = datetime.datetime(*date[:6])
-            if self.date.tzinfo is None:
-                self.date = self.date.replace(tzinfo=datetime.UTC)
-            else:
-                timezone = datetime.timezone(datetime.timedelta(seconds=date.tm_gmtoff))
-                self.date = self.date.replace(tzinfo=timezone)
-        elif isinstance(date, str): # type: ignore
-            try:
-                self.date = datetime.datetime.fromisoformat(date)
-            except ValueError:
-                self.date = None
-        else:
-            self.date = None
+        self.date = normalize_datetime_utc(date)
         self.entry_id = entry_id
         self.author = author if author is None or len(author) < 100 else author[:99]+'…'
         self.logo = feed.get_emoji(bot.emojis_manager)
@@ -366,7 +377,7 @@ class FeedObject:
         self.channel_id: int = from_dict["channel"]
         self.type: FeedType = from_dict["type"]
         self.link: str = from_dict["link"]
-        self.date: datetime.datetime | None = from_dict["date"]
+        self.date: datetime.datetime | None = normalize_datetime_utc(from_dict["date"])
         self.last_entry_id: str | None = from_dict["last_entry_id"]
         self.role_ids: list[str] = [role for role in from_dict["roles"].split(';') if role.isnumeric()]
         self.use_embed: bool = from_dict["use_embed"]

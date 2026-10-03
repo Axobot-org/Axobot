@@ -3,7 +3,6 @@ from __future__ import annotations
 import asyncio
 import datetime as dt
 import re
-import time
 from typing import TYPE_CHECKING, Literal
 from urllib.parse import parse_qs, urlencode, urlsplit
 
@@ -14,7 +13,7 @@ from feedparser.util import FeedParserDict
 
 from .convert_post_to_text import get_summary_from_entry, get_text_from_entry
 from .general import (FeedFilterConfig, FeedObject, RssMessage, check_filter,
-                      feed_parse, get_entry_id)
+                      feed_parse, get_entry_id, normalize_datetime_utc)
 
 if TYPE_CHECKING:
     from core.bot_classes import Axobot
@@ -88,18 +87,13 @@ class WebRSS:
         if entry_date is None or isinstance(entry_date, str):
             # no date, or a date feedparser could not parse
             return None
-        if isinstance(entry_date, time.struct_time):
-            if entry_date.tm_zone is None: # type: ignore
-                timezone = dt.UTC
-            else:
-                timezone = dt.timezone(dt.timedelta(seconds=entry_date.tm_gmtoff))
-            return dt.datetime(*entry_date[:6], tzinfo=timezone)
-        if isinstance(entry_date, dt.datetime):
-            if entry_date.tzinfo is None:
-                return entry_date.replace(tzinfo=dt.UTC)
-            return entry_date
-        self.bot.dispatch("error", f"Invalid date type for entry {entry.get('title', 'Unknown')}: {type(entry_date)}")
-        return None
+        parsed_date = normalize_datetime_utc(entry_date)
+        if parsed_date is None:
+            self.bot.dispatch(
+                "error",
+                f"Invalid date value for entry {entry.get('title', 'Unknown')}: {entry_date!r}",
+            )
+        return parsed_date
 
     async def _parse_entry(self, entry: FeedParserDict, feed: FeedParserDict, url: str, date: dt.datetime | None,
                            channel:"discord.abc.MessageableChannel"):
