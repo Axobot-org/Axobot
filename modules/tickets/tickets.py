@@ -28,6 +28,7 @@ TopicNameArgument = app_commands.Range[str, 1, 100]
 ChannelNameFormatArgument = app_commands.Range[str, 1, 70]
 HintTextArgument = app_commands.Range[str, 1, 2000]
 MAX_TOPICS_PER_GUILD = 25
+PIN_MESSAGE_PERMISSION = 1 << 51 # TODO: remove once discord.py has updated its Permissions class
 
 class Tickets(commands.Cog):
     "Handle the bot tickets system"
@@ -359,7 +360,7 @@ class Tickets(commands.Cog):
         else:
             await interaction.edit_original_response(content=txt)
         msg = await channel.send(embed=await self.create_channel_first_message(interaction, topic, ticket_name))
-        if channel.permissions_for(channel.guild.me).manage_messages:
+        if channel.permissions_for(channel.guild.me).value & (PIN_MESSAGE_PERMISSION):
             await msg.pin()
         self.bot.dispatch("ticket_creation", TicketCreationEvent(topic, ticket_name, interaction, channel))
 
