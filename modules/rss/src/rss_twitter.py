@@ -65,7 +65,7 @@ class TwitterRSS:
                     text = text.replace(match.group(0), '')
         return text
 
-    async def _get_feed_list(self, name: str):
+    async def _get_feed_list(self, name: str) -> list | None:
         "Get tweets from a given Twitter user"
         try:
             if isinstance(name, int) or name.isnumeric():
@@ -82,11 +82,11 @@ class TwitterRSS:
             raise err
         return posts
 
-    async def get_last_post(self, channel: discord.TextChannel, name: str) -> RssMessage | None:
+    async def get_last_post(self, channel: discord.TextChannel, name: str) -> RssMessage | str | None:
         "Get the last post from a given Twitter user"
         # fetch tweets
         posts = await self._get_feed_list(name)
-        if len(posts) == 0:
+        if not posts:
             return await self.bot._(channel, "rss.nothing")
         # get username
         if isinstance(name, int) or name.isnumeric():
@@ -124,7 +124,7 @@ class TwitterRSS:
         "Get new posts from a given Twitter user"
         # fetch tweets
         posts = await self._get_feed_list(name)
-        if len(posts) == 0:
+        if not posts:
             return []
         posts_list = []
         for post in posts:

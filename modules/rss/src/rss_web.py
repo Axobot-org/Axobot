@@ -1,9 +1,10 @@
 from __future__ import annotations
 
+import asyncio
 import datetime as dt
 import re
 import time
-from typing import TYPE_CHECKING, Any, Literal
+from typing import TYPE_CHECKING, Literal
 from urllib.parse import parse_qs, urlencode, urlsplit
 
 import aiohttp
@@ -23,7 +24,7 @@ class WebRSS:
 
     def __init__(self, bot: Axobot):
         self.bot = bot
-        self.min_time_between_posts = 120 # seconds
+        self.min_time_between_posts = 5 # seconds
         self.url_pattern = r"^(?:https://)(?:www\.)?(\S+)$"
 
     def is_web_url(self, string: str):
@@ -42,20 +43,16 @@ class WebRSS:
             # CharacterEncodingOverride exceptions are ignored
             return None
         if len(feed.entries) > 1:
-            # Remove entries that are older than the next one
-            try:
-                entry_date = await self._get_entry_datetime(feed.entries[0])
-                while entry_date is not None \
-                    and (len(feed.entries) > 1) \
-                    and (next_entry_date := await self._get_entry_datetime(feed.entries[1])) \
-                    and (entry_date < next_entry_date):
-                    del feed.entries[0]
-                    entry_date = next_entry_date
-            except KeyError:
-                pass
+            # sort by most recent first, but only if every entry has a usable date
+            dates = await asyncio.gather(*(self._get_entry_datetime(entry) for entry in feed.entries))
+            if all(date is not None for date in dates):
+                ordered = sorted(zip(dates, feed.entries), key=lambda pair: pair[0], reverse=True) # type: ignore
+                feed["entries"] = [entry for _, entry in ordered]
         if filter_config is not None:
             # Remove entries that don't match the filter
-            feed["entries"] = [entry for entry in feed.entries[:50] if await check_filter(entry, filter_config)]
+            entries_to_check = feed.entries[:50]
+            matches = await asyncio.gather(*(check_filter(entry, filter_config) for entry in entries_to_check))
+            feed["entries"] = [entry for entry, matched in zip(entries_to_check, matches, strict=True) if matched]
             if not feed["entries"]:
                 return None
         return feed
@@ -86,7 +83,11 @@ class WebRSS:
 
     async def _get_entry_datetime(self, entry: FeedParserDict) -> dt.datetime | None:
         "Try to find the entry publication date and return it as a datetime object"
-        entry_date = entry.get(await self._get_feed_date_key(entry))
+        feed_date_key = await self._get_feed_date_key(entry)
+        entry_date = entry.get(feed_date_key) if feed_date_key else None
+        if entry_date is None or isinstance(entry_date, str):
+            # no date, or a date feedparser could not parse
+            return None
         if isinstance(entry_date, time.struct_time):
             if entry_date.tm_zone is None: # type: ignore
                 timezone = dt.UTC
@@ -100,7 +101,8 @@ class WebRSS:
         self.bot.dispatch("error", f"Invalid date type for entry {entry.get('title', 'Unknown')}: {type(entry_date)}")
         return None
 
-    async def _parse_entry(self, entry: FeedParserDict, feed: FeedParserDict, url: str, date: Any, channel:"discord.abc.MessageableChannel"):
+    async def _parse_entry(self, entry: FeedParserDict, feed: FeedParserDict, url: str, date: dt.datetime | None,
+                           channel:"discord.abc.MessageableChannel"):
         "Parse a feed entry to get the relevant information and return a RssMessage object"
         if "link" in entry:
             link = entry["link"]
@@ -156,10 +158,33 @@ class WebRSS:
         if not feed:
             return await self.bot._(channel, "rss.web-invalid")
         entry = feed.entries[0]
-        entry_date = await self._get_entry_datetime(entry) or "Unknown"
+        entry_date = await self._get_entry_datetime(entry)
         return await self._parse_entry(entry, feed, url, entry_date, channel)
 
-    async def get_new_posts(self, channel: "discord.abc.MessageableChannel", url: str, date: dt.datetime,
+    async def _get_new_posts_by_entry_id(self, channel: "discord.abc.MessageableChannel", feed: FeedParserDict,
+                                         url: str, last_entry_id: str | None) -> list[RssMessage]:
+        "Get new posts from a feed without usable dates, by comparing entries to the last known entry ID"
+        if last_entry_id is None:
+            # no reference point: only post the latest entry
+            entries = feed.entries[:1]
+        else:
+            entries = []
+            max_parsed_entries = 15
+            for entry in feed.entries[:max_parsed_entries]:
+                if await get_entry_id(entry) == last_entry_id:
+                    break
+                entries.append(entry)
+            if len(entries) == max_parsed_entries:
+                # if no matching entry ID was found within the max parsed entries, only keep the latest entry
+                entries = entries[:1]
+        posts_list: list[RssMessage] = []
+        for entry in entries:
+            entry_date = await self._get_entry_datetime(entry)
+            posts_list.append(await self._parse_entry(entry, feed, url, entry_date, channel))
+        posts_list.reverse()
+        return posts_list
+
+    async def get_new_posts(self, channel: "discord.abc.MessageableChannel", url: str, date: dt.datetime | None,
                             filter_config: FeedFilterConfig | None,
                             last_entry_id: str | None=None,
                             session: aiohttp.ClientSession | None=None) -> list[RssMessage]:
@@ -169,14 +194,10 @@ class WebRSS:
             return []
         posts_list: list[RssMessage] = []
         date_field_key = await self._get_feed_date_key(feed.entries[0])
-        if date_field_key is None or date_field_key == "published":
-            entry = await self.get_last_post(channel, url, filter_config, session)
-            if isinstance(entry, RssMessage):
-                if last_entry_id is None or entry.entry_id != last_entry_id:
-                    return [entry]
-            return []
+        if date is None or date_field_key is None or date_field_key == "published":
+            return await self._get_new_posts_by_entry_id(channel, feed, url, last_entry_id)
         for entry in feed.entries:
-            if len(posts_list) > 10:
+            if len(posts_list) >= 10:
                 break
             entry_date = await self._get_entry_datetime(entry)
             # check if the entry is not too close to (or passed) the last post

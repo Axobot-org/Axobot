@@ -117,7 +117,7 @@ class RssMessage:
             feed: "FeedObject",
             url: str,
             title: str,
-            date: datetime.datetime | time.struct_time | str = datetime.datetime.now(),
+            date: datetime.datetime | time.struct_time | str | None,
             entry_id: str | None = None,
             author: str | None = None,
             channel: str | None = None,

@@ -1408,10 +1408,8 @@ class Rss(commands.Cog):
             ))
             return False
         elif feed.type == "web":
-            if feed.date is None:
+            if feed.date is None and feed.last_entry_id is None:
                 objs = await self.web_rss.get_last_post(chan, feed.link, feed.filter_config, session)
-                if feed.last_entry_id is not None and isinstance(objs, RssMessage) and objs.entry_id == feed.last_entry_id:
-                    return True
             else:
                 objs = await self.web_rss.get_new_posts(chan, feed.link, feed.date, feed.filter_config,
                                                         feed.last_entry_id, session)
