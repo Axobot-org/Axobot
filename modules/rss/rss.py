@@ -1441,6 +1441,7 @@ class Rss(commands.Cog):
         latest_post_date = None
         latest_entry_id = None
         sent_messages = 0
+        delivery_delays: list[float] = []
         for obj in objs[:self.max_messages]:
             # if the guild was marked as inactive (ie. the bot wasn't there in the previous loop),
             #  mark the feeds as completed but do not send any message, to avoid spamming channels
@@ -1463,6 +1464,8 @@ class Rss(commands.Cog):
                 try:
                     if await self.send_rss_msg(obj, chan):
                         sent_messages += 1
+                        if obj.date is not None and not self.bot.zombie_mode:
+                            delivery_delays.append((self.bot.utcnow() - obj.date).total_seconds())
                 except InvalidFormatError:
                     self.bot.dispatch("server_warning", RssInvalidFormat(
                         guild=guild, channel=chan, feed_id=feed.feed_id
@@ -1472,8 +1475,8 @@ class Rss(commands.Cog):
             latest_entry_id = obj.entry_id
         if sent_messages > 0:
             await self._update_feed_last_entry(feed.feed_id, latest_post_date, latest_entry_id)
-        if should_send_stats and sent_messages and (statscog := self.bot.get_cog("BotStats")):
-            statscog.rss_stats["messages"] += sent_messages
+        if should_send_stats and sent_messages:
+            self.bot.dispatch("rss_messages_sent", feed.type, sent_messages, delivery_delays)
         return sent_messages > 0
 
     async def disabled_feeds_check(self, feeds: list[FeedObject]):
@@ -1547,11 +1550,7 @@ class Rss(commands.Cog):
         elapsed_time = round(time.time() - start)
         desc = [f"**RSS loop done** in {elapsed_time}s ({len(success_ids)}/{checked_count} feeds)"]
         if guild_id is None:
-            if statscog := self.bot.get_cog("BotStats"):
-                statscog.rss_stats["checked"] = checked_count
-                statscog.rss_stats["errors"] = len(errors_ids)
-                statscog.rss_stats["time"] = elapsed_time
-                statscog.rss_loop_finished = True
+            self.bot.dispatch("rss_loop_completed", checked_count, len(errors_ids), elapsed_time)
         await self.db_set_last_refresh(list(feed.feed_id for feed in feeds_list))
         if len(errors_ids) > 0:
             desc.append(f"{len(errors_ids)} errors: {' '.join(str(x) for x in errors_ids)}")
