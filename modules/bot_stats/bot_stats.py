@@ -476,6 +476,8 @@ class BotStats(commands.Cog):
                 rows.append(StatRow("rss." + k, v, 0, k, k == "messages"))
             self.rss_stats = {"checked": 0, "messages": 0, "errors": 0, "warnings": 0, "time": 0}
             for source_type, delays in self.rss_delivery_delays.items():
+                if not delays:
+                    continue
                 rows.append(StatRow(f"rss.delay.{source_type}", round(median(delays), 1), 1, "s", False))
                 rows.append(StatRow(f"rss.delay_samples.{source_type}", len(delays), 0, "posts", True))
             self.rss_delivery_delays.clear()
