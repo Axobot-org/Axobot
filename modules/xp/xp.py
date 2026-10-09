@@ -216,7 +216,9 @@ class Xp(commands.Cog):
             # already got some XP in the last 10s
             return
         xp_per_minute: int
-        if xp_per_minute := await self.bot.get_config(member.guild.id, "voice_xp_per_min"): # pyright: ignore[reportAssignmentType]
+        if xp_per_minute := await self.bot.get_config(  # pyright: ignore[reportAssignmentType]
+            member.guild.id, "voice_xp_per_min"
+        ):
             prev_points = await self.get_member_xp(member, member.guild.id)
             rate: float = await self.bot.get_config(member.guild.id, "xp_rate") # pyright: ignore[reportAssignmentType]
             xp = round(xp_per_minute * rate * time_since_last_xp / 60)
@@ -871,7 +873,10 @@ class Xp(commands.Cog):
             ) # pyright: ignore[reportAssignmentType]
         else:
             xp_used_type = (await self.bot.get_options_list())["xp_type"]["default"] # pyright: ignore[reportAssignmentType]
-        xp = await self.db_get_xp(target_user.id, None if xp_used_type == "global" else interaction.guild.id)
+        xp = await self.db_get_xp(
+            target_user.id,
+            None if (xp_used_type == "global" or not interaction.guild) else interaction.guild.id
+        )
         if xp is None:
             if interaction.user == target_user:
                 await interaction.followup.send(await self.bot._(interaction, "xp.1-no-xp"))
