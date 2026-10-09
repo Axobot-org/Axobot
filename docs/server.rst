@@ -80,6 +80,7 @@ List of every option
 * poll_channels: List of channels in which the bot will add the reactions 👍 and 👎 to each message
 * private_leaderboard: Allow non-members to see your server XP leaderboard on our website. Default to False.
 * rank_in_private: Boolean indicating whether the rank command message should be sent as a private message or not. If the value is set to :code:`True`, the message will be sent in DM or as an ephemeral message.
+* rr_highest_only: Boolean indicating whether members should only keep the highest role reward they have reached. When enabled, lower role rewards are removed from members when they level up. Default is :code:`False`.
 * ttt_emojis: List of emojis used to play on tic-tac-toe. Two emojis must be entered: one for the bot, and one for the player. Discord emojis as well as server emojis can work.
 * update_mentions: A list of roles which will be mentioned in each update changelog. You can enable those changelogs with the `bot_news` option. Default to None.
 * voice_category: Category used by the automated voice channels system (see `below <server.html#voice-channels-managment>`__)

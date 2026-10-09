@@ -19,6 +19,7 @@ from mysql.connector.errors import ProgrammingError as MySQLProgrammingError
 from PIL import Image, ImageFont
 
 from core.bot_classes import Axobot
+from core.getch_methods import getch_member
 from core.safedict import SafeDict
 from core.tips import UserTip
 from core.type_utils import (AnyStrDict, GuildMessage, UserOrMember,
@@ -431,46 +432,90 @@ class Xp(commands.Cog):
         return (current_level, xp_for_next_lvl, xp_for_current_lvl)
 
 
-    async def give_rr(self, member: discord.Member, level: int, rr_list: list[DbRoleReward], remove: bool=False):
-        """Give (and remove?) roles rewards to a member"""
-        if not member.guild.me.guild_permissions.manage_roles:
-            return 0
-        count = 0
+    def compute_rr_changes(
+            self,
+            member: discord.Member,
+            level: int,
+            rr_list: list[DbRoleReward],
+            *,
+            highest_only: bool,
+            remove_excess: bool,
+    ) -> tuple[list[discord.Role], list[discord.Role]]:
+        """Compute which role rewards should be given to and removed from a member, as (to_give, to_remove)
+        Only roles that exist and are below the bot's top role are returned"""
         has_roles = {role.id for role in member.roles}
         bot_top_role_position = member.guild.me.top_role.position
-        # list roles to add to this member
-        roles_to_give: list[discord.Role] = []
-        for role in [rr for rr in rr_list if rr["level"] <= level and rr["role"] not in has_roles]:
-            guild_role = member.guild.get_role(role["role"])
-            if guild_role is None or guild_role.position >= bot_top_role_position:
-                continue
-            roles_to_give.append(guild_role)
-        # give missing roles
-        try:
-            if not self.bot.beta:
-                await member.add_roles(*roles_to_give, reason="Role rewards")
-            count += len(roles_to_give)
-        except Exception as err:
-            if self.bot.beta:
+
+        def get_manageable_role(role_id: int) -> discord.Role | None:
+            """Get the role from the guild if it exists and if the bot can grant/revoke it, or None otherwise"""
+            guild_role = member.guild.get_role(role_id)
+            if guild_role is None or guild_role.position >= bot_top_role_position or not guild_role.is_assignable():
+                return None
+            return guild_role
+
+        if highest_only:
+            reached = [rr for rr in rr_list if rr["level"] <= level]
+            highest_role_id = max(reached, key=lambda rr: rr["level"])["role"] if reached else None
+            wanted_ids = {highest_role_id} if highest_role_id is not None else set()
+            remove_ids = {rr["role"] for rr in rr_list} - wanted_ids
+        else:
+            wanted_ids = {rr["role"] for rr in rr_list if rr["level"] <= level}
+            remove_ids = {rr["role"] for rr in rr_list if rr["level"] > level} if remove_excess else set()
+            # a role may be shared by several rewards: never remove a role that should be kept
+            remove_ids -= wanted_ids
+
+        roles_to_give = [
+            guild_role for role_id in wanted_ids - has_roles
+            if (guild_role := get_manageable_role(role_id)) is not None
+        ]
+        roles_to_remove = [
+            guild_role for role_id in remove_ids & has_roles
+            if (guild_role := get_manageable_role(role_id)) is not None
+        ]
+        return roles_to_give, roles_to_remove
+
+    async def apply_rr_changes(self, member: discord.Member, to_give: list[discord.Role], to_remove: list[discord.Role]):
+        """Give and remove the given roles from a member. Return the number of edited roles"""
+        count = 0
+        if to_give:
+            try:
+                await member.add_roles(*to_give, reason="Role rewards")
+                count += len(to_give)
+            except Exception as err:
                 self.bot.dispatch("error", err)
-        if not remove:
-            return count
-        # list roles to remove from this member
-        roles_to_remove: list[discord.Role] = []
-        for role in [rr for rr in rr_list if rr["level"] > level and rr["role"] in has_roles]:
-            guild_role = member.guild.get_role(role["role"])
-            if guild_role is None or guild_role.position >= bot_top_role_position:
-                continue
-            roles_to_remove.append(guild_role)
-        # remove unauthorized roles
-        try:
-            if not self.bot.beta:
-                await member.remove_roles(*roles_to_remove, reason="Role rewards")
-            count += len(roles_to_remove)
-        except Exception as err:
-            if self.bot.beta:
+        if to_remove:
+            try:
+                await member.remove_roles(*to_remove, reason="Role rewards")
+                count += len(to_remove)
+            except Exception as err:
                 self.bot.dispatch("error", err)
         return count
+
+    async def give_rr(
+            self,
+            member: discord.Member,
+            level: int,
+            rr_list: list[DbRoleReward],
+            *,
+            remove: bool=False,
+            highest_only: bool | None = None
+    ):
+        """Give (and remove?) roles rewards to a member
+
+        If `highest_only` is None, the value is read from the 'rr_highest_only' server option.
+        When enabled, only the highest reward is kept (every other reward role is removed, `remove` is ignored)"""
+        if not member.guild.me.guild_permissions.manage_roles:
+            return 0
+        if highest_only is None:
+            highest_only = await self.get_rr_highest_only(member.guild.id)
+        to_give, to_remove = self.compute_rr_changes(
+            member, level, rr_list, highest_only=highest_only, remove_excess=remove
+        )
+        return await self.apply_rr_changes(member, to_give, to_remove)
+
+    async def get_rr_highest_only(self, guild_id: int) -> bool:
+        "Check if the 'rr_highest_only' option is enabled in a guild"
+        return bool(await self.bot.get_config(guild_id, "rr_highest_only"))
 
     async def reload_sus(self):
         """Check who should be observed for potential xp cheating"""
@@ -758,21 +803,54 @@ class Xp(commands.Cog):
     async def on_voice_xp_loop_error(self, error: BaseException):
         self.bot.dispatch("error", error, "Voice XP loop has stopped  <@279568324260528128>")
 
+    async def refresh_rr_after_decay(self, guild: discord.Guild, rr_list: list[DbRoleReward], decay: int):
+        """Update role rewards of members whose XP crossed a role reward threshold during the xp decay.
+        Must be called after the decay query, but before members with 0 xp are removed from the table.
+        Only members whose new xp is in [threshold - decay, threshold[ can have crossed a threshold,
+        so we only fetch those rows instead of the whole table. Return the number of edited roles"""
+        if not rr_list or not guild.me.guild_permissions.manage_roles:
+            return 0
+        xp_type: XpSystemType = await self.bot.get_config(guild.id, "xp_type") # pyright: ignore[reportAssignmentType]
+        get_xp_from_level = (
+            get_xp_from_level_mee6 if xp_type == "mee6-like"
+            else get_xp_from_level_global
+        )
+        thresholds = {await get_xp_from_level(rr["level"]) for rr in rr_list}
+        conditions = " OR ".join("(`xp` >= %s AND `xp` < %s)" for _ in thresholds)
+        args = [bound for threshold in thresholds for bound in (max(threshold - decay, 0), threshold)]
+        query = f"SELECT `userID`, `xp` FROM `{guild.id}` WHERE {conditions}"
+        async with self.bot.db_xp.read(query, tuple(args)) as rows:
+            affected = [(row["userID"], row["xp"]) for row in rows]
+        if not affected:
+            return 0
+
+        if not guild.chunked:
+            await guild.chunk()
+        highest_only = await self.get_rr_highest_only(guild.id)
+        count = 0
+        for user_id, xp in affected:
+            if (member := guild.get_member(user_id)) is None:
+                continue
+            level = (await self.calc_level(xp, xp_type))[0]
+            count += await self.give_rr(member, level, rr_list, remove=True, highest_only=highest_only)
+        return count
+
     @tasks.loop(time=datetime.time(hour=0, tzinfo=datetime.UTC))
     async def xp_decay_loop(self):
         "Remove some xp to every member every day at midnight"
         guilds = await self.db_get_guilds_decays()
         decay_query = "UPDATE `{table}` SET `xp` = GREATEST(CAST(`xp` AS SIGNED) - %s, 0)"
         cleanup_query = "DELETE FROM `{table}` WHERE `xp` <= 0"
-        guilds_count = users_count = 0
+        guilds_count = users_count = rr_updates_count = 0
         for guild_data in guilds:
             guild_id, value = guild_data["guild_id"], guild_data["value"]
             # check if axobot is still there
-            if self.bot.get_guild(guild_id) is None:
+            if (guild := self.bot.get_guild(guild_id)) is None:
                 continue
             # check if xp_type is not 'global'
             if await self.bot.get_config(guild_id, "xp_type") == "global":
                 continue
+            rr_list = await self.db_list_rr(guild_id)
             # apply decay
             try:
                 async with self.bot.db_xp.write(decay_query.format(table=guild_id), (value,), returnrowcount=True) as row_count:
@@ -782,6 +860,8 @@ class Xp(commands.Cog):
                     # if xp has been edited, invalidate cache
                     if row_count > 0 and guild_id in self.leaderboard_cache:
                         del self.leaderboard_cache[guild_id]
+                # refresh role rewards (before 0xp members are removed, as they may lose their roles)
+                rr_updates_count += await self.refresh_rr_after_decay(guild, rr_list, value)
                 # remove members with 0xp or less
                 async with self.bot.db_xp.write(cleanup_query.format(table=guild_id), returnrowcount=True) as row_count:
                     self.log.info("xp decay: removed %s members from guild %s", row_count, guild_id)
@@ -791,7 +871,7 @@ class Xp(commands.Cog):
                     self.log.warning("XP decay: table %s does not exist, skipping", guild_id)
                     continue
                 raise err
-        log_text = f"XP decay: removed xp of {users_count} users from {guilds_count} guilds"
+        log_text = f"XP decay: removed xp of {users_count} users from {guilds_count} guilds ({rr_updates_count} role rewards updated)"
         emb = discord.Embed(description=log_text, color=0x66ffcc, timestamp=self.bot.utcnow())
         emb.set_author(name=self.bot.user, icon_url=self.bot.display_avatar)
         self.bot.log.info(log_text)
@@ -1119,6 +1199,11 @@ class Xp(commands.Cog):
             await self.db_set_xp(user.id, xp, action="set", guild_id=interaction.guild_id)
         # confirm success
         await interaction.followup.send(await self.bot._(interaction, "xp.change-xp-ok", user=str(user), xp=xp))
+        # refresh the member's role rewards
+        if member := interaction.guild.get_member(user.id):
+            if rr_list := await self.db_list_rr(interaction.guild_id):
+                level = (await self.calc_level(xp, xp_used_type))[0]
+                await self.give_rr(member, level, rr_list, remove=True)
         # update cache
         if interaction.guild_id not in self.leaderboard_cache:
             await self.db_load_cache(interaction.guild_id)
@@ -1267,10 +1352,11 @@ class Xp(commands.Cog):
             {"user": x["userID"], "xp": x["xp"]}
             for x in await self.db_get_top(limit=None, guild=None if used_system == "global" else interaction.guild)
         ]
+        highest_only = await self.get_rr_highest_only(interaction.guild_id)
         for member_data in xps:
-            if member := interaction.guild.get_member(member_data["user"]):
+            if member := await getch_member(interaction.guild, member_data["user"]):
                 level = (await self.calc_level(member_data["xp"], used_system))[0]
-                count += await self.give_rr(member, level, rr_list, remove=True)
+                count += await self.give_rr(member, level, rr_list, remove=True, highest_only=highest_only)
         await interaction.followup.send(
             await self.bot._(interaction, "xp.rr-reload", role_count=count, member_count=interaction.guild.member_count)
         )

@@ -59,6 +59,8 @@ Roles rewards
 
 Roles rewards are roles given to your members when they reach a certain level of XP. These levels are defined by you (or by anyone with "Manage Server" permission), and you can add up to 10 rewards per server.
 
+By default, members keep every role reward they have reached. If you want them to only keep the highest one, enable the :code:`rr_highest_only` option: lower role rewards will then be removed when a member levels up. In both modes, role rewards are refreshed when a member's XP is edited with :code:`/set-xp` or lowered by the :code:`xp_decay` option.
+
 The main command to manage these roles is :code:`roles-rewards` (or its alias :code:`rr`). Here is the list of commands currently available :
 
 * :code:`roles-rewards add <level> <role>` : allows you to add a new role to the list of roles-rewards. The level is at least 1, without maximum, and to give the role you can provide either the Identifier or the name.
