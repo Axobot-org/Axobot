@@ -13,7 +13,8 @@ from core.server_warnings import (MembercounterMissingPermissions,
                                   TicketCreationUnknownTarget,
                                   TicketInitFailed,
                                   WelcomeMissingTxtPermissions,
-                                  WelcomeRoleMissingPermissions)
+                                  WelcomeRoleMissingPermissions,
+                                  XpRoleRewardMissingPermissions)
 
 
 async def build_server_warning_embed(bot: Axobot, warning: ServerWarning) -> discord.Embed | None:
@@ -26,6 +27,8 @@ async def build_server_warning_embed(bot: Axobot, warning: ServerWarning) -> dis
             _welcome_role_missing_permissions(warning, emb)
         case MembercounterMissingPermissions():
             await _membercounter_missing_permissions(bot, warning, emb)
+        case XpRoleRewardMissingPermissions():
+            await _xp_role_reward_missing_permissions(bot, warning, emb)
         case RssMissingTxtPermission():
             await _rss_missing_permission(bot, warning, emb, "send_messages")
         case RssMissingEmbedPermission():
@@ -78,6 +81,14 @@ async def _membercounter_missing_permissions(bot: Axobot, warning: Membercounter
     emb.description = f"**Could not update membercount channel** {warning.channel.mention}"
     permissions = await _permissions(bot, warning.guild, "read_messages", "connect", "manage_channels")
     emb.add_field(name="Required permissions", value=permissions)
+
+async def _xp_role_reward_missing_permissions(
+        bot: Axobot,
+        warning: XpRoleRewardMissingPermissions,
+        emb: discord.Embed
+):
+    emb.description = f"**Could not give role rewards** to user {warning.member.mention}"
+    emb.add_field(name="Missing permission", value=await _permissions(bot, warning.guild, "manage_roles"))
 
 
 # ---- RSS ----

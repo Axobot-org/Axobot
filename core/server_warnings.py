@@ -34,6 +34,13 @@ class MembercounterMissingPermissions(ServerWarning):
     channel: discord.VoiceChannel | discord.StageChannel
 
 
+# ---- XP ----
+
+@dataclass(frozen=True, slots=True, kw_only=True)
+class XpRoleRewardMissingPermissions(ServerWarning):
+    member: discord.Member
+
+
 # ---- RSS ----
 
 @dataclass(frozen=True, slots=True, kw_only=True)

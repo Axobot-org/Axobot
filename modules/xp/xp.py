@@ -21,6 +21,7 @@ from PIL import Image, ImageFont
 from core.bot_classes import Axobot
 from core.getch_methods import getch_member
 from core.safedict import SafeDict
+from core.server_warnings import XpRoleRewardMissingPermissions
 from core.tips import UserTip
 from core.type_utils import (AnyStrDict, GuildMessage, UserOrMember,
                              assert_interaction_channel_is_guild_messageable,
@@ -505,6 +506,8 @@ class Xp(commands.Cog):
         If `highest_only` is None, the value is read from the 'rr_highest_only' server option.
         When enabled, only the highest reward is kept (every other reward role is removed, `remove` is ignored)"""
         if not member.guild.me.guild_permissions.manage_roles:
+            self.log.warning("Cannot give role rewards in guild %s: missing manage_roles permission", member.guild.id)
+            self.bot.dispatch("server_warning", XpRoleRewardMissingPermissions(guild=member.guild, member=member))
             return 0
         if highest_only is None:
             highest_only = await self.get_rr_highest_only(member.guild.id)
