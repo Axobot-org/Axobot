@@ -15,7 +15,7 @@ class RandomCollectSubcog(AbstractSubcog):
     "Utility class for the BotEvents cog when the event is about collecting random items"
 
     def __init__(self, bot: Axobot,
-                 current_event: EventType | None, current_event_data: EventData, current_event_id: str | None):
+                 current_event: EventType, current_event_data: EventData, current_event_id: str):
         super().__init__(bot, current_event, current_event_data, current_event_id)
 
         self.collect_reward = [-8, 25] # points given when no item is collected
@@ -27,7 +27,7 @@ class RandomCollectSubcog(AbstractSubcog):
 
     async def on_message(self, msg: discord.Message):
         "Add random reaction to some messages"
-        if self.current_event and (data := self.current_event_data.get("emojis")):
+        if data := self.current_event_data.get("emojis"):
             if msg.guild is not None and not msg.channel.permissions_for(msg.guild.me).add_reactions:
                 # don't react if we can't add reactions
                 return
@@ -47,10 +47,9 @@ class RandomCollectSubcog(AbstractSubcog):
         events_desc = self.translations_data[lang]["events_desc"]
 
         # if no event
-        if not self.current_event_id in events_desc:
+        if self.current_event_id not in events_desc:
             await interaction.followup.send(await self.bot._(interaction, "bot_events.nothing-desc"))
-            if self.current_event_id:
-                self.bot.dispatch("error", ValueError(f"'{self.current_event_id}' has no event description"), interaction)
+            self.bot.dispatch("error", ValueError(f"'{self.current_event_id}' has no event description"), interaction)
             return
         # if current event has no objectives
         if not self.current_event_data["objectives"]:
@@ -73,10 +72,9 @@ class RandomCollectSubcog(AbstractSubcog):
         lang = await self.get_event_language(interaction)
         events_desc = self.translations_data[lang]["events_desc"]
         # if no event
-        if not self.current_event_id in events_desc:
+        if self.current_event_id not in events_desc:
             await interaction.followup.send(await self.bot._(interaction, "bot_events.nothing-desc"))
-            if self.current_event_id:
-                self.bot.dispatch("error", ValueError(f"'{self.current_event_id}' has no event description"), interaction)
+            self.bot.dispatch("error", ValueError(f"'{self.current_event_id}' has no event description"), interaction)
             return
         # if current event has no objectives
         if not self.current_event_data["objectives"]:
@@ -150,12 +148,10 @@ class RandomCollectSubcog(AbstractSubcog):
 
     async def get_random_items(self) -> list[EventItem]:
         "Get some random items to win during an event"
-        if self.current_event is None:
-            return []
         items_count = min(round(lognormvariate(*self.normvariate_params)), self.max_items_per_collect)
         if items_count <= 0:
             return []
-        items = await self.db_get_event_items(self.current_event_data["type"])
+        items = await self.db_get_event_items(self.current_event)
         if len(items) == 0:
             return []
         return choices(

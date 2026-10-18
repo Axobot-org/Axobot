@@ -31,9 +31,9 @@ class AbstractSubcog(ABC):
     "Abstract class for the subcogs used by BotEvents"
 
     def __init__(self, bot: Axobot,
-                 current_event: EventType | None, current_event_data: EventData, current_event_id: str | None):
+                 current_event: EventType, current_event_data: EventData, current_event_id: str):
         self.bot = bot
-        self.current_event = current_event
+        self.current_event: EventType = current_event
         self.current_event_data = current_event_data
         self.current_event_id = current_event_id
         self.translations_data = get_events_translations()
@@ -133,7 +133,7 @@ class AbstractSubcog(ABC):
             title = await self.bot._(interaction, "bot_events.collection-title.user")
         else:
             title = await self.bot._(interaction, "bot_events.collection-title.other", user=user.display_name)
-        items = await self.db_get_user_collected_items(user.id, self.current_event_data["type"])
+        items = await self.db_get_user_collected_items(user.id, self.current_event)
         if len(items) == 0:
             if interaction.user == user:
                 _empty_collection = await self.bot._(interaction, "bot_events.collection-empty.user")
