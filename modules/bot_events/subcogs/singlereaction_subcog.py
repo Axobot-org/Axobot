@@ -69,7 +69,7 @@ class SingleReactionSubcog(AbstractSubcog):
         user_mention = f"<@{payload.user_id}>"
         # check last collect from this user
         seconds_since_last_collect = await self.get_seconds_since_last_collect(payload.user_id)
-        if seconds_since_last_collect < self.collect_cooldown:
+        if seconds_since_last_collect is not None and seconds_since_last_collect < self.collect_cooldown:
             # user is trying to collect too quickly
             time_remaining = self.collect_cooldown - seconds_since_last_collect
             remaining = await FormatUtils.time_delta(time_remaining, lang=lang, seconds=time_remaining < 60)

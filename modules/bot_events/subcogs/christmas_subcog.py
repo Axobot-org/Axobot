@@ -1,7 +1,7 @@
 import datetime as dt
+import time
 from collections import defaultdict
 from random import choices, random
-import time
 
 import discord
 import emoji
@@ -10,6 +10,7 @@ from cachetools import TTLCache
 
 from core.bot_classes import Axobot
 from core.formatutils import FormatUtils
+from core.type_utils import UserOrMember
 
 from ..data.dict_types import EventData, EventItem, EventType
 from .abstract_subcog import AbstractSubcog
@@ -92,24 +93,27 @@ class ChristmasSubcog(AbstractSubcog):
             return
         delete_after = 12 if isinstance(channel, discord.abc.PrivateChannel) else None
         translation_source = payload.guild_id or payload.user_id
-        lang = await self.bot._(translation_source, "_used_locale")
+        lang = await self.get_event_language(translation_source)
         user_mention = f"<@{payload.user_id}>"
         # check last collect from this user
         seconds_since_last_collect = await self.get_seconds_since_last_collect(payload.user_id)
-        if seconds_since_last_collect < self.collect_cooldown:
+        if seconds_since_last_collect is not None and seconds_since_last_collect < self.collect_cooldown:
             # user is trying to collect too quickly
             time_remaining = self.collect_cooldown - seconds_since_last_collect
             remaining = await FormatUtils.time_delta(time_remaining, lang=lang, seconds=time_remaining < 60)
-            await channel.send(
-                await self.bot._(translation_source, "bot_events.christmas-cooldown", user=user_mention, time=remaining),
-                delete_after=delete_after
+            message = await self.bot._(
+                translation_source, "bot_events.christmas-cooldown", user=user_mention, time=remaining
             )
+            if delete_after is None:
+                await channel.send(message)
+            else:
+                await channel.send(message, delete_after=delete_after)
             return
         del self.pending_reactions[payload.message_id]
         # add item to user collection
         await self.db_add_user_items(payload.user_id, [item["item_id"]])
         # prepare the notification embed
-        title = self.translations_data[lang]["events_title"][self.current_event_id]
+        title = self.translations_data[lang]["events_title"][self.current_event_data["type"]]
         desc_key = "bot_events.reaction.positive" if item["points"] >= 0 else "bot_events.reaction.negative"
         name_key = "french_name" if lang in ("fr", "fr2") else "english_name"
         item_name = item["emoji"] + " " + item[name_key]
@@ -118,17 +122,20 @@ class ChristmasSubcog(AbstractSubcog):
         if self.current_event_data["icon"]:
             embed.set_image(url=self.current_event_data["icon"])
         # send the notification in the guild/DM channel
-        await channel.send(embed=embed, delete_after=delete_after)
+        if delete_after is None:
+            await channel.send(embed=embed)
+        else:
+            await channel.send(embed=embed, delete_after=delete_after)
         # add points (and potentially grant reward rank card)
         await self.add_collect(payload.user_id, item["points"], ignore_last_collect=True, send_notif_to_interaction=channel)
 
-    async def profile_cmd(self, interaction, user):
+    async def profile_cmd(self, interaction: discord.Interaction, user: UserOrMember):
         "Displays the profile of the user"
         lang = await self.get_event_language(interaction)
         events_desc = self.translations_data[lang]["events_desc"]
 
         # if no event
-        if not self.current_event_id in events_desc:
+        if self.current_event_id is None or self.current_event_id not in events_desc:
             await interaction.followup.send(await self.bot._(interaction, "bot_events.nothing-desc"))
             if self.current_event_id:
                 self.bot.dispatch("error", ValueError(f"'{self.current_event_id}' has no event description"), interaction)
@@ -152,13 +159,13 @@ class ChristmasSubcog(AbstractSubcog):
         emb.add_field(**await self.generate_user_profile_collection_field(interaction, user))
         await interaction.followup.send(embed=emb)
 
-    async def collect_cmd(self, interaction):
+    async def collect_cmd(self, interaction: discord.Interaction):
         "Collect your daily reward"
         current_event = self.current_event_id
         lang = await self.get_event_language(interaction)
         events_desc = self.translations_data[lang]["events_desc"]
         # if no event
-        if not current_event in events_desc:
+        if current_event is None or current_event not in events_desc:
             await interaction.followup.send(await self.bot._(interaction, "bot_events.nothing-desc"))
             if current_event:
                 self.bot.dispatch("error", ValueError(f"'{current_event}' has no event description"), interaction)
@@ -184,8 +191,10 @@ class ChristmasSubcog(AbstractSubcog):
         # add points (and potentially grant reward rank card)
         await self.add_collect(interaction.user.id, sum(item["points"] for item in gifts), send_notif_to_interaction=interaction)
 
+    @staticmethod
     @cached(TTLCache(maxsize=1, ttl=60*2)) # cache for 2min
-    async def today(self):
+    async def today() -> dt.date:
+        "Return today's UTC date"
         return dt.datetime.now(dt.UTC).date()
 
     async def check_trigger_words(self, message: str):
@@ -209,7 +218,7 @@ class ChristmasSubcog(AbstractSubcog):
             gifts_ids += ADVENT_CALENDAR[day + 1]
         if not gifts_ids:
             return []
-        items = await self.db_get_event_items(self.current_event)
+        items = await self.db_get_event_items(self.current_event_data["type"])
         gifts: list[EventItem] = []
         for item in items:
             if item["item_id"] in gifts_ids:
@@ -275,11 +284,11 @@ the end of the event? Don't forget to join our [support server](https://discord.
         return last_collect_day
 
     @cached(TTLCache(maxsize=1, ttl=60*60*24))
-    async def _get_suitable_reaction_items(self):
+    async def _get_suitable_reaction_items(self) -> list[EventItem]:
         "Get the list of items usable in reactions"
         if self.current_event is None:
             return []
-        items = await self.db_get_event_items(self.current_event)
+        items = await self.db_get_event_items(self.current_event_data["type"])
         if len(items) == 0:
             return []
         return [item for item in items if emoji.emoji_count(item["emoji"]) == 1]

@@ -3,7 +3,8 @@ import json
 import logging
 import time
 from collections import defaultdict
-from typing import AsyncGenerator, Literal
+from collections.abc import Sequence
+from typing import AsyncGenerator, Literal, cast, overload
 
 import discord
 from discord import app_commands
@@ -14,7 +15,8 @@ from core.checks.checks import database_connected
 from core.formatutils import FormatUtils
 from core.type_utils import UserOrMember
 
-from .data import EventData, EventRewardRole, EventType
+from .data import EventData, EventType
+from .data.dict_types import EventRewardCard, EventRewardCustom, EventRewardRole
 from .subcogs import AbstractSubcog, RandomCollectSubcog
 
 
@@ -27,11 +29,11 @@ class BotEvents(commands.Cog):
         self.log = logging.getLogger("bot.event")
 
         self.current_event: EventType | None = None
-        self.current_event_data: EventData = {}
+        self.current_event_data: EventData = cast(EventData, {})
         self.current_event_id: str | None = None
 
         self.coming_event: EventType | None = None
-        self.coming_event_data: EventData = {}
+        self.coming_event_data: EventData = cast(EventData, {})
         self.coming_event_id: str | None = None
         self.update_current_event()
 
@@ -60,10 +62,10 @@ class BotEvents(commands.Cog):
     def reset(self):
         "Reset current and coming events"
         self.current_event = None
-        self.current_event_data = {}
+        self.current_event_data = cast(EventData, {})
         self.current_event_id = None
         self.coming_event = None
-        self.coming_event_data = {}
+        self.coming_event_data = cast(EventData, {})
         self.coming_event_id = None
 
     def update_current_event(self):
@@ -80,17 +82,28 @@ class BotEvents(commands.Cog):
 
             if ev_data["begin"] <= now < ev_data["end"]:
                 self.current_event = ev_data["type"]
-                self.current_event_data = ev_data
+                self.current_event_data = cast(EventData, ev_data)
                 self.current_event_id = ev_id
                 self.log.info("Current bot event: %s", ev_id)
                 break
             if ev_data["begin"] - datetime.timedelta(days=6) <= now < ev_data["begin"]:
                 self.coming_event = ev_data["type"]
-                self.coming_event_data = ev_data
+                self.coming_event_data = cast(EventData, ev_data)
                 self.coming_event_id = ev_id
                 self.log.info("Incoming bot event: %s", ev_id)
 
-    async def get_specific_objectives(self, reward_type: Literal["rankcard", "role", "custom"]):
+    @overload
+    async def get_specific_objectives(self, reward_type: Literal["rankcard"]) -> list[EventRewardCard]: ...
+
+    @overload
+    async def get_specific_objectives(self, reward_type: Literal["role"]) -> list[EventRewardRole]: ...
+
+    @overload
+    async def get_specific_objectives(self, reward_type: Literal["custom"]) -> list[EventRewardCustom]: ...
+
+    async def get_specific_objectives(
+        self, reward_type: Literal["rankcard", "role", "custom"]
+    ) -> Sequence[EventRewardCard | EventRewardRole | EventRewardCustom]:
         "Get all objectives matching a certain reward type"
         if self.current_event_id is None:
             return []
@@ -325,7 +338,7 @@ class BotEvents(commands.Cog):
 
     async def check_and_send_card_unlocked_notif(
             self,
-            interaction: discord.Interaction | discord.TextChannel,
+            interaction: discord.Interaction | discord.abc.Messageable,
             user: UserOrMember | int
         ):
         "Check if the user meets the requirements to unlock the event rank card, and send a notification if so"
@@ -379,7 +392,6 @@ class BotEvents(commands.Cog):
         'points' argument can be provided to avoid re-fetching the database"""
         if self.current_event is None or len(rewards := await self.get_specific_objectives("role")) == 0:
             return
-        rewards: list[EventRewardRole]
         if (support_guild := self.bot.get_guild(SUPPORT_GUILD_ID.id)) is None:
             return
         user_id = user if isinstance(user, int) else user.id
@@ -431,5 +443,5 @@ class BotEvents(commands.Cog):
             return False
 
 
-async def setup(bot):
+async def setup(bot: Axobot):
     await bot.add_cog(BotEvents(bot))

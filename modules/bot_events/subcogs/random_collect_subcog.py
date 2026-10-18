@@ -5,6 +5,7 @@ from random import choice, choices, lognormvariate, randint, random
 import discord
 
 from core.bot_classes import Axobot
+from core.type_utils import UserOrMember
 
 from ..data.dict_types import EventData, EventItem, EventType
 from .abstract_subcog import AbstractSubcog
@@ -24,7 +25,7 @@ class RandomCollectSubcog(AbstractSubcog):
         self.normvariate_params = (2.4, 1.0) # parameters for the lognormal distribution (average, standard deviation)
         self.max_items_per_collect = 8 # maximum number of items that can be collected at once
 
-    async def on_message(self, msg):
+    async def on_message(self, msg: discord.Message):
         "Add random reaction to some messages"
         if self.current_event and (data := self.current_event_data.get("emojis")):
             if msg.guild is not None and not msg.channel.permissions_for(msg.guild.me).add_reactions:
@@ -37,10 +38,10 @@ class RandomCollectSubcog(AbstractSubcog):
                 react = choice(data["reactions_list"])
                 await msg.add_reaction(react)
 
-    async def on_raw_reaction_add(self, payload):
+    async def on_raw_reaction_add(self, payload: discord.RawReactionActionEvent):
         pass
 
-    async def profile_cmd(self, interaction, user):
+    async def profile_cmd(self, interaction: discord.Interaction, user: UserOrMember):
         "Displays the profile of the user"
         lang = await self.get_event_language(interaction)
         events_desc = self.translations_data[lang]["events_desc"]
@@ -67,7 +68,7 @@ class RandomCollectSubcog(AbstractSubcog):
         emb.add_field(**await self.generate_user_profile_collection_field(interaction, user))
         await interaction.followup.send(embed=emb)
 
-    async def collect_cmd(self, interaction):
+    async def collect_cmd(self, interaction: discord.Interaction):
         "Get some event points every hour"
         lang = await self.get_event_language(interaction)
         events_desc = self.translations_data[lang]["events_desc"]
@@ -85,10 +86,13 @@ class RandomCollectSubcog(AbstractSubcog):
 
         # check last collect from this user
         seconds_since_last_collect = await self.get_seconds_since_last_collect(interaction.user.id)
-        can_collect, is_strike = await self.check_user_collect_availability(interaction.user.id, seconds_since_last_collect)
+        can_collect, is_strike = await self.check_user_collect_availability(seconds_since_last_collect)
         if not can_collect:
             # cooldown error
-            time_to_next_collect = time.time() - seconds_since_last_collect + self.collect_cooldown
+            time_to_next_collect = (
+                time.time() - seconds_since_last_collect + self.collect_cooldown
+                if seconds_since_last_collect is not None else time.time() + self.collect_cooldown
+            )
             txt = await self.bot._(interaction, "bot_events.collect.too-quick", time=f"<t:{time_to_next_collect:.0f}:R>")
         else:
             # grant points
@@ -151,7 +155,7 @@ class RandomCollectSubcog(AbstractSubcog):
         items_count = min(round(lognormvariate(*self.normvariate_params)), self.max_items_per_collect)
         if items_count <= 0:
             return []
-        items = await self.db_get_event_items(self.current_event)
+        items = await self.db_get_event_items(self.current_event_data["type"])
         if len(items) == 0:
             return []
         return choices(
@@ -160,12 +164,12 @@ class RandomCollectSubcog(AbstractSubcog):
             k=items_count
         )
 
-    async def check_user_collect_availability(self, user_id: int, seconds_since_last_collect: int | None = None):
+    async def check_user_collect_availability(
+        self, seconds_since_last_collect: float | None
+    ) -> tuple[bool, bool]:
         "Check if a user can collect points, and if they are in a strike period"
         if not self.bot.database_online or self.bot.current_event is None:
             return False, False
-        if not seconds_since_last_collect:
-            seconds_since_last_collect = await self.get_seconds_since_last_collect(user_id)
         if seconds_since_last_collect is None:
             return True, False
         if seconds_since_last_collect < self.collect_cooldown:
