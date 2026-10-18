@@ -454,6 +454,17 @@
                 "xp_to_next_level_with_text": [255, 255, 255],
                 "total_xp_with_text": [255, 255, 255]
             }
+        },
+        "halloween26": {
+            "xp_bar": [143,97,232],
+            "texts": {
+                "username": [250,238,227],
+                "level": [143,97,232],
+                "rank": [224,201,255],
+                "participants": [199,183,232],
+                "xp_to_next_level_with_text": [250,238,227],
+                "total_xp_with_text": [199,183,232]
+            }
         }
     }
 }

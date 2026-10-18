@@ -44,6 +44,7 @@ V3_CARDS = {
     "april25",
     "christmas25",
     "april26",
+    "halloween26",
 }
 
 JSON_DATA_FILE = os.path.dirname(__file__) + "/cards_data.json"
@@ -141,7 +142,7 @@ def get_card_texts(
         "rank_and_participants": f"{rank}/{participants}",
         "rank": str(rank),
         "participants": str(participants),
-        "xp_to_next_level_with_text": translation_map.get("xp_left").format(xp_left=xp_to_next_level - total_xp),
-        "total_xp_with_text": translation_map.get("total_xp").format(total_xp=total_xp),
+        "xp_to_next_level_with_text": translation_map["xp_left"].format(xp_left=xp_to_next_level - total_xp),
+        "total_xp_with_text": translation_map["total_xp"].format(total_xp=total_xp),
         "xp": f"{xp_from_last_level}/{xp_between_last_next_level} ({total_xp}/{xp_to_next_level})"
     }

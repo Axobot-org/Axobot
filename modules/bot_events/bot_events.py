@@ -15,7 +15,7 @@ from core.formatutils import FormatUtils
 from core.type_utils import UserOrMember
 
 from .data import EventData, EventRewardRole, EventType
-from .subcogs import AbstractSubcog, SingleReactionSubcog
+from .subcogs import AbstractSubcog, RandomCollectSubcog
 
 
 class BotEvents(commands.Cog):
@@ -35,7 +35,7 @@ class BotEvents(commands.Cog):
         self.coming_event_id: str | None = None
         self.update_current_event()
 
-        self._subcog: AbstractSubcog = SingleReactionSubcog(
+        self._subcog: AbstractSubcog = RandomCollectSubcog(
             self.bot, self.current_event, self.current_event_data, self.current_event_id)
         self.min_delay_between_ttt_wins = 90 # seconds between 2 tictactoe wins to reduce farming/abuse
         self.last_ttt_win: dict[int, int] = defaultdict(int) # map of user_id -> timestamp
@@ -45,7 +45,7 @@ class BotEvents(commands.Cog):
         "Return the subcog populated with the current event data"
         if self._subcog.current_event != self.current_event or self._subcog.current_event_data != self.current_event_data:
             self.log.debug("Updating subcog with new data")
-            self._subcog = SingleReactionSubcog(self.bot, self.current_event, self.current_event_data, self.current_event_id)
+            self._subcog = RandomCollectSubcog(self.bot, self.current_event, self.current_event_data, self.current_event_id)
         return self._subcog
 
     async def cog_load(self):
