@@ -112,7 +112,7 @@ class _ChangelogTextModal(ui.Modal):
             style=TextStyle.paragraph,
             default=initial_text,
             required=False,
-            max_length=1500,
+            max_length=1900,
         )
         self.add_item(self.text_input)
         self.last_interaction: Interaction | None = None
