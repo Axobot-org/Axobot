@@ -9,8 +9,8 @@ from mysql.connector.errors import IntegrityError
 
 from core.arguments import PartialorUnicodeEmojiArgument
 from core.bot_classes import Axobot
-from core.enums import ServerWarningType
 from core.safedict import SafeDict
+from core.server_warnings import TicketCreationFailed, TicketCreationUnknownTarget
 from core.type_utils import (GuildInteraction, UserOrMember,
                              assert_interaction_channel_is_guild_messageable)
 
@@ -28,6 +28,7 @@ TopicNameArgument = app_commands.Range[str, 1, 100]
 ChannelNameFormatArgument = app_commands.Range[str, 1, 70]
 HintTextArgument = app_commands.Range[str, 1, 2000]
 MAX_TOPICS_PER_GUILD = 25
+PIN_MESSAGE_PERMISSION = 1 << 51 # TODO: remove once discord.py has updated its Permissions class
 
 class Tickets(commands.Cog):
     "Handle the bot tickets system"
@@ -247,9 +248,9 @@ class Tickets(commands.Cog):
         return discord.Embed(title=title, description=desc, color=discord.Color.green())
 
     async def get_ticket_channel_perms(self, channel: discord.CategoryChannel, topic: DBTopicRowWithDefault, user: discord.Member
-                                       ) -> dict[discord.Role | discord.Member, discord.PermissionOverwrite]:
+                                       ) -> dict[discord.Role | discord.Member | discord.Object, discord.PermissionOverwrite]:
         "Setup the required permissions for a channel ticket"
-        permissions = {}
+        permissions: dict[discord.Role | discord.Member | discord.Object, discord.PermissionOverwrite] = {}
         # set for everyone
         permissions[channel.guild.default_role] = discord.PermissionOverwrite(read_messages=False)
         # set for the user and the bot
@@ -304,11 +305,11 @@ class Tickets(commands.Cog):
         self.cooldowns[interaction.user] = time.time()
         category = interaction.guild.get_channel(topic["category"]) if topic["category"] else None
         if category is None:
-            self.bot.dispatch("server_warning", ServerWarningType.TICKET_CREATION_UNKNOWN_TARGET,
-                interaction.guild,
+            self.bot.dispatch("server_warning", TicketCreationUnknownTarget(
+                guild=interaction.guild,
                 channel_id=topic["category"],
                 topic_name=topic["topic"]
-            )
+            ))
             raise RuntimeError(f"No category configured for guild {interaction.guild_id} and topic {topic['topic']}")
         sent_error = False
         channel_name = await self.get_channel_name(topic["name_format"], interaction, topic, ticket_name)
@@ -322,11 +323,11 @@ class Tickets(commands.Cog):
                     content=await self.bot._(interaction.guild_id, "tickets.missing-perms-creation.channel",
                                              category=category.name)
                 )
-                self.bot.dispatch("server_warning", ServerWarningType.TICKET_CREATION_FAILED,
-                    interaction.guild,
+                self.bot.dispatch("server_warning", TicketCreationFailed(
+                    guild=interaction.guild,
                     channel=category,
                     topic_name=topic["topic"]
-                )
+                ))
                 return
         elif isinstance(category, discord.TextChannel):
             try:
@@ -341,11 +342,11 @@ class Tickets(commands.Cog):
                     content=await self.bot._(interaction.guild_id, "tickets.missing-perms-creation.thread",
                                              channel=category.mention)
                 )
-                self.bot.dispatch("server_warning", ServerWarningType.TICKET_CREATION_FAILED,
-                    interaction.guild,
+                self.bot.dispatch("server_warning", TicketCreationFailed(
+                    guild=interaction.guild,
                     channel=category,
                     topic_name=topic["topic"]
-                )
+                ))
                 return
             await self.setup_ticket_thread(channel, topic, interaction.user)
         else:
@@ -359,7 +360,7 @@ class Tickets(commands.Cog):
         else:
             await interaction.edit_original_response(content=txt)
         msg = await channel.send(embed=await self.create_channel_first_message(interaction, topic, ticket_name))
-        if channel.permissions_for(channel.guild.me).manage_messages:
+        if channel.permissions_for(channel.guild.me).value & (PIN_MESSAGE_PERMISSION):
             await msg.pin()
         self.bot.dispatch("ticket_creation", TicketCreationEvent(topic, ticket_name, interaction, channel))
 
@@ -380,7 +381,7 @@ class Tickets(commands.Cog):
         filtered = sorted([
             (not topic["topic"].lower().startswith(current), topic["topic"], topic["id"])
             for topic in topics
-            if topic["topic"] is not None and current in topic["topic"].lower()
+            if current in topic["topic"].lower()
         ])
         return [
             app_commands.Choice(name=name, value=topic_id)
@@ -683,7 +684,7 @@ class Tickets(commands.Cog):
             if isinstance(res, list):
                 raise TypeError("This command should only edit one topic at a time")
             topic_id = res
-        elif isinstance(emote, discord.PartialEmoji):
+        if isinstance(emote, discord.PartialEmoji):
             emote = f"{emote.name}:{emote.id}"
         if await self.db_edit_topic_emoji(interaction.guild_id, topic_id, emote):
             topic = await self.db_get_topic_with_defaults(interaction.guild_id, topic_id)

@@ -125,6 +125,7 @@
         "poll_channels": "List of channels where :thumbsup: and :thumbsdown: reactions will be automatically added to each message: %{value}",
         "private_leaderboard": "Should non-members be able to access the server leaderboard? %{value}",
         "rank_in_private": "Send rank cards in private messages? %{value}",
+        "rr_highest_only": "Only keep the highest role reward of each member? %{value}",
         "save_roles": "Should roles be saved when a member leaves, in case they return? %{value}",
         "streaming_channel": "Channel where to send live notifications: %{value}",
         "stream_mention": "Role to mention when a member starts a live: %{value}",

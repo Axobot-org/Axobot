@@ -124,6 +124,7 @@
         "poll_channels": "List oof channl whre :thumbsup: & :thumbsdown: réactonz would be aut:o2:maticall ad to aech msg pliz : %{value}",
         "private_leaderboard": "Shud we allow random ppl 2 access teh xp leaderboard? %{value}",
         "rank_in_private": "Send shiny rank cards on private msg? %{value}",
+        "rr_highest_only": "Keep only teh biggest role prize 4 each ppl? %{value}",
         "save_roles": "Can role bee save:b: wHen an membr leive, in case him retrns? %{value}",
         "streaming_channel": "Chanel where 2 sent stream news: %{value}",
         "stream_mention": "Role to mentun when a membur startz a lief: %{value}",

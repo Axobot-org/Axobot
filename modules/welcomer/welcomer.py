@@ -8,9 +8,9 @@ from cachetools import TTLCache
 from discord.ext import commands
 
 from core.bot_classes import SUPPORT_GUILD_ID, Axobot
-from core.enums import ServerWarningType
 from core.parse_mentions import parse_allowed_mentions
 from core.safedict import SafeDict
+from core.server_warnings import WelcomeMissingTxtPermissions, WelcomeRoleMissingPermissions
 from core.text_cleanup import sync_check_any_link
 from modules.xp.xp import XpSystemType
 
@@ -136,11 +136,9 @@ class Welcomer(commands.Cog):
             if event_type == "welcome":
                 self.join_cache[member.guild.id, member.id] = msg.id
         except discord.Forbidden:
-            self.bot.dispatch("server_warning",
-                                ServerWarningType.WELCOME_MISSING_TXT_PERMISSIONS,
-                                member.guild,
-                                channel=channel,
-                                is_join=event_type == "welcome")
+            self.bot.dispatch("server_warning", WelcomeMissingTxtPermissions(
+                guild=member.guild, channel=channel, is_join=event_type == "welcome"
+            ))
         except Exception as err:
             self.bot.dispatch("error", err, f"{member.guild} | {channel.name}")
 
@@ -241,13 +239,9 @@ class Welcomer(commands.Cog):
                 try:
                     await member.add_roles(role, reason=await self.bot._(member.guild.id,"logs.reason.welcome_roles"))
                 except discord.errors.Forbidden:
-                    self.bot.dispatch(
-                        "server_warning",
-                        ServerWarningType.WELCOME_ROLE_MISSING_PERMISSIONS,
-                        member.guild,
-                        role=role,
-                        user=member
-                    )
+                    self.bot.dispatch("server_warning", WelcomeRoleMissingPermissions(
+                        guild=member.guild, role=role, user=member
+                    ))
         except discord.errors.NotFound:
             pass
         except Exception as err:

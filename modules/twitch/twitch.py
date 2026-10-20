@@ -11,7 +11,7 @@ from discord.ext import commands, tasks
 from mysql.connector.errors import IntegrityError
 
 from core.bot_classes import Axobot
-from core.enums import ServerWarningType
+from core.server_warnings import StreamNotificationMissingPermissions, StreamRoleMissingPermissions
 from core.type_utils import assert_interaction_channel_is_guild_messageable, channel_is_guild_messageable
 
 from .api.api_agent import TwitchApiAgent
@@ -350,8 +350,9 @@ class Twitch(commands.Cog):
                 await self.send_stream_alert(stream, channel)
             except discord.Forbidden:
                 self.log.info("Cannot send notif to channel %s in guild %s: Forbidden", channel.id, guild.id)
-                self.bot.dispatch("server_warning", ServerWarningType.STREAM_NOTIFICATION_MISSING_PERMISSIONS,
-                                  guild, channel_id=channel.id, username=stream["user_name"])
+                self.bot.dispatch("server_warning", StreamNotificationMissingPermissions(
+                    guild=guild, channel_id=channel.id, username=stream["user_name"]
+                ))
         # Grant role
         if (role := await self.bot.get_config(guild.id, "streaming_role")) and isinstance(role, discord.Role):
             if member := await self.find_streamer_in_guild(stream["user_name"], guild):
@@ -359,8 +360,9 @@ class Twitch(commands.Cog):
                     await member.add_roles(role, reason="Twitch streamer is live")
                 except discord.Forbidden:
                     self.log.info("Cannot add role %s to member %s in guild %s: Forbidden", role.id, member.id, guild.id)
-                    self.bot.dispatch("server_warning", ServerWarningType.STREAM_ROLE_MISSING_PERMISSIONS,
-                                    guild, role_id=role.id, member=member, username=stream["user_name"])
+                    self.bot.dispatch("server_warning", StreamRoleMissingPermissions(
+                        guild=guild, role_id=role.id, member=member, username=stream["user_name"]
+                    ))
 
     @commands.Cog.listener()
     async def on_stream_ends(self, _streamer_name: str, guild: discord.Guild):

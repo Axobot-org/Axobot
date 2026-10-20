@@ -3,7 +3,8 @@ import json
 import logging
 import time
 from collections import defaultdict
-from typing import AsyncGenerator, Literal
+from collections.abc import Sequence
+from typing import AsyncGenerator, Literal, assert_never, cast, overload
 
 import discord
 from discord import app_commands
@@ -14,8 +15,11 @@ from core.checks.checks import database_connected
 from core.formatutils import FormatUtils
 from core.type_utils import UserOrMember
 
-from .data import EventData, EventRewardRole, EventType
-from .subcogs import AbstractSubcog, SingleReactionSubcog
+from .data import EventData, EventType
+from .data.dict_types import (EventRewardCard, EventRewardCustom,
+                              EventRewardRole)
+from .subcogs import (AbstractSubcog, ChristmasSubcog, RandomCollectSubcog,
+                      SingleReactionSubcog)
 
 
 class BotEvents(commands.Cog):
@@ -27,25 +31,21 @@ class BotEvents(commands.Cog):
         self.log = logging.getLogger("bot.event")
 
         self.current_event: EventType | None = None
-        self.current_event_data: EventData = {}
+        self.current_event_data: EventData | None = None
         self.current_event_id: str | None = None
 
         self.coming_event: EventType | None = None
-        self.coming_event_data: EventData = {}
+        self.coming_event_data: EventData | None = None
         self.coming_event_id: str | None = None
+        self._subcog: AbstractSubcog | None = None
         self.update_current_event()
 
-        self._subcog: AbstractSubcog = SingleReactionSubcog(
-            self.bot, self.current_event, self.current_event_data, self.current_event_id)
         self.min_delay_between_ttt_wins = 90 # seconds between 2 tictactoe wins to reduce farming/abuse
         self.last_ttt_win: dict[int, int] = defaultdict(int) # map of user_id -> timestamp
 
     @property
-    def subcog(self) -> AbstractSubcog:
-        "Return the subcog populated with the current event data"
-        if self._subcog.current_event != self.current_event or self._subcog.current_event_data != self.current_event_data:
-            self.log.debug("Updating subcog with new data")
-            self._subcog = SingleReactionSubcog(self.bot, self.current_event, self.current_event_data, self.current_event_id)
+    def subcog(self) -> AbstractSubcog | None:
+        "Return the subcog for the active event, if any"
         return self._subcog
 
     async def cog_load(self):
@@ -60,11 +60,12 @@ class BotEvents(commands.Cog):
     def reset(self):
         "Reset current and coming events"
         self.current_event = None
-        self.current_event_data = {}
+        self.current_event_data = None
         self.current_event_id = None
         self.coming_event = None
-        self.coming_event_data = {}
+        self.coming_event_data = None
         self.coming_event_id = None
+        self._subcog = None
 
     def update_current_event(self):
         "Update class attributes with the new/incoming bot events if needed"
@@ -80,19 +81,50 @@ class BotEvents(commands.Cog):
 
             if ev_data["begin"] <= now < ev_data["end"]:
                 self.current_event = ev_data["type"]
-                self.current_event_data = ev_data
+                self.current_event_data = cast(EventData, ev_data)
                 self.current_event_id = ev_id
                 self.log.info("Current bot event: %s", ev_id)
                 break
             if ev_data["begin"] - datetime.timedelta(days=6) <= now < ev_data["begin"]:
                 self.coming_event = ev_data["type"]
-                self.coming_event_data = ev_data
+                self.coming_event_data = cast(EventData, ev_data)
                 self.coming_event_id = ev_id
                 self.log.info("Incoming bot event: %s", ev_id)
 
-    async def get_specific_objectives(self, reward_type: Literal["rankcard", "role", "custom"]):
+        current_event = self.current_event
+        current_event_data = self.current_event_data
+        current_event_id = self.current_event_id
+        if current_event is None and self._subcog is not None:
+            self._subcog = None
+            return
+        if current_event is not None and current_event_data is not None and current_event_id is not None:
+            match current_event:
+                case "christmas":
+                    subcog_type = ChristmasSubcog
+                case "fish":
+                    subcog_type = SingleReactionSubcog
+                case "blurple" | "halloween":
+                    subcog_type = RandomCollectSubcog
+                case _:
+                    assert_never(current_event)
+            self._subcog = subcog_type(
+                self.bot, current_event, current_event_data, current_event_id
+            )
+
+    @overload
+    async def get_specific_objectives(self, reward_type: Literal["rankcard"]) -> list[EventRewardCard]: ...
+
+    @overload
+    async def get_specific_objectives(self, reward_type: Literal["role"]) -> list[EventRewardRole]: ...
+
+    @overload
+    async def get_specific_objectives(self, reward_type: Literal["custom"]) -> list[EventRewardCustom]: ...
+
+    async def get_specific_objectives(
+        self, reward_type: Literal["rankcard", "role", "custom"]
+    ) -> Sequence[EventRewardCard | EventRewardRole | EventRewardCustom]:
         "Get all objectives matching a certain reward type"
-        if self.current_event_id is None:
+        if self.current_event_data is None:
             return []
         return [
             objective
@@ -123,21 +155,22 @@ class BotEvents(commands.Cog):
         if msg.guild is not None and not msg.channel.permissions_for(msg.guild.me).add_reactions:
             # don't react if we don't have the required permission
             return
-        if self.current_event:
-            await self.subcog.on_message(msg)
+        if subcog := self.subcog:
+            await subcog.on_message(msg)
 
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload: discord.RawReactionActionEvent):
         "Give points to the user if they reacted to a message with the right emoji"
         if self.bot.zombie_mode:
             return
-        if self.current_event:
-            await self.subcog.on_raw_reaction_add(payload)
+        if subcog := self.subcog:
+            await subcog.on_raw_reaction_add(payload)
 
     @commands.Cog.listener()
     async def on_tictactoe_win(self, interaction: discord.Interaction):
         "Grant points to the user if they won a game of tictactoe"
-        if not self.current_event or not self.current_event_data["objectives"]:
+        event_data = self.current_event_data
+        if self.current_event is None or event_data is None or not event_data["objectives"]:
             return
         now = time.time()
         # limit to 1 win per X seconds
@@ -147,8 +180,8 @@ class BotEvents(commands.Cog):
         user = interaction.user
         # check if user points is high enough to add some difficulty (ie. grant less points on win)
         user_points = await self.db_get_user_points(user.id)
-        first_objective = self.current_event_data["objectives"][0]["points"]
-        last_objective = self.current_event_data["objectives"][-1]["points"]
+        first_objective = event_data["objectives"][0]["points"]
+        last_objective = event_data["objectives"][-1]["points"]
         first_cap = first_objective * 0.9 if first_objective > 50 else 0
         second_cap = max(50, last_objective * 0.9)
         last_cap = max(200, last_objective * 2)
@@ -168,7 +201,7 @@ class BotEvents(commands.Cog):
         emb = discord.Embed(
             title=await self.bot._(interaction, "bot_events.tictactoe.won.title"),
             description=await self.bot._(interaction, "bot_events.tictactoe.won.desc", points=points),
-            color=self.current_event_data["color"],
+            color=event_data["color"],
         )
         emb.set_author(name=user.global_name, icon_url=user.display_avatar)
         await interaction.followup.send(embed=emb)
@@ -180,13 +213,14 @@ class BotEvents(commands.Cog):
     @commands.Cog.listener()
     async def on_tictactoe_lose(self, interaction: discord.Interaction):
         "Grant points to the user if they lost a game of tictactoe"
-        if not self.current_event or not self.current_event_data["objectives"]:
+        event_data = self.current_event_data
+        if self.current_event is None or event_data is None or not event_data["objectives"]:
             return
         user = interaction.user
         # check if user points is high enough to add some difficulty (ie. remove points on loss)
         user_points = await self.db_get_user_points(user.id)
-        first_cap = self.current_event_data["objectives"][0]["points"]
-        last_cap = self.current_event_data["objectives"][-1]["points"]
+        first_cap = event_data["objectives"][0]["points"]
+        last_cap = event_data["objectives"][-1]["points"]
         if user_points is None or user_points < first_cap * 1.1:
             return
         if first_cap == last_cap or user_points < last_cap * 1.1:
@@ -199,7 +233,7 @@ class BotEvents(commands.Cog):
         emb = discord.Embed(
             title=await self.bot._(interaction, "bot_events.tictactoe.lost.title"),
             description=await self.bot._(interaction, "bot_events.tictactoe.lost.desc", points=-points),
-            color=self.current_event_data["color"],
+            color=event_data["color"],
         )
         emb.set_author(name=user.global_name, icon_url=user.display_avatar)
         await interaction.followup.send(embed=emb)
@@ -216,23 +250,28 @@ class BotEvents(commands.Cog):
     async def event_info(self, interaction: discord.Interaction):
         """Get info about the current event"""
         await interaction.response.defer()
+        subcog = self.subcog
+        event_data = self.current_event_data
         current_event = self.current_event_id
-        lang = await self.subcog.get_event_language(interaction)
-        events_desc = self.subcog.translations_data[lang]["events_desc"]
+        if subcog is None or event_data is None or current_event is None:
+            await interaction.followup.send(await self.get_no_active_event_response(interaction))
+            return
+        lang = await subcog.get_event_language(interaction)
+        events_desc = subcog.translations_data[lang]["events_desc"]
 
         if current_event in events_desc:
             event_desc = events_desc[current_event]
             # Title
             try:
-                title = self.subcog.translations_data[lang]["events_title"][current_event]
+                title = subcog.translations_data[lang]["events_title"][current_event]
             except KeyError:
-                title = self.current_event
+                title = subcog.current_event
             # Begin/End dates
-            begin = f"<t:{self.current_event_data['begin'].timestamp():.0f}>"
-            end = f"<t:{self.current_event_data['end'].timestamp():.0f}>"
-            emb = discord.Embed(title=title, description=event_desc, color=self.current_event_data["color"])
-            if self.current_event_data["icon"]:
-                emb.set_image(url=self.current_event_data["icon"])
+            begin = f"<t:{event_data['begin'].timestamp():.0f}>"
+            end = f"<t:{event_data['end'].timestamp():.0f}>"
+            emb = discord.Embed(title=title, description=event_desc, color=event_data["color"])
+            if event_data["icon"]:
+                emb.set_image(url=event_data["icon"])
             emb.add_field(
                 name=(await self.bot._(interaction, "misc.beginning")).capitalize(),
                 value=begin
@@ -242,36 +281,39 @@ class BotEvents(commands.Cog):
                 value=end
             )
             # Prices to win
-            prices_translations = self.subcog.translations_data[lang]["events_prices"]
+            prices_translations = subcog.translations_data[lang]["events_prices"]
             if current_event in prices_translations:
                 emb.add_field(
                     name=await self.bot._(interaction, "bot_events.events-price-title"),
-                    value=await self.get_info_prices_field(interaction),
+                    value=await self.get_info_prices_field(interaction, subcog, event_data, current_event, lang),
                     inline=False
                 )
             await interaction.followup.send(embed=emb)
-        elif self.coming_event_data:
-            date = f"<t:{self.coming_event_data['begin'].timestamp():.0f}>"
-            await interaction.followup.send(await self.bot._(interaction, "bot_events.soon", date=date))
         else:
             await interaction.followup.send(await self.bot._(interaction, "bot_events.nothing-desc"))
             if current_event:
                 self.bot.dispatch("error", ValueError(f"'{current_event}' has no event description"), interaction)
 
-    async def get_info_prices_field(self, interaction: discord.Interaction):
+    async def get_info_prices_field(
+        self,
+        interaction: discord.Interaction,
+        subcog: AbstractSubcog,
+        event_data: EventData,
+        event_id: str,
+        lang: Literal["fr", "en"],
+    ) -> str:
         "Get the prices field text for the current event"
-        lang = await self.subcog.get_event_language(interaction)
-        prices_translations = self.subcog.translations_data[lang]["events_prices"]
-        if self.current_event_id not in prices_translations:
+        prices_translations = subcog.translations_data[lang]["events_prices"]
+        if event_id not in prices_translations:
             return await self.bot._(interaction, "bot_events.nothing-desc")
         points = await self.bot._(interaction, "bot_events.points")
         if lang == "fr":
             points += " "
         prices: list[str] = []
-        for required_points, description in prices_translations[self.current_event_id].items():
+        for required_points, description in prices_translations[event_id].items():
             related_objective = [
                 objective
-                for objective in self.current_event_data["objectives"]
+                for objective in event_data["objectives"]
                 if str(objective["points"]) == required_points
             ]
             if related_objective and (min_date := related_objective[0].get("min_date")):
@@ -287,35 +329,48 @@ class BotEvents(commands.Cog):
     async def event_profile(self, interaction: discord.Interaction, user: discord.User | None = None):
         """Take a look at your progress in the event and your global ranking
         Event points are reset after each event"""
-        if self.current_event is None and self.coming_event_data:
-            date = f"<t:{self.coming_event_data['begin'].timestamp():.0f}>"
-            await interaction.response.send_message(await self.bot._(interaction, "bot_events.soon", date=date))
+        subcog = self.subcog
+        if subcog is None:
+            await interaction.response.send_message(
+                await self.get_no_active_event_response(interaction)
+            )
             return
         resolved_user = user or interaction.user
         await interaction.response.defer()
-        await self.subcog.profile_cmd(interaction, resolved_user)
+        await subcog.profile_cmd(interaction, resolved_user)
 
     @events_main.command(name="collect")
     @app_commands.checks.cooldown(2, 60)
     @app_commands.check(database_connected)
     async def event_collect(self, interaction: discord.Interaction):
         "Get some event points every hour"
-        if self.current_event is None and self.coming_event_data:
-            date = f"<t:{self.coming_event_data['begin'].timestamp():.0f}>"
-            await interaction.response.send_message(await self.bot._(interaction, "bot_events.soon", date=date))
+        subcog = self.subcog
+        if subcog is None:
+            await interaction.response.send_message(
+                await self.get_no_active_event_response(interaction)
+            )
             return
         await interaction.response.defer()
-        await self.subcog.collect_cmd(interaction)
+        await subcog.collect_cmd(interaction)
+
+    async def get_no_active_event_response(self, interaction: discord.Interaction) -> str:
+        "Get the response message when there is no active event"
+        coming_event_data = self.coming_event_data
+        if coming_event_data is not None:
+            date = f"<t:{coming_event_data['begin'].timestamp():.0f}>"
+            return await self.bot._(interaction, "bot_events.soon", date=date)
+        return await self.bot._(interaction, "bot_events.nothing-desc")
 
     async def get_user_unlockable_rankcards(self, user: UserOrMember, points: int | None=None) -> AsyncGenerator[str, None]:
         "Get a list of event rank cards that the user can unlock"
         if (users_cog := self.bot.get_cog("Users")) is None:
             return
-        if self.current_event is None or len(rewards := await self.get_specific_objectives("rankcard")) == 0:
+        subcog = self.subcog
+        if subcog is None or len(rewards := await self.get_specific_objectives("rankcard")) == 0:
             return
         cards = await users_cog.get_rankcards(user)
         if points is None:
-            db_result = await self.subcog.db_get_event_rank(user.id)
+            db_result = await subcog.db_get_event_rank(user.id)
             points = 0 if (db_result is None) else db_result["points"]
         for reward in rewards:
             if reward["rank_card"] not in cards and points >= reward["points"]:
@@ -325,7 +380,7 @@ class BotEvents(commands.Cog):
 
     async def check_and_send_card_unlocked_notif(
             self,
-            interaction: discord.Interaction | discord.TextChannel,
+            interaction: discord.Interaction | discord.abc.Messageable,
             user: UserOrMember | int
         ):
         "Check if the user meets the requirements to unlock the event rank card, and send a notification if so"
@@ -377,16 +432,16 @@ class BotEvents(commands.Cog):
     async def reload_event_special_role(self, user: UserOrMember | int, points: int | None = None):
         """Grant the current event special role to the provided user, if they have enough points
         'points' argument can be provided to avoid re-fetching the database"""
-        if self.current_event is None or len(rewards := await self.get_specific_objectives("role")) == 0:
+        subcog = self.subcog
+        if subcog is None or len(rewards := await self.get_specific_objectives("role")) == 0:
             return
-        rewards: list[EventRewardRole]
         if (support_guild := self.bot.get_guild(SUPPORT_GUILD_ID.id)) is None:
             return
         user_id = user if isinstance(user, int) else user.id
         if (member := support_guild.get_member(user_id)) is None:
             return
         if points is None:
-            db_result = await self.subcog.db_get_event_rank(user_id)
+            db_result = await subcog.db_get_event_rank(user_id)
             points = 0 if (db_result is None) else db_result["points"]
         for reward in rewards:
             if points >= reward["points"]:
@@ -431,5 +486,5 @@ class BotEvents(commands.Cog):
             return False
 
 
-async def setup(bot):
+async def setup(bot: Axobot):
     await bot.add_cog(BotEvents(bot))

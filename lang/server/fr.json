@@ -125,6 +125,7 @@
         "poll_channels": "Liste des salons dans lesquels les réactions :thumbsup: et :thumbsdown: seront automatiquement ajoutées à chaque message : %{value}",
         "private_leaderboard": "Les non-membres doivent-ils pouvoir accéder au classement du serveur ? %{value}",
         "rank_in_private": "Envoyer les cartes d'xp en messages privés ? %{value}",
+        "rr_highest_only": "Ne conserver que la plus haute récompense de rôle de chaque membre ? %{value}",
         "save_roles": "Les rôles doivent-ils être sauvegardés lorsqu'un membre part, au cas où il revienne ? %{value}",
         "streaming_channel": "Salon où envoyer les notifications de live : %{value}",
         "stream_mention": "Rôle à mentionner lorsqu'un live débute : %{value}",

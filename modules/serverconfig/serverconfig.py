@@ -8,6 +8,7 @@ from discord import app_commands
 from discord.ext import commands, tasks
 
 from core.bot_classes import Axobot
+from core.server_warnings import MembercounterMissingPermissions
 from core.tips import UserTip
 from core.type_utils import AnyStrDict, GuildInteraction, assert_interaction_channel_is_guild_messageable
 from core.views import ConfirmView
@@ -216,8 +217,8 @@ class ServerConfig(commands.Cog):
         try:
             await channel.edit(name=text, reason=await self.bot._(guild.id, "logs.reason.memberchan"))
             return True
-        except (discord.Forbidden, discord.NotFound):
-            pass
+        except discord.Forbidden:
+            self.bot.dispatch("server_warning", MembercounterMissingPermissions(guild=guild, channel=channel))
         except Exception as err:
             self.bot.dispatch("error", err, f"Updating membercount channel {channel.id} in guild {guild.id}")
         return False
@@ -455,7 +456,8 @@ class ServerConfig(commands.Cog):
         await confirm_view.wait()
         if confirm_view.response_interaction:
             interaction = confirm_view.response_interaction
-            await interaction.response.defer()
+            if not interaction.response.is_done():
+                await interaction.response.defer()
         await confirm_view.disable(interaction)
         if not confirm_view.value:
             return

@@ -1,6 +1,6 @@
 import datetime
 from abc import ABC, abstractmethod
-from typing import Any, Literal, TypedDict
+from typing import Any, Literal, TypedDict, cast
 
 import discord
 
@@ -20,13 +20,20 @@ class DBUserRank(TypedDict):
     rank: int
 
 
+class EmbedField(TypedDict):
+    "Type for the arguments of an embed field"
+    name: str
+    value: str
+    inline: bool
+
+
 class AbstractSubcog(ABC):
     "Abstract class for the subcogs used by BotEvents"
 
     def __init__(self, bot: Axobot,
-                 current_event: EventType | None, current_event_data: EventData, current_event_id: str | None):
+                 current_event: EventType, current_event_data: EventData, current_event_id: str):
         self.bot = bot
-        self.current_event = current_event
+        self.current_event: EventType = current_event
         self.current_event_data = current_event_data
         self.current_event_id = current_event_id
         self.translations_data = get_events_translations()
@@ -47,7 +54,9 @@ class AbstractSubcog(ABC):
     async def collect_cmd(self, interaction: discord.Interaction):
         "Collects the daily/hourly reward"
 
-    async def get_event_language(self, translation_source) -> Literal["fr", "en"]:
+    async def get_event_language(
+        self, translation_source: discord.Interaction | int
+    ) -> Literal["fr", "en"]:
         "Find which language to use for the event translations"
         lang = await self.bot._(translation_source, "_used_locale")
         if lang in ("fr", "fr2"):
@@ -116,7 +125,9 @@ class AbstractSubcog(ABC):
             "inline": False
         }
 
-    async def generate_user_profile_collection_field(self, interaction: discord.Interaction, user: discord.User):
+    async def generate_user_profile_collection_field(
+        self, interaction: discord.Interaction, user: UserOrMember
+    ) -> EmbedField:
         "Compute the texts to display in the /event profile command"
         if interaction.user == user:
             title = await self.bot._(interaction, "bot_events.collection-title.user")
@@ -164,29 +175,35 @@ class AbstractSubcog(ABC):
         "Check if events are enabled in a given context"
         if message.guild is None:
             return True
-        if not self.bot.database_online and not message.author.guild_permissions.manage_guild:
+        if (
+            not self.bot.database_online
+            and not (isinstance(message.author, discord.Member) and message.author.guild_permissions.manage_guild)
+        ):
             return False
         return await self.bot.get_config(message.guild.id, "enable_events")
 
-    async def get_random_tip_field(self, interaction: discord.Interaction):
+    async def get_random_tip_field(self, interaction: discord.Interaction) -> EmbedField:
         return {
             "name": await self.bot._(interaction, "bot_events.tip-title"),
             "value": await self.bot.tips_manager.generate_random_tip(interaction),
             "inline": False
         }
 
-    async def get_seconds_since_last_collect(self, user_id: int):
-        "Get the seconds since the last collect from a user"
+    async def get_seconds_since_last_collect(self, user_id: int) -> float | None:
+        "Get seconds since the last collect, or None if there was none"
         last_collect = await self.db_get_last_user_collect(user_id)
         if last_collect is None:
-            return 1e9
+            return None
         return (self.bot.utcnow() - last_collect).total_seconds()
 
-    async def get_reaction_destination_channel(self, payload: discord.RawReactionActionEvent):
+    async def get_reaction_destination_channel(
+        self, payload: discord.RawReactionActionEvent
+    ) -> discord.abc.Messageable | None:
         "Find the correct channel to use when responding to a collect reaction"
         # get the destination channel
         if (
             (channel := self.bot.get_channel(payload.channel_id))
+            and isinstance(channel, discord.abc.Messageable)
             and (
                 isinstance(channel, discord.abc.PrivateChannel)
                 or (
@@ -201,7 +218,7 @@ class AbstractSubcog(ABC):
 
     async def add_collect(self, user_id: int, points: int, /,
                           ignore_last_collect: bool = False,
-                          send_notif_to_interaction: discord.Interaction | discord.TextChannel | None = None):
+                          send_notif_to_interaction: discord.Interaction | discord.abc.Messageable | None = None):
         "Add collect points to a user"
         if not self.bot.database_online or self.bot.current_event is None:
             return
@@ -216,7 +233,7 @@ class AbstractSubcog(ABC):
                 self.bot.dispatch("error", err)
 
     async def add_collect_and_strike(self, user_id: int, points: int, /,
-                                     send_notif_to_interaction: discord.Interaction | discord.TextChannel | None = None):
+                                     send_notif_to_interaction: discord.Interaction | discord.abc.Messageable | None = None):
         """Add collect points to a user and increase the strike level by 1"""
         if not self.bot.database_online or self.bot.current_event is None:
             return True
@@ -256,7 +273,9 @@ class AbstractSubcog(ABC):
             ( SELECT GROUP_CONCAT( `points` ORDER BY `points` DESC ) FROM `event_points` WHERE `beta` = %(beta)s ) ) AS rank \
                 FROM `event_points` WHERE `user_id` = %(user)s AND `beta` = %(beta)s"
         async with self.bot.db_main.read(query, {"user": user_id, "beta": self.bot.beta}, fetchone=True) as query_results:
-            return query_results or None
+            if not query_results:
+                return None
+            return cast(DBUserRank, query_results)
 
     async def db_get_user_collected_items(self, user_id: int, event_type: EventType) -> list[EventItemWithCount]:
         "Get the items collected by a user"
@@ -269,7 +288,7 @@ class AbstractSubcog(ABC):
             AND a.`event_type` = %s
         GROUP BY c.`item_id`"""
         async with self.bot.db_main.read(query, (user_id, self.bot.beta, event_type)) as query_results:
-            return query_results
+            return cast(list[EventItemWithCount], query_results)
 
     async def db_get_last_user_collect(self, user_id: int) -> datetime.datetime | None:
         "Get the last collect datetime from a user"
@@ -277,9 +296,9 @@ class AbstractSubcog(ABC):
             return None
         query = "SELECT `last_collect` FROM `event_points` WHERE `user_id` = %s AND `beta` = %s;"
         async with self.bot.db_main.read(query, (user_id, self.bot.beta), fetchone=True, astuple=True) as query_result:
-            if not query_result:
+            query_result = cast(tuple[datetime.datetime | None] | None, query_result)
+            if query_result is None:
                 return None
-            query_result: tuple[datetime.datetime]
             if query_result[0] is None:
                 return None
             # apply utc offset
@@ -292,7 +311,9 @@ class AbstractSubcog(ABC):
             return
         query = "INSERT INTO `event_collected_items` (`user_id`, `item_id`, `beta`) VALUES " + \
             ", ".join(["(%s, %s, %s)"] * len(items_ids)) + ';'
-        async with self.bot.db_main.write(query, [arg for item_id in items_ids for arg in (user_id, item_id, self.bot.beta)]):
+        async with self.bot.db_main.write(
+            query, tuple(arg for item_id in items_ids for arg in (user_id, item_id, self.bot.beta))
+        ):
             pass
 
     async def db_add_collect(self, user_id: int, points: int, ignore_last_collect: bool):
@@ -331,4 +352,4 @@ class AbstractSubcog(ABC):
             return []
         query = "SELECT * FROM `event_available_items` WHERE `event_type` = %s;"
         async with self.bot.db_main.read(query, (event_type, )) as query_results:
-            return query_results
+            return cast(list[EventItem], query_results)

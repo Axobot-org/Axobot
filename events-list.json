@@ -496,5 +496,50 @@
             ],
             "probability": 0.2
         }
+    },
+    "halloween-2026": {
+        "begin": "2026-10-24",
+        "end": "2026-11-01",
+        "type": "halloween",
+        "icon": "https://zrunner.me/cdn/halloween_2026.png",
+        "color": 16089635,
+        "objectives": [
+            {
+                "points": 300,
+                "reward_type": "rankcard",
+                "rank_card": "halloween26"
+            },
+            {
+                "points": 600,
+                "reward_type": "role",
+                "role_id": 1561469361561280622
+            }
+        ],
+        "emojis": {
+            "reactions_list": [
+                "🦇",
+                "🎃",
+                "🕷️",
+                "👻",
+                "🪦",
+                "🧙",
+                "🧛",
+                "🧟",
+                "🕸️"
+            ],
+            "triggers": [
+                "booh",
+                "halloween",
+                "witch",
+                "ghost",
+                "pumpkin",
+                "tombstone",
+                "sorcière",
+                "fantôme",
+                "citrouille",
+                "tombe"
+            ],
+            "probability": 0.05
+        }
     }
 }

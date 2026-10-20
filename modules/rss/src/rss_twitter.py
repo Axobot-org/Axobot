@@ -65,7 +65,7 @@ class TwitterRSS:
                     text = text.replace(match.group(0), '')
         return text
 
-    async def _get_feed_list(self, name: str):
+    async def _get_feed_list(self, name: str) -> list | None:
         "Get tweets from a given Twitter user"
         try:
             if isinstance(name, int) or name.isnumeric():
@@ -82,11 +82,11 @@ class TwitterRSS:
             raise err
         return posts
 
-    async def get_last_post(self, channel: discord.TextChannel, name: str) -> RssMessage | None:
+    async def get_last_post(self, channel: discord.TextChannel, name: str) -> RssMessage | str | None:
         "Get the last post from a given Twitter user"
         # fetch tweets
         posts = await self._get_feed_list(name)
-        if len(posts) == 0:
+        if not posts:
             return await self.bot._(channel, "rss.nothing")
         # get username
         if isinstance(name, int) or name.isnumeric():
@@ -112,7 +112,7 @@ class TwitterRSS:
             feed=FeedObject.unrecorded("tw", channel.guild.id if channel.guild else None, channel.id, url),
             url=url,
             title=text,
-            date=dt.datetime.fromtimestamp(lastpost.created_at_in_seconds),
+            date=dt.datetime.fromtimestamp(lastpost.created_at_in_seconds, tz=dt.UTC),
             author=lastpost.user.screen_name,
             retweeted_from=is_rt,
             channel=lastpost.user.name,
@@ -124,7 +124,7 @@ class TwitterRSS:
         "Get new posts from a given Twitter user"
         # fetch tweets
         posts = await self._get_feed_list(name)
-        if len(posts) == 0:
+        if not posts:
             return []
         posts_list = []
         for post in posts:
@@ -132,7 +132,8 @@ class TwitterRSS:
             if len(posts_list) > 10:
                 break
             # don't return posts older than the date
-            if (dt.datetime.fromtimestamp(post.created_at_in_seconds) - date).total_seconds() < self.min_time_between_posts:
+            post_date = dt.datetime.fromtimestamp(post.created_at_in_seconds, tz=dt.UTC)
+            if (post_date - date).total_seconds() < self.min_time_between_posts:
                 break
             # detect if retweet
             is_rt = None
@@ -152,7 +153,7 @@ class TwitterRSS:
                 feed=FeedObject.unrecorded("tw", channel.guild.id if channel.guild else None, channel.id, url),
                 url=url,
                 title=text,
-                date=dt.datetime.fromtimestamp(post.created_at_in_seconds),
+                date=post_date,
                 author=post.user.screen_name,
                 retweeted_from=is_rt,
                 channel=post.user.name,

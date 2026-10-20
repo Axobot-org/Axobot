@@ -4,6 +4,7 @@ import re
 import subprocess
 from collections import defaultdict
 from datetime import datetime
+from statistics import median
 from typing import Any, Literal, NamedTuple
 
 import aiohttp
@@ -13,7 +14,9 @@ from discord.ext import commands, tasks
 from mysql.connector.errors import IntegrityError as MysqlIntegrityError
 
 from core.bot_classes import Axobot, MyContext
-from core.enums import ServerWarningType
+from core.server_warnings import (RssMissingEmbedPermission,
+                                  RssMissingTxtPermission, RssTwitterDisabled,
+                                  RssUnknownChannel, ServerWarning)
 from core.type_utils import AnyStrDict
 from core.utilities import avg
 
@@ -52,6 +55,7 @@ class BotStats(commands.Cog):
         self.commands_uses: dict[str, int] = defaultdict(int)
         self.app_commands_uses: dict[str, int] = defaultdict(int)
         self.rss_stats: RssStats = {"checked": 0, "messages": 0, "errors": 0, "warnings": 0, "time": 0}
+        self.rss_delivery_delays: dict[str, list[float]] = defaultdict(list)
         self.rss_loop_finished = False
         self.xp_cards: XpCardsStats = {"generated": 0, "sent": 0}
         self.process: psutil.Process = psutil.Process()
@@ -188,14 +192,26 @@ class BotStats(commands.Cog):
         self.ticket_events["creation"] += 1
 
     @commands.Cog.listener()
-    async def on_server_warning(self, warning_type: ServerWarningType, *_args: Any, **_kwargs: Any):
+    async def on_rss_messages_sent(self, source_type: str, message_count: int, delivery_delays: list[float]):
+        self.rss_stats["messages"] += message_count
+        self.rss_delivery_delays[source_type].extend(delivery_delays)
+
+    @commands.Cog.listener()
+    async def on_rss_loop_completed(self, checked_count: int, error_count: int, elapsed_time: int):
+        self.rss_stats["checked"] = checked_count
+        self.rss_stats["errors"] = error_count
+        self.rss_stats["time"] = elapsed_time
+        self.rss_loop_finished = True
+
+    @commands.Cog.listener()
+    async def on_server_warning(self, warning: ServerWarning):
         "Called when a server warning is triggered"
-        if warning_type in {
-            ServerWarningType.RSS_UNKNOWN_CHANNEL,
-            ServerWarningType.RSS_MISSING_TXT_PERMISSION,
-            ServerWarningType.RSS_MISSING_EMBED_PERMISSION,
-            ServerWarningType.RSS_TWITTER_DISABLED,
-        }:
+        if isinstance(warning, (
+            RssUnknownChannel,
+            RssMissingTxtPermission,
+            RssMissingEmbedPermission,
+            RssTwitterDisabled,
+        )):
             self.rss_stats["warnings"] += 1
 
     @commands.Cog.listener()
@@ -459,6 +475,12 @@ class BotStats(commands.Cog):
             for k, v in self.rss_stats.items():
                 rows.append(StatRow("rss." + k, v, 0, k, k == "messages"))
             self.rss_stats = {"checked": 0, "messages": 0, "errors": 0, "warnings": 0, "time": 0}
+            for source_type, delays in self.rss_delivery_delays.items():
+                if not delays:
+                    continue
+                rows.append(StatRow(f"rss.delay.{source_type}", round(median(delays), 1), 1, "s", False))
+                rows.append(StatRow(f"rss.delay_samples.{source_type}", len(delays), 0, "posts", True))
+            self.rss_delivery_delays.clear()
             self.rss_loop_finished = False
 
         # XP cards
