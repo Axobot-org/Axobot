@@ -1,5 +1,6 @@
 import inspect
-from typing import Any, Callable, TypedDict, Union, get_type_hints
+import types
+from typing import Any, Callable, TypedDict, Union, get_args, get_origin, get_type_hints
 
 import discord
 from discord import app_commands
@@ -114,6 +115,7 @@ async def _run_check_function(ctx: MyContext, check: Callable[..., Any]) -> bool
     # get type of expected argument
     sig = inspect.signature(check)
     first_param_name = list(sig.parameters.keys())[0]
+    original_param_type: Any
     try:
         original_param_type = get_type_hints(check).get(first_param_name)
     except NameError:
@@ -125,13 +127,17 @@ async def _run_check_function(ctx: MyContext, check: Callable[..., Any]) -> bool
         elif "Interaction" in original_param_type:
             original_param_type = discord.Interaction
     # check if parameter is Union
-    if getattr(original_param_type, "__origin__", None) == Union:
-        param_types = original_param_type.__args__
+    param_types: tuple[Any, ...]
+    if get_origin(original_param_type) in (Union, types.UnionType):
+        param_types = get_args(original_param_type)
     else:
         # else, use the original type
-        param_types = [original_param_type]
+        param_types = (original_param_type,)
     # check against each possible type
     for param_type in param_types:
+        # parametrized generics (e.g. Interaction[Axobot]) are not classes: use their origin
+        if not inspect.isclass(param_type):
+            param_type = get_origin(param_type) or param_type
         try:
             if ctx.interaction and issubclass(param_type, discord.Interaction):
                 return await discord.utils.maybe_coroutine(check, ctx.interaction)
