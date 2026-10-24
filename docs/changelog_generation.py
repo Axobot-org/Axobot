@@ -116,10 +116,18 @@ def _format_date(raw_date: str):
 
 def _convert_to_rst(text: str):
     "Convert a markdown release note to reStructuredText format"
-    # convert markdown inline code
-    text = re.sub(r"`([^`]+)`", r"``\1``", text)
-    # convert markdown links
-    text = re.sub(r"\[([^\]]+)\]\(<?([^>)]+)>?\)", r"`\1 <\2>`__", text)
+    # convert markdown links and inline code in a single pass
+    # (rst does not support inline code inside a link, so backticks are dropped from link labels)
+    def _replace(match: re.Match[str]):
+        if match.group("label") is not None:
+            label = match.group("label").replace("`", "")
+            return f"`{label} <{match.group('url')}>`__"
+        return f"``{match.group('code')}``"
+    text = re.sub(
+        r"\[(?P<label>[^\]]+)\]\(<?(?P<url>[^>)\s]+)>?\)|`(?P<code>[^`]+)`",
+        _replace,
+        text,
+    )
     # convert discord custom emojis
     text = re.sub(r"<a?:(\w+):\d+>", '', text)
     # convert discord command mentions

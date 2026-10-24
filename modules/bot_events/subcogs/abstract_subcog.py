@@ -297,9 +297,7 @@ class AbstractSubcog(ABC):
         query = "SELECT `last_collect` FROM `event_points` WHERE `user_id` = %s AND `beta` = %s;"
         async with self.bot.db_main.read(query, (user_id, self.bot.beta), fetchone=True, astuple=True) as query_result:
             query_result = cast(tuple[datetime.datetime | None] | None, query_result)
-            if query_result is None:
-                return None
-            if query_result[0] is None:
+            if not query_result or query_result[0] is None:
                 return None
             # apply utc offset
             last_collect = query_result[0].replace(tzinfo=datetime.UTC)

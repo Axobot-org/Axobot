@@ -3,6 +3,7 @@ import datetime
 import importlib
 import io
 import os
+import subprocess
 import sys
 import textwrap
 import time
@@ -383,7 +384,10 @@ class Admin(commands.Cog):
             ))
         if install_requirements:
             msg = await msg.edit(content=msg.content + "\nInstallation des dépendances...")
-            os.system("pip install -qr requirements.txt")
+            subprocess.run(
+                [sys.executable, "-m", "pip", "install", "-q", "-r", "requirements.txt"],
+                check=True,
+            )
             await msg.edit(content=msg.content + "\nDépendances installées")
 
     @admin_main.command(name="membercounter")
