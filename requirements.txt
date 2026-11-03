@@ -2,25 +2,25 @@ aiohttp~=3.13.0
 asyncache~=0.3.1
 Babel~=2.15.0
 beautifulsoup4~=4.12.0
-cryptography~=46.0.0
+cryptography==50.0.2
 discord.py==2.6.4
-emoji~=2.14.0
+emoji==2.16.0
 feedparser~=6.0.0
-geocoder
-GitPython
+geocoder==1.38.1
+GitPython==3.2.1
 google-api-python-client~=2.129.0
 i18nice~=0.15.0
 LRFutils==0.1.2
 markdownify~=1.2.2
 mysql-connector-python~=9.1.0
 nltk>=3.7
-Pillow~=12.1.0
+Pillow==12.1.1
 psutil>=5.8
-python-dateutil
-pytz
+python-dateutil==4.0.0
+pytz==2026.6
 rembg~=2.0.0
 timezonefinder~=8.1.0
 
 # Antiscam training
-pandas
-scikit-learn
+pandas==2.3.3
+scikit-learn==1.7.2
