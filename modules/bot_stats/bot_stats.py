@@ -396,18 +396,19 @@ class BotStats(commands.Cog):
             )
             async with self.bot.db_stats.write(q, (now, f"eventpoints_collect.{label}", *tail)):
                 pass
-        median_q = """SET @row_index := -1;
-        INSERT INTO `zbot`
-            SELECT %s, %s, ROUND(AVG(subq.collect_points)) as value, 0, %s, %s, %s
-            FROM (
-                SELECT @row_index:=@row_index + 1 AS row_index, collect_points
-                FROM `axobot`.`event_points`
-                WHERE `beta` = %s
-                ORDER BY collect_points
-            ) AS subq
-            WHERE subq.row_index
-            IN (FLOOR(@row_index / 2) , CEIL(@row_index / 2))"""
-        async with self.bot.db_stats.write(median_q, (now, "eventpoints_collect.median", *tail), multi=True):
+        median_q = """
+            INSERT INTO `zbot`
+                SELECT %s, %s, ROUND(AVG(subq.collect_points)) AS value, 0, %s, %s, %s
+                FROM (
+                    SELECT collect_points,
+                        ROW_NUMBER() OVER (ORDER BY collect_points) AS rn,
+                        COUNT(*) OVER () AS cnt
+                    FROM `axobot`.`event_points`
+                    WHERE `beta` = %s
+                ) AS subq
+                WHERE subq.rn IN (FLOOR((subq.cnt + 1) / 2), CEIL((subq.cnt + 1) / 2))
+        """
+        async with self.bot.db_stats.write(median_q, (now, "eventpoints_collect.median", *tail)):
             pass
         rows_q = (
             "INSERT INTO `zbot` SELECT %s, %s, COUNT(*) AS value, 0, %s, %s, %s "
@@ -430,18 +431,19 @@ class BotStats(commands.Cog):
             )
             async with self.bot.db_stats.write(q, (now, f"eventpoints.{label}", *tail)):
                 pass
-        median_q = """SET @row_index := -1;
-        INSERT INTO `zbot`
-            SELECT %s, %s, ROUND(AVG(subq.`points`)) as value, 0, %s, %s, %s
-            FROM (
-                SELECT @row_index:=@row_index + 1 AS row_index, `points`
-                FROM `axobot`.`event_points`
-                WHERE `points` != 0 AND `beta` = %s
-                ORDER BY points
-            ) AS subq
-            WHERE subq.row_index
-            IN (FLOOR(@row_index / 2) , CEIL(@row_index / 2))"""
-        async with self.bot.db_stats.write(median_q, (now, "eventpoints.median", *tail), multi=True):
+        median_q = """
+            INSERT INTO `zbot`
+                SELECT %s, %s, ROUND(AVG(subq.`points`)) AS value, 0, %s, %s, %s
+                FROM (
+                    SELECT `points`,
+                        ROW_NUMBER() OVER (ORDER BY `points`) AS rn,
+                        COUNT(*) OVER () AS cnt
+                    FROM `axobot`.`event_points`
+                    WHERE `points` != 0 AND `beta` = %s
+                ) AS subq
+                WHERE subq.rn IN (FLOOR((subq.cnt + 1) / 2), CEIL((subq.cnt + 1) / 2))
+        """
+        async with self.bot.db_stats.write(median_q, (now, "eventpoints.median", *tail)):
             pass
         rows_q = (
             "INSERT INTO `zbot` SELECT %s, %s, COUNT(*) AS value, 0, %s, %s, %s "

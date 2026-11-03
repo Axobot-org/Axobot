@@ -21,7 +21,7 @@ class DatabaseReadQuery(DatabaseAbstractQuery, Generic[T]):
     "Represents a context manager to execute a SELECT or SHOW query to a database"
 
     def __init__(self, bot: "Axobot", cnx: MySQLConnection | CMySQLConnection, query: str, args: AnyTuple | AnyDict | None = None,
-                 fetchone: bool = False, astuple: bool = False):
+                 *, fetchone: bool = False, astuple: bool = False):
         super().__init__(bot, cnx, query, args)
         self.fetchone = fetchone
         self.astuple = astuple

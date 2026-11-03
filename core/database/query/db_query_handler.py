@@ -61,6 +61,7 @@ class DatabaseQueryHandler:
         self,
             query: str,
             args: AnyTuple | AnyDict | None = None,
+            *,
             fetchone: bool = False,
             astuple: bool = False
     ):
@@ -69,13 +70,13 @@ class DatabaseQueryHandler:
         if query_type(query) != "read":
             raise ValueError(
                 f"Expected read query, but received {truncate_query(query)}")
-        return DatabaseReadQuery[Any](self.bot, cnx, query, args, fetchone, astuple)
+        return DatabaseReadQuery[Any](self.bot, cnx, query, args, fetchone=fetchone, astuple=astuple)
 
     def write(
         self,
             query: str,
             args: AnyTuple | AnyDict | None = None,
-            multi: bool = False,
+            *,
             returnrowcount: bool = False
     ):
         "Perform a write query to the database"
@@ -83,7 +84,7 @@ class DatabaseQueryHandler:
         if query_type(query) != "write":
             raise ValueError(
                 f"Expected write query, but received {truncate_query(query)}")
-        return DatabaseWriteQuery(self.bot, cnx, query, args, multi, returnrowcount)
+        return DatabaseWriteQuery(self.bot, cnx, query, args, returnrowcount=returnrowcount)
 
     def multi(self):
         "Create a context manager to execute multiple write queries on the same connection"
