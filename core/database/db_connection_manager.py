@@ -79,7 +79,9 @@ class DatabaseConnectionManager:
             buffered=True,
             charset="utf8mb4",
             collation="utf8mb4_unicode_ci",
-            connection_timeout=5
+            connection_timeout=5,
+            read_timeout=5,
+            write_timeout=5,
         )
         if not isinstance(cnx, (MySQLConnection, CMySQLConnection)):
             raise TypeError("Connection is not a MySQLConnection or CMySQLConnection")
