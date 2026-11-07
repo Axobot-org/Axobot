@@ -80,14 +80,14 @@ class SingleReactionSubcog(AbstractSubcog):
         # add item to user collection
         await self.db_add_user_items(payload.user_id, [item["item_id"]])
         # prepare the notification embed
-        title = self.translations_data[lang]["events_title"][self.current_event_id]
+        title = self.get_event_translation(lang, "events_title") or self.current_event
         desc_key = "bot_events.reaction.neutral"
-        name_key = "french_name" if lang in ("fr", "fr2") else "english_name"
+        name_key = "french_name" if lang.startswith("fr") else "english_name"
         item_name = item["emoji"] + " " + item[name_key]
         desc = await self.bot._(translation_source, desc_key, user=user_mention, item=item_name)
-        embed = discord.Embed(title=title, description=desc, color=self.current_event_data["color"])
-        if self.current_event_data["icon"]:
-            embed.set_image(url=self.current_event_data["icon"])
+        embed = discord.Embed(title=title, description=desc, color=self.current_event_data["theme_color"])
+        if self.current_event_data["banner_url"]:
+            embed.set_image(url=self.current_event_data["banner_url"])
         # send the notification in the guild/DM channel
         await channel.send(embed=embed)
         # add points (and potentially grant reward rank card)
@@ -96,10 +96,9 @@ class SingleReactionSubcog(AbstractSubcog):
     async def profile_cmd(self, interaction, user):
         "Displays the profile of the user"
         lang = await self.get_event_language(interaction)
-        events_desc = self.translations_data[lang]["events_desc"]
 
         # if no event
-        if self.current_event_id not in events_desc:
+        if self.get_event_translation(lang, "events_desc") is None:
             await interaction.followup.send(await self.bot._(interaction, "bot_events.nothing-desc"))
             self.bot.dispatch("error", ValueError(f"'{self.current_event_id}' has no event description"), interaction)
             return
@@ -112,7 +111,7 @@ class SingleReactionSubcog(AbstractSubcog):
         title = await self.bot._(interaction, "bot_events.rank-title")
         desc = await self.bot._(interaction, "bot_events.xp-howto")
 
-        emb = discord.Embed(title=title, description=desc, color=self.current_event_data["color"])
+        emb = discord.Embed(title=title, description=desc, color=self.current_event_data["theme_color"])
         emb.set_author(name=user.global_name, icon_url=user.display_avatar.replace(static_format="png", size=32))
         for field in await self.generate_user_profile_rank_fields(interaction, lang, user):
             emb.add_field(**field)
@@ -122,10 +121,9 @@ class SingleReactionSubcog(AbstractSubcog):
     async def collect_cmd(self, interaction):
         "Collects the daily/hourly reward"
         lang = await self.get_event_language(interaction)
-        events_desc = self.translations_data[lang]["events_desc"]
 
         # if no event
-        if self.current_event_id not in events_desc:
+        if self.get_event_translation(lang, "events_desc") is None:
             await interaction.followup.send(await self.bot._(interaction, "bot_events.nothing-desc"))
             self.bot.dispatch("error", ValueError(f"'{self.current_event_id}' has no event description"), interaction)
             return

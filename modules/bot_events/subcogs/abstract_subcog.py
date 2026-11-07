@@ -1,6 +1,6 @@
 import datetime
 from abc import ABC, abstractmethod
-from typing import Any, Literal, TypedDict, cast
+from typing import Any, Literal, TypedDict, cast, overload
 
 import discord
 
@@ -9,8 +9,7 @@ from core.formatutils import FormatUtils
 from core.type_utils import UserOrMember
 
 from ..data.dict_types import (EventData, EventItem, EventItemWithCount,
-                               EventType)
-from ..data.get_translations import get_events_translations
+                               EventType, EventsTranslation)
 
 
 class DBUserRank(TypedDict):
@@ -36,7 +35,21 @@ class AbstractSubcog(ABC):
         self.current_event: EventType = current_event
         self.current_event_data = current_event_data
         self.current_event_id = current_event_id
-        self.translations_data = get_events_translations()
+        languages = (
+            current_event_data["title_translations"].keys()
+            | current_event_data["description_translations"].keys()
+            | current_event_data["objective_descriptions"].keys()
+        )
+        self.translations_data: dict[str, EventsTranslation] = {}
+        for lang in languages:
+            translations: EventsTranslation = {}
+            if lang in current_event_data["description_translations"]:
+                translations["events_desc"] = current_event_data["description_translations"][lang]
+            if lang in current_event_data["objective_descriptions"]:
+                translations["events_prices"] = current_event_data["objective_descriptions"][lang]
+            if lang in current_event_data["title_translations"]:
+                translations["events_title"] = current_event_data["title_translations"][lang]
+            self.translations_data[lang] = translations
 
     @abstractmethod
     async def on_message(self, msg: discord.Message):
@@ -56,14 +69,46 @@ class AbstractSubcog(ABC):
 
     async def get_event_language(
         self, translation_source: discord.Interaction | int
-    ) -> Literal["fr", "en"]:
+    ) -> str:
         "Find which language to use for the event translations"
-        lang = await self.bot._(translation_source, "_used_locale")
-        if lang in ("fr", "fr2"):
-            return "fr"
-        return "en"
+        return await self.bot._(translation_source, "_used_locale")
 
-    async def generate_user_profile_rank_fields(self, interaction: discord.Interaction, lang: Literal["fr", "en"],
+    @overload
+    def get_event_translation(self, locale: str, key: Literal["events_desc", "events_title"]) -> str | None: ...
+
+    @overload
+    def get_event_translation(self, locale: str, key: Literal["events_prices"]) -> dict[str, str] | None: ...
+
+    def get_event_translation(
+        self, locale: str, key: Literal["events_desc", "events_prices", "events_title"]
+    ) -> str | dict[str, str] | None:
+        "Return a translation in the requested language or a locale fallback"
+        translation = self._recursive_get_translation(locale, key)
+        if translation is None:
+            return None
+        return translation
+
+    def _recursive_get_translation(
+        self,
+        locale: str,
+        key: Literal["events_desc", "events_prices", "events_title"],
+    ) -> str | dict[str, str] | None:
+        "Resolve event text using the same fallback order as the bot's locale translations"
+        translation = self.translations_data.get(locale, {}).get(key)
+        if translation:
+            return translation
+
+        fallback = "fr" if locale == "fr2" else "en"
+        if fallback != locale and (fallback_translation := self._recursive_get_translation(fallback, key)):
+            return fallback_translation
+
+        for available_locale in sorted(self.translations_data):
+            fallback_translation = self.translations_data[available_locale].get(key)
+            if fallback_translation:
+                return fallback_translation
+        return None
+
+    async def generate_user_profile_rank_fields(self, interaction: discord.Interaction, lang: str,
                                                 user: UserOrMember):
         "Compute the texts to display in the /event profile command"
         user_rank_query = await self.db_get_event_rank(user.id)
@@ -93,13 +138,13 @@ class AbstractSubcog(ABC):
             fields.append({"name": _rank_global, "value": top_5, "inline": False})
         return fields
 
-    async def generate_prices_field(self, interaction: discord.Interaction, lang: Literal["fr", "en"], user_points: int):
+    async def generate_prices_field(self, interaction: discord.Interaction, lang: str, user_points: int):
         "Generate an embed field to display the current event prices for the user"
-        prices_translations: dict[str, dict[str, str]] = self.translations_data[lang]["events_prices"]
-        if self.current_event_id not in prices_translations:
+        prices_translations = self.get_event_translation(lang, "events_prices")
+        if not prices_translations:
             return None
         prices = []
-        for required_points, desc in prices_translations[self.current_event_id].items():
+        for required_points, desc in prices_translations.items():
             # check for a min_date
             related_objective = [
                 objective

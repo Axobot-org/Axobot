@@ -1,10 +1,9 @@
 import datetime
-import json
 import logging
 import time
 from collections import defaultdict
-from collections.abc import Sequence
-from typing import AsyncGenerator, Literal, assert_never, cast, overload
+from collections.abc import AsyncGenerator, Sequence
+from typing import Literal, assert_never, cast, overload
 
 import discord
 from discord import app_commands
@@ -18,6 +17,8 @@ from core.type_utils import UserOrMember
 from .data import EventData, EventType
 from .data.dict_types import (EventRewardCard, EventRewardCustom,
                               EventRewardRole)
+from .data.event_emojis import EVENT_EMOJIS
+from .data.event_parsers import ensure_utc_datetime, parse_json_column
 from .subcogs import (AbstractSubcog, ChristmasSubcog, RandomCollectSubcog,
                       SingleReactionSubcog)
 
@@ -38,7 +39,6 @@ class BotEvents(commands.Cog):
         self.coming_event_data: EventData | None = None
         self.coming_event_id: str | None = None
         self._subcog: AbstractSubcog | None = None
-        self.update_current_event()
 
         self.min_delay_between_ttt_wins = 90 # seconds between 2 tictactoe wins to reduce farming/abuse
         self.last_ttt_win: dict[int, int] = defaultdict(int) # map of user_id -> timestamp
@@ -49,6 +49,7 @@ class BotEvents(commands.Cog):
         return self._subcog
 
     async def cog_load(self):
+        await self.update_current_event()
         if self.bot.internal_loop_enabled:
             self._update_event_loop.start() # pylint: disable=no-member
 
@@ -67,29 +68,23 @@ class BotEvents(commands.Cog):
         self.coming_event_id = None
         self._subcog = None
 
-    def update_current_event(self):
+    async def update_current_event(self):
         "Update class attributes with the new/incoming bot events if needed"
         now = self.bot.utcnow()
-        with open("events-list.json", 'r', encoding="utf-8") as file:
-            events = json.load(file)
         self.reset()
-        for ev_id, ev_data in events.items():
-            ev_data["begin"] = datetime.datetime.strptime(
-                ev_data["begin"], "%Y-%m-%d").replace(tzinfo=datetime.UTC)
-            ev_data["end"] = datetime.datetime.strptime(
-                ev_data["end"], "%Y-%m-%d").replace(tzinfo=datetime.UTC)
-
+        async for ev_id, ev_data in self._load_events_from_database():
             if ev_data["begin"] <= now < ev_data["end"]:
                 self.current_event = ev_data["type"]
-                self.current_event_data = cast(EventData, ev_data)
+                self.current_event_data = ev_data
                 self.current_event_id = ev_id
                 self.log.info("Current bot event: %s", ev_id)
                 break
             if ev_data["begin"] - datetime.timedelta(days=6) <= now < ev_data["begin"]:
                 self.coming_event = ev_data["type"]
-                self.coming_event_data = cast(EventData, ev_data)
+                self.coming_event_data = ev_data
                 self.coming_event_id = ev_id
                 self.log.info("Incoming bot event: %s", ev_id)
+                break
 
         current_event = self.current_event
         current_event_data = self.current_event_data
@@ -110,6 +105,47 @@ class BotEvents(commands.Cog):
             self._subcog = subcog_type(
                 self.bot, current_event, current_event_data, current_event_id
             )
+
+    async def _load_events_from_database(self) -> AsyncGenerator[tuple[str, EventData], None]:
+        "Yield relevant event data from the database in date order"
+        query = """
+            SELECT * FROM events_list
+            WHERE ends_on > UTC_TIMESTAMP()
+              AND starts_on <= DATE_ADD(UTC_TIMESTAMP(), INTERVAL 6 DAY)
+            ORDER BY starts_on, event_id
+        """
+        async with self.bot.db_main.read(query) as rows:
+            for row in rows:
+                event_type = cast(EventType, row["event_type"])
+                event_data: EventData = {
+                    "begin": ensure_utc_datetime(row["starts_on"]),
+                    "end": ensure_utc_datetime(row["ends_on"]),
+                    "type": event_type,
+                    "banner_url": row["banner_url"],
+                    "theme_color": row["theme_color"],
+                    "objectives": cast(
+                        list[EventRewardCard | EventRewardCustom | EventRewardRole],
+                        parse_json_column(row["objectives"], "objectives", list),
+                    ),
+                    "title_translations": cast(
+                        dict[str, str],
+                        parse_json_column(row["title_translations"], "title_translations", dict),
+                    ),
+                    "description_translations": cast(
+                        dict[str, str],
+                        parse_json_column(
+                            row["description_translations"], "description_translations", dict
+                        ),
+                    ),
+                    "objective_descriptions": cast(
+                        dict[str, dict[str, str]],
+                        parse_json_column(
+                            row["objective_descriptions"], "objective_descriptions", dict
+                        ),
+                    ),
+                    "emojis": EVENT_EMOJIS[event_type],
+                }
+                yield row["event_id"], event_data
 
     @overload
     async def get_specific_objectives(self, reward_type: Literal["rankcard"]) -> list[EventRewardCard]: ...
@@ -138,7 +174,7 @@ class BotEvents(commands.Cog):
     ])
     async def _update_event_loop(self):
         "Refresh the current bot event every 12h"
-        self.update_current_event()
+        await self.update_current_event()
         emb = discord.Embed(
             description=f"**Bot event** updated (current event is {self.current_event})",
             color=1406147, timestamp=self.bot.utcnow()
@@ -201,7 +237,7 @@ class BotEvents(commands.Cog):
         emb = discord.Embed(
             title=await self.bot._(interaction, "bot_events.tictactoe.won.title"),
             description=await self.bot._(interaction, "bot_events.tictactoe.won.desc", points=points),
-            color=event_data["color"],
+            color=event_data["theme_color"],
         )
         emb.set_author(name=user.global_name, icon_url=user.display_avatar)
         await interaction.followup.send(embed=emb)
@@ -233,7 +269,7 @@ class BotEvents(commands.Cog):
         emb = discord.Embed(
             title=await self.bot._(interaction, "bot_events.tictactoe.lost.title"),
             description=await self.bot._(interaction, "bot_events.tictactoe.lost.desc", points=-points),
-            color=event_data["color"],
+            color=event_data["theme_color"],
         )
         emb.set_author(name=user.global_name, icon_url=user.display_avatar)
         await interaction.followup.send(embed=emb)
@@ -257,21 +293,17 @@ class BotEvents(commands.Cog):
             await interaction.followup.send(await self.get_no_active_event_response(interaction))
             return
         lang = await subcog.get_event_language(interaction)
-        events_desc = subcog.translations_data[lang]["events_desc"]
+        event_desc = subcog.get_event_translation(lang, "events_desc")
 
-        if current_event in events_desc:
-            event_desc = events_desc[current_event]
+        if event_desc is not None:
             # Title
-            try:
-                title = subcog.translations_data[lang]["events_title"][current_event]
-            except KeyError:
-                title = subcog.current_event
+            title = subcog.get_event_translation(lang, "events_title") or subcog.current_event
             # Begin/End dates
             begin = f"<t:{event_data['begin'].timestamp():.0f}>"
             end = f"<t:{event_data['end'].timestamp():.0f}>"
-            emb = discord.Embed(title=title, description=event_desc, color=event_data["color"])
-            if event_data["icon"]:
-                emb.set_image(url=event_data["icon"])
+            emb = discord.Embed(title=title, description=event_desc, color=event_data["theme_color"])
+            if event_data["banner_url"]:
+                emb.set_image(url=event_data["banner_url"])
             emb.add_field(
                 name=(await self.bot._(interaction, "misc.beginning")).capitalize(),
                 value=begin
@@ -281,11 +313,10 @@ class BotEvents(commands.Cog):
                 value=end
             )
             # Prices to win
-            prices_translations = subcog.translations_data[lang]["events_prices"]
-            if current_event in prices_translations:
+            if subcog.get_event_translation(lang, "events_prices"):
                 emb.add_field(
                     name=await self.bot._(interaction, "bot_events.events-price-title"),
-                    value=await self.get_info_prices_field(interaction, subcog, event_data, current_event, lang),
+                    value=await self.get_info_prices_field(interaction, subcog, event_data, lang),
                     inline=False
                 )
             await interaction.followup.send(embed=emb)
@@ -299,18 +330,17 @@ class BotEvents(commands.Cog):
         interaction: discord.Interaction,
         subcog: AbstractSubcog,
         event_data: EventData,
-        event_id: str,
-        lang: Literal["fr", "en"],
+        lang: str,
     ) -> str:
         "Get the prices field text for the current event"
-        prices_translations = subcog.translations_data[lang]["events_prices"]
-        if event_id not in prices_translations:
+        prices_translations = subcog.get_event_translation(lang, "events_prices")
+        if not prices_translations:
             return await self.bot._(interaction, "bot_events.nothing-desc")
         points = await self.bot._(interaction, "bot_events.points")
-        if lang == "fr":
+        if lang.startswith("fr"):
             points += " "
         prices: list[str] = []
-        for required_points, description in prices_translations[event_id].items():
+        for required_points, description in prices_translations.items():
             related_objective = [
                 objective
                 for objective in event_data["objectives"]

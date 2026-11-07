@@ -44,10 +44,9 @@ class RandomCollectSubcog(AbstractSubcog):
     async def profile_cmd(self, interaction: discord.Interaction, user: UserOrMember):
         "Displays the profile of the user"
         lang = await self.get_event_language(interaction)
-        events_desc = self.translations_data[lang]["events_desc"]
 
         # if no event
-        if self.current_event_id not in events_desc:
+        if self.get_event_translation(lang, "events_desc") is None:
             await interaction.followup.send(await self.bot._(interaction, "bot_events.nothing-desc"))
             self.bot.dispatch("error", ValueError(f"'{self.current_event_id}' has no event description"), interaction)
             return
@@ -60,7 +59,7 @@ class RandomCollectSubcog(AbstractSubcog):
         title = await self.bot._(interaction, "bot_events.rank-title")
         desc = await self.bot._(interaction, "bot_events.xp-howto")
 
-        emb = discord.Embed(title=title, description=desc, color=self.current_event_data["color"])
+        emb = discord.Embed(title=title, description=desc, color=self.current_event_data["theme_color"])
         emb.set_author(name=user, icon_url=user.display_avatar.replace(static_format="png", size=32))
         for field in await self.generate_user_profile_rank_fields(interaction, lang, user):
             emb.add_field(**field)
@@ -70,9 +69,8 @@ class RandomCollectSubcog(AbstractSubcog):
     async def collect_cmd(self, interaction: discord.Interaction):
         "Get some event points every hour"
         lang = await self.get_event_language(interaction)
-        events_desc = self.translations_data[lang]["events_desc"]
         # if no event
-        if self.current_event_id not in events_desc:
+        if self.get_event_translation(lang, "events_desc") is None:
             await interaction.followup.send(await self.bot._(interaction, "bot_events.nothing-desc"))
             self.bot.dispatch("error", ValueError(f"'{self.current_event_id}' has no event description"), interaction)
             return
@@ -112,8 +110,8 @@ class RandomCollectSubcog(AbstractSubcog):
             else:
                 await self.add_collect(interaction.user.id, points + bonus, send_notif_to_interaction=interaction)
         # send result
-        title = self.translations_data[lang]["events_title"][self.current_event_id]
-        emb = discord.Embed(title=title, description=txt, color=self.current_event_data["color"])
+        title = self.get_event_translation(lang, "events_title") or self.current_event
+        emb = discord.Embed(title=title, description=txt, color=self.current_event_data["theme_color"])
         emb.add_field(**await self.get_random_tip_field(interaction))
         await interaction.followup.send(embed=emb)
 

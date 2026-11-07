@@ -3,11 +3,11 @@ from typing import Literal, TypedDict
 
 EventType = Literal["blurple", "halloween", "fish", "christmas"]
 
-class EventsTranslation(TypedDict):
+class EventsTranslation(TypedDict, total=False):
     "Represents the translations for the bot events in one language"
-    events_desc: dict[str, str]
-    events_prices: dict[str, dict[str, str]]
-    events_title: dict[str, str]
+    events_desc: str
+    events_prices: dict[str, str]
+    events_title: str
 
 class EventEmojis(TypedDict):
     "Represents data about available reactions during an event"
@@ -39,10 +39,13 @@ class EventData(TypedDict):
     begin: datetime.datetime
     end: datetime.datetime
     type: EventType
-    icon: str | None
-    color: int
+    banner_url: str | None
+    theme_color: int
     objectives: list[EventRewardCard | EventRewardCustom | EventRewardRole]
     emojis: EventEmojis | None
+    title_translations: dict[str, str]
+    description_translations: dict[str, str]
+    objective_descriptions: dict[str, dict[str, str]]
 
 class EventItem(TypedDict):
     "Represents an item that can be obtained during an event"
