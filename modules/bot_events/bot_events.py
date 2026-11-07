@@ -488,10 +488,10 @@ class BotEvents(commands.Cog):
 
     async def db_get_user_points(self, user_id: int) -> int | None:
         "Get the user's event points"
-        if not self.bot.database_online or self.bot.current_event is None:
+        if not self.bot.database_online or (event_id := self.current_event_id) is None:
             return None
-        query = "SELECT `points` FROM `event_points` WHERE `user_id` = %s AND `beta` = %s;"
-        async with self.bot.db_main.read(query, (user_id, self.bot.beta), fetchone=True) as query_result:
+        query = "SELECT `points` FROM `event_points` WHERE `user_id` = %s AND `beta` = %s AND `event_id` = %s;"
+        async with self.bot.db_main.read(query, (user_id, self.bot.beta, event_id), fetchone=True) as query_result:
             if query_result:
                 return query_result["points"]
         return None
@@ -499,11 +499,11 @@ class BotEvents(commands.Cog):
     async def db_add_user_points(self, user_id: int, points: int):
         "Add some 'other' events points to a user"
         try:
-            if not self.bot.database_online or self.bot.current_event is None:
+            if not self.bot.database_online or (event_id := self.current_event_id) is None:
                 return True
-            query = "INSERT INTO `event_points` (`user_id`, `other_points`, `beta`) VALUES (%s, %s, %s) \
+            query = "INSERT INTO `event_points` (`user_id`, `other_points`, `beta`, `event_id`) VALUES (%s, %s, %s, %s) \
                 ON DUPLICATE KEY UPDATE other_points = other_points + VALUE(`other_points`);"
-            async with self.bot.db_main.write(query, (user_id, points, self.bot.beta)):
+            async with self.bot.db_main.write(query, (user_id, points, self.bot.beta, event_id)):
                 pass
             try:
                 await self.reload_event_rankcard(user_id)

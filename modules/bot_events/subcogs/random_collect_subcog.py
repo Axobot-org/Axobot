@@ -182,6 +182,8 @@ class RandomCollectSubcog(AbstractSubcog):
         "Get the strike level of a user"
         if not self.bot.database_online:
             return 0
-        query = "SELECT `strike_level` FROM `event_points` WHERE `user_id` = %s AND `beta` = %s;"
-        async with self.bot.db_main.read(query, (user_id, self.bot.beta), fetchone=True) as query_result:
+        query = "SELECT `strike_level` FROM `event_points` WHERE `user_id` = %s AND `beta` = %s AND `event_id` = %s;"
+        async with self.bot.db_main.read(
+            query, (user_id, self.bot.beta, self.current_event_id), fetchone=True
+        ) as query_result:
             return query_result["strike_level"] if query_result else 0

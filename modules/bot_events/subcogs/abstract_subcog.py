@@ -297,17 +297,17 @@ class AbstractSubcog(ABC):
         "Get the event points leaderboard containing at max the given number of users"
         if not self.bot.database_online:
             return None
-        query = "SELECT `user_id`, `points` FROM `event_points` WHERE `points` != 0 AND `beta` = %s \
+        query = "SELECT `user_id`, `points` FROM `event_points` WHERE `points` != 0 AND `beta` = %s AND `event_id` = %s \
             ORDER BY `points` DESC LIMIT %s"
-        async with self.bot.db_main.read(query, (self.bot.beta, number)) as query_results:
+        async with self.bot.db_main.read(query, (self.bot.beta, self.current_event_id, number)) as query_results:
             return query_results
 
     async def db_get_participants_count(self) -> int:
         "Get the number of users who have at least 1 event point"
         if not self.bot.database_online:
             return 0
-        query = "SELECT COUNT(*) as count FROM `event_points` WHERE `points` > 0 AND `beta` = %s;"
-        async with self.bot.db_main.read(query, (self.bot.beta,), fetchone=True) as query_results:
+        query = "SELECT COUNT(*) as count FROM `event_points` WHERE `points` > 0 AND `beta` = %s AND `event_id` = %s;"
+        async with self.bot.db_main.read(query, (self.bot.beta, self.current_event_id), fetchone=True) as query_results:
             return query_results["count"]
 
     async def db_get_event_rank(self, user_id: int) -> DBUserRank | None:
@@ -315,9 +315,11 @@ class AbstractSubcog(ABC):
         if not self.bot.database_online:
             return None
         query = "SELECT `user_id`, `points`, FIND_IN_SET( `points`, \
-            ( SELECT GROUP_CONCAT( `points` ORDER BY `points` DESC ) FROM `event_points` WHERE `beta` = %(beta)s ) ) AS rank \
-                FROM `event_points` WHERE `user_id` = %(user)s AND `beta` = %(beta)s"
-        async with self.bot.db_main.read(query, {"user": user_id, "beta": self.bot.beta}, fetchone=True) as query_results:
+            ( SELECT GROUP_CONCAT( `points` ORDER BY `points` DESC ) FROM `event_points` \
+                WHERE `beta` = %(beta)s AND `event_id` = %(event_id)s ) ) AS rank \
+                FROM `event_points` WHERE `user_id` = %(user)s AND `beta` = %(beta)s AND `event_id` = %(event_id)s"
+        params = {"user": user_id, "beta": self.bot.beta, "event_id": self.current_event_id}
+        async with self.bot.db_main.read(query, params, fetchone=True) as query_results:
             if not query_results:
                 return None
             return cast(DBUserRank, query_results)
@@ -330,17 +332,20 @@ class AbstractSubcog(ABC):
         FROM `event_collected_items` c LEFT JOIN `event_available_items` a ON c.`item_id` = a.`item_id`
         WHERE c.`user_id` = %s
             AND c.`beta` = %s
+            AND c.`event_id` = %s
             AND a.`event_type` = %s
         GROUP BY c.`item_id`"""
-        async with self.bot.db_main.read(query, (user_id, self.bot.beta, event_type)) as query_results:
+        async with self.bot.db_main.read(query, (user_id, self.bot.beta, self.current_event_id, event_type)) as query_results:
             return cast(list[EventItemWithCount], query_results)
 
     async def db_get_last_user_collect(self, user_id: int) -> datetime.datetime | None:
         "Get the last collect datetime from a user"
         if not self.bot.database_online:
             return None
-        query = "SELECT `last_collect` FROM `event_points` WHERE `user_id` = %s AND `beta` = %s;"
-        async with self.bot.db_main.read(query, (user_id, self.bot.beta), fetchone=True, astuple=True) as query_result:
+        query = "SELECT `last_collect` FROM `event_points` WHERE `user_id` = %s AND `beta` = %s AND `event_id` = %s;"
+        async with self.bot.db_main.read(
+            query, (user_id, self.bot.beta, self.current_event_id), fetchone=True, astuple=True
+        ) as query_result:
             query_result = cast(tuple[datetime.datetime | None] | None, query_result)
             if not query_result or query_result[0] is None:
                 return None
@@ -352,10 +357,10 @@ class AbstractSubcog(ABC):
         "Add some items to a user's collection"
         if not self.bot.database_online:
             return
-        query = "INSERT INTO `event_collected_items` (`user_id`, `item_id`, `beta`) VALUES " + \
-            ", ".join(["(%s, %s, %s)"] * len(items_ids)) + ';'
+        query = "INSERT INTO `event_collected_items` (`user_id`, `item_id`, `beta`, `event_id`) VALUES " + \
+            ", ".join(["(%s, %s, %s, %s)"] * len(items_ids)) + ';'
         async with self.bot.db_main.write(
-            query, tuple(arg for item_id in items_ids for arg in (user_id, item_id, self.bot.beta))
+            query, tuple(arg for item_id in items_ids for arg in (user_id, item_id, self.bot.beta, self.current_event_id))
         ):
             pass
 
@@ -364,29 +369,30 @@ class AbstractSubcog(ABC):
         if not self.bot.database_online or not points or self.bot.current_event is None:
             return
         if ignore_last_collect:
-            query = "INSERT INTO `event_points` (`user_id`, `collect_points`, `beta`) \
-                VALUES (%s, %s, %s) \
+            query = "INSERT INTO `event_points` (`user_id`, `collect_points`, `beta`, `event_id`) \
+                VALUES (%s, %s, %s, %s) \
                 ON DUPLICATE KEY UPDATE \
                     collect_points = collect_points + VALUE(`collect_points`), \
                     strike_level = 0;"
         else:
-            query = "INSERT INTO `event_points` (`user_id`, `collect_points`, `last_collect`, `beta`) \
-                VALUES (%s, %s, CURRENT_TIMESTAMP(), %s) \
+            query = "INSERT INTO `event_points` (`user_id`, `collect_points`, `last_collect`, `beta`, `event_id`) \
+                VALUES (%s, %s, CURRENT_TIMESTAMP(), %s, %s) \
                 ON DUPLICATE KEY UPDATE collect_points = collect_points + VALUE(`collect_points`), \
                     strike_level = 0, \
                     last_collect = CURRENT_TIMESTAMP();"
-        async with self.bot.db_main.write(query, (user_id, points, self.bot.beta)):
+        async with self.bot.db_main.write(query, (user_id, points, self.bot.beta, self.current_event_id)):
             pass
 
     async def db_add_collect_and_increase_strike(self, user_id: int, points: int):
         """Add collect points to a user and increase the strike level by 1"""
         if not self.bot.database_online or not points or self.bot.current_event is None:
             return
-        query = "INSERT INTO `event_points` (`user_id`, `collect_points`, `strike_level`, `beta`) VALUES (%s, %s, 1, %s) \
+        query = "INSERT INTO `event_points` (`user_id`, `collect_points`, `strike_level`, `beta`, `event_id`) \
+            VALUES (%s, %s, 1, %s, %s) \
             ON DUPLICATE KEY UPDATE collect_points = collect_points + VALUE(`collect_points`), \
                 strike_level = strike_level + 1, \
                 last_collect = CURRENT_TIMESTAMP();"
-        async with self.bot.db_main.write(query, (user_id, points, self.bot.beta)):
+        async with self.bot.db_main.write(query, (user_id, points, self.bot.beta, self.current_event_id)):
             pass
 
     async def db_get_event_items(self, event_type: EventType) -> list[EventItem]:

@@ -381,18 +381,18 @@ class BotStats(commands.Cog):
             for kind, count in enabled_kinds.items()
         ]
 
-    async def db_record_event_collect_values(self, now: datetime):
+    async def db_record_event_collect_values(self, now: datetime, event_id: str):
         "Record the collect-points distribution (total, min, max, median, row count)"
-        query = "SELECT COUNT(*) FROM `axobot`.`event_points` WHERE `beta` = %s"
-        async with self.bot.db_main.read(query, (self.bot.beta,), fetchone=True, astuple=True) as result:
+        query = "SELECT COUNT(*) FROM `axobot`.`event_points` WHERE `beta` = %s AND `event_id` = %s"
+        async with self.bot.db_main.read(query, (self.bot.beta, event_id), fetchone=True, astuple=True) as result:
             if result[0] == 0:
                 return
         # (unit, is_sum, entity_id, beta) – appended after the per-query positional args
-        tail = ("points", False, self.bot.entity_id, self.bot.beta)
+        tail = ("points", False, self.bot.entity_id, self.bot.beta, event_id)
         for label, agg in (("total", "SUM"), ("min", "MIN"), ("max", "MAX")):
             q = (
                 f"INSERT INTO `zbot` SELECT %s, %s, {agg}(collect_points) AS value, 0, %s, %s, %s "
-                "FROM `axobot`.`event_points` WHERE `beta` = %s"
+                "FROM `axobot`.`event_points` WHERE `beta` = %s AND `event_id` = %s"
             )
             async with self.bot.db_stats.write(q, (now, f"eventpoints_collect.{label}", *tail)):
                 pass
@@ -404,7 +404,7 @@ class BotStats(commands.Cog):
                         ROW_NUMBER() OVER (ORDER BY collect_points) AS rn,
                         COUNT(*) OVER () AS cnt
                     FROM `axobot`.`event_points`
-                    WHERE `beta` = %s
+                    WHERE `beta` = %s AND `event_id` = %s
                 ) AS subq
                 WHERE subq.rn IN (FLOOR((subq.cnt + 1) / 2), CEIL((subq.cnt + 1) / 2))
         """
@@ -412,22 +412,22 @@ class BotStats(commands.Cog):
             pass
         rows_q = (
             "INSERT INTO `zbot` SELECT %s, %s, COUNT(*) AS value, 0, %s, %s, %s "
-            "FROM `axobot`.`event_points` WHERE `collect_points` != 0 AND `beta` = %s"
+            "FROM `axobot`.`event_points` WHERE `collect_points` != 0 AND `beta` = %s AND `event_id` = %s"
         )
         async with self.bot.db_stats.write(rows_q, (now, "eventpoints_collect.rows", *tail)):
             pass
 
-    async def db_record_event_points_values(self, now: datetime):
+    async def db_record_event_points_values(self, now: datetime, event_id: str):
         "Record the event-points distribution (total, min, max, median, row count)"
-        query = "SELECT COUNT(*) FROM `axobot`.`event_points` WHERE `beta` = %s"
-        async with self.bot.db_main.read(query, (self.bot.beta,), fetchone=True, astuple=True) as result:
+        query = "SELECT COUNT(*) FROM `axobot`.`event_points` WHERE `beta` = %s AND `event_id` = %s"
+        async with self.bot.db_main.read(query, (self.bot.beta, event_id), fetchone=True, astuple=True) as result:
             if result[0] == 0:
                 return
-        tail = ("points", False, self.bot.entity_id, self.bot.beta)
+        tail = ("points", False, self.bot.entity_id, self.bot.beta, event_id)
         for label, agg in (("total", "SUM"), ("min", "MIN"), ("max", "MAX")):
             q = (
                 f"INSERT INTO `zbot` SELECT %s, %s, {agg}(`points`) AS value, 0, %s, %s, %s "
-                "FROM `axobot`.`event_points` WHERE `beta` = %s"
+                "FROM `axobot`.`event_points` WHERE `beta` = %s AND `event_id` = %s"
             )
             async with self.bot.db_stats.write(q, (now, f"eventpoints.{label}", *tail)):
                 pass
@@ -439,7 +439,7 @@ class BotStats(commands.Cog):
                         ROW_NUMBER() OVER (ORDER BY `points`) AS rn,
                         COUNT(*) OVER () AS cnt
                     FROM `axobot`.`event_points`
-                    WHERE `points` != 0 AND `beta` = %s
+                    WHERE `points` != 0 AND `beta` = %s AND `event_id` = %s
                 ) AS subq
                 WHERE subq.rn IN (FLOOR((subq.cnt + 1) / 2), CEIL((subq.cnt + 1) / 2))
         """
@@ -447,7 +447,7 @@ class BotStats(commands.Cog):
             pass
         rows_q = (
             "INSERT INTO `zbot` SELECT %s, %s, COUNT(*) AS value, 0, %s, %s, %s "
-            "FROM `axobot`.`event_points` WHERE `points` != 0 AND `beta` = %s"
+            "FROM `axobot`.`event_points` WHERE `points` != 0 AND `beta` = %s AND `event_id` = %s"
         )
         async with self.bot.db_stats.write(rows_q, (now, "eventpoints.rows", *tail)):
             pass
@@ -612,10 +612,10 @@ class BotStats(commands.Cog):
         rows.extend(await self._collect_serverlogs_enabled_rows())
 
         # Event points – use direct INSERT … SELECT queries, cannot be batched
-        if self.bot.current_event:
+        if event_id := self.bot.current_event:
             try:
-                await self.db_record_event_collect_values(now)
-                await self.db_record_event_points_values(now)
+                await self.db_record_event_collect_values(now, event_id)
+                await self.db_record_event_points_values(now, event_id)
             except Exception as err:  # pylint: disable=broad-except
                 self.bot.dispatch("error", err, "When recording event points")
 
